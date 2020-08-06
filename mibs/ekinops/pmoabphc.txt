@@ -1,0 +1,3241 @@
+-- *****************************************************************
+-- EKINOPS-pmoabphc.TXT:  MIB
+--
+--MIB Part Number:3MI00208AABE
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-PmOabphc-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulepmoabphc MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "Creation"
+	REVISION "201107060000Z"
+	DESCRIPTION
+	  "Initial Version."
+	
+	REVISION "201107060000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "201302080000Z"
+	DESCRIPTION
+	  "Ext Pump alarms"
+	REVISION "201307010000Z"
+	DESCRIPTION
+	  "Constant Gain function"
+	REVISION "201309160000Z"
+	DESCRIPTION
+	  "Help change"
+	REVISION "201312020000Z"
+	DESCRIPTION
+	  "Ext Pump Fail insertion"
+	REVISION "201403260000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201412100000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 51 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmoabphcalarms OBJECT IDENTIFIER ::= { modulepmoabphc 2 }	
+pmoabphcAlmOther OBJECT IDENTIFIER ::= { pmoabphcalarms 1 }
+pmoabphcAlmOtherNurg OBJECT IDENTIFIER ::= { pmoabphcAlmOther 1 }
+pmoabphcAlmOtherUrg OBJECT IDENTIFIER ::= { pmoabphcAlmOther 2 }
+pmoabphcAlmOtherCrit OBJECT IDENTIFIER ::= { pmoabphcAlmOther 3 }
+
+pmoabphcAlmClient OBJECT IDENTIFIER ::= { pmoabphcalarms 2 }
+pmoabphcAlmClientNurg OBJECT IDENTIFIER ::= { pmoabphcAlmClient 1 }
+pmoabphcAlmClientUrg OBJECT IDENTIFIER ::= { pmoabphcAlmClient 2 }
+pmoabphcAlmClientCrit OBJECT IDENTIFIER ::= { pmoabphcAlmClient 3 }
+	
+pmoabphcAlmLine OBJECT IDENTIFIER ::= { pmoabphcalarms 3 }
+pmoabphcAlmLineNurg OBJECT IDENTIFIER ::= { pmoabphcAlmLine 1 }
+pmoabphcAlmLineUrg OBJECT IDENTIFIER ::= { pmoabphcAlmLine 2 }
+pmoabphcAlmLineCrit OBJECT IDENTIFIER ::= { pmoabphcAlmLine 3 }
+
+
+pmoabphcmeasures OBJECT IDENTIFIER ::= { modulepmoabphc 3 }	
+pmoabphcMesrOther OBJECT IDENTIFIER ::= { pmoabphcmeasures 1 }	
+pmoabphcMesrClient OBJECT IDENTIFIER ::= { pmoabphcmeasures 2 }	
+pmoabphcMesrLine OBJECT IDENTIFIER ::= { pmoabphcmeasures 3 }	
+
+
+pmoabphccontrolsWrite OBJECT IDENTIFIER ::= { modulepmoabphc 6 }
+pmoabphcCtrlOther OBJECT IDENTIFIER ::= { pmoabphccontrolsWrite 1 }
+pmoabphcCtrlClient OBJECT IDENTIFIER ::= { pmoabphccontrolsWrite 2 }
+pmoabphcCtrlLine OBJECT IDENTIFIER ::= { pmoabphccontrolsWrite 3 }
+
+pmoabphcri OBJECT IDENTIFIER ::= { modulepmoabphc 7 }
+
+
+pmoabphcConfig OBJECT IDENTIFIER ::= { modulepmoabphc 9 }
+
+pmoabphctraps OBJECT IDENTIFIER ::= { modulepmoabphc 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+PmoabphcpreampMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on OA preamp"
+    SYNTAX INTEGER {
+		oabphcpreampdefaultmode(0),
+		oabphcpreampconstantcurrentmode(1),
+		oabphcpreampconstantpowermode(2)
+		oabphcpreampconstantgainmode(3)
+		oabphcpreamppoutpinmode(4)
+		oabphcpreampmanualmode(5)
+		oabphcpreampfeedforwardmode(6)
+		oabphcpreamptransientsupmode(7)
+
+           }
+
+PmoabphcboosterMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on OA booster"
+    SYNTAX INTEGER {
+		oabphcboosterdefaultmode(0),
+		oabphcboosterconstantcurrentmode(1),
+		oabphcboosterconstantpowermode(2)
+		oabphcboosterconstantgainmode(3)
+		oabphcboosterpoutpinmode(4)
+		oabphcboostermanualmode(5)
+		oabphcboosterfeedforwardmode(6)
+		oabphcboostertransientsupmode(7)
+           }
+
+
+PmoabphcaprMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on APR"
+    SYNTAX INTEGER {
+		oabphcaproffmode(0),
+		oabphcaprsemiautomode(1),
+		oabphcaprautomode(2)
+		oabphcaprlossforwardingmode(3)
+		oabphcaprrepeatmode(4)
+
+           }
+
+PmoabphcPreampGainAdjMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on Gain"
+    SYNTAX INTEGER {
+		oabphcpreampgainadjmanualmode(0),
+		oabphcpreampgainadjsemiautomode(1),
+		oabphcpreampgainadjautomode(2)
+
+           }
+
+PmoabphcBoosterGainAdjMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on Gain"
+    SYNTAX INTEGER {
+		oabphcboostergainadjmanualmode(0),
+		oabphcboostergainadjsemiautomode(1),
+		oabphcboostergainadjautomode(2)
+
+           }
+
+PmoabphcPreampCstGainAdjMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes when constant Gain"
+    SYNTAX INTEGER {
+		oabphcpreampcstgainadjsemiautomode(1),
+		oabphcpreampcstgainadjautomode(2)
+
+           }
+
+PmoabphcBoosterCstGainAdjMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes when constant Gain"
+    SYNTAX INTEGER {
+		oabphcboostercstgainadjsemiautomode(1),
+		oabphcboostercstgainadjautomode(2)
+
+           }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmoabphcRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmoabphcri 2 }
+  
+pmoabphcRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmoabphcri 3 }
+  
+pmoabphcRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmoabphcri 4 }
+
+pmoabphcRinvSwFoa OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Optical device driver description: This OID contains
+	 the description of the driver of the optical devices 
+	(Booster and Pre-Amp)"
+  ::= { pmoabphcri 5 }
+  
+  
+pmoabphcRinvBoosterTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmoabphcRinvBoosterEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the Boosters on the selected module"
+      ::= { pmoabphcri 6 }
+
+pmoabphcRinvBoosterEntry OBJECT-TYPE
+        SYNTAX  PmoabphcRinvBoosterEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the Boosters table"
+        INDEX   { pmoabphcRinvBoosterIndex }
+        ::= { pmoabphcRinvBoosterTable 1 }
+    
+
+
+PmoabphcRinvBoosterEntry::=
+        SEQUENCE {
+          pmoabphcRinvBoosterIndex 
+              Integer32,
+          pmoabphcRinvBooster
+              DisplayString
+        }
+
+
+    pmoabphcRinvBoosterIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Booster table"
+        ::= { pmoabphcRinvBoosterEntry 1 }
+
+
+    pmoabphcRinvBooster OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the Booster: This OID contains the inventory for the Booster"
+        ::= { pmoabphcRinvBoosterEntry 2 }
+
+
+
+
+pmoabphcRinvPreAmpTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmoabphcRinvPreAmpEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the PreAmps on the selected module"
+      ::= { pmoabphcri 7 }
+
+pmoabphcRinvPreAmpEntry OBJECT-TYPE
+        SYNTAX  PmoabphcRinvPreAmpEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the PreAmp table"
+        INDEX   { pmoabphcRinvPreAmpIndex }
+        ::= { pmoabphcRinvPreAmpTable 1 }
+    
+
+
+PmoabphcRinvPreAmpEntry::=
+        SEQUENCE {
+          pmoabphcRinvPreAmpIndex 
+              Integer32,
+          pmoabphcRinvPreAmp
+              DisplayString
+        }
+
+
+    pmoabphcRinvPreAmpIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for PreAmp table"
+        ::= { pmoabphcRinvPreAmpEntry 1 }
+
+
+    pmoabphcRinvPreAmp OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the PreAmp: This OID contains the inventory for the PreAmp"
+        ::= { pmoabphcRinvPreAmpEntry 2 }
+
+
+
+  
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmoabphcAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmoabphcAlmOtherCrit 0 }
+
+
+
+
+pmoabphcAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 16 }
+
+
+
+pmoabphcAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 15 }
+
+
+
+pmoabphcAlmExtPump2NotLocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        External Pump2 Not Detected :This 
+        OID indicates that the second external 
+        pump is not detected by the amplifier 
+        module  <Help>  This alarm indicates 
+        if the second external pump is
+         detected by the amplifier module 
+        <Condtype> EXT_PUMP2_NOT_LOCKED 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 13 }
+
+
+
+pmoabphcAlmExtPump1NotLocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        External Pump1 Not Detected :This 
+        OID indicates that the first external 
+        pump is not detected by the amplifier 
+        module  <Help>  This alarm indicates 
+        if the first external pump is detected 
+        by the amplifier module <Condtype> 
+        EXT_PUMP1_NOT_LOCKED <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 12 }
+
+
+
+pmoabphcAlmDwEdfaInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Not Initialized :This
+         OID indicates that the initialisation 
+        of the Pre-Amp is not completed 
+         <Help>  This status indicates
+         if the Pre-Amp has been correctly 
+        initialized <Condtype> DW_EDFA_INIT_NOT_COMPL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 11 }
+
+
+
+pmoabphcAlmUpEdfaInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Not Initialized :This
+         OID indicates that the initialisation 
+        of the Booster is not completed 
+         <Help>  This status indicates
+         if the Booster has been correctly 
+        initialized <Condtype> UP_EDFA_INIT_NOT_COMPL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 10 }
+
+
+
+pmoabphcAlmModGlobFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MOD_GLOB_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 9 }
+
+
+
+pmoabphcAlmAprOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Automatic Power Reduction :This 
+        OID indicates that the APR algorithm 
+        has been operated and the  output 
+        of the lasers are shutdown  <Help> 
+          The APR algorithm has been completed 
+         <Condtype> APR_ON <Probcause>
+         other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 2 }
+
+
+
+pmoabphcAlmMaintenanceMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Maintenance Mode :This OID indicates 
+        that the PM is in maintenance mode 
+         <Help>  This status indiates if 
+        the module is currently in maintenance 
+        mode <Condtype> MAINTENANCE_MODE 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmoabphcAlmsynthAlm2 OBJECT IDENTIFIER ::= { pmoabphcAlmOtherNurg 2 }
+
+
+
+
+pmoabphcAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> bandwidthReduced(4) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm2 3 }
+
+
+
+pmoabphcAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> bandwidthReduced(4) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm2 2 }
+
+
+
+pmoabphcAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> bandwidthReduced(4) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm7 article
+--- *****************************************************
+pmoabphcAlmsynthAlm7 OBJECT IDENTIFIER ::= { pmoabphcAlmLineCrit 7 }
+
+
+
+
+pmoabphcAlmLineExtPumpFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster External Pump Fail :This 
+        OID indicates that the external 
+        pump linked to the Booster is in 
+        fail condition   <Help>  This alarm 
+        indicates if the external pump
+         linked to the Booster is in fail 
+        condition <Condtype> LINE_EXT_PUMP_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm7 13 }
+
+
+
+pmoabphcAlmLineFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line Port Failure :This OID indicates 
+        a failure on the line port <Condtype> 
+        LINE_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm7 12 }
+
+
+
+pmoabphcAlmLineDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Line Optical Module DDM 
+        :This OID indicates an alarm is 
+        present coming out of Line optical 
+        interface DDM <Condtype> LINE_DDM_ALM 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm7 10 }
+
+
+
+pmoabphcAlmLineDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Line Optical Module 
+        DDM :This OID indicates a warning 
+        is present coming out of Line optical 
+        interface DDM <Condtype> LINE_DDM_WARNING 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm7 9 }
+
+
+
+pmoabphcAlmLineTxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Optical Output Shutdown 
+        :This OID indicates the Booster 
+        optical output power is on  <Help> 
+         This status indicates if the Booster 
+        laser pump is ON or OFF <Condtype> 
+        LINE_TX_OFF <Probcause> other (1) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm7 5 }
+
+
+
+pmoabphcAlmLineHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line Port HW Failure :This OID 
+        indicates a failure on line port, 
+        most probably caused by a HW issue 
+        <Condtype> LINE_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm7 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm8 article
+--- *****************************************************
+pmoabphcAlmsynthAlm8 OBJECT IDENTIFIER ::= { pmoabphcAlmClientCrit 8 }
+
+
+
+
+pmoabphcAlmClientExtPumpFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp External Pump Fail :This 
+        OID indicates that the external 
+        pump linked to the Pre-Amp is in 
+        fail condition   <Help>  This alarm 
+        indicates if the external pump
+         linked to the Pre-Amp is in fail 
+        condition <Condtype> CLIENT_EXT_PUMP_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm8 13 }
+
+
+
+pmoabphcAlmClientFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Client Port Failure :This OID
+         indicates a failure on the Client 
+        port <Condtype> CLIENT_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm8 12 }
+
+
+
+pmoabphcAlmClientDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Client Optical Module 
+        DDM :This OID indicates an alarm 
+        is present coming out of Client 
+        optical interface DDM <Condtype> 
+        CLIENT_DDM_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm8 10 }
+
+
+
+pmoabphcAlmClientDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Client Optical Module 
+        DDM :This OID indicates a warning 
+        is present coming out of Client 
+        optical interface DDM <Condtype> 
+        CLIENT_DDM_WARNING <Probcause>
+         equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm8 9 }
+
+
+
+pmoabphcAlmClientTxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Optical Output Shutdown 
+        :This OID indicates the Pre-Amp 
+        optical output power is on  <Help> 
+         This status indicates if the Pre-Amp 
+        laser pump transceiver laser is 
+        ON or OFF <Condtype> CLIENT_TX_OFF 
+        <Probcause> other (1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm8 5 }
+
+
+
+pmoabphcAlmClientHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Client Port HW Failure :This OID 
+        indicates a failure on Client port, 
+        most probably caused by a HW issue 
+        <Condtype> CLIENT_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoabphcAlmsynthAlm8 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaAlarms1 article
+--- *****************************************************
+pmoabphcAlmclientEdfaAlarms1 OBJECT IDENTIFIER ::= { pmoabphcAlmClientUrg 32 }
+
+
+
+
+pmoabphcAlmClientBiasHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Bias High Alarm :This
+         OID indicates that the Bias is 
+        higher than the alarm theshold
+         of the Pre-Amp Optical Module
+          <Help>  This alarm indicates
+         if the Pre-Amp bias is too high 
+        <Condtype> CLIENT_BIAS_HIGH_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms1 8 }
+
+
+
+pmoabphcAlmClientBiasLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Bias Low Alarm :This OID 
+        indicates that the Bias is lower 
+        than the alarm theshold of the
+         Pre-Amp Optical Module  <Help> 
+         This alarm indicates if the Pre-Amp 
+        bias is too low <Condtype> CLIENT_BIAS_LOW_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms1 7 }
+
+
+
+pmoabphcAlmClientOutputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Tx Pwr High Alarm :This 
+        OID indicates that the Transmit 
+        Power is higher than the alarm
+         theshold of the Pre-Amp Optical 
+        Module  <Help>  This alarm indicates 
+        if the Pre-Amp tx power is too
+         high <Condtype> CLIENT_OUTPUT_PWR_HIGH_ALARM 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms1 6 }
+
+
+
+pmoabphcAlmClientOutputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Tx Pwr Low Alarm :This 
+        OID indicates that the Transmit 
+        Power is lower than the alarm theshold 
+        of the Pre-Amp Optical Module 
+         <Help>  This alarm indicates if 
+        the Pre-Amp tx power is too low 
+        <Condtype> CLIENT_OUTPUT_PWR_LOW_ALARM 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms1 5 }
+
+
+
+pmoabphcAlmClientInputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Rx Pwr High Alarm :This 
+        OID indicates that the Receive
+         Power is higher than the alarm 
+        theshold of the Booster Optical 
+        Module  <Help>  This alarm indicates 
+        if the Booster rx power is too
+         high <Condtype> CLIENT_INPUT_PWR_HIGH_ALARM 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms1 4 }
+
+
+
+pmoabphcAlmClientInputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Rx Pwr Low Alarm :This 
+        OID indicates that the Receive
+         Power is lower than the alarm
+         theshold of the Booster Optical 
+        Module  <Help>  This alarm indicates 
+        if the Booster rx power is too
+         low <Condtype> CLIENT_INPUT_PWR_LOW_ALARM 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms1 3 }
+
+
+
+pmoabphcAlmClientGainHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Gain High Alarm :This
+         OID indicates that the Gain is 
+        higher than the alarm threshold 
+        of the Pre-Amp Module  <Help> 
+         This alarm indicates if the Pre-Amp 
+        gain is too high <Condtype> CLIENT_GAIN_HIGH_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms1 2 }
+
+
+
+pmoabphcAlmClientGainLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Gain Low Alarm :This OID 
+        indicates that the Gain is lower 
+        than the alarm theshold of the
+         Pre-Amp Module  <Help>  This alarm 
+        indicates if the Pre-Amp gain is 
+        too low <Condtype> CLIENT_GAIN_LOW_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaWarnings article
+--- *****************************************************
+pmoabphcAlmclientEdfaWarnings OBJECT IDENTIFIER ::= { pmoabphcAlmClientNurg 33 }
+
+
+
+
+pmoabphcAlmClientBiasHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Bias High Warning :This 
+        OID indicates that the Bias is
+         higher than the Warning theshold 
+        of the Pre-Amp Optical Module 
+         <Help>  This warning indicates 
+        if the Pre-Amp bias is too high 
+        <Condtype> CLIENT_BIAS_HIGH_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaWarnings 8 }
+
+
+
+pmoabphcAlmClientBiasLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Bias Low Warning :This 
+        OID indicates that the Bias is
+         lower than the Warning theshold 
+        of the Pre-Amp Optical Module 
+         <Help>  This warning indicates 
+        if the Pre-Amp bias is too low
+         <Condtype> CLIENT_BIAS_LOW_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaWarnings 7 }
+
+
+
+pmoabphcAlmClientOutputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Tx Pwr High Warning :This 
+        OID indicates that the Transmit 
+        Power is higher than the Warning 
+        theshold of the Pre-Amp Optical 
+        Module  <Help>  This warning indicates 
+        if the Pre-Amp tx power is too
+         high <Condtype> CLIENT_OUTPUT_PWR_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaWarnings 6 }
+
+
+
+pmoabphcAlmClientOutputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Tx Pwr Low Warning :This 
+        OID indicates that the Transmit 
+        Power is lower than the Warning 
+        theshold of the Pre-Amp Optical 
+        Module  <Help>  This warning indicates 
+        if the Pre-Amp tx power is too
+         low <Condtype> CLIENT_OUTPUT_PWR_LOW_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaWarnings 5 }
+
+
+
+pmoabphcAlmClientInputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Rx Pwr High Warning :This 
+        OID indicates that the Receive
+         Power is higher than the Warning 
+        theshold of the Booster Optical 
+        Module  <Help>  This warning indicates 
+        if the Booster rx power is too
+         high <Condtype> CLIENT_INPUT_PWR_HIGH_WARNING 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaWarnings 4 }
+
+
+
+pmoabphcAlmClientInputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Rx Pwr Low Warning :This 
+        OID indicates that the Receive
+         Power is lower than the Warning 
+        theshold of the Booster Optical 
+        Module  <Help>  This warning indicates 
+        if the Booster rx power is too
+         low <Condtype> CLIENT_INPUT_PWR_LOW_WARNING 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaWarnings 3 }
+
+
+
+pmoabphcAlmClientGainHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Gain High Warning :This 
+        OID indicates that the Gain is
+         higher than the Warning threshold 
+        of the Pre-Amp Module  <Help> 
+         This alarm indicates if the Pre-Amp 
+        gain is too high <Condtype> CLIENT_GAIN_HIGH_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaWarnings 2 }
+
+
+
+pmoabphcAlmClientGainLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Gain Low Warning :This 
+        OID indicates that the Gain is
+         lower than the Warning theshold 
+        of the Pre-Amp Module  <Help> 
+         This alarm indicates if the Pre-Amp 
+        gain is too low <Condtype> CLIENT_GAIN_LOW_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaWarnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaAlarms2 article
+--- *****************************************************
+pmoabphcAlmclientEdfaAlarms2 OBJECT IDENTIFIER ::= { pmoabphcAlmClientCrit 35 }
+
+
+
+
+pmoabphcAlmClientExtPumpEdfaLowCurrent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Pump Low Current :This 
+        OID indicates that the EDFA pump 
+        current of Pre-Amp is too low because 
+        of the external pump high power<Help> 
+         This alarm (only active when there 
+        is at least on external pump) indicates 
+        that the EDFA pump current of the 
+        Pre-Amp is too low because of the 
+        external pump high power. <Condtype> 
+        CLIENT_EXT_PUMP_EDFA_LOW_CURRENT 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5)  <Polarity>
+         (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms2 5 }
+
+
+
+pmoabphcAlmClientEdfaLos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Loss Of Signal :This OID 
+        indicates a Loss of Signal on the 
+        Booster Optical Module  <Help>
+          This alarm indicates if an optical 
+        signal is detected on the Booster 
+        input <Condtype> CLIENT_EDFA_LOS 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms2 4 }
+
+
+
+pmoabphcAlmClientEdfaLaserFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Pump Laser Fail :This
+         OID indicates a Transmit Laser 
+        Fail on the Pre-Amp Optical Module 
+         <Help>  This alarm indicates if 
+        the laser of the Pre-Amp is in
+         fail condition <Condtype> CLIENT_EDFA_LASER_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms2 3 }
+
+
+
+pmoabphcAlmClientEdfaTecFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp TEC Fail :This OID indicates 
+        that the TEC is in fail condition 
+        on the Pre-Amp Optical Module 
+         <Help>  This alarm indicates if 
+        the TEC of the Pre-Amp is in fail 
+        condition <Condtype> CLIENT_EDFA_TEC_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms2 2 }
+
+
+
+pmoabphcAlmClientEdfaNr OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Optical Module Not Ready 
+        :This OID indicates that the Pre-Amp 
+        Optical Module is not ready  <Help> 
+         This status indicates if the Pre-Amp 
+        has been correctly initialized
+         <Condtype> CLIENT_EDFA_NR <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmclientEdfaAlarms2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaAlarms1 article
+--- *****************************************************
+pmoabphcAlmlineEdfaAlarms1 OBJECT IDENTIFIER ::= { pmoabphcAlmLineUrg 40 }
+
+
+
+
+pmoabphcAlmLineBiasHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Bias High Alarm :This
+         OID indicates that the Bias is 
+        higher than the alarm theshold
+         of the Booster Optical Module
+          <Help>  This alarm indicates
+         if the Booster bias is too high 
+        <Condtype> LINE_BIAS_HIGH_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms1 8 }
+
+
+
+pmoabphcAlmLineBiasLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Bias Low Alarm :This OID 
+        indicates that the Bias is lower 
+        than the alarm theshold of the
+         Booster Optical Module  <Help> 
+         This alarm indicates if the Booster 
+        bias is too low <Condtype> LINE_BIAS_LOW_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms1 7 }
+
+
+
+pmoabphcAlmLineOutputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Tx Pwr High Alarm :This 
+        OID indicates that the Transmit 
+        Power is higher than the alarm
+         theshold of the Booster Optical 
+        Module  <Help>  This alarm indicates 
+        if the Booster tx power is too
+         high <Condtype> LINE_OUTPUT_PWR_HIGH_ALARM 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms1 6 }
+
+
+
+pmoabphcAlmLineOutputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Tx Pwr Low Alarm :This 
+        OID indicates that the Transmit 
+        Power is lower than the alarm theshold 
+        of the Booster Optical Module 
+         <Help>  This alarm indicates if 
+        the Booster tx power is too low 
+        <Condtype> LINE_OUTPUT_PWR_LOW_ALARM 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms1 5 }
+
+
+
+pmoabphcAlmLineInputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Rx Pwr High Alarm :This 
+        OID indicates that the Receive
+         Power is higher than the alarm 
+        theshold of the Pre-Amp Optical 
+        Module  <Help>  This alarm indicates 
+        if the Pre-Amp rx power is too
+         high <Condtype> LINE_INPUT_PWR_HIGH_ALARM 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms1 4 }
+
+
+
+pmoabphcAlmLineInputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Rx Pwr Low Alarm :This 
+        OID indicates that the Receive
+         Power is lower than the alarm
+         theshold of the Pre-Amp Optical 
+        Module  <Help>  This alarm indicates 
+        if the Pre-Amp rx power is too
+         low <Condtype> LINE_INPUT_PWR_LOW_ALARM 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms1 3 }
+
+
+
+pmoabphcAlmLineGainHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Gain High Alarm :This
+         OID indicates that the Gain is 
+        higher than the alarm threshold 
+        of the Booster Module  <Help> 
+         This alarm indicates if the Booster 
+        gain is too high <Condtype> LINE_GAIN_HIGH_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms1 2 }
+
+
+
+pmoabphcAlmLineGainLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Gain Low Alarm :This OID 
+        indicates that the Gain is lower 
+        than the alarm theshold of the
+         Booster Module  <Help>  This alarm 
+        indicates if the Booster gain is 
+        too low <Condtype> LINE_GAIN_LOW_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaWarnings article
+--- *****************************************************
+pmoabphcAlmlineEdfaWarnings OBJECT IDENTIFIER ::= { pmoabphcAlmLineNurg 41 }
+
+
+
+
+pmoabphcAlmLineBiasHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Bias High Warning :This 
+        OID indicates that the Bias is
+         higher than the Warning theshold 
+        of the Booster Optical Module 
+         <Help>  This warning indicates 
+        if the Booster bias is too high 
+        <Condtype> LINE_BIAS_HIGH_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaWarnings 8 }
+
+
+
+pmoabphcAlmLineBiasLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Bias Low Warning :This 
+        OID indicates that the Bias is
+         lower than the Warning theshold 
+        of the Booster Optical Module 
+         <Help>  This warning indicates 
+        if the Booster bias is too low
+         <Condtype> LINE_BIAS_LOW_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaWarnings 7 }
+
+
+
+pmoabphcAlmLineOutputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Tx Pwr High Warning :This 
+        OID indicates that the Transmit 
+        Power is higher than the Warning 
+        theshold of the Booster Optical 
+        Module  <Help>  This warning indicates 
+        if the Booster tx power is too
+         high <Condtype> LINE_OUTPUT_PWR_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaWarnings 6 }
+
+
+
+pmoabphcAlmLineOutputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Tx Pwr Low Warning :This 
+        OID indicates that the Transmit 
+        Power is lower than the Warning 
+        theshold of the Booster Optical 
+        Module  <Help>  This warning indicates 
+        if the Booster tx power is too
+         low <Condtype> LINE_OUTPUT_PWR_LOW_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaWarnings 5 }
+
+
+
+pmoabphcAlmLineInputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Rx Pwr High Warning :This 
+        OID indicates that the Receive
+         Power is higher than the Warning 
+        theshold of the Pre-Amp Optical 
+        Module  <Help>  This warning indicates 
+        if the Pre-Amp rx power is too
+         high <Condtype> LINE_INPUT_PWR_HIGH_WARNING 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaWarnings 4 }
+
+
+
+pmoabphcAlmLineInputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Rx Pwr Low Warning :This 
+        OID indicates that the Receive
+         Power is lower than the Warning 
+        theshold of the Pre-Amp Optical 
+        Module  <Help>  This warning indicates 
+        if the Pre-Amp rx power is too
+         low <Condtype> LINE_INPUT_PWR_LOW_WARNING 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaWarnings 3 }
+
+
+
+pmoabphcAlmLineGainHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Gain High Warning :This 
+        OID indicates that the Gain is
+         higher than the Warning threshold 
+        of the Booster Module  <Help> 
+         This alarm indicates if the Booster 
+        gain is too high <Condtype> LINE_GAIN_HIGH_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaWarnings 2 }
+
+
+
+pmoabphcAlmLineGainLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Gain Low Warning :This 
+        OID indicates that the Gain is
+         lower than the Warning theshold 
+        of the Booster Module  <Help> 
+         This alarm indicates if the Booster 
+        gain is too low <Condtype> LINE_GAIN_LOW_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaWarnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaAlarms2 article
+--- *****************************************************
+pmoabphcAlmlineEdfaAlarms2 OBJECT IDENTIFIER ::= { pmoabphcAlmLineCrit 43 }
+
+
+
+
+pmoabphcAlmLineExtPumpEdfaLowCurrent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Pump Low Current :This 
+        OID indicates that the EDFA pump 
+        current of Booster is too low because 
+        of the external pump high power<Help> 
+         This alarm (only active when there 
+        is at least on external pump) indicates 
+        that the EDFA pump current of the 
+        Booster is too low because of the 
+        external pump high power. <Condtype> 
+        LINE_EXT_PUMP_EDFA_LOW_CURRENT
+         <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5)  <Polarity>
+         (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms2 5 }
+
+
+
+pmoabphcAlmLineEdfaLos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Loss Of Signal :This OID 
+        indicates a Loss of Signal on the 
+        Pre-Amp Optical Module  <Help>
+          This alarm indicates if an optical 
+        signal is detected on the Pre-Amp 
+        input <Condtype> LINE_EDFA_LOS
+         <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms2 4 }
+
+
+
+pmoabphcAlmLineEdfaLaserFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Pump Laser Fail :This
+         OID indicates a Transmit Laser 
+        Fail on the Booster Optical Module 
+         <Help>  This alarm indicates if 
+        the laser of the Booster is in
+         fail condition <Condtype> LINE_EDFA_LASER_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms2 3 }
+
+
+
+pmoabphcAlmLineEdfaTecFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster TEC Fail :This OID indicates 
+        that the TEC is in fail condition 
+        on the Booster Optical Module 
+         <Help>  This alarm indicates if 
+        the TEC of the Booster is in fail 
+        condition <Condtype> LINE_EDFA_TEC_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms2 2 }
+
+
+
+pmoabphcAlmLineEdfaNr OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Optical Module Not Ready 
+        :This OID indicates that the Booster 
+        Optical Module is not ready  <Help> 
+         This status indicates if the Booster 
+        has been correctly initialized
+         <Condtype> LINE_EDFA_NR <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmlineEdfaAlarms2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the foaAlarms article
+--- *****************************************************
+pmoabphcAlmfoaAlarms OBJECT IDENTIFIER ::= { pmoabphcAlmOtherUrg 74 }
+
+
+
+
+pmoabphcAlmTempHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Temperature High Alarm :This OID 
+        indicates that the PM temperature 
+        is higher than the alarm threshold 
+        <Condtype> TEMP_HIGH_ALARM <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmfoaAlarms 8 }
+
+
+
+pmoabphcAlmTermpLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Temperature Low Alarm :This OID 
+        indicates that the PM temperature 
+        if lower than the alarm threshold 
+        <Condtype> TERMP_LOW_ALARM <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmfoaAlarms 7 }
+
+
+
+--- *****************************************************
+---     LEAF for the foaWarnings article
+--- *****************************************************
+pmoabphcAlmfoaWarnings OBJECT IDENTIFIER ::= { pmoabphcAlmOtherNurg 75 }
+
+
+
+
+pmoabphcAlmTempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Temperature High Warning :This 
+        OID indicates that the PM temperature 
+        if higher than the Warning threshold 
+        <Condtype> TEMP_HIGH_WARNING <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmfoaWarnings 8 }
+
+
+
+pmoabphcAlmTermpLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Temperature Low Warning :This
+         OID indicates that the PM temperature 
+        if lower than the Warning threshold 
+        <Condtype> TERMP_LOW_WARNING <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoabphcAlmfoaWarnings 7 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmoabphcCtrlsynth0 OBJECT IDENTIFIER ::= { pmoabphcCtrlOther 0 }
+
+
+
+
+pmoabphcCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmoabphcCtrlsynth0 13 }
+
+
+
+pmoabphcCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmoabphcCtrlsynth0 9 }
+
+
+
+pmoabphcCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmoabphcCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmoabphcCtrlswMgnt OBJECT IDENTIFIER ::= { pmoabphcCtrlOther 5 }
+
+
+
+
+pmoabphcCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmoabphcCtrlswMgnt 3 }
+
+
+
+pmoabphcCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmoabphcCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaLaserOff article
+--- *****************************************************
+pmoabphcCtrlclientEdfaLaserOff OBJECT IDENTIFIER ::= { pmoabphcCtrlClient 32 }
+
+
+
+
+pmoabphcCtrlClientEdfaLaserOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Optical Module Laser Off 
+        :This OID switches OFF the laser 
+        of the Pre-Amp Optical Module 
+         <Help>  This control defines the 
+        laser state of the Pre-Amp
+        "
+	  ::= { pmoabphcCtrlclientEdfaLaserOff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientGainCstMonitorValue article
+--- *****************************************************
+
+pmoabphcCtrlclientGainCstMonitorValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Fiber Aging Period :This 
+        OID sets the value of the monitoring 
+        period to detect a fiber aging. 
+        (Unit = s) This value sets the
+         monitoring period to detect a
+         fiber aging.
+        "
+	  ::= { pmoabphcCtrlClient 34 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientGainCstPoutValue article
+--- *****************************************************
+
+pmoabphcCtrlclientGainCstPoutValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Ref Pout :This OID sets 
+        the value of the reference output 
+        power used to compensate the fiber 
+        aging  (active only in constant 
+        gain mode) (AV=(Gain/0,005) + 32768) 
+        (Unit = dBm) <Help> This value
+         defines the reference output power 
+        used to compensate the fiber aging
+        "
+	  ::= { pmoabphcCtrlClient 35 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientGainSettingValue article
+--- *****************************************************
+
+pmoabphcCtrlclientGainSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Gain Target :This OID
+         sets the value of the nominal
+         gain of the Pre-Amplifier Module 
+        (active only in constant output 
+        power mode) (AV=(Gain/0,005) +
+         32768) (Unit = dB)<Help> This
+         control sets the value of the
+         nominal gain of the Pre- Amplifier 
+        Module (active only in constant 
+        output power mode)
+        "
+	  ::= { pmoabphcCtrlClient 36 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientGainProcessing article
+--- *****************************************************
+pmoabphcCtrlclientGainProcessing OBJECT IDENTIFIER ::= { pmoabphcCtrlClient 37 }
+
+
+
+
+pmoabphcCtrlClientGainProc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Gain Adjustment :This
+         OID initiates the automatic nominal 
+        gain adjustment on the Pre-Amplifier 
+        Module<Help> This control initiates 
+        the automatic nominal gain adjustment 
+        on the Pre-Amplifier Module
+        "
+	  ::= { pmoabphcCtrlclientGainProcessing 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientGainCstFiberAgingMarginValue article
+--- *****************************************************
+
+pmoabphcCtrlclientGainCstFiberAgingMarginValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Aging Threshold :This
+         OID sets the threshold to consider 
+        the power drop as a fiber aging. 
+        (active only in constant gain mode) 
+        (AV=(Gain/0,005) + 32768) (Unit 
+        = dB) <Help> This value defines 
+        the threshold to consider the power 
+        drop as a fiber aging.
+        "
+	  ::= { pmoabphcCtrlClient 38 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientGainCstAdddropMarginValue article
+--- *****************************************************
+
+pmoabphcCtrlclientGainCstAdddropMarginValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp AddDrop Threshold :This 
+        OID sets the threshold to not consider 
+        the power drop as a fiber aging. 
+         (active only in constant gain
+         mode) (AV=(Gain/0,005) + 32768) 
+        (Unit = dB) <Help> This value defines 
+        the threshold to not consider the 
+        power drop as a fiber aging.
+        "
+	  ::= { pmoabphcCtrlClient 39 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaLaserOff article
+--- *****************************************************
+pmoabphcCtrllineEdfaLaserOff OBJECT IDENTIFIER ::= { pmoabphcCtrlLine 40 }
+
+
+
+
+pmoabphcCtrlLineEdfaLaserOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Optical Module Laser Off 
+        :This OID switches OFF the laser 
+        of the Booster Optical Module 
+         <Help>  This control defines the 
+        laser state of the Booster
+        "
+	  ::= { pmoabphcCtrllineEdfaLaserOff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineGainCstMonitorValue article
+--- *****************************************************
+
+pmoabphcCtrllineGainCstMonitorValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Fiber Aging Period :This 
+        OID sets the value of the monitoring 
+        period to detect a fiber aging. 
+        (Unit = s) This value sets the
+         monitoring period to detect a
+         fiber aging.
+        "
+	  ::= { pmoabphcCtrlLine 42 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineGainCstPoutValue article
+--- *****************************************************
+
+pmoabphcCtrllineGainCstPoutValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Ref Pout :This OID sets 
+        the value of the reference output 
+        power used to compensate the fiber 
+        aging  (active only in constant 
+        gain mode) (AV=(Gain/0,005) + 32768) 
+        (Unit = dBm) <Help> This value
+         defines the reference output power 
+        used to compensate the fiber aging
+        "
+	  ::= { pmoabphcCtrlLine 43 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineGainSettingValue article
+--- *****************************************************
+
+pmoabphcCtrllineGainSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Gain Target :This OID
+         sets the value of the nominal
+         gain of the Booster Module (active 
+        only in constant output power mode) 
+        (AV=(Gain/0,005) + 32768) (Unit 
+        = dB) <Help> This control sets
+         the value of the nominal gain
+         of the Booster Module (active
+         only in constant output power
+         mode)
+        "
+	  ::= { pmoabphcCtrlLine 44 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineGainProcessing article
+--- *****************************************************
+pmoabphcCtrllineGainProcessing OBJECT IDENTIFIER ::= { pmoabphcCtrlLine 45 }
+
+
+
+
+pmoabphcCtrlLineGainProc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Gain Adjustment :This
+         OID initiates the automatic nominal 
+        gain adjustment on the Booster
+         Module<Help> This control initiates 
+        the automatic nominal gain adjustment 
+        on the Booster Module
+        "
+	  ::= { pmoabphcCtrllineGainProcessing 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineGainCstFiberAgingMarginValue article
+--- *****************************************************
+
+pmoabphcCtrllineGainCstFiberAgingMarginValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Aging Threshold :This
+         OID sets the threshold to consider 
+        the power drop as a fiber aging. 
+        (active only in constant gain mode) 
+        (AV=(Gain/0,005) + 32768) (Unit 
+        = dB) <Help> This value defines 
+        the threshold to consider the power 
+        drop as a fiber aging.
+        "
+	  ::= { pmoabphcCtrlLine 46 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineGainCstAdddropMarginValue article
+--- *****************************************************
+
+pmoabphcCtrllineGainCstAdddropMarginValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster AddDrop Threshold :This 
+        OID sets the threshold to not consider 
+        the power drop as a fiber aging. 
+         (active only in constant gain
+         mode) (AV=(Gain/0,005) + 32768) 
+        (Unit = dB) <Help> This value defines 
+        the threshold to not consider the 
+        power drop as a fiber aging.
+        "
+	  ::= { pmoabphcCtrlLine 47 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmoabphcCtrlledTest OBJECT IDENTIFIER ::= { pmoabphcCtrlOther 73 }
+
+
+
+
+pmoabphcCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmoabphcCtrlledTest 3 }
+
+
+
+pmoabphcCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmoabphcCtrlledTest 2 }
+
+
+
+pmoabphcCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmoabphcCtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the maintMode article
+--- *****************************************************
+pmoabphcCtrlmaintMode OBJECT IDENTIFIER ::= { pmoabphcCtrlOther 75 }
+
+
+
+
+pmoabphcCtrlMaintenance OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Maintenance Mode :This OID
+         sets the PM in maintenance mode 
+         <Help>  This control enables the 
+        maintenance mode of the module
+        "
+	  ::= { pmoabphcCtrlmaintMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the aprRestart article
+--- *****************************************************
+pmoabphcCtrlaprRestart OBJECT IDENTIFIER ::= { pmoabphcCtrlOther 76 }
+
+
+
+
+pmoabphcCtrlAprManualRestart OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        APR Manual Restart :This OID initiates 
+        the Restart mechanism to retrieve 
+        from the APR state.<Help> This
+         control initiates the Restart
+         mechanism to retrieve from the 
+        APR state.
+        "
+	  ::= { pmoabphcCtrlaprRestart 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaBiasMeas article
+--- *****************************************************
+
+pmoabphcMesrclientEdfaBiasMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Pump Laser Current :This 
+        OID gives the pump laser current 
+        of the Pre-Amp Optical Module (Current 
+        =AV/100) (Unit = mA)  <Help>  This 
+        measure gives the bias of the Pre-Amp 
+        pump laser
+        "
+	  ::= { pmoabphcMesrClient 32 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaTxpwrMeas article
+--- *****************************************************
+
+pmoabphcMesrclientEdfaTxpwrMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Tx Power :This OID gives 
+        the transmit power value of the 
+        Pre-Amp Optical Module (Power =(AV-32768)*0,005) 
+         (Unit = dBm)  <Help>  This measure 
+        gives the Tx optical power of the 
+        Pre-Amp
+        "
+	  ::= { pmoabphcMesrClient 33 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaRxpwrMeas article
+--- *****************************************************
+
+pmoabphcMesrclientEdfaRxpwrMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Rx Power :This OID gives 
+        the receive power value of the
+         Booster Optical Module (Power
+         =(AV-32768)*0,005) (Unit = dBm) 
+         <Help>  This measure gives the 
+        Rx optical power of the Booster
+        "
+	  ::= { pmoabphcMesrClient 34 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaGainMeas article
+--- *****************************************************
+
+pmoabphcMesrclientEdfaGainMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Gain Target :This OID
+         gives the gain value of the Pre-Amp 
+        Module  (Gain =(AV-32768)*0,005) 
+        (Unit = dB)  <Help> This information 
+        gives the target gain of the amplifier 
+        for optimal performance
+        "
+	  ::= { pmoabphcMesrClient 35 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientCorrectedGain article
+--- *****************************************************
+
+pmoabphcMesrclientCorrectedGain OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Gain :This OID gives the 
+        gain value of the Pre-Amp Module 
+        corrected by the ASE compensation 
+        mechanism (Gain =(AV-32768)*0,005) 
+        (Unit = dB)   <Help>  This measure 
+        gives the effective gain of the 
+        amplifier
+        "
+	  ::= { pmoabphcMesrClient 38 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaBiasMeas article
+--- *****************************************************
+
+pmoabphcMesrlineEdfaBiasMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Pump Laser Current :This 
+        OID gives the pump laser current 
+        of the Booster Optical Module 
+         (Current =AV/100) (Unit = mA)
+          <Help>  This measure gives the 
+        bias of the Booster pump laser
+        "
+	  ::= { pmoabphcMesrLine 40 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaTxpwrMeas article
+--- *****************************************************
+
+pmoabphcMesrlineEdfaTxpwrMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Tx Power :This OID gives 
+        the transmit power value of the 
+        Booster Optical Module (Power =(AV-32768)*0,005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Tx optical power of the 
+        Booster
+        "
+	  ::= { pmoabphcMesrLine 41 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaRxpwrMeas article
+--- *****************************************************
+
+pmoabphcMesrlineEdfaRxpwrMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp Rx Power :This OID gives 
+        the receive power value of the
+         Pre-Amp Optical Module (Power
+         =(AV-32768)*0,005) (Unit = dBm) 
+         <Help>  This measure gives the 
+        Rx optical power of the Pre-Amp
+        "
+	  ::= { pmoabphcMesrLine 42 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaGainMeas article
+--- *****************************************************
+
+pmoabphcMesrlineEdfaGainMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Gain Target :This OID
+         gives the gain value of the Booster 
+        Module  (Gain =(AV-32768)*0,005) 
+        (Unit = dB)  <Help>  This information 
+        gives the target gain of the amplifier 
+        for optimal performance
+        "
+	  ::= { pmoabphcMesrLine 43 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineCorrectedGain article
+--- *****************************************************
+
+pmoabphcMesrlineCorrectedGain OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster Gain :This OID gives the 
+        gain value of the Booster Module 
+        corrected by the ASE compensation 
+        mechanism (Gain =(AV-32768)*0,005) 
+        (Unit = dB)   <Help>  This measure 
+        gives the effective gain of the 
+        amplifier
+        "
+	  ::= { pmoabphcMesrLine 46 }
+
+
+
+--- *****************************************************
+---     LEAF for the tempMeas article
+--- *****************************************************
+
+pmoabphcMesrtempMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature :This OID gives 
+        the temperature of the PM  (Temperature 
+        =AV/256) (Unit = C)  <Help>  This 
+        measure gives the temperature of 
+        the module
+        "
+	  ::= { pmoabphcMesrOther 72 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group noValue
+--- *****************************************************
+
+pmoabphcCfgNoValue OBJECT IDENTIFIER ::= { pmoabphcConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2111
+--- *****************************************************
+
+pmoabphctableclientStartup OBJECT IDENTIFIER ::= { pmoabphcCfgNoValue 1 }
+
+
+
+pmoabphcCfgclientEdfaLaserCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client Laser 
+        :This OID configures the default 
+        initialisation settings on the
+         client laser.
+        "
+	  ::= { pmoabphctableclientStartup 2 }
+
+
+
+pmoabphcCfgclientEdfaLaserMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client mode 
+        :This OID configures the default 
+        mode on the client amplifier.
+        "
+	  ::= { pmoabphctableclientStartup 3 }
+
+
+
+pmoabphcCfgclientGainValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client Gain 
+        :This OID configures the default 
+        gain on the client amplifier.
+        "
+	  ::= { pmoabphctableclientStartup 4 }
+
+
+
+pmoabphcCfgclientTiltValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client Tilt 
+        :This OID configures the default 
+        tilt on the client amplifier.
+        "
+	  ::= { pmoabphctableclientStartup 5 }
+
+
+
+pmoabphcCfgclientMsaLoss OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client MSA 
+        :This OID configures the default 
+        MSA value on the client amplifier.
+        "
+	  ::= { pmoabphctableclientStartup 6 }
+
+
+
+pmoabphcCfgclientOutputPowerValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client Output 
+        power :This OID configures the
+         default Output power value on
+         the client amplifier.
+        "
+	  ::= { pmoabphctableclientStartup 7 }
+
+
+
+pmoabphcCfgclientAseCompensation OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client ASE 
+        :This OID configures the default 
+        ASE compensation value on the client 
+        amplifier.
+        "
+	  ::= { pmoabphctableclientStartup 8 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lineStartUp
+--- *****************************************************
+
+pmoabphcCfgLineStartUp OBJECT IDENTIFIER ::= { pmoabphcConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmoabphctablelineStartup OBJECT IDENTIFIER ::= { pmoabphcCfgLineStartUp 1 }
+
+
+
+pmoabphcCfglineEdfaLaserCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line Laser 
+        :This OID configures the default 
+        initialisation settings on the
+         line laser.
+        "
+	  ::= { pmoabphctablelineStartup 2 }
+
+
+
+pmoabphcCfglineEdfaLaserMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line mode
+         :This OID configures the default 
+        mode on the line amplifier.
+        "
+	  ::= { pmoabphctablelineStartup 3 }
+
+
+
+pmoabphcCfglineGainValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line Gain
+         :This OID configures the default 
+        gain on the line amplifier.
+        "
+	  ::= { pmoabphctablelineStartup 4 }
+
+
+
+pmoabphcCfglineTiltValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line Tilt
+         :This OID configures the default 
+        tilt on the line amplifier.
+        "
+	  ::= { pmoabphctablelineStartup 5 }
+
+
+
+pmoabphcCfglineMsaLoss OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line MSA :This 
+        OID configures the default MSA
+         value on the line amplifier.
+        "
+	  ::= { pmoabphctablelineStartup 6 }
+
+
+
+pmoabphcCfglineOutputPowerValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line Output 
+        power :This OID configures the
+         default Output power value on
+         the line amplifier.
+        "
+	  ::= { pmoabphctablelineStartup 7 }
+
+
+
+pmoabphcCfglineAseCompensation OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line ASE :This 
+        OID configures the default ASE
+         compensation value on the line 
+        amplifier.
+        "
+	  ::= { pmoabphctablelineStartup 8 }
+
+
+
+pmoabphcCfgaprMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on module :This 
+        OID configures the default mode 
+        on the APR
+        "
+	  ::= { pmoabphctablelineStartup 11 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmoabphcCfgLabels OBJECT IDENTIFIER ::= { pmoabphcConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmoabphcCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmoabphcCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmoabphcCfgLabels 1 }
+
+
+pmoabphcCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmoabphcCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmoabphcCfgLabelclientIndex }
+	::= { pmoabphcCfgLabelclientTable 1 }
+
+
+PmoabphcCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmoabphcCfgLabelclientIndex
+		INTEGER,
+	pmoabphcCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmoabphcCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmoabphcCfgLabelclientEntry 1 }
+
+
+pmoabphcCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmoabphcCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmoabphcCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmoabphcCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmoabphcCfgLabels 2 }
+
+
+pmoabphcCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmoabphcCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmoabphcCfgLabellineIndex }
+	::= { pmoabphcCfgLabellineTable 1 }
+
+
+PmoabphcCfgLabellineEntry ::=
+	SEQUENCE {
+	pmoabphcCfgLabellineIndex
+		INTEGER,
+	pmoabphcCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmoabphcCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmoabphcCfgLabellineEntry 1 }
+
+
+pmoabphcCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmoabphcCfgLabellineEntry 3 }
+
+
+
+pmoabphcCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmoabphcConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmoabphctrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmoabphctraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     GLOBAL TRAPS
+--- *****************************************************
+
+pmoabphcLineTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmLineDdmWarning, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Line Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmoabphcAlmLineDdmWarning "on", pmoabphctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Pre-Amp input or Booster Output of PMOABPHC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pmoabphctraps 30 }
+
+pmoabphcLineTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmLineDdmWarning, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Line Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOABPHC Line Not Urgent ON"}
+	--&MATCH       { pmoabphcAlmLineDdmWarning "on", pmoabphctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Pre-Amp input or Booster Output of PMOABPHC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pmoabphctraps 31 }
+
+pmoabphcLineTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmLineDdmAlm, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Line Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoabphcAlmLineDdmAlm "on", pmoabphctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm appears on Pre-Amp input or Booster Output of PMOABPHC in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pmoabphctraps 32 }
+
+pmoabphcLineTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmLineDdmAlm, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Line Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOABPHC Line Urgent ON"}
+	--&MATCH       { pmoabphcAlmLineDdmAlm "on", pmoabphctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Pre-Amp input or Booster Output of PMOABPHC in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pmoabphctraps 33 }
+
+pmoabphcLineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmLineFail, pmoabphcAlmLineHwFail, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Line Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmoabphcAlmLineFail "on", pmoabphcAlmLineHwFail "*", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on Pre-Amp input or Booster Output of PMOABPHC in slot $3 ($A)"
+	
+	--&FILTNAME    "PMOABPHC Line HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoabphcAlmLineFail "*", pmoabphcAlmLineHwFail "on", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on Pre-Amp input or Booster Output of PMOABPHC in slot $3 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmoabphctraps 34 }
+
+pmoabphcLineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmLineFail, pmoabphcAlmLineHwFail, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Line Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOABPHC Line Fail ON"}
+	--&MATCH       { pmoabphcAlmLineFail "on", pmoabphcAlmLineHwFail "*", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on Pre-Amp input or Booster Output of PMOABPHC in slot $3 ($A)"
+	
+	--&FILTNAME    "PMOABPHC Line HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoabphcAlmLineFail "*", pmoabphcAlmLineHwFail "on", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on Pre-Amp input or Booster Output of PMOABPHC in slot $3 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmoabphctraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     PORTS TRAPS
+--- *****************************************************
+
+pmoabphcClientTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmClientDdmWarning, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Client Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmoabphcAlmClientDdmWarning "on", pmoabphctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Booster input or Pre-Amp Output of PMOABPHC in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default is activated"
+	::= { pmoabphctraps 40 }
+
+pmoabphcClientTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmClientDdmWarning, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Client Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOABPHC Client Not Urgent ON"}
+	--&MATCH       { pmoabphcAlmClientDdmWarning "on", pmoabphctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Booster input or Pre-Amp Output of PMOABPHC in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default disappeared"
+	::= { pmoabphctraps 41 }
+
+pmoabphcClientTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmClientDdmAlm, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Client Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoabphcAlmClientDdmAlm "on", pmoabphctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm appears on Booster input or Pre-Amp Output of PMOABPHC in slot $2 ($A)"
+	DESCRIPTION "Urgent client default is activated"
+	::= { pmoabphctraps 42 }
+
+pmoabphcClientTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmClientDdmAlm, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Client Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOABPHC Client Urgent ON"}
+	--&MATCH       { pmoabphcAlmClientDdmAlm "on", pmoabphctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Booster input or Pre-Amp Output of PMOABPHC in slot $2 ($A)"
+	DESCRIPTION "Urgent client default disappeared"
+	::= { pmoabphctraps 43 }
+
+pmoabphcClientTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmClientFail, pmoabphcAlmClientHwFail, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Client Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmoabphcAlmClientFail "on", pmoabphcAlmClientHwFail "*", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on Booster input or Pre-Amp Output of PMOABPHC in slot $3 ($A)"
+	
+	--&FILTNAME    "PMOABPHC Client HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoabphcAlmClientFail "*", pmoabphcAlmClientHwFail "on", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on Booster input or Pre-Amp Output of PMOABPHC in slot $3 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pmoabphctraps 44 }
+
+pmoabphcClientTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmClientFail, pmoabphcAlmClientHwFail, pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Client Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOABPHC Client Fail ON"}
+	--&MATCH       { pmoabphcAlmClientFail "on", pmoabphcAlmClientHwFail "*", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on Booster input or Pre-Amp Output of PMOABPHC in slot $3 ($A)"
+	
+	--&FILTNAME    "PMOABPHC Client HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoabphcAlmClientFail "*", pmoabphcAlmClientHwFail "on", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on Booster input or Pre-Amp Output of PMOABPHC in slot $3 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pmoabphctraps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmoabphcPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmDefFuseB, pmoabphcAlmDefFuseA , pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoabphcAlmDefFuseB "*", pmoabphcAlmDefFuseA "on", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMOABPHC in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOABPHC Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoabphcAlmDefFuseB "on", pmoabphcAlmDefFuseA "*", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMOABPHC in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmoabphctraps 50 }
+pmoabphcPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoabphcAlmDefFuseB, pmoabphcAlmDefFuseA , pmoabphctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOABPHC Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMOABPHC Fuse A Fail ON", "PMOABPHC Fuse B Fail ON" }
+	--&MATCH       { pmoabphcAlmDefFuseB "on", pmoabphcAlmDefFuseA "on", pmoabphctrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMOABPHC in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmoabphctraps 51 }
+
+
+
+
+
+
+END

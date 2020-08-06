@@ -1,0 +1,3064 @@
+-- *****************************************************************
+-- EKINOPS-Pmapc.TXT:  MIB
+--
+--MIB Part Number:3MI00206AEAD
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pmapc-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePmapc MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Pmapc hardware."
+	REVISION "200905290000Z"
+	DESCRIPTION
+	  "Initial Version."
+	REVISION "200909290000Z"
+	DESCRIPTION
+	  "CondTypeParameters insertion"
+	REVISION "201002250000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS"
+	REVISION "201011050000Z"
+	DESCRIPTION
+	  "Formulas in comments"
+	REVISION "201012140000Z"
+	DESCRIPTION
+	  "Add Inventory of the lasers"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201403250000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201411210000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 42 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmapcalarms OBJECT IDENTIFIER ::= { modulePmapc 2 }	
+pmapcAlmOther OBJECT IDENTIFIER ::= { pmapcalarms 1 }
+pmapcAlmOtherNurg OBJECT IDENTIFIER ::= { pmapcAlmOther 1 }
+pmapcAlmOtherUrg OBJECT IDENTIFIER ::= { pmapcAlmOther 2 }
+pmapcAlmOtherCrit OBJECT IDENTIFIER ::= { pmapcAlmOther 3 }
+
+pmapcAlmClient OBJECT IDENTIFIER ::= { pmapcalarms 2 }
+pmapcAlmClientNurg OBJECT IDENTIFIER ::= { pmapcAlmClient 1 }
+pmapcAlmClientUrg OBJECT IDENTIFIER ::= { pmapcAlmClient 2 }
+pmapcAlmClientCrit OBJECT IDENTIFIER ::= { pmapcAlmClient 3 }
+	
+pmapcAlmLine OBJECT IDENTIFIER ::= { pmapcalarms 3 }
+pmapcAlmLineNurg OBJECT IDENTIFIER ::= { pmapcAlmLine 1 }
+pmapcAlmLineUrg OBJECT IDENTIFIER ::= { pmapcAlmLine 2 }
+pmapcAlmLineCrit OBJECT IDENTIFIER ::= { pmapcAlmLine 3 }
+
+
+pmapcmeasures OBJECT IDENTIFIER ::= { modulePmapc 3 }	
+pmapcMesrOther OBJECT IDENTIFIER ::= { pmapcmeasures 1 }	
+pmapcMesrClient OBJECT IDENTIFIER ::= { pmapcmeasures 2 }	
+pmapcMesrLine OBJECT IDENTIFIER ::= { pmapcmeasures 3 }	
+
+
+pmapccontrolsWrite OBJECT IDENTIFIER ::= { modulePmapc 6 }
+pmapcCtrlOther OBJECT IDENTIFIER ::= { pmapccontrolsWrite 1 }
+pmapcCtrlClient OBJECT IDENTIFIER ::= { pmapccontrolsWrite 2 }
+pmapcCtrlLine OBJECT IDENTIFIER ::= { pmapccontrolsWrite 3 }
+
+pmapcri OBJECT IDENTIFIER ::= { modulePmapc 7 }
+pmapcriTable OBJECT IDENTIFIER ::= { pmapcri 1 }
+
+
+pmapcConfig OBJECT IDENTIFIER ::= { modulePmapc 9 }
+
+pmapctraps OBJECT IDENTIFIER ::= { modulePmapc 10 }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmapcRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmapcri 2 }
+
+pmapcRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmapcri 3 }
+  
+pmapcRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmapcri 4 }
+  
+pmapcRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmapcri 5 }
+
+
+
+pmapcRinvLaser1Table OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmapcRinvLaser1Entry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the laser clients on the selected module"
+      ::= { pmapcriTable 1 }
+
+pmapcRinvLaser1Entry OBJECT-TYPE
+        SYNTAX  PmapcRinvLaser1Entry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the laser client table"
+        INDEX   { pmapcRinvLaser1Index }
+        ::= { pmapcRinvLaser1Table 1 }
+    
+
+
+PmapcRinvLaser1Entry::=
+        SEQUENCE {
+          pmapcRinvLaser1Index 
+              Integer32,
+          pmapcRinvLaser1
+              DisplayString
+        }
+
+
+    pmapcRinvLaser1Index OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for laser client table"
+        ::= { pmapcRinvLaser1Entry 1 }
+
+
+    pmapcRinvLaser1 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the laser client: This OID contains the inventory for the laser client"
+        ::= { pmapcRinvLaser1Entry 2 }
+
+
+
+pmapcRinvLaser2Table OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmapcRinvLaser2Entry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the laser clients on the selected module"
+      ::= { pmapcriTable 2 }
+
+pmapcRinvLaser2Entry OBJECT-TYPE
+        SYNTAX  PmapcRinvLaser2Entry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the laser client table"
+        INDEX   { pmapcRinvLaser2Index }
+        ::= { pmapcRinvLaser2Table 1 }
+    
+
+
+PmapcRinvLaser2Entry::=
+        SEQUENCE {
+          pmapcRinvLaser2Index 
+              Integer32,
+          pmapcRinvLaser2
+              DisplayString
+        }
+
+
+    pmapcRinvLaser2Index OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for laser client table"
+        ::= { pmapcRinvLaser2Entry 1 }
+
+
+    pmapcRinvLaser2 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the laser client: This OID contains the inventory for the laser client"
+        ::= { pmapcRinvLaser2Entry 2 }
+
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmapcAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmapcAlmOtherCrit 0 }
+
+
+
+
+pmapcAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition   <Help> 
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlm0 16 }
+
+
+
+pmapcAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition   <Help> 
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlm0 15 }
+
+
+
+pmapcAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlm0 9 }
+
+
+
+pmapcAlmPwrOutWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Output Warning :This OID 
+        indicates that  the power output 
+        on the transmit side is in warning 
+        condition   <Help>   This warning 
+        indicates that the power output 
+        is in a warning out of range <Condtype> 
+        PWR_OUT_WNG <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlm0 8 }
+
+
+
+pmapcAlmPwrOutAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Output Alarm :This OID indicates 
+        that  the power output on the transmit 
+        side is in fail condition  <Help> 
+          This alarm indicates that the 
+        power output is in an alarm out 
+        of range <Condtype> PWR_OUT_ALA 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlm0 7 }
+
+
+
+pmapcAlmPwrInWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input Warning :This OID
+         indicates that  the power input 
+        on the transmit side is in warning 
+        condition  <Help>   This warning 
+        indicates that the power input
+         is in a warning out of range <Condtype> 
+        PWR_IN_WNG <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlm0 6 }
+
+
+
+pmapcAlmPwrInAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input Alarm :This OID indicates 
+        that  the power input on the transmit 
+        side is in fail condition  <Help> 
+          This alarm indicates that the 
+        power input is in an alarm out
+         of range <Condtype> PWR_IN_ALA 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlm0 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmapcAlmsynthAlm2 OBJECT IDENTIFIER ::= { pmapcAlmOtherNurg 2 }
+
+
+
+
+pmapcAlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> other
+         (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmsynthAlm2 4 }
+
+
+
+pmapcAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlm2 3 }
+
+
+
+pmapcAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmsynthAlm2 2 }
+
+
+
+pmapcAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmsynthAlm2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlmLaser1 article
+--- *****************************************************
+pmapcAlmsynthAlmLaser1 OBJECT IDENTIFIER ::= { pmapcAlmClientCrit 8 }
+
+
+
+
+pmapcAlmLas1FailAcc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Fail :This 
+        OID indicates a failure on the
+         Stuffing Wavelength Laser 1 <Condtype> 
+        LAS1_FAIL_ACC <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser1 12 }
+
+
+
+pmapcAlmLas1MeasAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Alarm :This 
+        OID indicates if an alarm is present 
+        coming out of Stuffing Wavelength 
+        Laser 1 monitoring   <Help>   This 
+        alarm indicates if a monitoring 
+        alarm has been detected on the
+         Laser 1 <Condtype> LAS1_MEAS_ALM 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser1 10 }
+
+
+
+pmapcAlmLas1MeasWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Warning :This 
+        OID indicates a warning is present 
+        coming out of Stuffing Wavelength 
+        Laser 1 monitoring  <Help>   This 
+        alarm indicates if a monitoring 
+        warning has been detected on the 
+        Laser 1 <Condtype> LAS1_MEAS_WNG 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser1 9 }
+
+
+
+pmapcAlmLas1LocalOos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Out Of Service 
+        :This OID indicates that the Stuffing 
+        Wavelength Laser 1 is In Service 
+        (1) of Out or Service (2).  <Help> 
+          This status indicates if the
+         Laser 1 is in service <Condtype> 
+        LAS1_LOCAL_OOS <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser1 6 }
+
+
+
+pmapcAlmLas1HwFailAcc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 HW Fail :This 
+        OID indicates a hardware failure 
+        on the Stuffing Wavelength Laser 
+        1 <Condtype> LAS1_HW_FAIL_ACC <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser1 4 }
+
+
+
+pmapcAlmLas1InitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Not Ready
+         :This OID indicates that the optical 
+        interface  of the Stuffing Wavelength 
+        Laser 1 is not operational.   <Help> 
+          This status indicates if Laser 
+        1 has been correctly initialized 
+        <Condtype> LAS1_INIT_NOT_COMPL
+         <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser1 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlmLaser2 article
+--- *****************************************************
+pmapcAlmsynthAlmLaser2 OBJECT IDENTIFIER ::= { pmapcAlmClientCrit 9 }
+
+
+
+
+pmapcAlmLas2FailAcc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Fail :This 
+        OID indicates a failure on the
+         Stuffing Wavelength Laser 2 <Condtype> 
+        LAS2_FAIL_ACC <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser2 12 }
+
+
+
+pmapcAlmLas2MeasAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Alarm :This 
+        OID indicates if an alarm is present 
+        coming out of Stuffing Wavelength 
+        Laser 2 monitoring   <Help>   This 
+        alarm indicates if a monitoring 
+        alarm has been detected on the
+         Laser 2 <Condtype> LAS2_MEAS_ALM 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser2 10 }
+
+
+
+pmapcAlmLas2MeasWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Warning :This 
+        OID indicates a warning is present 
+        coming out of Stuffing Wavelength 
+        Laser 2 monitoring  <Help>   This 
+        alarm indicates if a monitoring 
+        warning has been detected on the 
+        Laser 2 <Condtype> LAS2_MEAS_WNG 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser2 9 }
+
+
+
+pmapcAlmLas2LocalOos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Out Of Service 
+        :This OID indicates that the Stuffing 
+        Wavelength Laser 2 is In Service 
+        (2) of Out or Service (2).  <Help> 
+          This status indicates if the
+         Laser 2 is in service <Condtype> 
+        LAS2_LOCAL_OOS <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser2 6 }
+
+
+
+pmapcAlmLas2HwFailAcc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 HW Fail :This 
+        OID indicates a hardware failure 
+        on the Stuffing Wavelength Laser 
+        2 <Condtype> LAS2_HW_FAIL_ACC <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser2 4 }
+
+
+
+pmapcAlmLas2InitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Not Ready
+         :This OID indicates that the optical 
+        interface  of the Stuffing Wavelength 
+        Laser 2 is not operational.   <Help> 
+          This status indicates if Laser 
+        2 has been correctly initialized 
+        <Condtype> LAS2_INIT_NOT_COMPL
+         <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmsynthAlmLaser2 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1Alm article
+--- *****************************************************
+pmapcAlmlaser1Alm OBJECT IDENTIFIER ::= { pmapcAlmClientUrg 16 }
+
+
+
+
+pmapcAlmLas1Tec1Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 TEC Fail :This 
+        OID indicates that the TEC of the 
+        Stuffing Wavelength Laser 1 failed 
+        on the transmit side.  <Help> 
+          This alarm indicates if the TEC 
+        of the Laser 1 of the transmit
+         line is in a fail condition  <Condtype> 
+        LAS1_TEC1_FAIL <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1Alm 2 }
+
+
+
+pmapcAlmLas1Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Fail :This 
+        OID indicates that the Stuffing 
+        Wavelength Laser 1 failed on the 
+        transmit side  <Help>   This alarm 
+        indicates if the laser of the transmit 
+         line is in a fail condition  <Condtype> 
+        LAS1_FAIL <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1Alm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1MeasAlm article
+--- *****************************************************
+pmapcAlmlaser1MeasAlm OBJECT IDENTIFIER ::= { pmapcAlmClientUrg 17 }
+
+
+
+
+pmapcAlmILas1HighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 Current High Alarm :This 
+        OID indicates that the current
+         of the Stuffing Wavelength Laser 
+        1 is higher than the alarm threshold 
+         <Help>   This alarm indicates
+         if the current of the Laser 1
+         is too high <Condtype> I_LAS1_HIGH_ALA 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasAlm 8 }
+
+
+
+pmapcAlmILas1LowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 Current Low Alarm :This 
+        OID indicates that the current
+         of the Stuffing Wavelength Laser 
+        1 is lower than the alarm threshold 
+         <Help>   This alarm indicates
+         if the current of the Laser 1
+         is too low <Condtype> I_LAS1_LOW_ALA 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasAlm 7 }
+
+
+
+pmapcAlmVtecLas1HighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 TEC Volt High Alarm :This 
+        OID indicates that the TEC voltage 
+        of the Stuffing Wavelength Laser 
+        1 is higher than the alarm threshold 
+         <Help>   This alarm indicates
+         if the TEC voltage of the Laser 
+        1 is too high <Condtype> VTEC_LAS1_HIGH_ALA 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasAlm 6 }
+
+
+
+pmapcAlmVtecLas1LowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 TEC Volt Low Alarm :This 
+        OID indicates that the TEC voltage 
+        of the Stuffing Wavelength Laser 
+        1 is lower than the alarm threshold 
+         <Help>   This alarm indicates
+         if the TEC voltage of the Laser 
+        1 is too low <Condtype> VTEC_LAS1_LOW_ALA 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasAlm 5 }
+
+
+
+pmapcAlmVthLas1HighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 TEC Temp High Alarm :This 
+        OID indicates that the TEC temperature 
+        of the Stuffing Wavelength Laser 
+        1 is higher than the alarm threshold 
+         <Help>   This alarm indicates
+         if the TEC temperature of the
+         Laser 1 is too high <Condtype> 
+        VTH_LAS1_HIGH_ALA <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasAlm 4 }
+
+
+
+pmapcAlmVthLas1LowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 TEC Temp Low Alarm :This 
+        OID indicates that the TEC temperature 
+        of the Stuffing Wavelength Laser 
+        1 is lower than the alarm threshold 
+         <Help>   This alarm indicates
+         if the TEC temperature of the
+         Laser 1 is too low <Condtype>
+         VTH_LAS1_LOW_ALA <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasAlm 3 }
+
+
+
+pmapcAlmPwrLas1HighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 Pwr High Alarm :This OID 
+        indicates that transmit power of 
+        the Stuffing Wavelength Laser 1 
+        is higher than the alarm threshold 
+         <Help>   This alarm indicates
+         if the transmit power on the transmit 
+        side of the Laser 1 is too high 
+        <Condtype> PWR_LAS1_HIGH_ALA <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasAlm 2 }
+
+
+
+pmapcAlmPwrLas1LowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 Pwr Low Alarm :This OID 
+        indicates that transmit power of 
+        the Stuffing Wavelength Laser 1 
+        is lower than the alarm threshold 
+         <Help>   This alarm indicates
+         if the transmit power on the transmit 
+        side of the Laser 1 is too low
+         <Condtype> PWR_LAS1_LOW_ALA <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1MeasWng article
+--- *****************************************************
+pmapcAlmlaser1MeasWng OBJECT IDENTIFIER ::= { pmapcAlmClientNurg 18 }
+
+
+
+
+pmapcAlmILas1HighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 Current High Warning :This 
+        OID indicates that the current
+         of the Stuffing Wavelength Laser 
+        1 is higher than the warning threshold 
+         <Help>   This warning indicates 
+        if the current of the Laser 1 is 
+        too high <Condtype> I_LAS1_HIGH_WNG 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasWng 8 }
+
+
+
+pmapcAlmILas1LowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 Current Low Warning :This 
+        OID indicates that the current
+         of the Stuffing Wavelength Laser 
+        1 is lower than the warning threshold 
+         <Help>   This warning indicates 
+        if the current of the Laser 1 is 
+        too low <Condtype> I_LAS1_LOW_WNG 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasWng 7 }
+
+
+
+pmapcAlmVtecLas1HighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 TEC Volt High Warning
+         :This OID indicates that the TEC 
+        voltage of the Stuffing Wavelength 
+        Laser 1 is higher than the warning 
+        threshold  <Help>   This warning 
+        indicates if the TEC voltage of 
+        the Laser 1 is too high <Condtype> 
+        VTEC_LAS1_HIGH_WNG <Probcause>
+         powerProblem (36) <Alarmtype>
+         equipmentAlarm (5) <Polarity>
+         (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasWng 6 }
+
+
+
+pmapcAlmVtecLas1LowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 TEC Volt Low Warning :This 
+        OID indicates that the TEC voltage 
+        of the Stuffing Wavelength Laser 
+        1 is lower than the warning threshold 
+         <Help>   This warning indicates 
+        if the TEC voltage of the Laser 
+        1 is too low <Condtype> VTEC_LAS1_LOW_WNG 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasWng 5 }
+
+
+
+pmapcAlmVthLas1HighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 TEC Temp High Warning
+         :This OID indicates that the TEC 
+        temperature of the Stuffing Wavelength 
+        Laser 1 is higher than the warning 
+        threshold  <Help>   This warning 
+        indicates if the TEC temperature 
+        of the Laser 1 is too high <Condtype> 
+        VTH_LAS1_HIGH_WNG <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasWng 4 }
+
+
+
+pmapcAlmVthLas1LowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 TEC Temp Low Warning :This 
+        OID indicates that the TEC temperature 
+        of the Stuffing Wavelength Laser 
+        1 is lower than the warning threshold 
+         <Help>   This warning indicates 
+        if the TEC temperature of the Laser 
+        1 is too low <Condtype> VTH_LAS1_LOW_WNG 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasWng 3 }
+
+
+
+pmapcAlmPwrLas1HighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 Pwr High Warning :This 
+        OID indicates that transmit power 
+        of the Stuffing Wavelength Laser 
+        1 is higher than the warning threshold 
+         <Help>   This warning indicates 
+        if the transmit power on the transmit 
+        side of the Laser 1 is too high 
+        <Condtype> PWR_LAS1_HIGH_WNG <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasWng 2 }
+
+
+
+pmapcAlmPwrLas1LowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 1 Pwr Low Warning :This
+         OID indicates that transmit power 
+        of the Stuffing Wavelength Laser 
+        1 is lower than the warning threshold 
+         <Help>   This warning indicates 
+        if the transmit power on the transmit 
+        side of the Laser 1 is too low
+         <Condtype> PWR_LAS1_LOW_WNG <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser1MeasWng 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2Alm article
+--- *****************************************************
+pmapcAlmlaser2Alm OBJECT IDENTIFIER ::= { pmapcAlmLineUrg 24 }
+
+
+
+
+pmapcAlmLas2TecFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 TEC Fail :This 
+        OID indicates that the TEC of the 
+        Stuffing Wavelength Laser 2 failed 
+        on the transmit side.  <Help> 
+          This alarm indicates if the TEC 
+        of the Laser 2 of the transmit
+         line is in a fail condition  <Condtype> 
+        LAS2_TEC_FAIL <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2Alm 2 }
+
+
+
+pmapcAlmLas2Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Fail :This 
+        OID indicates that the Stuffing 
+        Wavelength Laser 2 failed on the 
+        transmit side  <Help>   This alarm 
+        indicates if the laser of the transmit 
+         line is in a fail condition  <Condtype> 
+        LAS2_FAIL <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2Alm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2MeasAla article
+--- *****************************************************
+pmapcAlmlaser2MeasAla OBJECT IDENTIFIER ::= { pmapcAlmLineUrg 25 }
+
+
+
+
+pmapcAlmILas2HighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 Current High Alarm :This 
+        OID indicates that the current
+         of the Stuffing Wavelength Laser 
+        2 is higher than the alarm threshold 
+         <Help>   This alarm indicates
+         if the current of the Laser 2
+         is too high <Condtype> I_LAS2_HIGH_ALA 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasAla 8 }
+
+
+
+pmapcAlmILas2LowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 Current Low Alarm :This 
+        OID indicates that the current
+         of the Stuffing Wavelength Laser 
+        2 is lower than the alarm threshold 
+         <Help>   This alarm indicates
+         if the current of the Laser 2
+         is too low <Condtype> I_LAS2_LOW_ALA 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasAla 7 }
+
+
+
+pmapcAlmVtecLas2HighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 TEC Volt High Alarm :This 
+        OID indicates that the TEC voltage 
+        of the Stuffing Wavelength Laser 
+        2 is higher than the alarm threshold 
+         <Help>   This alarm indicates
+         if the TEC voltage of the Laser 
+        2 is too high <Condtype> VTEC_LAS2_HIGH_ALA 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasAla 6 }
+
+
+
+pmapcAlmVtecLas2LowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 TEC Volt Low Alarm :This 
+        OID indicates that the TEC voltage 
+        of the Stuffing Wavelength Laser 
+        2 is lower than the alarm threshold 
+         <Help>   This alarm indicates
+         if the TEC voltage of the Laser 
+        2 is too low <Condtype> VTEC_LAS2_LOW_ALA 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasAla 5 }
+
+
+
+pmapcAlmVthLas2HighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 TEC Temp High Alarm :This 
+        OID indicates that the TEC temperature 
+        of the Stuffing Wavelength Laser 
+        2 is higher than the alarm threshold 
+         <Help>   This alarm indicates
+         if the TEC temperature of the
+         Laser 2 is too high <Condtype> 
+        VTH_LAS2_HIGH_ALA <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasAla 4 }
+
+
+
+pmapcAlmVthLas2LowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 TEC Temp Low Alarm :This 
+        OID indicates that the TEC temperature 
+        of the Stuffing Wavelength Laser 
+        2 is lower than the alarm threshold 
+         <Help>   This alarm indicates
+         if the TEC temperature of the
+         Laser 2 is too low <Condtype>
+         VTH_LAS2_LOW_ALA <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasAla 3 }
+
+
+
+pmapcAlmPwrLas2HighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 Pwr High Alarm :This OID 
+        indicates that transmit power of 
+        the Stuffing Wavelength Laser 2 
+        is higher than the alarm threshold 
+         <Help>   This alarm indicates
+         if the transmit power on the transmit 
+        side of the Laser 2 is too high 
+        <Condtype> PWR_LAS2_HIGH_ALA <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasAla 2 }
+
+
+
+pmapcAlmPwrLas2LowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 Pwr Low Alarm :This OID 
+        indicates that transmit power of 
+        the Stuffing Wavelength Laser 2 
+        is lower than the alarm threshold 
+         <Help>   This alarm indicates
+         if the transmit power on the transmit 
+        side of the Laser 2 is too low
+         <Condtype> PWR_LAS2_LOW_ALA <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasAla 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2MeasWng article
+--- *****************************************************
+pmapcAlmlaser2MeasWng OBJECT IDENTIFIER ::= { pmapcAlmLineNurg 26 }
+
+
+
+
+pmapcAlmILas2HighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 Current High Warning :This 
+        OID indicates that the current
+         of the Stuffing Wavelength Laser 
+        2 is higher than the warning threshold 
+         <Help>   This warning indicates 
+        if the current of the Laser 2 is 
+        too high <Condtype> I_LAS2_HIGH_WNG 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasWng 8 }
+
+
+
+pmapcAlmILas2LowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 Current Low Warning :This 
+        OID indicates that the current
+         of the Stuffing Wavelength Laser 
+        2 is lower than the warning threshold 
+         <Help>   This warning indicates 
+        if the current of the Laser 2 is 
+        too low <Condtype> I_LAS2_LOW_WNG 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasWng 7 }
+
+
+
+pmapcAlmVtecLas2HighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 TEC Volt High Warning
+         :This OID indicates that the TEC 
+        voltage of the Stuffing Wavelength 
+        Laser 2 is higher than the warning 
+        threshold  <Help>   This warning 
+        indicates if the TEC voltage of 
+        the Laser 2 is too high <Condtype> 
+        VTEC_LAS2_HIGH_WNG <Probcause>
+         powerProblem (36) <Alarmtype>
+         equipmentAlarm (5) <Polarity>
+         (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasWng 6 }
+
+
+
+pmapcAlmVtecLas2LowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 TEC Volt Low Warning :This 
+        OID indicates that the TEC voltage 
+        of the Stuffing Wavelength Laser 
+        2 is lower than the warning threshold 
+         <Help>   This warning indicates 
+        if the TEC voltage of the Laser 
+        2 is too low <Condtype> VTEC_LAS2_LOW_WNG 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasWng 5 }
+
+
+
+pmapcAlmVthLas2HighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 TEC Temp High Warning
+         :This OID indicates that the TEC 
+        temperature of the Stuffing Wavelength 
+        Laser 2 is higher than the warning 
+        threshold  <Help>   This warning 
+        indicates if the TEC temperature 
+        of the Laser 2 is too high <Condtype> 
+        VTH_LAS2_HIGH_WNG <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasWng 4 }
+
+
+
+pmapcAlmVthLas2LowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 TEC Temp Low Warning :This 
+        OID indicates that the TEC temperature 
+        of the Stuffing Wavelength Laser 
+        2 is lower than the warning threshold 
+         <Help>   This warning indicates 
+        if the TEC temperature of the Laser 
+        2 is too low <Condtype> VTH_LAS2_LOW_WNG 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasWng 3 }
+
+
+
+pmapcAlmPwrLas2HighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 Pwr High Warning :This 
+        OID indicates that transmit power 
+        of the Stuffing Wavelength Laser 
+        2 is higher than the warning threshold 
+         <Help>   This warning indicates 
+        if the transmit power on the transmit 
+        side of the Laser 2 is too high 
+        <Condtype> PWR_LAS2_HIGH_WNG <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasWng 2 }
+
+
+
+pmapcAlmPwrLas2LowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser 2 Pwr Low Warning :This
+         OID indicates that transmit power 
+        of the Stuffing Wavelength Laser 
+        2 is lower than the warning threshold 
+         <Help>   This warning indicates 
+        if the transmit power on the transmit 
+        side of the Laser 2 is too low
+         <Condtype> PWR_LAS2_LOW_WNG <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmlaser2MeasWng 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleAlarm article
+--- *****************************************************
+pmapcAlmmoduleAlarm OBJECT IDENTIFIER ::= { pmapcAlmOtherUrg 64 }
+
+
+
+
+pmapcAlmLossInputSignal OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Loss Of Input Signal :This OID 
+        indicates there is a Loss of Signal 
+        on the input of the module.   <Help> 
+          This alarm indicates if there 
+        is a Loss of Signal of the input 
+        of the module. <Condtype> LOSS_INPUT_SIGNAL 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleAlarm 16 }
+
+
+
+pmapcAlmEamAttHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        EAM Attenuation High Alarm :This 
+        OID indicates that the attenuation 
+        of the EAM is higher than the alarm 
+        threshold  <Help>   This alarm
+         indicates if the attenuation of 
+        the EAM is too high <Condtype>
+         EAM_ATT_HIGH_ALA <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleAlarm 6 }
+
+
+
+pmapcAlmEamAttLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        EAM Attenuation Low Alarm :This 
+        OID indicates that the attenuation 
+        of the EAM is lower than the alarm 
+        threshold  <Help>   This alarm
+         indicates if the attenuation of 
+        the EAM is too low <Condtype> EAM_ATT_LOW_ALA 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleAlarm 5 }
+
+
+
+pmapcAlmPwrOutHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Output High Alarm :This
+         OID indicates that Output power 
+        of the transmit side is higher
+         than the alarm threshold  <Help> 
+          This alarm indicates if the transmit 
+        power on the transmit side  is
+         too high <Condtype> PWR_OUT_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleAlarm 4 }
+
+
+
+pmapcAlmPwrOutLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Output Low Alarm :This OID 
+        indicates that Output power of
+         the transmit side is lower than 
+        the alarm threshold   <Help>  
+         This alarm indicates if the transmit 
+        power on the transmit side  is
+         too low <Condtype> PWR_OUT_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleAlarm 3 }
+
+
+
+pmapcAlmPwrInHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input High Alarm :This OID 
+        indicates that input power of the 
+        transmit side is higher than the 
+        alarm threshold  <Help>   This
+         alarm indicates if the received 
+        power on the transmit side  is
+         too high <Condtype> PWR_IN_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleAlarm 2 }
+
+
+
+pmapcAlmPwrInLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input Low Alarm :This OID 
+        indicates that input power of the 
+        transmit side is lower than the 
+        alarm threshold   <Help>   This 
+        alarm indicates if the received 
+        power on the transmit side  is
+         too low <Condtype> PWR_IN_LOW_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleAlarm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleWarning article
+--- *****************************************************
+pmapcAlmmoduleWarning OBJECT IDENTIFIER ::= { pmapcAlmOtherNurg 65 }
+
+
+
+
+pmapcAlmEamAttHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        EAM Attenuation High Warning :EThis 
+        OID indicates that the attenuation 
+        of the EAM is higher than the warning 
+        threshold  <Help>   This warning 
+        indicates if the attenuation of 
+        the EAM is too high <Condtype>
+         EAM_ATT_HIGH_WNG <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleWarning 6 }
+
+
+
+pmapcAlmEamAttLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        EAM Attenuation Low Warning :This 
+        OID indicates that the attenuation 
+        of the EAM is lower than the warning 
+        threshold  <Help>   This warning 
+        indicates if the attenuation of 
+        the EAM is too low <Condtype> EAM_ATT_LOW_WNG 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleWarning 5 }
+
+
+
+pmapcAlmPwrOutHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Output High Warning :This 
+        OID indicates that Output power 
+        of the transmit side is higher
+         than the warning threshold   <Help> 
+          This warning indicates if the 
+        transmit power on the transmit
+         side  is too high <Condtype> PWR_OUT_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleWarning 4 }
+
+
+
+pmapcAlmPwrOutLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Output Low Warning :This 
+        OID indicates that Output power 
+        of the transmit side is lower than 
+        the warning threshold  <Help> 
+          This warning indicates if the 
+        transmit power on the transmit
+         side  is too low <Condtype> PWR_OUT_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleWarning 3 }
+
+
+
+pmapcAlmPwrInHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input High Warning :This 
+        OID indicates that input power
+         of the transmit side is higher 
+        than the warning threshold   <Help> 
+          This warning indicates if the 
+        received power on the transmit
+         side  is too high <Condtype> PWR_IN_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleWarning 2 }
+
+
+
+pmapcAlmPwrInLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input Low Warning :This
+         OID indicates that input power 
+        of the transmit side is lower than 
+        the warning threshold  <Help> 
+          This warning indicates if the 
+        received power on the transmit
+         side  is too low <Condtype> PWR_IN_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmoduleWarning 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the modInitFailLevel2 article
+--- *****************************************************
+pmapcAlmmodInitFailLevel2 OBJECT IDENTIFIER ::= { pmapcAlmOtherUrg 70 }
+
+
+
+
+pmapcAlmThreshConfFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Thresh_Conf_Fail : <Condtype>
+         THRESH_CONF_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmodInitFailLevel2 7 }
+
+
+
+pmapcAlmCalibReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Calib_Read_Fail : <Condtype> CALIB_READ_FAIL 
+        <Probcause> softwareError (47)
+         <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmodInitFailLevel2 6 }
+
+
+
+pmapcAlmInvReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+         : <Condtype> INV_READ_FAIL <Probcause> 
+        softwareError (47) <Alarmtype>
+         processingErrorAlarm (4) <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmmodInitFailLevel2 4 }
+
+
+
+pmapcAlmConfReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Conf_Read_Fail : <Condtype> CONF_READ_FAIL 
+        <Probcause> softwareError (47)
+         <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmodInitFailLevel2 3 }
+
+
+
+pmapcAlmResetHwInitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reset_HW_Init_Fail : <Condtype> 
+        RESET_HW_INIT_FAIL <Probcause>
+         softwareError (47) <Alarmtype> 
+        processingErrorAlarm (4) <Polarity> 
+        (2) 
+        "
+	  ::= { pmapcAlmmodInitFailLevel2 2 }
+
+
+
+pmapcAlmRegReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reg_Read_Fail : <Condtype> REG_READ_FAIL 
+        <Probcause> softwareError (47)
+         <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmodInitFailLevel2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the modInitFailLevel3 article
+--- *****************************************************
+pmapcAlmmodInitFailLevel3 OBJECT IDENTIFIER ::= { pmapcAlmOtherUrg 71 }
+
+
+
+
+pmapcAlmOptIdentFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Opt_Ident_Fail : <Condtype> OPT_IDENT_FAIL 
+        <Probcause> softwareError (47)
+         <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pmapcAlmmodInitFailLevel3 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmapcCtrlsynth0 OBJECT IDENTIFIER ::= { pmapcCtrlOther 0 }
+
+
+
+
+pmapcCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>    This control restores 
+        the default configuration of the 
+        module
+        "
+	  ::= { pmapcCtrlsynth0 13 }
+
+
+
+pmapcCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>    This
+         control saves the customer configuration 
+        on the module
+        "
+	  ::= { pmapcCtrlsynth0 9 }
+
+
+
+pmapcCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmapcCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmapcCtrlsynth4 OBJECT IDENTIFIER ::= { pmapcCtrlOther 4 }
+
+
+
+
+pmapcCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmapcCtrlsynth4 2 }
+
+
+
+pmapcCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmapcCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmapcCtrlswMgnt OBJECT IDENTIFIER ::= { pmapcCtrlOther 5 }
+
+
+
+
+pmapcCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>    This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmapcCtrlswMgnt 3 }
+
+
+
+pmapcCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>    This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmapcCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1Shutdown article
+--- *****************************************************
+pmapcCtrllaser1Shutdown OBJECT IDENTIFIER ::= { pmapcCtrlClient 16 }
+
+
+
+
+pmapcCtrlLaser1Shutdown OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Laser Shutdown 
+        :This OID shuts down the laser
+         of the Stuffing Wavelength 1 
+         <Help>    This control shuts down 
+        the laser of the Stuffing Wavelength 
+        1
+        "
+	  ::= { pmapcCtrllaser1Shutdown 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2Shutdown article
+--- *****************************************************
+pmapcCtrllaser2Shutdown OBJECT IDENTIFIER ::= { pmapcCtrlLine 17 }
+
+
+
+
+pmapcCtrlLaser2Shutdown OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Laser Shutdown 
+        :This OID shuts down the laser
+         of the Stuffing Wavelength 2 
+         <Help>    This control shuts down 
+        the laser of the Stuffing Wavelength 
+        2
+        "
+	  ::= { pmapcCtrllaser2Shutdown 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1Oos article
+--- *****************************************************
+pmapcCtrllaser1Oos OBJECT IDENTIFIER ::= { pmapcCtrlClient 18 }
+
+
+
+
+pmapcCtrlLaser1OosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Out Of Service 
+        :This OID sets the Stuffing Wavelength 
+        1 Out of Service  <Help>    This 
+        controls defines the service state 
+        of the Stuffing Wavelength 1
+        "
+	  ::= { pmapcCtrllaser1Oos 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2Oos article
+--- *****************************************************
+pmapcCtrllaser2Oos OBJECT IDENTIFIER ::= { pmapcCtrlLine 19 }
+
+
+
+
+pmapcCtrlLaser2OosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Out Of Service 
+        :This OID sets the Stuffing Wavelength 
+        2 Out of Service  <Help>    This 
+        controls defines the service state 
+        of the Stuffing Wavelength 2
+        "
+	  ::= { pmapcCtrllaser2Oos 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmapcCtrlledTest OBJECT IDENTIFIER ::= { pmapcCtrlOther 64 }
+
+
+
+
+pmapcCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>    This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmapcCtrlledTest 3 }
+
+
+
+pmapcCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>    This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmapcCtrlledTest 2 }
+
+
+
+pmapcCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>    This control 
+        initiates a test leds turning all 
+        the LEDs to green
+        "
+	  ::= { pmapcCtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleOutputPwrSetting article
+--- *****************************************************
+
+pmapcCtrlmoduleOutputPwrSetting OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Output Power [-14 , +6] 
+        :This OID sets the output power 
+        of the module (AV=(Power/0.005)+32768) 
+        (Unit = dBm)  <Help>   This control 
+        defines the output power of the 
+        module
+        "
+	  ::= { pmapcCtrlLine 65 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleInputPwrSetting article
+--- *****************************************************
+
+pmapcCtrlmoduleInputPwrSetting OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Input Power :This OID sets 
+        the input power of the module (AV=(Power/0.005)+32768) 
+        (Unit = dBm)  <Help>   This control 
+        defines the input power of the
+         module
+        "
+	  ::= { pmapcCtrlLine 66 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the powerLas1 article
+--- *****************************************************
+
+pmapcMesrpowerLas1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff, Wavelength 1 Power :This 
+        OID gives the power value of the 
+        Sutfing Wavelength 1 Laser (Power 
+        = 10*log(AV)-40) (Unit = dBm) 
+         <Help>   This measure gives the 
+        optical power of the Stuffing Wavelength 
+        1 Laser
+        "
+	  ::= { pmapcMesrClient 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the vthLas1 article
+--- *****************************************************
+
+pmapcMesrvthLas1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 Temp. Reg. 
+        Volt :This OID gives the Voltage 
+        of the Temperature Regulator of 
+        the Stuffing Wavelength 1 (Voltage 
+        = AV/10000) (Unit = V)  <Help>
+           This measure gives the Voltage 
+        of the Temperature Regulator of 
+        the Stuffing Wavelength 1
+        "
+	  ::= { pmapcMesrClient 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the vtecLas1 article
+--- *****************************************************
+
+pmapcMesrvtecLas1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 1 TEC Voltage 
+        :This OID gives the Voltage of
+         the TEC of the Stuffing Wavelength 
+        1 (Voltage = AV/10000) (Unit =
+         V)  <Help>   This measure gives 
+        the Voltage of the TEC of the Stuffing 
+        Wavelength 1
+        "
+	  ::= { pmapcMesrClient 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the iLas1 article
+--- *****************************************************
+
+pmapcMesriLas1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        :
+        "
+	  ::= { pmapcMesrClient 19 }
+
+
+
+--- *****************************************************
+---     LEAF for the powerLas2 article
+--- *****************************************************
+
+pmapcMesrpowerLas2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff, Wavelength 2 Power :This 
+        OID gives the power value of the 
+        Sutfing Wavelength 2 Laser (Power 
+        = 10*log(AV)-40) (Unit = dBm) 
+         <Help>   This measure gives the 
+        optical power of the Stuffing Wavelength 
+        2 Laser
+        "
+	  ::= { pmapcMesrLine 24 }
+
+
+
+--- *****************************************************
+---     LEAF for the vthLas2 article
+--- *****************************************************
+
+pmapcMesrvthLas2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 Temp. Reg. 
+        Volt :This OID gives the Voltage 
+        of the Temperature Regulator of 
+        the Stuffing Wavelength 2 (Voltage 
+        = AV/10000) (Unit = V)  <Help>
+           This measure gives the Voltage 
+        of the Temperature Regulator of 
+        the Stuffing Wavelength 2
+        "
+	  ::= { pmapcMesrLine 25 }
+
+
+
+--- *****************************************************
+---     LEAF for the vtecLas2 article
+--- *****************************************************
+
+pmapcMesrvtecLas2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuff. Wavelength 2 TEC Voltage 
+        :This OID gives the Voltage of
+         the TEC of the Stuffing Wavelength 
+        2 (Voltage = AV/10000) (Unit =
+         V)  <Help>   This measure gives 
+        the Voltage of the TEC of the Stuffing 
+        Wavelength 2
+        "
+	  ::= { pmapcMesrLine 26 }
+
+
+
+--- *****************************************************
+---     LEAF for the iLas2 article
+--- *****************************************************
+
+pmapcMesriLas2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        :
+        "
+	  ::= { pmapcMesrLine 27 }
+
+
+
+--- *****************************************************
+---     LEAF for the modulePowerIn article
+--- *****************************************************
+
+pmapcMesrmodulePowerIn OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Input Power :This OID gives 
+        the input power of the module (Power=(AV-32768)*0.005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the input power of the module
+        "
+	  ::= { pmapcMesrOther 64 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleVPowerOut article
+--- *****************************************************
+
+pmapcMesrmoduleVPowerOut OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Output Power Voltage :This 
+        OID gives the output power voltage 
+        (Voltage = AV/10000) (Unit = V) 
+         <Help>  This measure gives the 
+        output power voltage of the module
+        "
+	  ::= { pmapcMesrOther 65 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleEamAtt article
+--- *****************************************************
+
+pmapcMesrmoduleEamAtt OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Stuffing Lasers Attenuation :This 
+        OID gives the attenuation level 
+        applied on the stuffing lasers
+         in percent (0: not attenuation, 
+        100: full attenuation)  (Attenuation 
+        = AV) (Unit = %)  <Help>  This
+         measure gives the attenuation
+         level applied on the stuffing
+         lasers in percent (0: not attenuation, 
+        100: full attenuation)
+        "
+	  ::= { pmapcMesrOther 66 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleTemp article
+--- *****************************************************
+
+pmapcMesrmoduleTemp OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature :This OID gives 
+        the module temperature (Temperature 
+        = AV/256) (Unit = C)  <Help>  This 
+        measure gives the module temperature
+        "
+	  ::= { pmapcMesrOther 67 }
+
+
+
+--- *****************************************************
+---     LEAF for the module33v article
+--- *****************************************************
+
+pmapcMesrmodule33v OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module 3.3 Voltage :This OID gives 
+        the module 3V3 Voltage (Voltage 
+        = AV/10000) (Unit = V)  <Help>
+          This measure gives the module 
+        3V3 Voltage
+        "
+	  ::= { pmapcMesrOther 68 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pmapcCfgLsd OBJECT IDENTIFIER ::= { pmapcConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmapctablecomaLsd OBJECT IDENTIFIER ::= { pmapcCfgLsd 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+pmapcCfgStartUp OBJECT IDENTIFIER ::= { pmapcConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmapctablecomaStartup OBJECT IDENTIFIER ::= { pmapcCfgStartUp 1 }
+
+
+
+pmapcCfglaser1Oos OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on  laser 1 :This 
+         register configures the default 
+        service state on laser 1
+        "
+	  ::= { pmapctablecomaStartup 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmapctablecombStartup OBJECT IDENTIFIER ::= { pmapcCfgStartUp 2 }
+
+
+
+pmapcCfglaser2Oos OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on  laser 2 :This 
+         register configures the default 
+        service state on laser 2
+        "
+	  ::= { pmapctablecombStartup 2 }
+
+
+
+pmapcCfgmoduleOutputPwrSetting OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on module output 
+        power :This  register configures 
+        the default output power level
+         of the module
+        "
+	  ::= { pmapctablecombStartup 10 }
+
+
+
+pmapcCfgmoduleInputPwrSetting OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on module input 
+        power :This  register configures 
+        the default input power level of 
+        the module
+        "
+	  ::= { pmapctablecombStartup 11 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmapcCfgLabels OBJECT IDENTIFIER ::= { pmapcConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmapcCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmapcCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmapcCfgLabels 1 }
+
+
+pmapcCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmapcCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmapcCfgLabelclientIndex }
+	::= { pmapcCfgLabelclientTable 1 }
+
+
+PmapcCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmapcCfgLabelclientIndex
+		INTEGER,
+	pmapcCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmapcCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmapcCfgLabelclientEntry 1 }
+
+
+pmapcCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmapcCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmapcCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmapcCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmapcCfgLabels 2 }
+
+
+pmapcCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmapcCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmapcCfgLabellineIndex }
+	::= { pmapcCfgLabellineTable 1 }
+
+
+PmapcCfgLabellineEntry ::=
+	SEQUENCE {
+	pmapcCfgLabellineIndex
+		INTEGER,
+	pmapcCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmapcCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmapcCfgLabellineEntry 1 }
+
+
+pmapcCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmapcCfgLabellineEntry 3 }
+
+
+
+pmapcCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmapcConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmapctrapPortNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last port which generates a trap"
+	::= { pmapctraps 2 }
+
+pmapctrapLineNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last Line which generates a trap"
+	::= { pmapctraps 3 }
+
+pmapctrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmapctraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     Las2 TRAPS
+--- *****************************************************
+
+pmapcLas2TrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas2MeasWng, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 2 Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmapcAlmLas2MeasWng "on", pmapctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Stuffing Laser 2 of PMAPC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pmapctraps 30 }
+
+pmapcLas2TrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas2MeasWng, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 2 Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMAPC Stuffing Laser 2 Not Urgent ON"}
+	--&MATCH       { pmapcAlmLas2MeasWng "on", pmapctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Stuffing Laser 2 of PMAPC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pmapctraps 31 }
+
+pmapcLas2TrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas2MeasAlm, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 2 Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmapcAlmLas2MeasAlm "on", pmapctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on Stuffing Laser 2 of PMAPC in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pmapctraps 32 }
+
+pmapcLas2TrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas2MeasAlm, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 2 Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMAPC Stuffing Laser 2 Urgent ON"}
+	--&MATCH       { pmapcAlmLas2MeasAlm "on", pmapctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Stuffing Laser 2 of PMAPC in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pmapctraps 33 }
+
+pmapcLas2TrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas2FailAcc , pmapcAlmLas2HwFailAcc, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 2 Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmapcAlmLas2FailAcc "on", pmapcAlmLas2HwFailAcc "*", pmapctrapBoardNumber "$3"}
+	--&MESG        "Stuffing Laser 2 Down on PMAPC in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMAPC Stuffing Laser 2 HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmapcAlmLas2FailAcc "*", pmapcAlmLas2HwFailAcc "on", pmapctrapBoardNumber "$3"}
+	--&MESG        "Stuffing Laser 2 Down on PMAPC in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmapctraps 34 }
+
+pmapcLas2TrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas2FailAcc , pmapcAlmLas2HwFailAcc, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 2 Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMAPC Stuffing Laser 2 Fail ON" }
+	--&MATCH       { pmapcAlmLas2FailAcc "on", pmapcAlmLas2HwFailAcc "*", pmapctrapBoardNumber "$3"}
+	--&MESG        "Stuffing Laser 2 Up on PMAPC in Slot $3 ($A)"
+
+	--&FILTNAME    "PMAPC Stuffing Laser 2 HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmapcAlmLas2FailAcc "*", pmapcAlmLas2HwFailAcc "on", pmapctrapBoardNumber "$3"}
+	--&MESG        "Stuffing Laser 2 Up on PMAPC in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmapctraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     Las1 TRAPS
+--- *****************************************************
+
+pmapcLas1TrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas1MeasWng, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 1 Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmapcAlmLas1MeasWng "on", pmapctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Stuffing Laser 1 of PMAPC in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default is activated"
+	::= { pmapctraps 40 }
+
+pmapcLas1TrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas1MeasWng, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 1 Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMAPC Stuffing Laser 1 Not Urgent ON"}
+	--&MATCH       { pmapcAlmLas1MeasWng "on", pmapctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Stuffing Laser 1 of PMAPC in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default disappeared"
+	::= { pmapctraps 41 }
+
+pmapcLas1TrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas1MeasAlm, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 1 Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmapcAlmLas1MeasAlm "on", pmapctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on Stuffing Laser 1 of PMAPC in slot $2 ($A)"
+	DESCRIPTION "Urgent client default is activated"
+	::= { pmapctraps 42 }
+
+pmapcLas1TrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas1MeasAlm, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 1 Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMAPC Stuffing Laser 1 Urgent ON"}
+	--&MATCH       { pmapcAlmLas1MeasAlm "on", pmapctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Stuffing Laser 1 of PMAPC in slot $2 ($A)"
+	DESCRIPTION "Urgent client default disappeared"
+	::= { pmapctraps 43 }
+
+pmapcLas1TrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas1FailAcc, pmapcAlmLas1HwFailAcc, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 1 Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmapcAlmLas1FailAcc "on", pmapcAlmLas1HwFailAcc "*", pmapctrapBoardNumber "$3"}
+	--&MESG        "Stuffing Laser 1 Down on PMAPC in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMAPC Stuffing Laser 1 HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmapcAlmLas1FailAcc "*", pmapcAlmLas1HwFailAcc "on", pmapctrapBoardNumber "$3"}
+	--&MESG        "Stuffing Laser 1 Down on PMAPC in Slot $3 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pmapctraps 44 }
+
+pmapcLas1TrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmLas1FailAcc, pmapcAlmLas1HwFailAcc, pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Stuffing Laser 1 Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMAPC Stuffing Laser 1 Fail ON" }
+	--&MATCH       { pmapcAlmLas1FailAcc "on", pmapcAlmLas1HwFailAcc "*", pmapctrapBoardNumber "$3"}
+	--&MESG        "Stuffing Laser 1 Up on PMAPC in Slot $3 ($A)"
+
+	--&FILTNAME    "PMAPC Stuffing Laser 1 HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmapcAlmLas1FailAcc "*", pmapcAlmLas1HwFailAcc "on", pmapctrapBoardNumber "$3"}
+	--&MESG        "Stuffing Laser 1 Up on PMAPC in Slot $3 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pmapctraps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmapcPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmDefFuseB, pmapcAlmDefFuseA , pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmapcAlmDefFuseB "*", pmapcAlmDefFuseA "on", pmapctrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMAPC in Slot $3 ($A)"
+
+	--&FILTNAME    "PMAPC Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmapcAlmDefFuseB "on", pmapcAlmDefFuseA "*", pmapctrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMAPC in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmapctraps 50 }
+
+pmapcPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmapcAlmDefFuseB, pmapcAlmDefFuseA , pmapctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMAPC Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMAPC Fuse A Fail ON", "PMAPC Fuse B Fail ON" }
+	--&MATCH       { pmapcAlmDefFuseB "on", pmapcAlmDefFuseA "on", pmapctrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMAPC in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmapctraps 51 }
+
+
+
+
+
+
+END

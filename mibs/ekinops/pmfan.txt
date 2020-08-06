@@ -1,0 +1,1296 @@
+-- *****************************************************************
+-- EKINOPS-Pmfan.TXT:  MIB
+--
+--MIB Part Number:3MI00122AAAD
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pmfan-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulepmfan MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@Ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Pmfan hardware."
+
+	REVISION "201310230000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "201403270000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201412160000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 59 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmfanalarms OBJECT IDENTIFIER ::= { modulepmfan 2 }	
+pmfanAlmOther OBJECT IDENTIFIER ::= { pmfanalarms 1 }
+pmfanAlmOtherNurg OBJECT IDENTIFIER ::= { pmfanAlmOther 1 }
+pmfanAlmOtherUrg OBJECT IDENTIFIER ::= { pmfanAlmOther 2 }
+pmfanAlmOtherCrit OBJECT IDENTIFIER ::= { pmfanAlmOther 3 }
+
+
+
+pmfanmeasures OBJECT IDENTIFIER ::= { modulepmfan 3 }	
+pmfanMesrOther OBJECT IDENTIFIER ::= { pmfanmeasures 1 }	
+
+
+pmfancontrolsWrite OBJECT IDENTIFIER ::= { modulepmfan 6 }
+pmfanCtrlOther OBJECT IDENTIFIER ::= { pmfancontrolsWrite 1 }
+
+pmfanri OBJECT IDENTIFIER ::= { modulepmfan 7 }
+pmfanriTable OBJECT IDENTIFIER ::= { pmfanri 1 }
+
+
+pmfanConfig OBJECT IDENTIFIER ::= { modulepmfan 9 }
+
+pmfantraps OBJECT IDENTIFIER ::= { modulepmfan 10 }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmfanRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmfanri 2 }
+
+pmfanRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmfanri 3 }
+  
+pmfanRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmfanri 4 }
+  
+pmfanRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmfanri 5 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmfanAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmfanAlmOtherCrit 0 }
+
+
+
+
+pmfanAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition.  <Help> 
+         Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmsynthAlm0 16 }
+
+
+
+pmfanAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition.  <Help> 
+         Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmsynthAlm0 15 }
+
+
+
+pmfanAlmAcknowledge OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm Ack. :This OID indicates 
+        the alarms have been acknowledged 
+        by the user (locally or remotely) 
+          <Help>  This status indicates 
+        the alarms have been acknowledged 
+        by the user (locally or remotely) 
+        <Condtype> ACKNOWLEDGE <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmfanAlmsynthAlm0 13 }
+
+
+
+pmfanAlmDefPowerB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input B Present :This OID 
+        indicates that there is not input 
+        power on the right power connector 
+        (B).  <Help>  This alarm indicates 
+        if the power input B is present 
+        (right power connector) <Condtype> 
+        DEF_POWER_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmsynthAlm0 12 }
+
+
+
+pmfanAlmDefPowerA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input A Present :This OID 
+        indicates that there is not input 
+        power on the right power connector 
+        (A).  <Help>  This alarm indicates 
+        if the power input A is present 
+        (left power connector) <Condtype> 
+        DEF_POWER_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmsynthAlm0 11 }
+
+
+
+pmfanAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmfanAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm1 article
+--- *****************************************************
+pmfanAlmsynthAlm1 OBJECT IDENTIFIER ::= { pmfanAlmOtherCrit 1 }
+
+
+
+
+pmfanAlmFansFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Fan Module Failure :This 
+        OID indicates that at least one 
+        of the FAN unit of the FAN module 
+        is in fail condition  <Help>  This 
+        alarm indicates that one of the 
+        fans is in a fail condition <Condtype> 
+        FANS_FAILURE <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmsynthAlm1 10 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmfanAlmsynthAlm2 OBJECT IDENTIFIER ::= { pmfanAlmOtherNurg 2 }
+
+
+
+
+pmfanAlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> other
+         (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmfanAlmsynthAlm2 4 }
+
+
+
+pmfanAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmsynthAlm2 3 }
+
+
+
+pmfanAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmfanAlmsynthAlm2 2 }
+
+
+
+pmfanAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmfanAlmsynthAlm2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the filterAlm article
+--- *****************************************************
+pmfanAlmfilterAlm OBJECT IDENTIFIER ::= { pmfanAlmOtherUrg 16 }
+
+
+
+
+pmfanAlmFilterNotPresent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Dust Filter Presence :This OID 
+        indicates that the dust filter
+         is not present  <Help>  This alarm 
+        indicates that the dust filter
+         is not present <Condtype> FILTER_NOT_PRESENT 
+        <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmfilterAlm 15 }
+
+
+
+--- *****************************************************
+---     LEAF for the fansMgnt article
+--- *****************************************************
+pmfanAlmfansMgnt OBJECT IDENTIFIER ::= { pmfanAlmOtherUrg 20 }
+
+
+
+
+pmfanAlmFanLowSpeed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Low Speed :This OID indicates 
+        the fans of the PM FAN are blowing 
+        at low speed <Help> This alarm
+         indicates the fans of the PM FAN 
+        are blowing at low speed <Condtype> 
+        FAN_LOW_SPEED <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmfanAlmfansMgnt 14 }
+
+
+
+pmfanAlmFansOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fans Fail :This OID indicates
+         the fans of the PMFAN are OFF
+          <Help>  This alarm indicates
+         the fans of the PMFAN are OFF
+         <Condtype> FANS_OFF <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmfansMgnt 13 }
+
+
+
+pmfanAlmFan6Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit N°6 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 6. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN n°6 is in fail condition 
+        <Condtype> FAN6_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmfansMgnt 7 }
+
+
+
+pmfanAlmFan5Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit N°5 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 5. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN n°5 is in fail condition 
+        <Condtype> FAN5_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmfansMgnt 6 }
+
+
+
+pmfanAlmFan4Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit N°4 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 4. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN n°4 is in fail condition 
+        <Condtype> FAN4_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmfansMgnt 5 }
+
+
+
+pmfanAlmFan3Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit N°3 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 3. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN n°3 is in fail condition 
+        <Condtype> FAN3_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmfansMgnt 4 }
+
+
+
+pmfanAlmFan2Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit N°2 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 2. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN n°2 is in fail condition 
+        <Condtype> FAN2_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmfansMgnt 3 }
+
+
+
+pmfanAlmFan1Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit N°1 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 1. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN n°1 is in fail condition 
+        <Condtype> FAN1_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmfansMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the chassisTempAlarms article
+--- *****************************************************
+pmfanAlmchassisTempAlarms OBJECT IDENTIFIER ::= { pmfanAlmOtherUrg 21 }
+
+
+
+
+pmfanAlmChassisTempHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Temperature High Alarm 
+        :This OID indicates a high threshold 
+        temperature alarm is reached  <Help> 
+         This alarm indicates that the
+         chassis temperature is over the 
+        alarm threshold <Condtype> CHASSIS_TEMP_HIGH_ALARM 
+        <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm(5) 
+         <Polarity> (2) 
+        "
+	  ::= { pmfanAlmchassisTempAlarms 2 }
+
+
+
+pmfanAlmChassisTempLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Temperature Low Alarm
+         :This OID indicates a low threshold 
+        temperature alarm is reached  <Help> 
+         This alarm indicates that the
+         chassis temperature is under the 
+        alarm threshold <Condtype> CHASSIS_TEMP_LOW_ALARM 
+        <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm(5) 
+         <Polarity> (2) 
+        "
+	  ::= { pmfanAlmchassisTempAlarms 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the chassisTempWarnings article
+--- *****************************************************
+pmfanAlmchassisTempWarnings OBJECT IDENTIFIER ::= { pmfanAlmOtherUrg 22 }
+
+
+
+
+pmfanAlmChassisTempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Temperature High Warning 
+        :This OID indicates a high threshold 
+        temperature warning is reached
+          <Help>  This alarm indicates
+         that the chassis temperature is 
+        over the warning threshold <Condtype> 
+        CHASSIS_TEMP_HIGH_WARNING <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm(5) 
+         <Polarity> (2) 
+        "
+	  ::= { pmfanAlmchassisTempWarnings 2 }
+
+
+
+pmfanAlmChassisTempLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Temperature Low Warning 
+        :This OID indicates a low threshold 
+        temperature warning is reached
+          <Help>  This alarm indicates
+         that the chassis temperature is 
+        under the warning threshold <Condtype> 
+        CHASSIS_TEMP_LOW_WARNING <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm(5) 
+         <Polarity> (2) 
+        "
+	  ::= { pmfanAlmchassisTempWarnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the modInitFailLevel2 article
+--- *****************************************************
+pmfanAlmmodInitFailLevel2 OBJECT IDENTIFIER ::= { pmfanAlmOtherUrg 70 }
+
+
+
+
+pmfanAlmInvReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+         : <Condtype> INV_READ_FAIL <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmfanAlmmodInitFailLevel2 4 }
+
+
+
+pmfanAlmConfReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Conf_Read_Fail : <Condtype> CONF_READ_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmmodInitFailLevel2 3 }
+
+
+
+pmfanAlmResetHwInitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reset_HW_Init_Fail : <Condtype> 
+        RESET_HW_INIT_FAIL <Probcause>
+         other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmfanAlmmodInitFailLevel2 2 }
+
+
+
+pmfanAlmRegReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reg_Read_Fail : <Condtype> REG_READ_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmfanAlmmodInitFailLevel2 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmfanCtrlsynth0 OBJECT IDENTIFIER ::= { pmfanCtrlOther 0 }
+
+
+
+
+pmfanCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>    This control restores 
+        the default configuration of the 
+        module
+        "
+	  ::= { pmfanCtrlsynth0 13 }
+
+
+
+pmfanCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>    This
+         control saves the customer configuration 
+        on the module
+        "
+	  ::= { pmfanCtrlsynth0 9 }
+
+
+
+pmfanCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmfanCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmfanCtrlsynth4 OBJECT IDENTIFIER ::= { pmfanCtrlOther 4 }
+
+
+
+
+pmfanCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmfanCtrlsynth4 2 }
+
+
+
+pmfanCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmfanCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmfanCtrlswMgnt OBJECT IDENTIFIER ::= { pmfanCtrlOther 5 }
+
+
+
+
+pmfanCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>    This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmfanCtrlswMgnt 3 }
+
+
+
+pmfanCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>    This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmfanCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the poweraLed article
+--- *****************************************************
+pmfanCtrlpoweraLed OBJECT IDENTIFIER ::= { pmfanCtrlOther 43 }
+
+
+
+
+pmfanCtrlLedPowerA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PowerA_Led :This OID switches
+         on the PowerA Led on the PMFAN 
+          <Help>    This control sets the 
+        PowerA led
+        "
+	  ::= { pmfanCtrlpoweraLed 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the powerbLed article
+--- *****************************************************
+pmfanCtrlpowerbLed OBJECT IDENTIFIER ::= { pmfanCtrlOther 44 }
+
+
+
+
+pmfanCtrlLedPowerB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PowerB_Led :This OID switches
+         on the PowerB Led on the PMFAN 
+        <Help>    This control sets the 
+        PowerB led
+        "
+	  ::= { pmfanCtrlpowerbLed 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmfanCtrlledTest OBJECT IDENTIFIER ::= { pmfanCtrlOther 64 }
+
+
+
+
+pmfanCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>    This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmfanCtrlledTest 3 }
+
+
+
+pmfanCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>    This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmfanCtrlledTest 2 }
+
+
+
+pmfanCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>    This control 
+        initiates a test leds turning all 
+        the LEDs to green
+        "
+	  ::= { pmfanCtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the acknowledgeActiv article
+--- *****************************************************
+pmfanCtrlacknowledgeActiv OBJECT IDENTIFIER ::= { pmfanCtrlOther 65 }
+
+
+
+
+pmfanCtrlAckActiv OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm Ack. :This OID is used to 
+        acknowledge the current active
+         alarms of the chassis  <Help>
+          This control is used to acknowledge 
+        the current active alarms of the 
+        chassis
+        "
+	  ::= { pmfanCtrlacknowledgeActiv 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the tempChassis article
+--- *****************************************************
+
+pmfanMesrtempChassis OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Temperature :This OID
+         gives the temperature value of 
+        the Chassis (Temperature = AV/256) 
+         (Unit = C)  <Help>   This measure 
+        gives the temperature value of
+         the Chassis
+        "
+	  ::= { pmfanMesrOther 64 }
+
+
+
+--- *****************************************************
+---     LEAF for the tempModule article
+--- *****************************************************
+
+pmfanMesrtempModule OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature :This OID gives 
+        the temperature value of the PMFAN 
+        (Temperature = AV/256)  (Unit = 
+        C)  <Help>   This measure gives 
+        the temperature value of the PMFAN
+        "
+	  ::= { pmfanMesrOther 65 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pmfanCfgLsd OBJECT IDENTIFIER ::= { pmfanConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+pmfanCfgStartUp OBJECT IDENTIFIER ::= { pmfanConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmfantableother OBJECT IDENTIFIER ::= { pmfanCfgStartUp 1 }
+
+
+
+pmfanCfglowspeedThresh OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fans Low Speed Threshold Temp
+         :This register selects the temperature 
+        threshold to trigger the fans to 
+        a low speed when the temperature 
+        is reaching that threshold when 
+        decreasing
+        "
+	  ::= { pmfantableother 2 }
+
+
+
+pmfanCfghighspeedThresh OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fans High Speed Threshold Temp 
+        :This register selects the temperature 
+        threshold to trigger the fans to 
+        a high speed when the temperature 
+        is reaching that threshold when 
+        increasing
+        "
+	  ::= { pmfantableother 3 }
+
+
+
+pmfanCfgpmfanMgnt OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pmfan Management :This register 
+        selects the features to manage
+         the Pmfan
+        "
+	  ::= { pmfantableother 10 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmfanCfgLabels OBJECT IDENTIFIER ::= { pmfanConfig 3 }
+
+
+
+
+pmfanCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmfanConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmfantrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmfantraps 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     FAN TRAPS
+--- *****************************************************
+
+pmfanPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmfanAlmDefPowerA, pmfanAlmDefPowerB}
+	STATUS current
+	--&FILTNAME    "Power A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmfanAlmDefPowerA "on", pmfantrapBoardNumber "$3"}
+	--&MESG        "Power A Fail in Slot $3 ($A)"
+
+	--&FILTNAME    "Power B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmfanAlmDefPowerB "on", pmfantrapBoardNumber "$3"}
+	--&MESG        "Power B Fail in Slot $3 ($A)"
+	DESCRIPTION "Urgent power default is activated"
+	::= { pmfantraps 32 }
+
+pmfanPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmfanAlmDefPowerA, pmfanAlmDefPowerB}
+	STATUS current
+	--&FILTNAME    "Power A Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "Power A ON"}
+	--&MATCH       { pmfanAlmDefPowerA "on", pmfantrapBoardNumber "$3"}
+	--&MESG        "Power A ON in Slot $3 ($A)"
+
+	--&FILTNAME    "Power B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "Power B ON"}
+	--&MATCH       { pmfanAlmDefPowerB "on", pmfantrapBoardNumber "$3"}
+	--&MESG        "Power B ON in Slot $3 ($A)"
+	DESCRIPTION "Urgent power default disappeared"
+	::= { pmfantraps 33 }
+
+pmfanPowerTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmfanAlmDefFuseB,pmfanAlmDefFuseA}
+	STATUS current
+	--&FILTNAME    "PMFAN Fuse Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmfanAlmDefFuseA "on", pmfanAlmDefFuseB "on", pmfantrapBoardNumber "$3"}
+	--&MESG        "Fuse Fail on PMFAN in Slot $3 ($A)"
+	DESCRIPTION "Critical power default is activated"
+	::= { pmfantraps 34 }
+
+pmfanPowerTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmfanAlmDefFuseB,pmfanAlmDefFuseA}
+	STATUS current
+	--&FILTNAME    "PMFAN Fuse Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMFAN Fuse Fail ON"}
+	--&MATCH       { pmfanAlmDefFuseA "on", pmfanAlmDefFuseB "on", pmfantrapBoardNumber "$3"}
+	--&MESG        "Fuse on PMFAN present in Slot $3 ($A)"
+	DESCRIPTION "Critical power default disappeared"
+	::= { pmfantraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     Fan TRAPS
+--- *****************************************************
+
+pmfanFanTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmfanAlmFansFailure}
+	STATUS current
+	--&FILTNAME    "FANs Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmfanAlmFansFailure "on", pmfantrapBoardNumber "$3"}
+	--&MESG        "FAN Fail in Slot $3 ($A)"
+	DESCRIPTION "Critical fan default is activated"
+	::= { pmfantraps 44 }
+
+pmfanFanTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmfanAlmFansFailure}
+	STATUS current
+	--&FILTNAME    "FANs Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "FANs Fail ON"}
+	--&MATCH       { pmfanAlmFansFailure "on", pmfantrapBoardNumber "$3"}
+	--&MESG        "FANs OK in Slot $3 ($A)"
+	DESCRIPTION "Critical fan default disappeared"
+	::= { pmfantraps 45 }
+
+
+
+
+
+
+END

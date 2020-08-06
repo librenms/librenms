@@ -1,0 +1,2061 @@
+-- *****************************************************************
+-- EKINOPS-PmROADMC.TXT:  MIB
+--
+--MIB Part Number:3MI00204AGAD
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-PmroadmC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulepmroadmC MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops PmroadmC hardware."
+	REVISION "200808210000Z"
+	DESCRIPTION
+	  "Initial Version."
+
+	REVISION "200902050000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "200909290000Z"
+	DESCRIPTION
+	  "CondType Insertion parameters"
+	REVISION "201002050000Z"
+	DESCRIPTION
+	  "Add more for NMS"
+
+	REVISION "201002240000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS"
+	REVISION "201011040000Z"
+	DESCRIPTION
+	  "Formulas in comments"
+	REVISION "201012150000Z"
+	DESCRIPTION
+	  "Add inventories for the NMS"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201207050000Z"
+	DESCRIPTION
+	  "Mib Part Number corrected"
+	REVISION "201207090000Z"
+	DESCRIPTION
+	  "Mib Part Number corrected"
+	REVISION "201403260000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201412160000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 35 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmroadmCalarms OBJECT IDENTIFIER ::= { modulepmroadmC 2 }	
+pmroadmCAlmOther OBJECT IDENTIFIER ::= { pmroadmCalarms 1 }
+pmroadmCAlmOtherNurg OBJECT IDENTIFIER ::= { pmroadmCAlmOther 1 }
+pmroadmCAlmOtherUrg OBJECT IDENTIFIER ::= { pmroadmCAlmOther 2 }
+pmroadmCAlmOtherCrit OBJECT IDENTIFIER ::= { pmroadmCAlmOther 3 }
+
+
+pmroadmCmeasures OBJECT IDENTIFIER ::= { modulepmroadmC 3 }	
+pmroadmCMesrOther OBJECT IDENTIFIER ::= { pmroadmCmeasures 1 }	
+
+
+pmroadmCcontrolsWrite OBJECT IDENTIFIER ::= { modulepmroadmC 6 }
+pmroadmCCtrlOther OBJECT IDENTIFIER ::= { pmroadmCcontrolsWrite 1 }
+pmroadmCCtrlExpress OBJECT IDENTIFIER ::= { pmroadmCcontrolsWrite 2 }
+pmroadmCCtrlLine OBJECT IDENTIFIER ::= { pmroadmCcontrolsWrite 3 }
+
+pmroadmCri OBJECT IDENTIFIER ::= { modulepmroadmC 7 }
+pmroadmCriTable OBJECT IDENTIFIER ::= { pmroadmCri 1 }
+
+pmroadmCConfig OBJECT IDENTIFIER ::= { modulepmroadmC 9 }
+
+pmroadmCtraps OBJECT IDENTIFIER ::= { modulepmroadmC 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+PmroadmCGrid ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different grids on line ports"
+    SYNTAX INTEGER {
+		roadmCgrid200(200),
+		roadmCgrid100(100),
+		roadmCgrid50(50)
+           }
+
+PmroadmCPlanNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different values for plans"
+    SYNTAX INTEGER {
+		workingPlan(0),
+		savedPlan1(1),
+		savedPlan2(2),
+		usedPlan(7)
+           }
+
+PmroadmCChannel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Channel selection on line ports"
+    SYNTAX INTEGER {
+
+           }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmroadmCRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmroadmCri 2 }
+
+  
+pmroadmCRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmroadmCri 4 }
+  
+pmroadmCRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmroadmCri 5 }
+
+
+
+
+pmroadmCRinvPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmroadmCRinvPortEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the Ports on the selected module"
+      ::= { pmroadmCriTable 1 }
+
+pmroadmCRinvPortEntry OBJECT-TYPE
+        SYNTAX  PmroadmCRinvPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the Port table"
+        INDEX   { pmroadmCRinvPortIndex }
+        ::= { pmroadmCRinvPortTable 1 }
+    
+
+
+PmroadmCRinvPortEntry::=
+        SEQUENCE {
+          pmroadmCRinvPortIndex 
+              Integer32,
+          pmroadmCRinvPort
+              DisplayString
+        }
+
+
+    pmroadmCRinvPortIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Port table"
+        ::= { pmroadmCRinvPortEntry 1 }
+
+
+    pmroadmCRinvPort OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the Port: This OID contains the inventory for the Port"
+        ::= { pmroadmCRinvPortEntry 2 }
+
+
+
+
+pmroadmCRinvLineTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmroadmCRinvLineEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the Lines on the selected module"
+      ::= { pmroadmCriTable 2 }
+
+pmroadmCRinvLineEntry OBJECT-TYPE
+        SYNTAX  PmroadmCRinvLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the Line table"
+        INDEX   { pmroadmCRinvLineIndex }
+        ::= { pmroadmCRinvLineTable 1 }
+    
+
+
+PmroadmCRinvLineEntry::=
+        SEQUENCE {
+          pmroadmCRinvLineIndex 
+              Integer32,
+          pmroadmCRinvxfpLine
+              DisplayString
+        }
+
+
+    pmroadmCRinvLineIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Line table"
+        ::= { pmroadmCRinvLineEntry 1 }
+
+
+    pmroadmCRinvxfpLine OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the Line: This OID contains the inventory for the Line"
+        ::= { pmroadmCRinvLineEntry 2 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmroadmCAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmroadmCAlmOtherCrit 0 }
+
+
+
+
+pmroadmCAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmsynthAlm0 16 }
+
+
+
+pmroadmCAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmsynthAlm0 15 }
+
+
+
+pmroadmCAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmsynthAlm0 9 }
+
+
+
+pmroadmCAlmInServiceNotReady OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Building Waveplan :This OID is 
+        a status indicating that the switch 
+        is currently setting a new waveplan 
+        (used plan)  <Help>  This status 
+        indicates that the ROADM is building 
+        a new waveplan (used plan) <Condtype> 
+        IN_SERVICE_NOT_READY <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmsynthAlm0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm7 article
+--- *****************************************************
+pmroadmCAlmsynthAlm7 OBJECT IDENTIFIER ::= { pmroadmCAlmOtherCrit 7 }
+
+
+
+
+pmroadmCAlmSwitchAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On WSS :This OID indicates 
+        an alarm is present coming out
+         of the switch  <Help>  This alarm 
+        indicates if an Alarm has been
+         detected on the switch <Condtype> 
+        SWITCH_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2)
+        "
+	  ::= { pmroadmCAlmsynthAlm7 10 }
+
+
+
+pmroadmCAlmSwitchDegrade OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On WSS :This OID indicates 
+        a  warning is present coming out 
+        of the switch  <Help>  This alarm 
+        indicates if a warning has been 
+        detected on the switch <Condtype> 
+        SWITCH_DEGRADE <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2)
+        "
+	  ::= { pmroadmCAlmsynthAlm7 9 }
+
+
+
+pmroadmCAlmInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        WSS Not Ready :This OID indicates 
+        the switch is not operational.
+ 
+         <Help>  This status indicates
+         if the switch has been correctly 
+        initialized <Condtype> INIT_NOT_COMPL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmsynthAlm7 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the switchAlarms article
+--- *****************************************************
+pmroadmCAlmswitchAlarms OBJECT IDENTIFIER ::= { pmroadmCAlmOtherUrg 16 }
+
+
+
+
+pmroadmCAlmSwitchTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        WSS Temperature High Alarm :Alarm 
+        indicating that the temperature 
+        of the Switch in the ROADM is higher 
+        than the alarm threshold value
+          <Help>  This Alarm indicates
+         if the temperature of the Switch 
+        in the ROADM is higher than the 
+        alarm threshold value. <Condtype> 
+        SWITCH_TEMP_HIGH_ALA <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmswitchAlarms 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the switchDegrade article
+--- *****************************************************
+pmroadmCAlmswitchDegrade OBJECT IDENTIFIER ::= { pmroadmCAlmOtherNurg 17 }
+
+
+
+
+pmroadmCAlmSwitchTempHighDeg OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        WSS Temperature High Warning :Warning 
+        indicating that the temperature 
+        of the Switch in the ROADM is higher 
+        than the warning threshold value. 
+         <Help>  This Warning indicates 
+        if the temperature of the Switch 
+        in the ROADM is higher than the 
+        warning threshold value. <Condtype> 
+        SWITCH_TEMP_HIGH_DEG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmswitchDegrade 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleStatus article
+--- *****************************************************
+pmroadmCAlmmoduleStatus OBJECT IDENTIFIER ::= { pmroadmCAlmOtherUrg 66 }
+
+
+
+
+pmroadmCAlmSwitchNotReady OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        WSS Not Ready :This OID indicates 
+        the switch is not operational.
+ 
+         <Help>   This status indicates 
+        if the Switch of the ROADM has
+         been correctly initialized <Condtype> 
+        SWITCH_NOT_READY <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmmoduleStatus 5 }
+
+
+
+pmroadmCAlmHotReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Previous Hot Reset :  <Help> 
+         This status indicates that the 
+        previous reset was a Hot Reset. 
+        <Condtype> HOT_RESET <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmmoduleStatus 3 }
+
+
+
+pmroadmCAlmWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Previous Warm Reset :  <Help>
+          This status indicates that the 
+        previous reset was a Warm Reset. 
+        <Condtype> WARM_RESET <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmmoduleStatus 2 }
+
+
+
+pmroadmCAlmColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Previous Cold Reset :  <Help>
+          This status indicates that the 
+        previous reset was a Cold Reset. 
+        <Condtype> COLD_RESET <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmmoduleStatus 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleAlarms article
+--- *****************************************************
+pmroadmCAlmmoduleAlarms OBJECT IDENTIFIER ::= { pmroadmCAlmOtherUrg 67 }
+
+
+
+
+pmroadmCAlmCaseTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Case Temperature High Alarm :Alarm 
+        indicating that the temperature 
+        of the case is higher than the
+         alarm threshold value  <Help>
+          This Alarm indicates if the temperature 
+        of the case is higher than the
+         alarm threshold value. <Condtype> 
+        CASE_TEMP_HIGH_ALA <Probcause>
+         temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmmoduleAlarms 4 }
+
+
+
+pmroadmCAlmModuleTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature High Alarm
+         :Alarm indicating that the temperature 
+        of the module is higher than the 
+        alarm threshold value  <Help> 
+         This Alarm indicates if the temperature 
+        of the ROADM is higher than the 
+        alarm threshold value. <Condtype> 
+        MODULE_TEMP_HIGH_ALA <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmmoduleAlarms 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleDegrad article
+--- *****************************************************
+pmroadmCAlmmoduleDegrad OBJECT IDENTIFIER ::= { pmroadmCAlmOtherUrg 68 }
+
+
+
+
+pmroadmCAlmCaseTempHighDeg OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Case Temperature High Warning
+         :Alarm indicating that the temperature 
+        of the case is higher than the
+         warning threshold value  <Help> 
+         This Warning indicates if the
+         temperature of the case is higher 
+        than the warning threshold value. 
+        <Condtype> CASE_TEMP_HIGH_DEG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmmoduleDegrad 4 }
+
+
+
+pmroadmCAlmModuleTempHighDeg OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature High Warning 
+        :Alarm indicating that the temperature 
+        of the module is higher than the 
+        warning threshold value  <Help> 
+         This Warning indicates if the
+         temperature of the ROADM is higher 
+        than the warning threshold value. 
+        <Condtype> MODULE_TEMP_HIGH_DEG 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmroadmCAlmmoduleDegrad 2 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmroadmCCtrlsynth0 OBJECT IDENTIFIER ::= { pmroadmCCtrlOther 0 }
+
+
+
+
+pmroadmCCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmroadmCCtrlsynth0 13 }
+
+
+
+pmroadmCCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmroadmCCtrlsynth0 9 }
+
+
+
+pmroadmCCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmroadmCCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmroadmCCtrlsynth4 OBJECT IDENTIFIER ::= { pmroadmCCtrlOther 4 }
+
+
+
+
+pmroadmCCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM
+        "
+	  ::= { pmroadmCCtrlsynth4 2 }
+
+
+
+pmroadmCCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM
+        "
+	  ::= { pmroadmCCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmroadmCCtrlswMgnt OBJECT IDENTIFIER ::= { pmroadmCCtrlOther 5 }
+
+
+
+
+pmroadmCCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Software Warm Reset :This OID, 
+        when set, causes a warm reset of 
+        the Software. This reset is not 
+        traffic affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmroadmCCtrlswMgnt 3 }
+
+
+
+pmroadmCCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Software Cold Reset :This OID, 
+        when set, causes a cold reset of 
+        the Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmroadmCCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the switchCtrl article
+--- *****************************************************
+pmroadmCCtrlswitchCtrl OBJECT IDENTIFIER ::= { pmroadmCCtrlOther 16 }
+
+
+
+
+pmroadmCCtrlAllChannelsHighLoss OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Express Ports Shutdown :This OID 
+        , when set, puts all the waves
+         on a high attenuation mode.  
+         <Help>  This control sets the
+         waves on a high attenuation mode
+        "
+	  ::= { pmroadmCCtrlswitchCtrl 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the craftSynch article
+--- *****************************************************
+
+pmroadmCCtrlcraftSynch OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Craft Synchro :This OID is used 
+        for internal purpose only
+        "
+	  ::= { pmroadmCCtrlOther 17 }
+
+
+
+--- *********************************************************
+---     TABLE for the pmroadmCCtrlexpTxCommonAttDeg articles
+--- *********************************************************
+
+pmroadmCCtrlexpTxCommonAttDegTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmroadmCCtrlexpTxCommonAttDegEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmroadmCCtrlexpTxCommonAttDeg 
+        Article
+        "
+	::= { pmroadmCCtrlExpress 19 }
+
+
+pmroadmCCtrlexpTxCommonAttDegEntry OBJECT-TYPE
+	SYNTAX PmroadmCCtrlexpTxCommonAttDegEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmroadmCCtrlexpTxCommonAttDeg 
+        table
+        "
+	INDEX   { pmroadmCCtrlexpTxCommonAttDegIndex }
+	::= { pmroadmCCtrlexpTxCommonAttDegTable 1 }
+
+
+PmroadmCCtrlexpTxCommonAttDegEntry ::=
+	SEQUENCE {
+	pmroadmCCtrlexpTxCommonAttDegIndex
+		INTEGER,
+	pmroadmCCtrlexpTxCommonAttDegPortn
+		INTEGER 
+	}
+
+
+pmroadmCCtrlexpTxCommonAttDegIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmroadmCCtrlexpTxCommonAttDeg 
+        table
+        "
+	::= { pmroadmCCtrlexpTxCommonAttDegEntry 1 }
+
+
+pmroadmCCtrlexpTxCommonAttDegPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Express Output Attenuation :This 
+        OID defines the line output attenuation. 
+          <Help>  This OID defines the
+         line output attenuation
+        "
+	::= { pmroadmCCtrlexpTxCommonAttDegEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmroadmCCtrlexpRxCommonAttDeg articles
+--- *********************************************************
+
+pmroadmCCtrlexpRxCommonAttDegTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmroadmCCtrlexpRxCommonAttDegEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmroadmCCtrlexpRxCommonAttDeg 
+        Article
+        "
+	::= { pmroadmCCtrlExpress 43 }
+
+
+pmroadmCCtrlexpRxCommonAttDegEntry OBJECT-TYPE
+	SYNTAX PmroadmCCtrlexpRxCommonAttDegEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmroadmCCtrlexpRxCommonAttDeg 
+        table
+        "
+	INDEX   { pmroadmCCtrlexpRxCommonAttDegIndex }
+	::= { pmroadmCCtrlexpRxCommonAttDegTable 1 }
+
+
+PmroadmCCtrlexpRxCommonAttDegEntry ::=
+	SEQUENCE {
+	pmroadmCCtrlexpRxCommonAttDegIndex
+		INTEGER,
+	pmroadmCCtrlexpRxCommonAttDegPortn
+		INTEGER 
+	}
+
+
+pmroadmCCtrlexpRxCommonAttDegIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmroadmCCtrlexpRxCommonAttDeg 
+        table
+        "
+	::= { pmroadmCCtrlexpRxCommonAttDegEntry 1 }
+
+
+pmroadmCCtrlexpRxCommonAttDegPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Express Input Attenuation :This 
+        OID defines the line input attenuation. 
+        (Unit = dB)  <Help>  This OID defines 
+        the line input attenuation
+        "
+	::= { pmroadmCCtrlexpRxCommonAttDegEntry 2 }
+
+
+--- *****************************************************
+---     LEAF for the applyPlanUpdate article
+--- *****************************************************
+pmroadmCCtrlapplyPlanUpdate OBJECT IDENTIFIER ::= { pmroadmCCtrlExpress 44 }
+
+
+
+
+pmroadmCCtrlApply OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Apply Update :This OID confirms 
+        the parameters selected for the 
+        waveplan modification
+        "
+	  ::= { pmroadmCCtrlapplyPlanUpdate 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmroadmCCtrlledTest OBJECT IDENTIFIER ::= { pmroadmCCtrlOther 64 }
+
+
+
+
+pmroadmCCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmroadmCCtrlledTest 3 }
+
+
+
+pmroadmCCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmroadmCCtrlledTest 2 }
+
+
+
+pmroadmCCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmroadmCCtrlledTest 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pmroadmCCtrlwavePlanAssignmentsRefresh articles
+--- *********************************************************
+
+pmroadmCCtrlwavePlanAssignmentsRefreshTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmroadmCCtrlwavePlanAssignmentsRefreshEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmroadmCCtrlwavePlanAssignmentsRefresh 
+        Article
+        "
+	::= { pmroadmCCtrlOther 65 }
+
+
+pmroadmCCtrlwavePlanAssignmentsRefreshEntry OBJECT-TYPE
+	SYNTAX PmroadmCCtrlwavePlanAssignmentsRefreshEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmroadmCCtrlwavePlanAssignmentsRefresh 
+        table
+        "
+	INDEX   { pmroadmCCtrlwavePlanAssignmentsRefreshIndex }
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshTable 1 }
+
+
+PmroadmCCtrlwavePlanAssignmentsRefreshEntry ::=
+	SEQUENCE {
+	pmroadmCCtrlwavePlanAssignmentsRefreshIndex
+		INTEGER,
+	pmroadmCCtrlWaveStatusRefreshPortn
+		EkiOnOff,
+	pmroadmCCtrlWaveNarrowingRefreshPortn
+		INTEGER,
+	pmroadmCCtrlWaveCenterFrequencyRefreshPortn
+		INTEGER,
+	pmroadmCCtrlWaveOOSRefreshPortn
+		EkiOnOff,
+	pmroadmCCtrlWaveAttenuationRefreshPortn
+		INTEGER,
+	pmroadmCCtrlWaveItuRefreshPortn
+		DisplayString,
+	pmroadmCCtrlWaveDegreeRefreshPortn
+		INTEGER,
+	pmroadmCCtrlUsageRefreshPortn
+		EkiOnOff
+	}
+
+
+pmroadmCCtrlwavePlanAssignmentsRefreshIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmroadmCCtrlwavePlanAssignmentsRefresh 
+        table
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 1 }
+
+
+pmroadmCCtrlWaveStatusRefreshPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        WaveStatus :This OID sets  the 
+        waves status to ON or OFF inside 
+        the waveplan.
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 2 }
+
+
+pmroadmCCtrlWaveNarrowingRefreshPortn OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        WaveNarrowing :This OID sets 
+         the wave narrowing value  inside 
+        the waveplan (Not Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 3 }
+
+
+pmroadmCCtrlWaveCenterFrequencyRefreshPortn OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        WaveCenterFrequency :This OID
+         sets  the wave center frequency 
+        value  inside the waveplan (Not 
+        Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 4 }
+
+
+pmroadmCCtrlWaveOOSRefreshPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        WaveOOS :This OID sets  the wave 
+        Out Of Service value  inside the 
+        waveplan (Not Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 5 }
+
+
+pmroadmCCtrlWaveAttenuationRefreshPortn OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        WaveAttenuation :This OID sets 
+         the wave attenuation value inside 
+        the waveplan.
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 6 }
+
+
+pmroadmCCtrlWaveItuRefreshPortn OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        WaveItu :This OID sets  the wave 
+        channel number inside the waveplan 
+        (Not Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 7 }
+
+
+pmroadmCCtrlWaveDegreeRefreshPortn OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        WaveDegree :This OID sets  the 
+        degree assigned to the wave inside 
+        the waveplan (Not Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 8 }
+
+
+pmroadmCCtrlUsageRefreshPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Wave Assignment :This OID gives 
+        the assignment of a wave for a
+         given waveplan along with the
+         full possible  waveplan.
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsRefreshEntry 16 }
+
+
+--- *********************************************************
+---     TABLE for the pmroadmCCtrlwavePlanAssignmentsWork articles
+--- *********************************************************
+
+pmroadmCCtrlwavePlanAssignmentsWorkTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmroadmCCtrlwavePlanAssignmentsWorkEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmroadmCCtrlwavePlanAssignmentsWork 
+        Article
+        "
+	::= { pmroadmCCtrlOther 66 }
+
+
+pmroadmCCtrlwavePlanAssignmentsWorkEntry OBJECT-TYPE
+	SYNTAX PmroadmCCtrlwavePlanAssignmentsWorkEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmroadmCCtrlwavePlanAssignmentsWork 
+        table
+        "
+	INDEX   { pmroadmCCtrlwavePlanAssignmentsWorkIndex }
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkTable 1 }
+
+
+PmroadmCCtrlwavePlanAssignmentsWorkEntry ::=
+	SEQUENCE {
+	pmroadmCCtrlwavePlanAssignmentsWorkIndex
+		INTEGER,
+	pmroadmCCtrlWaveStatusWorkPortn
+		EkiOnOff,
+	pmroadmCCtrlWaveNarrowingWorkPortn
+		INTEGER,
+	pmroadmCCtrlWaveCenterFrequencyWorkPortn
+		INTEGER,
+	pmroadmCCtrlWaveOOSWorkPortn
+		EkiOnOff,
+	pmroadmCCtrlWaveAttenuationWorkPortn
+		INTEGER,
+	pmroadmCCtrlWaveItuWorkPortn
+		DisplayString,
+	pmroadmCCtrlWaveDegreeWorkPortn
+		INTEGER,
+	pmroadmCCtrlUsageWorkPortn
+		EkiOnOff
+	}
+
+
+pmroadmCCtrlwavePlanAssignmentsWorkIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmroadmCCtrlwavePlanAssignmentsWork 
+        table
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 1 }
+
+
+pmroadmCCtrlWaveStatusWorkPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        WaveStatus :This OID sets  the 
+        waves status to ON or OFF inside 
+        the waveplan.
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 2 }
+
+
+pmroadmCCtrlWaveNarrowingWorkPortn OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        WaveNarrowing :This OID sets 
+         the wave narrowing value  inside 
+        the waveplan (Not Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 3 }
+
+
+pmroadmCCtrlWaveCenterFrequencyWorkPortn OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        WaveCenterFrequency :This OID
+         sets  the wave center frequency 
+        value  inside the waveplan (Not 
+        Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 4 }
+
+
+pmroadmCCtrlWaveOOSWorkPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        WaveOOS :This OID sets  the wave 
+        Out Of Service value  inside the 
+        waveplan (Not Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 5 }
+
+
+pmroadmCCtrlWaveAttenuationWorkPortn OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        WaveAttenuation :This OID sets 
+         the wave attenuation value inside 
+        the waveplan.
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 6 }
+
+
+pmroadmCCtrlWaveItuWorkPortn OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        WaveItu :This OID sets  the wave 
+        channel number inside the waveplan 
+        (Not Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 7 }
+
+
+pmroadmCCtrlWaveDegreeWorkPortn OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        WaveDegree :This OID sets  the 
+        degree assigned to the wave inside 
+        the waveplan (Not Used)
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 8 }
+
+
+pmroadmCCtrlUsageWorkPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Wave Assignment :This OID gives 
+        the assignment of a wave for a
+         given waveplan along with the
+         full possible  waveplan.
+        "
+	::= { pmroadmCCtrlwavePlanAssignmentsWorkEntry 16 }
+
+
+--- *****************************************************
+---     LEAF for the buildFromMgntPlan article
+--- *****************************************************
+
+pmroadmCCtrlbuildFromMgntPlan OBJECT-TYPE
+	  SYNTAX DisplayString
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Build From MGNT :This OID builds 
+        a waveplan from the waveplans stored 
+        in the MGNT board.  <Help>  This 
+        control builds a waveplan from
+         the waveplans stored in the MGNT 
+        board.
+        "
+	  ::= { pmroadmCCtrlOther 67 }
+
+
+
+--- *****************************************************
+---     LEAF for the loadToWorkplan article
+--- *****************************************************
+
+pmroadmCCtrlloadToWorkplan OBJECT-TYPE
+	  SYNTAX PmroadmCPlanNumber
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Display Waveplan :This OID displays 
+        in the user interface one of the 
+        following waveplan : In service 
+        Waveplan, Saved Waveplan 1, Saved 
+        Waveplan 2, Build from MGNT Waveplan. 
+         <Help>  This control displays
+         in the user interface one of the 
+        following waveplan : In service 
+        Waveplan, Saved Waveplan 1, Saved 
+        Waveplan 2, Build from MGNT Waveplan.
+        "
+	  ::= { pmroadmCCtrlOther 68 }
+
+
+
+--- *****************************************************
+---     LEAF for the saveWorkPlanTo article
+--- *****************************************************
+
+pmroadmCCtrlsaveWorkPlanTo OBJECT-TYPE
+	  SYNTAX PmroadmCPlanNumber
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Save Waveplan : This OID saves 
+        (in the Saved Waveplan 1 or Saved 
+        Waveplan 2) the waveplan built
+         with the user interface.  <Help> 
+         This control saves (in the Saved 
+        Waveplan 1 or Saved Waveplan 2) 
+        the waveplan displayed with the 
+        user interface.
+        "
+	  ::= { pmroadmCCtrlOther 69 }
+
+
+
+--- *****************************************************
+---     LEAF for the loadPlanToUse article
+--- *****************************************************
+
+pmroadmCCtrlloadPlanToUse OBJECT-TYPE
+	  SYNTAX PmroadmCPlanNumber
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Waveplan In Service : This 
+        OID sets on the following waveplan 
+        In Service (Saved Waveplan 1, Saved 
+        Waveplan 2 or Displayed Waveplan). 
+         <Help>  This control sets on the 
+        following waveplan In Service (Saved 
+        Waveplan 1, Saved Waveplan 2 or 
+        Displayed Waveplan).
+        "
+	  ::= { pmroadmCCtrlOther 70 }
+
+
+
+--- *****************************************************
+---     LEAF for the refreshWithPlan article
+--- *****************************************************
+
+pmroadmCCtrlrefreshWithPlan OBJECT-TYPE
+	  SYNTAX PmroadmCPlanNumber
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Refresh User Interface :This OID 
+        refreshes the user interface with 
+        the information coming from the 
+        In service Waveplan, the Saved
+         Waveplan 1 or the Saved Waveplan 
+        2.  <Help>  This control refreshes 
+        the user interface with the information 
+        coming from the In service Waveplan, 
+        the Saved Waveplan 1 or the Saved 
+        Waveplan 2.
+        "
+	  ::= { pmroadmCCtrlOther 71 }
+
+
+
+--- *****************************************************
+---     LEAF for the savePlanToFile article
+--- *****************************************************
+
+pmroadmCCtrlsavePlanToFile OBJECT-TYPE
+	  SYNTAX PmroadmCPlanNumber
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Export To File On MGNT :This OID 
+        exports the Displayed Waveplan
+         to a file on the MGNT board. 
+         <Help>  This control the Displayed 
+        waveplan to a file on the MGNT
+         board.
+        "
+	  ::= { pmroadmCCtrlOther 72 }
+
+
+
+--- *****************************************************
+---     LEAF for the loadPlanFromFile article
+--- *****************************************************
+
+pmroadmCCtrlloadPlanFromFile OBJECT-TYPE
+	  SYNTAX PmroadmCPlanNumber
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Import From File On MGNT :This 
+        OID imports a waveplan from a file 
+        on the MGNT board to the Displayed 
+        Waveplan.  <Help>  This control 
+        imports a waveplan from a file
+         on the MGNT board to the Displayed 
+        Waveplan.
+        "
+	  ::= { pmroadmCCtrlOther 73 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the switchTemp article
+--- *****************************************************
+
+pmroadmCMesrswitchTemp OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        WSS Temperature :This OID gives 
+        the temperature value of the switch 
+        in the ROADM (Temperature = AV/256) 
+        (Unit = C)   <Help>   This measure 
+        gives the temperature value of
+         the switch in the ROADM
+        "
+	  ::= { pmroadmCMesrOther 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleTemp article
+--- *****************************************************
+
+pmroadmCMesrmoduleTemp OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature :This OID gives 
+        the temperature value of the ROADM 
+        (Temperature = AV/256) (Unit =
+         C)  <Help>   This measure gives 
+        the temperature value of the ROADM
+        "
+	  ::= { pmroadmCMesrOther 64 }
+
+
+
+--- *****************************************************
+---     LEAF for the caseTemp article
+--- *****************************************************
+
+pmroadmCMesrcaseTemp OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Case Temperature :This OID gives 
+        the temperature value of the case 
+        of the ROADM  (Temperature = AV/256) 
+        (Unit = C)  <Help>   This measure 
+        gives the temperature value of
+         the case of the ROADM
+        "
+	  ::= { pmroadmCMesrOther 65 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pmroadmCCfgLsd OBJECT IDENTIFIER ::= { pmroadmCConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0012
+--- *****************************************************
+
+pmroadmCtableclientLsd OBJECT IDENTIFIER ::= { pmroadmCCfgLsd 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startup
+--- *****************************************************
+
+pmroadmCCfgStartup OBJECT IDENTIFIER ::= { pmroadmCConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2111
+--- *****************************************************
+
+pmroadmCCfgClientStartupTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmroadmCCfgClientStartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmroadmCCfgStartup 1 }
+
+
+pmroadmCCfgClientStartupEntry OBJECT-TYPE
+	SYNTAX PmroadmCCfgClientStartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startup 
+        table
+        "
+	INDEX   { pmroadmCCfgClientStartupIndex }
+	::= { pmroadmCCfgClientStartupTable 1 }
+
+
+PmroadmCCfgClientStartupEntry ::=
+	SEQUENCE {
+	pmroadmCCfgClientStartupIndex
+		INTEGER,
+	pmroadmCCfgLineaRxCommonAttDegPortn
+		Unsigned32
+	}
+
+
+pmroadmCCfgClientStartupIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientStartup 
+        table
+        "
+	::= { pmroadmCCfgClientStartupEntry 1 }
+
+
+pmroadmCCfgLineaRxCommonAttDegPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Defaut setting on attenuation
+         on Rx Express :This register selects 
+        the Rx attenuator value of the
+         Express line on setup
+        "
+	::= { pmroadmCCfgClientStartupEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmroadmCtablelineStartup OBJECT IDENTIFIER ::= { pmroadmCCfgStartup 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2511
+--- *****************************************************
+
+pmroadmCtableclientsRoadm OBJECT IDENTIFIER ::= { pmroadmCCfgStartup 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2591
+--- *****************************************************
+
+pmroadmCtablelinesRoadm OBJECT IDENTIFIER ::= { pmroadmCCfgStartup 4 }
+
+
+
+pmroadmCCfgexpGridCurrent OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting of the grid  :This 
+        register selects the configuration 
+        of the grid used on setup
+        "
+	  ::= { pmroadmCtablelinesRoadm 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0005
+--- *****************************************************
+
+pmroadmCtableother OBJECT IDENTIFIER ::= { pmroadmCCfgStartup 5 }
+
+
+
+pmroadmCCfgcomponentType OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Component parameters :This OID 
+        defines the component parameters
+        "
+	  ::= { pmroadmCtableother 2 }
+
+
+
+pmroadmCCfgmiscellaneous OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Miscellaneous default settings 
+        :This OID defines the miscellaneous 
+        parameters
+        "
+	  ::= { pmroadmCtableother 3 }
+
+
+
+pmroadmCCfgfirstChannel OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Number of the first channel of 
+        the component :This OID defines 
+        the first channel number of the 
+        PM
+        "
+	  ::= { pmroadmCtableother 4 }
+
+
+
+pmroadmCCfglastChannel OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Number of the last channel of
+         the component :This OID defines 
+        the last channel number of the
+         PM
+        "
+	  ::= { pmroadmCtableother 5 }
+
+
+
+pmroadmCCfggrid OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Grid value of the component :This 
+        OID defines the grid of the PM
+        "
+	  ::= { pmroadmCtableother 6 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmroadmCCfgLabels OBJECT IDENTIFIER ::= { pmroadmCConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmroadmCCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmroadmCCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmroadmCCfgLabels 1 }
+
+
+pmroadmCCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmroadmCCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmroadmCCfgLabelclientIndex }
+	::= { pmroadmCCfgLabelclientTable 1 }
+
+
+PmroadmCCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmroadmCCfgLabelclientIndex
+		INTEGER,
+	pmroadmCCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmroadmCCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmroadmCCfgLabelclientEntry 1 }
+
+
+pmroadmCCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmroadmCCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmroadmCCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmroadmCCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmroadmCCfgLabels 2 }
+
+
+pmroadmCCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmroadmCCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmroadmCCfgLabellineIndex }
+	::= { pmroadmCCfgLabellineTable 1 }
+
+
+PmroadmCCfgLabellineEntry ::=
+	SEQUENCE {
+	pmroadmCCfgLabellineIndex
+		INTEGER,
+	pmroadmCCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmroadmCCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmroadmCCfgLabellineEntry 1 }
+
+
+pmroadmCCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmroadmCCfgLabellineEntry 3 }
+
+
+
+pmroadmCCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmroadmCConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmroadmCtrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmroadmCtraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmroadmCPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmroadmCAlmDefFuseB, pmroadmCAlmDefFuseA , pmroadmCtrapBoardNumber}
+	STATUS current
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmroadmCtraps 50 }
+pmroadmCPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmroadmCAlmDefFuseB, pmroadmCAlmDefFuseA , pmroadmCtrapBoardNumber}
+	STATUS current
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmroadmCtraps 51 }
+
+
+
+
+
+
+END

@@ -1,0 +1,2901 @@
+-- *****************************************************************
+-- EKINOPS-pmoail.TXT:  MIB
+--
+--MIB Part Number:3MI00205AJAD
+--MIB Version:02
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-PmOail-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulepmoail MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "Creation"
+
+	REVISION "200903230000Z"
+	DESCRIPTION
+	  "Add ext Pumps features"
+	REVISION "200904080000Z"
+	DESCRIPTION
+	  "Cosmetic for mib compilers"
+	REVISION "200909240000Z"
+	DESCRIPTION
+	  "CondType parameters insertion"
+	REVISION "200912140000Z"
+	DESCRIPTION
+	  "Correction on traps"
+	REVISION "201002240000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS"
+	REVISION "201007150000Z"
+	DESCRIPTION
+	  "Add inventory objects for the NMS"
+	REVISION "201010290000Z"
+	DESCRIPTION
+	  "Formula in comments, Objetcs removal"
+	REVISION "201011030000Z"
+	DESCRIPTION
+	  "Modify inventory objects for the NMS"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201210050000Z"
+	DESCRIPTION
+	  "Minor labels changes"
+	REVISION "201403260000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201412100000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 36 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmoailalarms OBJECT IDENTIFIER ::= { modulepmoail 2 }	
+pmoailAlmOther OBJECT IDENTIFIER ::= { pmoailalarms 1 }
+pmoailAlmOtherNurg OBJECT IDENTIFIER ::= { pmoailAlmOther 1 }
+pmoailAlmOtherUrg OBJECT IDENTIFIER ::= { pmoailAlmOther 2 }
+pmoailAlmOtherCrit OBJECT IDENTIFIER ::= { pmoailAlmOther 3 }
+
+pmoailAlmClient OBJECT IDENTIFIER ::= { pmoailalarms 2 }
+pmoailAlmClientNurg OBJECT IDENTIFIER ::= { pmoailAlmClient 1 }
+pmoailAlmClientUrg OBJECT IDENTIFIER ::= { pmoailAlmClient 2 }
+pmoailAlmClientCrit OBJECT IDENTIFIER ::= { pmoailAlmClient 3 }
+	
+pmoailAlmLine OBJECT IDENTIFIER ::= { pmoailalarms 3 }
+pmoailAlmLineNurg OBJECT IDENTIFIER ::= { pmoailAlmLine 1 }
+pmoailAlmLineUrg OBJECT IDENTIFIER ::= { pmoailAlmLine 2 }
+pmoailAlmLineCrit OBJECT IDENTIFIER ::= { pmoailAlmLine 3 }
+
+
+pmoailmeasures OBJECT IDENTIFIER ::= { modulepmoail 3 }	
+pmoailMesrOther OBJECT IDENTIFIER ::= { pmoailmeasures 1 }	
+pmoailMesrClient OBJECT IDENTIFIER ::= { pmoailmeasures 2 }	
+pmoailMesrLine OBJECT IDENTIFIER ::= { pmoailmeasures 3 }	
+
+
+pmoailcontrolsWrite OBJECT IDENTIFIER ::= { modulepmoail 6 }
+pmoailCtrlOther OBJECT IDENTIFIER ::= { pmoailcontrolsWrite 1 }
+pmoailCtrlClient OBJECT IDENTIFIER ::= { pmoailcontrolsWrite 2 }
+pmoailCtrlLine OBJECT IDENTIFIER ::= { pmoailcontrolsWrite 3 }
+
+pmoailri OBJECT IDENTIFIER ::= { modulepmoail 7 }
+
+
+pmoailConfig OBJECT IDENTIFIER ::= { modulepmoail 9 }
+
+pmoailtraps OBJECT IDENTIFIER ::= { modulepmoail 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+PmoailpreampMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on OA preamp"
+    SYNTAX INTEGER {
+		oapreampdefaultmode(0),
+		oapreampconstantcurrentmode(1),
+		oapreampconstantpowermode(2)
+
+           }
+
+PmoailboosterMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on OA booster"
+    SYNTAX INTEGER {
+		oaboosterdefaultmode(0),
+		oaboosterconstantcurrentmode(1),
+		oaboosterconstantpowermode(2)
+
+           }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmoailRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmoailri 2 }
+  
+pmoailRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmoailri 3 }
+  
+pmoailRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmoailri 4 }
+  
+pmoailRinvSwFoa OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Optical device driver description: This OID contains
+	 the description of the driver of the optical devices 
+	(Booster and Pre-Amp)"
+  ::= { pmoailri 5 }
+
+
+
+pmoailRinvInLine1Table OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmoailRinvInLine1Entry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the InLine1s on the selected module"
+      ::= { pmoailri 6 }
+
+pmoailRinvInLine1Entry OBJECT-TYPE
+        SYNTAX  PmoailRinvInLine1Entry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the InLine1s table"
+        INDEX   { pmoailRinvInLine1Index }
+        ::= { pmoailRinvInLine1Table 1 }
+    
+
+
+PmoailRinvInLine1Entry::=
+        SEQUENCE {
+          pmoailRinvInLine1Index 
+              Integer32,
+          pmoailRinvInLine1
+              DisplayString
+        }
+
+
+    pmoailRinvInLine1Index OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for InLine1 table"
+        ::= { pmoailRinvInLine1Entry 1 }
+
+
+    pmoailRinvInLine1 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the InLine1: This OID contains the inventory for the InLine1"
+        ::= { pmoailRinvInLine1Entry 2 }
+
+
+
+
+pmoailRinvInLine2Table OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmoailRinvInLine2Entry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the InLine2s on the selected module"
+      ::= { pmoailri 7 }
+
+pmoailRinvInLine2Entry OBJECT-TYPE
+        SYNTAX  PmoailRinvInLine2Entry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the InLine2 table"
+        INDEX   { pmoailRinvInLine2Index }
+        ::= { pmoailRinvInLine2Table 1 }
+    
+
+
+PmoailRinvInLine2Entry::=
+        SEQUENCE {
+          pmoailRinvInLine2Index 
+              Integer32,
+          pmoailRinvInLine2
+              DisplayString
+        }
+
+
+    pmoailRinvInLine2Index OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for InLine2 table"
+        ::= { pmoailRinvInLine2Entry 1 }
+
+
+    pmoailRinvInLine2 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the InLine2: This OID contains the inventory for the InLine2"
+        ::= { pmoailRinvInLine2Entry 2 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmoailAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmoailAlmOtherCrit 0 }
+
+
+
+
+pmoailAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm0 16 }
+
+
+
+pmoailAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm0 15 }
+
+
+
+pmoailAlmExtPumpNotLocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        External Pump1 Not Detected :This 
+        OID indicates that the first external 
+        pump is not detected by the amplifier 
+        module  <Help>  This alarm indicates 
+        if the first external pump is detected 
+        by the amplifier module <Condtype> 
+        EXT_PUMP_NOT_LOCKED <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm0 12 }
+
+
+
+pmoailAlmDwEdfaInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Not Initialized :This OID
+         indicates that the initialisation 
+        of the IL2 is not completed  <Help> 
+         This status indicates if the IL2 
+        has been correctly initialized
+         <Condtype> DW_EDFA_INIT_NOT_COMPL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm0 11 }
+
+
+
+pmoailAlmUpEdfaInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Not Initialized :This OID
+         indicates that the initialisation 
+        of the IL1 is not completed  <Help> 
+         This status indicates if the IL1 
+        has been correctly initialized
+         <Condtype> UP_EDFA_INIT_NOT_COMPL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm0 10 }
+
+
+
+pmoailAlmModGlobFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MOD_GLOB_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm0 9 }
+
+
+
+pmoailAlmMaintenanceMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Maintenance Mode :This OID indicates 
+        that the PM is in maintenance mode 
+         <Help>  This status indiates if 
+        the module is currently in maintenance 
+        mode <Condtype> MAINTENANCE_MODE 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmoailAlmsynthAlm2 OBJECT IDENTIFIER ::= { pmoailAlmOtherNurg 2 }
+
+
+
+
+pmoailAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm2 3 }
+
+
+
+pmoailAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmoailAlmsynthAlm2 2 }
+
+
+
+pmoailAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmoailAlmsynthAlm2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm7 article
+--- *****************************************************
+pmoailAlmsynthAlm7 OBJECT IDENTIFIER ::= { pmoailAlmLineCrit 7 }
+
+
+
+
+pmoailAlmLineFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line Port Failure :This OID indicates 
+        a failure on the line port <Condtype> 
+        LINE_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm7 12 }
+
+
+
+pmoailAlmLineDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Line Optical Module DDM 
+        :This OID indicates an alarm is 
+        present coming out of Line optical 
+        interface DDM <Condtype> LINE_DDM_ALM 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm7 10 }
+
+
+
+pmoailAlmLineDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Line Optical Module 
+        DDM :This OID indicates a warning 
+        is present coming out of Line optical 
+        interface DDM <Condtype> LINE_DDM_WARNING 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm7 9 }
+
+
+
+pmoailAlmLineTxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Optical Output Shutdown :This 
+        OID indicates the IL1 optical output 
+        power is on  <Help>  This status 
+        indicates if the IL1 laser pump 
+        is ON or OFF <Condtype> LINE_TX_OFF 
+        <Probcause> other (1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm7 5 }
+
+
+
+pmoailAlmLineHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line Port HW Failure :This OID 
+        indicates a failure on line port, 
+        most probably caused by a HW issue 
+        <Condtype> LINE_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoailAlmsynthAlm7 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm8 article
+--- *****************************************************
+pmoailAlmsynthAlm8 OBJECT IDENTIFIER ::= { pmoailAlmClientCrit 8 }
+
+
+
+
+pmoailAlmClientFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Client Port Failure :This OID
+         indicates a failure on the Client 
+        port <Condtype> CLIENT_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoailAlmsynthAlm8 12 }
+
+
+
+pmoailAlmClientDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Client Optical Module 
+        DDM :This OID indicates an alarm 
+        is present coming out of Client 
+        optical interface DDM <Condtype> 
+        CLIENT_DDM_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm8 10 }
+
+
+
+pmoailAlmClientDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Client Optical Module 
+        DDM :This OID indicates a warning 
+        is present coming out of Client 
+        optical interface DDM <Condtype> 
+        CLIENT_DDM_WARNING <Probcause>
+         equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoailAlmsynthAlm8 9 }
+
+
+
+pmoailAlmClientTxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Optical Output Shutdown :This 
+        OID indicates the IL2 optical output 
+        power is on  <Help>  This status 
+        indicates if the IL2 laser pump 
+        transceiver laser is ON or OFF
+         <Condtype> CLIENT_TX_OFF <Probcause> 
+        other (1) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmsynthAlm8 5 }
+
+
+
+pmoailAlmClientHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Client Port HW Failure :This OID 
+        indicates a failure on Client port, 
+        most probably caused by a HW issue 
+        <Condtype> CLIENT_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoailAlmsynthAlm8 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaAlarms1 article
+--- *****************************************************
+pmoailAlmclientEdfaAlarms1 OBJECT IDENTIFIER ::= { pmoailAlmClientUrg 32 }
+
+
+
+
+pmoailAlmClientBiasHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Bias High Alarm :This OID
+         indicates that the Bias is higher 
+        than the alarm theshold of the
+         IL2 Optical Module  <Help>  This 
+        alarm indicates if the IL2 bias 
+        is too high <Condtype> CLIENT_BIAS_HIGH_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms1 8 }
+
+
+
+pmoailAlmClientBiasLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Bias Low Alarm :This OID indicates 
+        that the Bias is lower than the 
+        alarm theshold of the IL2 Optical 
+        Module  <Help>  This alarm indicates 
+        if the IL2 bias is too low <Condtype> 
+        CLIENT_BIAS_LOW_ALARM <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms1 7 }
+
+
+
+pmoailAlmClientOutputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Tx Pwr High Alarm :This OID 
+        indicates that the Transmit Power 
+        is higher than the alarm theshold 
+        of the IL2 Optical Module  <Help> 
+         This alarm indicates if the IL2 
+        tx power is too high <Condtype> 
+        CLIENT_OUTPUT_PWR_HIGH_ALARM <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms1 6 }
+
+
+
+pmoailAlmClientOutputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Tx Pwr Low Alarm :This OID 
+        indicates that the Transmit Power 
+        is lower than the alarm theshold 
+        of the IL2 Optical Module  <Help> 
+         This alarm indicates if the IL2 
+        tx power is too low <Condtype>
+         CLIENT_OUTPUT_PWR_LOW_ALARM <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms1 5 }
+
+
+
+pmoailAlmClientInputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Rx Pwr High Alarm :This OID 
+        indicates that the Receive Power 
+        is higher than the alarm theshold 
+        of the IL1 Optical Module  <Help> 
+         This alarm indicates if the IL1 
+        rx power is too high <Condtype> 
+        CLIENT_INPUT_PWR_HIGH_ALARM <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms1 4 }
+
+
+
+pmoailAlmClientInputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Rx Pwr Low Alarm :This OID 
+        indicates that the Receive Power 
+        is lower than the alarm theshold 
+        of the IL1 Optical Module  <Help> 
+         This alarm indicates if the IL1 
+        rx power is too low <Condtype>
+         CLIENT_INPUT_PWR_LOW_ALARM <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms1 3 }
+
+
+
+pmoailAlmClientGainHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Gain High Alarm :This OID
+         indicates that the Gain is higher 
+        than the alarm threshold of the 
+        IL2 Module  <Help>  This alarm
+         indicates if the IL2 gain is too 
+        high <Condtype> CLIENT_GAIN_HIGH_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms1 2 }
+
+
+
+pmoailAlmClientGainLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Gain Low Alarm :This OID indicates 
+        that the Gain is lower than the 
+        alarm theshold of the IL2 Module 
+         <Help>  This alarm indicates if 
+        the IL2 gain is too low <Condtype> 
+        CLIENT_GAIN_LOW_ALARM <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaWarnings article
+--- *****************************************************
+pmoailAlmclientEdfaWarnings OBJECT IDENTIFIER ::= { pmoailAlmClientNurg 33 }
+
+
+
+
+pmoailAlmClientBiasHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Bias High Warning :This OID 
+        indicates that the Bias is higher 
+        than the Warning theshold of the 
+        IL2 Optical Module  <Help>  This 
+        warning indicates if the IL2 bias 
+        is too high <Condtype> CLIENT_BIAS_HIGH_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaWarnings 8 }
+
+
+
+pmoailAlmClientBiasLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Bias Low Warning :This OID 
+        indicates that the Bias is lower 
+        than the Warning theshold of the 
+        IL2 Optical Module  <Help>  This 
+        warning indicates if the IL2 bias 
+        is too low <Condtype> CLIENT_BIAS_LOW_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaWarnings 7 }
+
+
+
+pmoailAlmClientOutputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Tx Pwr High Warning :This
+         OID indicates that the Transmit 
+        Power is higher than the Warning 
+        theshold of the IL2 Optical Module 
+         <Help>  This warning indicates 
+        if the IL2 tx power is too high 
+        <Condtype> CLIENT_OUTPUT_PWR_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaWarnings 6 }
+
+
+
+pmoailAlmClientOutputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Tx Pwr Low Warning :This OID 
+        indicates that the Transmit Power 
+        is lower than the Warning theshold 
+        of the IL2 Optical Module  <Help> 
+         This warning indicates if the
+         IL2 tx power is too low <Condtype> 
+        CLIENT_OUTPUT_PWR_LOW_WARNING <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaWarnings 5 }
+
+
+
+pmoailAlmClientInputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Rx Pwr High Warning :This
+         OID indicates that the Receive 
+        Power is higher than the Warning 
+        theshold of the IL1 Optical Module 
+         <Help>  This warning indicates 
+        if the IL1 rx power is too high 
+        <Condtype> CLIENT_INPUT_PWR_HIGH_WARNING 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaWarnings 4 }
+
+
+
+pmoailAlmClientInputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Rx Pwr Low Warning :This OID 
+        indicates that the Receive Power 
+        is lower than the Warning theshold 
+        of the IL1 Optical Module  <Help> 
+         This warning indicates if the
+         IL1 rx power is too low <Condtype> 
+        CLIENT_INPUT_PWR_LOW_WARNING <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaWarnings 3 }
+
+
+
+pmoailAlmClientGainHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Gain High Warning :This OID 
+        indicates that the Gain is higher 
+        than the Warning threshold of the 
+        IL2 Module  <Help>  This alarm
+         indicates if the IL2 gain is too 
+        high <Condtype> CLIENT_GAIN_HIGH_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaWarnings 2 }
+
+
+
+pmoailAlmClientGainLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Gain Low Warning :This OID 
+        indicates that the Gain is lower 
+        than the Warning theshold of the 
+        IL2 Module  <Help>  This alarm
+         indicates if the IL2 gain is too 
+        low <Condtype> CLIENT_GAIN_LOW_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaWarnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaAlarms2 article
+--- *****************************************************
+pmoailAlmclientEdfaAlarms2 OBJECT IDENTIFIER ::= { pmoailAlmClientCrit 35 }
+
+
+
+
+pmoailAlmClientExtPumpEdfaLowCurrent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 External Pump1 Low Current 
+        :This OID indicates that the EDFA 
+        pump current of the first external 
+        pump linked to the IL2 is too low 
+         <Help>  This alarm indicates that 
+        the EDFA pump current of the first 
+        external pump linked to the IL2 
+        is too low <Condtype> CLIENT_EXT_PUMP_EDFA_LOW_CURRENT 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms2 5 }
+
+
+
+pmoailAlmClientEdfaLos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Loss Of Signal :This OID indicates 
+        a Loss of Signal on the IL1 Optical 
+        Module  <Help>  This alarm indicates 
+        if an optical signal is detected 
+        on the IL1 input <Condtype> CLIENT_EDFA_LOS 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms2 4 }
+
+
+
+pmoailAlmClientEdfaLaserFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Pump Laser Fail :This OID
+         indicates a Transmit Laser Fail 
+        on the IL2 Optical Module  <Help> 
+         This alarm indicates if the laser 
+        of the IL2 is in fail condition 
+        <Condtype> CLIENT_EDFA_LASER_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms2 3 }
+
+
+
+pmoailAlmClientEdfaTecFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 TEC Fail :This OID indicates 
+        that the TEC is in fail condition 
+        on the IL2 Optical Module  <Help> 
+         This alarm indicates if the TEC 
+        of the IL2 is in fail condition 
+        <Condtype> CLIENT_EDFA_TEC_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms2 2 }
+
+
+
+pmoailAlmClientEdfaNr OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Optical Module Not Ready :This 
+        OID indicates that the IL2 Optical 
+        Module is not ready  <Help>  This 
+        status indicates if the IL2 has 
+        been correctly initialized <Condtype> 
+        CLIENT_EDFA_NR <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmclientEdfaAlarms2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaAlarms1 article
+--- *****************************************************
+pmoailAlmlineEdfaAlarms1 OBJECT IDENTIFIER ::= { pmoailAlmLineUrg 40 }
+
+
+
+
+pmoailAlmLineBiasHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Bias High Alarm :This OID
+         indicates that the Bias is higher 
+        than the alarm theshold of the
+         IL1 Optical Module  <Help>  This 
+        alarm indicates if the IL1 bias 
+        is too high <Condtype> LINE_BIAS_HIGH_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms1 8 }
+
+
+
+pmoailAlmLineBiasLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Bias Low Alarm :This OID indicates 
+        that the Bias is lower than the 
+        alarm theshold of the IL1 Optical 
+        Module  <Help>  This alarm indicates 
+        if the IL1 bias is too low <Condtype> 
+        LINE_BIAS_LOW_ALARM <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms1 7 }
+
+
+
+pmoailAlmLineOutputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Tx Pwr High Alarm :This OID 
+        indicates that the Transmit Power 
+        is higher than the alarm theshold 
+        of the IL1 Optical Module  <Help> 
+         This alarm indicates if the IL1 
+        tx power is too high <Condtype> 
+        LINE_OUTPUT_PWR_HIGH_ALARM <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms1 6 }
+
+
+
+pmoailAlmLineOutputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Tx Pwr Low Alarm :This OID 
+        indicates that the Transmit Power 
+        is lower than the alarm theshold 
+        of the IL1 Optical Module  <Help> 
+         This alarm indicates if the IL1 
+        tx power is too low <Condtype>
+         LINE_OUTPUT_PWR_LOW_ALARM <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms1 5 }
+
+
+
+pmoailAlmLineInputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Rx Pwr High Alarm :This OID 
+        indicates that the Receive Power 
+        is higher than the alarm theshold 
+        of the IL2 Optical Module  <Help> 
+         This alarm indicates if the IL2 
+        rx power is too high <Condtype> 
+        LINE_INPUT_PWR_HIGH_ALARM <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms1 4 }
+
+
+
+pmoailAlmLineInputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Rx Pwr Low Alarm :This OID 
+        indicates that the Receive Power 
+        is lower than the alarm theshold 
+        of the IL2 Optical Module  <Help> 
+         This alarm indicates if the IL2 
+        rx power is too low <Condtype>
+         LINE_INPUT_PWR_LOW_ALARM <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms1 3 }
+
+
+
+pmoailAlmLineGainHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Gain High Alarm :This OID
+         indicates that the Gain is higher 
+        than the alarm threshold of the 
+        IL1 Module  <Help>  This alarm
+         indicates if the IL1 gain is too 
+        high <Condtype> LINE_GAIN_HIGH_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms1 2 }
+
+
+
+pmoailAlmLineGainLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Gain Low Alarm :This OID indicates 
+        that the Gain is lower than the 
+        alarm theshold of the IL1 Module 
+         <Help>  This alarm indicates if 
+        the IL1 gain is too low <Condtype> 
+        LINE_GAIN_LOW_ALARM <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaWarnings article
+--- *****************************************************
+pmoailAlmlineEdfaWarnings OBJECT IDENTIFIER ::= { pmoailAlmLineNurg 41 }
+
+
+
+
+pmoailAlmLineBiasHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Bias High Warning :This OID 
+        indicates that the Bias is higher 
+        than the Warning theshold of the 
+        IL1 Optical Module  <Help>  This 
+        warning indicates if the IL1 bias 
+        is too high <Condtype> LINE_BIAS_HIGH_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaWarnings 8 }
+
+
+
+pmoailAlmLineBiasLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Bias Low Warning :This OID 
+        indicates that the Bias is lower 
+        than the Warning theshold of the 
+        IL1 Optical Module  <Help>  This 
+        warning indicates if the IL1 bias 
+        is too low <Condtype> LINE_BIAS_LOW_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaWarnings 7 }
+
+
+
+pmoailAlmLineOutputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Tx Pwr High Warning :This
+         OID indicates that the Transmit 
+        Power is higher than the Warning 
+        theshold of the IL1 Optical Module 
+         <Help>  This warning indicates 
+        if the IL1 tx power is too high 
+        <Condtype> LINE_OUTPUT_PWR_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaWarnings 6 }
+
+
+
+pmoailAlmLineOutputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Tx Pwr Low Warning :This OID 
+        indicates that the Transmit Power 
+        is lower than the Warning theshold 
+        of the IL1 Optical Module  <Help> 
+         This warning indicates if the
+         IL1 tx power is too low <Condtype> 
+        LINE_OUTPUT_PWR_LOW_WARNING <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaWarnings 5 }
+
+
+
+pmoailAlmLineInputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Rx Pwr High Warning :This
+         OID indicates that the Receive 
+        Power is higher than the Warning 
+        theshold of the IL2 Optical Module 
+         <Help>  This warning indicates 
+        if the IL2 rx power is too high 
+        <Condtype> LINE_INPUT_PWR_HIGH_WARNING 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaWarnings 4 }
+
+
+
+pmoailAlmLineInputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Rx Pwr Low Warning :This OID 
+        indicates that the Receive Power 
+        is lower than the Warning theshold 
+        of the IL2 Optical Module  <Help> 
+         This warning indicates if the
+         IL2 rx power is too low <Condtype> 
+        LINE_INPUT_PWR_LOW_WARNING <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaWarnings 3 }
+
+
+
+pmoailAlmLineGainHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Gain High Warning :This OID 
+        indicates that the Gain is higher 
+        than the Warning threshold of the 
+        IL1 Module  <Help>  This alarm
+         indicates if the IL1 gain is too 
+        high <Condtype> LINE_GAIN_HIGH_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaWarnings 2 }
+
+
+
+pmoailAlmLineGainLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Gain Low Warning :This OID 
+        indicates that the Gain is lower 
+        than the Warning theshold of the 
+        IL1 Module  <Help>  This alarm
+         indicates if the IL1 gain is too 
+        low <Condtype> LINE_GAIN_LOW_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaWarnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaAlarms2 article
+--- *****************************************************
+pmoailAlmlineEdfaAlarms2 OBJECT IDENTIFIER ::= { pmoailAlmLineCrit 43 }
+
+
+
+
+pmoailAlmLineExtPumpEdfaLowCurrent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 External Pump1 Low Current 
+        :This OID indicates that the EDFA 
+        pump current of the first external 
+        pump linked to the IL1 is too low 
+         <Help>  This alarm indicates that 
+        the EDFA pump current of the first 
+        external pump linked to the IL1 
+        is too low. <Condtype> LINE_EXT_PUMP_EDFA_LOW_CURRENT 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms2 5 }
+
+
+
+pmoailAlmLineEdfaLos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Loss Of Signal :This OID indicates 
+        a Loss of Signal on the IL2 Optical 
+        Module  <Help>  This alarm indicates 
+        if an optical signal is detected 
+        on the IL2 input <Condtype> LINE_EDFA_LOS 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms2 4 }
+
+
+
+pmoailAlmLineEdfaLaserFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Pump Laser Fail :This OID
+         indicates a Transmit Laser Fail 
+        on the IL1 Optical Module  <Help> 
+         This alarm indicates if the laser 
+        of the IL1 is in fail condition 
+        <Condtype> LINE_EDFA_LASER_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms2 3 }
+
+
+
+pmoailAlmLineEdfaTecFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 TEC Fail :This OID indicates 
+        that the TEC is in fail condition 
+        on the IL1 Optical Module  <Help> 
+         This alarm indicates if the TEC 
+        of the IL1 is in fail condition 
+        <Condtype> LINE_EDFA_TEC_FAIL <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms2 2 }
+
+
+
+pmoailAlmLineEdfaNr OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Optical Module Not Ready :This 
+        OID indicates that the IL1 Optical 
+        Module is not ready  <Help>  This 
+        status indicates if the IL1 has 
+        been correctly initialized <Condtype> 
+        LINE_EDFA_NR <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmlineEdfaAlarms2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the foaAlarms article
+--- *****************************************************
+pmoailAlmfoaAlarms OBJECT IDENTIFIER ::= { pmoailAlmOtherUrg 74 }
+
+
+
+
+pmoailAlmTempHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Temperature High Alarm :This OID 
+        indicates that the PM temperature 
+        is higher than the alarm threshold 
+        <Condtype> TEMP_HIGH_ALARM <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmfoaAlarms 8 }
+
+
+
+pmoailAlmTermpLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Temperature Low Alarm :This OID 
+        indicates that the PM temperature 
+        if lower than the alarm threshold 
+        <Condtype> TERMP_LOW_ALARM <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmfoaAlarms 7 }
+
+
+
+pmoailAlm3v3HighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        3V3 High Alarm :This OID indicates 
+        that the PM 3V3 voltage is higher 
+        than the alarm threshold <Condtype> 
+        3V3_HIGH_ALARM <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmfoaAlarms 6 }
+
+
+
+pmoailAlm3v3LowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        3V3 Low Alarm :This OID indicates 
+        that the PM 3V3 voltage is lower 
+        than the alarm threshold <Condtype> 
+        3V3_LOW_ALARM <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmfoaAlarms 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the foaWarnings article
+--- *****************************************************
+pmoailAlmfoaWarnings OBJECT IDENTIFIER ::= { pmoailAlmOtherNurg 75 }
+
+
+
+
+pmoailAlmTempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Temperature High Warning :This 
+        OID indicates that the PM temperature 
+        if higher than the Warning threshold 
+        <Condtype> TEMP_HIGH_WARNING <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmfoaWarnings 8 }
+
+
+
+pmoailAlmTermpLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Temperature Low Warning :This
+         OID indicates that the PM temperature 
+        if lower than the Warning threshold 
+        <Condtype> TERMP_LOW_WARNING <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmfoaWarnings 7 }
+
+
+
+pmoailAlm3v3HighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        3V3 High Warning :This OID indicates 
+        that the PM 3V3 voltage is higher 
+        than the Warning threshold <Condtype> 
+        3V3_HIGH_WARNING <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmfoaWarnings 6 }
+
+
+
+pmoailAlm3v3LowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        3V3 Low Warning :This OID indicates 
+        that the PM 3V3 voltage is lower 
+        than the Warning threshold <Condtype> 
+        3V3_LOW_WARNING <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoailAlmfoaWarnings 5 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmoailCtrlsynth0 OBJECT IDENTIFIER ::= { pmoailCtrlOther 0 }
+
+
+
+
+pmoailCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmoailCtrlsynth0 13 }
+
+
+
+pmoailCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmoailCtrlsynth0 9 }
+
+
+
+pmoailCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmoailCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmoailCtrlswMgnt OBJECT IDENTIFIER ::= { pmoailCtrlOther 5 }
+
+
+
+
+pmoailCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmoailCtrlswMgnt 3 }
+
+
+
+pmoailCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmoailCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaLaserOff article
+--- *****************************************************
+pmoailCtrlclientEdfaLaserOff OBJECT IDENTIFIER ::= { pmoailCtrlClient 32 }
+
+
+
+
+pmoailCtrlClientEdfaLaserOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Pump Laser Shutdown :This
+         OID switches OFF the laser of
+         the IL2 Optical Module  <Help> 
+         This control defines the laser 
+        state of the IL2
+        "
+	  ::= { pmoailCtrlclientEdfaLaserOff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaMode article
+--- *****************************************************
+
+pmoailCtrlclientEdfaMode OBJECT-TYPE
+	  SYNTAX PmoailpreampMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Module Mode :This OID selects 
+        the mode of the IL2 Module  <Help> 
+         This control defines the IL2 Mode 
+        (0: Default mode, 2:Constant output 
+        power)
+        "
+	  ::= { pmoailCtrlClient 33 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientIlasSettingValue article
+--- *****************************************************
+
+pmoailCtrlclientIlasSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Laser Current Value :This
+         OID sets the value of the laser 
+        current of the IL2 Module (active 
+         only in constant current mode) 
+        (AV = Current *100) (Unit = mA) 
+         <Help>  This control defines the 
+        IL2 Laser current in mA (valid
+         only in constant current mode)
+        "
+	  ::= { pmoailCtrlClient 34 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientPlasSettingValue article
+--- *****************************************************
+
+pmoailCtrlclientPlasSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Pump Power Value :This OID 
+        sets the value of the laser power 
+        of the IL2 Optical Module (active 
+        only in constant power mode) (AV=(Power/0,005) 
+        + 32768)  (Unit = dBm)  <Help>
+          This control defines the IL2
+         laser power in dBm (valid only 
+        in constant output power mode)
+        "
+	  ::= { pmoailCtrlClient 35 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientGainSettingValue article
+--- *****************************************************
+
+pmoailCtrlclientGainSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Gain Value :This OID sets
+         the value of the gain of the IL2 
+        Module (active only in constant 
+        gain mode) (AV=(Gain/0,005) + 32768) 
+        (Unit = dB)
+        "
+	  ::= { pmoailCtrlClient 36 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEffPwrOutSettingValue article
+--- *****************************************************
+
+pmoailCtrlclientEffPwrOutSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Effective Output Power :This 
+        OID sets the value of the effective 
+        output power (without noise power) 
+        of the IL2 Module (active only
+         in input power function mode)
+         (AV=(Power/0,005) + 32768) (Unit 
+        = dBm)  <Help>  This control defines 
+        the IL2 effective output power
+         in dBm (valid only in Effective 
+        Ouput power mode).
+        "
+	  ::= { pmoailCtrlClient 37 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaLaserOff article
+--- *****************************************************
+pmoailCtrllineEdfaLaserOff OBJECT IDENTIFIER ::= { pmoailCtrlLine 40 }
+
+
+
+
+pmoailCtrlLineEdfaLaserOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Pump Laser Shutdown :This
+         OID switches OFF the laser of
+         the IL1 Optical Module  <Help> 
+         This control defines the laser 
+        state of the IL1
+        "
+	  ::= { pmoailCtrllineEdfaLaserOff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaMode article
+--- *****************************************************
+
+pmoailCtrllineEdfaMode OBJECT-TYPE
+	  SYNTAX PmoailboosterMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Module Mode :This OID selects 
+        the mode of the IL1 Module  <Help> 
+         This control defines the IL1 Mode 
+        (0: Default mode, 2:Constant output 
+        power)
+        "
+	  ::= { pmoailCtrlLine 41 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineIlasSettingValue article
+--- *****************************************************
+
+pmoailCtrllineIlasSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Laser Current Value :This
+         OID sets the value of the laser 
+        current of the IL1 Module (active 
+         only in constant current mode) 
+        (AV = Current *100) (Unit = mA) 
+         <Help>  This control defines the 
+        IL1 Laser current in mA (valid
+         only in constant current mode)
+        "
+	  ::= { pmoailCtrlLine 42 }
+
+
+
+--- *****************************************************
+---     LEAF for the linePlasSettingValue article
+--- *****************************************************
+
+pmoailCtrllinePlasSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Pump Power Value :This OID 
+        sets the value of the laser power 
+        of the IL1 Optical Module (active 
+        only in constant power mode) (AV=(Power/0,005) 
+        + 32768) (Unit = dBm)  <Help> 
+         This control defines the IL1 laser 
+        power in dBm (valid only in constant 
+        output power mode)
+        "
+	  ::= { pmoailCtrlLine 43 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineGainSettingValue article
+--- *****************************************************
+
+pmoailCtrllineGainSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Gain Value :This OID sets
+         the value of the gain of the IL1 
+        Module (active only in constant 
+        gain mode) (AV=(Gain/0,005) + 32768) 
+         (Unit = dB)
+        "
+	  ::= { pmoailCtrlLine 44 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEffPwrOutSettingValue article
+--- *****************************************************
+
+pmoailCtrllineEffPwrOutSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Effective Output Power :This 
+        OID sets the value of the effective 
+        output power (without noise power) 
+        of the IL1 Module (active only
+         in input power function mode)
+          (AV=(Power/0,005) + 32768)  (Unit 
+        = dBm)
+        "
+	  ::= { pmoailCtrlLine 45 }
+
+
+
+--- *****************************************************
+---     LEAF for the powerDown article
+--- *****************************************************
+pmoailCtrlpowerDown OBJECT IDENTIFIER ::= { pmoailCtrlOther 72 }
+
+
+
+
+pmoailCtrlSoftPowerDown OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Software Shutdown :This 
+        OID shuts down the PM Software
+          <Help>  This control initiates 
+        a shut down of software.
+        "
+	  ::= { pmoailCtrlpowerDown 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmoailCtrlledTest OBJECT IDENTIFIER ::= { pmoailCtrlOther 73 }
+
+
+
+
+pmoailCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmoailCtrlledTest 3 }
+
+
+
+pmoailCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmoailCtrlledTest 2 }
+
+
+
+pmoailCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmoailCtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the maintMode article
+--- *****************************************************
+pmoailCtrlmaintMode OBJECT IDENTIFIER ::= { pmoailCtrlOther 75 }
+
+
+
+
+pmoailCtrlMaintenance OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Maintenance Mode :This
+         OID sets the PM in maintenance 
+        mode  <Help>  This control enables 
+        the maintenance mode of the module
+        "
+	  ::= { pmoailCtrlmaintMode 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaBiasMeas article
+--- *****************************************************
+
+pmoailMesrclientEdfaBiasMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Pump Laser Current :This OID 
+        gives the pump laser current of 
+        the IL2 Optical Module (Current 
+        =AV/100) (Unit = mA)  <Help>  This 
+        measure gives the bias of the IL2 
+        pump laser
+        "
+	  ::= { pmoailMesrClient 32 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaTxpwrMeas article
+--- *****************************************************
+
+pmoailMesrclientEdfaTxpwrMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Tx Power :This OID gives the 
+        transmit power value of the IL2 
+        Optical Module (Power =(AV-32768)*0,005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Tx optical power of the 
+        IL2
+        "
+	  ::= { pmoailMesrClient 33 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaRxpwrMeas article
+--- *****************************************************
+
+pmoailMesrclientEdfaRxpwrMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Rx Power :This OID gives the 
+        receive power value of the IL1
+         Optical Module (Power =(AV-32768)*0,005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Rx optical power of the 
+        IL1
+        "
+	  ::= { pmoailMesrClient 34 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientEdfaGainMeas article
+--- *****************************************************
+
+pmoailMesrclientEdfaGainMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Gain :This OID gives the gain 
+        value of the IL2 Module  (Gain
+         =(AV-32768)*0,005) (Unit = dB) 
+         <Help>  This measure gives the 
+        optical gain of the IL2
+        "
+	  ::= { pmoailMesrClient 35 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaBiasMeas article
+--- *****************************************************
+
+pmoailMesrlineEdfaBiasMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Pump Laser Current :This OID 
+        gives the pump laser current of 
+        the IL1 Optical Module (Current 
+        =AV/100) (Unit = mA)  <Help>  This 
+        measure gives the bias of the IL1 
+        pump laser
+        "
+	  ::= { pmoailMesrLine 40 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaTxpwrMeas article
+--- *****************************************************
+
+pmoailMesrlineEdfaTxpwrMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Tx Power :This OID gives the 
+        transmit power value of the IL1 
+        Optical Module (Power =(AV-32768)*0,005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Tx optical power of the 
+        IL1
+        "
+	  ::= { pmoailMesrLine 41 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaRxpwrMeas article
+--- *****************************************************
+
+pmoailMesrlineEdfaRxpwrMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL2 Rx Power :This OID gives the 
+        receive power value of the IL2
+         Optical Module (Power =(AV-32768)*0,005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Rx optical power of the 
+        IL2
+        "
+	  ::= { pmoailMesrLine 42 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineEdfaGainMeas article
+--- *****************************************************
+
+pmoailMesrlineEdfaGainMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        IL1 Gain :This OID gives the gain 
+        value of the IL1 Module (Gain =(AV-32768)*0,005) 
+        (Unit = dB)  <Help>  This measure 
+        gives the optical gain of the IL1
+        "
+	  ::= { pmoailMesrLine 43 }
+
+
+
+--- *****************************************************
+---     LEAF for the tempMeas article
+--- *****************************************************
+
+pmoailMesrtempMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature :This OID gives 
+        the temperature of the PM (Unit 
+        = C)  <Help>  This measure gives 
+        the temperature of the module
+        "
+	  ::= { pmoailMesrOther 72 }
+
+
+
+--- *****************************************************
+---     LEAF for the 3v3Meas article
+--- *****************************************************
+
+pmoailMesr3v3Meas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module 3.3 Voltage :This OID gives 
+        the 3V3 voltage of the PM (Unit 
+        = V)  <Help>  This measure gives 
+        the 3V3 voltage of the module
+        "
+	  ::= { pmoailMesrOther 73 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group noValue
+--- *****************************************************
+
+pmoailCfgNoValue OBJECT IDENTIFIER ::= { pmoailConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2111
+--- *****************************************************
+
+pmoailtableclientStartup OBJECT IDENTIFIER ::= { pmoailCfgNoValue 1 }
+
+
+
+pmoailCfgclientEdfaLaserCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client Laser 
+        :This OID configures the default 
+        initialisation settings on the
+         client laser.
+        "
+	  ::= { pmoailtableclientStartup 2 }
+
+
+
+pmoailCfgclientEdfaLaserMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Client mode 
+        :This OID configures the default 
+        mode on the client amplifier.
+        "
+	  ::= { pmoailtableclientStartup 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lineStartUp
+--- *****************************************************
+
+pmoailCfgLineStartUp OBJECT IDENTIFIER ::= { pmoailConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmoailtablelineStartup OBJECT IDENTIFIER ::= { pmoailCfgLineStartUp 1 }
+
+
+
+pmoailCfglineEdfaLaserCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line Laser 
+        :This OID configures the default 
+        initialisation settings on the
+         line laser.
+        "
+	  ::= { pmoailtablelineStartup 2 }
+
+
+
+pmoailCfglineEdfaLaserMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line mode
+         :This OID configures the default 
+        mode on the line amplifier.
+        "
+	  ::= { pmoailtablelineStartup 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmoailCfgLabels OBJECT IDENTIFIER ::= { pmoailConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmoailCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmoailCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmoailCfgLabels 1 }
+
+
+pmoailCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmoailCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmoailCfgLabelclientIndex }
+	::= { pmoailCfgLabelclientTable 1 }
+
+
+PmoailCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmoailCfgLabelclientIndex
+		INTEGER,
+	pmoailCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmoailCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmoailCfgLabelclientEntry 1 }
+
+
+pmoailCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmoailCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmoailCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmoailCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmoailCfgLabels 2 }
+
+
+pmoailCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmoailCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmoailCfgLabellineIndex }
+	::= { pmoailCfgLabellineTable 1 }
+
+
+PmoailCfgLabellineEntry ::=
+	SEQUENCE {
+	pmoailCfgLabellineIndex
+		INTEGER,
+	pmoailCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmoailCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmoailCfgLabellineEntry 1 }
+
+
+pmoailCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmoailCfgLabellineEntry 3 }
+
+
+
+pmoailCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmoailConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmoailtrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmoailtraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     GLOBAL TRAPS
+--- *****************************************************
+
+pmoailLineTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmLineDdmWarning, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Line Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmoailAlmLineDdmWarning "on", pmoailtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on IL2 input or IL1 Output of PMOAIL in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pmoailtraps 30 }
+
+pmoailLineTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmLineDdmWarning, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Line Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOAIL Line Not Urgent ON"}
+	--&MATCH       { pmoailAlmLineDdmWarning "on", pmoailtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on IL2 input or IL1 Output of PMOAIL in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pmoailtraps 31 }
+
+pmoailLineTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmLineDdmAlm, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Line Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoailAlmLineDdmAlm "on", pmoailtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm appears on IL2 input or IL1 Output of PMOAIL in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pmoailtraps 32 }
+
+pmoailLineTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmLineDdmAlm, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Line Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOAIL Line Urgent ON"}
+	--&MATCH       { pmoailAlmLineDdmAlm "on", pmoailtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on IL2 input or IL1 Output of PMOAIL in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pmoailtraps 33 }
+
+pmoailLineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmLineFail, pmoailAlmLineHwFail, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Line Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmoailAlmLineFail "on", pmoailAlmLineHwFail "*", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on IL2 input or IL1 Output of PMOAIL in slot $3 ($A)"
+	
+	--&FILTNAME    "PMOAIL Line HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoailAlmLineFail "*", pmoailAlmLineHwFail "on", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on IL2 input or IL1 Output of PMOAIL in slot $3 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmoailtraps 34 }
+
+pmoailLineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmLineFail, pmoailAlmLineHwFail, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Line Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOAIL Line Fail ON"}
+	--&MATCH       { pmoailAlmLineFail "on", pmoailAlmLineHwFail "*", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on IL2 input or IL1 Output of PMOAIL in slot $3 ($A)"
+	
+	--&FILTNAME    "PMOAIL Line HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoailAlmLineFail "*", pmoailAlmLineHwFail "on", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on IL2 input or IL1 Output of PMOAIL in slot $3 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmoailtraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     PORTS TRAPS
+--- *****************************************************
+
+pmoailClientTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmClientDdmWarning, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Client Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmoailAlmClientDdmWarning "on", pmoailtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on IL1 input or IL2 Output of PMOAIL in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default is activated"
+	::= { pmoailtraps 40 }
+
+pmoailClientTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmClientDdmWarning, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Client Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOAIL Client Not Urgent ON"}
+	--&MATCH       { pmoailAlmClientDdmWarning "on", pmoailtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on IL1 input or IL2 Output of PMOAIL in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default disappeared"
+	::= { pmoailtraps 41 }
+
+pmoailClientTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmClientDdmAlm, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Client Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoailAlmClientDdmAlm "on", pmoailtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm appears on IL1 input or IL2 Output of PMOAIL in slot $2 ($A)"
+	DESCRIPTION "Urgent client default is activated"
+	::= { pmoailtraps 42 }
+
+pmoailClientTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmClientDdmAlm, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Client Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOAIL Client Urgent ON"}
+	--&MATCH       { pmoailAlmClientDdmAlm "on", pmoailtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on IL1 input or IL2 Output of PMOAIL in slot $2 ($A)"
+	DESCRIPTION "Urgent client default disappeared"
+	::= { pmoailtraps 43 }
+
+pmoailClientTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmClientFail, pmoailAlmClientHwFail, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Client Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmoailAlmClientFail "on", pmoailAlmClientHwFail "*", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on IL1 input or IL2 Output of PMOA-IL in slot $3 ($A)"
+	
+	--&FILTNAME    "PMOAIL Client HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoailAlmClientFail "*", pmoailAlmClientHwFail "on", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on IL1 input or IL2 Output of PMOA-IL in slot $3 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pmoailtraps 44 }
+
+pmoailClientTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmClientFail, pmoailAlmClientHwFail, pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Client Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMOAIL Client Fail ON"}
+	--&MATCH       { pmoailAlmClientFail "on", pmoailAlmClientHwFail "*", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on IL1 input or IL2 Output of PMOA-IL in slot $3 ($A)"
+	
+	--&FILTNAME    "PMOAIL Client HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoailAlmClientFail "*", pmoailAlmClientHwFail "on", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on IL1 input or IL2 Output of PMOA-IL in slot $3 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pmoailtraps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmoailPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmDefFuseB, pmoailAlmDefFuseA , pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoailAlmDefFuseB "*", pmoailAlmDefFuseA "on", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMOA-IL in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOAIL Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoailAlmDefFuseB "on", pmoailAlmDefFuseA "*", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMOA-IL in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmoailtraps 50 }
+pmoailPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoailAlmDefFuseB, pmoailAlmDefFuseA , pmoailtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOAIL Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMOAIL Fuse A Fail ON", "PMOAIL Fuse B Fail ON" }
+	--&MATCH       { pmoailAlmDefFuseB "on", pmoailAlmDefFuseA "on", pmoailtrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMOA-IL in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmoailtraps 51 }
+
+
+
+
+
+
+END

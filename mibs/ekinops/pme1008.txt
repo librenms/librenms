@@ -1,0 +1,7298 @@
+-- *****************************************************************
+-- EKINOPS-Pme1008.TXT:  MIB
+--
+--MIB Part Number:3MI00041AAAA
+--MIB Version:03
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pme1008-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePme1008 MODULE-IDENTITY
+        LAST-UPDATED "201609050000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.fr"
+        DESCRIPTION
+          "Creation."
+
+	REVISION "201609050000Z"
+	DESCRIPTION
+	  "Creation for PME1008"
+        ::= { ekinops 79 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pme1008alarms OBJECT IDENTIFIER ::= { modulePme1008 2 }	
+pme1008AlmOther OBJECT IDENTIFIER ::= { pme1008alarms 1 }
+pme1008AlmOtherNurg OBJECT IDENTIFIER ::= { pme1008AlmOther 1 }
+pme1008AlmOtherUrg OBJECT IDENTIFIER ::= { pme1008AlmOther 2 }
+pme1008AlmOtherCrit OBJECT IDENTIFIER ::= { pme1008AlmOther 3 }
+
+pme1008AlmClient OBJECT IDENTIFIER ::= { pme1008alarms 2 }
+pme1008AlmClientNurg OBJECT IDENTIFIER ::= { pme1008AlmClient 1 }
+pme1008AlmClientUrg OBJECT IDENTIFIER ::= { pme1008AlmClient 2 }
+pme1008AlmClientCrit OBJECT IDENTIFIER ::= { pme1008AlmClient 3 }
+	
+pme1008AlmLine OBJECT IDENTIFIER ::= { pme1008alarms 3 }
+pme1008AlmLineNurg OBJECT IDENTIFIER ::= { pme1008AlmLine 1 }
+pme1008AlmLineUrg OBJECT IDENTIFIER ::= { pme1008AlmLine 2 }
+pme1008AlmLineCrit OBJECT IDENTIFIER ::= { pme1008AlmLine 3 }
+
+
+
+
+
+pme1008measures OBJECT IDENTIFIER ::= { modulePme1008 3 }	
+pme1008MesrOther OBJECT IDENTIFIER ::= { pme1008measures 1 }	
+pme1008MesrClient OBJECT IDENTIFIER ::= { pme1008measures 2 }	
+pme1008MesrLine OBJECT IDENTIFIER ::= { pme1008measures 3 }	
+
+
+
+
+pme1008counters OBJECT IDENTIFIER ::= { modulePme1008 4 }
+pme1008CntOther OBJECT IDENTIFIER ::= { pme1008counters 1 }
+pme1008CntClient OBJECT IDENTIFIER ::= { pme1008counters 2 }
+pme1008CntLine OBJECT IDENTIFIER ::= { pme1008counters 3 }
+
+
+pme1008controlsWrite OBJECT IDENTIFIER ::= { modulePme1008 6 }
+pme1008CtrlOther OBJECT IDENTIFIER ::= { pme1008controlsWrite 1 }
+pme1008CtrlClient OBJECT IDENTIFIER ::= { pme1008controlsWrite 2 }
+pme1008CtrlLine OBJECT IDENTIFIER ::= { pme1008controlsWrite 3 }
+
+pme1008ri OBJECT IDENTIFIER ::= { modulePme1008 7 }
+pme1008riTable OBJECT IDENTIFIER ::= { pme1008ri 1 }
+
+pme1008download OBJECT IDENTIFIER ::= { modulePme1008 8 }
+pme1008DwlOther OBJECT IDENTIFIER ::= { pme1008download 1 }
+pme1008DwlClient OBJECT IDENTIFIER ::= { pme1008download 2 }
+pme1008DwlLine OBJECT IDENTIFIER ::= { pme1008download 3 }
+
+
+pme1008Config OBJECT IDENTIFIER ::= { modulePme1008 9 }
+
+pme1008traps OBJECT IDENTIFIER ::= { modulePme1008 10 }
+
+
+
+pme1008Monitoring OBJECT IDENTIFIER ::= { modulePme1008 11}
+
+pme1008MonOther OBJECT IDENTIFIER ::= { pme1008Monitoring 1 }
+pme1008MonRmon OBJECT IDENTIFIER ::= { pme1008MonOther 3 }
+
+pme1008MonClient OBJECT IDENTIFIER ::= { pme1008Monitoring 2 }
+pme1008MonClientRmonCounter OBJECT IDENTIFIER ::= { pme1008MonClient 4 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+Pme1008OtxGrid ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different grids on client and line ports"
+    SYNTAX INTEGER {
+		otxgrid200(200),
+		otxgrid100(100),
+		otxgrid50(50)
+           }
+
+
+Pme1008DccMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Mode for DCC"
+    SYNTAX INTEGER {
+		dccNo(0),
+		dccLine1(1),
+		dccLine2(2)
+           }
+
+Pme1008LineChannel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Channel selection on transceiver Line ports"
+    SYNTAX INTEGER
+
+
+Pme1008Odu2SapiMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Mode for SAPI-DAPI"
+    SYNTAX INTEGER {
+		off(0),
+		sapi(1),
+		dapi(2),
+		sapidapi(3)
+           }
+
+Pme1008Otu2SapiMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Mode for SAPI-DAPI"
+    SYNTAX INTEGER {
+		off(0),
+		sapi(1),
+		dapi(2),
+		sapidapi(3)
+           }
+
+Pme1008ClientProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different values on the protocol on the client ports"
+    SYNTAX INTEGER {
+		protocolclientvalue2(2),
+		protocolclientvalue3(3),
+		protocolclientvalue4(4),
+		protocolclientvalue6(6),
+		protocolclientvalue7(7)
+           }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pme1008RinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pme1008ri 2 }
+
+pme1008RinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pme1008ri 3 }
+  
+pme1008RinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pme1008ri 4 }
+  
+pme1008RinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pme1008ri 5 }
+  
+pme1008RinvGwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "GW platform description: This OID contains the 
+         description of the Gateware platform."
+  ::= { pme1008ri 6 }
+
+
+pme1008RinvSfpTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pme1008RinvSfpEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the SFPs on the selected module"
+      ::= { pme1008riTable 1 }
+
+pme1008RinvSfpEntry OBJECT-TYPE
+        SYNTAX  Pme1008RinvSfpEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the SFP table"
+        INDEX   { pme1008RinvSfpIndex }
+        ::= { pme1008RinvSfpTable 1 }
+    
+
+
+Pme1008RinvSfpEntry::=
+        SEQUENCE {
+          pme1008RinvSfpIndex 
+              Integer32,
+          pme1008Rinvsfp
+              DisplayString
+        }
+
+
+    pme1008RinvSfpIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for SFP table"
+        ::= { pme1008RinvSfpEntry 1 }
+
+
+    pme1008Rinvsfp OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the SFP: This OID contains the inventory for the SFP"
+        ::= { pme1008RinvSfpEntry 2 }
+
+
+
+
+pme1008RinvLineTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pme1008RinvLineEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the SFPs on the selected module"
+      ::= { pme1008riTable 2 }
+
+pme1008RinvLineEntry OBJECT-TYPE
+        SYNTAX  Pme1008RinvLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the SFP table"
+        INDEX   { pme1008RinvLineIndex }
+        ::= { pme1008RinvLineTable 1 }
+    
+
+
+Pme1008RinvLineEntry::=
+        SEQUENCE {
+          pme1008RinvLineIndex 
+              Integer32,
+          pme1008RinvxfpLine
+              DisplayString
+        }
+
+
+    pme1008RinvLineIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for SFP table"
+        ::= { pme1008RinvLineEntry 1 }
+
+
+    pme1008RinvxfpLine OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the XFP: This OID contains the inventory for the XFP"
+        ::= { pme1008RinvLineEntry 2 }
+
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pme1008AlmsynthAlm0 OBJECT IDENTIFIER ::= { pme1008AlmOtherCrit 0 }
+
+
+
+
+pme1008AlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition <Help> Status 
+        of the Fuse B <Condtype> DEF_FUSE_B 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pme1008AlmsynthAlm0 16 }
+
+
+
+pme1008AlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition <Help> Status 
+        of the Fuse A <Condtype> DEF_FUSE_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pme1008AlmsynthAlm0 15 }
+
+
+
+pme1008AlmModGlobFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the RM <Help> This alarm is 
+        set on detection of a failure originating 
+        from the equipment <Condtype> MOD_GLOB_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pme1008AlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pme1008AlmsynthAlm2 OBJECT IDENTIFIER ::= { pme1008AlmOtherNurg 2 }
+
+
+
+
+pme1008AlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pme1008AlmsynthAlm2 4 }
+
+
+
+pme1008AlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pme1008AlmsynthAlm2 3 }
+
+
+
+pme1008AlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pme1008AlmsynthAlm2 2 }
+
+
+
+pme1008AlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pme1008AlmsynthAlm2 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pme1008AlmsynthAlmPort articles
+--- *********************************************************
+
+pme1008AlmsynthAlmPortTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008AlmsynthAlmPortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008AlmsynthAlmPort 
+        Article
+        "
+	::= { pme1008AlmClientCrit 8 }
+
+
+pme1008AlmsynthAlmPortEntry OBJECT-TYPE
+	SYNTAX Pme1008AlmsynthAlmPortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008AlmsynthAlmPort 
+        table
+        "
+	INDEX   { pme1008AlmsynthAlmPortIndex }
+	::= { pme1008AlmsynthAlmPortTable 1 }
+
+
+Pme1008AlmsynthAlmPortEntry ::=
+	SEQUENCE {
+	pme1008AlmsynthAlmPortIndex
+		INTEGER,
+	pme1008AlmUpCsfPortn
+		EkiOnOff,
+	pme1008AlmFailAccPortn
+		EkiOnOff,
+	pme1008AlmSfpDdmAlmPortn
+		EkiOnOff,
+	pme1008AlmSfpDdmWarningPortn
+		EkiOnOff,
+	pme1008AlmDwCaisPortn
+		EkiOnOff,
+	pme1008AlmClientRemoteOosPortn
+		EkiOnOff,
+	pme1008AlmClientLocalOosPortn
+		EkiOnOff,
+	pme1008AlmDwLsdPortn
+		EkiOnOff,
+	pme1008AlmHwFailAccPortn
+		EkiOnOff,
+	pme1008AlmDdmAbsentPortn
+		EkiOnOff,
+	pme1008AlmSfpAbsentPortn
+		EkiOnOff
+	}
+
+
+pme1008AlmsynthAlmPortIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008AlmsynthAlmPort 
+        table
+        "
+	::= { pme1008AlmsynthAlmPortEntry 1 }
+
+
+pme1008AlmUpCsfPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Signal Fail Inserted :This 
+        OID indicates a CSF has been inserted 
+        in the upstream client port. <Help> 
+        This status indicates if a Client 
+        Signal Fail is currently inserted 
+        on the line signal for this client 
+        port <Condtype> UP_CSF_1 <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 17 }
+
+
+pme1008AlmFailAccPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Access Fail :This OID indicates 
+        a failure on the Client port <Help> 
+        This alarm indicates a failure
+         on the Client port <Condtype>
+         FAIL_ACC_1 <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 13 }
+
+
+pme1008AlmSfpDdmAlmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Alarm On Client Trscv DDM :This 
+        OID indicates an alarm is being 
+        received from the Client Transceiver 
+        DDM <Help> This alarm indicates 
+        if a DDM Alarm has been detected 
+        on the client transceiver <Condtype> 
+        SFP_DDM_ALM_1 <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 11 }
+
+
+pme1008AlmSfpDdmWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Warning On Client Trscv DDM :This 
+        OID indicates a warning is being 
+        received from the Client Transceiver 
+        DDM <Help> This alarm indicates 
+        if a DDM Warning has been detected 
+        on the client transceiver <Condtype> 
+        SFP_DDM_WARNING_1 <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 10 }
+
+
+pme1008AlmDwCaisPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client AIS Inserted :This OID
+         indicates a CAIS has been inserted 
+        on the output client port. <Help> 
+        This status indicates if a Client 
+        Alarm Indication Signal is currently 
+        inserted on the client interface 
+        <Condtype> DW_CAIS_1 <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 9 }
+
+
+pme1008AlmClientRemoteOosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Remote Client Port In Service
+         :This OID indicates that the remote 
+        Client port is In Service (1) or 
+        Out of Service (2) <Help> This
+         status indicates if the remote 
+        client port is in service <Condtype> 
+        CLIENT_REMOTE_OOS <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 8 }
+
+
+pme1008AlmClientLocalOosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Local Client Port In Service :This 
+        OID indicates that the local Client 
+        port is In Service (1) or Out of 
+        Service (2) <Help> This status
+         indicates if the local client
+         port is in service <Condtype>
+         CLIENT_LOCAL_OOS <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 7 }
+
+
+pme1008AlmDwLsdPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client SFP Laser Shutdown :This 
+        OID indicates the Client transceiver 
+        laser is shutdown <Help> This status 
+        indicates if the client transceiver 
+        laser is shutdown <Condtype> DW_LSD_1 
+        <Probcause> other (1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 6 }
+
+
+pme1008AlmHwFailAccPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client HW Fail :This OID indicates 
+        a failure on client port, most
+         probably caused by a HW issue. 
+        <Help> This alarm indicates a failure 
+        on client port, most probably caused 
+        by a HW issue. <Condtype> HW_FAIL_ACC_1 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 5 }
+
+
+pme1008AlmDdmAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        DDM Supported On Client Trscv
+         :This OID indicates that the Client 
+        transceiver supports the Digital 
+        Diagnostic Monitoring function
+         <Help> This status indicates if 
+        the client transceiver includes 
+        the DDM feature <Condtype> DDM_ABSENT_1 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pme1008AlmsynthAlmPortEntry 3 }
+
+
+pme1008AlmSfpAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client SFP Absent :This OID indicates 
+        that the Transceiver is not present 
+        in the client port. <Help> This 
+        alarm indicates if the client transceiver 
+        is not plugged <Condtype> SFP_ABSENT_1 
+        <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) <Event> ObjectCDINV
+        "
+	::= { pme1008AlmsynthAlmPortEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008AlmsynthAlmLine articles
+--- *********************************************************
+
+pme1008AlmsynthAlmLineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008AlmsynthAlmLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008AlmsynthAlmLine 
+        Article
+        "
+	::= { pme1008AlmLineCrit 24 }
+
+
+pme1008AlmsynthAlmLineEntry OBJECT-TYPE
+	SYNTAX Pme1008AlmsynthAlmLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008AlmsynthAlmLine 
+        table
+        "
+	INDEX   { pme1008AlmsynthAlmLineIndex }
+	::= { pme1008AlmsynthAlmLineTable 1 }
+
+
+Pme1008AlmsynthAlmLineEntry ::=
+	SEQUENCE {
+	pme1008AlmsynthAlmLineIndex
+		INTEGER,
+	pme1008AlmLineFailPortn
+		EkiOnOff,
+	pme1008AlmLineDdmAlmPortn
+		EkiOnOff,
+	pme1008AlmLineDdmWarningPortn
+		EkiOnOff,
+	pme1008AlmUpRdiInsPortn
+		EkiOnOff,
+	pme1008AlmLineLocalOosPortn
+		EkiOnOff,
+	pme1008AlmLineTxOffPortn
+		EkiOnOff,
+	pme1008AlmLineHwFailPortn
+		EkiOnOff,
+	pme1008AlmLineDdmAbsentPortn
+		EkiOnOff,
+	pme1008AlmLineSfpAbsentPortn
+		EkiOnOff
+	}
+
+
+pme1008AlmsynthAlmLineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008AlmsynthAlmLine 
+        table
+        "
+	::= { pme1008AlmsynthAlmLineEntry 1 }
+
+
+pme1008AlmLineFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port Failure :This OID indicates 
+        a failure on the line port <Help> 
+        This alarm indicates a failure
+         on the line port <Condtype> LINE_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmLineEntry 13 }
+
+
+pme1008AlmLineDdmAlmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Alarm On Line Optical Module DDM 
+        :This OID indicates an alarm is 
+        present coming out of Line transceiver 
+        DDM <Help> This alarm indicates 
+        if a DDM Alarm has been detected 
+        on the line transceiver <Condtype> 
+        LINE_DDM_ALM <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmLineEntry 11 }
+
+
+pme1008AlmLineDdmWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Warning On Line Optical Module 
+        DDM :This OID indicates a warning 
+        is present coming out of Line transceiver 
+        DDM <Help> This alarm indicates 
+        if a DDM Warning has been detected 
+        on the line transceiver <Condtype> 
+        LINE_DDM_WARNING <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmLineEntry 10 }
+
+
+pme1008AlmUpRdiInsPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        MS-RDI/L-RDI Inserted On Line
+         :This OID indicates an upstream 
+        MS-RDI/L-RDI has been inserted
+         in the outgoing 10 Gb/s SDH/SONET 
+        signal. <Help> This status indicates 
+        if a MS-RDI/L-RDI is currently
+         inserted on the line interface. 
+        <Condtype> UP_RDI_INS <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmLineEntry 9 }
+
+
+pme1008AlmLineLocalOosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port In Service :This OID 
+        indicates that the Line port is 
+        In Service (1) of Out or Service 
+        (2) <Help> This status indicates 
+        if the line port is in service
+         <Condtype> LINE_LOCAL_OOS <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmLineEntry 7 }
+
+
+pme1008AlmLineTxOffPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Laser Shutdown 
+        :This OID indicates the Line transceiver 
+        laser is shutdown <Help> This status 
+        indicates if the Line transceiver 
+        laser is shutdown <Condtype> LINE_TX_OFF 
+        <Probcause> other (1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmLineEntry 6 }
+
+
+pme1008AlmLineHwFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port HW Failure :This OID 
+        indicates a failure on line port, 
+        most probably caused by a HW issue 
+        <Help> This alarm indicates a failure 
+        on line port, most probably caused 
+        by a HW issue <Condtype> LINE_HW_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pme1008AlmsynthAlmLineEntry 5 }
+
+
+pme1008AlmLineDdmAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Ready :This 
+        OID indicates that the optical
+         interface is not operational.
+         <Help> This status indicates if 
+        the line transceiver has been correctly 
+        initialized <Condtype> LINE_DDM_ABSENT_1 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pme1008AlmsynthAlmLineEntry 3 }
+
+
+pme1008AlmLineSfpAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Absent :This 
+        OID indicates that the line optical 
+        interface is not present. <Help> 
+        This alarm indicates if the line 
+        transceiver is not plugged <Condtype> 
+        LINE_SFP_ABSENT_1 <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) <Event> ObjectCDINV
+        "
+	::= { pme1008AlmsynthAlmLineEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008AlmclientHostLaneFault articles
+--- *********************************************************
+
+pme1008AlmclientHostLaneFaultTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008AlmclientHostLaneFaultEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008AlmclientHostLaneFault 
+        Article
+        "
+	::= { pme1008AlmClientUrg 88 }
+
+
+pme1008AlmclientHostLaneFaultEntry OBJECT-TYPE
+	SYNTAX Pme1008AlmclientHostLaneFaultEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008AlmclientHostLaneFault 
+        table
+        "
+	INDEX   { pme1008AlmclientHostLaneFaultIndex }
+	::= { pme1008AlmclientHostLaneFaultTable 1 }
+
+
+Pme1008AlmclientHostLaneFaultEntry ::=
+	SEQUENCE {
+	pme1008AlmclientHostLaneFaultIndex
+		INTEGER,
+	pme1008AlmClientLaneTxFifoErrorPortn
+		EkiOnOff,
+	pme1008AlmClientCsfDetectedPortn
+		EkiOnOff,
+	pme1008AlmClientInputLossOfSigPortn
+		EkiOnOff,
+	pme1008AlmClientLossOfSyncPortn
+		EkiOnOff
+	}
+
+
+pme1008AlmclientHostLaneFaultIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008AlmclientHostLaneFault 
+        table
+        "
+	::= { pme1008AlmclientHostLaneFaultEntry 1 }
+
+
+pme1008AlmClientLaneTxFifoErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Tx FIFO Error :This OID 
+        indicates a Tx FIFO Error on the 
+        Client Trscv <Help> Alarm indicating 
+        a Tx FIFO Error on the Client Trscv 
+        <Condtype> CLIENT_LANE_TX_FIFO_ERROR 
+        <Probcause> receiverFailure (42) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2)
+        "
+	::= { pme1008AlmclientHostLaneFaultEntry 11 }
+
+
+pme1008AlmClientCsfDetectedPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Signal Fail Detected :This 
+        OID indicates that a CSF has been 
+        detected on client port in the
+         downstream direction   <Help>
+          This alarm indicates if a Client 
+        Signal Fail has been detected in 
+        the incoming line frame for this 
+        client port <Condtype> CLIENT_CSF_DETECTED 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> other(1) <Polarity> 
+        (2)
+        "
+	::= { pme1008AlmclientHostLaneFaultEntry 7 }
+
+
+pme1008AlmClientInputLossOfSigPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Input Loss Of Signal :This 
+        OID indicates a Loss of Signal
+         is detected on the Client Trscv 
+        <Help> Alarm indicating a Loss
+         of Signal is detected on the Client 
+        Trscv <Condtype> CLIENT_INPUT_LOSS_OF_SIG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	::= { pme1008AlmclientHostLaneFaultEntry 3 }
+
+
+pme1008AlmClientLossOfSyncPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Frame Alignment Loss :This 
+        OID indicates the module is not 
+        aligned with the incoming Client 
+        signal <Help> Alarm indicating
+         the module is not aligned with 
+        the incoming client signal <Condtype> 
+        CLIENT_LOSS_OF_SYNC <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        integrityViolation (7) <Polarity> 
+        (2) 
+        "
+	::= { pme1008AlmclientHostLaneFaultEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008AlmlineNetworkLaneAlarmWarning1 articles
+--- *********************************************************
+
+pme1008AlmlineNetworkLaneAlarmWarning1Table OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008AlmlineNetworkLaneAlarmWarning1Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008AlmlineNetworkLaneAlarmWarning1 
+        Article
+        "
+	::= { pme1008AlmLineUrg 104 }
+
+
+pme1008AlmlineNetworkLaneAlarmWarning1Entry OBJECT-TYPE
+	SYNTAX Pme1008AlmlineNetworkLaneAlarmWarning1Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008AlmlineNetworkLaneAlarmWarning1 
+        table
+        "
+	INDEX   { pme1008AlmlineNetworkLaneAlarmWarning1Index }
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Table 1 }
+
+
+Pme1008AlmlineNetworkLaneAlarmWarning1Entry ::=
+	SEQUENCE {
+	pme1008AlmlineNetworkLaneAlarmWarning1Index
+		INTEGER,
+	pme1008AlmLineRxPwrHighAlaPortn
+		EkiOnOff,
+	pme1008AlmLineRxPwrLowAlaPortn
+		EkiOnOff,
+	pme1008AlmLineTempHighAlaPortn
+		EkiOnOff,
+	pme1008AlmLineTempLowAlaPortn
+		EkiOnOff,
+	pme1008AlmLineVccHighAlaPortn
+		EkiOnOff,
+	pme1008AlmLineVccLowAlaPortn
+		EkiOnOff,
+	pme1008AlmLineTxBiasHighAlaPortn
+		EkiOnOff,
+	pme1008AlmLineTxBiasLowAlaPortn
+		EkiOnOff,
+	pme1008AlmLineTxPwrHighAlaPortn
+		EkiOnOff,
+	pme1008AlmLineTxPwrLowAlaPortn
+		EkiOnOff
+	}
+
+
+pme1008AlmlineNetworkLaneAlarmWarning1Index OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008AlmlineNetworkLaneAlarmWarning1 
+        table
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 1 }
+
+
+pme1008AlmLineRxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Rx Power High :This 
+        OID indicates that the Trscv input 
+        power of port is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv input power of port 
+        is higher than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        LINE_RX_PWR_HIGH_ALA_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 17 }
+
+
+pme1008AlmLineRxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Rx Power Low :This
+         OID indicates that the Trscv input 
+        power of port is lower than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv input power of port 
+        is lower than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        LINE_RX_PWR_LOW_ALA_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 16 }
+
+
+pme1008AlmLineTempHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Temp High :This OID 
+        indicates that the Trscv temperature 
+        of port is higher than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Alarm indicating that the 
+        Trscv temperature of port is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         LINE_TEMP_HIGH_ALA_1 <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 9 }
+
+
+pme1008AlmLineTempLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Temp Low :This OID
+         indicates that the Trscv temperature 
+        of port is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Alarm indicating that the 
+        Trscv temperature of port is lower 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         LINE_TEMP_LOW_ALA_1 <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 8 }
+
+
+pme1008AlmLineVccHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Power Supply High :This 
+        OID indicates that the Trscv power 
+        supply of port is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv power supply of
+         port is higher than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> LINE_VCC_HIGH_ALA_1
+         <Probcause> powerProblem (36)
+         <Alarmtype> equipmentAlarm (5) 
+        <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 7 }
+
+
+pme1008AlmLineVccLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Power Supply Low :This 
+        OID indicates that the Trscv power 
+        supply of port is lower than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv power supply of
+         port is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> LINE_VCC_LOW_ALA_1 <Probcause> 
+        powerProblem (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 6 }
+
+
+pme1008AlmLineTxBiasHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Bias High :This OID 
+        indicates that the Trscv laser
+         bias current of port is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Help> Alarm 
+        indicating that the Trscv laser 
+        bias current of port is higher
+         than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         LINE_TX_BIAS_HIGH_ALA_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 5 }
+
+
+pme1008AlmLineTxBiasLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Bias Low :This OID
+         indicates that the Trscv laser 
+        bias current of port is lower than 
+        the threshold value written in
+         the Trscv EEPROM <Help> Alarm
+         indicating that the Trscv laser 
+        bias current of port is lower than 
+        the threshold value written in
+         the Trscv EEPROM <Condtype> LINE_TX_BIAS_LOW_ALA_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 4 }
+
+
+pme1008AlmLineTxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Tx Power High :This 
+        OID indicates that the Trscv output 
+        power of port is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv output power of
+         port is higher than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> LINE_TX_PWR_HIGH_ALA_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 3 }
+
+
+pme1008AlmLineTxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Tx Power Low :This
+         OID indicates that the Trscv output 
+        power of port is lower than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv output power of
+         port is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> LINE_TX_PWR_LOW_ALA_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning1Entry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008AlmlineNetworkLaneAlarmWarning2 articles
+--- *********************************************************
+
+pme1008AlmlineNetworkLaneAlarmWarning2Table OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008AlmlineNetworkLaneAlarmWarning2Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008AlmlineNetworkLaneAlarmWarning2 
+        Article
+        "
+	::= { pme1008AlmLineUrg 120 }
+
+
+pme1008AlmlineNetworkLaneAlarmWarning2Entry OBJECT-TYPE
+	SYNTAX Pme1008AlmlineNetworkLaneAlarmWarning2Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008AlmlineNetworkLaneAlarmWarning2 
+        table
+        "
+	INDEX   { pme1008AlmlineNetworkLaneAlarmWarning2Index }
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Table 1 }
+
+
+Pme1008AlmlineNetworkLaneAlarmWarning2Entry ::=
+	SEQUENCE {
+	pme1008AlmlineNetworkLaneAlarmWarning2Index
+		INTEGER,
+	pme1008AlmLineRxPwrHighWngPortn
+		EkiOnOff,
+	pme1008AlmLineRxPwrLowWngPortn
+		EkiOnOff,
+	pme1008AlmLineTempHighWngPortn
+		EkiOnOff,
+	pme1008AlmLineTempLowWngPortn
+		EkiOnOff,
+	pme1008AlmLineVccHighWngPortn
+		EkiOnOff,
+	pme1008AlmLineVccLowWngPortn
+		EkiOnOff,
+	pme1008AlmLineTxBiasHighWngPortn
+		EkiOnOff,
+	pme1008AlmLineTxBiasLowWngPortn
+		EkiOnOff,
+	pme1008AlmLineTxPwrHighWngPortn
+		EkiOnOff,
+	pme1008AlmLineTxPwLowWngPortn
+		EkiOnOff
+	}
+
+
+pme1008AlmlineNetworkLaneAlarmWarning2Index OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008AlmlineNetworkLaneAlarmWarning2 
+        table
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 1 }
+
+
+pme1008AlmLineRxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Rx Power High Warning 
+        :This OID indicates that the Trscv 
+        input power is higher than the
+         threshold value written in the 
+        Trscv EEPROM <Help> Warning indicating 
+        that the Trscv input power is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         LINE_RX_PWR_HIGH_WNG_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 17 }
+
+
+pme1008AlmLineRxPwrLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Rx Power Low Warning 
+        :This OID indicates that the Trscv 
+        input power is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Warning indicating that
+         the Trscv input power is lower 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         LINE_RX_PWR_LOW_WNG_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 16 }
+
+
+pme1008AlmLineTempHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Temp High Warning :This 
+        OID indicates that the Trscv temperature 
+        is higher than the threshold value 
+        written in the Trscv EEPROM <Help> 
+        Warning indicating that the Trscv 
+        temperature is higher than the
+         threshold value written in the 
+        Trscv EEPROM <Condtype> LINE_TEMP_HIGH_WNG_1 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 9 }
+
+
+pme1008AlmLineTempLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Temp Low Warning :This 
+        OID indicates that the Trscv temperature 
+        is lower than the threshold value 
+        written in the Trscv EEPROM <Help> 
+        Warning indicating that the Trscv 
+        temperature is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> LINE_TEMP_LOW_WNG_1
+         <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 8 }
+
+
+pme1008AlmLineVccHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Power Supply High Warning 
+        :This OID indicates that the Trscv 
+        power supply is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Warning indicating 
+        that the Trscv power supply is
+         higher than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        LINE_VCC_HIGH_WNG_1 <Probcause> 
+        powerProblem (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 7 }
+
+
+pme1008AlmLineVccLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Power Supply Low Warning 
+        :This OID indicates that the Trscv 
+        power supply is lower than the
+         threshold value written in the 
+        Trscv EEPROM <Help> Warning indicating 
+        that the Trscv power supply is
+         lower than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        LINE_VCC_LOW_WNG_1 <Probcause>
+         powerProblem (36) <Alarmtype>
+         equipmentAlarm (5) <Polarity>
+         (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 6 }
+
+
+pme1008AlmLineTxBiasHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Bias High Warning :This 
+        OID indicates that the Trscv laser 
+        bias current is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Warning indicating 
+        that the Trscv laser bias current 
+        is higher than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        LINE_TX_BIAS_HIGH_WNG_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 5 }
+
+
+pme1008AlmLineTxBiasLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Bias Low Warning :This 
+        OID indicates that the Trscv laser 
+        bias current is lower than the
+         threshold value written in the 
+        Trscv EEPROM <Help> Warning indicating 
+        that the Trscv laser bias current 
+        is lower than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        LINE_TX_BIAS_LOW_WNG_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 4 }
+
+
+pme1008AlmLineTxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Tx Power High Warning 
+        :This OID indicates that the Trscv 
+        output power is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Warning indicating 
+        that the Trscv output power is
+         higher than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        LINE_TX_PWR_HIGH_WNG_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 3 }
+
+
+pme1008AlmLineTxPwLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Trscv Tx Power Low Warning 
+        :This OID indicates that the Trscv 
+        output power is lower than the
+         threshold value written in the 
+        Trscv EEPROM <Help> Warning indicating 
+        that the Trscv output power is
+         lower than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        LINE_TX_PW_LOW_WNG_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineNetworkLaneAlarmWarning2Entry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008AlmlineHostLaneFault articles
+--- *********************************************************
+
+pme1008AlmlineHostLaneFaultTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008AlmlineHostLaneFaultEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008AlmlineHostLaneFault 
+        Article
+        "
+	::= { pme1008AlmLineUrg 152 }
+
+
+pme1008AlmlineHostLaneFaultEntry OBJECT-TYPE
+	SYNTAX Pme1008AlmlineHostLaneFaultEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008AlmlineHostLaneFault 
+        table
+        "
+	INDEX   { pme1008AlmlineHostLaneFaultIndex }
+	::= { pme1008AlmlineHostLaneFaultTable 1 }
+
+
+Pme1008AlmlineHostLaneFaultEntry ::=
+	SEQUENCE {
+	pme1008AlmlineHostLaneFaultIndex
+		INTEGER,
+	pme1008AlmLineLossOfFramePortn
+		EkiOnOff,
+	pme1008AlmLineInputLossOfSignalPortn
+		EkiOnOff
+	}
+
+
+pme1008AlmlineHostLaneFaultIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008AlmlineHostLaneFault 
+        table
+        "
+	::= { pme1008AlmlineHostLaneFaultEntry 1 }
+
+
+pme1008AlmLineLossOfFramePortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Loss Of Frame :This OID indicates 
+        the module is not aligned with
+         the incoming Line signal<Help> 
+         This alarm indicates if a Loss 
+        Of Frame has been detected on the 
+        line port <Condtype> LINE_LOSS_OF_FRAME 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> integrityViolation
+         (7) <Polarity> (2) 
+        "
+	::= { pme1008AlmlineHostLaneFaultEntry 3 }
+
+
+pme1008AlmLineInputLossOfSignalPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Input Loss Of Signal :This 
+        OID indicates a Loss of Signal
+         is detected on the Line Trscv<Help> 
+         This alarm indicates if an Optical 
+        Path Break has been detected on 
+        the line port <Condtype> LINE_INPUT_LOSS_OF_SIGNAL 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	::= { pme1008AlmlineHostLaneFaultEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008AlmclientSfpAlmDdm articles
+--- *********************************************************
+
+pme1008AlmclientSfpAlmDdmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008AlmclientSfpAlmDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008AlmclientSfpAlmDdm 
+        Article
+        "
+	::= { pme1008AlmClientUrg 216 }
+
+
+pme1008AlmclientSfpAlmDdmEntry OBJECT-TYPE
+	SYNTAX Pme1008AlmclientSfpAlmDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008AlmclientSfpAlmDdm 
+        table
+        "
+	INDEX   { pme1008AlmclientSfpAlmDdmIndex }
+	::= { pme1008AlmclientSfpAlmDdmTable 1 }
+
+
+Pme1008AlmclientSfpAlmDdmEntry ::=
+	SEQUENCE {
+	pme1008AlmclientSfpAlmDdmIndex
+		INTEGER,
+	pme1008AlmClientRxPwrHighAlaPortn
+		EkiOnOff,
+	pme1008AlmClientRxPwrLowAlaPortn
+		EkiOnOff,
+	pme1008AlmClientTempHighAlaPortn
+		EkiOnOff,
+	pme1008AlmClientTempLowAlaPortn
+		EkiOnOff,
+	pme1008AlmClientVccHighAlaPortn
+		EkiOnOff,
+	pme1008AlmClientVccLowAlaPortn
+		EkiOnOff,
+	pme1008AlmClientTxBiasHighAlaPortn
+		EkiOnOff,
+	pme1008AlmClientTxBiasLowAlaPortn
+		EkiOnOff,
+	pme1008AlmClientTxPwrHighAlaPortn
+		EkiOnOff,
+	pme1008AlmClientTxPwrLowAlaPortn
+		EkiOnOff
+	}
+
+
+pme1008AlmclientSfpAlmDdmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008AlmclientSfpAlmDdm 
+        table
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 1 }
+
+
+pme1008AlmClientRxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Rx Power High :This 
+        OID indicates that the Trscv input 
+        power of port is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv input power of port 
+        is higher than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        CLIENT_RX_PWR_HIGH_ALA_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 17 }
+
+
+pme1008AlmClientRxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Rx Power Low :This 
+        OID indicates that the Trscv input 
+        power of port is lower than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv input power of port 
+        is lower than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        CLIENT_RX_PWR_LOW_ALA_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 16 }
+
+
+pme1008AlmClientTempHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Temp High :This OID 
+        indicates that the Trscv temperature 
+        of port is higher than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Alarm indicating that the 
+        Trscv temperature of port is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         CLIENT_TEMP_HIGH_ALA_1 <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 9 }
+
+
+pme1008AlmClientTempLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Temp Low :This OID 
+        indicates that the Trscv temperature 
+        of port is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Alarm indicating that the 
+        Trscv temperature of port is lower 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         CLIENT_TEMP_LOW_ALA_1 <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 8 }
+
+
+pme1008AlmClientVccHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Power Supply High 
+        :This OID indicates that the Trscv 
+        power supply of port is higher
+         than the threshold value written 
+        in the Trscv EEPROM <Help> Alarm 
+        indicating that the Trscv power 
+        supply of port is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Condtype> CLIENT_VCC_HIGH_ALA_1 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 7 }
+
+
+pme1008AlmClientVccLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Power Supply Low
+         :This OID indicates that the Trscv 
+        power supply of port is lower than 
+        the threshold value written in
+         the Trscv EEPROM <Help> Alarm
+         indicating that the Trscv power 
+        supply of port is lower than the 
+        threshold value written in the
+         Trscv EEPROM <Condtype> CLIENT_VCC_LOW_ALA_1 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 6 }
+
+
+pme1008AlmClientTxBiasHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Bias High :This OID 
+        indicates that the Trscv laser
+         bias current of port is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Help> Alarm 
+        indicating that the Trscv laser 
+        bias current of port is higher
+         than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         CLIENT_TX_BIAS_HIGH_ALA_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 5 }
+
+
+pme1008AlmClientTxBiasLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Bias Low :This OID 
+        indicates that the Trscv laser
+         bias current of port is lower
+         than the threshold value written 
+        in the Trscv EEPROM <Help> Alarm 
+        indicating that the Trscv laser 
+        bias current of port is lower than 
+        the threshold value written in
+         the Trscv EEPROM <Condtype> CLIENT_TX_BIAS_LOW_ALA_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 4 }
+
+
+pme1008AlmClientTxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Tx Power High :This 
+        OID indicates that the Trscv output 
+        power of port is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv output power of
+         port is higher than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> CLIENT_TX_PWR_HIGH_ALA_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 3 }
+
+
+pme1008AlmClientTxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Tx Power Low :This 
+        OID indicates that the Trscv output 
+        power of port is lower than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Alarm indicating 
+        that the Trscv output power of
+         port is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> CLIENT_TX_PWR_LOW_ALA_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpAlmDdmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008AlmclientSfpWarnDdm articles
+--- *********************************************************
+
+pme1008AlmclientSfpWarnDdmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008AlmclientSfpWarnDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008AlmclientSfpWarnDdm 
+        Article
+        "
+	::= { pme1008AlmClientNurg 232 }
+
+
+pme1008AlmclientSfpWarnDdmEntry OBJECT-TYPE
+	SYNTAX Pme1008AlmclientSfpWarnDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008AlmclientSfpWarnDdm 
+        table
+        "
+	INDEX   { pme1008AlmclientSfpWarnDdmIndex }
+	::= { pme1008AlmclientSfpWarnDdmTable 1 }
+
+
+Pme1008AlmclientSfpWarnDdmEntry ::=
+	SEQUENCE {
+	pme1008AlmclientSfpWarnDdmIndex
+		INTEGER,
+	pme1008AlmClientRxPwrHighWngPortn
+		EkiOnOff,
+	pme1008AlmClientRxPwrLowWngPortn
+		EkiOnOff,
+	pme1008AlmClientTempHighWngPortn
+		EkiOnOff,
+	pme1008AlmClientTempLowWngPortn
+		EkiOnOff,
+	pme1008AlmClientVccHighWngPortn
+		EkiOnOff,
+	pme1008AlmClientVccLowWngPortn
+		EkiOnOff,
+	pme1008AlmClientTxBiasHighWngPortn
+		EkiOnOff,
+	pme1008AlmClientTxBiasLowWngPortn
+		EkiOnOff,
+	pme1008AlmClientTxPwrHighWngPortn
+		EkiOnOff,
+	pme1008AlmClientTxPwLowWngPortn
+		EkiOnOff
+	}
+
+
+pme1008AlmclientSfpWarnDdmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008AlmclientSfpWarnDdm 
+        table
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 1 }
+
+
+pme1008AlmClientRxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Rx Power High Warning 
+        :This OID indicates that the Trscv 
+        input power is higher than the
+         threshold value written in the 
+        Trscv EEPROM <Help> Warning indicating 
+        that the Trscv input power is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         CLIENT_RX_PWR_HIGH_WNG_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 17 }
+
+
+pme1008AlmClientRxPwrLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Rx Power Low Warning 
+        :This OID indicates that the Trscv 
+        input power is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Warning indicating that
+         the Trscv input power is lower 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         CLIENT_RX_PWR_LOW_WNG_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 16 }
+
+
+pme1008AlmClientTempHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Temp High Warning 
+        :This OID indicates that the Trscv 
+        temperature is higher than the
+         threshold value written in the 
+        Trscv EEPROM <Help> Warning indicating 
+        that the Trscv temperature is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         CLIENT_TEMP_HIGH_WNG_1 <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 9 }
+
+
+pme1008AlmClientTempLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Temp Low Warning
+         :This OID indicates that the Trscv 
+        temperature is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Warning indicating that
+         the Trscv temperature is lower 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         CLIENT_TEMP_LOW_WNG_1 <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 8 }
+
+
+pme1008AlmClientVccHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Power Supply High 
+        Warning :This OID indicates that 
+        the Trscv power supply is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Help> Warning 
+        indicating that the Trscv power 
+        supply is higher than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> CLIENT_VCC_HIGH_WNG_1 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 7 }
+
+
+pme1008AlmClientVccLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Power Supply Low
+         Warning :This OID indicates that 
+        the Trscv power supply is lower 
+        than the threshold value written 
+        in the Trscv EEPROM <Help> Warning 
+        indicating that the Trscv power 
+        supply is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> CLIENT_VCC_LOW_WNG_1 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 6 }
+
+
+pme1008AlmClientTxBiasHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Bias High Warning 
+        :This OID indicates that the Trscv 
+        laser bias current is higher than 
+        the threshold value written in
+         the Trscv EEPROM <Help> Warning 
+        indicating that the Trscv laser 
+        bias current is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Condtype> CLIENT_TX_BIAS_HIGH_WNG_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 5 }
+
+
+pme1008AlmClientTxBiasLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Bias Low Warning
+         :This OID indicates that the Trscv 
+        laser bias current is lower than 
+        the threshold value written in
+         the Trscv EEPROM <Help> Warning 
+        indicating that the Trscv laser 
+        bias current is lower than the
+         threshold value written in the 
+        Trscv EEPROM <Condtype> CLIENT_TX_BIAS_LOW_WNG_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 4 }
+
+
+pme1008AlmClientTxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Tx Power High Warning 
+        :This OID indicates that the Trscv 
+        output power is higher than the 
+        threshold value written in the
+         Trscv EEPROM <Help> Warning indicating 
+        that the Trscv output power is
+         higher than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        CLIENT_TX_PWR_HIGH_WNG_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 3 }
+
+
+pme1008AlmClientTxPwLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Trscv Tx Power Low Warning 
+        :This OID indicates that the Trscv 
+        output power is lower than the
+         threshold value written in the 
+        Trscv EEPROM <Help> Warning indicating 
+        that the Trscv output power is
+         lower than the threshold value 
+        written in the Trscv EEPROM <Condtype> 
+        CLIENT_TX_PW_LOW_WNG_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pme1008AlmclientSfpWarnDdmEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the confMgnt1 article
+--- *****************************************************
+pme1008CtrlconfMgnt1 OBJECT IDENTIFIER ::= { pme1008CtrlOther 1 }
+
+
+
+
+pme1008CtrlConf2Clear1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        OID clears the configuration tables 
+        from configuration2 in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pme1008CtrlconfMgnt1 14 }
+
+
+
+pme1008CtrlConf2Flash1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        OID saves the current configuration 
+        of the PM as configuration2 in
+         the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pme1008CtrlconfMgnt1 10 }
+
+
+
+pme1008CtrlConf2Load1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables Set
+         Nb 2 :When set this OID enables 
+        loading from flash configuration2 
+        into the PM.
+        "
+	  ::= { pme1008CtrlconfMgnt1 2 }
+
+
+
+pme1008CtrlConf1Load1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables Set
+         Nb 1 :When set this OID enables 
+        loading from flash configuration1 
+        into the PM.
+        "
+	  ::= { pme1008CtrlconfMgnt1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pme1008Ctrlsynth4 OBJECT IDENTIFIER ::= { pme1008CtrlOther 4 }
+
+
+
+
+pme1008CtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pme1008Ctrlsynth4 2 }
+
+
+
+pme1008CtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pme1008Ctrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pme1008CtrlswMgnt OBJECT IDENTIFIER ::= { pme1008CtrlOther 5 }
+
+
+
+
+pme1008CtrlLoadSwBank2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Software Nb 2 As Active :This 
+        OID, when set, loads the SW from 
+        bank2 into the PM. It must be followed 
+        by a reset.  <Help>  This controls 
+        selects the second SW bank as the 
+        active bank for the next module 
+        reset
+        "
+	  ::= { pme1008CtrlswMgnt 6 }
+
+
+
+pme1008CtrlLoadSwBank1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Software Nb 1 As Active :This 
+        OID, when set, loads the SW from 
+        bank1 into the PM. It must be followed 
+        by a reset.  <Help>  This controls 
+        selects the first SW bank as the 
+        active bank for the next module 
+        reset
+        "
+	  ::= { pme1008CtrlswMgnt 5 }
+
+
+
+pme1008CtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        PM. This reset is not traffic affecting, 
+        and the configuration of PM remains 
+        unchanged.  <Help>  This control 
+        initiates a warm reset of the module. 
+        "
+	  ::= { pme1008CtrlswMgnt 3 }
+
+
+
+pme1008CtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        PM. This reset is traffic affecting, 
+        and the configuration of PM is
+         reloaded on start-up.  <Help>
+          This control initiates a cold 
+        reset of the module. 
+        "
+	  ::= { pme1008CtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the gwMgnt article
+--- *****************************************************
+pme1008CtrlgwMgnt OBJECT IDENTIFIER ::= { pme1008CtrlOther 6 }
+
+
+
+
+pme1008CtrlLoadGwBank4 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 4 As Active :This 
+        OID, when set, loads the GW from 
+        bank4 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.
+        "
+	  ::= { pme1008CtrlgwMgnt 8 }
+
+
+
+pme1008CtrlLoadGwBank3 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 3 As Active :This 
+        OID, when set, loads the GW from 
+        bank3 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.  <Help>  This controls 
+        initiates a cold reset of the module 
+        and select the third GW bank as 
+        the active bank
+        "
+	  ::= { pme1008CtrlgwMgnt 7 }
+
+
+
+pme1008CtrlLoadGwBank2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 2 As Active :This 
+        OID, when set, loads the GW from 
+        bank2 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.
+        "
+	  ::= { pme1008CtrlgwMgnt 6 }
+
+
+
+pme1008CtrlLoadGwBank1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 1 As Active :This 
+        OID, when set, loads the GW from 
+        bank1 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.  <Help>  This controls 
+        initiates a cold reset of the module 
+        and select the first GW bank as 
+        the active bank
+        "
+	  ::= { pme1008CtrlgwMgnt 5 }
+
+
+
+pme1008CtrlCurrentGwReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Active Gateware Reset :This OID, 
+        when set, resets the active gateware. 
+        It is traffic affecting.
+        "
+	  ::= { pme1008CtrlgwMgnt 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlaccessLoop articles
+--- *********************************************************
+
+pme1008CtrlaccessLoopTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlaccessLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlaccessLoop
+         Article
+        "
+	::= { pme1008CtrlClient 16 }
+
+
+pme1008CtrlaccessLoopEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlaccessLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlaccessLoop 
+        table
+        "
+	INDEX   { pme1008CtrlaccessLoopIndex }
+	::= { pme1008CtrlaccessLoopTable 1 }
+
+
+Pme1008CtrlaccessLoopEntry ::=
+	SEQUENCE {
+	pme1008CtrlaccessLoopIndex
+		INTEGER,
+	pme1008CtrlaccessLoopPortn
+		EkiState
+	}
+
+
+pme1008CtrlaccessLoopIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlaccessLoop 
+        table
+        "
+	::= { pme1008CtrlaccessLoopEntry 1 }
+
+
+pme1008CtrlaccessLoopPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Facility Loopback :This 
+        OID, when set at '1' puts the client 
+        port in loopback, looping the received 
+        10 Gb/s signal on the transmit
+         10 Gb/s output.  <Help> This control 
+        enables the Out Loopback on the 
+        client port, looping the client 
+        input signal on the client output
+        "
+	::= { pme1008CtrlaccessLoopEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlclientLoopToLine articles
+--- *********************************************************
+
+pme1008CtrlclientLoopToLineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlclientLoopToLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlclientLoopToLine 
+        Article
+        "
+	::= { pme1008CtrlClient 17 }
+
+
+pme1008CtrlclientLoopToLineEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlclientLoopToLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlclientLoopToLine 
+        table
+        "
+	INDEX   { pme1008CtrlclientLoopToLineIndex }
+	::= { pme1008CtrlclientLoopToLineTable 1 }
+
+
+Pme1008CtrlclientLoopToLineEntry ::=
+	SEQUENCE {
+	pme1008CtrlclientLoopToLineIndex
+		INTEGER,
+	pme1008CtrlclientLoopToLinePortn
+		EkiState
+	}
+
+
+pme1008CtrlclientLoopToLineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlclientLoopToLine 
+        table
+        "
+	::= { pme1008CtrlclientLoopToLineEntry 1 }
+
+
+pme1008CtrlclientLoopToLinePortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Terminal Loopback :This 
+        OID, when set, puts the client
+         port in loop back, looping the 
+        10 Gb/s output signal on the 10 
+        Gb/s input.<Help> This control
+         enables the In Loopback on the 
+        client port, looping the client 
+        output signal on the client input
+        "
+	::= { pme1008CtrlclientLoopToLineEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlcsfUpIns articles
+--- *********************************************************
+
+pme1008CtrlcsfUpInsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlcsfUpInsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlcsfUpIns Article
+        "
+	::= { pme1008CtrlClient 21 }
+
+
+pme1008CtrlcsfUpInsEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlcsfUpInsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlcsfUpIns 
+        table
+        "
+	INDEX   { pme1008CtrlcsfUpInsIndex }
+	::= { pme1008CtrlcsfUpInsTable 1 }
+
+
+Pme1008CtrlcsfUpInsEntry ::=
+	SEQUENCE {
+	pme1008CtrlcsfUpInsIndex
+		INTEGER,
+	pme1008CtrlcsfUpInsPortn
+		EkiState
+	}
+
+
+pme1008CtrlcsfUpInsIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlcsfUpIns 
+        table
+        "
+	::= { pme1008CtrlcsfUpInsEntry 1 }
+
+
+pme1008CtrlcsfUpInsPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Signal Fail Insertion :This 
+        OID, when set, inserts  a client 
+        signal fail in the upstream client 
+        Port.  <Help>  This control inserts 
+        a Client Signal Fail for the client 
+        port
+        "
+	::= { pme1008CtrlcsfUpInsEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlcaisDwIns articles
+--- *********************************************************
+
+pme1008CtrlcaisDwInsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlcaisDwInsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlcaisDwIns Article
+        "
+	::= { pme1008CtrlClient 22 }
+
+
+pme1008CtrlcaisDwInsEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlcaisDwInsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlcaisDwIns 
+        table
+        "
+	INDEX   { pme1008CtrlcaisDwInsIndex }
+	::= { pme1008CtrlcaisDwInsTable 1 }
+
+
+Pme1008CtrlcaisDwInsEntry ::=
+	SEQUENCE {
+	pme1008CtrlcaisDwInsIndex
+		INTEGER,
+	pme1008CtrlcaisDwInsPortn
+		EkiState
+	}
+
+
+pme1008CtrlcaisDwInsIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlcaisDwIns 
+        table
+        "
+	::= { pme1008CtrlcaisDwInsEntry 1 }
+
+
+pme1008CtrlcaisDwInsPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client AIS Insertion :This OID, 
+        when set, inserts a client AIS
+         on the downstream client Port. 
+         <Help>  This control inserts a 
+        Client AIS for the client port
+        "
+	::= { pme1008CtrlcaisDwInsEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlclientOci articles
+--- *********************************************************
+
+pme1008CtrlclientOciTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlclientOciEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlclientOci Article
+        "
+	::= { pme1008CtrlClient 23 }
+
+
+pme1008CtrlclientOciEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlclientOciEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlclientOci 
+        table
+        "
+	INDEX   { pme1008CtrlclientOciIndex }
+	::= { pme1008CtrlclientOciTable 1 }
+
+
+Pme1008CtrlclientOciEntry ::=
+	SEQUENCE {
+	pme1008CtrlclientOciIndex
+		INTEGER,
+	pme1008CtrlclientOciPortn
+		EkiState
+	}
+
+
+pme1008CtrlclientOciIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlclientOci 
+        table
+        "
+	::= { pme1008CtrlclientOciEntry 1 }
+
+
+pme1008CtrlclientOciPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        ODU2e-OCI :Label  <Help>  This 
+        control inserts a Client OCI
+        "
+	::= { pme1008CtrlclientOciEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlclientLck articles
+--- *********************************************************
+
+pme1008CtrlclientLckTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlclientLckEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlclientLck Article
+        "
+	::= { pme1008CtrlClient 24 }
+
+
+pme1008CtrlclientLckEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlclientLckEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlclientLck 
+        table
+        "
+	INDEX   { pme1008CtrlclientLckIndex }
+	::= { pme1008CtrlclientLckTable 1 }
+
+
+Pme1008CtrlclientLckEntry ::=
+	SEQUENCE {
+	pme1008CtrlclientLckIndex
+		INTEGER,
+	pme1008CtrlclientLckPortn
+		EkiState
+	}
+
+
+pme1008CtrlclientLckIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlclientLck 
+        table
+        "
+	::= { pme1008CtrlclientLckEntry 1 }
+
+
+pme1008CtrlclientLckPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        ODU2e-LCK :Label  <Help>  This 
+        control inserts a Client LCK
+        "
+	::= { pme1008CtrlclientLckEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlclientAis articles
+--- *********************************************************
+
+pme1008CtrlclientAisTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlclientAisEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlclientAis Article
+        "
+	::= { pme1008CtrlClient 25 }
+
+
+pme1008CtrlclientAisEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlclientAisEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlclientAis 
+        table
+        "
+	INDEX   { pme1008CtrlclientAisIndex }
+	::= { pme1008CtrlclientAisTable 1 }
+
+
+Pme1008CtrlclientAisEntry ::=
+	SEQUENCE {
+	pme1008CtrlclientAisIndex
+		INTEGER,
+	pme1008CtrlclientAisPortn
+		EkiState
+	}
+
+
+pme1008CtrlclientAisIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlclientAis 
+        table
+        "
+	::= { pme1008CtrlclientAisEntry 1 }
+
+
+pme1008CtrlclientAisPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        ODU2e-AIS :Label  <Help>  This 
+        control inserts a Client AIS 
+        "
+	::= { pme1008CtrlclientAisEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlclientBdi articles
+--- *********************************************************
+
+pme1008CtrlclientBdiTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlclientBdiEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlclientBdi Article
+        "
+	::= { pme1008CtrlClient 26 }
+
+
+pme1008CtrlclientBdiEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlclientBdiEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlclientBdi 
+        table
+        "
+	INDEX   { pme1008CtrlclientBdiIndex }
+	::= { pme1008CtrlclientBdiTable 1 }
+
+
+Pme1008CtrlclientBdiEntry ::=
+	SEQUENCE {
+	pme1008CtrlclientBdiIndex
+		INTEGER,
+	pme1008CtrlclientBdiPortn
+		EkiState
+	}
+
+
+pme1008CtrlclientBdiIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlclientBdi 
+        table
+        "
+	::= { pme1008CtrlclientBdiEntry 1 }
+
+
+pme1008CtrlclientBdiPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        ODU2e-BDI :Label  <Help>  This 
+        control inserts a Client BDI
+        "
+	::= { pme1008CtrlclientBdiEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlcommAccessLoop articles
+--- *********************************************************
+
+pme1008CtrlcommAccessLoopTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlcommAccessLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlcommAccessLoop 
+        Article
+        "
+	::= { pme1008CtrlLine 64 }
+
+
+pme1008CtrlcommAccessLoopEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlcommAccessLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlcommAccessLoop 
+        table
+        "
+	INDEX   { pme1008CtrlcommAccessLoopIndex }
+	::= { pme1008CtrlcommAccessLoopTable 1 }
+
+
+Pme1008CtrlcommAccessLoopEntry ::=
+	SEQUENCE {
+	pme1008CtrlcommAccessLoopIndex
+		INTEGER,
+	pme1008CtrlcommAccessLoopPortn
+		EkiState
+	}
+
+
+pme1008CtrlcommAccessLoopIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlcommAccessLoop 
+        table
+        "
+	::= { pme1008CtrlcommAccessLoopEntry 1 }
+
+
+pme1008CtrlcommAccessLoopPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Terminal Loopback :This OID, 
+        when set, puts the module in common 
+        access loop back, looping the 10 
+        Gb/s output signal on the 10 Gb/s 
+        input.<Help> This control enables 
+        the In Loopback on the line port, 
+        looping the 100 Gb/s output signal 
+        on the 100 Gb/s input
+        "
+	::= { pme1008CtrlcommAccessLoopEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrllineLoop articles
+--- *********************************************************
+
+pme1008CtrllineLoopTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrllineLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrllineLoop Article
+        "
+	::= { pme1008CtrlLine 66 }
+
+
+pme1008CtrllineLoopEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrllineLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrllineLoop 
+        table
+        "
+	INDEX   { pme1008CtrllineLoopIndex }
+	::= { pme1008CtrllineLoopTable 1 }
+
+
+Pme1008CtrllineLoopEntry ::=
+	SEQUENCE {
+	pme1008CtrllineLoopIndex
+		INTEGER,
+	pme1008CtrllineLoopPortn
+		EkiState
+	}
+
+
+pme1008CtrllineLoopIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrllineLoop 
+        table
+        "
+	::= { pme1008CtrllineLoopEntry 1 }
+
+
+pme1008CtrllineLoopPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Facility Loopback :This OID, 
+        when set at '1' puts the module 
+        in line loopback mode, looping
+         the received 10 Gb/s signal on 
+        the transmit 10 Gb/s output. The 
+        Upstream part of the module is
+         timed on the 10 Gb/s recovered 
+        clock in that case.<Help> This
+         control enables the Out Loopback 
+        on the line port, looping the 100 
+        Gb/s input signal on the 100 Gb/s 
+        output
+        "
+	::= { pme1008CtrllineLoopEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrlfecDisable articles
+--- *********************************************************
+
+pme1008CtrlfecDisableTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrlfecDisableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrlfecDisable
+         Article
+        "
+	::= { pme1008CtrlLine 69 }
+
+
+pme1008CtrlfecDisableEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrlfecDisableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrlfecDisable 
+        table
+        "
+	INDEX   { pme1008CtrlfecDisableIndex }
+	::= { pme1008CtrlfecDisableTable 1 }
+
+
+Pme1008CtrlfecDisableEntry ::=
+	SEQUENCE {
+	pme1008CtrlfecDisableIndex
+		INTEGER,
+	pme1008CtrlfecDisablePortn
+		EkiState
+	}
+
+
+pme1008CtrlfecDisableIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrlfecDisable 
+        table
+        "
+	::= { pme1008CtrlfecDisableEntry 1 }
+
+
+pme1008CtrlfecDisablePortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Forward Error Correction Inhibition 
+        :This OID, when set, inhibits the 
+        Forward Error Correction feature 
+        on the line input  <Help>  This 
+        control enables/disables the Forward 
+        Error Correction on the line interface
+        "
+	::= { pme1008CtrlfecDisableEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CtrllineBdi articles
+--- *********************************************************
+
+pme1008CtrllineBdiTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CtrllineBdiEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CtrllineBdi Article
+        "
+	::= { pme1008CtrlLine 70 }
+
+
+pme1008CtrllineBdiEntry OBJECT-TYPE
+	SYNTAX Pme1008CtrllineBdiEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CtrllineBdi 
+        table
+        "
+	INDEX   { pme1008CtrllineBdiIndex }
+	::= { pme1008CtrllineBdiTable 1 }
+
+
+Pme1008CtrllineBdiEntry ::=
+	SEQUENCE {
+	pme1008CtrllineBdiIndex
+		INTEGER,
+	pme1008CtrllineBdiPortn
+		EkiState
+	}
+
+
+pme1008CtrllineBdiIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CtrllineBdi 
+        table
+        "
+	::= { pme1008CtrllineBdiEntry 1 }
+
+
+pme1008CtrllineBdiPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        OTU2e-BDI :Label  <Help>  This 
+        control inserts a Line BDI
+        "
+	::= { pme1008CtrllineBdiEntry 2 }
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pme1008CtrlledTest OBJECT IDENTIFIER ::= { pme1008CtrlOther 192 }
+
+
+
+
+pme1008CtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pme1008CtrlledTest 3 }
+
+
+
+pme1008CtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pme1008CtrlledTest 2 }
+
+
+
+pme1008CtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pme1008CtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     COUNTERS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *********************************************************
+---     TABLE for the pme1008CntclientCbipCounter articles
+--- *********************************************************
+
+pme1008CntclientCbipCounterTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CntclientCbipCounterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CntclientCbipCounter 
+        Article
+        "
+	::= { pme1008CntClient 96 }
+
+
+pme1008CntclientCbipCounterEntry OBJECT-TYPE
+	SYNTAX Pme1008CntclientCbipCounterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CntclientCbipCounter 
+        table
+        "
+	INDEX   { pme1008CntclientCbipCounterIndex }
+	::= { pme1008CntclientCbipCounterTable 1 }
+
+
+Pme1008CntclientCbipCounterEntry ::=
+	SEQUENCE {
+	pme1008CntclientCbipCounterIndex
+		INTEGER,
+	pme1008CntclientCbipCounterValuePortn
+		Counter32,
+	pme1008CntclientCbipCounterErrorPortn
+		EkiOnOff,
+	pme1008CntclientCbipCounterOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008CntclientCbipCounterIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CntclientCbipCounter 
+        table
+        "
+	::= { pme1008CntclientCbipCounterEntry 1 }
+
+
+pme1008CntclientCbipCounterValuePortn OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Output Errors :This counter 
+        is incremented each time a BIP
+         error is detected on the Client 
+        path  <Help>  This counter gives 
+        the number of CBIP errors on the 
+        client path
+        "
+	::= { pme1008CntclientCbipCounterEntry 2 }
+
+
+pme1008CntclientCbipCounterErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Counter Error :This OID 
+        when set indicates the CBIP error 
+        counter value is invalid on Port
+        "
+	::= { pme1008CntclientCbipCounterEntry 3 }
+
+
+pme1008CntclientCbipCounterOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client CBIP Counter Overload :This 
+        OID when set indicates a CBIP error 
+        counter overload on Port
+        "
+	::= { pme1008CntclientCbipCounterEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CntlocalLineSmBip8ErrorCounter articles
+--- *********************************************************
+
+pme1008CntlocalLineSmBip8ErrorCounterTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CntlocalLineSmBip8ErrorCounterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CntlocalLineSmBip8ErrorCounter 
+        Article
+        "
+	::= { pme1008CntLine 192 }
+
+
+pme1008CntlocalLineSmBip8ErrorCounterEntry OBJECT-TYPE
+	SYNTAX Pme1008CntlocalLineSmBip8ErrorCounterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CntlocalLineSmBip8ErrorCounter 
+        table
+        "
+	INDEX   { pme1008CntlocalLineSmBip8ErrorCounterIndex }
+	::= { pme1008CntlocalLineSmBip8ErrorCounterTable 1 }
+
+
+Pme1008CntlocalLineSmBip8ErrorCounterEntry ::=
+	SEQUENCE {
+	pme1008CntlocalLineSmBip8ErrorCounterIndex
+		INTEGER,
+	pme1008CntlocalLineSmBip8ErrorCounterValuePortn
+		Counter32,
+	pme1008CntlocalLineSmBip8ErrorCounterErrorPortn
+		EkiOnOff,
+	pme1008CntlocalLineSmBip8ErrorCounterOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008CntlocalLineSmBip8ErrorCounterIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CntlocalLineSmBip8ErrorCounter 
+        table
+        "
+	::= { pme1008CntlocalLineSmBip8ErrorCounterEntry 1 }
+
+
+pme1008CntlocalLineSmBip8ErrorCounterValuePortn OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Input FCS Errors :This counter 
+        is increased each time a FCS error 
+        is detected on the line input stream 
+        <Help>  This counter gives the
+         number of FCS errors on the line 
+         input port
+        "
+	::= { pme1008CntlocalLineSmBip8ErrorCounterEntry 2 }
+
+
+pme1008CntlocalLineSmBip8ErrorCounterErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Counter Error :This OID when 
+        set indicates the B1 error counter 
+        value is invalid on Port
+        "
+	::= { pme1008CntlocalLineSmBip8ErrorCounterEntry 3 }
+
+
+pme1008CntlocalLineSmBip8ErrorCounterOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Counter Overload :This OID 
+        when set indicates a B1 error counter 
+        overload on Port
+        "
+	::= { pme1008CntlocalLineSmBip8ErrorCounterEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008CntlineDfrmTimCnt articles
+--- *********************************************************
+
+pme1008CntlineDfrmTimCntTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CntlineDfrmTimCntEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008CntlineDfrmTimCnt 
+        Article
+        "
+	::= { pme1008CntLine 216 }
+
+
+pme1008CntlineDfrmTimCntEntry OBJECT-TYPE
+	SYNTAX Pme1008CntlineDfrmTimCntEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008CntlineDfrmTimCnt 
+        table
+        "
+	INDEX   { pme1008CntlineDfrmTimCntIndex }
+	::= { pme1008CntlineDfrmTimCntTable 1 }
+
+
+Pme1008CntlineDfrmTimCntEntry ::=
+	SEQUENCE {
+	pme1008CntlineDfrmTimCntIndex
+		INTEGER,
+	pme1008CntlineDfrmTimCntValuePortn
+		Counter32,
+	pme1008CntlineDfrmTimCntErrorPortn
+		EkiOnOff,
+	pme1008CntlineDfrmTimCntOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008CntlineDfrmTimCntIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008CntlineDfrmTimCnt 
+        table
+        "
+	::= { pme1008CntlineDfrmTimCntEntry 1 }
+
+
+pme1008CntlineDfrmTimCntValuePortn OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Timer Counter :
+        "
+	::= { pme1008CntlineDfrmTimCntEntry 2 }
+
+
+pme1008CntlineDfrmTimCntErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Counter Error :This OID when 
+        set indicates the deframer timer 
+        counter value is invalid on Port
+        "
+	::= { pme1008CntlineDfrmTimCntEntry 3 }
+
+
+pme1008CntlineDfrmTimCntOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Counter Overload :This OID 
+        when set indicates a deframer timer 
+        counter overload on Port
+        "
+	::= { pme1008CntlineDfrmTimCntEntry 4 }
+
+
+pme1008CntCountersReset  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Counters Reset:This OID resets and restarts all the counters"
+	::= { pme1008counters  259 }
+
+pme1008CntCountersStop  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Counters stop:This OID stops all the counters"
+	::= { pme1008counters 260 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     RMON
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *********************************************************
+---     TABLE for the pme1008MonupRmonBytesCounterClientInput articles
+--- *********************************************************
+
+pme1008MonupRmonBytesCounterClientInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MonupRmonBytesCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MonupRmonBytesCounterClientInput 
+        Article
+        "
+	::= { pme1008MonClientRmonCounter 16 }
+
+
+pme1008MonupRmonBytesCounterClientInputEntry OBJECT-TYPE
+	SYNTAX Pme1008MonupRmonBytesCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MonupRmonBytesCounterClientInput 
+        table
+        "
+	INDEX   { pme1008MonupRmonBytesCounterClientInputIndex }
+	::= { pme1008MonupRmonBytesCounterClientInputTable 1 }
+
+
+Pme1008MonupRmonBytesCounterClientInputEntry ::=
+	SEQUENCE {
+	pme1008MonupRmonBytesCounterClientInputIndex
+		INTEGER,
+	pme1008MonupRmonBytesCounterClientInputValuePortn
+		Counter64,
+	pme1008MonupRmonBytesCounterClientInputErrorPortn
+		EkiOnOff,
+	pme1008MonupRmonBytesCounterClientInputOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008MonupRmonBytesCounterClientInputIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MonupRmonBytesCounterClientInput 
+        table
+        "
+	::= { pme1008MonupRmonBytesCounterClientInputEntry 1 }
+
+
+pme1008MonupRmonBytesCounterClientInputValuePortn OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Input Bytes :This counter 
+        is increased each time a data byte 
+        is received on the client port
+          <Help>  This counter gives the 
+        number of bytes received on the 
+        client port
+        "
+	::= { pme1008MonupRmonBytesCounterClientInputEntry 2 }
+
+
+pme1008MonupRmonBytesCounterClientInputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Bytes Counter Error :This OID
+         when set indicates the Bytes counter 
+        value is invalid on client port
+        "
+	::= { pme1008MonupRmonBytesCounterClientInputEntry 3 }
+
+
+pme1008MonupRmonBytesCounterClientInputOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Bytes Counter Overload :This OID 
+        when set indicates a Bytes counter 
+        overload on client port
+        "
+	::= { pme1008MonupRmonBytesCounterClientInputEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MonupRmonCrcErrorsCounterClientInput articles
+--- *********************************************************
+
+pme1008MonupRmonCrcErrorsCounterClientInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MonupRmonCrcErrorsCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MonupRmonCrcErrorsCounterClientInput 
+        Article
+        "
+	::= { pme1008MonClientRmonCounter 32 }
+
+
+pme1008MonupRmonCrcErrorsCounterClientInputEntry OBJECT-TYPE
+	SYNTAX Pme1008MonupRmonCrcErrorsCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MonupRmonCrcErrorsCounterClientInput 
+        table
+        "
+	INDEX   { pme1008MonupRmonCrcErrorsCounterClientInputIndex }
+	::= { pme1008MonupRmonCrcErrorsCounterClientInputTable 1 }
+
+
+Pme1008MonupRmonCrcErrorsCounterClientInputEntry ::=
+	SEQUENCE {
+	pme1008MonupRmonCrcErrorsCounterClientInputIndex
+		INTEGER,
+	pme1008MonupRmonCrcErrorsCounterClientInputValuePortn
+		Counter64,
+	pme1008MonupRmonCrcErrorsCounterClientInputErrorPortn
+		EkiOnOff,
+	pme1008MonupRmonCrcErrorsCounterClientInputOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008MonupRmonCrcErrorsCounterClientInputIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MonupRmonCrcErrorsCounterClientInput 
+        table
+        "
+	::= { pme1008MonupRmonCrcErrorsCounterClientInputEntry 1 }
+
+
+pme1008MonupRmonCrcErrorsCounterClientInputValuePortn OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Input CRC Errors :This
+         counter is increased each time 
+        a B1/FCS error is detected on the 
+        client port  <Help>  This counter 
+        gives the number of B1/FCS Errors 
+        received on the client port
+        "
+	::= { pme1008MonupRmonCrcErrorsCounterClientInputEntry 2 }
+
+
+pme1008MonupRmonCrcErrorsCounterClientInputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        B1/FCS Errors Counter Error :This 
+        OID when set indicates the B1/FCS 
+        Errors counter value is invalid 
+        on client port
+        "
+	::= { pme1008MonupRmonCrcErrorsCounterClientInputEntry 3 }
+
+
+pme1008MonupRmonCrcErrorsCounterClientInputOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        B1/FCS Errors Counter Overload 
+        :This OID when set indicates a
+         B1/FCS Errors counter overload 
+        on client port
+        "
+	::= { pme1008MonupRmonCrcErrorsCounterClientInputEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MonupRmonPacketsCounterClientInput articles
+--- *********************************************************
+
+pme1008MonupRmonPacketsCounterClientInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MonupRmonPacketsCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MonupRmonPacketsCounterClientInput 
+        Article
+        "
+	::= { pme1008MonClientRmonCounter 48 }
+
+
+pme1008MonupRmonPacketsCounterClientInputEntry OBJECT-TYPE
+	SYNTAX Pme1008MonupRmonPacketsCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MonupRmonPacketsCounterClientInput 
+        table
+        "
+	INDEX   { pme1008MonupRmonPacketsCounterClientInputIndex }
+	::= { pme1008MonupRmonPacketsCounterClientInputTable 1 }
+
+
+Pme1008MonupRmonPacketsCounterClientInputEntry ::=
+	SEQUENCE {
+	pme1008MonupRmonPacketsCounterClientInputIndex
+		INTEGER,
+	pme1008MonupRmonPacketsCounterClientInputValuePortn
+		Counter64,
+	pme1008MonupRmonPacketsCounterClientInputErrorPortn
+		EkiOnOff,
+	pme1008MonupRmonPacketsCounterClientInputOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008MonupRmonPacketsCounterClientInputIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MonupRmonPacketsCounterClientInput 
+        table
+        "
+	::= { pme1008MonupRmonPacketsCounterClientInputEntry 1 }
+
+
+pme1008MonupRmonPacketsCounterClientInputValuePortn OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Input Packets :This counter 
+        is increased each time a packet 
+        is received on the client port
+          <Help>  This counter gives the 
+        number of packets received on the 
+        client port
+        "
+	::= { pme1008MonupRmonPacketsCounterClientInputEntry 2 }
+
+
+pme1008MonupRmonPacketsCounterClientInputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Packets Counter Error :This OID 
+        when set indicates the Packets
+         counter value is invalid on client 
+        port
+        "
+	::= { pme1008MonupRmonPacketsCounterClientInputEntry 3 }
+
+
+pme1008MonupRmonPacketsCounterClientInputOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Packets Counter Overload :This 
+        OID when set indicates a Packets 
+        counter overload on client port
+        "
+	::= { pme1008MonupRmonPacketsCounterClientInputEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MonupRmonBroadcastCounterClientInput articles
+--- *********************************************************
+
+pme1008MonupRmonBroadcastCounterClientInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MonupRmonBroadcastCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MonupRmonBroadcastCounterClientInput 
+        Article
+        "
+	::= { pme1008MonClientRmonCounter 64 }
+
+
+pme1008MonupRmonBroadcastCounterClientInputEntry OBJECT-TYPE
+	SYNTAX Pme1008MonupRmonBroadcastCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MonupRmonBroadcastCounterClientInput 
+        table
+        "
+	INDEX   { pme1008MonupRmonBroadcastCounterClientInputIndex }
+	::= { pme1008MonupRmonBroadcastCounterClientInputTable 1 }
+
+
+Pme1008MonupRmonBroadcastCounterClientInputEntry ::=
+	SEQUENCE {
+	pme1008MonupRmonBroadcastCounterClientInputIndex
+		INTEGER,
+	pme1008MonupRmonBroadcastCounterClientInputValuePortn
+		Counter64,
+	pme1008MonupRmonBroadcastCounterClientInputErrorPortn
+		EkiOnOff,
+	pme1008MonupRmonBroadcastCounterClientInputOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008MonupRmonBroadcastCounterClientInputIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MonupRmonBroadcastCounterClientInput 
+        table
+        "
+	::= { pme1008MonupRmonBroadcastCounterClientInputEntry 1 }
+
+
+pme1008MonupRmonBroadcastCounterClientInputValuePortn OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Input Broadcast Packets 
+        :This counter is increased each 
+        time a broadcast packet is received 
+        on the client port  <Help>  This 
+        counter gives the number of Broadcast 
+        packets received on the client
+         port
+        "
+	::= { pme1008MonupRmonBroadcastCounterClientInputEntry 2 }
+
+
+pme1008MonupRmonBroadcastCounterClientInputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Broadcast Counter Error :This
+         OID when set indicates the Broadcast 
+        counter value is invalid on client 
+        port
+        "
+	::= { pme1008MonupRmonBroadcastCounterClientInputEntry 3 }
+
+
+pme1008MonupRmonBroadcastCounterClientInputOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Broadcast Counter Overload :This 
+        OID when set indicates a Broadcast 
+        counter overload on client port
+        "
+	::= { pme1008MonupRmonBroadcastCounterClientInputEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MonupRmonMulticastCounterClientInput articles
+--- *********************************************************
+
+pme1008MonupRmonMulticastCounterClientInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MonupRmonMulticastCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MonupRmonMulticastCounterClientInput 
+        Article
+        "
+	::= { pme1008MonClientRmonCounter 80 }
+
+
+pme1008MonupRmonMulticastCounterClientInputEntry OBJECT-TYPE
+	SYNTAX Pme1008MonupRmonMulticastCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MonupRmonMulticastCounterClientInput 
+        table
+        "
+	INDEX   { pme1008MonupRmonMulticastCounterClientInputIndex }
+	::= { pme1008MonupRmonMulticastCounterClientInputTable 1 }
+
+
+Pme1008MonupRmonMulticastCounterClientInputEntry ::=
+	SEQUENCE {
+	pme1008MonupRmonMulticastCounterClientInputIndex
+		INTEGER,
+	pme1008MonupRmonMulticastCounterClientInputValuePortn
+		Counter64,
+	pme1008MonupRmonMulticastCounterClientInputErrorPortn
+		EkiOnOff,
+	pme1008MonupRmonMulticastCounterClientInputOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008MonupRmonMulticastCounterClientInputIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MonupRmonMulticastCounterClientInput 
+        table
+        "
+	::= { pme1008MonupRmonMulticastCounterClientInputEntry 1 }
+
+
+pme1008MonupRmonMulticastCounterClientInputValuePortn OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Input Multicast Packets 
+        :This counter is increased each 
+        time a Multicast packet is received 
+        on the client port  <Help>  This 
+        counter gives the number of Multicast 
+        packets received on the client
+         port
+        "
+	::= { pme1008MonupRmonMulticastCounterClientInputEntry 2 }
+
+
+pme1008MonupRmonMulticastCounterClientInputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Multicast Counter Error :This
+         OID when set indicates the Multicast 
+        counter value is invalid on client 
+        port
+        "
+	::= { pme1008MonupRmonMulticastCounterClientInputEntry 3 }
+
+
+pme1008MonupRmonMulticastCounterClientInputOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Multicast Counter Overload :This 
+        OID when set indicates a Multicast 
+        counter overload on client port
+        "
+	::= { pme1008MonupRmonMulticastCounterClientInputEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MonupRmonPauseFrameCounterClientInput articles
+--- *********************************************************
+
+pme1008MonupRmonPauseFrameCounterClientInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MonupRmonPauseFrameCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MonupRmonPauseFrameCounterClientInput 
+        Article
+        "
+	::= { pme1008MonClientRmonCounter 96 }
+
+
+pme1008MonupRmonPauseFrameCounterClientInputEntry OBJECT-TYPE
+	SYNTAX Pme1008MonupRmonPauseFrameCounterClientInputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MonupRmonPauseFrameCounterClientInput 
+        table
+        "
+	INDEX   { pme1008MonupRmonPauseFrameCounterClientInputIndex }
+	::= { pme1008MonupRmonPauseFrameCounterClientInputTable 1 }
+
+
+Pme1008MonupRmonPauseFrameCounterClientInputEntry ::=
+	SEQUENCE {
+	pme1008MonupRmonPauseFrameCounterClientInputIndex
+		INTEGER,
+	pme1008MonupRmonPauseFrameCounterClientInputValuePortn
+		Counter64,
+	pme1008MonupRmonPauseFrameCounterClientInputErrorPortn
+		EkiOnOff,
+	pme1008MonupRmonPauseFrameCounterClientInputOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008MonupRmonPauseFrameCounterClientInputIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MonupRmonPauseFrameCounterClientInput 
+        table
+        "
+	::= { pme1008MonupRmonPauseFrameCounterClientInputEntry 1 }
+
+
+pme1008MonupRmonPauseFrameCounterClientInputValuePortn OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Input Pause Frames :This 
+        counter is increased each time
+         a Pause frame is received on the 
+        client port  <Help>  This counter 
+        gives the number of Pause frames 
+        received on the client port
+        "
+	::= { pme1008MonupRmonPauseFrameCounterClientInputEntry 2 }
+
+
+pme1008MonupRmonPauseFrameCounterClientInputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Pause Counter Error :This OID
+         when set indicates the Pause counter 
+        value is invalid on client port
+        "
+	::= { pme1008MonupRmonPauseFrameCounterClientInputEntry 3 }
+
+
+pme1008MonupRmonPauseFrameCounterClientInputOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Pause Counter Overload :This OID 
+        when set indicates a Pause counter 
+        overload on client port
+        "
+	::= { pme1008MonupRmonPauseFrameCounterClientInputEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MondwRmonCrcErrorsCounterClientOutput articles
+--- *********************************************************
+
+pme1008MondwRmonCrcErrorsCounterClientOutputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MondwRmonCrcErrorsCounterClientOutputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MondwRmonCrcErrorsCounterClientOutput 
+        Article
+        "
+	::= { pme1008MonClientRmonCounter 224 }
+
+
+pme1008MondwRmonCrcErrorsCounterClientOutputEntry OBJECT-TYPE
+	SYNTAX Pme1008MondwRmonCrcErrorsCounterClientOutputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MondwRmonCrcErrorsCounterClientOutput 
+        table
+        "
+	INDEX   { pme1008MondwRmonCrcErrorsCounterClientOutputIndex }
+	::= { pme1008MondwRmonCrcErrorsCounterClientOutputTable 1 }
+
+
+Pme1008MondwRmonCrcErrorsCounterClientOutputEntry ::=
+	SEQUENCE {
+	pme1008MondwRmonCrcErrorsCounterClientOutputIndex
+		INTEGER,
+	pme1008MondwRmonCrcErrorsCounterClientOutputValuePortn
+		Counter64,
+	pme1008MondwRmonCrcErrorsCounterClientOutputErrorPortn
+		EkiOnOff,
+	pme1008MondwRmonCrcErrorsCounterClientOutputOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008MondwRmonCrcErrorsCounterClientOutputIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MondwRmonCrcErrorsCounterClientOutput 
+        table
+        "
+	::= { pme1008MondwRmonCrcErrorsCounterClientOutputEntry 1 }
+
+
+pme1008MondwRmonCrcErrorsCounterClientOutputValuePortn OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Output B1/CRC Errors :This 
+        counter is increased each time
+         a B1/FCS error is detected on
+         the output client port  <Help> 
+         This counter gives the number
+         of B1/CRC Errors detected on the 
+        client port
+        "
+	::= { pme1008MondwRmonCrcErrorsCounterClientOutputEntry 2 }
+
+
+pme1008MondwRmonCrcErrorsCounterClientOutputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Output B1/FCS Errors Counter Error 
+        :This OID when set indicates the 
+        output B1/FCS Errors counter value 
+        is invalid on client port
+        "
+	::= { pme1008MondwRmonCrcErrorsCounterClientOutputEntry 3 }
+
+
+pme1008MondwRmonCrcErrorsCounterClientOutputOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Output B1/FCS Errors Counter Overload 
+        :This OID when set indicates an 
+        output B1/FCS Errors counter overload 
+        on client port
+        "
+	::= { pme1008MondwRmonCrcErrorsCounterClientOutputEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MondwRmonPacketsCounterClientOutput articles
+--- *********************************************************
+
+pme1008MondwRmonPacketsCounterClientOutputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MondwRmonPacketsCounterClientOutputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MondwRmonPacketsCounterClientOutput 
+        Article
+        "
+	::= { pme1008MonClientRmonCounter 240 }
+
+
+pme1008MondwRmonPacketsCounterClientOutputEntry OBJECT-TYPE
+	SYNTAX Pme1008MondwRmonPacketsCounterClientOutputEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MondwRmonPacketsCounterClientOutput 
+        table
+        "
+	INDEX   { pme1008MondwRmonPacketsCounterClientOutputIndex }
+	::= { pme1008MondwRmonPacketsCounterClientOutputTable 1 }
+
+
+Pme1008MondwRmonPacketsCounterClientOutputEntry ::=
+	SEQUENCE {
+	pme1008MondwRmonPacketsCounterClientOutputIndex
+		INTEGER,
+	pme1008MondwRmonPacketsCounterClientOutputValuePortn
+		Counter64,
+	pme1008MondwRmonPacketsCounterClientOutputErrorPortn
+		EkiOnOff,
+	pme1008MondwRmonPacketsCounterClientOutputOverloadPortn
+		EkiOnOff
+	}
+
+
+pme1008MondwRmonPacketsCounterClientOutputIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MondwRmonPacketsCounterClientOutput 
+        table
+        "
+	::= { pme1008MondwRmonPacketsCounterClientOutputEntry 1 }
+
+
+pme1008MondwRmonPacketsCounterClientOutputValuePortn OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client Output Packets :This counter 
+        is increased each time a packet 
+        is transmitted on the client port. 
+         <Help>  This counter gives the 
+        number of packets detected on the 
+        client port
+        "
+	::= { pme1008MondwRmonPacketsCounterClientOutputEntry 2 }
+
+
+pme1008MondwRmonPacketsCounterClientOutputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Output Packets Counter Error :This 
+        OID when set indicates the output 
+        Packets counter value is invalid 
+        on client port
+        "
+	::= { pme1008MondwRmonPacketsCounterClientOutputEntry 3 }
+
+
+pme1008MondwRmonPacketsCounterClientOutputOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Output Packets Counter Overload 
+        :This OID when set indicates an 
+        output Packets counter overload 
+        on client port
+        "
+	::= { pme1008MondwRmonPacketsCounterClientOutputEntry 4 }
+
+
+pme1008MonCountersReset  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"RMON Counters Reset:This OID resets and restarts all the RMON counters"
+	::= { pme1008MonRmon   359 }
+
+pme1008MonCountersStop  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"RMON Counters stop:This OID stops all the RMON counters"
+	::= { pme1008MonRmon  360 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *********************************************************
+---     TABLE for the pme1008MesrclientTemp articles
+--- *********************************************************
+
+pme1008MesrclientTempTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MesrclientTempEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MesrclientTemp
+         Article
+        "
+	::= { pme1008MesrClient 16 }
+
+
+pme1008MesrclientTempEntry OBJECT-TYPE
+	SYNTAX Pme1008MesrclientTempEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MesrclientTemp 
+        table
+        "
+	INDEX   { pme1008MesrclientTempIndex }
+	::= { pme1008MesrclientTempTable 1 }
+
+
+Pme1008MesrclientTempEntry ::=
+	SEQUENCE {
+	pme1008MesrclientTempIndex
+		INTEGER,
+	pme1008MesrclientTempPortn
+		INTEGER 
+	}
+
+
+pme1008MesrclientTempIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MesrclientTemp 
+        table
+        "
+	::= { pme1008MesrclientTempEntry 1 }
+
+
+pme1008MesrclientTempPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client SFP Temperature :This OID 
+        gives the Laser temperature value 
+        of the Client Transceiver, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Temperature = AV/256) 
+        (Unit = C) <Help> This Measure
+         gives the Laser temperature value 
+        of the Client Transceiver
+        "
+	::= { pme1008MesrclientTempEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MesrclientTxBias articles
+--- *********************************************************
+
+pme1008MesrclientTxBiasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MesrclientTxBiasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MesrclientTxBias 
+        Article
+        "
+	::= { pme1008MesrClient 32 }
+
+
+pme1008MesrclientTxBiasEntry OBJECT-TYPE
+	SYNTAX Pme1008MesrclientTxBiasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MesrclientTxBias 
+        table
+        "
+	INDEX   { pme1008MesrclientTxBiasIndex }
+	::= { pme1008MesrclientTxBiasTable 1 }
+
+
+Pme1008MesrclientTxBiasEntry ::=
+	SEQUENCE {
+	pme1008MesrclientTxBiasIndex
+		INTEGER,
+	pme1008MesrclientTxBiasPortn
+		INTEGER 
+	}
+
+
+pme1008MesrclientTxBiasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MesrclientTxBias 
+        table
+        "
+	::= { pme1008MesrclientTxBiasEntry 1 }
+
+
+pme1008MesrclientTxBiasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client SFP Laser Bias :This OID 
+        gives the Laser bias value of the 
+        Client Transceiver, read from the 
+        DDM (Digital Diagnostic Monitoring) 
+        (Bias = AV/500) (Unit = mA) <Help> 
+        This Measure gives the Laser bias 
+        value of the Client Transceiver
+        "
+	::= { pme1008MesrclientTxBiasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MesrclientTxPwr articles
+--- *********************************************************
+
+pme1008MesrclientTxPwrTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MesrclientTxPwrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MesrclientTxPwr 
+        Article
+        "
+	::= { pme1008MesrClient 48 }
+
+
+pme1008MesrclientTxPwrEntry OBJECT-TYPE
+	SYNTAX Pme1008MesrclientTxPwrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MesrclientTxPwr 
+        table
+        "
+	INDEX   { pme1008MesrclientTxPwrIndex }
+	::= { pme1008MesrclientTxPwrTable 1 }
+
+
+Pme1008MesrclientTxPwrEntry ::=
+	SEQUENCE {
+	pme1008MesrclientTxPwrIndex
+		INTEGER,
+	pme1008MesrclientTxPwrPortn
+		INTEGER 
+	}
+
+
+pme1008MesrclientTxPwrIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MesrclientTxPwr 
+        table
+        "
+	::= { pme1008MesrclientTxPwrEntry 1 }
+
+
+pme1008MesrclientTxPwrPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client SFP Tx Power :This OID
+         gives the transmit power value 
+        of the Client Transceiver, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm) <Help> This Measure 
+        gives the transmit power value
+         of the Client Transceiver
+        "
+	::= { pme1008MesrclientTxPwrEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MesrclientRxPwr articles
+--- *********************************************************
+
+pme1008MesrclientRxPwrTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MesrclientRxPwrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MesrclientRxPwr 
+        Article
+        "
+	::= { pme1008MesrClient 64 }
+
+
+pme1008MesrclientRxPwrEntry OBJECT-TYPE
+	SYNTAX Pme1008MesrclientRxPwrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MesrclientRxPwr 
+        table
+        "
+	INDEX   { pme1008MesrclientRxPwrIndex }
+	::= { pme1008MesrclientRxPwrTable 1 }
+
+
+Pme1008MesrclientRxPwrEntry ::=
+	SEQUENCE {
+	pme1008MesrclientRxPwrIndex
+		INTEGER,
+	pme1008MesrclientRxPwrPortn
+		INTEGER 
+	}
+
+
+pme1008MesrclientRxPwrIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MesrclientRxPwr 
+        table
+        "
+	::= { pme1008MesrclientRxPwrEntry 1 }
+
+
+pme1008MesrclientRxPwrPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client SFP Rx Power :This OID
+         gives the receive power value
+         of the Client Transceiver, read 
+        in the DDM (Digital Diagnostic
+         Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm) <Help> This Measure 
+        gives the receive power value of 
+        the Client Transceiver
+        "
+	::= { pme1008MesrclientRxPwrEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MesrlineTxPwr articles
+--- *********************************************************
+
+pme1008MesrlineTxPwrTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MesrlineTxPwrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MesrlineTxPwr Article
+        "
+	::= { pme1008MesrLine 80 }
+
+
+pme1008MesrlineTxPwrEntry OBJECT-TYPE
+	SYNTAX Pme1008MesrlineTxPwrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MesrlineTxPwr 
+        table
+        "
+	INDEX   { pme1008MesrlineTxPwrIndex }
+	::= { pme1008MesrlineTxPwrTable 1 }
+
+
+Pme1008MesrlineTxPwrEntry ::=
+	SEQUENCE {
+	pme1008MesrlineTxPwrIndex
+		INTEGER,
+	pme1008MesrlineTxPwrPortn
+		INTEGER 
+	}
+
+
+pme1008MesrlineTxPwrIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MesrlineTxPwr 
+        table
+        "
+	::= { pme1008MesrlineTxPwrEntry 1 }
+
+
+pme1008MesrlineTxPwrPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Tx Power :This 
+        OID gives the Tx Laser transmit 
+        power value of the Line Transceiver, 
+        read in the DDM (Digital Diagnostic 
+        Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm) <Help> This Measure 
+        gives the Tx Laser transmit power 
+        value of the Line Transceiver
+        "
+	::= { pme1008MesrlineTxPwrEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MesrlineTemp articles
+--- *********************************************************
+
+pme1008MesrlineTempTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MesrlineTempEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MesrlineTemp Article
+        "
+	::= { pme1008MesrLine 96 }
+
+
+pme1008MesrlineTempEntry OBJECT-TYPE
+	SYNTAX Pme1008MesrlineTempEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MesrlineTemp 
+        table
+        "
+	INDEX   { pme1008MesrlineTempIndex }
+	::= { pme1008MesrlineTempTable 1 }
+
+
+Pme1008MesrlineTempEntry ::=
+	SEQUENCE {
+	pme1008MesrlineTempIndex
+		INTEGER,
+	pme1008MesrlineTempPortn
+		INTEGER 
+	}
+
+
+pme1008MesrlineTempIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MesrlineTemp 
+        table
+        "
+	::= { pme1008MesrlineTempEntry 1 }
+
+
+pme1008MesrlineTempPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Temperature 
+        :This OID gives the Tx Laser Temperature 
+        value of the Line Transceiver,
+         read from the DDM (Digital Diagnostic 
+        Monitoring) (Temperature = AV/256) 
+        (Unit = C) <Help> This Measure
+         gives the Tx Laser Temperature 
+        value of the Line Transceiver
+        "
+	::= { pme1008MesrlineTempEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MesrlineTxBias articles
+--- *********************************************************
+
+pme1008MesrlineTxBiasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MesrlineTxBiasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MesrlineTxBias
+         Article
+        "
+	::= { pme1008MesrLine 112 }
+
+
+pme1008MesrlineTxBiasEntry OBJECT-TYPE
+	SYNTAX Pme1008MesrlineTxBiasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MesrlineTxBias 
+        table
+        "
+	INDEX   { pme1008MesrlineTxBiasIndex }
+	::= { pme1008MesrlineTxBiasTable 1 }
+
+
+Pme1008MesrlineTxBiasEntry ::=
+	SEQUENCE {
+	pme1008MesrlineTxBiasIndex
+		INTEGER,
+	pme1008MesrlineTxBiasPortn
+		INTEGER 
+	}
+
+
+pme1008MesrlineTxBiasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MesrlineTxBias 
+        table
+        "
+	::= { pme1008MesrlineTxBiasEntry 1 }
+
+
+pme1008MesrlineTxBiasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Laser Bias 
+        :This OID gives the Tx Laser Bias 
+        value of the Line Transceiver,
+         read from the DDM (Digital Diagnostic 
+        Monitoring) (Bias = AV/500) (Unit 
+        = mA) <Help> This Measure gives 
+        the Tx Laser Bias value of the
+         Line Transceiver
+        "
+	::= { pme1008MesrlineTxBiasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pme1008MesrlineRxPwr articles
+--- *********************************************************
+
+pme1008MesrlineRxPwrTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008MesrlineRxPwrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pme1008MesrlineRxPwr Article
+        "
+	::= { pme1008MesrLine 128 }
+
+
+pme1008MesrlineRxPwrEntry OBJECT-TYPE
+	SYNTAX Pme1008MesrlineRxPwrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pme1008MesrlineRxPwr 
+        table
+        "
+	INDEX   { pme1008MesrlineRxPwrIndex }
+	::= { pme1008MesrlineRxPwrTable 1 }
+
+
+Pme1008MesrlineRxPwrEntry ::=
+	SEQUENCE {
+	pme1008MesrlineRxPwrIndex
+		INTEGER,
+	pme1008MesrlineRxPwrPortn
+		INTEGER 
+	}
+
+
+pme1008MesrlineRxPwrIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pme1008MesrlineRxPwr 
+        table
+        "
+	::= { pme1008MesrlineRxPwrEntry 1 }
+
+
+pme1008MesrlineRxPwrPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Rx Power :This 
+        OID gives the Receive power value 
+        of the Line Transceiver, read in 
+        the DDM (Digital Diagnostic Monitoring) 
+        (Power = 10*log(AV)-40) (Unit = 
+        dBm) <Help> This Measure gives
+         the Receive power value of the 
+        Line Transceiver
+        "
+	::= { pme1008MesrlineRxPwrEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     DOWNLOAD
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the restartProcess article
+--- *****************************************************
+pme1008DwlrestartProcess OBJECT IDENTIFIER ::= { pme1008DwlOther 0 }
+
+
+
+
+pme1008DwlColdRestartProcessed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Cold Restart :This OID indicates 
+        that the module last restart was 
+        a Cold RESTART
+        "
+	  ::= { pme1008DwlrestartProcess 2 }
+
+
+
+pme1008DwlWarmRestartProcessed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warm Restart :This OID indicates 
+        that the module last restart was 
+        a Warm RESTART
+        "
+	  ::= { pme1008DwlrestartProcess 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swBanksUsed article
+--- *****************************************************
+pme1008DwlswBanksUsed OBJECT IDENTIFIER ::= { pme1008DwlOther 1 }
+
+
+
+
+pme1008DwlSwBank2Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 2 loaded :This OID indicates 
+        a software is loaded in SW bank 
+        2  <Help>  This status indicates 
+        if the SW bank 2 contains SW package
+        "
+	  ::= { pme1008DwlswBanksUsed 6 }
+
+
+
+pme1008DwlSwBank1Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 1 loaded :This OID indicates 
+        a software is loaded in SW bank 
+        1  <Help>  This status indicates 
+        if the SW bank 1 contains SW package
+        "
+	  ::= { pme1008DwlswBanksUsed 5 }
+
+
+
+pme1008DwlSwBank2Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 2 active :This OID indicates 
+        the module is working on SW bank 
+        2  <Help>  This status indicates 
+        if the SW bank 2 is active or standby
+        "
+	  ::= { pme1008DwlswBanksUsed 2 }
+
+
+
+pme1008DwlSwBank1Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 1 active :This OID indicates 
+        the module is working on SW bank 
+        1  <Help>  This status indicates 
+        if the SW bank 1 is active or standby
+        "
+	  ::= { pme1008DwlswBanksUsed 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the gwBanksUsed article
+--- *****************************************************
+pme1008DwlgwBanksUsed OBJECT IDENTIFIER ::= { pme1008DwlOther 2 }
+
+
+
+
+pme1008DwlGwBank4Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 4 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        4
+        "
+	  ::= { pme1008DwlgwBanksUsed 8 }
+
+
+
+pme1008DwlGwBank3Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 3 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        3  <Help>  This status indicates 
+        if the GW bank 3 contains GW package
+        "
+	  ::= { pme1008DwlgwBanksUsed 7 }
+
+
+
+pme1008DwlGwBank2Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 2 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        2
+        "
+	  ::= { pme1008DwlgwBanksUsed 6 }
+
+
+
+pme1008DwlGwBank1Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 1 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        1  <Help>  This status indicates 
+        if the GW bank 1 contains GW package
+        "
+	  ::= { pme1008DwlgwBanksUsed 5 }
+
+
+
+pme1008DwlGwBank4Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 4 active :This OID indicates 
+        the module is working on GW bank 
+        4
+        "
+	  ::= { pme1008DwlgwBanksUsed 4 }
+
+
+
+pme1008DwlGwBank3Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 3 active :This OID indicates 
+        the module is working on GW bank 
+        3  <Help>  This status indicates 
+        if the GW bank 3 is active or standby
+        "
+	  ::= { pme1008DwlgwBanksUsed 3 }
+
+
+
+pme1008DwlGwBank2Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 2 active :This OID indicates 
+        the module is working on GW bank 
+        2
+        "
+	  ::= { pme1008DwlgwBanksUsed 2 }
+
+
+
+pme1008DwlGwBank1Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 1 active :This OID indicates 
+        the module is working on GW bank 
+        1  <Help>  This status indicates 
+        if the GW bank 1 is active or standby
+        "
+	  ::= { pme1008DwlgwBanksUsed 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startup
+--- *****************************************************
+
+pme1008CfgStartup OBJECT IDENTIFIER ::= { pme1008Config 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2110
+--- *****************************************************
+
+pme1008CfgClientStartupTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgClientStartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgStartup 1 }
+
+
+pme1008CfgClientStartupEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgClientStartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startup 
+        table
+        "
+	INDEX   { pme1008CfgClientStartupIndex }
+	::= { pme1008CfgClientStartupTable 1 }
+
+
+Pme1008CfgClientStartupEntry ::=
+	SEQUENCE {
+	pme1008CfgClientStartupIndex
+		INTEGER,
+	pme1008CfgSystConfPortPortn
+		Unsigned32,
+	pme1008CfgNetConfPortPortn
+		Unsigned32,
+	pme1008CfgOptionsPortPortn
+		Unsigned32
+	}
+
+
+pme1008CfgClientStartupIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientStartup 
+        table
+        "
+	::= { pme1008CfgClientStartupEntry 1 }
+
+
+pme1008CfgSystConfPortPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Settings on Client Port 
+        :This  register configures the
+         default initialisation settings 
+        on the port.
+        "
+	::= { pme1008CfgClientStartupEntry 3 }
+
+
+pme1008CfgNetConfPortPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Settings on Client Port 
+        :This  register configures the
+         default initialisation settings 
+        on the port.
+        "
+	::= { pme1008CfgClientStartupEntry 4 }
+
+
+pme1008CfgOptionsPortPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Options on Client Port 
+        :This register configures the default 
+        options on the port.
+        "
+	::= { pme1008CfgClientStartupEntry 14 }
+
+
+--- *****************************************************
+---     LEAF for the table 2190
+--- *****************************************************
+
+pme1008CfgLinexr1StartupTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLinexr1StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgStartup 2 }
+
+
+pme1008CfgLinexr1StartupEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLinexr1StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startup 
+        table
+        "
+	INDEX   { pme1008CfgLinexr1StartupIndex }
+	::= { pme1008CfgLinexr1StartupTable 1 }
+
+
+Pme1008CfgLinexr1StartupEntry ::=
+	SEQUENCE {
+	pme1008CfgLinexr1StartupIndex
+		INTEGER,
+	pme1008CfgSystConfLinePortn
+		Unsigned32,
+	pme1008CfgOptionsLinePortn
+		Unsigned32
+	}
+
+
+pme1008CfgLinexr1StartupIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the linexr1Startup 
+        table
+        "
+	::= { pme1008CfgLinexr1StartupEntry 1 }
+
+
+pme1008CfgSystConfLinePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Settings on Line :This 
+        register configures the default 
+        initialisation settings on Line
+        "
+	::= { pme1008CfgLinexr1StartupEntry 3 }
+
+
+pme1008CfgOptionsLinePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Options on Line :This
+         register configures the default 
+        options on the line
+        "
+	::= { pme1008CfgLinexr1StartupEntry 14 }
+
+
+--- *****************************************************
+---     LEAF for the table 2710
+--- *****************************************************
+
+pme1008CfgOtxtlhTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgOtxtlhEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgStartup 3 }
+
+
+pme1008CfgOtxtlhEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgOtxtlhEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startup 
+        table
+        "
+	INDEX   { pme1008CfgOtxtlhIndex }
+	::= { pme1008CfgOtxtlhTable 1 }
+
+
+Pme1008CfgOtxtlhEntry ::=
+	SEQUENCE {
+	pme1008CfgOtxtlhIndex
+		INTEGER,
+	pme1008CfgLineControlsPortn
+		Unsigned32,
+	pme1008CfgLinePwrLaserPortn
+		Unsigned32,
+	pme1008CfgLineFCurrentPortn
+		Unsigned32,
+	pme1008CfgLineGridCurrentPortn
+		Unsigned32,
+	pme1008CfgLineFoPortn
+		Unsigned32
+	}
+
+
+pme1008CfgOtxtlhIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the otxtlh 
+        table
+        "
+	::= { pme1008CfgOtxtlhEntry 1 }
+
+
+pme1008CfgLineControlsPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Default Line settings :This register 
+        configures the start-up settings 
+        on the ports
+        "
+	::= { pme1008CfgOtxtlhEntry 3 }
+
+
+pme1008CfgLinePwrLaserPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line output Power :This 
+        register configures the start-up 
+        output power of the client transceiver 
+         (Unit = dBm)
+        "
+	::= { pme1008CfgOtxtlhEntry 6 }
+
+
+pme1008CfgLineFCurrentPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line transceiver Channel 
+        :This register configures the start-up 
+        laser channel of the client  transceiver
+        "
+	::= { pme1008CfgOtxtlhEntry 7 }
+
+
+pme1008CfgLineGridCurrentPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line transceiver Grid
+         :This register configures the
+         start-up laser grid of the client 
+        transceiver
+        "
+	::= { pme1008CfgOtxtlhEntry 8 }
+
+
+pme1008CfgLineFoPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line first Frequency :This 
+        register configures the start-up 
+        first frequency of the client transceiver
+        "
+	::= { pme1008CfgOtxtlhEntry 9 }
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pme1008CfgLabels OBJECT IDENTIFIER ::= { pme1008Config 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0003
+--- *****************************************************
+
+pme1008CfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgLabels 1 }
+
+
+pme1008CfgLabelclientEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pme1008CfgLabelclientIndex }
+	::= { pme1008CfgLabelclientTable 1 }
+
+
+Pme1008CfgLabelclientEntry ::=
+	SEQUENCE {
+	pme1008CfgLabelclientIndex
+		INTEGER,
+	pme1008CfgLabelclientPortn
+		DisplayString
+	}
+
+
+pme1008CfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pme1008CfgLabelclientEntry 1 }
+
+
+pme1008CfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pme1008CfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table 0004
+--- *****************************************************
+
+pme1008CfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgLabels 2 }
+
+
+pme1008CfgLabellineEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pme1008CfgLabellineIndex }
+	::= { pme1008CfgLabellineTable 1 }
+
+
+Pme1008CfgLabellineEntry ::=
+	SEQUENCE {
+	pme1008CfgLabellineIndex
+		INTEGER,
+	pme1008CfgLabellinePortn
+		DisplayString
+	}
+
+
+pme1008CfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pme1008CfgLabellineEntry 1 }
+
+
+pme1008CfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pme1008CfgLabellineEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group other
+--- *****************************************************
+
+pme1008CfgOther OBJECT IDENTIFIER ::= { pme1008Config 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2300
+--- *****************************************************
+
+pme1008tablemoduleOther OBJECT IDENTIFIER ::= { pme1008CfgOther 1 }
+
+
+
+pme1008Cfgmode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default settings on Module :This 
+        register selects the configuration 
+        mode of the module
+        "
+	  ::= { pme1008tablemoduleOther 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group odu2Clienta
+--- *****************************************************
+
+pme1008CfgOdu2Clienta OBJECT IDENTIFIER ::= { pme1008Config 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 29C0
+--- *****************************************************
+
+pme1008CfgClientStartupOduTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgClientStartupOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgOdu2Clienta 1 }
+
+
+pme1008CfgClientStartupOduEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgClientStartupOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the odu2Clienta 
+        table
+        "
+	INDEX   { pme1008CfgClientStartupOduIndex }
+	::= { pme1008CfgClientStartupOduTable 1 }
+
+
+Pme1008CfgClientStartupOduEntry ::=
+	SEQUENCE {
+	pme1008CfgClientStartupOduIndex
+		INTEGER,
+	pme1008CfgOdu2ReserveLsbPortn
+		Unsigned32,
+	pme1008CfgOdu2DegthresholdPortn
+		Unsigned32,
+	pme1008CfgOdu2DegmPortn
+		Unsigned32,
+	pme1008CfgOdu2SettingsPortn
+		Unsigned32
+	}
+
+
+pme1008CfgClientStartupOduIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientStartupOdu 
+        table
+        "
+	::= { pme1008CfgClientStartupOduEntry 1 }
+
+
+pme1008CfgOdu2ReserveLsbPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        :
+        "
+	::= { pme1008CfgClientStartupOduEntry 3 }
+
+
+pme1008CfgOdu2DegthresholdPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        ODU2 Degrade Threshold :
+        "
+	::= { pme1008CfgClientStartupOduEntry 4 }
+
+
+pme1008CfgOdu2DegmPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        ODU2 Degrade Confirmation :
+        "
+	::= { pme1008CfgClientStartupOduEntry 5 }
+
+
+pme1008CfgOdu2SettingsPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        ODU2 Settings :
+        "
+	::= { pme1008CfgClientStartupOduEntry 6 }
+
+
+--- *****************************************************
+---     LEAF for the table Group otu2Line
+--- *****************************************************
+
+pme1008CfgOtu2Line OBJECT IDENTIFIER ::= { pme1008Config 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 29E0
+--- *****************************************************
+
+pme1008CfgLinexStartupOtuTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLinexStartupOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgOtu2Line 1 }
+
+
+pme1008CfgLinexStartupOtuEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLinexStartupOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the otu2Line 
+        table
+        "
+	INDEX   { pme1008CfgLinexStartupOtuIndex }
+	::= { pme1008CfgLinexStartupOtuTable 1 }
+
+
+Pme1008CfgLinexStartupOtuEntry ::=
+	SEQUENCE {
+	pme1008CfgLinexStartupOtuIndex
+		INTEGER,
+	pme1008CfgOtu2ReserveMsbPortn
+		Unsigned32,
+	pme1008CfgOtu2DegthresholdPortn
+		Unsigned32,
+	pme1008CfgOtu2DegmPortn
+		Unsigned32,
+	pme1008CfgOtu2SettingsPortn
+		Unsigned32
+	}
+
+
+pme1008CfgLinexStartupOtuIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the linexStartupOtu 
+        table
+        "
+	::= { pme1008CfgLinexStartupOtuEntry 1 }
+
+
+pme1008CfgOtu2ReserveMsbPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        :
+        "
+	::= { pme1008CfgLinexStartupOtuEntry 3 }
+
+
+pme1008CfgOtu2DegthresholdPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        OTU2 Degrade Threshold :
+        "
+	::= { pme1008CfgLinexStartupOtuEntry 4 }
+
+
+pme1008CfgOtu2DegmPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        OTU2 Degrade Confirmation :
+        "
+	::= { pme1008CfgLinexStartupOtuEntry 5 }
+
+
+pme1008CfgOtu2SettingsPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        OTU2 Settings :
+        "
+	::= { pme1008CfgLinexStartupOtuEntry 6 }
+
+
+--- *****************************************************
+---     LEAF for the table Group sapiTxClient
+--- *****************************************************
+
+pme1008CfgSapiTxClient OBJECT IDENTIFIER ::= { pme1008Config 6 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2A10
+--- *****************************************************
+
+pme1008CfgClientSapiTxOduTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgClientSapiTxOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgSapiTxClient 1 }
+
+
+pme1008CfgClientSapiTxOduEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgClientSapiTxOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the sapiTxClient 
+        table
+        "
+	INDEX   { pme1008CfgClientSapiTxOduIndex }
+	::= { pme1008CfgClientSapiTxOduTable 1 }
+
+
+Pme1008CfgClientSapiTxOduEntry ::=
+	SEQUENCE {
+	pme1008CfgClientSapiTxOduIndex
+		INTEGER,
+	pme1008CfgClientSapiTxSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgClientSapiTxOduIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientSapiTxOdu 
+        table
+        "
+	::= { pme1008CfgClientSapiTxOduEntry 1 }
+
+
+pme1008CfgClientSapiTxSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Transmitted SAPI :This
+         register defines the value of
+         the transmitted Trace Identifier 
+        on the line output
+        "
+	::= { pme1008CfgClientSapiTxOduEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group sapiExpClient
+--- *****************************************************
+
+pme1008CfgSapiExpClient OBJECT IDENTIFIER ::= { pme1008Config 7 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2A30
+--- *****************************************************
+
+pme1008CfgClientSapiExpOduTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgClientSapiExpOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgSapiExpClient 1 }
+
+
+pme1008CfgClientSapiExpOduEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgClientSapiExpOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the sapiExpClient 
+        table
+        "
+	INDEX   { pme1008CfgClientSapiExpOduIndex }
+	::= { pme1008CfgClientSapiExpOduTable 1 }
+
+
+Pme1008CfgClientSapiExpOduEntry ::=
+	SEQUENCE {
+	pme1008CfgClientSapiExpOduIndex
+		INTEGER,
+	pme1008CfgClientSapiExpSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgClientSapiExpOduIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientSapiExpOdu 
+        table
+        "
+	::= { pme1008CfgClientSapiExpOduEntry 1 }
+
+
+pme1008CfgClientSapiExpSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Expected SAPI :This register 
+        defines the value of the expected 
+        Trace Identifier on the line input
+        "
+	::= { pme1008CfgClientSapiExpOduEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group sapiAccClient
+--- *****************************************************
+
+pme1008CfgSapiAccClient OBJECT IDENTIFIER ::= { pme1008Config 8 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2A50
+--- *****************************************************
+
+pme1008CfgClientSapiAccOduTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgClientSapiAccOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgSapiAccClient 1 }
+
+
+pme1008CfgClientSapiAccOduEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgClientSapiAccOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the sapiAccClient 
+        table
+        "
+	INDEX   { pme1008CfgClientSapiAccOduIndex }
+	::= { pme1008CfgClientSapiAccOduTable 1 }
+
+
+Pme1008CfgClientSapiAccOduEntry ::=
+	SEQUENCE {
+	pme1008CfgClientSapiAccOduIndex
+		INTEGER,
+	pme1008CfgClientSapiAccSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgClientSapiAccOduIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientSapiAccOdu 
+        table
+        "
+	::= { pme1008CfgClientSapiAccOduEntry 1 }
+
+
+pme1008CfgClientSapiAccSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Client Accepted SAPI :This register 
+        defines the value of the accepted 
+        Trace Identifier on the line input
+        "
+	::= { pme1008CfgClientSapiAccOduEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group dapiTxClient
+--- *****************************************************
+
+pme1008CfgDapiTxClient OBJECT IDENTIFIER ::= { pme1008Config 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2A90
+--- *****************************************************
+
+pme1008CfgClientDapiTxOduTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgClientDapiTxOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgDapiTxClient 1 }
+
+
+pme1008CfgClientDapiTxOduEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgClientDapiTxOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the dapiTxClient 
+        table
+        "
+	INDEX   { pme1008CfgClientDapiTxOduIndex }
+	::= { pme1008CfgClientDapiTxOduTable 1 }
+
+
+Pme1008CfgClientDapiTxOduEntry ::=
+	SEQUENCE {
+	pme1008CfgClientDapiTxOduIndex
+		INTEGER,
+	pme1008CfgClientDapiTxSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgClientDapiTxOduIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientDapiTxOdu 
+        table
+        "
+	::= { pme1008CfgClientDapiTxOduEntry 1 }
+
+
+pme1008CfgClientDapiTxSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Transmitted DAPI :This
+         register defines the value of
+         the transmitted Trace Identifier 
+        on the line output
+        "
+	::= { pme1008CfgClientDapiTxOduEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group dapiExpClient
+--- *****************************************************
+
+pme1008CfgDapiExpClient OBJECT IDENTIFIER ::= { pme1008Config 10 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2AB0
+--- *****************************************************
+
+pme1008CfgClientDapiExpOduTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgClientDapiExpOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgDapiExpClient 1 }
+
+
+pme1008CfgClientDapiExpOduEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgClientDapiExpOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the dapiExpClient 
+        table
+        "
+	INDEX   { pme1008CfgClientDapiExpOduIndex }
+	::= { pme1008CfgClientDapiExpOduTable 1 }
+
+
+Pme1008CfgClientDapiExpOduEntry ::=
+	SEQUENCE {
+	pme1008CfgClientDapiExpOduIndex
+		INTEGER,
+	pme1008CfgClientDapiExpSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgClientDapiExpOduIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientDapiExpOdu 
+        table
+        "
+	::= { pme1008CfgClientDapiExpOduEntry 1 }
+
+
+pme1008CfgClientDapiExpSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Expected DAPI :This register 
+        defines the value of the expected 
+        Trace Identifier on the line input
+        "
+	::= { pme1008CfgClientDapiExpOduEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group dapiAccClient
+--- *****************************************************
+
+pme1008CfgDapiAccClient OBJECT IDENTIFIER ::= { pme1008Config 11 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2AD0
+--- *****************************************************
+
+pme1008CfgClientDapiAccOduTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgClientDapiAccOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgDapiAccClient 1 }
+
+
+pme1008CfgClientDapiAccOduEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgClientDapiAccOduEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the dapiAccClient 
+        table
+        "
+	INDEX   { pme1008CfgClientDapiAccOduIndex }
+	::= { pme1008CfgClientDapiAccOduTable 1 }
+
+
+Pme1008CfgClientDapiAccOduEntry ::=
+	SEQUENCE {
+	pme1008CfgClientDapiAccOduIndex
+		INTEGER,
+	pme1008CfgClientDapiAccSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgClientDapiAccOduIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientDapiAccOdu 
+        table
+        "
+	::= { pme1008CfgClientDapiAccOduEntry 1 }
+
+
+pme1008CfgClientDapiAccSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Client Accepted DAPI :This register 
+        defines the value of the accepted 
+        Trace Identifier on the line input
+        "
+	::= { pme1008CfgClientDapiAccOduEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group sapiTxLine
+--- *****************************************************
+
+pme1008CfgSapiTxLine OBJECT IDENTIFIER ::= { pme1008Config 12 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2B10
+--- *****************************************************
+
+pme1008CfgLineSapiTxOtuTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLineSapiTxOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgSapiTxLine 1 }
+
+
+pme1008CfgLineSapiTxOtuEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLineSapiTxOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the sapiTxLine 
+        table
+        "
+	INDEX   { pme1008CfgLineSapiTxOtuIndex }
+	::= { pme1008CfgLineSapiTxOtuTable 1 }
+
+
+Pme1008CfgLineSapiTxOtuEntry ::=
+	SEQUENCE {
+	pme1008CfgLineSapiTxOtuIndex
+		INTEGER,
+	pme1008CfgLineSapiTxSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgLineSapiTxOtuIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the lineSapiTxOtu 
+        table
+        "
+	::= { pme1008CfgLineSapiTxOtuEntry 1 }
+
+
+pme1008CfgLineSapiTxSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transmitted SAPI :This register 
+        defines the value of the transmitted 
+        Trace Identifier on the line output
+        "
+	::= { pme1008CfgLineSapiTxOtuEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group sapiExpLine
+--- *****************************************************
+
+pme1008CfgSapiExpLine OBJECT IDENTIFIER ::= { pme1008Config 13 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2B30
+--- *****************************************************
+
+pme1008CfgLineSapiExpOtuTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLineSapiExpOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgSapiExpLine 1 }
+
+
+pme1008CfgLineSapiExpOtuEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLineSapiExpOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the sapiExpLine 
+        table
+        "
+	INDEX   { pme1008CfgLineSapiExpOtuIndex }
+	::= { pme1008CfgLineSapiExpOtuTable 1 }
+
+
+Pme1008CfgLineSapiExpOtuEntry ::=
+	SEQUENCE {
+	pme1008CfgLineSapiExpOtuIndex
+		INTEGER,
+	pme1008CfgLineSapiExpSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgLineSapiExpOtuIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the lineSapiExpOtu 
+        table
+        "
+	::= { pme1008CfgLineSapiExpOtuEntry 1 }
+
+
+pme1008CfgLineSapiExpSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Expected SAPI :This register 
+        defines the value of the expected 
+        Trace Identifier on the line input
+        "
+	::= { pme1008CfgLineSapiExpOtuEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group sapiAccLine
+--- *****************************************************
+
+pme1008CfgSapiAccLine OBJECT IDENTIFIER ::= { pme1008Config 14 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2B50
+--- *****************************************************
+
+pme1008CfgLineSapiAccOtuTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLineSapiAccOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgSapiAccLine 1 }
+
+
+pme1008CfgLineSapiAccOtuEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLineSapiAccOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the sapiAccLine 
+        table
+        "
+	INDEX   { pme1008CfgLineSapiAccOtuIndex }
+	::= { pme1008CfgLineSapiAccOtuTable 1 }
+
+
+Pme1008CfgLineSapiAccOtuEntry ::=
+	SEQUENCE {
+	pme1008CfgLineSapiAccOtuIndex
+		INTEGER,
+	pme1008CfgLineSapiAccSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgLineSapiAccOtuIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the lineSapiAccOtu 
+        table
+        "
+	::= { pme1008CfgLineSapiAccOtuEntry 1 }
+
+
+pme1008CfgLineSapiAccSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Line Accepted SAPI :This register 
+        defines the value of the accepted 
+        Trace Identifier on the line input
+        "
+	::= { pme1008CfgLineSapiAccOtuEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group dapiTxLine
+--- *****************************************************
+
+pme1008CfgDapiTxLine OBJECT IDENTIFIER ::= { pme1008Config 15 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2B90
+--- *****************************************************
+
+pme1008CfgLineDapiTxOtuTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLineDapiTxOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgDapiTxLine 1 }
+
+
+pme1008CfgLineDapiTxOtuEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLineDapiTxOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the dapiTxLine 
+        table
+        "
+	INDEX   { pme1008CfgLineDapiTxOtuIndex }
+	::= { pme1008CfgLineDapiTxOtuTable 1 }
+
+
+Pme1008CfgLineDapiTxOtuEntry ::=
+	SEQUENCE {
+	pme1008CfgLineDapiTxOtuIndex
+		INTEGER,
+	pme1008CfgLineDapiTxSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgLineDapiTxOtuIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the lineDapiTxOtu 
+        table
+        "
+	::= { pme1008CfgLineDapiTxOtuEntry 1 }
+
+
+pme1008CfgLineDapiTxSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transmitted DAPI :This register 
+        defines the value of the transmitted 
+        Trace Identifier on the line output
+        "
+	::= { pme1008CfgLineDapiTxOtuEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group dapiExpLine
+--- *****************************************************
+
+pme1008CfgDapiExpLine OBJECT IDENTIFIER ::= { pme1008Config 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2BB0
+--- *****************************************************
+
+pme1008CfgLineDapiExpOtuTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLineDapiExpOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgDapiExpLine 1 }
+
+
+pme1008CfgLineDapiExpOtuEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLineDapiExpOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the dapiExpLine 
+        table
+        "
+	INDEX   { pme1008CfgLineDapiExpOtuIndex }
+	::= { pme1008CfgLineDapiExpOtuTable 1 }
+
+
+Pme1008CfgLineDapiExpOtuEntry ::=
+	SEQUENCE {
+	pme1008CfgLineDapiExpOtuIndex
+		INTEGER,
+	pme1008CfgLineDapiExpSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgLineDapiExpOtuIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the lineDapiExpOtu 
+        table
+        "
+	::= { pme1008CfgLineDapiExpOtuEntry 1 }
+
+
+pme1008CfgLineDapiExpSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Expected DAPI :This register 
+        defines the value of the expected 
+        Trace Identifier on the line input
+        "
+	::= { pme1008CfgLineDapiExpOtuEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group dapiAccLine
+--- *****************************************************
+
+pme1008CfgDapiAccLine OBJECT IDENTIFIER ::= { pme1008Config 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2BD0
+--- *****************************************************
+
+pme1008CfgLineDapiAccOtuTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgLineDapiAccOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgDapiAccLine 1 }
+
+
+pme1008CfgLineDapiAccOtuEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgLineDapiAccOtuEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the dapiAccLine 
+        table
+        "
+	INDEX   { pme1008CfgLineDapiAccOtuIndex }
+	::= { pme1008CfgLineDapiAccOtuTable 1 }
+
+
+Pme1008CfgLineDapiAccOtuEntry ::=
+	SEQUENCE {
+	pme1008CfgLineDapiAccOtuIndex
+		INTEGER,
+	pme1008CfgLineDapiAccSetupPortn
+		DisplayString
+	}
+
+
+pme1008CfgLineDapiAccOtuIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the lineDapiAccOtu 
+        table
+        "
+	::= { pme1008CfgLineDapiAccOtuEntry 1 }
+
+
+pme1008CfgLineDapiAccSetupPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Line Accepted DAPI :This register 
+        defines the value of the accepted 
+        Trace Identifier on the line input
+        "
+	::= { pme1008CfgLineDapiAccOtuEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group startuptablefive
+--- *****************************************************
+
+pme1008CfgStartuptablefive OBJECT IDENTIFIER ::= { pme1008Config 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0005
+--- *****************************************************
+
+pme1008CfgOtxtlhcapabilitiesTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pme1008CfgOtxtlhcapabilitiesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pme1008CfgStartuptablefive 1 }
+
+
+pme1008CfgOtxtlhcapabilitiesEntry OBJECT-TYPE
+	SYNTAX Pme1008CfgOtxtlhcapabilitiesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startuptablefive 
+        table
+        "
+	INDEX   { pme1008CfgOtxtlhcapabilitiesIndex }
+	::= { pme1008CfgOtxtlhcapabilitiesTable 1 }
+
+
+Pme1008CfgOtxtlhcapabilitiesEntry ::=
+	SEQUENCE {
+	pme1008CfgOtxtlhcapabilitiesIndex
+		INTEGER,
+	pme1008CfgComponentTypePortn
+		Unsigned32,
+	pme1008CfgMiscellaneousPortn
+		Unsigned32,
+	pme1008CfgFirstChannelPortn
+		Unsigned32,
+	pme1008CfgLastChannelPortn
+		Unsigned32,
+	pme1008CfgGridPortn
+		Unsigned32
+	}
+
+
+pme1008CfgOtxtlhcapabilitiesIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the otxtlhcapabilities 
+        table
+        "
+	::= { pme1008CfgOtxtlhcapabilitiesEntry 1 }
+
+
+pme1008CfgComponentTypePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Component parameters :This OID 
+        defines the component parameters
+        "
+	::= { pme1008CfgOtxtlhcapabilitiesEntry 3 }
+
+
+pme1008CfgMiscellaneousPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Miscellaneous default settings 
+        :This OID defines the miscellaneous 
+        parameters
+        "
+	::= { pme1008CfgOtxtlhcapabilitiesEntry 4 }
+
+
+pme1008CfgFirstChannelPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Number of the first channel of 
+        the component :This OID defines 
+        the first channel number of the 
+        PM
+        "
+	::= { pme1008CfgOtxtlhcapabilitiesEntry 5 }
+
+
+pme1008CfgLastChannelPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Number of the last channel of
+         the component :This OID defines 
+        the last channel number of the
+         PM
+        "
+	::= { pme1008CfgOtxtlhcapabilitiesEntry 6 }
+
+
+pme1008CfgGridPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Grid value of the component :This 
+        OID defines the grid of the PM
+        "
+	::= { pme1008CfgOtxtlhcapabilitiesEntry 7 }
+
+
+
+pme1008CfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pme1008Config 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pme1008trapPortNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last port which generates a trap"
+	::= { pme1008traps 2 }
+
+pme1008trapLineNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last Line which generates a trap"
+	::= { pme1008traps 3 }
+
+pme1008trapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pme1008traps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     LINE TRAPS
+--- *****************************************************
+
+pme1008LineTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmLineDdmWarningPortn, pme1008trapLineNumber, pme1008trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PME1008 Line Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pme1008AlmLineDdmWarningPortn "on", pme1008trapLineNumber "$2", pme1008trapBoardNumber "$3"}
+	--&MESG        "DDM Warning appears on Line Port $2 of PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pme1008traps 30 }
+
+pme1008LineTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmLineDdmWarningPortn, pme1008trapLineNumber, pme1008trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PME1008 Line Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PME1008 Line Not Urgent ON" }
+	--&MATCH       { pme1008AlmLineDdmWarningPortn "on", pme1008trapLineNumber "$2", pme1008trapBoardNumber "$3"}
+	--&MESG        "DDM Warning disappears on Line Port $2 of PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pme1008traps 31 }
+
+pme1008LineTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmLineDdmAlmPortn, pme1008trapLineNumber, pme1008trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PME1008 Line Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pme1008AlmLineDdmAlmPortn "on", pme1008trapLineNumber "$2", pme1008trapBoardNumber "$3"}
+	--&MESG        "DDM Alarm appears on Line Port $2 of PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pme1008traps 32 }
+
+pme1008LineTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmLineDdmAlmPortn, pme1008trapLineNumber, pme1008trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PME1008 Line Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PME1008 Line Urgent ON" }
+	--&MATCH       { pme1008AlmLineDdmAlmPortn "on", pme1008trapLineNumber "$2", pme1008trapBoardNumber "$3"}
+	--&MESG        "DDM Alarm disappears on Line Port $2 of PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pme1008traps 33 }
+
+pme1008LineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmLineFailPortn , pme1008AlmLineHwFailPortn , pme1008trapLineNumber, pme1008trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PME1008 Line Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pme1008AlmLineFailPortn "on", pme1008AlmLineHwFailPortn "*", pme1008trapLineNumber "$3", pme1008trapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Down on PME1008 in Slot $4 ($A)"
+	
+	--&FILTNAME    "PME1008 Line HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pme1008AlmLineFailPortn "*", pme1008AlmLineHwFailPortn "on", pme1008trapLineNumber "$3", pme1008trapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Down on PME1008 in Slot $4 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pme1008traps 34 }
+
+pme1008LineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmLineFailPortn , pme1008AlmLineHwFailPortn , pme1008trapLineNumber, pme1008trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PME1008 Line Fail OFF"
+	--&ACTIONS     { log,  normal }
+	--&CLEARS      { "PME1008 Line Fail ON" }
+	--&MATCH       { pme1008AlmLineFailPortn "on", pme1008AlmLineHwFailPortn "*", pme1008trapLineNumber "$3", pme1008trapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Up on PME1008 in Slot $4 ($A)"
+
+	--&FILTNAME    "PME1008 Line HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pme1008AlmLineFailPortn "*", pme1008AlmLineHwFailPortn "on", pme1008trapLineNumber "$3", pme1008trapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Up on PME1008 in Slot $4 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pme1008traps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     CLIENT TRAPS
+--- *****************************************************
+
+pme1008ClientTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmSfpDdmWarningPortn, pme1008trapPortNumber, pme1008trapBoardNumber}
+	STATUS current
+		--&FILTNAME    "PME1008 Client Not Urgent ON"
+		--&ACTIONS     { log, minor }
+		--&MATCH       { pme1008AlmSfpDdmWarningPortn "on", pme1008trapPortNumber "$2", pme1008trapBoardNumber "$3"}
+		--&MESG        "DDM Warning appears on Client Port $2 of PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Not urgent client default is activated"
+	::= { pme1008traps 40 }
+
+pme1008ClientTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmSfpDdmWarningPortn, pme1008trapPortNumber, pme1008trapBoardNumber}
+	STATUS current
+		--&FILTNAME    "PME1008 Client Not Urgent OFF"
+		--&ACTIONS     { log, normal }
+		--&CLEARS      { "PME1008 Client Not Urgent ON" }
+		--&MATCH       { pme1008AlmSfpDdmWarningPortn "on", pme1008trapPortNumber "$2", pme1008trapBoardNumber "$3"}
+		--&MESG        "DDM Warning appears on Client Port $2 of PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Not urgent client default disappeared"
+	::= { pme1008traps 41 }
+
+pme1008ClientTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmSfpDdmAlmPortn, pme1008trapPortNumber, pme1008trapBoardNumber}
+	STATUS current
+		--&FILTNAME    "PME1008 Client Urgent ON"
+		--&ACTIONS     { log, major }
+		--&MATCH       { pme1008AlmSfpDdmAlmPortn "on", pme1008trapPortNumber "$2", pme1008trapBoardNumber "$3"}
+		--&MESG        "DDM Alarm appears on Client Port $2 of PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Urgent client default is activated"
+	::= { pme1008traps 42 }
+
+pme1008ClientTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmSfpDdmAlmPortn, pme1008trapPortNumber, pme1008trapBoardNumber}
+	STATUS current
+		--&FILTNAME    "PME1008 Client Urgent OFF"
+		--&ACTIONS     { log, normal }
+		--&CLEARS      { "PME1008 Client Urgent ON" }
+		--&MATCH       { pme1008AlmSfpDdmAlmPortn "on", pme1008trapPortNumber "$2", pme1008trapBoardNumber "$3"}
+		--&MESG        "DDM Alarm disappears on Client Port $2 of PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Urgent client default disappeared"
+	::= { pme1008traps 43 }
+
+pme1008ClientTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmFailAccPortn, pme1008AlmHwFailAccPortn, pme1008trapPortNumber, pme1008trapBoardNumber}
+	STATUS current
+		--&FILTNAME    "PME1008 Client Fail ON"
+		--&ACTIONS     { log, critical }
+		--&MATCH       { pme1008AlmFailAccPortn "on", pme1008AlmHwFailAccPortn "*", pme1008trapPortNumber "$3", pme1008trapBoardNumber "$4"}
+		--&MESG        "Client Port $3 Down on PME1008 in Slot $4 ($A)"
+		
+		--&FILTNAME    "PME1008 Client HW Fail ON (Hidden)"
+		--&ACTIONS     { info }
+		--&MATCH       { pme1008AlmFailAccPortn "*", pme1008AlmHwFailAccPortn "on", pme1008trapPortNumber "$3", pme1008trapBoardNumber "$4"}
+		--&MESG        "Client Port $3 Down on PME1008 in Slot $4 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pme1008traps 44 }
+
+pme1008ClientTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmFailAccPortn, pme1008AlmHwFailAccPortn, pme1008trapPortNumber, pme1008trapBoardNumber}
+	STATUS current
+		--&FILTNAME    "PME1008 Client Fail OFF"
+		--&ACTIONS     { log, normal }
+		--&CLEARS      { "PME1008 Client Fail ON" }
+		--&MATCH       { pme1008AlmFailAccPortn "on", pme1008AlmHwFailAccPortn "*", pme1008trapPortNumber "$3", pme1008trapBoardNumber "$4"}
+		--&MESG        "Client Port $3 Up on PME1008 in Slot $4 ($A)"
+		
+		--&FILTNAME    "PME1008 Client HW Fail OFF (Hidden)"
+		--&ACTIONS     { info }
+		--&MATCH       { pme1008AlmFailAccPortn "*", pme1008AlmHwFailAccPortn "on", pme1008trapPortNumber "$3", pme1008trapBoardNumber "$4"}
+		--&MESG        "Client Port $3 Up on PME1008 in Slot $4 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pme1008traps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pme1008PowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmDefFuseB, pme1008AlmDefFuseA , pme1008trapBoardNumber}
+	STATUS current
+		--&FILTNAME    "PME1008 Fuse A Fail ON"
+		--&ACTIONS     { log, major }
+		--&MATCH       { pme1008AlmDefFuseB "*", pme1008AlmDefFuseA "on", pme1008trapBoardNumber "$3"}
+		--&MESG        "Power Input A Fail on PME1008 in Slot $3 ($A)"
+	
+		--&FILTNAME    "PME1008 Fuse B Fail ON"
+		--&ACTIONS     { log, major }
+		--&MATCH       { pme1008AlmDefFuseB "on", pme1008AlmDefFuseA "*", pme1008trapBoardNumber "$3"}
+		--&MESG        "Power Input B Fail on PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pme1008traps 50 }
+
+pme1008PowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pme1008AlmDefFuseB, pme1008AlmDefFuseA , pme1008trapBoardNumber}
+	STATUS current
+		--&FILTNAME    "PME1008 Fuse A&B Fail OFF"
+		--&ACTIONS     { log, normal}
+		--&CLEARS      { "PME1008 Fuse A Fail ON", "PME1008 Fuse B Fail ON" }
+		--&MATCH       { pme1008AlmDefFuseB "on", pme1008AlmDefFuseA "on", pme1008trapBoardNumber "$3"}
+		--&MESG        "Power Inputs A and B Present on PME1008 in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pme1008traps 51 }
+
+
+
+
+
+
+END

@@ -1,0 +1,1921 @@
+-- *****************************************************************
+-- EKINOPS-Pmvoa.TXT:  MIB
+--
+--MIB Part Number:3MI00124AAAA
+--MIB Version:02
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pmvoa-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePmvoa MODULE-IDENTITY
+        LAST-UPDATED "201612210000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.fr"
+        DESCRIPTION
+          "Creation."
+
+	REVISION "201612210000Z"
+	DESCRIPTION
+	  "Creation for PMVOA"
+        ::= { ekinops 84 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmvoaalarms OBJECT IDENTIFIER ::= { modulePmvoa 2 }	
+pmvoaAlmOther OBJECT IDENTIFIER ::= { pmvoaalarms 1 }
+pmvoaAlmOtherNurg OBJECT IDENTIFIER ::= { pmvoaAlmOther 1 }
+pmvoaAlmOtherUrg OBJECT IDENTIFIER ::= { pmvoaAlmOther 2 }
+pmvoaAlmOtherCrit OBJECT IDENTIFIER ::= { pmvoaAlmOther 3 }
+
+pmvoaAlmClient OBJECT IDENTIFIER ::= { pmvoaalarms 2 }
+pmvoaAlmClientNurg OBJECT IDENTIFIER ::= { pmvoaAlmClient 1 }
+pmvoaAlmClientUrg OBJECT IDENTIFIER ::= { pmvoaAlmClient 2 }
+pmvoaAlmClientCrit OBJECT IDENTIFIER ::= { pmvoaAlmClient 3 }
+	
+pmvoaAlmLine OBJECT IDENTIFIER ::= { pmvoaalarms 3 }
+pmvoaAlmLineNurg OBJECT IDENTIFIER ::= { pmvoaAlmLine 1 }
+pmvoaAlmLineUrg OBJECT IDENTIFIER ::= { pmvoaAlmLine 2 }
+pmvoaAlmLineCrit OBJECT IDENTIFIER ::= { pmvoaAlmLine 3 }
+
+
+
+pmvoameasures OBJECT IDENTIFIER ::= { modulePmvoa 3 }	
+pmvoaMesrOther OBJECT IDENTIFIER ::= { pmvoameasures 1 }	
+pmvoaMesrClient OBJECT IDENTIFIER ::= { pmvoameasures 2 }	
+pmvoaMesrLine OBJECT IDENTIFIER ::= { pmvoameasures 3 }	
+
+
+
+pmvoacontrolsWrite OBJECT IDENTIFIER ::= { modulePmvoa 6 }
+pmvoaCtrlOther OBJECT IDENTIFIER ::= { pmvoacontrolsWrite 1 }
+pmvoaCtrlClient OBJECT IDENTIFIER ::= { pmvoacontrolsWrite 2 }
+pmvoaCtrlLine OBJECT IDENTIFIER ::= { pmvoacontrolsWrite 3 }
+
+pmvoari OBJECT IDENTIFIER ::= { modulePmvoa 7 }
+pmvoariTable OBJECT IDENTIFIER ::= { pmvoari 1 }
+
+pmvoadownload OBJECT IDENTIFIER ::= { modulePmvoa 8 }
+pmvoaDwlOther OBJECT IDENTIFIER ::= { pmvoadownload 1 }
+pmvoaDwlClient OBJECT IDENTIFIER ::= { pmvoadownload 2 }
+pmvoaDwlLine OBJECT IDENTIFIER ::= { pmvoadownload 3 }
+
+
+pmvoaConfig OBJECT IDENTIFIER ::= { modulePmvoa 9 }
+
+pmvoatraps OBJECT IDENTIFIER ::= { modulePmvoa 10 }
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+PmvoaMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Mode for the SFP VOA"
+    SYNTAX INTEGER {
+		attenuationctrl(0),
+		powerctrl(1)
+           }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmvoaRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmvoari 2 }
+
+pmvoaRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmvoari 3 }
+  
+pmvoaRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmvoari 4 }
+  
+pmvoaRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmvoari 5 }
+  
+pmvoaRinvGwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "GW platform description: This OID contains the 
+         description of the Gateware platform."
+  ::= { pmvoari 6 }
+
+
+--- ***Clients***
+
+---pmvoaRinvSfpTable OBJECT-TYPE
+---      SYNTAX  SEQUENCE OF PmvoaRinvSfpEntry
+---      MAX-ACCESS  not-accessible
+---      STATUS  current
+---      DESCRIPTION
+---              "List of the SFPs on the selected module"
+---      ::= { pmvoariTable 1 }
+
+---pmvoaRinvSfpEntry OBJECT-TYPE
+---        SYNTAX  PmvoaRinvSfpEntry
+---        MAX-ACCESS  not-accessible
+---        STATUS  current
+---        DESCRIPTION
+---              "Row definition for the SFP table"
+---        INDEX   { pmvoaRinvSfpIndex }
+---        ::= { pmvoaRinvSfpTable 1 }
+    
+
+
+---PmvoaRinvSfpEntry::=
+---        SEQUENCE {
+---          pmvoaRinvSfpIndex 
+---              Integer32,
+---          pmvoaRinvsfp
+---             DisplayString
+---        }
+
+
+---    pmvoaRinvSfpIndex OBJECT-TYPE
+---        SYNTAX  Integer32(1..16)
+---        MAX-ACCESS  read-only
+---        STATUS  current
+---        DESCRIPTION
+---              "Index for SFP table"
+---        ::= { pmvoaRinvSfpEntry 1 }
+
+
+---    pmvoaRinvsfp OBJECT-TYPE
+---      SYNTAX  DisplayString
+---        MAX-ACCESS  read-only
+---        STATUS  current
+---        DESCRIPTION
+---              "Inventory for the SFP: This OID contains the inventory for the SFP"
+---        ::= { pmvoaRinvSfpEntry 2 }
+
+
+--- ***Lines***
+
+pmvoaRinvLineTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmvoaRinvLineEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the SFPs on the selected module"
+      ::= { pmvoariTable 2 }
+
+pmvoaRinvLineEntry OBJECT-TYPE
+        SYNTAX  PmvoaRinvLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the SFP table"
+        INDEX   { pmvoaRinvLineIndex }
+        ::= { pmvoaRinvLineTable 1 }
+    
+
+
+PmvoaRinvLineEntry::=
+        SEQUENCE {
+          pmvoaRinvLineIndex 
+              Integer32,
+          pmvoaRinvxfpLine
+              DisplayString
+        }
+
+
+    pmvoaRinvLineIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for SFP table"
+        ::= { pmvoaRinvLineEntry 1 }
+
+
+    pmvoaRinvxfpLine OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the XFP: This OID contains the inventory for the XFP"
+        ::= { pmvoaRinvLineEntry 2 }
+
+
+
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmvoaAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmvoaAlmOtherCrit 0 }
+
+
+
+
+pmvoaAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition <Help> Status 
+        of the Fuse B <Condtype> DEF_FUSE_B 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmvoaAlmsynthAlm0 16 }
+
+
+
+pmvoaAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition <Help> Status 
+        of the Fuse A <Condtype> DEF_FUSE_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmvoaAlmsynthAlm0 15 }
+
+
+
+pmvoaAlmModGlobFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the RM <Help> This alarm is 
+        set on detection of a failure originating 
+        from the equipment <Condtype> MOD_GLOB_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmvoaAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmvoaAlmsynthAlm2 OBJECT IDENTIFIER ::= { pmvoaAlmOtherNurg 2 }
+
+
+
+
+pmvoaAlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmvoaAlmsynthAlm2 4 }
+
+
+
+pmvoaAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmvoaAlmsynthAlm2 3 }
+
+
+
+pmvoaAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmvoaAlmsynthAlm2 2 }
+
+
+
+pmvoaAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmvoaAlmsynthAlm2 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pmvoaAlmsynthAlmLine articles
+--- *********************************************************
+
+pmvoaAlmsynthAlmLineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmvoaAlmsynthAlmLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmvoaAlmsynthAlmLine Article
+        "
+	::= { pmvoaAlmLineCrit 24 }
+
+
+pmvoaAlmsynthAlmLineEntry OBJECT-TYPE
+	SYNTAX PmvoaAlmsynthAlmLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmvoaAlmsynthAlmLine 
+        table
+        "
+	INDEX   { pmvoaAlmsynthAlmLineIndex }
+	::= { pmvoaAlmsynthAlmLineTable 1 }
+
+
+PmvoaAlmsynthAlmLineEntry ::=
+	SEQUENCE {
+	pmvoaAlmsynthAlmLineIndex
+		INTEGER,
+	pmvoaAlmLineFailPortn
+		EkiOnOff,
+	pmvoaAlmLineOosPortn
+		EkiOnOff,
+	pmvoaAlmLineHwFailPortn
+		EkiOnOff,
+	pmvoaAlmLineSfpVoaAbsentPortn
+		EkiOnOff
+	}
+
+
+pmvoaAlmsynthAlmLineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmvoaAlmsynthAlmLine 
+        table
+        "
+	::= { pmvoaAlmsynthAlmLineEntry 1 }
+
+
+pmvoaAlmLineFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port Failure :This OID indicates 
+        a failure on the line port <Help> 
+        This alarm indicates a failure
+         on the line port <Condtype> LINE_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmvoaAlmsynthAlmLineEntry 13 }
+
+
+pmvoaAlmLineOosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VOA Module Out Of Service :This 
+        OID indicates that the SFP is In 
+        Service or Out of Service<Help> 
+         This status indicates if the VOA 
+        SFP is in service <Condtype> LINE_OOS 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pmvoaAlmsynthAlmLineEntry 7 }
+
+
+pmvoaAlmLineHwFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port HW Failure :This OID 
+        indicates a failure on line port, 
+        most probably caused by a HW issue 
+        <Help> This alarm indicates a failure 
+        on line port, most probably caused 
+        by a HW issue <Condtype> LINE_HW_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmvoaAlmsynthAlmLineEntry 5 }
+
+
+pmvoaAlmLineSfpVoaAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VOA Module Absent :This OID indicates 
+        that the VOA SFP is not present. 
+         <Help> This alarm indicates if 
+        the VOA SFP is absent  <Condtype> 
+        LINE_SFP_VOA_ABSENT <Probcause> 
+        inputOutputDeviceError (24) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDSingleClientInv
+        "
+	::= { pmvoaAlmsynthAlmLineEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmvoaAlmlineAlm articles
+--- *********************************************************
+
+pmvoaAlmlineAlmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmvoaAlmlineAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmvoaAlmlineAlm Article
+        "
+	::= { pmvoaAlmLineCrit 40 }
+
+
+pmvoaAlmlineAlmEntry OBJECT-TYPE
+	SYNTAX PmvoaAlmlineAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmvoaAlmlineAlm 
+        table
+        "
+	INDEX   { pmvoaAlmlineAlmIndex }
+	::= { pmvoaAlmlineAlmTable 1 }
+
+
+PmvoaAlmlineAlmEntry ::=
+	SEQUENCE {
+	pmvoaAlmlineAlmIndex
+		INTEGER,
+	pmvoaAlmLossInputPowerPortn
+		EkiOnOff,
+	pmvoaAlmTempLowAlarmPortn
+		EkiOnOff,
+	pmvoaAlmTempHighAlarmPortn
+		EkiOnOff,
+	pmvoaAlmLossOutputPowerPortn
+		EkiOnOff,
+	pmvoaAlmOutputErrorPortn
+		EkiOnOff
+	}
+
+
+pmvoaAlmlineAlmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmvoaAlmlineAlm 
+        table
+        "
+	::= { pmvoaAlmlineAlmEntry 1 }
+
+
+pmvoaAlmLossInputPowerPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Loss Of Input Power :This OID
+         indicates that the VOA SFP attenuation 
+        has no input power) <Help> Alarm 
+        indicating that the VOA SFP attenuation 
+        has no input power <Condtype> LOSS_INPUT_POWER_1 
+        <Probcause> lossOfSignal(30) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pmvoaAlmlineAlmEntry 6 }
+
+
+pmvoaAlmTempLowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VOA Temp Low Alarm :OID indicates 
+        the VOA SFP Temperature is lower 
+        than the threshold value written 
+        in the SFP <Help> Alarm indicating 
+        that the VOA SFP Temperature is 
+        lower than the threshold value
+         written in the SFP <Condtype>
+         TEMP_LOW_ALARM_1 <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmvoaAlmlineAlmEntry 5 }
+
+
+pmvoaAlmTempHighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VOA Temp High Alarm :This OID
+         indicates the VOA SFP Temperature 
+        is higher than the threshold value 
+        written in the SFP <Help> Alarm 
+        indicating that the VOA SFP Temperature 
+        is higher than the threshold value 
+        written in the SFP <Condtype> TEMP_HIGH_ALARM_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmvoaAlmlineAlmEntry 4 }
+
+
+pmvoaAlmLossOutputPowerPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Loss Of Output Power :This OID 
+        indicates that the VOA SFP attenuation 
+        is infinite (no output power) <Help> 
+        Alarm indicating that the VOA SFP 
+        attenuation is infinite (no output 
+        power) <Condtype> LOSS_OUTPUT_POWER_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmvoaAlmlineAlmEntry 3 }
+
+
+pmvoaAlmOutputErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VOA Module Output power Failure 
+        :When configured in Constant Output 
+        Power, this OID indicates the required 
+        output power can’t be reached 
+         <Help> When configured in Constant 
+        output power, this alarm indicates 
+        the required output power can’t 
+        be reached <Condtype> OUTPUT_ERROR_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmvoaAlmlineAlmEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the confMgnt1 article
+--- *****************************************************
+pmvoaCtrlconfMgnt1 OBJECT IDENTIFIER ::= { pmvoaCtrlOther 1 }
+
+
+
+
+pmvoaCtrlConf2Clear1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        OID clears the configuration tables 
+        from configuration2 in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmvoaCtrlconfMgnt1 14 }
+
+
+
+pmvoaCtrlConf2Flash1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        OID saves the current configuration 
+        of the PM as configuration2 in
+         the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmvoaCtrlconfMgnt1 10 }
+
+
+
+pmvoaCtrlConf2Load1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables Set
+         Nb 2 :When set this OID enables 
+        loading from flash configuration2 
+        into the PM.
+        "
+	  ::= { pmvoaCtrlconfMgnt1 2 }
+
+
+
+pmvoaCtrlConf1Load1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables Set
+         Nb 1 :When set this OID enables 
+        loading from flash configuration1 
+        into the PM.
+        "
+	  ::= { pmvoaCtrlconfMgnt1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmvoaCtrlsynth4 OBJECT IDENTIFIER ::= { pmvoaCtrlOther 4 }
+
+
+
+
+pmvoaCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmvoaCtrlsynth4 2 }
+
+
+
+pmvoaCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmvoaCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmvoaCtrlswMgnt OBJECT IDENTIFIER ::= { pmvoaCtrlOther 5 }
+
+
+
+
+pmvoaCtrlLoadSwBank2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Software Nb 2 As Active :This 
+        OID, when set, loads the SW from 
+        bank2 into the PM. It must be followed 
+        by a reset.  <Help>  This controls 
+        selects the second SW bank as the 
+        active bank for the next module 
+        reset
+        "
+	  ::= { pmvoaCtrlswMgnt 6 }
+
+
+
+pmvoaCtrlLoadSwBank1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Software Nb 1 As Active :This 
+        OID, when set, loads the SW from 
+        bank1 into the PM. It must be followed 
+        by a reset.  <Help>  This controls 
+        selects the first SW bank as the 
+        active bank for the next module 
+        reset
+        "
+	  ::= { pmvoaCtrlswMgnt 5 }
+
+
+
+pmvoaCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        PM. This reset is not traffic affecting, 
+        and the configuration of PM remains 
+        unchanged.  <Help>  This control 
+        initiates a warm reset of the module. 
+        "
+	  ::= { pmvoaCtrlswMgnt 3 }
+
+
+
+pmvoaCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        PM. This reset is traffic affecting, 
+        and the configuration of PM is
+         reloaded on start-up.  <Help>
+          This control initiates a cold 
+        reset of the module. 
+        "
+	  ::= { pmvoaCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the gwMgnt article
+--- *****************************************************
+pmvoaCtrlgwMgnt OBJECT IDENTIFIER ::= { pmvoaCtrlOther 6 }
+
+
+
+
+pmvoaCtrlLoadGwBank4 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 4 As Active :This 
+        OID, when set, loads the GW from 
+        bank4 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.
+        "
+	  ::= { pmvoaCtrlgwMgnt 8 }
+
+
+
+pmvoaCtrlLoadGwBank3 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 3 As Active :This 
+        OID, when set, loads the GW from 
+        bank3 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.  <Help>  This controls 
+        initiates a cold reset of the module 
+        and select the third GW bank as 
+        the active bank
+        "
+	  ::= { pmvoaCtrlgwMgnt 7 }
+
+
+
+pmvoaCtrlLoadGwBank2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 2 As Active :This 
+        OID, when set, loads the GW from 
+        bank2 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.
+        "
+	  ::= { pmvoaCtrlgwMgnt 6 }
+
+
+
+pmvoaCtrlLoadGwBank1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 1 As Active :This 
+        OID, when set, loads the GW from 
+        bank1 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.  <Help>  This controls 
+        initiates a cold reset of the module 
+        and select the first GW bank as 
+        the active bank
+        "
+	  ::= { pmvoaCtrlgwMgnt 5 }
+
+
+
+pmvoaCtrlCurrentGwReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Active Gateware Reset :This OID, 
+        when set, resets the active gateware. 
+        It is traffic affecting.
+        "
+	  ::= { pmvoaCtrlgwMgnt 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmvoaCtrlledTest OBJECT IDENTIFIER ::= { pmvoaCtrlOther 72 }
+
+
+
+
+pmvoaCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmvoaCtrlledTest 3 }
+
+
+
+pmvoaCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmvoaCtrlledTest 2 }
+
+
+
+pmvoaCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmvoaCtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *********************************************************
+---     TABLE for the pmvoaMesrlineSfpTemp articles
+--- *********************************************************
+
+pmvoaMesrlineSfpTempTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmvoaMesrlineSfpTempEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmvoaMesrlineSfpTemp Article
+        "
+	::= { pmvoaMesrLine 16 }
+
+
+pmvoaMesrlineSfpTempEntry OBJECT-TYPE
+	SYNTAX PmvoaMesrlineSfpTempEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmvoaMesrlineSfpTemp 
+        table
+        "
+	INDEX   { pmvoaMesrlineSfpTempIndex }
+	::= { pmvoaMesrlineSfpTempTable 1 }
+
+
+PmvoaMesrlineSfpTempEntry ::=
+	SEQUENCE {
+	pmvoaMesrlineSfpTempIndex
+		INTEGER,
+	pmvoaMesrlineSfpTempPortn
+		INTEGER 
+	}
+
+
+pmvoaMesrlineSfpTempIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmvoaMesrlineSfpTemp 
+        table
+        "
+	::= { pmvoaMesrlineSfpTempEntry 1 }
+
+
+pmvoaMesrlineSfpTempPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Temperature :This OID gives the 
+        temperature value of the VOA SFP 
+        (Temperature = AV_S16/256) (Unit 
+        = C) <Help> This measure gives
+         the temperature value of the VOA 
+        SFP
+        "
+	::= { pmvoaMesrlineSfpTempEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmvoaMesrlinePout articles
+--- *********************************************************
+
+pmvoaMesrlinePoutTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmvoaMesrlinePoutEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmvoaMesrlinePout Article
+        "
+	::= { pmvoaMesrLine 48 }
+
+
+pmvoaMesrlinePoutEntry OBJECT-TYPE
+	SYNTAX PmvoaMesrlinePoutEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmvoaMesrlinePout 
+        table
+        "
+	INDEX   { pmvoaMesrlinePoutIndex }
+	::= { pmvoaMesrlinePoutTable 1 }
+
+
+PmvoaMesrlinePoutEntry ::=
+	SEQUENCE {
+	pmvoaMesrlinePoutIndex
+		INTEGER,
+	pmvoaMesrlinePoutPortn
+		INTEGER 
+	}
+
+
+pmvoaMesrlinePoutIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmvoaMesrlinePout 
+        table
+        "
+	::= { pmvoaMesrlinePoutEntry 1 }
+
+
+pmvoaMesrlinePoutPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Output Power :This OID gives the 
+        output power value of the VOA SFP 
+        (Power = 10*log(AV_U16)-40) (Unit 
+        = dBm) <Help> This measure gives 
+        the output power value of the VOA 
+        SFP
+        "
+	::= { pmvoaMesrlinePoutEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmvoaMesrlineEstPin articles
+--- *********************************************************
+
+pmvoaMesrlineEstPinTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmvoaMesrlineEstPinEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmvoaMesrlineEstPin Article
+        "
+	::= { pmvoaMesrLine 64 }
+
+
+pmvoaMesrlineEstPinEntry OBJECT-TYPE
+	SYNTAX PmvoaMesrlineEstPinEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmvoaMesrlineEstPin 
+        table
+        "
+	INDEX   { pmvoaMesrlineEstPinIndex }
+	::= { pmvoaMesrlineEstPinTable 1 }
+
+
+PmvoaMesrlineEstPinEntry ::=
+	SEQUENCE {
+	pmvoaMesrlineEstPinIndex
+		INTEGER,
+	pmvoaMesrlineEstPinPortn
+		INTEGER 
+	}
+
+
+pmvoaMesrlineEstPinIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmvoaMesrlineEstPin 
+        table
+        "
+	::= { pmvoaMesrlineEstPinEntry 1 }
+
+
+pmvoaMesrlineEstPinPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Estimated Input Power :This OID 
+        gives the estimated input power 
+        value of the VOA SFP (Power = 10*log(AV_U16)-40) 
+        (Unit = dBm) <Help> This measure 
+        gives the estimated input power 
+        value of the VOA SFP
+        "
+	::= { pmvoaMesrlineEstPinEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     DOWNLOAD
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the restartProcess article
+--- *****************************************************
+pmvoaDwlrestartProcess OBJECT IDENTIFIER ::= { pmvoaDwlOther 0 }
+
+
+
+
+pmvoaDwlColdRestartProcessed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Cold Restart :This OID indicates 
+        that the module last restart was 
+        a Cold RESTART
+        "
+	  ::= { pmvoaDwlrestartProcess 2 }
+
+
+
+pmvoaDwlWarmRestartProcessed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warm Restart :This OID indicates 
+        that the module last restart was 
+        a Warm RESTART
+        "
+	  ::= { pmvoaDwlrestartProcess 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swBanksUsed article
+--- *****************************************************
+pmvoaDwlswBanksUsed OBJECT IDENTIFIER ::= { pmvoaDwlOther 1 }
+
+
+
+
+pmvoaDwlSwBank2Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 2 loaded :This OID indicates 
+        a software is loaded in SW bank 
+        2  <Help>  This status indicates 
+        if the SW bank 2 contains SW package
+        "
+	  ::= { pmvoaDwlswBanksUsed 6 }
+
+
+
+pmvoaDwlSwBank1Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 1 loaded :This OID indicates 
+        a software is loaded in SW bank 
+        1  <Help>  This status indicates 
+        if the SW bank 1 contains SW package
+        "
+	  ::= { pmvoaDwlswBanksUsed 5 }
+
+
+
+pmvoaDwlSwBank2Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 2 active :This OID indicates 
+        the module is working on SW bank 
+        2  <Help>  This status indicates 
+        if the SW bank 2 is active or standby
+        "
+	  ::= { pmvoaDwlswBanksUsed 2 }
+
+
+
+pmvoaDwlSwBank1Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 1 active :This OID indicates 
+        the module is working on SW bank 
+        1  <Help>  This status indicates 
+        if the SW bank 1 is active or standby
+        "
+	  ::= { pmvoaDwlswBanksUsed 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the gwBanksUsed article
+--- *****************************************************
+pmvoaDwlgwBanksUsed OBJECT IDENTIFIER ::= { pmvoaDwlOther 2 }
+
+
+
+
+pmvoaDwlGwBank4Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 4 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        4
+        "
+	  ::= { pmvoaDwlgwBanksUsed 8 }
+
+
+
+pmvoaDwlGwBank3Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 3 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        3  <Help>  This status indicates 
+        if the GW bank 3 contains GW package
+        "
+	  ::= { pmvoaDwlgwBanksUsed 7 }
+
+
+
+pmvoaDwlGwBank2Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 2 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        2
+        "
+	  ::= { pmvoaDwlgwBanksUsed 6 }
+
+
+
+pmvoaDwlGwBank1Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 1 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        1  <Help>  This status indicates 
+        if the GW bank 1 contains GW package
+        "
+	  ::= { pmvoaDwlgwBanksUsed 5 }
+
+
+
+pmvoaDwlGwBank4Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 4 active :This OID indicates 
+        the module is working on GW bank 
+        4
+        "
+	  ::= { pmvoaDwlgwBanksUsed 4 }
+
+
+
+pmvoaDwlGwBank3Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 3 active :This OID indicates 
+        the module is working on GW bank 
+        3  <Help>  This status indicates 
+        if the GW bank 3 is active or standby
+        "
+	  ::= { pmvoaDwlgwBanksUsed 3 }
+
+
+
+pmvoaDwlGwBank2Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 2 active :This OID indicates 
+        the module is working on GW bank 
+        2
+        "
+	  ::= { pmvoaDwlgwBanksUsed 2 }
+
+
+
+pmvoaDwlGwBank1Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 1 active :This OID indicates 
+        the module is working on GW bank 
+        1  <Help>  This status indicates 
+        if the GW bank 1 is active or standby
+        "
+	  ::= { pmvoaDwlgwBanksUsed 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startup
+--- *****************************************************
+
+pmvoaCfgStartup OBJECT IDENTIFIER ::= { pmvoaConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2190
+--- *****************************************************
+
+pmvoaCfgLinexr1StartupTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmvoaCfgLinexr1StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmvoaCfgStartup 1 }
+
+
+pmvoaCfgLinexr1StartupEntry OBJECT-TYPE
+	SYNTAX PmvoaCfgLinexr1StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startup 
+        table
+        "
+	INDEX   { pmvoaCfgLinexr1StartupIndex }
+	::= { pmvoaCfgLinexr1StartupTable 1 }
+
+
+PmvoaCfgLinexr1StartupEntry ::=
+	SEQUENCE {
+	pmvoaCfgLinexr1StartupIndex
+		INTEGER,
+	pmvoaCfgSfpModePortn
+		Unsigned32,
+	pmvoaCfgAttenuationCtrlPortn
+		Unsigned32,
+	pmvoaCfgPowerCtrlPortn
+		Unsigned32,
+	pmvoaCfgLosInputThresholdPortn
+		Unsigned32,
+	pmvoaCfgInsertionLossValuePortn
+		Unsigned32
+	}
+
+
+pmvoaCfgLinexr1StartupIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the linexr1Startup 
+        table
+        "
+	::= { pmvoaCfgLinexr1StartupEntry 1 }
+
+
+pmvoaCfgSfpModePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default mode on the SFP :This
+          register configures the default 
+        initialisation settings on the
+         SFP
+        "
+	::= { pmvoaCfgLinexr1StartupEntry 3 }
+
+
+pmvoaCfgAttenuationCtrlPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default attenuation setting on 
+        the SFP :This  register configures 
+        the default initialisation settings 
+        of the attenuation
+        "
+	::= { pmvoaCfgLinexr1StartupEntry 4 }
+
+
+pmvoaCfgPowerCtrlPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default power setting on the SFP 
+        :This  register configures the
+         default initialisation settings 
+        of the power
+        "
+	::= { pmvoaCfgLinexr1StartupEntry 5 }
+
+
+pmvoaCfgLosInputThresholdPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default threshold setting on the 
+        SFP :This  register configures
+         the default initialisation settings 
+        of the input threshold
+        "
+	::= { pmvoaCfgLinexr1StartupEntry 6 }
+
+
+pmvoaCfgInsertionLossValuePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Insertion Loss setting 
+        on the SFP :This  register configures 
+        the default initialisation settings 
+        of the insertion loss value
+        "
+	::= { pmvoaCfgLinexr1StartupEntry 7 }
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmvoaCfgLabels OBJECT IDENTIFIER ::= { pmvoaConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0003
+--- *****************************************************
+
+pmvoaCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmvoaCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmvoaCfgLabels 1 }
+
+
+pmvoaCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmvoaCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmvoaCfgLabelclientIndex }
+	::= { pmvoaCfgLabelclientTable 1 }
+
+
+PmvoaCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmvoaCfgLabelclientIndex
+		INTEGER,
+	pmvoaCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmvoaCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmvoaCfgLabelclientEntry 1 }
+
+
+pmvoaCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmvoaCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table 0004
+--- *****************************************************
+
+pmvoaCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmvoaCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmvoaCfgLabels 2 }
+
+
+pmvoaCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmvoaCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmvoaCfgLabellineIndex }
+	::= { pmvoaCfgLabellineTable 1 }
+
+
+PmvoaCfgLabellineEntry ::=
+	SEQUENCE {
+	pmvoaCfgLabellineIndex
+		INTEGER,
+	pmvoaCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmvoaCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmvoaCfgLabellineEntry 1 }
+
+
+pmvoaCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmvoaCfgLabellineEntry 3 }
+
+
+
+pmvoaCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmvoaConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmvoatrapPortNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last port which generates a trap"
+	::= { pmvoatraps 2 }
+
+pmvoatrapLineNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last Line which generates a trap"
+	::= { pmvoatraps 3 }
+
+pmvoatrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmvoatraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     LINE TRAPS
+--- *****************************************************
+
+pmvoaLineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmvoaAlmLineFailPortn , pmvoaAlmLineHwFailPortn , pmvoatrapLineNumber, pmvoatrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMVOA Line Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmvoaAlmLineFailPortn "on", pmvoaAlmLineHwFailPortn "*", pmvoatrapLineNumber "$3", pmvoatrapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Down on PMVOA in Slot $4 ($A)"
+	
+	--&FILTNAME    "PMVOA Line HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmvoaAlmLineFailPortn "*", pmvoaAlmLineHwFailPortn "on", pmvoatrapLineNumber "$3", pmvoatrapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Down on PMVOA in Slot $4 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmvoatraps 34 }
+
+pmvoaLineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmvoaAlmLineFailPortn , pmvoaAlmLineHwFailPortn , pmvoatrapLineNumber, pmvoatrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMVOA Line Fail OFF"
+	--&ACTIONS     { log,  normal }
+	--&CLEARS      { "PMVOA Line Fail ON" }
+	--&MATCH       { pmvoaAlmLineFailPortn "on", pmvoaAlmLineHwFailPortn "*", pmvoatrapLineNumber "$3", pmvoatrapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Up on PMVOA in Slot $4 ($A)"
+
+	--&FILTNAME    "PMVOA Line HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmvoaAlmLineFailPortn "*", pmvoaAlmLineHwFailPortn "on", pmvoatrapLineNumber "$3", pmvoatrapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Up on PMVOA in Slot $4 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmvoatraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     CLIENT TRAPS
+--- *****************************************************
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmvoaPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmvoaAlmDefFuseB, pmvoaAlmDefFuseA , pmvoatrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMVOA Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmvoaAlmDefFuseB "*", pmvoaAlmDefFuseA "on", pmvoatrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMVOA in Slot $3 ($A)"
+
+	--&FILTNAME    "PMVOA Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmvoaAlmDefFuseB "on", pmvoaAlmDefFuseA "*", pmvoatrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMVOA in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmvoatraps 50 }
+
+pmvoaPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmvoaAlmDefFuseB, pmvoaAlmDefFuseA , pmvoatrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMVOA Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMVOA Fuse A Fail ON", "PMVOA Fuse B Fail ON" }
+	--&MATCH       { pmvoaAlmDefFuseB "on", pmvoaAlmDefFuseA "on", pmvoatrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMVOA in Slot $3 ($A)"
+	
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmvoatraps 51 }
+
+
+
+
+
+
+END

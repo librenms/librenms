@@ -1,0 +1,4004 @@
+-- *****************************************************************
+-- EKINOPS-Pm801RR.TXT:  MIB
+--
+--MIB Part Number:3MI00101ACAD
+--MIB Version:02
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pm801RR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePm801RR MODULE-IDENTITY
+        LAST-UPDATED "201606070000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Pm801RR hardware."
+	REVISION "201008260000Z"
+	DESCRIPTION
+	  "Initial Version."
+
+	REVISION "201008260000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "201011030000Z"
+	DESCRIPTION
+	  "Formula in comments, Event on XFP init"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201403250000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201412090000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+	REVISION "201606070000Z"
+	DESCRIPTION
+	  "Capabilities objects of Table 5"
+        ::= { ekinops 48 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pm801rralarms OBJECT IDENTIFIER ::= { modulePm801RR 2 }	
+pm801rrAlmOther OBJECT IDENTIFIER ::= { pm801rralarms 1 }
+pm801rrAlmOtherNurg OBJECT IDENTIFIER ::= { pm801rrAlmOther 1 }
+pm801rrAlmOtherUrg OBJECT IDENTIFIER ::= { pm801rrAlmOther 2 }
+pm801rrAlmOtherCrit OBJECT IDENTIFIER ::= { pm801rrAlmOther 3 }
+
+pm801rrAlmClient OBJECT IDENTIFIER ::= { pm801rralarms 2 }
+pm801rrAlmClientNurg OBJECT IDENTIFIER ::= { pm801rrAlmClient 1 }
+pm801rrAlmClientUrg OBJECT IDENTIFIER ::= { pm801rrAlmClient 2 }
+pm801rrAlmClientCrit OBJECT IDENTIFIER ::= { pm801rrAlmClient 3 }
+	
+pm801rrAlmLine OBJECT IDENTIFIER ::= { pm801rralarms 3 }
+pm801rrAlmLineNurg OBJECT IDENTIFIER ::= { pm801rrAlmLine 1 }
+pm801rrAlmLineUrg OBJECT IDENTIFIER ::= { pm801rrAlmLine 2 }
+pm801rrAlmLineCrit OBJECT IDENTIFIER ::= { pm801rrAlmLine 3 }
+
+
+pm801rrmeasures OBJECT IDENTIFIER ::= { modulePm801RR 3 }	
+pm801rrMesrOther OBJECT IDENTIFIER ::= { pm801rrmeasures 1 }	
+pm801rrMesrClient OBJECT IDENTIFIER ::= { pm801rrmeasures 2 }	
+pm801rrMesrLine OBJECT IDENTIFIER ::= { pm801rrmeasures 3 }	
+
+
+pm801rrcontrolsWrite OBJECT IDENTIFIER ::= { modulePm801RR 6 }
+pm801rrCtrlOther OBJECT IDENTIFIER ::= { pm801rrcontrolsWrite 1 }
+pm801rrCtrlClient OBJECT IDENTIFIER ::= { pm801rrcontrolsWrite 2 }
+pm801rrCtrlLine OBJECT IDENTIFIER ::= { pm801rrcontrolsWrite 3 }
+
+pm801rrri OBJECT IDENTIFIER ::= { modulePm801RR 7 }
+
+
+pm801rrConfig OBJECT IDENTIFIER ::= { modulePm801RR 9 }
+
+pm801rrtraps OBJECT IDENTIFIER ::= { modulePm801RR 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+Pm801rrBitRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different rates for a client and line ports"
+    SYNTAX INTEGER {
+		rateOC192(0),
+		rate10GBELAN(1),
+		rate10GBEWAN(2),
+		rate10GFC(3),
+		rate10FECG975(4),
+		rate10FECG709(5)
+           }
+
+Pm801rrOtxMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on OTX-TLH on client and line ports"
+    SYNTAX INTEGER {
+		otx80mode(1),
+		otx60mode(2),
+		otxadjustmode(4)
+           }
+
+Pm801rrOtxGrid ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different grids on OTX-TLH on client and line ports"
+    SYNTAX INTEGER {
+		otxgrid200(200),
+		otxgrid100(100),
+		otxgrid50(50)
+           }
+
+Pm801rrAdjustValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different values in Adjust mode on OTX-TLH on client and line ports"
+    SYNTAX INTEGER {
+		otxadjustvalue0(0),
+		otxadjustvalue1(1),
+		otxadjustvalue2(2),
+		otxadjustvalue3(3),
+		otxadjustvalue4(4),
+		otxadjustvalue5(5),
+		otxadjustvalue6(6),
+		otxadjustvalue7(7),
+		otxadjustvalue8(8),
+		otxadjustvalue9(9),
+		otxadjustvalue10(10)
+           }
+
+Pm801rrOtxChannel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Channel selection on OTX-TLH on client and line ports"
+    SYNTAX INTEGER 
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pm801rrRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pm801rrri 2 }
+
+  
+pm801rrRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pm801rrri 4 }
+  
+pm801rrRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pm801rrri 5 }
+  
+pm801rrRinvClientXFP OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Inventory for the XFP: This OID contains the inventory for the Client XFP"
+  ::= { pm801rrri 6 }
+
+
+pm801rrRinvLineXFP OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Inventory for the XFP: This OID contains the inventory for the Line XFP"
+  ::= { pm801rrri 7 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pm801rrAlmsynthAlm0 OBJECT IDENTIFIER ::= { pm801rrAlmOtherCrit 0 }
+
+
+
+
+pm801rrAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm0 16 }
+
+
+
+pm801rrAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm0 15 }
+
+
+
+pm801rrAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm7 article
+--- *****************************************************
+pm801rrAlmsynthAlm7 OBJECT IDENTIFIER ::= { pm801rrAlmLineCrit 7 }
+
+
+
+
+pm801rrAlmLineVccAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 VCC Alarm :This OID indicates 
+        an overall VCC alarm is set over 
+        the Line 2 XFP <Condtype> LINE_VCC_ALARM 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm7 15 }
+
+
+
+pm801rrAlmLineVccWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 VCC Warning :This OID indicates 
+        an overall VCC warning is set over 
+        the Line 2 XFP <Condtype> LINE_VCC_WARNING 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm7 14 }
+
+
+
+pm801rrAlmLineFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Port Failure :This OID
+         indicates a failure on the Line 
+        2 port <Condtype> LINE_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm7 12 }
+
+
+
+pm801rrAlmLineDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Line 2 Optical Module 
+        DDM :This OID indicates an alarm 
+        is present coming out of Line 2 
+        optical interface DDM  <Help> 
+         This alarm indicates if a DDM
+         Alarm has been detected on the 
+        line 2 transceiver <Condtype> LINE_DDM_ALM 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm7 10 }
+
+
+
+pm801rrAlmLineDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Line 2 Optical Module 
+        DDM :This OID indicates a warning 
+        is present coming out of Line 2 
+        optical interface DDM  <Help> 
+         This alarm indicates if a DDM
+         Warning has been detected on the 
+        line 2 transceiver <Condtype> LINE_DDM_WARNING 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm7 9 }
+
+
+
+pm801rrAlmLineXfpTxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Module Laser Shutdown 
+        :This OID indicates the Line 2
+         optical output power is off  <Help> 
+         This status indicates if the line 
+        2 transceiver laser is ON or OFF 
+        <Condtype> LINE_XFP_TX_OFF <Probcause> 
+        other (1) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm7 5 }
+
+
+
+pm801rrAlmLineHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Port HW Failure :This OID 
+        indicates a failure on Line 2 port, 
+        most probably caused by a HW issue 
+        <Condtype> LINE_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm7 4 }
+
+
+
+pm801rrAlmLineInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Module Ready :This 
+        OID indicates the optical interface 
+        (XFP or OTX) is not operational
+ 
+         <Help>  This status indicates
+         if the line 2 transceiver has
+         been correctly initialized <Condtype> 
+        LINE_INIT_NOT_COMPL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDINV
+        "
+	  ::= { pm801rrAlmsynthAlm7 2 }
+
+
+
+pm801rrAlmLineXfpAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Module Absent :This 
+        OID indicates the Line 2 optical 
+        interface (XFP or OTX) is not present 
+        in the PM  <Help>  This alarm indicates 
+        if the line 2 transceiver is present. 
+        <Condtype> LINE_XFP_ABSENT <Probcause> 
+        inputOutputDeviceError (24) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDINV
+        "
+	  ::= { pm801rrAlmsynthAlm7 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm8 article
+--- *****************************************************
+pm801rrAlmsynthAlm8 OBJECT IDENTIFIER ::= { pm801rrAlmClientCrit 8 }
+
+
+
+
+pm801rrAlmClientVccAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 VCC Alarm :This OID indicates 
+        an overall VCC alarm is set over 
+        the Line 1 XFP <Condtype> CLIENT_VCC_ALARM 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm8 15 }
+
+
+
+pm801rrAlmClientVccWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1VCC Warning :This OID indicates 
+        an overall VCC warning is set over 
+        the Line 1 XFP <Condtype> CLIENT_VCC_WARNING 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm8 14 }
+
+
+
+pm801rrAlmClientFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Port Failure :This OID
+         indicates a failure on the Line 
+        1 port <Condtype> CLIENT_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm8 12 }
+
+
+
+pm801rrAlmClientDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Line 1 Optical Module 
+        DDM :This OID indicates an alarm 
+        is present coming out of Line 1 
+        optical interface DDM  <Help> 
+         This alarm indicates if a DDM
+         Alarm has been detected on the 
+        line 1 transceiver <Condtype> CLIENT_DDM_ALM 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm8 10 }
+
+
+
+pm801rrAlmClientDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Line 1 Optical Module 
+        DDM :This OID indicates a warning 
+        is present coming out of Line 1 
+        optical interface DDM  <Help> 
+         This alarm indicates if a DDM
+         Warning has been detected on the 
+        line 1 transceiver <Condtype> CLIENT_DDM_WARNING 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm8 9 }
+
+
+
+pm801rrAlmClientXfpTxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Module Laser Shutdown 
+        :This OID indicates the Line 1
+         optical output power is off  <Help> 
+         This status indicates if the line 
+        1 transceiver laser is ON or OFF 
+        <Condtype> CLIENT_XFP_TX_OFF <Probcause> 
+        other (1) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm8 5 }
+
+
+
+pm801rrAlmClientHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Port HW Failure :This OID 
+        indicates a failure on Line 1 port, 
+        most probably caused by a HW issue. 
+        <Condtype> CLIENT_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pm801rrAlmsynthAlm8 4 }
+
+
+
+pm801rrAlmClientInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Module Ready :This 
+        OID indicates the optical interface 
+        (XFP or OTX) is not operational
+ 
+         <Help>  This status indicates
+         if the line 1 transceiver has
+         been correctly initialized <Condtype> 
+        CLIENT_INIT_NOT_COMPL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDINV
+        "
+	  ::= { pm801rrAlmsynthAlm8 2 }
+
+
+
+pm801rrAlmClientXfpAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Module Absent :This 
+        OID indicates the Line 1 optical 
+        interface (XFP or OTX) is not present 
+        in the PM  <Help>  This alarm indicates 
+        if the line 1 transceiver is present. 
+        <Condtype> CLIENT_XFP_ABSENT <Probcause> 
+        inputOutputDeviceError (24) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDINV
+        "
+	  ::= { pm801rrAlmsynthAlm8 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientXfpAlarm1 article
+--- *****************************************************
+pm801rrAlmclientXfpAlarm1 OBJECT IDENTIFIER ::= { pm801rrAlmClientUrg 16 }
+
+
+
+
+pm801rrAlmClientRxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Rx Power High :Alarm 
+        indicating that the Line 1 XFP/OTX 
+        received optical power is higher 
+        than the threshold value written 
+        in the Line 1 XFP/OTX EEPROM <Condtype> 
+        CLIENT_RX_PWR_HIGH_ALA <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarm1 16 }
+
+
+
+pm801rrAlmClientRxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Rx Power Low :Alarm 
+        indicating that the Line 1 XFP/OTX 
+        received optical power is lower 
+        than the threshold value written 
+        in the Line 1 XFP/OTX EEPROM  <Condtype> 
+        CLIENT_RX_PWR_LOW_ALA <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarm1 15 }
+
+
+
+pm801rrAlmClientTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Transceiver Temp High :Alarm 
+        indicating that the Line 1 XFP/OTX 
+        temperature is higher than the
+         threshold value written in the 
+        Line 1 XFP/OTX EEPROM <Condtype> 
+        CLIENT_TEMP_HIGH_ALA <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarm1 8 }
+
+
+
+pm801rrAlmClientTempLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Transceiver Temp Low :Alarm 
+        indicating that the Line 1 XFP/OTX 
+        temperature is lower than the threshold 
+        value written in the Line 1 XFP/OTX 
+        EEPROM <Condtype> CLIENT_TEMP_LOW_ALA 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarm1 7 }
+
+
+
+pm801rrAlmClientTxBiasHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Transceiver Bias High :Alarm 
+        indicating that the Line 1 XFP/OTX 
+        transmitter laser bias current
+         is higher than the threshold value 
+        written in the Line 1 XFP/OTX EEPROM 
+        <Condtype> CLIENT_TX_BIAS_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarm1 4 }
+
+
+
+pm801rrAlmClientTxBiasLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Transceiver Bias Low :Alarm 
+        indicating that the Line 1 XFP/OTX 
+        transmitter laser bias current
+         is lower than the threshold value 
+        written in the Line 1 XFP/OTX EEPROM 
+        <Condtype> CLIENT_TX_BIAS_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarm1 3 }
+
+
+
+pm801rrAlmClientTxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx Power High :Alarm 
+        indicating that the Line 1 XFP/OTX 
+        transmitter transmitter output
+         power is higher than the threshold 
+        value written in the Line 1 XFP/OTX 
+        EEPROM <Condtype> CLIENT_TX_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarm1 2 }
+
+
+
+pm801rrAlmClientTxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx Power Low :Alarm 
+        indicating that the Line 1 XFP/OTX 
+        transmitter transmitter output
+         power is lower than the threshold 
+        value written in the Line 1 XFP/OTX 
+        EEPROM <Condtype> CLIENT_TX_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarm1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientXfpWarnings article
+--- *****************************************************
+pm801rrAlmclientXfpWarnings OBJECT IDENTIFIER ::= { pm801rrAlmClientNurg 17 }
+
+
+
+
+pm801rrAlmClientRxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Rx Power High Warning 
+        :Warning indicating that the Line 
+        1 XFP/OTX received optical power 
+        is higher than the threshold value 
+        written in the Line 1 XFP/OTX EEPROM 
+        <Condtype> CLIENT_RX_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpWarnings 16 }
+
+
+
+pm801rrAlmClientRxPwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Rx Power Low Warning 
+        :Warning indicating that the Line 
+        1 XFP/OTX received optical power 
+        is lower than the threshold value 
+        written in the Line 1 XFP/OTX EEPROM 
+         <Condtype> CLIENT_RX_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpWarnings 15 }
+
+
+
+pm801rrAlmClientTempHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Transceiver Temp High Warning 
+        :Warning indicating that the Line 
+        1 XFP/OTX temperature is higher 
+        than the threshold value written 
+        in the Line 1 XFP/OTX EEPROM <Condtype> 
+        CLIENT_TEMP_HIGH_WNG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpWarnings 8 }
+
+
+
+pm801rrAlmClientTempLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Transceiver Temp Low Warning 
+        :Warning indicating that the Line 
+        1 XFP/OTX temperature is lower
+         than the threshold value written 
+        in the Line 1 XFP/OTX EEPROM <Condtype> 
+        CLIENT_TEMP_LOW_WNG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpWarnings 7 }
+
+
+
+pm801rrAlmClientTxBiasHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Transceiver Bias High Warning 
+        :Warning indicating that the Line 
+        1 XFP/OTX transmitter laser bias 
+        current is higher than the threshold 
+        value written in the Line 1 XFP/OTX 
+        EEPROM <Condtype> CLIENT_TX_BIAS_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpWarnings 4 }
+
+
+
+pm801rrAlmClientTxBiasLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Transceiver Bias Low Warning 
+        :Warning indicating that the Line 
+        1 XFP/OTX transmitter laser bias 
+        current is lower than the threshold 
+        value written in the Line 1 XFP/OTX 
+        EEPROM <Condtype> CLIENT_TX_BIAS_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpWarnings 3 }
+
+
+
+pm801rrAlmClientTxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx Power High Warning 
+        :Warning indicating that the Line 
+        1 XFP/OTX transmitter transmitter 
+        output power is higher than the 
+        threshold value written in the
+         Line 1 XFP/OTX EEPROM <Condtype> 
+        CLIENT_TX_PWR_HIGH_WNG <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpWarnings 2 }
+
+
+
+pm801rrAlmClientTxPwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx Power Low Warning 
+        :Warning indicating that the Line 
+        1 XFP/OTX transmitter transmitter 
+        output power is lower than the
+         threshold value written in the 
+        Line 1 XFP/OTX EEPROM <Condtype> 
+        CLIENT_TX_PWR_LOW_WNG <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpWarnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientXfpAlarms2 article
+--- *****************************************************
+pm801rrAlmclientXfpAlarms2 OBJECT IDENTIFIER ::= { pm801rrAlmClientCrit 19 }
+
+
+
+
+pm801rrAlmClientApdSupplyFault OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Rx Photodiode Power Failed 
+        :This OID indicates a failure on 
+        the Line 1 APD power supply <Condtype> 
+        CLIENT_APD_SUPPLY_FAULT <Probcause> 
+        receiverFailure (42) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 16 }
+
+
+
+pm801rrAlmClientTecFault OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx Temp Regul.
+         Failed :This OID indicates a failure 
+        on the Line 1 TEC module <Condtype> 
+        CLIENT_TEC_FAULT <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 15 }
+
+
+
+pm801rrAlmClientWavelengthUnlocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx Wavelength Unlocked 
+        :This OID indicates that the Line 
+        1 wavelength error is exceeding 
+        the manufacturer tolerance <Condtype> 
+        CLIENT_WAVELENGTH_UNLOCKED <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 14 }
+
+
+
+pm801rrAlmClientChannelNotAcquired OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 DWDM Channel Not Acquired 
+        :This OID indicates the transceiver 
+        didn't tune the DWDM Channel succesfully. 
+         <Help>  This status indicates
+         the transceiver has not tuned
+         the DWDM Channel succesfully.
+         <Condtype> CLIENT_CHANNEL_NOT_ACQUIRED 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 10 }
+
+
+
+pm801rrAlmClientTxNr OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx Not Ready :This 
+        OID indicates a condition has arisen 
+        leading to invalid data on the
+         Line 1 transmitting side <Condtype> 
+        CLIENT_TX_NR <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 8 }
+
+
+
+pm801rrAlmClientTxFault OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx Failure :This 
+        OID indicates a fault condition 
+        on the Line 1 laser detected by 
+        the safety syste <Condtype> CLIENT_TX_FAULT 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 7 }
+
+
+
+pm801rrAlmClientTxCdrNotLocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Tx CDR Unlocked 
+        :This OID indicates a loss of lock 
+        on the Line 1 transmitting side 
+        CDR has been detected. <Condtype> 
+        CLIENT_TX_CDR_NOT_LOCKED <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 6 }
+
+
+
+pm801rrAlmClientRxNr OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Rx Not Ready :This 
+        OID indicates that a condition
+         has arisen leading to invalid
+         data on the Line 1 receiving side. 
+        <Condtype> CLIENT_RX_NR <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 5 }
+
+
+
+pm801rrAlmClientRxLos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Loss Of Optical Signal
+         :This bit indicates an absence 
+        of signal on the XFP/OTX  <Help> 
+         This alarm indicates if an optical 
+        signal is detected on the line
+         1 transceiver input <Condtype> 
+        CLIENT_RX_LOS <Probcause> receiveFailure 
+        (41) <Alarmtype> physicalViolation 
+        (9) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 4 }
+
+
+
+pm801rrAlmClientRxCdrNotLocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Rx CDR Unlocked 
+        :This OID indicates that a loss 
+        of lock on the Line 1 receiving 
+        side CDR has been detected <Condtype> 
+        CLIENT_RX_CDR_NOT_LOCKED <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 3 }
+
+
+
+pm801rrAlmClientResetComplete OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This bit indicates that 
+        the internal reset process is completed 
+        and the data are available <Condtype> 
+        CLIENT_RESET_COMPLETE <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientXfpAlarms2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientOtxTlhAlarms3 article
+--- *****************************************************
+pm801rrAlmclientOtxTlhAlarms3 OBJECT IDENTIFIER ::= { pm801rrAlmClientUrg 22 }
+
+
+
+
+pm801rrAlmClientLaserTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Laser Temp. High Alarm
+         :Alarm indicating the Line 1 OTX 
+        TLH laser temperature is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> CLIENT_LASER_TEMP_HIGH_ALA 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhAlarms3 14 }
+
+
+
+pm801rrAlmClientFreqDevHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Freq. Deviation High Alarm 
+        :Alarm indicating the Line 1 OTX 
+        TLH frequency deviation is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> CLIENT_FREQ_DEV_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhAlarms3 12 }
+
+
+
+pm801rrAlmClientCdrNotReady OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 CDR Not Ready :This OID 
+        indicates the Clock Data Recovery 
+        unit is not yet initialized   
+         <Help>   This alarm indicates
+         the Clock Data Recovery unit is 
+        not yet initialized. <Condtype> 
+        CLIENT_CDR_NOT_READY <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhAlarms3 9 }
+
+
+
+pm801rrAlmClientAgingHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 OTX TLH Aging High Alarm 
+        :Alarm indicating the Line 1 OTX 
+        TLH aging is higher than the threshold 
+        written in the EEPROM <Condtype> 
+        CLIENT_AGING_HIGH_ALA <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhAlarms3 6 }
+
+
+
+pm801rrAlmClientModulatorAgingHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Modulator Aging High Alarm 
+        :Alarm indicating the Line 1 OTX 
+        TLH modulator aging is higher than 
+        the threshold written in the EEPROM 
+        <Condtype> CLIENT_MODULATOR_AGING_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhAlarms3 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientOtxTlhWarnings article
+--- *****************************************************
+pm801rrAlmclientOtxTlhWarnings OBJECT IDENTIFIER ::= { pm801rrAlmClientNurg 23 }
+
+
+
+
+pm801rrAlmClientLaserTempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Laser Temp. High Warning 
+        :Warning indicating the Line 1
+         OTX TLH laser temperature is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> CLIENT_LASER_TEMP_HIGH_WARNING 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhWarnings 14 }
+
+
+
+pm801rrAlmClientFreqDevHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Freq. Deviation High Warning 
+        :Warning indicating the Line 1
+         OTX TLH frequency deviation is 
+        higher than the threshold written 
+        in the EEPROM <Condtype> CLIENT_FREQ_DEV_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhWarnings 12 }
+
+
+
+pm801rrAlmClientAgingHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 OTX TLH Aging High Warning 
+        :Warning indicating the Line 1
+         OTX TLH aging is higher than the 
+        threshold written in the EEPROM 
+        <Condtype> CLIENT_AGING_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhWarnings 6 }
+
+
+
+pm801rrAlmClientModulatorAgingHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Modulator Aging High Warning 
+        :Warning indicating the Line 1
+         OTX TLH modulator aging is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> CLIENT_MODULATOR_AGING_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmclientOtxTlhWarnings 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineXfpAlarm1 article
+--- *****************************************************
+pm801rrAlmlineXfpAlarm1 OBJECT IDENTIFIER ::= { pm801rrAlmLineUrg 24 }
+
+
+
+
+pm801rrAlmLineRxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Rx Power High :Alarm 
+        indicating that the Line 2 XFP/OTX 
+        received optical power is higher 
+        than the threshold value written 
+        in the Line 2 XFP/OTX EEPROM <Condtype> 
+        LINE_RX_PWR_HIGH_ALA <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarm1 16 }
+
+
+
+pm801rrAlmLineRxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Rx Power Low :Alarm 
+        indicating that the Line 2 XFP/OTX 
+        received optical power is lower 
+        than the threshold value written 
+        in the Line 2 XFP/OTX EEPROM  <Condtype> 
+        LINE_RX_PWR_LOW_ALA <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarm1 15 }
+
+
+
+pm801rrAlmLineTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Transceiver Temp High :Alarm 
+        indicating that the Line 2 XFP/OTX 
+        temperature is higher than the
+         threshold value written in the 
+        Line 2 XFP/OTX EEPROM <Condtype> 
+        LINE_TEMP_HIGH_ALA <Probcause>
+         temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarm1 8 }
+
+
+
+pm801rrAlmLineTempLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Transceiver Temp Low :Alarm 
+        indicating that the Line 2 XFP/OTX 
+        temperature is lower than the threshold 
+        value written in the Line 2 XFP/OTX 
+        EEPROM <Condtype> LINE_TEMP_LOW_ALA 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarm1 7 }
+
+
+
+pm801rrAlmLineTxBiasHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Transceiver Bias High :Alarm 
+        indicating that the Line 2 XFP/OTX 
+        transmitter laser bias current
+         is higher than the threshold value 
+        written in the Line 2 XFP/OTX EEPROM 
+        <Condtype> LINE_TX_BIAS_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarm1 4 }
+
+
+
+pm801rrAlmLineTxBiasLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Transceiver Bias Low :Alarm 
+        indicating that the Line 2 XFP/OTX 
+        transmitter laser bias current
+         is lower than the threshold value 
+        written in the Line 2 XFP/OTX EEPROM 
+        <Condtype> LINE_TX_BIAS_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarm1 3 }
+
+
+
+pm801rrAlmLineTxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx Power High :Alarm 
+        indicating that the Line 2 XFP/OTX 
+        transmitter transmitter output
+         power is higher than the threshold 
+        value written in the Line 2 XFP/OTX 
+        EEPROM <Condtype> LINE_TX_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarm1 2 }
+
+
+
+pm801rrAlmLineTxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx Power Low :Alarm 
+        indicating that the Line 2 XFP/OTX 
+        transmitter transmitter output
+         power is lower than the threshold 
+        value written in the Line 2 XFP/OTX 
+        EEPROM <Condtype> LINE_TX_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarm1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineXfpWarnings article
+--- *****************************************************
+pm801rrAlmlineXfpWarnings OBJECT IDENTIFIER ::= { pm801rrAlmLineNurg 25 }
+
+
+
+
+pm801rrAlmLineRxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Rx Power High Warning 
+        :Warning indicating that the Line 
+        2 XFP/OTX received optical power 
+        is higher than the threshold value 
+        written in the Line 2 XFP/OTX EEPROM 
+        <Condtype> LINE_RX_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpWarnings 16 }
+
+
+
+pm801rrAlmLineRxPwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Rx Power Low Warning 
+        :Warning indicating that the Line 
+        2 XFP/OTX received optical power 
+        is lower than the threshold value 
+        written in the Line 2 XFP/OTX EEPROM 
+         <Condtype> LINE_RX_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpWarnings 15 }
+
+
+
+pm801rrAlmLineTempHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Transceiver Temp High Warning 
+        :Warning indicating that the Line 
+        2 XFP/OTX temperature is higher 
+        than the threshold value written 
+        in the Line 2 XFP/OTX EEPROM <Condtype> 
+        LINE_TEMP_HIGH_WNG <Probcause>
+         temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpWarnings 8 }
+
+
+
+pm801rrAlmLineTempLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Transceiver Temp Low Warning 
+        :Warning indicating that the Line 
+        2 XFP/OTX temperature is lower
+         than the threshold value written 
+        in the Line 2 XFP/OTX EEPROM <Condtype> 
+        LINE_TEMP_LOW_WNG <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpWarnings 7 }
+
+
+
+pm801rrAlmLineTxBiasHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Transceiver Bias High Warning 
+        :Warning indicating that the Line 
+        2 XFP/OTX transmitter laser bias 
+        current is higher than the threshold 
+        value written in the Line 2 XFP/OTX 
+        EEPROM <Condtype> LINE_TX_BIAS_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpWarnings 4 }
+
+
+
+pm801rrAlmLineTxBiasLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Transceiver Bias Low Warning 
+        :Warning indicating that the Line 
+        2 XFP/OTX transmitter laser bias 
+        current is lower than the threshold 
+        value written in the Line 2 XFP/OTX 
+        EEPROM <Condtype> LINE_TX_BIAS_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpWarnings 3 }
+
+
+
+pm801rrAlmLineTxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx Power High Warning 
+        :Warning indicating that the Line 
+        2 XFP/OTX transmitter transmitter 
+        output power is higher than the 
+        threshold value written in the
+         Line 2 XFP/OTX EEPROM <Condtype> 
+        LINE_TX_PWR_HIGH_WNG <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpWarnings 2 }
+
+
+
+pm801rrAlmLineTxPwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx Power Low Warning 
+        :Warning indicating that the Line 
+        2 XFP/OTX transmitter transmitter 
+        output power is lower than the
+         threshold value written in the 
+        Line 2 XFP/OTX EEPROM <Condtype> 
+        LINE_TX_PWR_LOW_WNG <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpWarnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineXfpAlarms2 article
+--- *****************************************************
+pm801rrAlmlineXfpAlarms2 OBJECT IDENTIFIER ::= { pm801rrAlmLineCrit 27 }
+
+
+
+
+pm801rrAlmLineApdSupplyFault OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Rx Photodiode Power Failed 
+        :This OID indicates a failure on 
+        the Line 2 APD power supply <Condtype> 
+        LINE_APD_SUPPLY_FAULT <Probcause> 
+        receiverFailure (42) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 16 }
+
+
+
+pm801rrAlmLineTecFault OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx Temp Regul.
+         Failed :This OID indicates a failure 
+        on the Line 2 TEC module <Condtype> 
+        LINE_TEC_FAULT <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 15 }
+
+
+
+pm801rrAlmLineWavelengthUnlocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx Wavelength Unlocked 
+        :This OID indicates that the Line 
+        2 wavelength error is exceeding 
+        the manufacturer tolerance <Condtype> 
+        LINE_WAVELENGTH_UNLOCKED <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 14 }
+
+
+
+pm801rrAlmLineChannelNotAcquired OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 DWDM Channel Not Acquired 
+        :This OID indicates the transceiver 
+        didn't tune the DWDM Channel succesfully. 
+         <Help>  This status indicates
+         the transceiver has not tuned
+         the DWDM Channel succesfully.
+         <Condtype> LINE_CHANNEL_NOT_ACQUIRED 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 10 }
+
+
+
+pm801rrAlmLineTxNr OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx Not Ready :This 
+        OID indicates a condition has arisen 
+        leading to invalid data on the
+         Line 2 transmitting side <Condtype> 
+        LINE_TX_NR <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 8 }
+
+
+
+pm801rrAlmLineTxFault OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx Failure :This 
+        OID indicates a fault condition 
+        on the Line 2 laser detected by 
+        the safety syste <Condtype> LINE_TX_FAULT 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 7 }
+
+
+
+pm801rrAlmLineTxCdrNotLocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Tx CDR Unlocked 
+        :This OID indicates a loss of lock 
+        on the Line 2 transmitting side 
+        CDR has been detected. <Condtype> 
+        LINE_TX_CDR_NOT_LOCKED <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 6 }
+
+
+
+pm801rrAlmLineRxNr OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Rx Not Ready :This 
+        OID indicates that a condition
+         has arisen leading to invalid
+         data on the Line 2 receiving side. 
+        <Condtype> LINE_RX_NR <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 5 }
+
+
+
+pm801rrAlmLineRxLos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Loss Of Optical Signal
+         :This bit indicates an absence 
+        of signal on the XFP/OTX  <Help> 
+         This alarm indicates if an optical 
+        signal is detected on the line
+         2 transceiver input <Condtype> 
+        LINE_RX_LOS <Probcause> receiveFailure 
+        (41) <Alarmtype> physicalViolation 
+        (9) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 4 }
+
+
+
+pm801rrAlmLineRxCdrNotLocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Rx CDR Unlocked 
+        :This OID indicates that a loss 
+        of lock on the Line 2 receiving 
+        side CDR has been detected <Condtype> 
+        LINE_RX_CDR_NOT_LOCKED <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 3 }
+
+
+
+pm801rrAlmLineResetComplete OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This bit indicates that 
+        the internal reset process is completed 
+        and the data are available <Condtype> 
+        LINE_RESET_COMPLETE <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmlineXfpAlarms2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the rrLineOtxTlhAlarms3 article
+--- *****************************************************
+pm801rrAlmrrLineOtxTlhAlarms3 OBJECT IDENTIFIER ::= { pm801rrAlmLineUrg 30 }
+
+
+
+
+pm801rrAlmLineLaserTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Laser Temp. High Alarm
+         :Alarm indicating the Line 2 OTX 
+        TLH laser temperature is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> LINE_LASER_TEMP_HIGH_ALA 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhAlarms3 14 }
+
+
+
+pm801rrAlmLineFreqDevHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Freq. Deviation High Alarm 
+        :Alarm indicating the Line 2 OTX 
+        TLH frequency deviation is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> LINE_FREQ_DEV_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhAlarms3 12 }
+
+
+
+pm801rrAlmLineCdrNotReady OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 CDR Not Ready :This OID 
+        indicates the Clock Data Recovery 
+        unit is not yet initialized   
+         <Help>   This alarm indicates
+         the Clock Data Recovery unit is 
+        not yet initialized. <Condtype> 
+        LINE_CDR_NOT_READY <Probcause>
+         receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhAlarms3 9 }
+
+
+
+pm801rrAlmLineAgingHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 OTX TLH Aging High Alarm 
+        :Alarm indicating the Line 2 OTX 
+        TLH aging is higher than the threshold 
+        written in the EEPROM <Condtype> 
+        LINE_AGING_HIGH_ALA <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhAlarms3 6 }
+
+
+
+pm801rrAlmLineModulatorAgingHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Modulator Aging High Alarm 
+        :Alarm indicating the Line 2 OTX 
+        TLH modulator aging is higher than 
+        the threshold written in the EEPROM 
+        <Condtype> LINE_MODULATOR_AGING_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhAlarms3 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the rrLineOtxTlhWarnings article
+--- *****************************************************
+pm801rrAlmrrLineOtxTlhWarnings OBJECT IDENTIFIER ::= { pm801rrAlmLineNurg 31 }
+
+
+
+
+pm801rrAlmLineLaserTempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Laser Temp. High Warning 
+        :Warning indicating the Line 2
+         OTX TLH laser temperature is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> LINE_LASER_TEMP_HIGH_WARNING 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhWarnings 14 }
+
+
+
+pm801rrAlmLineFreqDevHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Freq. Deviation High Warning 
+        :Warning indicating the Line 2
+         OTX TLH frequency deviation is 
+        higher than the threshold written 
+        in the EEPROM <Condtype> LINE_FREQ_DEV_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhWarnings 12 }
+
+
+
+pm801rrAlmLineAgingHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 OTX TLH Aging High Warning 
+        :Warning indicating the Line 2
+         OTX TLH aging is higher than the 
+        threshold written in the EEPROM 
+        <Condtype> LINE_AGING_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhWarnings 6 }
+
+
+
+pm801rrAlmLineModulatorAgingHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Modulator Aging High Warning 
+        :Warning indicating the Line 2
+         OTX TLH modulator aging is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> LINE_MODULATOR_AGING_HIGH_WARNING 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm801rrAlmrrLineOtxTlhWarnings 5 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pm801rrCtrlsynth0 OBJECT IDENTIFIER ::= { pm801rrCtrlOther 0 }
+
+
+
+
+pm801rrCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pm801rrCtrlsynth0 13 }
+
+
+
+pm801rrCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pm801rrCtrlsynth0 9 }
+
+
+
+pm801rrCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pm801rrCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pm801rrCtrlsynth4 OBJECT IDENTIFIER ::= { pm801rrCtrlOther 4 }
+
+
+
+
+pm801rrCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM
+        "
+	  ::= { pm801rrCtrlsynth4 2 }
+
+
+
+pm801rrCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM
+        "
+	  ::= { pm801rrCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pm801rrCtrlswMgnt OBJECT IDENTIFIER ::= { pm801rrCtrlOther 5 }
+
+
+
+
+pm801rrCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Software Warm Reset :This OID, 
+        when set, causes a warm reset of 
+        the Software. This reset is not 
+        traffic affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pm801rrCtrlswMgnt 3 }
+
+
+
+pm801rrCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Software Cold Reset :This OID, 
+        when set, causes a cold reset of 
+        the Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pm801rrCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientXfpOnoff article
+--- *****************************************************
+pm801rrCtrlclientXfpOnoff OBJECT IDENTIFIER ::= { pm801rrCtrlClient 16 }
+
+
+
+
+pm801rrCtrlClientXfpOnoff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        XFP/OTX Laser Shut Down :This
+         OID switches off the Line 1 XFP/OTX 
+         <Help>  This control defines the 
+        laser state of the line 1 transceiver
+        "
+	  ::= { pm801rrCtrlclientXfpOnoff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientXfpLineLoop article
+--- *****************************************************
+pm801rrCtrlclientXfpLineLoop OBJECT IDENTIFIER ::= { pm801rrCtrlClient 17 }
+
+
+
+
+pm801rrCtrlClientXfpLineLoop OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        XFP/OTX Loop :This OID operates 
+        a loopback on the Line 1  XFP/OTX 
+         <Help>  This control defines the 
+        line loop back of the line 1 transceiver
+        "
+	  ::= { pm801rrCtrlclientXfpLineLoop 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientXfiLoop article
+--- *****************************************************
+pm801rrCtrlclientXfiLoop OBJECT IDENTIFIER ::= { pm801rrCtrlClient 18 }
+
+
+
+
+pm801rrCtrlClientXfiLoop OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        XFP/OTX XFI Loop :This OID operates 
+        a XFI loopback on the Line 1 XFP/OTX 
+          <Help>  This control defines
+         the XFI loop back of the line
+         transceiver
+        "
+	  ::= { pm801rrCtrlclientXfiLoop 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientTunableChannel article
+--- *****************************************************
+
+pm801rrCtrlclientTunableChannel OBJECT-TYPE
+	  SYNTAX Pm801rrOtxChannel
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        ITU Channel :This OID selects
+         the ITU channel of the Line 1
+         OTX TLH Laser  <Help>   This control 
+        defines the ITU channel of the
+         Line 1 OTX TLH Laser
+        "
+	  ::= { pm801rrCtrlClient 19 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientPhotodiodeMode article
+--- *****************************************************
+
+pm801rrCtrlclientPhotodiodeMode OBJECT-TYPE
+	  SYNTAX Pm801rrOtxMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        OTX TLH Rx Sens. Mode :This OID 
+        defines the Rx sensiblity mode
+         of the Line 1 OTX TLH  <Help>
+           This control defines the receiver 
+        sensibility mode of the Line 1
+         OTX TLH Laser (OTX60, OTX80 or 
+        Custom)
+        "
+	  ::= { pm801rrCtrlClient 20 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientPhotodiodeValue article
+--- *****************************************************
+
+pm801rrCtrlclientPhotodiodeValue OBJECT-TYPE
+	  SYNTAX Pm801rrAdjustValue
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        OTX TLH Rx Sensibility :This OID 
+        sets the Rx sensibility of the
+         Line 1 OTX TLH (custom mode only) 
+         <Help>   This control defines
+         the receiver sensibility value 
+        (only in Custom mode) of the Line 
+        1 OTX TLH Laser
+        "
+	  ::= { pm801rrCtrlClient 21 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientPowerLaser article
+--- *****************************************************
+
+pm801rrCtrlclientPowerLaser OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser Output Power [3-5] :This 
+        OID sets the output power value 
+        on the laser of the Line 1 OTX
+         TLH (AV=Power*10+158) (Unit =
+         dBm)  <Help>   This control defines 
+        the start-up output power of the 
+        Line 1 OTX TLH
+        "
+	  ::= { pm801rrCtrlClient 22 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientOtxVlhReset article
+--- *****************************************************
+pm801rrCtrlclientOtxVlhReset OBJECT IDENTIFIER ::= { pm801rrCtrlLine 23 }
+
+
+
+
+pm801rrCtrlClientOtxVlhReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        OTX-VLH Reset :This OID resets 
+        the OTX-VLH module   <Help>  This 
+        control resets the OTX-TLH and
+         its parameters 
+        "
+	  ::= { pm801rrCtrlclientOtxVlhReset 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineXfpOnoff article
+--- *****************************************************
+pm801rrCtrllineXfpOnoff OBJECT IDENTIFIER ::= { pm801rrCtrlLine 24 }
+
+
+
+
+pm801rrCtrlLineXfpOnoff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        XFP/OTX Laser Shut Down :This
+         OID switches off the Line 2 XFP/OTX 
+         <Help>  This control defines the 
+        laser state of the line 2 transceiver
+        "
+	  ::= { pm801rrCtrllineXfpOnoff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineXfpLineLoop article
+--- *****************************************************
+pm801rrCtrllineXfpLineLoop OBJECT IDENTIFIER ::= { pm801rrCtrlLine 25 }
+
+
+
+
+pm801rrCtrlLineXfpLineLoop OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        XFP/OTX Loop :This OID operates 
+        a loopback on the Line 2  XFP/OTX 
+         <Help>  This control defines the 
+        line loop back of the line 2 transceiver
+        "
+	  ::= { pm801rrCtrllineXfpLineLoop 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineXfiLoop article
+--- *****************************************************
+pm801rrCtrllineXfiLoop OBJECT IDENTIFIER ::= { pm801rrCtrlLine 26 }
+
+
+
+
+pm801rrCtrlLineXfiLoop OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        XFP/OTX XFI Loop :This OID operates 
+        a XFI loopback on the Line 2 XFP/OTX 
+          <Help>  This control defines
+         the XFI loop back of the line
+         2 transceiver
+        "
+	  ::= { pm801rrCtrllineXfiLoop 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineTunableChannel article
+--- *****************************************************
+
+pm801rrCtrllineTunableChannel OBJECT-TYPE
+	  SYNTAX Pm801rrOtxChannel
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        ITU Channel :This OID selects
+         the ITU channel of the Line 2
+         OTX TLH Laser  <Help>   This control 
+        defines the ITU channel of the
+         Line 2 OTX TLH Laser
+        "
+	  ::= { pm801rrCtrlLine 27 }
+
+
+
+--- *****************************************************
+---     LEAF for the linePhotodiodeMode article
+--- *****************************************************
+
+pm801rrCtrllinePhotodiodeMode OBJECT-TYPE
+	  SYNTAX Pm801rrOtxMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        OTX TLH Rx Sens. Mode :This OID 
+        defines the Rx sensiblity mode
+         of the Line 2 OTX TLH  <Help>
+           This control defines the receiver 
+        sensibility mode of the Line 2
+         OTX TLH Laser (OTX60, OTX80 or 
+        Custom)
+        "
+	  ::= { pm801rrCtrlLine 28 }
+
+
+
+--- *****************************************************
+---     LEAF for the linePhotodiodeValue article
+--- *****************************************************
+
+pm801rrCtrllinePhotodiodeValue OBJECT-TYPE
+	  SYNTAX Pm801rrAdjustValue
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        OTX TLH Rx Sensibility :This OID 
+        sets the Rx sensibility of the
+         Line 2 OTX TLH (custom mode only) 
+         <Help>   This control defines
+         the receiver sensibility value 
+        (only in Custom mode) of the Line 
+        2 OTX TLH Laser
+        "
+	  ::= { pm801rrCtrlLine 29 }
+
+
+
+--- *****************************************************
+---     LEAF for the linePowerLaser article
+--- *****************************************************
+
+pm801rrCtrllinePowerLaser OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Laser Output Power [3-5] :This 
+        OID sets the output power value 
+        on the laser of the Line 2 OTX
+         TLH (AV=Power*10+158) (Unit =
+         dBm)  <Help>   This control defines 
+        the start-up output power of the 
+        Line 2 OTX TLH
+        "
+	  ::= { pm801rrCtrlLine 30 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineOtxVlhReset article
+--- *****************************************************
+pm801rrCtrllineOtxVlhReset OBJECT IDENTIFIER ::= { pm801rrCtrlLine 31 }
+
+
+
+
+pm801rrCtrlLineOtxVlhReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        OTX-VLH Reset :This OID resets 
+        the OTX-VLH module   <Help>  This 
+        control resets the OTX-TLH and
+         its parameters 
+        "
+	  ::= { pm801rrCtrllineOtxVlhReset 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pm801rrCtrlledTest OBJECT IDENTIFIER ::= { pm801rrCtrlOther 64 }
+
+
+
+
+pm801rrCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pm801rrCtrlledTest 3 }
+
+
+
+pm801rrCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pm801rrCtrlledTest 2 }
+
+
+
+pm801rrCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pm801rrCtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the clientTemperature article
+--- *****************************************************
+
+pm801rrMesrclientTemperature OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Module Temperature 
+        :This OID gives the temperature 
+        of the Client XFP/OTX, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+         (Temperature = AV/256) (Unit = 
+        C)  <Help>  This measure gives
+         the temperature of the line 1
+         transceiver
+        "
+	  ::= { pm801rrMesrClient 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientTxBias article
+--- *****************************************************
+
+pm801rrMesrclientTxBias OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 XFP/OTX Tx Bias Current 
+        :This OID gives the bias value
+         of the Client XFP/OTX, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+        (Bias = AV/500) (Unit = mA)  <Help> 
+         This measure gives the bias of 
+        the line 1 transceiver
+        "
+	  ::= { pm801rrMesrClient 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientTxPower article
+--- *****************************************************
+
+pm801rrMesrclientTxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Module Tx Power 
+        :This OID gives the transmit power 
+        value of the Client XFP/OTX, read 
+        from the DDM (Digital   Diagnostic 
+        Monitoring)  (Power = 10*log(AV)-40) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Tx optical power of the 
+        line 1 transceiver
+        "
+	  ::= { pm801rrMesrClient 19 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientRxPower article
+--- *****************************************************
+
+pm801rrMesrclientRxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Module Rx Power 
+        :This OID gives the receive power 
+        value of the Client XFP/OTX, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Rx optical power of the 
+        line 1 transceiver
+        "
+	  ::= { pm801rrMesrClient 20 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineTemperature article
+--- *****************************************************
+
+pm801rrMesrlineTemperature OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Module Temperature 
+        :This OID gives the temperature 
+        of the Line XFP/OTX, read from
+         the DDM (Digital Diagnostic Monitoring) 
+         (Temperature = AV/256) (Unit = 
+        C)  <Help>  This measure gives
+         the temperature of the line 2
+         transceiver
+        "
+	  ::= { pm801rrMesrLine 24 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineTxBias article
+--- *****************************************************
+
+pm801rrMesrlineTxBias OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 XFP/OTX Tx Bias Current 
+        :This OID gives the bias value
+         of the Line XFP/OTX, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+        (Bias = AV/500) (Unit = mA)  <Help> 
+         This measure gives the bias of 
+        the line 2 transceiver
+        "
+	  ::= { pm801rrMesrLine 26 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineTxPower article
+--- *****************************************************
+
+pm801rrMesrlineTxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Module Tx Power 
+        :This OID gives the transmit power 
+        value of the Line XFP/OTX, read 
+        from the DDM (Digital   Diagnostic 
+        Monitoring)  (Power = 10*log(AV)-40) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Tx optical power of the 
+        line 2 transceiver
+        "
+	  ::= { pm801rrMesrLine 27 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineRxPower article
+--- *****************************************************
+
+pm801rrMesrlineRxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Module Rx Power 
+        :This OID gives the receive power 
+        value of the Line XFP/OTX, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Rx optical power of the 
+        line 2 transceiver
+        "
+	  ::= { pm801rrMesrLine 28 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientAging article
+--- *****************************************************
+
+pm801rrMesrclientAging OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 OTX TLH Aging :This OID 
+        gives the aging of the Line 1 OTX 
+        TLH, read from the DDM (Digital 
+        Diagnostic Monitoring)  (Aging
+         = AV) (Unit = %)  <Help>  This 
+        measure gives the aging of the
+         line 1 OTX TLH
+        "
+	  ::= { pm801rrMesrClient 32 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientLaserTemperature article
+--- *****************************************************
+
+pm801rrMesrclientLaserTemperature OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 OTX TLH Laser Temperature 
+        :This OID gives the laser temperature 
+        of the Line 1 OTX TLH, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+         (Temperature = AV/256)  (Unit
+         = C)  <Help>  This measure gives 
+        the laser temperature of the line 
+        1 OTX TLH
+        "
+	  ::= { pm801rrMesrClient 33 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientFreqDeviation article
+--- *****************************************************
+
+pm801rrMesrclientFreqDeviation OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 OTX TLH Frequency Deviation 
+        :This OID gives the frequency deviation 
+        of the Line 1 OTX TLH, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+        (Deviation = (AV-32768)*100) (Unit 
+        = MHz)  <Help>   This measure gives 
+        the frequency deviation of the
+         line 1 OTX TLH
+        "
+	  ::= { pm801rrMesrClient 34 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientLaserWvlength article
+--- *****************************************************
+
+pm801rrMesrclientLaserWvlength OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Optical Module Wavelength 
+        :This OID gives the laser wavelength 
+        of the Line 1 OTX TLH, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+        (Wavelength=299792458/((193,100+(AV-32768 
+        )*12,5)*10 3))  (Unit = nm)  <Help> 
+          This measure gives the laser
+         wavelength of the line 1 OTX TLH
+        "
+	  ::= { pm801rrMesrClient 35 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineAging article
+--- *****************************************************
+
+pm801rrMesrlineAging OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 OTX TLH Aging :This OID 
+        gives the aging of the Line 2 OTX 
+        TLH, read from the DDM (Digital 
+        Diagnostic Monitoring)  (Aging
+         = AV) (Unit = %)  <Help>  This 
+        measure gives the aging of the
+         line 2 OTX TLH
+        "
+	  ::= { pm801rrMesrLine 40 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineLaserTemperature article
+--- *****************************************************
+
+pm801rrMesrlineLaserTemperature OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 OTX TLH Laser Temperature 
+        :This OID gives the laser temperature 
+        of the Line 2 OTX TLH, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+          (Temperature = AV/256)  (Unit 
+        = C)  <Help>  This measure gives 
+        the laser temperature of the line 
+        2 OTX TLH
+        "
+	  ::= { pm801rrMesrLine 41 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineFreqDeviation article
+--- *****************************************************
+
+pm801rrMesrlineFreqDeviation OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 OTX TLH Frequency Deviation 
+        :This OID gives the frequency deviation 
+        of the Line 2 OTX TLH, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+        (Deviation = (AV-32768)*100) (Unit 
+        = MHz)  <Help>  This measure gives 
+        the frequency deviation of the
+         line 2 OTX TLH
+        "
+	  ::= { pm801rrMesrLine 42 }
+
+
+
+--- *****************************************************
+---     LEAF for the lineLaserWvlength article
+--- *****************************************************
+
+pm801rrMesrlineLaserWvlength OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Optical Module Wavelength 
+        :This OID gives the laser wavelength 
+        of the Line 2 OTX TLH, read from 
+        the DDM (Digital Diagnostic Monitoring) 
+        (Wavelength=299792458/((193,100+(AV-32768 
+        )*12,5)*10 3))  (Unit = nm)  <Help> 
+         This measure gives the laser wavelength 
+        of the line 2 OTX TLH
+        "
+	  ::= { pm801rrMesrLine 43 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pm801rrCfgLsd OBJECT IDENTIFIER ::= { pm801rrConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0012
+--- *****************************************************
+
+pm801rrtableclientLsd OBJECT IDENTIFIER ::= { pm801rrCfgLsd 1 }
+
+
+
+pm801rrCfglsdMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        LSD mode  on Client/Line Port
+         :This OID enables/disables the 
+        automatic laser shutdown on the 
+        Client and Line ports
+        "
+	  ::= { pm801rrtableclientLsd 2 }
+
+
+
+pm801rrCfgclientXfpAlarms OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        LSD contributors on Client port 
+        :This OID configures the contributors 
+        for the automatic laser shutdown 
+        of the client port
+        "
+	  ::= { pm801rrtableclientLsd 3 }
+
+
+
+pm801rrCfgclientXfpAbsence OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        LSD contributors on Client port 
+        :This OID configures the contributors 
+        for the automatic laser shutdown 
+        of the client port
+        "
+	  ::= { pm801rrtableclientLsd 4 }
+
+
+
+pm801rrCfglineXfpAlarms OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        LSD contributors on Line port
+         :This OID configures the contributors 
+        for the automatic laser shutdown 
+        of the line port
+        "
+	  ::= { pm801rrtableclientLsd 5 }
+
+
+
+pm801rrCfglineXfpAbsence OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        LSD contributors on Line port
+         :This OID configures the contributors 
+        for the automatic laser shutdown 
+        of the line port
+        "
+	  ::= { pm801rrtableclientLsd 6 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+pm801rrCfgStartUp OBJECT IDENTIFIER ::= { pm801rrConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2111
+--- *****************************************************
+
+pm801rrtableclientStartup OBJECT IDENTIFIER ::= { pm801rrCfgStartUp 1 }
+
+
+
+pm801rrCfgclientXfpCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line 1 Port 
+        :This  register configures the
+         default initialisation settings 
+        on the client port.
+        "
+	  ::= { pm801rrtableclientStartup 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pm801rrtablelineStartup OBJECT IDENTIFIER ::= { pm801rrCfgStartUp 2 }
+
+
+
+pm801rrCfglineXfpCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line 2 Port 
+        :This  register configures the
+         default initialisation settings 
+        on the line port.
+        "
+	  ::= { pm801rrtablelineStartup 2 }
+
+
+
+pm801rrCfgprotocolSelect OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Bitrate selection on Line/Client 
+        port :This OID register configure 
+        the bitrate for the client and
+         line interface (0=9,953 Gb/s - 
+        1=10,3125 Gb/s - 2=9,953 Gb/s - 
+        3=10,518 Gb/s - 4=10,664 Gb/s - 
+        5=10,709 Gb/s).
+        "
+	  ::= { pm801rrtablelineStartup 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2511
+--- *****************************************************
+
+pm801rrtableclientOtxtlh OBJECT IDENTIFIER ::= { pm801rrCfgStartUp 3 }
+
+
+
+pm801rrCfgclientDitherControl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Dither Line 
+        1 :This  register configures the 
+        default initialisation settings 
+        on the dither of the client port.
+        "
+	  ::= { pm801rrtableclientOtxtlh 2 }
+
+
+
+pm801rrCfgclientDitherRate OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 1 OTX TLH FM amplitude 
+        :This register configures the start-up 
+        width of the frequency modulation 
+        of the line 1 OTX TLH
+        "
+	  ::= { pm801rrtableclientOtxtlh 3 }
+
+
+
+pm801rrCfgclientDitherFhz OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 1 OTX TLH FM frequency 
+        :This register configures the start-up 
+        frequency of the frequency modulation 
+        of the line 1 OTX TLH
+        "
+	  ::= { pm801rrtableclientOtxtlh 4 }
+
+
+
+pm801rrCfgclientPwrLaser OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Defaut Line 1 OTX TLH output Power 
+        :This register configures the start-up 
+        output power of the line 1 OTX
+         TLH  (Unit = dBm)
+        "
+	  ::= { pm801rrtableclientOtxtlh 5 }
+
+
+
+pm801rrCfgclientFCurrent OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 1 OTX TLH Channel 
+        :This register configures the start-up 
+        laser channel of the line 1 OTX 
+        TLH
+        "
+	  ::= { pm801rrtableclientOtxtlh 6 }
+
+
+
+pm801rrCfgclientGridCurrent OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 1 OTX TLH Grid :This 
+        register configures the start-up 
+        laser grid of the line 1 OTX TLH
+        "
+	  ::= { pm801rrtableclientOtxtlh 7 }
+
+
+
+pm801rrCfgclientF0 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 1 OTX TLH lowest
+         Freq :This register configures 
+        the start-up lowest frequency supported 
+        on the line 1 OTX TLH
+        "
+	  ::= { pm801rrtableclientOtxtlh 8 }
+
+
+
+pm801rrCfgclientPhotodiodeMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 1 OTX TLH APD mode 
+        :This register configures the start-up 
+        APD mode of the line 1 OTX TLH
+        "
+	  ::= { pm801rrtableclientOtxtlh 10 }
+
+
+
+pm801rrCfgclientPhotodiodeValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 1 OTX TLH APD atten. 
+        :This register configures the start-up 
+        APD attenuation on the line 1 OTX 
+        TLH
+        "
+	  ::= { pm801rrtableclientOtxtlh 11 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2591
+--- *****************************************************
+
+pm801rrtablelineOtxtlh OBJECT IDENTIFIER ::= { pm801rrCfgStartUp 4 }
+
+
+
+pm801rrCfglineDitherControl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Dither Line 
+        2 :This  register configures the 
+        default initialisation settings 
+        on the dither of the client port.
+        "
+	  ::= { pm801rrtablelineOtxtlh 2 }
+
+
+
+pm801rrCfglineDitherRate OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 2 OTX TLH FM amplitude 
+        :This register configures the start-up 
+        width of the frequency modulation 
+        of the line 2 OTX TLH
+        "
+	  ::= { pm801rrtablelineOtxtlh 3 }
+
+
+
+pm801rrCfglineDitherFhz OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 2 OTX TLH FM frequency 
+        :This register configures the start-up 
+        frequency of the frequency modulation 
+        of the line 2 OTX TLH
+        "
+	  ::= { pm801rrtablelineOtxtlh 4 }
+
+
+
+pm801rrCfglinePwrLaser OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Defaut Line 2 OTX TLH output Power 
+        :This register configures the start-up 
+        output power of the line 2 OTX
+         TLH (Unit = dBm)
+        "
+	  ::= { pm801rrtablelineOtxtlh 5 }
+
+
+
+pm801rrCfglineFCurrent OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 2 OTX TLH Channel 
+        :This register configures the start-up 
+        laser channel of the line 2 OTX 
+        TLH
+        "
+	  ::= { pm801rrtablelineOtxtlh 6 }
+
+
+
+pm801rrCfglineGridCurrent OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 2 OTX TLH Grid :This 
+        register configures the start-up 
+        laser grid of the line 2 OTX TLH
+        "
+	  ::= { pm801rrtablelineOtxtlh 7 }
+
+
+
+pm801rrCfglineF0 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 2 OTX TLH lowest
+         Freq :This register configures 
+        the start-up lowest frequency supported 
+        on the line 2 OTX TLH
+        "
+	  ::= { pm801rrtablelineOtxtlh 8 }
+
+
+
+pm801rrCfglinePhotodiodeMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 2 OTX TLH APD mode 
+        :This register configures the start-up 
+        APD mode of the line 2 OTX TLH
+        "
+	  ::= { pm801rrtablelineOtxtlh 10 }
+
+
+
+pm801rrCfglinePhotodiodeValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Line 2 OTX TLH APD atten. 
+        :This register configures the start-up 
+        APD attenuation on the line 2 OTX 
+        TLH
+        "
+	  ::= { pm801rrtablelineOtxtlh 11 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pm801rrCfgLabels OBJECT IDENTIFIER ::= { pm801rrConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm801rrCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm801rrCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm801rrCfgLabels 1 }
+
+
+pm801rrCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX Pm801rrCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pm801rrCfgLabelclientIndex }
+	::= { pm801rrCfgLabelclientTable 1 }
+
+
+Pm801rrCfgLabelclientEntry ::=
+	SEQUENCE {
+	pm801rrCfgLabelclientIndex
+		INTEGER,
+	pm801rrCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pm801rrCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pm801rrCfgLabelclientEntry 1 }
+
+
+pm801rrCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pm801rrCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm801rrCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm801rrCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm801rrCfgLabels 2 }
+
+
+pm801rrCfgLabellineEntry OBJECT-TYPE
+	SYNTAX Pm801rrCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pm801rrCfgLabellineIndex }
+	::= { pm801rrCfgLabellineTable 1 }
+
+
+Pm801rrCfgLabellineEntry ::=
+	SEQUENCE {
+	pm801rrCfgLabellineIndex
+		INTEGER,
+	pm801rrCfgLabellinePortn
+		DisplayString
+	}
+
+
+pm801rrCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pm801rrCfgLabellineEntry 1 }
+
+
+pm801rrCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pm801rrCfgLabellineEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group startuptablefive
+--- *****************************************************
+
+pm801rrCfgStartuptablefive OBJECT IDENTIFIER ::= { pm801rrConfig 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0005
+--- *****************************************************
+
+pm801rrCfgOtxtlhcapabilitiesTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm801rrCfgOtxtlhcapabilitiesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm801rrCfgStartuptablefive 1 }
+
+
+pm801rrCfgOtxtlhcapabilitiesEntry OBJECT-TYPE
+	SYNTAX Pm801rrCfgOtxtlhcapabilitiesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startuptablefive 
+        table
+        "
+	INDEX   { pm801rrCfgOtxtlhcapabilitiesIndex }
+	::= { pm801rrCfgOtxtlhcapabilitiesTable 1 }
+
+
+Pm801rrCfgOtxtlhcapabilitiesEntry ::=
+	SEQUENCE {
+	pm801rrCfgOtxtlhcapabilitiesIndex
+		INTEGER,
+	pm801rrCfgComponentTypePortn
+		Unsigned32,
+	pm801rrCfgMiscellaneousPortn
+		Unsigned32,
+	pm801rrCfgFirstChannelPortn
+		Unsigned32,
+	pm801rrCfgLastChannelPortn
+		Unsigned32,
+	pm801rrCfgGridPortn
+		Unsigned32
+	}
+
+
+pm801rrCfgOtxtlhcapabilitiesIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the otxtlhcapabilities 
+        table
+        "
+	::= { pm801rrCfgOtxtlhcapabilitiesEntry 1 }
+
+
+pm801rrCfgComponentTypePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Component parameters :This OID 
+        defines the component parameters
+        "
+	::= { pm801rrCfgOtxtlhcapabilitiesEntry 3 }
+
+
+pm801rrCfgMiscellaneousPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Miscellaneous default settings 
+        :This OID defines the miscellaneous 
+        parameters
+        "
+	::= { pm801rrCfgOtxtlhcapabilitiesEntry 4 }
+
+
+pm801rrCfgFirstChannelPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Number of the first channel of 
+        the component :This OID defines 
+        the first channel number of the 
+        PM
+        "
+	::= { pm801rrCfgOtxtlhcapabilitiesEntry 5 }
+
+
+pm801rrCfgLastChannelPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Number of the last channel of
+         the component :This OID defines 
+        the last channel number of the
+         PM
+        "
+	::= { pm801rrCfgOtxtlhcapabilitiesEntry 6 }
+
+
+pm801rrCfgGridPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Grid value of the component :This 
+        OID defines the grid of the PM
+        "
+	::= { pm801rrCfgOtxtlhcapabilitiesEntry 7 }
+
+
+
+pm801rrCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pm801rrConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pm801rrtrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pm801rrtraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     GLOBAL TRAPS
+--- *****************************************************
+
+pm801rrLineTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmLineDdmWarning, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Line Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pm801rrAlmLineDdmWarning "on", pm801rrtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Line Port of PM801RR in Slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pm801rrtraps 30 }
+
+pm801rrLineTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmLineDdmWarning, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Line Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM801RR Line Not Urgent ON" }
+	--&MATCH       { pm801rrAlmLineDdmWarning "on", pm801rrtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Line Port of PM801RR in Slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pm801rrtraps 31 }
+
+pm801rrLineTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmLineDdmAlm, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Line Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm801rrAlmLineDdmAlm "on", pm801rrtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm appears on Line Port of PM801RR in Slot $2 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pm801rrtraps 32 }
+
+pm801rrLineTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmLineDdmAlm, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Line Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM801RR Line Urgent ON" }
+	--&MATCH       { pm801rrAlmLineDdmAlm "on", pm801rrtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Line Port of PM801RR in Slot $2 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pm801rrtraps 33 }
+
+pm801rrLineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmLineFail, pm801rrAlmLineHwFail, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Line Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pm801rrAlmLineFail "on", pm801rrAlmLineHwFail "*", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Line Port Down on PM801RR in Slot $3 ($A)"
+	
+	--&FILTNAME    "PM801RR Line HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm801rrAlmLineFail "*", pm801rrAlmLineHwFail "on", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Line Port Down on PM801RR in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pm801rrtraps 34 }
+
+pm801rrLineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmLineFail, pm801rrAlmLineHwFail, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Line Fail OFF"
+	--&ACTIONS     { log,  normal }
+	--&CLEARS      { "PM801RR Line Fail ON" }
+	--&MATCH       { pm801rrAlmLineFail "on", pm801rrAlmLineHwFail "*", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Line Port Up on PM801RR in Slot $3 ($A)"
+
+	--&FILTNAME    "PM801RR Line HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm801rrAlmLineFail "*", pm801rrAlmLineHwFail "on", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Line Port Up on PM801RR in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pm801rrtraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     PORTS TRAPS
+--- *****************************************************
+
+pm801rrClientTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmClientDdmWarning, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Client Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pm801rrAlmClientDdmWarning "on", pm801rrtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Client Port of PM801RR in Slot $2 ($A)"
+	DESCRIPTION "Not urgent client default is activated"
+	::= { pm801rrtraps 40 }
+
+pm801rrClientTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmClientDdmWarning, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Client Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM801RR Client Not Urgent ON" }
+	--&MATCH       { pm801rrAlmClientDdmWarning "on", pm801rrtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Client Port of PM801RR in Slot $2 ($A)"
+	DESCRIPTION "Not urgent client default disappeared"
+	::= { pm801rrtraps 41 }
+
+pm801rrClientTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmClientDdmAlm, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Client Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm801rrAlmClientDdmAlm "on", pm801rrtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm appears on Client Port of PM801RR in Slot $2 ($A)"
+	DESCRIPTION "Urgent client default is activated"
+	::= { pm801rrtraps 42 }
+
+pm801rrClientTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmClientDdmAlm, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Client Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM801RR Client Urgent ON" }
+	--&MATCH       { pm801rrAlmClientDdmAlm "on", pm801rrtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Client Port of PM801RR in Slot $2 ($A)"
+	DESCRIPTION "Urgent client default disappeared"
+	::= { pm801rrtraps 43 }
+
+pm801rrClientTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmClientFail, pm801rrAlmClientHwFail, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Client Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pm801rrAlmClientFail "on", pm801rrAlmClientHwFail "*", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Client Port Down on PM801RR in Slot $3 ($A)"
+	
+	--&FILTNAME    "PM801RR Client HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm801rrAlmClientFail "*", pm801rrAlmClientHwFail "on", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Client Port Down on PM801RR in Slot $3 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pm801rrtraps 44 }
+
+pm801rrClientTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmClientFail, pm801rrAlmClientHwFail, pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Client Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM801RR Client Fail ON" }
+	--&MATCH       { pm801rrAlmClientFail "on", pm801rrAlmClientHwFail "*", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Client Port Up on PM801RR in Slot $3 ($A)"
+	
+	--&FILTNAME    "PM801RR Client HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm801rrAlmClientFail "*", pm801rrAlmClientHwFail "on", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Client Port Up on PM801RR in Slot $3 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pm801rrtraps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pm801rrPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmDefFuseB, pm801rrAlmDefFuseA , pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm801rrAlmDefFuseB "*", pm801rrAlmDefFuseA "on", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PM801RR in Slot $3 ($A)"
+
+	--&FILTNAME    "PM801RR Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm801rrAlmDefFuseB "on", pm801rrAlmDefFuseA "*", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PM801RR in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pm801rrtraps 50 }
+pm801rrPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm801rrAlmDefFuseB, pm801rrAlmDefFuseA , pm801rrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM801RR Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PM801RR Fuse A Fail ON", "PM801RR Fuse B Fail ON" }
+	--&MATCH       { pm801rrAlmDefFuseB "on", pm801rrAlmDefFuseA "on", pm801rrtrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PM801RR in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pm801rrtraps 51 }
+
+
+
+
+
+
+END

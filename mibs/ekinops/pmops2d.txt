@@ -1,0 +1,2004 @@
+-- *****************************************************************
+-- EKINOPS-Pmops2d.TXT:  MIB
+--
+--MIB Part Number:3MI00307AAAA
+--MIB Version:05
+--
+-- Copyright (c) 2014 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pmops2d-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePmops2d MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Pmops2d hardware."
+	REVISION "201506250000Z"
+	DESCRIPTION
+	  "Initial Version."
+
+	REVISION "201506250000Z"
+	DESCRIPTION
+	  "Creation for PMOPS2D"
+	REVISION "201603040000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 71 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmops2dalarms OBJECT IDENTIFIER ::= { modulePmops2d 2 }
+	
+pmops2dAlmOther OBJECT IDENTIFIER ::= { pmops2dalarms 1 }
+pmops2dAlmOtherNurg OBJECT IDENTIFIER ::= { pmops2dAlmOther 1 }
+pmops2dAlmOtherUrg OBJECT IDENTIFIER ::= { pmops2dAlmOther 2 }
+pmops2dAlmOtherCrit OBJECT IDENTIFIER ::= { pmops2dAlmOther 3 }
+
+pmops2dAlmClient OBJECT IDENTIFIER ::= { pmops2dalarms 2 }
+pmops2dAlmClientNurg OBJECT IDENTIFIER ::= { pmops2dAlmClient 1 }
+pmops2dAlmClientUrg OBJECT IDENTIFIER ::= { pmops2dAlmClient 2 }
+pmops2dAlmClientCrit OBJECT IDENTIFIER ::= { pmops2dAlmClient 3 }
+	
+pmops2dAlmLine OBJECT IDENTIFIER ::= { pmops2dalarms 3 }
+pmops2dAlmLineNurg OBJECT IDENTIFIER ::= { pmops2dAlmLine 1 }
+pmops2dAlmLineUrg OBJECT IDENTIFIER ::= { pmops2dAlmLine 2 }
+pmops2dAlmLineCrit OBJECT IDENTIFIER ::= { pmops2dAlmLine 3 }
+
+
+pmops2dmeasures OBJECT IDENTIFIER ::= { modulePmops2d 3 }	
+pmops2dMesrOther OBJECT IDENTIFIER ::= { pmops2dmeasures 1 }	
+pmops2dMesrClient OBJECT IDENTIFIER ::= { pmops2dmeasures 2 }	
+pmops2dMesrLine OBJECT IDENTIFIER ::= { pmops2dmeasures 3 }	
+
+
+pmops2dcontrolsWrite OBJECT IDENTIFIER ::= { modulePmops2d 6 }
+pmops2dCtrlOther OBJECT IDENTIFIER ::= { pmops2dcontrolsWrite 1 }
+pmops2dCtrlClient OBJECT IDENTIFIER ::= { pmops2dcontrolsWrite 2 }
+pmops2dCtrlLine OBJECT IDENTIFIER ::= { pmops2dcontrolsWrite 3 }
+
+pmops2dri OBJECT IDENTIFIER ::= { modulePmops2d 7 }
+pmops2driTable OBJECT IDENTIFIER ::= { pmops2dri 1 }
+
+
+pmops2dConfig OBJECT IDENTIFIER ::= { modulePmops2d 9 }
+
+pmops2dtraps OBJECT IDENTIFIER ::= { modulePmops2d 10 }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+Pmops2dSwitchMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different switch mode for port"
+    SYNTAX INTEGER {
+		switchManual1(1),
+		switchManual2(2),
+		switchAuto(4),
+		switchAutoRevertive(8)
+           }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmops2dRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmops2dri 2 }
+
+pmops2dRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmops2dri 3 }
+  
+pmops2dRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmops2dri 4 }
+  
+pmops2dRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmops2dri 5 }
+
+
+
+--- Clients INV
+
+pmops2dRinvSfpTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pmops2dRinvSfpEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the clients on the selected module"
+      ::= { pmops2driTable 1 }
+
+pmops2dRinvSfpEntry OBJECT-TYPE
+        SYNTAX  Pmops2dRinvSfpEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the client table"
+        INDEX   { pmops2dRinvSfpIndex }
+        ::= { pmops2dRinvSfpTable 1 }
+    
+
+
+Pmops2dRinvSfpEntry::=
+        SEQUENCE {
+          pmops2dRinvSfpIndex 
+              Integer32,
+          pmops2dRinvSfp
+              DisplayString
+        }
+
+
+    pmops2dRinvSfpIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Sfp table"
+        ::= { pmops2dRinvSfpEntry 1 }
+
+
+    pmops2dRinvSfp OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the Clients: This OID contains the inventory for the clients"
+        ::= { pmops2dRinvSfpEntry 2 }
+
+
+
+--- Lines INV
+
+pmops2dRinvLineTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pmops2dRinvLineEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the lines on the selected module"
+      ::= { pmops2driTable 2 }
+
+pmops2dRinvLineEntry OBJECT-TYPE
+        SYNTAX  Pmops2dRinvLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the line table"
+        INDEX   { pmops2dRinvLineIndex }
+        ::= { pmops2dRinvLineTable 1 }
+    
+
+
+Pmops2dRinvLineEntry::=
+        SEQUENCE {
+          pmops2dRinvLineIndex 
+              Integer32,
+          pmops2dRinvLine
+              DisplayString
+        }
+
+
+    pmops2dRinvLineIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for line table"
+        ::= { pmops2dRinvLineEntry 1 }
+
+
+    pmops2dRinvLine OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the lines: This OID contains the inventory for the lines"
+        ::= { pmops2dRinvLineEntry 2 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmops2dAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmops2dAlmOtherCrit 0 }
+
+
+
+
+pmops2dAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmops2dAlmsynthAlm0 16 }
+
+
+
+pmops2dAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmops2dAlmsynthAlm0 15 }
+
+
+
+pmops2dAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmops2dAlmsynthAlm0 9 }
+
+
+
+--- *********************************************************
+---     TABLE for the pmops2dAlmsynthClientAlm articles
+--- *********************************************************
+
+pmops2dAlmsynthClientAlmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dAlmsynthClientAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmops2dAlmsynthClientAlm 
+        Article
+        "
+	::= { pmops2dAlmClientCrit 8 }
+
+
+pmops2dAlmsynthClientAlmEntry OBJECT-TYPE
+	SYNTAX Pmops2dAlmsynthClientAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmops2dAlmsynthClientAlm 
+        table
+        "
+	INDEX   { pmops2dAlmsynthClientAlmIndex }
+	::= { pmops2dAlmsynthClientAlmTable 1 }
+
+
+Pmops2dAlmsynthClientAlmEntry ::=
+	SEQUENCE {
+	pmops2dAlmsynthClientAlmIndex
+		INTEGER,
+	pmops2dAlmClientFailAccPortn
+		EkiOnOff,
+	pmops2dAlmClientHwFailAccPortn
+		EkiOnOff
+	}
+
+
+pmops2dAlmsynthClientAlmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmops2dAlmsynthClientAlm 
+        table
+        "
+	::= { pmops2dAlmsynthClientAlmEntry 1 }
+
+
+pmops2dAlmClientFailAccPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Client_Acc_Fail :This OID indicates 
+        a client failure on the OPS  <Help> 
+         This alarm indicates if a client 
+        fail access Alarm has been detected 
+        on the OPS <Condtype> CLIENT_FAIL_ACC 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmops2dAlmsynthClientAlmEntry 13 }
+
+
+pmops2dAlmClientHwFailAccPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        HW_Fail_Acc :This OID indicates 
+        a client hardware failure on the 
+        OPS  <Help>  This alarm indicates 
+        if a client HW fail access Alarm 
+        has been detected on the OPS <Condtype> 
+        CLIENT_HW_FAIL_ACC <Probcause>
+         equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	::= { pmops2dAlmsynthClientAlmEntry 5 }
+
+
+--- *********************************************************
+---     TABLE for the pmops2dAlmsynthLineAlm articles
+--- *********************************************************
+
+pmops2dAlmsynthLineAlmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dAlmsynthLineAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmops2dAlmsynthLineAlm 
+        Article
+        "
+	::= { pmops2dAlmLineCrit 16 }
+
+
+pmops2dAlmsynthLineAlmEntry OBJECT-TYPE
+	SYNTAX Pmops2dAlmsynthLineAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmops2dAlmsynthLineAlm 
+        table
+        "
+	INDEX   { pmops2dAlmsynthLineAlmIndex }
+	::= { pmops2dAlmsynthLineAlmTable 1 }
+
+
+Pmops2dAlmsynthLineAlmEntry ::=
+	SEQUENCE {
+	pmops2dAlmsynthLineAlmIndex
+		INTEGER,
+	pmops2dAlmLineFailAccPortn
+		EkiOnOff,
+	pmops2dAlmLineMeasAlmPortn
+		EkiOnOff,
+	pmops2dAlmLineMeasWngPortn
+		EkiOnOff,
+	pmops2dAlmLineHwFailAccPortn
+		EkiOnOff
+	}
+
+
+pmops2dAlmsynthLineAlmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmops2dAlmsynthLineAlm 
+        table
+        "
+	::= { pmops2dAlmsynthLineAlmEntry 1 }
+
+
+pmops2dAlmLineFailAccPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line_Acc_Fail :This OID indicates 
+        a line failure on the OPS  <Help> 
+         This alarm indicates if a line 
+        fail access Alarm has been detected 
+        on the OPS <Condtype> LINE_FAIL_ACC 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmops2dAlmsynthLineAlmEntry 13 }
+
+
+pmops2dAlmLineMeasAlmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Measure Alarm :This OID indicates 
+        an line alarm is present coming 
+        out of OPS diagnostic monitoring 
+         <Help>  This alarm indicates if 
+        a line diagnostic monitoring Alarm 
+        has been detected on the OPS <Condtype> 
+        LINE_MEAS_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmops2dAlmsynthLineAlmEntry 11 }
+
+
+pmops2dAlmLineMeasWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Measure Warning :This OID indicates 
+        a line warning is present coming 
+        out of OPS diagnostic  monitoring 
+         <Help>  This alarm indicates if 
+        a line diagnostic monitoring Warning 
+        has been detected on the OPS <Condtype> 
+        LINE_MEAS_WNG <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmops2dAlmsynthLineAlmEntry 10 }
+
+
+pmops2dAlmLineHwFailAccPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        HW_Fail_Acc :This OID indicates 
+        a line hardware failure on the
+         OPS  <Help>  This alarm indicates 
+        if a line HW fail access Alarm
+         has been detected on the OPS <Condtype> 
+        LINE_HW_FAIL_ACC <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmops2dAlmsynthLineAlmEntry 5 }
+
+
+--- *********************************************************
+---     TABLE for the pmops2dAlmclientComAlarm articles
+--- *********************************************************
+
+pmops2dAlmclientComAlarmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dAlmclientComAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmops2dAlmclientComAlarm 
+        Article
+        "
+	::= { pmops2dAlmClientUrg 24 }
+
+
+pmops2dAlmclientComAlarmEntry OBJECT-TYPE
+	SYNTAX Pmops2dAlmclientComAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmops2dAlmclientComAlarm 
+        table
+        "
+	INDEX   { pmops2dAlmclientComAlarmIndex }
+	::= { pmops2dAlmclientComAlarmTable 1 }
+
+
+Pmops2dAlmclientComAlarmEntry ::=
+	SEQUENCE {
+	pmops2dAlmclientComAlarmIndex
+		INTEGER,
+	pmops2dAlmClientComSwitchFailPortn
+		EkiOnOff
+	}
+
+
+pmops2dAlmclientComAlarmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmops2dAlmclientComAlarm 
+        table
+        "
+	::= { pmops2dAlmclientComAlarmEntry 1 }
+
+
+pmops2dAlmClientComSwitchFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Switch Fail :This OID indicates 
+        the OPS A switch component in in 
+        fail condition  <Help>  This alarm 
+        indicates if the OPS switch is
+         in fail condition <Condtype> CLIENT_COM_SWITCH_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmops2dAlmclientComAlarmEntry 9 }
+
+
+--- *********************************************************
+---     TABLE for the pmops2dAlmlineAlarm articles
+--- *********************************************************
+
+pmops2dAlmlineAlarmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dAlmlineAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmops2dAlmlineAlarm Article
+        "
+	::= { pmops2dAlmLineUrg 32 }
+
+
+pmops2dAlmlineAlarmEntry OBJECT-TYPE
+	SYNTAX Pmops2dAlmlineAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmops2dAlmlineAlarm 
+        table
+        "
+	INDEX   { pmops2dAlmlineAlarmIndex }
+	::= { pmops2dAlmlineAlarmTable 1 }
+
+
+Pmops2dAlmlineAlarmEntry ::=
+	SEQUENCE {
+	pmops2dAlmlineAlarmIndex
+		INTEGER,
+	pmops2dAlmSwitchPositionTwoPortn
+		EkiOnOff,
+	pmops2dAlmSwitchPositionOnePortn
+		EkiOnOff,
+	pmops2dAlmLosTxPortn
+		EkiOnOff,
+	pmops2dAlmLosRxPortn
+		EkiOnOff
+	}
+
+
+pmops2dAlmlineAlarmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmops2dAlmlineAlarm 
+        table
+        "
+	::= { pmops2dAlmlineAlarmEntry 1 }
+
+
+pmops2dAlmSwitchPositionTwoPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        RX2 Selected :This OID indicates 
+        the OPS selects the RX 2 input
+          <Help>  This status indicates 
+        if the RX2 input is selected on 
+        the OPS <Condtype> SWITCH_POSITION_TWO 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineAlarmEntry 7 }
+
+
+pmops2dAlmSwitchPositionOnePortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        RX1 Selected :This OID indicates 
+        the OPS selects the RX 1 input
+          <Help>  This status indicates 
+        if the RX 1 input is selected on 
+        the OPS <Condtype> SWITCH_POSITION_ONE 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineAlarmEntry 6 }
+
+
+pmops2dAlmLosTxPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        TX Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Transmit 
+        of the OPS  <Help>  This alarm
+         indicates if an optical signal 
+        is detected on the TX of the OPS 
+        <Condtype> LOS_TX <Probcause> transmitFailure 
+        (55) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineAlarmEntry 4 }
+
+
+pmops2dAlmLosRxPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        RX Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Receive 
+        1 of the OPS  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the RX of the OPS 
+         <Condtype> LOS_RX <Probcause>
+         receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineAlarmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmops2dAlmlineMeasAla articles
+--- *********************************************************
+
+pmops2dAlmlineMeasAlaTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dAlmlineMeasAlaEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmops2dAlmlineMeasAla
+         Article
+        "
+	::= { pmops2dAlmLineUrg 40 }
+
+
+pmops2dAlmlineMeasAlaEntry OBJECT-TYPE
+	SYNTAX Pmops2dAlmlineMeasAlaEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmops2dAlmlineMeasAla 
+        table
+        "
+	INDEX   { pmops2dAlmlineMeasAlaIndex }
+	::= { pmops2dAlmlineMeasAlaTable 1 }
+
+
+Pmops2dAlmlineMeasAlaEntry ::=
+	SEQUENCE {
+	pmops2dAlmlineMeasAlaIndex
+		INTEGER,
+	pmops2dAlmLineRxPwrHighAlaPortn
+		EkiOnOff,
+	pmops2dAlmLineRxPwrLowAlaPortn
+		EkiOnOff,
+	pmops2dAlmLineTxPwrHighAlaPortn
+		EkiOnOff,
+	pmops2dAlmLineTxPwrLowAlaPortn
+		EkiOnOff
+	}
+
+
+pmops2dAlmlineMeasAlaIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmops2dAlmlineMeasAla 
+        table
+        "
+	::= { pmops2dAlmlineMeasAlaEntry 1 }
+
+
+pmops2dAlmLineRxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Rx High Alarm : This OID indicates 
+        that Receive power of the OPS is 
+        higher than the alarm threshold 
+        of the OPS  <Help>  This alarm
+         indicates if the receive power 
+        on the receive side of the OPS
+         is too high <Condtype> LINE_RX_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineMeasAlaEntry 5 }
+
+
+pmops2dAlmLineRxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Rx Low Alarm :This OID indicates 
+        that Receive power or the OPS is 
+        lower than the alarm threshold
+         of the OPS  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        is too low <Condtype> LINE_RX_PWR_LOW_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineMeasAlaEntry 4 }
+
+
+pmops2dAlmLineTxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Tx High Alarm : This OID indicates 
+        that Transmit power or the OPS
+         is higher than the alarm threshold 
+        of the OPS  <Help>  This alarm
+         indicates if the receive power 
+        on the transmit side of the OPS 
+        is too high <Condtype> LINE_TX_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineMeasAlaEntry 3 }
+
+
+pmops2dAlmLineTxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Tx Low Alarm :This OID indicates 
+        that Transmit power or the OPS
+         is lower than the alarm threshold 
+        of the OPS  <Help>  This alarm
+         indicates if the receive power 
+        on the transmit side of the OPS 
+        is too low <Condtype> LINE_TX_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineMeasAlaEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmops2dAlmlineMeasWng articles
+--- *********************************************************
+
+pmops2dAlmlineMeasWngTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dAlmlineMeasWngEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmops2dAlmlineMeasWng
+         Article
+        "
+	::= { pmops2dAlmLineNurg 48 }
+
+
+pmops2dAlmlineMeasWngEntry OBJECT-TYPE
+	SYNTAX Pmops2dAlmlineMeasWngEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmops2dAlmlineMeasWng 
+        table
+        "
+	INDEX   { pmops2dAlmlineMeasWngIndex }
+	::= { pmops2dAlmlineMeasWngTable 1 }
+
+
+Pmops2dAlmlineMeasWngEntry ::=
+	SEQUENCE {
+	pmops2dAlmlineMeasWngIndex
+		INTEGER,
+	pmops2dAlmLineRxPwrHighWngPortn
+		EkiOnOff,
+	pmops2dAlmLineRxPwrLowWngPortn
+		EkiOnOff,
+	pmops2dAlmLineTxPwrHighWngPortn
+		EkiOnOff,
+	pmops2dAlmLineTxPwrLowWngPortn
+		EkiOnOff
+	}
+
+
+pmops2dAlmlineMeasWngIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmops2dAlmlineMeasWng 
+        table
+        "
+	::= { pmops2dAlmlineMeasWngEntry 1 }
+
+
+pmops2dAlmLineRxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Rx High Warning : This OID indicates 
+        that Receive power or the OPS is 
+        higher than the warning threshold 
+        of the OPS  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        is too high <Condtype> LINE_RX_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineMeasWngEntry 5 }
+
+
+pmops2dAlmLineRxPwrLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Rx Low Warning :This OID indicates 
+        that Receive power or the OPS is 
+        lower than the warning threshold 
+        of the OPS  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        is too low <Condtype> LINE_RX_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineMeasWngEntry 4 }
+
+
+pmops2dAlmLineTxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Tx High Warning : This OID indicates 
+        that Transmit power or the OPS
+         is higher than the warning threshold 
+        of the OPS  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        is too high <Condtype> LINE_TX_PWR_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineMeasWngEntry 3 }
+
+
+pmops2dAlmLineTxPwrLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Tx Low Warning :This OID indicates 
+        that Transmit power or the OPS
+         is lower than the warning threshold 
+        of the OPS  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        is too low <Condtype> LINE_TX_PWR_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmops2dAlmlineMeasWngEntry 2 }
+
+
+--- *****************************************************
+---     LEAF for the switchOutOfService article
+--- *****************************************************
+pmops2dAlmswitchOutOfService OBJECT IDENTIFIER ::= { pmops2dAlmOtherNurg 64 }
+
+
+
+
+pmops2dAlmOpsbOutofservice OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        OPS B Out Of Service :This OID 
+        indicates that the OPSB is In Service 
+        (1) of Out or Service (2).   <Help> 
+         This status indicates if the OPS 
+        is in service <Condtype> OPSB_OUTOFSERVICE 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmops2dAlmswitchOutOfService 2 }
+
+
+
+pmops2dAlmOpsaOutofservice OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        OPS A Out Of Service :This OID 
+        indicates that the OPSA is In Service 
+        (1) of Out or Service (2).   <Help> 
+         This status indicates if the OPS 
+        is in service <Condtype> OPSA_OUTOFSERVICE 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmops2dAlmswitchOutOfService 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmops2dCtrlsynth0 OBJECT IDENTIFIER ::= { pmops2dCtrlOther 0 }
+
+
+
+
+pmops2dCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmops2dCtrlsynth0 13 }
+
+
+
+pmops2dCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmops2dCtrlsynth0 9 }
+
+
+
+pmops2dCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmops2dCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmops2dCtrlsynth4 OBJECT IDENTIFIER ::= { pmops2dCtrlOther 4 }
+
+
+
+
+pmops2dCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmops2dCtrlsynth4 2 }
+
+
+
+pmops2dCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmops2dCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmops2dCtrlswMgnt OBJECT IDENTIFIER ::= { pmops2dCtrlOther 5 }
+
+
+
+
+pmops2dCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmops2dCtrlswMgnt 3 }
+
+
+
+pmops2dCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmops2dCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmops2dCtrlledTest OBJECT IDENTIFIER ::= { pmops2dCtrlOther 64 }
+
+
+
+
+pmops2dCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmops2dCtrlledTest 3 }
+
+
+
+pmops2dCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmops2dCtrlledTest 2 }
+
+
+
+pmops2dCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmops2dCtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *********************************************************
+---     TABLE for the pmops2dMesrtxPower articles
+--- *********************************************************
+
+pmops2dMesrtxPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dMesrtxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmops2dMesrtxPower Article
+        "
+	::= { pmops2dMesrLine 16 }
+
+
+pmops2dMesrtxPowerEntry OBJECT-TYPE
+	SYNTAX Pmops2dMesrtxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmops2dMesrtxPower 
+        table
+        "
+	INDEX   { pmops2dMesrtxPowerIndex }
+	::= { pmops2dMesrtxPowerTable 1 }
+
+
+Pmops2dMesrtxPowerEntry ::=
+	SEQUENCE {
+	pmops2dMesrtxPowerIndex
+		INTEGER,
+	pmops2dMesrtxPowerPortn
+		INTEGER 
+	}
+
+
+pmops2dMesrtxPowerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmops2dMesrtxPower 
+        table
+        "
+	::= { pmops2dMesrtxPowerEntry 1 }
+
+
+pmops2dMesrtxPowerPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        TX Power :This OID gives the transmit 
+        power value of the signal , read 
+        on the coupler output (Power=(AV-32768)*0.005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Transmit optical power 
+        on the TX of the OPS
+        "
+	::= { pmops2dMesrtxPowerEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmops2dMesrrxPower articles
+--- *********************************************************
+
+pmops2dMesrrxPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dMesrrxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmops2dMesrrxPower Article
+        "
+	::= { pmops2dMesrLine 24 }
+
+
+pmops2dMesrrxPowerEntry OBJECT-TYPE
+	SYNTAX Pmops2dMesrrxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmops2dMesrrxPower 
+        table
+        "
+	INDEX   { pmops2dMesrrxPowerIndex }
+	::= { pmops2dMesrrxPowerTable 1 }
+
+
+Pmops2dMesrrxPowerEntry ::=
+	SEQUENCE {
+	pmops2dMesrrxPowerIndex
+		INTEGER,
+	pmops2dMesrrxPowerPortn
+		INTEGER 
+	}
+
+
+pmops2dMesrrxPowerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmops2dMesrrxPower 
+        table
+        "
+	::= { pmops2dMesrrxPowerEntry 1 }
+
+
+pmops2dMesrrxPowerPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        RX Power :This OID gives the receive 
+        power value of the signal , read 
+        on the switch input (Power=(AV-32768)*0.005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Receive optical power 
+        on the RX of the OPS
+        "
+	::= { pmops2dMesrrxPowerEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group accessCAisCsf
+--- *****************************************************
+
+pmops2dCfgAccessCAisCsf OBJECT IDENTIFIER ::= { pmops2dConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmops2dCfgClientcaiscsfTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dCfgClientcaiscsfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmops2dCfgAccessCAisCsf 1 }
+
+
+pmops2dCfgClientcaiscsfEntry OBJECT-TYPE
+	SYNTAX Pmops2dCfgClientcaiscsfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the accessCAisCsf 
+        table
+        "
+	INDEX   { pmops2dCfgClientcaiscsfIndex }
+	::= { pmops2dCfgClientcaiscsfTable 1 }
+
+
+Pmops2dCfgClientcaiscsfEntry ::=
+	SEQUENCE {
+	pmops2dCfgClientcaiscsfIndex
+		INTEGER,
+	pmops2dCfgReservedPortn
+		Unsigned32
+	}
+
+
+pmops2dCfgClientcaiscsfIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientcaiscsf 
+        table
+        "
+	::= { pmops2dCfgClientcaiscsfEntry 1 }
+
+
+pmops2dCfgReservedPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        :
+        "
+	::= { pmops2dCfgClientcaiscsfEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+pmops2dCfgStartUp OBJECT IDENTIFIER ::= { pmops2dConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2111
+--- *****************************************************
+
+pmops2dCfgClientStartupTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dCfgClientStartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmops2dCfgStartUp 1 }
+
+
+pmops2dCfgClientStartupEntry OBJECT-TYPE
+	SYNTAX Pmops2dCfgClientStartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startUp 
+        table
+        "
+	INDEX   { pmops2dCfgClientStartupIndex }
+	::= { pmops2dCfgClientStartupTable 1 }
+
+
+Pmops2dCfgClientStartupEntry ::=
+	SEQUENCE {
+	pmops2dCfgClientStartupIndex
+		INTEGER,
+	pmops2dCfgClientSwitchModePortn
+		Unsigned32
+	}
+
+
+pmops2dCfgClientStartupIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the clientStartup 
+        table
+        "
+	::= { pmops2dCfgClientStartupEntry 1 }
+
+
+pmops2dCfgClientSwitchModePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default setting on OPS switch
+         :This  register configures the 
+        default switch mode
+        "
+	::= { pmops2dCfgClientStartupEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmops2dCfgLineStartupThreshTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dCfgLineStartupThreshEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmops2dCfgStartUp 2 }
+
+
+pmops2dCfgLineStartupThreshEntry OBJECT-TYPE
+	SYNTAX Pmops2dCfgLineStartupThreshEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startUp 
+        table
+        "
+	INDEX   { pmops2dCfgLineStartupThreshIndex }
+	::= { pmops2dCfgLineStartupThreshTable 1 }
+
+
+Pmops2dCfgLineStartupThreshEntry ::=
+	SEQUENCE {
+	pmops2dCfgLineStartupThreshIndex
+		INTEGER,
+	pmops2dCfgLineRxPwrSettingPortn
+		Unsigned32
+	}
+
+
+pmops2dCfgLineStartupThreshIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the lineStartupThresh 
+        table
+        "
+	::= { pmops2dCfgLineStartupThreshEntry 1 }
+
+
+pmops2dCfgLineRxPwrSettingPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default setting on OPS Rx Pwr
+         :This register configures the
+         default RX1 Loss threshold on
+         the OPS B (Unit = dBm)
+        "
+	::= { pmops2dCfgLineStartupThreshEntry 4 }
+
+
+--- *****************************************************
+---     LEAF for the table Group other
+--- *****************************************************
+
+pmops2dCfgOther OBJECT IDENTIFIER ::= { pmops2dConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2300
+--- *****************************************************
+
+pmops2dtablemoduleOther OBJECT IDENTIFIER ::= { pmops2dCfgOther 1 }
+
+
+
+pmops2dCfgoutOfService OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Setting on the OOS of
+         the OPS :This  register configures 
+        the default  mode on the OOS of 
+        the OPS
+        "
+	  ::= { pmops2dtablemoduleOther 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmops2dCfgLabels OBJECT IDENTIFIER ::= { pmops2dConfig 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmops2dCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmops2dCfgLabels 1 }
+
+
+pmops2dCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX Pmops2dCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmops2dCfgLabelclientIndex }
+	::= { pmops2dCfgLabelclientTable 1 }
+
+
+Pmops2dCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmops2dCfgLabelclientIndex
+		INTEGER,
+	pmops2dCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmops2dCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmops2dCfgLabelclientEntry 1 }
+
+
+pmops2dCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the clients :These registers 
+        configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmops2dCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmops2dCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmops2dCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmops2dCfgLabels 2 }
+
+
+pmops2dCfgLabellineEntry OBJECT-TYPE
+	SYNTAX Pmops2dCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmops2dCfgLabellineIndex }
+	::= { pmops2dCfgLabellineTable 1 }
+
+
+Pmops2dCfgLabellineEntry ::=
+	SEQUENCE {
+	pmops2dCfgLabellineIndex
+		INTEGER,
+	pmops2dCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmops2dCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmops2dCfgLabellineEntry 1 }
+
+
+pmops2dCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmops2dCfgLabellineEntry 3 }
+
+
+
+pmops2dCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmops2dConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmops2dtrapPortNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last port which generates a trap"
+	::= { pmops2dtraps 2 }
+
+pmops2dtrapLineNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last Line which generates a trap"
+	::= { pmops2dtraps 3 }
+
+pmops2dtrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmops2dtraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     LINE TRAPS
+--- *****************************************************
+
+pmops2dLineTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmLineMeasWngPortn, pmops2dtrapLineNumber, pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmops2dAlmLineMeasWngPortn "on", pmops2dtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on OPS of PMOPS2D in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pmops2dtraps 30 }
+
+pmops2dLineTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmLineMeasWngPortn, pmops2dtrapLineNumber, pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS2D Not Urgent ON"}
+	--&MATCH       { pmops2dAlmLineMeasWngPortn "on", pmops2dtrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on OPS of PMOPS2D in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pmops2dtraps 31 }
+
+pmops2dLineTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmLineMeasAlmPortn, pmops2dtrapLineNumber, pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D B Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmops2d2dAlmLineMeasAlmPortn "on", pmops2d2dtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on OPS of PMOPS2D in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pmops2dtraps 32 }
+
+pmops2dLineTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmLineMeasAlmPortn, pmops2dtrapLineNumber, pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS2D Urgent ON"}
+	--&MATCH       { pmops2dAlmLineMeasAlmPortn "on", pmops2dtrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on OPS of PMOPS2D in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pmops2dtraps 33 }
+
+pmops2dLineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmLineFailAccPortn , pmops2dAlmLineHwFailAccPortn , pmops2dtrapLineNumber, pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmops2dAlmLineFailAccPortn "on", pmops2dAlmLineHwFailAccPortn "*", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Critical alarm appears on OPS of PMOPS2D in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMOPS2D HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmops2dAlmLineFailAccPortn "*", pmops2dAlmLineHwFailAccPortn "on", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Critical alarm appears on OPS of PMOPS2D in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmops2dtraps 34 }
+
+pmops2dLineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmLineFailAccPortn , pmops2dAlmLineHwFailAccPortn , pmops2dtrapLineNumber, pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS2D Fail ON" }
+	--&MATCH       { pmops2dAlmLineFailAccPortn "on", pmops2dAlmLineHwFailAccPortn "*", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Critical alarm disappears on OPS of PMOPS2D in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOPS2D HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmops2dAlmLineFailAccPortn "*", pmops2dAlmLineHwFailAccPortn "on", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Critical alarm disappears on OPS of PMOPS2D in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmops2dtraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     CLIENT TRAPS
+--- *****************************************************
+
+pmops2dClientTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmClientFailAccPortn, pmops2dAlmClientHwFailAccPortn, pmops2dtrapPortNumber, pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmops2dAlmClientFailAccPortn "on", pmops2dAlmClientHwFailAccPortn "*", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Critical alarm appears on OPS of PMOPS2D in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMOPS2D HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmops2dAlmClientFailAccPortn "*", pmops2dAlmClientHwFailAccPortn "on", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Critical alarm appears on OPS of PMOPS2D in Slot $3 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pmops2dtraps 44 }
+
+pmops2dClientTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmClientFailAccPortn, pmops2dAlmClientHwFailAccPortn, pmops2dtrapPortNumber, pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS2D Fail ON" }
+	--&MATCH       { pmops2dAlmClientFailAccPortn "on", pmops2dAlmClientHwFailAccPortn "*", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Critical alarm disappears on OPS of PMOPS2D in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOPS2D HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmops2dAlmClientFailAccPortn "*", pmops2dAlmClientHwFailAccPortn "on", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Critical alarm disappears on OPS of PMOPS2D in Slot $3 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pmops2dtraps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmops2dPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmDefFuseB, pmops2dAlmDefFuseA , pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmops2dAlmDefFuseB "*", pmops2dAlmDefFuseA "on", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMOPS2D in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOPS2D Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmops2dAlmDefFuseB "on", pmops2dAlmDefFuseA "*", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMOPS2D in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmops2dtraps 50 }
+
+pmops2dPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmops2dAlmDefFuseB, pmops2dAlmDefFuseA , pmops2dtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS2D Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMOPS2D Fuse A Fail ON", "PMOPS2D Fuse B Fail ON" }
+	--&MATCH       { pmops2dAlmDefFuseB "on", pmops2dAlmDefFuseA "on", pmops2dtrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMOPS2D in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmops2dtraps 51 }
+
+
+
+
+
+
+END

@@ -1,0 +1,5793 @@
+-- *****************************************************************
+-- EKINOPS-Pm1001lhr.TXT:  MIB
+--
+--MIB Part Number:3MI00011AIAD
+--MIB Version:02
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pm1001lhr-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePm1001lhr MODULE-IDENTITY
+        LAST-UPDATED "201606020000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for managing Ekinops modules with PM1001LHR software"
+	REVISION "200702010000Z"
+	DESCRIPTION
+	  "Initial Version."
+	REVISION "200705310000Z"
+	DESCRIPTION
+	  "Using EkiProtocol instead of EkiLineProtocol."
+	REVISION "200706290000Z"
+	DESCRIPTION
+	  "Add DCC alarms."
+	REVISION "200712050000Z"
+	DESCRIPTION
+	  "Update Ekinops address,Helps on objects, Ports Labels"
+	REVISION "200811270000Z"
+	DESCRIPTION
+	  "DCC storm info suppress"
+	REVISION "200902060000Z"
+	DESCRIPTION
+	  "Add OTX-TLH features"
+	REVISION "200910070000Z"
+	DESCRIPTION
+	  "Add Condtype parameters"
+	REVISION "201002150000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS"
+	REVISION "201102030000Z"
+	DESCRIPTION
+	  "Formulas in comments and Event on XFP init"
+	REVISION "201207030000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201403280000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201501200000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605200000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+	REVISION "201606020000Z"
+	DESCRIPTION
+	  "Capabilities objects of Table 5"
+        ::= { ekinops 22 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pm1001lhralarms OBJECT IDENTIFIER ::= { modulePm1001lhr 2 }	
+pm1001lhrAlmOther OBJECT IDENTIFIER ::= { pm1001lhralarms 1 }
+pm1001lhrAlmOtherNurg OBJECT IDENTIFIER ::= { pm1001lhrAlmOther 1 }
+pm1001lhrAlmOtherUrg OBJECT IDENTIFIER ::= { pm1001lhrAlmOther 2 }
+pm1001lhrAlmOtherCrit OBJECT IDENTIFIER ::= { pm1001lhrAlmOther 3 }
+
+pm1001lhrAlmClient OBJECT IDENTIFIER ::= { pm1001lhralarms 2 }
+pm1001lhrAlmClientNurg OBJECT IDENTIFIER ::= { pm1001lhrAlmClient 1 }
+pm1001lhrAlmClientUrg OBJECT IDENTIFIER ::= { pm1001lhrAlmClient 2 }
+pm1001lhrAlmClientCrit OBJECT IDENTIFIER ::= { pm1001lhrAlmClient 3 }
+	
+pm1001lhrAlmLine OBJECT IDENTIFIER ::= { pm1001lhralarms 3 }
+pm1001lhrAlmLineNurg OBJECT IDENTIFIER ::= { pm1001lhrAlmLine 1 }
+pm1001lhrAlmLineUrg OBJECT IDENTIFIER ::= { pm1001lhrAlmLine 2 }
+pm1001lhrAlmLineCrit OBJECT IDENTIFIER ::= { pm1001lhrAlmLine 3 }
+
+
+
+
+
+pm1001lhrmeasures OBJECT IDENTIFIER ::= { modulePm1001lhr 3 }	
+pm1001lhrMesrOther OBJECT IDENTIFIER ::= { pm1001lhrmeasures 1 }	
+pm1001lhrMesrClient OBJECT IDENTIFIER ::= { pm1001lhrmeasures 2 }	
+pm1001lhrMesrLine OBJECT IDENTIFIER ::= { pm1001lhrmeasures 3 }	
+
+
+
+
+pm1001lhrcounters OBJECT IDENTIFIER ::= { modulePm1001lhr 4 }
+pm1001lhrCntOther OBJECT IDENTIFIER ::= { pm1001lhrcounters 1 }
+pm1001lhrCntClient OBJECT IDENTIFIER ::= { pm1001lhrcounters 2 }
+pm1001lhrCntLine OBJECT IDENTIFIER ::= { pm1001lhrcounters 3 }
+
+
+pm1001lhrcontrolsWrite OBJECT IDENTIFIER ::= { modulePm1001lhr 6 }
+pm1001lhrCtrlOther OBJECT IDENTIFIER ::= { pm1001lhrcontrolsWrite 1 }
+pm1001lhrCtrlClient OBJECT IDENTIFIER ::= { pm1001lhrcontrolsWrite 2 }
+pm1001lhrCtrlLine OBJECT IDENTIFIER ::= { pm1001lhrcontrolsWrite 3 }
+
+pm1001lhrri OBJECT IDENTIFIER ::= { modulePm1001lhr 7 }
+pm1001lhrriTable OBJECT IDENTIFIER ::= { pm1001lhrri 1 }
+
+pm1001lhrdownload OBJECT IDENTIFIER ::= { modulePm1001lhr 8 }
+pm1001lhrDwlOther OBJECT IDENTIFIER ::= { pm1001lhrdownload 1 }
+pm1001lhrDwlClient OBJECT IDENTIFIER ::= { pm1001lhrdownload 2 }
+pm1001lhrDwlLine OBJECT IDENTIFIER ::= { pm1001lhrdownload 3 }
+
+
+pm1001lhrConfig OBJECT IDENTIFIER ::= { modulePm1001lhr 9 }
+
+pm1001lhrtraps OBJECT IDENTIFIER ::= { modulePm1001lhr 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+Pm1001lhrOtxMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on OTX-TLH on line ports"
+    SYNTAX INTEGER {
+		otx80mode(1),
+		otx60mode(2),
+		otxadjustmode(4),
+           }
+
+Pm1001lhrOtxGrid ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different grids on OTX-TLH on line ports"
+    SYNTAX INTEGER {
+		otxgrid200(200),
+		otxgrid100(100),
+		otxgrid50(50),
+           }
+
+Pm1001lhrAdjustValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different values in Adjust mode on OTX-TLH on line ports"
+    SYNTAX INTEGER {
+		otxadjustvalue0(0),
+		otxadjustvalue1(1),
+		otxadjustvalue2(2),
+		otxadjustvalue3(3),
+		otxadjustvalue4(4),
+		otxadjustvalue5(5),
+		otxadjustvalue6(6),
+		otxadjustvalue7(7),
+		otxadjustvalue8(8),
+		otxadjustvalue9(9),
+		otxadjustvalue10(10),
+           }
+
+Pm1001lhrOtxChannel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Channel selection on OTX-TLH on line ports"
+    SYNTAX INTEGER {
+
+           }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pm1001lhrRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pm1001lhrri 2 }
+
+pm1001lhrRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pm1001lhrri 3 }
+  
+pm1001lhrRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pm1001lhrri 4 }
+  
+pm1001lhrRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pm1001lhrri 5 }
+  
+pm1001lhrRinvGwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "GW platform desciption: This OID contains the 
+         description of the Gateware platform."
+  ::= { pm1001lhrri 6 }
+
+
+
+
+pm1001lhrRinvLineTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pm1001lhrRinvLineEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the XFPs on the selected module"
+      ::= { pm1001lhrriTable 1 }
+
+pm1001lhrRinvLineEntry OBJECT-TYPE
+        SYNTAX  Pm1001lhrRinvLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the XFP table"
+        INDEX   { pm1001lhrRinvLineIndex }
+        ::= { pm1001lhrRinvLineTable 1 }
+    
+
+
+Pm1001lhrRinvLineEntry::=
+        SEQUENCE {
+          pm1001lhrRinvLineIndex 
+              Integer32,
+          pm1001lhrRinvxfpLine
+              DisplayString
+        }
+
+
+    pm1001lhrRinvLineIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for XFP table"
+        ::= { pm1001lhrRinvLineEntry 1 }
+
+
+    pm1001lhrRinvxfpLine OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the XFP: This OID contains the inventory for the XFP"
+        ::= { pm1001lhrRinvLineEntry 2 }
+
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pm1001lhrAlmsynthAlm0 OBJECT IDENTIFIER ::= { pm1001lhrAlmOtherCrit 0 }
+
+
+
+
+pm1001lhrAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmsynthAlm0 16 }
+
+
+
+pm1001lhrAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmsynthAlm0 15 }
+
+
+
+pm1001lhrAlmModGlobFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MOD_GLOB_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pm1001lhrAlmsynthAlm2 OBJECT IDENTIFIER ::= { pm1001lhrAlmOtherNurg 2 }
+
+
+
+
+pm1001lhrAlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> other
+         (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pm1001lhrAlmsynthAlm2 4 }
+
+
+
+pm1001lhrAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmsynthAlm2 3 }
+
+
+
+pm1001lhrAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pm1001lhrAlmsynthAlm2 2 }
+
+
+
+pm1001lhrAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pm1001lhrAlmsynthAlm2 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmsynthAlmLine articles
+--- *********************************************************
+
+pm1001lhrAlmsynthAlmLineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmsynthAlmLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmsynthAlmLine 
+        Article
+        "
+	::= { pm1001lhrAlmLineCrit 7 }
+
+
+pm1001lhrAlmsynthAlmLineEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmsynthAlmLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmsynthAlmLine 
+        table
+        "
+	INDEX   { pm1001lhrAlmsynthAlmLineIndex }
+	::= { pm1001lhrAlmsynthAlmLineTable 1 }
+
+
+Pm1001lhrAlmsynthAlmLineEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmsynthAlmLineIndex
+		INTEGER,
+	pm1001lhrAlmLineFailPortn
+		EkiOnOff,
+	pm1001lhrAlmLineDdmAlmPortn
+		EkiOnOff,
+	pm1001lhrAlmLineDdmWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmLineLocalOosPortn
+		EkiOnOff,
+	pm1001lhrAlmXfpTxOffPortn
+		EkiOnOff,
+	pm1001lhrAlmLineHwFailPortn
+		EkiOnOff,
+	pm1001lhrAlmXfpInitNotComplPortn
+		EkiOnOff,
+	pm1001lhrAlmXfpAbsentPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmsynthAlmLineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmsynthAlmLine 
+        table
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 1 }
+
+
+pm1001lhrAlmLineFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port Failure :This OID indicates 
+        a failure on the line port <Condtype> 
+        LINE_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 13 }
+
+
+pm1001lhrAlmLineDdmAlmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Alarm On Line Optical Module DDM 
+        :This OID indicates an alarm is 
+        present coming out of Line optical 
+        interface DDM  <Help>  This alarm 
+        indicates if a DDM Alarm has been 
+        detected on the line transceiver 
+        <Condtype> LINE_DDM_ALM <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 11 }
+
+
+pm1001lhrAlmLineDdmWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Warning On Line Optical Module 
+        DDM :This OID indicates a warning 
+        is present coming out of Line optical 
+        interface DDM  <Help>  This alarm 
+        indicates if a DDM Warning has
+         been detected on the line transceiver 
+        <Condtype> LINE_DDM_WARNING <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 10 }
+
+
+pm1001lhrAlmLineLocalOosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port In Service :This OID 
+        indicates that the Line port is 
+        In Service (1) of Out or Service 
+        (2)  <Help>  This status indicates 
+        if the line port is in service
+         <Condtype> LINE_LOCAL_OOS <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 7 }
+
+
+pm1001lhrAlmXfpTxOffPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Laser Shutdown :This 
+        OID indicates the line optical
+         output power is on  <Help>  This 
+        status indicates if the line transceiver 
+        laser is ON or OFF <Condtype> XFP_TX_OFF 
+        <Probcause> other (1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 6 }
+
+
+pm1001lhrAlmLineHwFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port HW Failure :This OID 
+        indicates a failure on line port, 
+        most probably caused by a HW issue 
+        <Condtype> LINE_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 5 }
+
+
+pm1001lhrAlmXfpInitNotComplPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Ready :This 
+        OID indicates that the optical
+         interface (XFP or OTX) is not
+         operational.  <Help>  This status 
+        indicates if the line transceiver 
+        has been correctly initialized
+         <Condtype> XFP_INIT_NOT_COMPL
+         <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) <Event> ObjectCDINV
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 3 }
+
+
+pm1001lhrAlmXfpAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Absent :This 
+        OID indicates that the line optical 
+        interface (XFP or OTX) is not plugged 
+        in.  <Help>  This alarm indicates 
+        if the line transceiver is present. 
+        <Condtype> XFP_ABSENT <Probcause> 
+        inputOutputDeviceError (24) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDINV
+        "
+	::= { pm1001lhrAlmsynthAlmLineEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmdfrmAlm articles
+--- *********************************************************
+
+pm1001lhrAlmdfrmAlmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmdfrmAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmdfrmAlm Article
+        "
+	::= { pm1001lhrAlmLineCrit 128 }
+
+
+pm1001lhrAlmdfrmAlmEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmdfrmAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmdfrmAlm 
+        table
+        "
+	INDEX   { pm1001lhrAlmdfrmAlmIndex }
+	::= { pm1001lhrAlmdfrmAlmTable 1 }
+
+
+Pm1001lhrAlmdfrmAlmEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmdfrmAlmIndex
+		INTEGER,
+	pm1001lhrAlmDwLofPortn
+		EkiOnOff,
+	pm1001lhrAlmDwOofPortn
+		EkiOnOff,
+	pm1001lhrAlmDwRdiDetPortn
+		EkiOnOff,
+	pm1001lhrAlmDwAisDetPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmdfrmAlmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmdfrmAlm 
+        table
+        "
+	::= { pm1001lhrAlmdfrmAlmEntry 1 }
+
+
+pm1001lhrAlmDwLofPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        SONET/SDH Line Loss Of Frame :This 
+        OID indicates that a Loss Of Frame 
+        has been detected on incoming input 
+        signal  <Help>  This alarm indicates 
+        if there is a Loss of Frame is
+         detected on the line input signal 
+        <Condtype> DW_LOF_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        integrityViolation (7) <Polarity> 
+        (2) 
+        "
+	::= { pm1001lhrAlmdfrmAlmEntry 5 }
+
+
+pm1001lhrAlmDwOofPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        SONET/SDH Line Out Of Frame :This 
+        OID indicates that an Out Of Frame 
+        has been detected on incoming input 
+        signal  <Help>  This alarm indicates 
+        if there is a Out of Frame is detected 
+        on the line input signal <Condtype> 
+        DW_OOF_1 <Probcause> receiveFailure 
+        (41) <Alarmtype> integrityViolation 
+        (7) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmdfrmAlmEntry 4 }
+
+
+pm1001lhrAlmDwRdiDetPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        MS-RDI/L-RDI Detected On Line
+         Input :This bit indicates that 
+        an MS-RDI has been detected on
+         incoming  OC-192c/STM-64c input 
+        signal  <Help>  This alarm indicates 
+        if there is a MS-RDI/L-RDI is detected 
+        on the line input signal <Condtype> 
+        DW_RDI_DET_1 <Probcause> remoteNodeTransmissionError 
+        (43) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pm1001lhrAlmdfrmAlmEntry 3 }
+
+
+pm1001lhrAlmDwAisDetPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        MS-AIS/L-AIS Detected On Line
+         Input :This bit indicates that 
+        an MS-AIS has been detected on
+         incoming  OC-192c/STM-64c input 
+        signal  <Help>  This alarm indicates 
+        if there is a MS-AIS/L-AIS is detected 
+        on the line input signal <Condtype> 
+        DW_AIS_DET_1 <Probcause> receiveFailure 
+        (41) <Alarmtype> operationalViolation 
+        (8) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmdfrmAlmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmdfrmBer articles
+--- *********************************************************
+
+pm1001lhrAlmdfrmBerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmdfrmBerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmdfrmBer Article
+        "
+	::= { pm1001lhrAlmLineUrg 129 }
+
+
+pm1001lhrAlmdfrmBerEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmdfrmBerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmdfrmBer 
+        table
+        "
+	INDEX   { pm1001lhrAlmdfrmBerIndex }
+	::= { pm1001lhrAlmdfrmBerTable 1 }
+
+
+Pm1001lhrAlmdfrmBerEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmdfrmBerIndex
+		INTEGER,
+	pm1001lhrAlmLineDegradePortn
+		EkiOnOff,
+	pm1001lhrAlmLineSignalFailPortn
+		EkiOnOff,
+	pm1001lhrAlmLineSignalDegradePortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmdfrmBerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmdfrmBer 
+        table
+        "
+	::= { pm1001lhrAlmdfrmBerEntry 1 }
+
+
+pm1001lhrAlmLineDegradePortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Fixed Line Signal Degrade :This 
+        OID indicates that the line input 
+        signal is DEGRADE. The assetion 
+        hysteresis is fixed to 10-8 (assertion) 
+        and 10-9 (de-assertion) <Condtype> 
+        LINE_DEGRADE_1 <Probcause> degradedSignal 
+        (13) <Alarmtype> qualityOfServiceAlarm 
+        (3) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmdfrmBerEntry 6 }
+
+
+pm1001lhrAlmLineSignalFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Custom Line Signal Fail :This
+         OID indicates that the line input 
+        signal is FAIL. The assertion hysteresis 
+        can be customized by the host <Condtype> 
+        LINE_SIGNAL_FAIL_1 <Probcause>
+         receiveFailure (41) <Alarmtype> 
+        integrityViolation (7) <Polarity> 
+        (2) 
+        "
+	::= { pm1001lhrAlmdfrmBerEntry 3 }
+
+
+pm1001lhrAlmLineSignalDegradePortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Custom Line Signal Degrade :This 
+        OID indicates that the line input 
+        signal is DEGRADE. The assertion 
+        hysteresis can customized by the 
+        host <Condtype> LINE_SIGNAL_DEGRADE_1 
+        <Probcause> degradedSignal (13) 
+        <Alarmtype> qualityOfServiceAlarm 
+        (3) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmdfrmBerEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmlineSyncAlarms articles
+--- *********************************************************
+
+pm1001lhrAlmlineSyncAlarmsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmlineSyncAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmlineSyncAlarms 
+        Article
+        "
+	::= { pm1001lhrAlmLineCrit 133 }
+
+
+pm1001lhrAlmlineSyncAlarmsEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmlineSyncAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmlineSyncAlarms 
+        table
+        "
+	INDEX   { pm1001lhrAlmlineSyncAlarmsIndex }
+	::= { pm1001lhrAlmlineSyncAlarmsTable 1 }
+
+
+Pm1001lhrAlmlineSyncAlarmsEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmlineSyncAlarmsIndex
+		INTEGER,
+	pm1001lhrAlmDwLosPortn
+		EkiOnOff,
+	pm1001lhrAlmUpLockerrPortn
+		EkiOnOff,
+	pm1001lhrAlmDwLockerrPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmlineSyncAlarmsIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmlineSyncAlarms 
+        table
+        "
+	::= { pm1001lhrAlmlineSyncAlarmsEntry 1 }
+
+
+pm1001lhrAlmDwLosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Input Loss Of Signal :This 
+        OID indicates a loss of signal
+         on the 10 Gb/s input.  <Help>
+          This alarm indicates if an optical 
+        signal is detected on the line
+         transceiver input <Condtype> DW_LOS 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineSyncAlarmsEntry 17 }
+
+
+pm1001lhrAlmUpLockerrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Upstream Clock Lock Error :This 
+        OID indicates that the serializer 
+        output 10 Gb/s clock multiplier 
+        unit is not locked. <Condtype>
+         UP_LOCKERR <Probcause> receiveFailure 
+        (41) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineSyncAlarmsEntry 14 }
+
+
+pm1001lhrAlmDwLockerrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Downstream Clock Lock Error :This 
+        OID indicates that the deserializer 
+        input 10 Gb/s clock recovery is 
+        not locked. <Condtype> DW_LOCKERR 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineSyncAlarmsEntry 13 }
+
+
+--- *****************************************************
+---     LEAF for the modInitFailLevel2 article
+--- *****************************************************
+pm1001lhrAlmmodInitFailLevel2 OBJECT IDENTIFIER ::= { pm1001lhrAlmOtherUrg 194 }
+
+
+
+
+pm1001lhrAlmSwInitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW Init Fail :This OID indicates 
+        that the SW intialization has caused 
+        unknown intial conditions  <Help> 
+         This alarm indicates if the SW 
+        module is correctly initialized 
+        <Condtype> SW_INIT_FAIL <Probcause> 
+        softwareError (47) <Alarmtype>
+         processingErrorAlarm (4) <Polarity> 
+        (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel2 5 }
+
+
+
+pm1001lhrAlmResetHwInitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reset HW Init Fail :This OID indicates 
+        that the HW intialization has caused 
+        unknown intial conditions  <Help> 
+         This alarm indicates if the HW 
+        has been correctly initialized
+         <Condtype> RESET_HW_INIT_FAIL
+         <Probcause> softwareError (47) 
+        <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel2 4 }
+
+
+
+pm1001lhrAlmBootUndone OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Boot Undone :This OID indicates 
+        that the boot has not been correctly 
+        achieved  <Help>  This alarm indicates 
+        if the module has correctly boot 
+        <Condtype> BOOT_UNDONE <Probcause> 
+        softwareError (47) <Alarmtype>
+         processingErrorAlarm (4) <Polarity> 
+        (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel2 3 }
+
+
+
+pm1001lhrAlmNextColdBootForced OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Next Cold Boot Forced :This OID 
+        indicates that the next Reset will 
+        be forced Cold  <Help>  This alarm 
+        indicates that the next reset of 
+        the module will be forced to cold 
+        reset <Condtype> NEXT_COLD_BOOT_FORCED 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel2 2 }
+
+
+
+pm1001lhrAlmLedFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Led Fail :This OID indicates that 
+        Led register has not been correctly 
+        initalized  <Help>  This alarm
+         indicates if the module LEDs are 
+        correctly initialized <Condtype> 
+        LED_FAIL <Probcause> softwareError 
+        (47) <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the modInitFailLevel3 article
+--- *****************************************************
+pm1001lhrAlmmodInitFailLevel3 OBJECT IDENTIFIER ::= { pm1001lhrAlmOtherUrg 195 }
+
+
+
+
+pm1001lhrAlmLine2InitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line2 Init Fail :This OID indicates 
+        that the Line register subset has 
+        not been correctly initialized
+          <Help>  This alarm indicates
+         if the line port 2 is correctly 
+        initialized <Condtype> LINE2_INIT_FAIL 
+        <Probcause> softwareError (47)
+         <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel3 8 }
+
+
+
+pm1001lhrAlmLine1InitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line1 Init Fail :This OID indicates 
+        that the Line registersvsubset
+         has not been correctly initialized 
+         <Help>  This alarm indicates if 
+        the line port 1 is correctly initialized 
+        <Condtype> LINE1_INIT_FAIL <Probcause> 
+        softwareError (47) <Alarmtype>
+         processingErrorAlarm (4) <Polarity> 
+        (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel3 7 }
+
+
+
+pm1001lhrAlmXfp2InitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        XFP2 Init Fail :This OID indicates 
+        that the XFP has not been correctly 
+        initialized  <Help>  This alarm 
+        indicates if the line transceiver 
+        2 is correctly initialized <Condtype> 
+        XFP2_INIT_FAIL <Probcause> softwareError 
+        (47) <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel3 6 }
+
+
+
+pm1001lhrAlmXfp1InitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        XFP1 Init Fail :This OID indicates 
+        that the XFP has not been correctly 
+        initialized  <Help>  This alarm 
+        indicates if the line transceiver 
+        1 is correctly initialized <Condtype> 
+        XFP1_INIT_FAIL <Probcause> softwareError 
+        (47) <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel3 5 }
+
+
+
+pm1001lhrAlmInitModuleFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Init Module Fail :This OID indicates 
+        that the Module has not been correctly 
+        initialized  <Help>  This alarm 
+        indicates if the SW module is correctly 
+        initialized <Condtype> INIT_MODULE_FAIL 
+        <Probcause> softwareError (47)
+         <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel3 3 }
+
+
+
+pm1001lhrAlmObmTypeReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        OBM Type Read Fail :This OID indicates 
+        that OBM type has not been recognized 
+         <Help>  This alarm indicates if 
+        the OBM board has been correctly 
+        identified <Condtype> OBM_TYPE_READ_FAIL 
+        <Probcause> softwareError (47)
+         <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel3 2 }
+
+
+
+pm1001lhrAlmGwIdentFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW Ident Fail :This OID indicates 
+        that GW identification has not
+         been read  <Help>  This alarm
+         indicates if the GW has been correctly 
+        identified <Condtype> GW_IDENT_FAIL 
+        <Probcause> softwareError (47)
+         <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2) 
+        "
+	  ::= { pm1001lhrAlmmodInitFailLevel3 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmlineXfp1Alarm articles
+--- *********************************************************
+
+pm1001lhrAlmlineXfp1AlarmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmlineXfp1AlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmlineXfp1Alarm 
+        Article
+        "
+	::= { pm1001lhrAlmLineUrg 208 }
+
+
+pm1001lhrAlmlineXfp1AlarmEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmlineXfp1AlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmlineXfp1Alarm 
+        table
+        "
+	INDEX   { pm1001lhrAlmlineXfp1AlarmIndex }
+	::= { pm1001lhrAlmlineXfp1AlarmTable 1 }
+
+
+Pm1001lhrAlmlineXfp1AlarmEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmlineXfp1AlarmIndex
+		INTEGER,
+	pm1001lhrAlmRxPowerHighAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmRxPowerLowAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmTempHighAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmTempLowAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmTxBiasHighAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmTxBiasLowAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmTxPowerHighAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmTxPowerLowAlarmPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmlineXfp1AlarmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmlineXfp1Alarm 
+        table
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 1 }
+
+
+pm1001lhrAlmRxPowerHighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Rx Power High :Alarm 
+        indicating that the XFP received 
+        optical power is higher than the 
+        threshold value written in the
+         XFP EEPROM <Condtype> RX_POWER_HIGH_ALARM_1 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 17 }
+
+
+pm1001lhrAlmRxPowerLowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Rx Power Low :Alarm 
+        indicating that the XFP received 
+        optical power is lower than the 
+        threshold value written in the
+         XFP EEPROM  <Condtype> RX_POWER_LOW_ALARM_1 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 16 }
+
+
+pm1001lhrAlmTempHighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transceiver Temp High :Alarm 
+        indicating that the XFP/OTX temperature 
+        is higher than the threshold value 
+        written in the XFP EEPROM <Condtype> 
+        TEMP_HIGH_ALARM_1 <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 9 }
+
+
+pm1001lhrAlmTempLowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transceiver Temp Low :Alarm 
+        indicating that the XFP/OTX temperature 
+        is lower than the threshold value 
+        written in the XFP/OTX EEPROM <Condtype> 
+        TEMP_LOW_ALARM_1 <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 8 }
+
+
+pm1001lhrAlmTxBiasHighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transceiver Bias High :Alarm 
+        indicating that the XFP/OTX transmitter 
+        laser bias current is higher than 
+        the threshold value written in
+         the XFP EEPROM <Condtype> TX_BIAS_HIGH_ALARM_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 5 }
+
+
+pm1001lhrAlmTxBiasLowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transceiver Bias Low :Alarm 
+        indicating that the XFP/OTX transmitter 
+        laser bias current is lower than 
+        the threshold value written in
+         the XFP/OTX EEPROM <Condtype>
+         TX_BIAS_LOW_ALARM_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 4 }
+
+
+pm1001lhrAlmTxPowerHighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx Power High :Alarm 
+        indicating that the XFP/OTX transmitter 
+        transmitter output power is higher 
+        than the threshold value written 
+        in the XFP EEPROM <Condtype> TX_POWER_HIGH_ALARM_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 3 }
+
+
+pm1001lhrAlmTxPowerLowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx Power Low :Alarm 
+        indicating that the XFP/OTX transmitter 
+        transmitter output power is lower 
+        than the threshold value written 
+        in the XFP/OTX EEPROM <Condtype> 
+        TX_POWER_LOW_ALARM_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmlineXfp1Warnings articles
+--- *********************************************************
+
+pm1001lhrAlmlineXfp1WarningsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmlineXfp1WarningsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmlineXfp1Warnings 
+        Article
+        "
+	::= { pm1001lhrAlmLineNurg 209 }
+
+
+pm1001lhrAlmlineXfp1WarningsEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmlineXfp1WarningsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmlineXfp1Warnings 
+        table
+        "
+	INDEX   { pm1001lhrAlmlineXfp1WarningsIndex }
+	::= { pm1001lhrAlmlineXfp1WarningsTable 1 }
+
+
+Pm1001lhrAlmlineXfp1WarningsEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmlineXfp1WarningsIndex
+		INTEGER,
+	pm1001lhrAlmRxPowerHighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmRxPowerLowWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmTempHighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmTempLowWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmTxBiasHighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmTxBiasLowWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmTxPowerHighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmTxPowerLowWarningPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmlineXfp1WarningsIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmlineXfp1Warnings 
+        table
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 1 }
+
+
+pm1001lhrAlmRxPowerHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Rx Power High Warning 
+        :Warning indicating that the XFP 
+        received optical power is higher 
+        than the threshold value written 
+        in the XFP EEPROM <Condtype> RX_POWER_HIGH_WARNING_1 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 17 }
+
+
+pm1001lhrAlmRxPowerLowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Rx Power Low Warning 
+        :Warning indicating that the XFP 
+        received optical power is lower 
+        than the threshold value written 
+        in the XFP EEPROM  <Condtype> RX_POWER_LOW_WARNING_1 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 16 }
+
+
+pm1001lhrAlmTempHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transceiver Temp High Warning 
+        :Warning indicating that the XFP/OTX 
+        temperature is higher than the
+         threshold value written in the 
+        XFP EEPROM <Condtype> TEMP_HIGH_WARNING_1 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 9 }
+
+
+pm1001lhrAlmTempLowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transceiver Temp Low Warning 
+        :Warning indicating that the XFP/OTX 
+        temperature is lower than the threshold 
+        value written in the XFP/OTX EEPROM 
+        <Condtype> TEMP_LOW_WARNING_1 <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 8 }
+
+
+pm1001lhrAlmTxBiasHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transceiver Bias High Warning 
+        :Warning indicating that the XFP/OTX 
+        transmitter laser bias current
+         is higher than the threshold value 
+        written in the XFP EEPROM <Condtype> 
+        TX_BIAS_HIGH_WARNING_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 5 }
+
+
+pm1001lhrAlmTxBiasLowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Transceiver Bias Low Warning 
+        :Warning indicating that the XFP/OTX 
+        transmitter laser bias current
+         is lower than the threshold value 
+        written in the XFP/OTX EEPROM <Condtype> 
+        TX_BIAS_LOW_WARNING_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 4 }
+
+
+pm1001lhrAlmTxPowerHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx Power High Warning 
+        :Warning indicating that the XFP/OTX 
+        transmitter transmitter output
+         power is higher than the threshold 
+        value written in the XFP EEPROM 
+        <Condtype> TX_POWER_HIGH_WARNING_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 3 }
+
+
+pm1001lhrAlmTxPowerLowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx Power Low Warning 
+        :Warning indicating that the XFP/OTX 
+        transmitter transmitter output
+         power is lower than the threshold 
+        value written in the XFP/OTX EEPROM 
+        <Condtype> TX_POWER_LOW_WARNING_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1WarningsEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmlineXfp1Alarms articles
+--- *********************************************************
+
+pm1001lhrAlmlineXfp1AlarmsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmlineXfp1AlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmlineXfp1Alarms 
+        Article
+        "
+	::= { pm1001lhrAlmLineCrit 211 }
+
+
+pm1001lhrAlmlineXfp1AlarmsEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmlineXfp1AlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmlineXfp1Alarms 
+        table
+        "
+	INDEX   { pm1001lhrAlmlineXfp1AlarmsIndex }
+	::= { pm1001lhrAlmlineXfp1AlarmsTable 1 }
+
+
+Pm1001lhrAlmlineXfp1AlarmsEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmlineXfp1AlarmsIndex
+		INTEGER,
+	pm1001lhrAlmApdSupplyFaultPortn
+		EkiOnOff,
+	pm1001lhrAlmTecFaultPortn
+		EkiOnOff,
+	pm1001lhrAlmWavelengthUnlockedPortn
+		EkiOnOff,
+	pm1001lhrAlmTxNrPortn
+		EkiOnOff,
+	pm1001lhrAlmTxFaultPortn
+		EkiOnOff,
+	pm1001lhrAlmTxCdrNotLockedPortn
+		EkiOnOff,
+	pm1001lhrAlmRxNrPortn
+		EkiOnOff,
+	pm1001lhrAlmRxCdrNotLockedPortn
+		EkiOnOff,
+	pm1001lhrAlmModNrPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmlineXfp1AlarmsIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmlineXfp1Alarms 
+        table
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 1 }
+
+
+pm1001lhrAlmApdSupplyFaultPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Rx Photodiode Power Failed 
+        :This OID indicates a failure on 
+        the APD power supply  <Help>  This 
+        alarm indicates if the APD power 
+        supply is in fail condition <Condtype> 
+        APD_SUPPLY_FAULT_1 <Probcause>
+         receiverFailure (42) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 17 }
+
+
+pm1001lhrAlmTecFaultPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx Temp Regul Failed 
+        :This OID indicates a failure on 
+        the TEC module  <Help>  This alarm 
+        indicates if the TEC of the line 
+        transceiver is in fail condition 
+        <Condtype> TEC_FAULT_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 16 }
+
+
+pm1001lhrAlmWavelengthUnlockedPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx Wavelength Unlocked 
+        :This OID indicates that the wavelength 
+        error is exceeding the manufacturer 
+        tolerance  <Help>  This alarm indicates 
+        if the wavelenght of the line transceiver 
+        is locked <Condtype> WAVELENGTH_UNLOCKED_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 15 }
+
+
+pm1001lhrAlmTxNrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx Not Ready :This 
+        OID indicates a condition has arisen 
+        leading to invalid data on the
+         transmitting side  <Help>  This 
+        alarm indicates if the Tx part
+         of the line transceiver is ready 
+        <Condtype> TX_NR_1 <Probcause>
+         transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 9 }
+
+
+pm1001lhrAlmTxFaultPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx Failure :This
+         OID indicates a fault condition 
+        on the laser detected by the safety 
+        syste  <Help>  This alarm indicates 
+        if the laser of the line transceiver 
+        is in fail condition <Condtype> 
+        TX_FAULT_1 <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 8 }
+
+
+pm1001lhrAlmTxCdrNotLockedPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Tx CDR Unlocked :This 
+        OID indicates a loss of lock on 
+        the transmitting side CDR has been 
+        detected.  <Help>  This alarm indicates 
+        if the Tx CDR is locked in the
+         line transceiver <Condtype> TX_CDR_NOT_LOCKED1_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 7 }
+
+
+pm1001lhrAlmRxNrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Rx Not Ready :This 
+        OID indicates that a condition
+         has arisen leading to invalid
+         data on the receiving side.  <Help> 
+         This alarm indicates if the Rx 
+        part of the line transceiver is 
+        ready <Condtype> RX_NR_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 6 }
+
+
+pm1001lhrAlmRxCdrNotLockedPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Rx CDR Unlocked :This 
+        OID indicates that a loss of lock 
+        on the receiving side CDR has been 
+        detected  <Help>  This alarm indicates 
+        if the Rx CDR is locked in the
+         line transceiver <Condtype> RX_CDR_NOT_LOCKED1_1 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 4 }
+
+
+pm1001lhrAlmModNrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Not Ready
+         :This OID indicates that the module 
+        is unable to determine correct
+         data.  <Help>  This alarm indicates 
+        if the line transceiver is ready 
+        <Condtype> MOD_NR_1 <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1AlarmsEntry 3 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmlineXfp1SupplyAlarm articles
+--- *********************************************************
+
+pm1001lhrAlmlineXfp1SupplyAlarmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmlineXfp1SupplyAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmlineXfp1SupplyAlarm 
+        Article
+        "
+	::= { pm1001lhrAlmLineUrg 212 }
+
+
+pm1001lhrAlmlineXfp1SupplyAlarmEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmlineXfp1SupplyAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmlineXfp1SupplyAlarm 
+        table
+        "
+	INDEX   { pm1001lhrAlmlineXfp1SupplyAlarmIndex }
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmTable 1 }
+
+
+Pm1001lhrAlmlineXfp1SupplyAlarmEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmlineXfp1SupplyAlarmIndex
+		INTEGER,
+	pm1001lhrAlmVcc5HighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc5LowWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc3HighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc3LowWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc2HighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc2LowWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmVee5HighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmVee5LowWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc5HighAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc5LowAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc3HighAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc3LowAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc2HighAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmVcc2LowAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmVee5HighAlarmPortn
+		EkiOnOff,
+	pm1001lhrAlmVee5LowAlarmPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmlineXfp1SupplyAlarmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmlineXfp1SupplyAlarm 
+        table
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 1 }
+
+
+pm1001lhrAlmVcc5HighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC5 Power Supply High Warning 
+        :Warning indicating the XFP/OTX 
+        VCC5 power supply is higher than 
+        the threshold written in the EEPROM 
+        <Condtype> VCC5_HIGH_WARNING_1
+         <Probcause> powerProblem (36)
+         <Alarmtype> equipmentAlarm (5) 
+        <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 17 }
+
+
+pm1001lhrAlmVcc5LowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC5 Power Supply Low Warning
+         :Warning indicating the XFP/OTX 
+        VCC5 power supply is lower than 
+        the threshold written in the EEPROM 
+        <Condtype> VCC5_LOW_WARNING_1 <Probcause> 
+        powerProblem (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 16 }
+
+
+pm1001lhrAlmVcc3HighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC3 Power Supply High Warning 
+        :Warning indicating the XFP/OTX 
+        VCC3 power supply is higher than 
+        the threshold written in the EEPROM 
+        <Condtype> VCC3_HIGH_WARNING_1
+         <Probcause> powerProblem (36)
+         <Alarmtype> equipmentAlarm (5) 
+        <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 15 }
+
+
+pm1001lhrAlmVcc3LowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC3 Power Supply Low Warning
+         :Warning indicating the XFP/OTX 
+        VCC3 power supply is lower than 
+        the threshold written in the EEPROM 
+        <Condtype> VCC3_LOW_WARNING_1 <Probcause> 
+        powerProblem (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 14 }
+
+
+pm1001lhrAlmVcc2HighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC2 Power Supply High Warning 
+        :Warning indicating the XFP/OTX 
+        VCC2 power supply is higher than 
+        the threshold written in the EEPROM 
+        <Condtype> VCC2_HIGH_WARNING_1
+         <Probcause> powerProblem (36)
+         <Alarmtype> equipmentAlarm (5) 
+        <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 13 }
+
+
+pm1001lhrAlmVcc2LowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC2 Power Supply Low Warning
+         :Warning indicating the XFP/OTX 
+        VCC2 power supply is lower than 
+        the threshold written in the EEPROM 
+        <Condtype> VCC2_LOW_WARNING_1 <Probcause> 
+        powerProblem (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 12 }
+
+
+pm1001lhrAlmVee5HighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VEE5 Power Supply High Warning 
+        :Warning indicating the XFP/OTX 
+        VEE5 power supply is higher than 
+        the threshold written in the EEPROM 
+        <Condtype> VEE5_HIGH_WARNING_1
+         <Probcause> powerProblem (36)
+         <Alarmtype> equipmentAlarm (5) 
+        <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 11 }
+
+
+pm1001lhrAlmVee5LowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VEE5 Power Supply Low Warning
+         :Warning indicating the XFP/OTX 
+        VEE5 power supply is lower than 
+        the threshold written in the EEPROM 
+        <Condtype> VEE5_LOW_WARNING_1 <Probcause> 
+        powerProblem (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 10 }
+
+
+pm1001lhrAlmVcc5HighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC5 Power Supply High :Alarm
+         indicating the XFP/OTX VCC5 power 
+        supply is higher than the threshold 
+        written in the EEPROM <Condtype> 
+        VCC5_HIGH_ALARM_1 <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 9 }
+
+
+pm1001lhrAlmVcc5LowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC5 Power Supply Low :Alarm indicating 
+        the XFP/OTX VCC5 power supply is 
+        lower than the threshold written 
+        in the EEPROM <Condtype> VCC5_LOW_ALARM_1 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 8 }
+
+
+pm1001lhrAlmVcc3HighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC3 Power Supply High :Alarm
+         indicating the XFP/OTX VCC3 power 
+        supply is higher than the threshold 
+        written in the EEPROM <Condtype> 
+        VCC3_HIGH_ALARM_1 <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 7 }
+
+
+pm1001lhrAlmVcc3LowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC3 Power Supply Low :Alarm indicating 
+        the XFP/OTX VCC3 power supply is 
+        lower than the threshold written 
+        in the EEPROM <Condtype> VCC3_LOW_ALARM_1 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 6 }
+
+
+pm1001lhrAlmVcc2HighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC2 Power Supply High :Alarm
+         indicating the XFP/OTX VCC2 power 
+        supply is higher than the threshold 
+        written in the EEPROM <Condtype> 
+        VCC2_HIGH_ALARM_1 <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 5 }
+
+
+pm1001lhrAlmVcc2LowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VCC2 Power Supply Low :Alarm indicating 
+        the XFP/OTX VCC2 power supply is 
+        lower than the threshold written 
+        in the EEPROM <Condtype> VCC2_LOW_ALARM_1 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 4 }
+
+
+pm1001lhrAlmVee5HighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VEE5 Power Supply High :Alarm
+         indicating the XFP/OTX VEE5 power 
+        supply is higher than the threshold 
+        written in the EEPROM <Condtype> 
+        VEE5_HIGH_ALARM_1 <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 3 }
+
+
+pm1001lhrAlmVee5LowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        VEE5 Power Supply Low :Alarm indicating 
+        the XFP/OTX VEE5 power supply is 
+        lower than the threshold written 
+        in the EEPROM <Condtype> VEE5_LOW_ALARM_1 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineXfp1SupplyAlarmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmlineOtx1TlhAlarms articles
+--- *********************************************************
+
+pm1001lhrAlmlineOtx1TlhAlarmsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmlineOtx1TlhAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmlineOtx1TlhAlarms 
+        Article
+        "
+	::= { pm1001lhrAlmLineUrg 224 }
+
+
+pm1001lhrAlmlineOtx1TlhAlarmsEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmlineOtx1TlhAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmlineOtx1TlhAlarms 
+        table
+        "
+	INDEX   { pm1001lhrAlmlineOtx1TlhAlarmsIndex }
+	::= { pm1001lhrAlmlineOtx1TlhAlarmsTable 1 }
+
+
+Pm1001lhrAlmlineOtx1TlhAlarmsEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmlineOtx1TlhAlarmsIndex
+		INTEGER,
+	pm1001lhrAlmLineLaserTempHighAlaPortn
+		EkiOnOff,
+	pm1001lhrAlmLineFreqDevHighAlaPortn
+		EkiOnOff,
+	pm1001lhrAlmLineAgingHighAlaPortn
+		EkiOnOff,
+	pm1001lhrAlmLineModulatorAgingHighAlaPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmlineOtx1TlhAlarmsIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmlineOtx1TlhAlarms 
+        table
+        "
+	::= { pm1001lhrAlmlineOtx1TlhAlarmsEntry 1 }
+
+
+pm1001lhrAlmLineLaserTempHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Laser Temp. High Alarm :Alarm 
+        indicating the Line OTX TLH laser 
+        temperature is higher than the
+         threshold written in the EEPROM 
+        <Condtype> LINE_LASER_TEMP_HIGH_ALA_1 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineOtx1TlhAlarmsEntry 15 }
+
+
+pm1001lhrAlmLineFreqDevHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Freq. Deviation High Alarm 
+        :Alarm indicating the Line OTX
+         TLH frequency deviation is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> LINE_FREQ_DEV_HIGH_ALA_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineOtx1TlhAlarmsEntry 13 }
+
+
+pm1001lhrAlmLineAgingHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line OTX TLH Aging High Alarm
+         :Alarm indicating the Line OTX 
+        TLH aging is higher than the threshold 
+        written in the EEPROM <Condtype> 
+        LINE_AGING_HIGH_ALA_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineOtx1TlhAlarmsEntry 7 }
+
+
+pm1001lhrAlmLineModulatorAgingHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Modulator Aging High Alarm 
+        :Alarm indicating the Line OTX
+         TLH modulator aging is higher
+         than the threshold written in
+         the EEPROM <Condtype> LINE_MODULATOR_AGING_HIGH_ALA_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineOtx1TlhAlarmsEntry 6 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrAlmlineOtx1TlhWarnings articles
+--- *********************************************************
+
+pm1001lhrAlmlineOtx1TlhWarningsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrAlmlineOtx1TlhWarningsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrAlmlineOtx1TlhWarnings 
+        Article
+        "
+	::= { pm1001lhrAlmLineNurg 225 }
+
+
+pm1001lhrAlmlineOtx1TlhWarningsEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrAlmlineOtx1TlhWarningsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrAlmlineOtx1TlhWarnings 
+        table
+        "
+	INDEX   { pm1001lhrAlmlineOtx1TlhWarningsIndex }
+	::= { pm1001lhrAlmlineOtx1TlhWarningsTable 1 }
+
+
+Pm1001lhrAlmlineOtx1TlhWarningsEntry ::=
+	SEQUENCE {
+	pm1001lhrAlmlineOtx1TlhWarningsIndex
+		INTEGER,
+	pm1001lhrAlmLineLaserTempHighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmLineFreqDevHighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmLineAgingHighWarningPortn
+		EkiOnOff,
+	pm1001lhrAlmLineModulatorAgingHighWarningPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrAlmlineOtx1TlhWarningsIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrAlmlineOtx1TlhWarnings 
+        table
+        "
+	::= { pm1001lhrAlmlineOtx1TlhWarningsEntry 1 }
+
+
+pm1001lhrAlmLineLaserTempHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Laser Temp. High Warning
+         :Warning indicating the Line OTX 
+        TLH laser temperature is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> LINE_LASER_TEMP_HIGH_WARNING_1 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineOtx1TlhWarningsEntry 15 }
+
+
+pm1001lhrAlmLineFreqDevHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Freq. Deviation High Warning 
+        :Warning indicating the Line OTX 
+        TLH frequency deviation is higher 
+        than the threshold written in the 
+        EEPROM <Condtype> LINE_FREQ_DEV_HIGH_WARNING_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineOtx1TlhWarningsEntry 13 }
+
+
+pm1001lhrAlmLineAgingHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line OTX TLH Aging High Warning 
+        :Warning indicating the Line OTX 
+        TLH aging is higher than the threshold 
+        written in the EEPROM <Condtype> 
+        LINE_AGING_HIGH_WARNING_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineOtx1TlhWarningsEntry 7 }
+
+
+pm1001lhrAlmLineModulatorAgingHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Modulator Aging High Warning 
+        :Warning indicating the Line OTX 
+        TLH modulator aging is higher than 
+        the threshold written in the EEPROM 
+        <Condtype> LINE_MODULATOR_AGING_HIGH_WARNING_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm1001lhrAlmlineOtx1TlhWarningsEntry 6 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the confMgnt1 article
+--- *****************************************************
+pm1001lhrCtrlconfMgnt1 OBJECT IDENTIFIER ::= { pm1001lhrCtrlOther 1 }
+
+
+
+
+pm1001lhrCtrlConf2Clear1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        OID clears the configuration tables 
+        from configuration2 in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pm1001lhrCtrlconfMgnt1 14 }
+
+
+
+pm1001lhrCtrlConf2Flash1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        OID saves the current configuration 
+        of the PM as configuration2 in
+         the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pm1001lhrCtrlconfMgnt1 10 }
+
+
+
+pm1001lhrCtrlConf2Load1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables Set
+         Nb 2 :When set this OID enables 
+        loading from flash configuration2 
+        into the PM.
+        "
+	  ::= { pm1001lhrCtrlconfMgnt1 2 }
+
+
+
+pm1001lhrCtrlConf1Load1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables Set
+         Nb 1 :When set this OID enables 
+        loading from flash configuration1 
+        into the PM.
+        "
+	  ::= { pm1001lhrCtrlconfMgnt1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pm1001lhrCtrlsynth4 OBJECT IDENTIFIER ::= { pm1001lhrCtrlOther 4 }
+
+
+
+
+pm1001lhrCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pm1001lhrCtrlsynth4 2 }
+
+
+
+pm1001lhrCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pm1001lhrCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pm1001lhrCtrlswMgnt OBJECT IDENTIFIER ::= { pm1001lhrCtrlOther 5 }
+
+
+
+
+pm1001lhrCtrlLoadSwBank2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Software Nb 2 As Active :This 
+        OID, when set, loads the SW from 
+        bank2 into the PM. It must be followed 
+        by a reset.  <Help>  This controls 
+        selects the second SW bank as the 
+        active bank for the next module 
+        reset
+        "
+	  ::= { pm1001lhrCtrlswMgnt 6 }
+
+
+
+pm1001lhrCtrlLoadSwBank1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Software Nb 1 As Active :This 
+        OID, when set, loads the SW from 
+        bank1 into the PM. It must be followed 
+        by a reset.  <Help>  This controls 
+        selects the first SW bank as the 
+        active bank for the next module 
+        reset
+        "
+	  ::= { pm1001lhrCtrlswMgnt 5 }
+
+
+
+pm1001lhrCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        PM. This reset is not traffic affecting, 
+        and the configuration of PM remains 
+        unchanged.  <Help>  This control 
+        initiates a warm reset of the module. 
+        "
+	  ::= { pm1001lhrCtrlswMgnt 3 }
+
+
+
+pm1001lhrCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        PM. This reset is traffic affecting, 
+        and the configuration of PM is
+         reloaded on start-up.  <Help>
+          This control initiates a cold 
+        reset of the module. 
+        "
+	  ::= { pm1001lhrCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the gwMgnt article
+--- *****************************************************
+pm1001lhrCtrlgwMgnt OBJECT IDENTIFIER ::= { pm1001lhrCtrlOther 6 }
+
+
+
+
+pm1001lhrCtrlLoadGwBank4 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 4 As Active :This 
+        OID, when set, loads the GW from 
+        bank4 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.
+        "
+	  ::= { pm1001lhrCtrlgwMgnt 8 }
+
+
+
+pm1001lhrCtrlLoadGwBank3 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 3 As Active :This 
+        OID, when set, loads the GW from 
+        bank3 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.  <Help>  This controls 
+        initiates a cold reset of the module 
+        and select the third GW bank as 
+        the active bank
+        "
+	  ::= { pm1001lhrCtrlgwMgnt 7 }
+
+
+
+pm1001lhrCtrlLoadGwBank2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 2 As Active :This 
+        OID, when set, loads the GW from 
+        bank2 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.
+        "
+	  ::= { pm1001lhrCtrlgwMgnt 6 }
+
+
+
+pm1001lhrCtrlLoadGwBank1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 1 As Active :This 
+        OID, when set, loads the GW from 
+        bank1 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.  <Help>  This controls 
+        initiates a cold reset of the module 
+        and select the first GW bank as 
+        the active bank
+        "
+	  ::= { pm1001lhrCtrlgwMgnt 5 }
+
+
+
+pm1001lhrCtrlCurrentGwReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Active Gateware Reset :This OID, 
+        when set, resets the active gateware. 
+        It is traffic affecting.
+        "
+	  ::= { pm1001lhrCtrlgwMgnt 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrlaccessLoop articles
+--- *********************************************************
+
+pm1001lhrCtrlaccessLoopTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrlaccessLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrlaccessLoop 
+        Article
+        "
+	::= { pm1001lhrCtrlClient 16 }
+
+
+pm1001lhrCtrlaccessLoopEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrlaccessLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrlaccessLoop 
+        table
+        "
+	INDEX   { pm1001lhrCtrlaccessLoopIndex }
+	::= { pm1001lhrCtrlaccessLoopTable 1 }
+
+
+Pm1001lhrCtrlaccessLoopEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrlaccessLoopIndex
+		INTEGER,
+	pm1001lhrCtrlaccessLoopPortn
+		EkiState
+	}
+
+
+pm1001lhrCtrlaccessLoopIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrlaccessLoop 
+        table
+        "
+	::= { pm1001lhrCtrlaccessLoopEntry 1 }
+
+
+pm1001lhrCtrlaccessLoopPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Facility Loopback :This 
+        OID operates a Client Facility
+         Loopback, looping client input 
+        signal on the client output port. 
+        The loop is located on the client 
+        transceiver  <Help> This maintenance 
+        parameter operates a Client Facility 
+        Loopback, looping client input
+         signal on the client output port. 
+        The loop is located on the client 
+        transceiver
+        "
+	::= { pm1001lhrCtrlaccessLoopEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrlclientAccessTermLoop articles
+--- *********************************************************
+
+pm1001lhrCtrlclientAccessTermLoopTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrlclientAccessTermLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrlclientAccessTermLoop 
+        Article
+        "
+	::= { pm1001lhrCtrlClient 26 }
+
+
+pm1001lhrCtrlclientAccessTermLoopEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrlclientAccessTermLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrlclientAccessTermLoop 
+        table
+        "
+	INDEX   { pm1001lhrCtrlclientAccessTermLoopIndex }
+	::= { pm1001lhrCtrlclientAccessTermLoopTable 1 }
+
+
+Pm1001lhrCtrlclientAccessTermLoopEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrlclientAccessTermLoopIndex
+		INTEGER,
+	pm1001lhrCtrlclientAccessTermLoopPortn
+		EkiState
+	}
+
+
+pm1001lhrCtrlclientAccessTermLoopIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrlclientAccessTermLoop 
+        table
+        "
+	::= { pm1001lhrCtrlclientAccessTermLoopEntry 1 }
+
+
+pm1001lhrCtrlclientAccessTermLoopPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Client Terminal Loopback :This 
+        OID operates a Client Terminal
+         Loopback, looping client input 
+        signal on the client output port. 
+        The loop is located on the line 
+        transceiver  <Help> This maintenance 
+        parameter operates a Client Terminal 
+        Loopback, looping client input
+         signal on the client output port. 
+        The loop is located on the line 
+        transceiver
+        "
+	::= { pm1001lhrCtrlclientAccessTermLoopEntry 2 }
+
+
+pm1001lhrCtrlprotocol OBJECT-TYPE
+	  SYNTAX EkiProtocol
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Client Protocol :This OID sets 
+        the protocol on the PM
+        "
+	  ::= { pm1001lhrCtrlLine 52 }
+
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrlfecDisable articles
+--- *********************************************************
+
+pm1001lhrCtrlfecDisableTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrlfecDisableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrlfecDisable 
+        Article
+        "
+	::= { pm1001lhrCtrlLine 69 }
+
+
+pm1001lhrCtrlfecDisableEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrlfecDisableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrlfecDisable 
+        table
+        "
+	INDEX   { pm1001lhrCtrlfecDisableIndex }
+	::= { pm1001lhrCtrlfecDisableTable 1 }
+
+
+Pm1001lhrCtrlfecDisableEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrlfecDisableIndex
+		INTEGER,
+	pm1001lhrCtrlfecDisablePortn
+		EkiState
+	}
+
+
+pm1001lhrCtrlfecDisableIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrlfecDisable 
+        table
+        "
+	::= { pm1001lhrCtrlfecDisableEntry 1 }
+
+
+pm1001lhrCtrlfecDisablePortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Forward Error Correction Inhibition 
+        :This OID, when set, inhibits the 
+        Forward Error Correction feature 
+        on the line input  <Help>  This 
+        control disables the Forward Error 
+        Correction on the line input signal.
+        "
+	::= { pm1001lhrCtrlfecDisableEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrllineOosMode articles
+--- *********************************************************
+
+pm1001lhrCtrllineOosModeTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrllineOosModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrllineOosMode 
+        Article
+        "
+	::= { pm1001lhrCtrlLine 74 }
+
+
+pm1001lhrCtrllineOosModeEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrllineOosModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrllineOosMode 
+        table
+        "
+	INDEX   { pm1001lhrCtrllineOosModeIndex }
+	::= { pm1001lhrCtrllineOosModeTable 1 }
+
+
+Pm1001lhrCtrllineOosModeEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrllineOosModeIndex
+		INTEGER,
+	pm1001lhrCtrllineOosModePortn
+		EkiState
+	}
+
+
+pm1001lhrCtrllineOosModeIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrllineOosMode 
+        table
+        "
+	::= { pm1001lhrCtrllineOosModeEntry 1 }
+
+
+pm1001lhrCtrllineOosModePortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port Out Of Service :This 
+        OID sets the line port Out Of Service
+        "
+	::= { pm1001lhrCtrllineOosModeEntry 2 }
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pm1001lhrCtrlledTest OBJECT IDENTIFIER ::= { pm1001lhrCtrlOther 192 }
+
+
+
+
+pm1001lhrCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pm1001lhrCtrlledTest 3 }
+
+
+
+pm1001lhrCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pm1001lhrCtrlledTest 2 }
+
+
+
+pm1001lhrCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pm1001lhrCtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleOosMode article
+--- *****************************************************
+pm1001lhrCtrlmoduleOosMode OBJECT IDENTIFIER ::= { pm1001lhrCtrlOther 193 }
+
+
+
+
+pm1001lhrCtrlModuleOosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Out Of Service :This OID sets 
+        the PM1008 Out Of Service  <Help> 
+         This control defines the service 
+        state of the complete module
+        "
+	  ::= { pm1001lhrCtrlmoduleOosMode 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrlxfpOnoff articles
+--- *********************************************************
+
+pm1001lhrCtrlxfpOnoffTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrlxfpOnoffEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrlxfpOnoff
+         Article
+        "
+	::= { pm1001lhrCtrlLine 208 }
+
+
+pm1001lhrCtrlxfpOnoffEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrlxfpOnoffEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrlxfpOnoff 
+        table
+        "
+	INDEX   { pm1001lhrCtrlxfpOnoffIndex }
+	::= { pm1001lhrCtrlxfpOnoffTable 1 }
+
+
+Pm1001lhrCtrlxfpOnoffEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrlxfpOnoffIndex
+		INTEGER,
+	pm1001lhrCtrlxfpOnoffPortn
+		EkiState
+	}
+
+
+pm1001lhrCtrlxfpOnoffIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrlxfpOnoff 
+        table
+        "
+	::= { pm1001lhrCtrlxfpOnoffEntry 1 }
+
+
+pm1001lhrCtrlxfpOnoffPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Laser Shutdown :This 
+        OID switches off the XFP or the 
+        OTX  <Help>  This control defines 
+        the laser state of the line transceiver
+        "
+	::= { pm1001lhrCtrlxfpOnoffEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrlxfpLineLoop articles
+--- *********************************************************
+
+pm1001lhrCtrlxfpLineLoopTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrlxfpLineLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrlxfpLineLoop 
+        Article
+        "
+	::= { pm1001lhrCtrlLine 209 }
+
+
+pm1001lhrCtrlxfpLineLoopEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrlxfpLineLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrlxfpLineLoop 
+        table
+        "
+	INDEX   { pm1001lhrCtrlxfpLineLoopIndex }
+	::= { pm1001lhrCtrlxfpLineLoopTable 1 }
+
+
+Pm1001lhrCtrlxfpLineLoopEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrlxfpLineLoopIndex
+		INTEGER,
+	pm1001lhrCtrlxfpLineLoopPortn
+		EkiState
+	}
+
+
+pm1001lhrCtrlxfpLineLoopIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrlxfpLineLoop 
+        table
+        "
+	::= { pm1001lhrCtrlxfpLineLoopEntry 1 }
+
+
+pm1001lhrCtrlxfpLineLoopPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Facility Loopback :This OID 
+        operates a Line Facility Loopback, 
+        looping line input signal on the 
+        line output port. The loop is located 
+        on the line transceiver. If the 
+        Line signal carries DCC, the management 
+        network is impacted  <Help> This 
+        maintenance parameter operates
+         a Line Facility Loopback, looping 
+        line input signal on the line output 
+        port. The loop is located on the 
+        line transceiver. If the Line signal 
+        carries DCC, the management network 
+        is impacted
+        "
+	::= { pm1001lhrCtrlxfpLineLoopEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrlxfpXfiLoop articles
+--- *********************************************************
+
+pm1001lhrCtrlxfpXfiLoopTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrlxfpXfiLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrlxfpXfiLoop 
+        Article
+        "
+	::= { pm1001lhrCtrlLine 210 }
+
+
+pm1001lhrCtrlxfpXfiLoopEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrlxfpXfiLoopEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrlxfpXfiLoop 
+        table
+        "
+	INDEX   { pm1001lhrCtrlxfpXfiLoopIndex }
+	::= { pm1001lhrCtrlxfpXfiLoopTable 1 }
+
+
+Pm1001lhrCtrlxfpXfiLoopEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrlxfpXfiLoopIndex
+		INTEGER,
+	pm1001lhrCtrlxfpXfiLoopPortn
+		EkiState
+	}
+
+
+pm1001lhrCtrlxfpXfiLoopIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrlxfpXfiLoop 
+        table
+        "
+	::= { pm1001lhrCtrlxfpXfiLoopEntry 1 }
+
+
+pm1001lhrCtrlxfpXfiLoopPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Terminal Loopback :This OID 
+        operates a Line Terminal Loopback, 
+        looping line input signal on the 
+        line output port. The loop is located 
+        on all client transceivers  <Help> 
+        This maintenance parameter operates 
+        a Line Terminal Loopback, looping 
+        line input signal on the line output 
+        port. The loop is located on all 
+        client transceivers.
+        "
+	::= { pm1001lhrCtrlxfpXfiLoopEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrllineTunableChannel articles
+--- *********************************************************
+
+pm1001lhrCtrllineTunableChannelTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrllineTunableChannelEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrllineTunableChannel 
+        Article
+        "
+	::= { pm1001lhrCtrlLine 212 }
+
+
+pm1001lhrCtrllineTunableChannelEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrllineTunableChannelEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrllineTunableChannel 
+        table
+        "
+	INDEX   { pm1001lhrCtrllineTunableChannelIndex }
+	::= { pm1001lhrCtrllineTunableChannelTable 1 }
+
+
+Pm1001lhrCtrllineTunableChannelEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrllineTunableChannelIndex
+		INTEGER,
+	pm1001lhrCtrllineTunableChannelPortn
+		Pm1001lhrOtxChannel
+	}
+
+
+pm1001lhrCtrllineTunableChannelIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrllineTunableChannel 
+        table
+        "
+	::= { pm1001lhrCtrllineTunableChannelEntry 1 }
+
+
+pm1001lhrCtrllineTunableChannelPortn OBJECT-TYPE
+	SYNTAX  Pm1001lhrOtxChannel
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        ITU Channel :This OID selects
+         the ITU channel of the Line OTX 
+        TLH Laser  <Help>   This control 
+        defines the ITU channel of the
+         Line OTX TLH Laser
+        "
+	::= { pm1001lhrCtrllineTunableChannelEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrllinePhotodiodeMode articles
+--- *********************************************************
+
+pm1001lhrCtrllinePhotodiodeModeTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrllinePhotodiodeModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrllinePhotodiodeMode 
+        Article
+        "
+	::= { pm1001lhrCtrlLine 213 }
+
+
+pm1001lhrCtrllinePhotodiodeModeEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrllinePhotodiodeModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrllinePhotodiodeMode 
+        table
+        "
+	INDEX   { pm1001lhrCtrllinePhotodiodeModeIndex }
+	::= { pm1001lhrCtrllinePhotodiodeModeTable 1 }
+
+
+Pm1001lhrCtrllinePhotodiodeModeEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrllinePhotodiodeModeIndex
+		INTEGER,
+	pm1001lhrCtrllinePhotodiodeModePortn
+		Pm1001lhrOtxMode
+	}
+
+
+pm1001lhrCtrllinePhotodiodeModeIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrllinePhotodiodeMode 
+        table
+        "
+	::= { pm1001lhrCtrllinePhotodiodeModeEntry 1 }
+
+
+pm1001lhrCtrllinePhotodiodeModePortn OBJECT-TYPE
+	SYNTAX  Pm1001lhrOtxMode
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        OTX TLH Rx Sens. Mode :This OID 
+        defines the Rx sensiblity mode
+         of the Line OTX TLH  <Help>  
+         This control defines the receiver 
+        sensibility mode of the Line OTX 
+        TLH Laser (OTX60, OTX80 or Custom)
+        "
+	::= { pm1001lhrCtrllinePhotodiodeModeEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrllinePhotodiodeValue articles
+--- *********************************************************
+
+pm1001lhrCtrllinePhotodiodeValueTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrllinePhotodiodeValueEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrllinePhotodiodeValue 
+        Article
+        "
+	::= { pm1001lhrCtrlLine 214 }
+
+
+pm1001lhrCtrllinePhotodiodeValueEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrllinePhotodiodeValueEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrllinePhotodiodeValue 
+        table
+        "
+	INDEX   { pm1001lhrCtrllinePhotodiodeValueIndex }
+	::= { pm1001lhrCtrllinePhotodiodeValueTable 1 }
+
+
+Pm1001lhrCtrllinePhotodiodeValueEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrllinePhotodiodeValueIndex
+		INTEGER,
+	pm1001lhrCtrllinePhotodiodeValuePortn
+		Pm1001lhrAdjustValue
+	}
+
+
+pm1001lhrCtrllinePhotodiodeValueIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrllinePhotodiodeValue 
+        table
+        "
+	::= { pm1001lhrCtrllinePhotodiodeValueEntry 1 }
+
+
+pm1001lhrCtrllinePhotodiodeValuePortn OBJECT-TYPE
+	SYNTAX  Pm1001lhrAdjustValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        OTX TLH Rx Sensibility :This OID 
+        sets the Rx sensibility of the
+         Line OTX TLH (custom mode only) 
+         <Help>   This control defines
+         the receiver sensibility value 
+        (only in Custom mode) of the Line 
+        OTX TLH Laser
+        "
+	::= { pm1001lhrCtrllinePhotodiodeValueEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCtrllinePowerLaser articles
+--- *********************************************************
+
+pm1001lhrCtrllinePowerLaserTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCtrllinePowerLaserEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCtrllinePowerLaser 
+        Article
+        "
+	::= { pm1001lhrCtrlLine 215 }
+
+
+pm1001lhrCtrllinePowerLaserEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCtrllinePowerLaserEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCtrllinePowerLaser 
+        table
+        "
+	INDEX   { pm1001lhrCtrllinePowerLaserIndex }
+	::= { pm1001lhrCtrllinePowerLaserTable 1 }
+
+
+Pm1001lhrCtrllinePowerLaserEntry ::=
+	SEQUENCE {
+	pm1001lhrCtrllinePowerLaserIndex
+		INTEGER,
+	pm1001lhrCtrllinePowerLaserPortn
+		INTEGER 
+	}
+
+
+pm1001lhrCtrllinePowerLaserIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCtrllinePowerLaser 
+        table
+        "
+	::= { pm1001lhrCtrllinePowerLaserEntry 1 }
+
+
+pm1001lhrCtrllinePowerLaserPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..255)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line Laser Output Power [3-5]
+         :This OID sets the output power 
+        value on the laser of the Line
+         OTX TLH (AV=Power*10+158) (Unit 
+        = dBm)  <Help>   This control defines 
+        the start-up output power of the 
+        Line OTX TLH
+        "
+	::= { pm1001lhrCtrllinePowerLaserEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     COUNTERS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCntdfrmB1ErrCnt articles
+--- *********************************************************
+
+pm1001lhrCntdfrmB1ErrCntTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCntdfrmB1ErrCntEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCntdfrmB1ErrCnt 
+        Article
+        "
+	::= { pm1001lhrCntLine 152 }
+
+
+pm1001lhrCntdfrmB1ErrCntEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCntdfrmB1ErrCntEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCntdfrmB1ErrCnt 
+        table
+        "
+	INDEX   { pm1001lhrCntdfrmB1ErrCntIndex }
+	::= { pm1001lhrCntdfrmB1ErrCntTable 1 }
+
+
+Pm1001lhrCntdfrmB1ErrCntEntry ::=
+	SEQUENCE {
+	pm1001lhrCntdfrmB1ErrCntIndex
+		INTEGER,
+	pm1001lhrCntdfrmB1ErrCntValuePortn
+		Counter32,
+	pm1001lhrCntdfrmB1ErrCntErrorPortn
+		EkiOnOff,
+	pm1001lhrCntdfrmB1ErrCntOverloadPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrCntdfrmB1ErrCntIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCntdfrmB1ErrCnt 
+        table
+        "
+	::= { pm1001lhrCntdfrmB1ErrCntEntry 1 }
+
+
+pm1001lhrCntdfrmB1ErrCntValuePortn OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Input SM-BIP8 Errors :This 
+        counter is incremented each time 
+        a B1 error is detected on the Deframer 
+        input stream.  <Help>  This counter 
+        gives the number of B1 errors on 
+        the line port
+        "
+	::= { pm1001lhrCntdfrmB1ErrCntEntry 2 }
+
+
+pm1001lhrCntdfrmB1ErrCntErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Counter Error :This OID when 
+        set indicates the B1 error counter 
+        value is invalid on Port
+        "
+	::= { pm1001lhrCntdfrmB1ErrCntEntry 3 }
+
+
+pm1001lhrCntdfrmB1ErrCntOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Counter Overload :This OID 
+        when set indicates a B1 error counter 
+        overload on Port
+        "
+	::= { pm1001lhrCntdfrmB1ErrCntEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCntdfrmTimCnt articles
+--- *********************************************************
+
+pm1001lhrCntdfrmTimCntTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCntdfrmTimCntEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCntdfrmTimCnt 
+        Article
+        "
+	::= { pm1001lhrCntLine 153 }
+
+
+pm1001lhrCntdfrmTimCntEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCntdfrmTimCntEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCntdfrmTimCnt 
+        table
+        "
+	INDEX   { pm1001lhrCntdfrmTimCntIndex }
+	::= { pm1001lhrCntdfrmTimCntTable 1 }
+
+
+Pm1001lhrCntdfrmTimCntEntry ::=
+	SEQUENCE {
+	pm1001lhrCntdfrmTimCntIndex
+		INTEGER,
+	pm1001lhrCntdfrmTimCntValuePortn
+		Counter32,
+	pm1001lhrCntdfrmTimCntErrorPortn
+		EkiOnOff,
+	pm1001lhrCntdfrmTimCntOverloadPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrCntdfrmTimCntIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCntdfrmTimCnt 
+        table
+        "
+	::= { pm1001lhrCntdfrmTimCntEntry 1 }
+
+
+pm1001lhrCntdfrmTimCntValuePortn OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Timer Counter :This is the 
+        timing counter dedicated to the 
+        downstream deframer counters. It 
+        is incremented every 125 us.
+        "
+	::= { pm1001lhrCntdfrmTimCntEntry 2 }
+
+
+pm1001lhrCntdfrmTimCntErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Counter Error :This OID when 
+        set indicates the deframer timer 
+        counter value is invalid on Port
+        "
+	::= { pm1001lhrCntdfrmTimCntEntry 3 }
+
+
+pm1001lhrCntdfrmTimCntOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Counter Overload :This OID 
+        when set indicates a deframer timer 
+        counter overload on Port
+        "
+	::= { pm1001lhrCntdfrmTimCntEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrCntdfrmPrimLineErrCnt articles
+--- *********************************************************
+
+pm1001lhrCntdfrmPrimLineErrCntTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCntdfrmPrimLineErrCntEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrCntdfrmPrimLineErrCnt 
+        Article
+        "
+	::= { pm1001lhrCntLine 154 }
+
+
+pm1001lhrCntdfrmPrimLineErrCntEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCntdfrmPrimLineErrCntEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrCntdfrmPrimLineErrCnt 
+        table
+        "
+	INDEX   { pm1001lhrCntdfrmPrimLineErrCntIndex }
+	::= { pm1001lhrCntdfrmPrimLineErrCntTable 1 }
+
+
+Pm1001lhrCntdfrmPrimLineErrCntEntry ::=
+	SEQUENCE {
+	pm1001lhrCntdfrmPrimLineErrCntIndex
+		INTEGER,
+	pm1001lhrCntdfrmPrimLineErrCntValuePortn
+		Counter32,
+	pm1001lhrCntdfrmPrimLineErrCntErrorPortn
+		EkiOnOff,
+	pm1001lhrCntdfrmPrimLineErrCntOverloadPortn
+		EkiOnOff
+	}
+
+
+pm1001lhrCntdfrmPrimLineErrCntIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrCntdfrmPrimLineErrCnt 
+        table
+        "
+	::= { pm1001lhrCntdfrmPrimLineErrCntEntry 1 }
+
+
+pm1001lhrCntdfrmPrimLineErrCntValuePortn OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Input FEC Corrected Errors 
+        :This counter is incremented each 
+        time the FEC is correcting an error 
+        on the line input stream.  <Help> 
+         This counter gives the number
+         of errors corrected by the FEC 
+        on the line port
+        "
+	::= { pm1001lhrCntdfrmPrimLineErrCntEntry 2 }
+
+
+pm1001lhrCntdfrmPrimLineErrCntErrorPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        FEC Counter Error :This bit when 
+        set indicates the FEC corrected 
+        errors counter value is invalid 
+        on Line
+        "
+	::= { pm1001lhrCntdfrmPrimLineErrCntEntry 3 }
+
+
+pm1001lhrCntdfrmPrimLineErrCntOverloadPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        FEC Counter Overload :This bit 
+        when set indicates a FEC corrected 
+        errors counter overload on Line
+        "
+	::= { pm1001lhrCntdfrmPrimLineErrCntEntry 4 }
+
+
+pm1001lhrCntCountersReset  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Counters Reset:This OID resets and restarts all the counters"
+	::= { pm1001lhrcounters  259 }
+
+pm1001lhrCntCountersStop  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Counters stop:This OID stops all the counters"
+	::= { pm1001lhrcounters 260 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+pm1001lhrMesrsynth0 OBJECT-TYPE
+	  SYNTAX EkiMeasureType
+	  MAX-ACCESS read-only
+	  STATUS deprecated
+	  DESCRIPTION
+        "
+        Not Used :This OID gives the unit 
+        used on AUX1 measurement of XFP#1 
+         (Unit = )
+        "
+	  ::= { pm1001lhrMesrOther 0 }
+
+
+
+pm1001lhrMesrsynth1 OBJECT-TYPE
+	  SYNTAX EkiMeasureType
+	  MAX-ACCESS read-only
+	  STATUS deprecated
+	  DESCRIPTION
+        "
+        Not Used :This OID gives the unit 
+        used on AUX2 measurement of XFP#1 
+         (Unit = )
+        "
+	  ::= { pm1001lhrMesrOther 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrxfp1LxModTempMeas articles
+--- *********************************************************
+
+pm1001lhrMesrxfp1LxModTempMeasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrxfp1LxModTempMeasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrxfp1LxModTempMeas 
+        Article
+        "
+	::= { pm1001lhrMesrLine 208 }
+
+
+pm1001lhrMesrxfp1LxModTempMeasEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrxfp1LxModTempMeasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrxfp1LxModTempMeas 
+        table
+        "
+	INDEX   { pm1001lhrMesrxfp1LxModTempMeasIndex }
+	::= { pm1001lhrMesrxfp1LxModTempMeasTable 1 }
+
+
+Pm1001lhrMesrxfp1LxModTempMeasEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrxfp1LxModTempMeasIndex
+		INTEGER,
+	pm1001lhrMesrxfp1LxModTempMeasPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrxfp1LxModTempMeasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrxfp1LxModTempMeas 
+        table
+        "
+	::= { pm1001lhrMesrxfp1LxModTempMeasEntry 1 }
+
+
+pm1001lhrMesrxfp1LxModTempMeasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Temperature 
+        :This OID gives the temperature 
+        of the XFP or OTX plugged in line#n, 
+        read from the DDM (Digital Diagnostic 
+        Monitoring) (Temperature = AV/256) 
+        (Unit = C)  <Help>  This measure 
+        gives the temperature of the line 
+        transceiver
+        "
+	::= { pm1001lhrMesrxfp1LxModTempMeasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrxfp1Reserved articles
+--- *********************************************************
+
+pm1001lhrMesrxfp1ReservedTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrxfp1ReservedEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrxfp1Reserved 
+        Article
+        "
+	::= { pm1001lhrMesrLine 209 }
+
+
+pm1001lhrMesrxfp1ReservedEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrxfp1ReservedEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrxfp1Reserved 
+        table
+        "
+	INDEX   { pm1001lhrMesrxfp1ReservedIndex }
+	::= { pm1001lhrMesrxfp1ReservedTable 1 }
+
+
+Pm1001lhrMesrxfp1ReservedEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrxfp1ReservedIndex
+		INTEGER,
+	pm1001lhrMesrxfp1ReservedPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrxfp1ReservedIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrxfp1Reserved 
+        table
+        "
+	::= { pm1001lhrMesrxfp1ReservedEntry 1 }
+
+
+pm1001lhrMesrxfp1ReservedPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Not Used :Reserved
+        "
+	::= { pm1001lhrMesrxfp1ReservedEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrxfp1LoBiasCurrentMeas articles
+--- *********************************************************
+
+pm1001lhrMesrxfp1LoBiasCurrentMeasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrxfp1LoBiasCurrentMeasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrxfp1LoBiasCurrentMeas 
+        Article
+        "
+	::= { pm1001lhrMesrLine 210 }
+
+
+pm1001lhrMesrxfp1LoBiasCurrentMeasEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrxfp1LoBiasCurrentMeasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrxfp1LoBiasCurrentMeas 
+        table
+        "
+	INDEX   { pm1001lhrMesrxfp1LoBiasCurrentMeasIndex }
+	::= { pm1001lhrMesrxfp1LoBiasCurrentMeasTable 1 }
+
+
+Pm1001lhrMesrxfp1LoBiasCurrentMeasEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrxfp1LoBiasCurrentMeasIndex
+		INTEGER,
+	pm1001lhrMesrxfp1LoBiasCurrentMeasPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrxfp1LoBiasCurrentMeasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrxfp1LoBiasCurrentMeas 
+        table
+        "
+	::= { pm1001lhrMesrxfp1LoBiasCurrentMeasEntry 1 }
+
+
+pm1001lhrMesrxfp1LoBiasCurrentMeasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Laser Bias 
+        :This OID gives the bias value
+         of the XFP or OTX plugged in line 
+        #n, read from the DDM (Digital
+         Diagnostic Monitoring) (Bias = 
+        AV/500) (Unit = mA)  <Help>  This 
+        measure gives the bias of the line 
+        transceiver
+        "
+	::= { pm1001lhrMesrxfp1LoBiasCurrentMeasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrxfp1LoTxPowerMeas articles
+--- *********************************************************
+
+pm1001lhrMesrxfp1LoTxPowerMeasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrxfp1LoTxPowerMeasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrxfp1LoTxPowerMeas 
+        Article
+        "
+	::= { pm1001lhrMesrLine 211 }
+
+
+pm1001lhrMesrxfp1LoTxPowerMeasEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrxfp1LoTxPowerMeasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrxfp1LoTxPowerMeas 
+        table
+        "
+	INDEX   { pm1001lhrMesrxfp1LoTxPowerMeasIndex }
+	::= { pm1001lhrMesrxfp1LoTxPowerMeasTable 1 }
+
+
+Pm1001lhrMesrxfp1LoTxPowerMeasEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrxfp1LoTxPowerMeasIndex
+		INTEGER,
+	pm1001lhrMesrxfp1LoTxPowerMeasPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrxfp1LoTxPowerMeasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrxfp1LoTxPowerMeas 
+        table
+        "
+	::= { pm1001lhrMesrxfp1LoTxPowerMeasEntry 1 }
+
+
+pm1001lhrMesrxfp1LoTxPowerMeasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Tx Power :This 
+        OID gives the transmit power value 
+        of the XFP or OTX plugged in line 
+        #n, read from the DDM (Digital
+           Diagnostic Monitoring) (Power 
+        = 10*log(AV)-40) (Unit = dBm) 
+         <Help>  This measure gives the 
+        Tx optical power of the line transceiver
+        "
+	::= { pm1001lhrMesrxfp1LoTxPowerMeasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrxfp1LiRxPowerMeas articles
+--- *********************************************************
+
+pm1001lhrMesrxfp1LiRxPowerMeasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrxfp1LiRxPowerMeasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrxfp1LiRxPowerMeas 
+        Article
+        "
+	::= { pm1001lhrMesrLine 212 }
+
+
+pm1001lhrMesrxfp1LiRxPowerMeasEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrxfp1LiRxPowerMeasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrxfp1LiRxPowerMeas 
+        table
+        "
+	INDEX   { pm1001lhrMesrxfp1LiRxPowerMeasIndex }
+	::= { pm1001lhrMesrxfp1LiRxPowerMeasTable 1 }
+
+
+Pm1001lhrMesrxfp1LiRxPowerMeasEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrxfp1LiRxPowerMeasIndex
+		INTEGER,
+	pm1001lhrMesrxfp1LiRxPowerMeasPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrxfp1LiRxPowerMeasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrxfp1LiRxPowerMeas 
+        table
+        "
+	::= { pm1001lhrMesrxfp1LiRxPowerMeasEntry 1 }
+
+
+pm1001lhrMesrxfp1LiRxPowerMeasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Rx Power :This 
+        OID gives the receive power value 
+        of the XFP or OTX plugged in line 
+        #n, read from the DDM (Digital
+         Diagnostic Monitoring) (Power
+         = 10*log(AV)-40) (Unit = dBm)
+          <Help>  This measure gives the 
+        Rx optical power of the line transceiver
+        "
+	::= { pm1001lhrMesrxfp1LiRxPowerMeasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrxfp1LxAux1Meas articles
+--- *********************************************************
+
+pm1001lhrMesrxfp1LxAux1MeasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrxfp1LxAux1MeasEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrxfp1LxAux1Meas 
+        Article
+        "
+	::= { pm1001lhrMesrLine 213 }
+
+
+pm1001lhrMesrxfp1LxAux1MeasEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrxfp1LxAux1MeasEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrxfp1LxAux1Meas 
+        table
+        "
+	INDEX   { pm1001lhrMesrxfp1LxAux1MeasIndex }
+	::= { pm1001lhrMesrxfp1LxAux1MeasTable 1 }
+
+
+Pm1001lhrMesrxfp1LxAux1MeasEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrxfp1LxAux1MeasIndex
+		INTEGER,
+	pm1001lhrMesrxfp1LxAux1MeasPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrxfp1LxAux1MeasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrxfp1LxAux1Meas 
+        table
+        "
+	::= { pm1001lhrMesrxfp1LxAux1MeasEntry 1 }
+
+
+pm1001lhrMesrxfp1LxAux1MeasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Not Used :This OID gives the receive 
+        power value read in the DDM (Digital 
+        Diagnostic Monitoring) of the XFP 
+        or OTX plugged in line #n (Unit 
+        = ?)
+        "
+	::= { pm1001lhrMesrxfp1LxAux1MeasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrxfp1LxAux2Meas articles
+--- *********************************************************
+
+pm1001lhrMesrxfp1LxAux2MeasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrxfp1LxAux2MeasEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrxfp1LxAux2Meas 
+        Article
+        "
+	::= { pm1001lhrMesrLine 214 }
+
+
+pm1001lhrMesrxfp1LxAux2MeasEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrxfp1LxAux2MeasEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrxfp1LxAux2Meas 
+        table
+        "
+	INDEX   { pm1001lhrMesrxfp1LxAux2MeasIndex }
+	::= { pm1001lhrMesrxfp1LxAux2MeasTable 1 }
+
+
+Pm1001lhrMesrxfp1LxAux2MeasEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrxfp1LxAux2MeasIndex
+		INTEGER,
+	pm1001lhrMesrxfp1LxAux2MeasPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrxfp1LxAux2MeasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrxfp1LxAux2Meas 
+        table
+        "
+	::= { pm1001lhrMesrxfp1LxAux2MeasEntry 1 }
+
+
+pm1001lhrMesrxfp1LxAux2MeasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Not Used :This OID gives the receive 
+        power value read in the DDM (Digital 
+        Diagnostic Monitoring) of the XFP 
+        or OTX plugged in line #n (Unit 
+        = ?)
+        "
+	::= { pm1001lhrMesrxfp1LxAux2MeasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrotx1Aging articles
+--- *********************************************************
+
+pm1001lhrMesrotx1AgingTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrotx1AgingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrotx1Aging 
+        Article
+        "
+	::= { pm1001lhrMesrLine 224 }
+
+
+pm1001lhrMesrotx1AgingEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrotx1AgingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrotx1Aging 
+        table
+        "
+	INDEX   { pm1001lhrMesrotx1AgingIndex }
+	::= { pm1001lhrMesrotx1AgingTable 1 }
+
+
+Pm1001lhrMesrotx1AgingEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrotx1AgingIndex
+		INTEGER,
+	pm1001lhrMesrotx1AgingPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrotx1AgingIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrotx1Aging 
+        table
+        "
+	::= { pm1001lhrMesrotx1AgingEntry 1 }
+
+
+pm1001lhrMesrotx1AgingPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line OTX TLH Aging :This OID gives 
+        the aging of the Line OTX TLH,
+         read from the DDM (Digital Diagnostic 
+        Monitoring)  (Aging = AV)  (Unit 
+        = %)  <Help>  This measure gives 
+        the aging of the Line OTX TLH
+        "
+	::= { pm1001lhrMesrotx1AgingEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrotx1LaserTemperature articles
+--- *********************************************************
+
+pm1001lhrMesrotx1LaserTemperatureTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrotx1LaserTemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrotx1LaserTemperature 
+        Article
+        "
+	::= { pm1001lhrMesrLine 225 }
+
+
+pm1001lhrMesrotx1LaserTemperatureEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrotx1LaserTemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrotx1LaserTemperature 
+        table
+        "
+	INDEX   { pm1001lhrMesrotx1LaserTemperatureIndex }
+	::= { pm1001lhrMesrotx1LaserTemperatureTable 1 }
+
+
+Pm1001lhrMesrotx1LaserTemperatureEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrotx1LaserTemperatureIndex
+		INTEGER,
+	pm1001lhrMesrotx1LaserTemperaturePortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrotx1LaserTemperatureIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrotx1LaserTemperature 
+        table
+        "
+	::= { pm1001lhrMesrotx1LaserTemperatureEntry 1 }
+
+
+pm1001lhrMesrotx1LaserTemperaturePortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS deprecated
+	DESCRIPTION
+        "
+        Line OTX TLH Laser Temperature 
+        :This OID gives the laser temperature 
+        of the Line OTX TLH, read from
+         the DDM (Digital Diagnostic Monitoring) 
+        (Temperature = AV/256)  (Unit = 
+        C)  <Help>  This measure gives
+         the laser temperature of the Line 
+        OTX TLH
+        "
+	::= { pm1001lhrMesrotx1LaserTemperatureEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrotx1FreqDeviation articles
+--- *********************************************************
+
+pm1001lhrMesrotx1FreqDeviationTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrotx1FreqDeviationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrotx1FreqDeviation 
+        Article
+        "
+	::= { pm1001lhrMesrLine 226 }
+
+
+pm1001lhrMesrotx1FreqDeviationEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrotx1FreqDeviationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrotx1FreqDeviation 
+        table
+        "
+	INDEX   { pm1001lhrMesrotx1FreqDeviationIndex }
+	::= { pm1001lhrMesrotx1FreqDeviationTable 1 }
+
+
+Pm1001lhrMesrotx1FreqDeviationEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrotx1FreqDeviationIndex
+		INTEGER,
+	pm1001lhrMesrotx1FreqDeviationPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrotx1FreqDeviationIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrotx1FreqDeviation 
+        table
+        "
+	::= { pm1001lhrMesrotx1FreqDeviationEntry 1 }
+
+
+pm1001lhrMesrotx1FreqDeviationPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line OTX TLH Frequency Deviation 
+        :This OID gives the frequency deviation 
+        of the Line OTX TLH, read from
+         the DDM (Digital Diagnostic Monitoring) 
+         (Deviation = (AV-32768)*100) (Unit 
+        = MHz)  <Help>  This measure gives 
+        the frequency deviation of the
+         Line OTX TLH
+        "
+	::= { pm1001lhrMesrotx1FreqDeviationEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm1001lhrMesrotx1LaserWvlength articles
+--- *********************************************************
+
+pm1001lhrMesrotx1LaserWvlengthTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrMesrotx1LaserWvlengthEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm1001lhrMesrotx1LaserWvlength 
+        Article
+        "
+	::= { pm1001lhrMesrLine 227 }
+
+
+pm1001lhrMesrotx1LaserWvlengthEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrMesrotx1LaserWvlengthEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm1001lhrMesrotx1LaserWvlength 
+        table
+        "
+	INDEX   { pm1001lhrMesrotx1LaserWvlengthIndex }
+	::= { pm1001lhrMesrotx1LaserWvlengthTable 1 }
+
+
+Pm1001lhrMesrotx1LaserWvlengthEntry ::=
+	SEQUENCE {
+	pm1001lhrMesrotx1LaserWvlengthIndex
+		INTEGER,
+	pm1001lhrMesrotx1LaserWvlengthPortn
+		INTEGER 
+	}
+
+
+pm1001lhrMesrotx1LaserWvlengthIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm1001lhrMesrotx1LaserWvlength 
+        table
+        "
+	::= { pm1001lhrMesrotx1LaserWvlengthEntry 1 }
+
+
+pm1001lhrMesrotx1LaserWvlengthPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Optical Module Wavelength 
+        :This OID gives the laser wavelength 
+        of the Line OTX TLH, read from
+         the DDM (Digital Diagnostic Monitoring) 
+        (Wavelength=299792458/((193,100+(AV-32768 
+        )*12,5)*10 3))  (Unit = nm)  <Help> 
+         This measure gives the laser wavelength 
+        of the Line OTX TLH
+        "
+	::= { pm1001lhrMesrotx1LaserWvlengthEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     DOWNLOAD
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the restartProcess article
+--- *****************************************************
+pm1001lhrDwlrestartProcess OBJECT IDENTIFIER ::= { pm1001lhrDwlOther 0 }
+
+
+
+
+pm1001lhrDwlColdRestartProcessed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Cold Restart :This OID indicates 
+        that the module last restart was 
+        a Cold RESTART
+        "
+	  ::= { pm1001lhrDwlrestartProcess 2 }
+
+
+
+pm1001lhrDwlWarmRestartProcessed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warm Restart :This OID indicates 
+        that the module last restart was 
+        a Warm RESTART
+        "
+	  ::= { pm1001lhrDwlrestartProcess 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swBanksUsed article
+--- *****************************************************
+pm1001lhrDwlswBanksUsed OBJECT IDENTIFIER ::= { pm1001lhrDwlOther 1 }
+
+
+
+
+pm1001lhrDwlSwBank2Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 2 loaded  :This OID indicates 
+        a software is loaded in SW bank 
+        2  <Help>  This status indicates 
+        if the SW bank 2 contains SW package
+        "
+	  ::= { pm1001lhrDwlswBanksUsed 6 }
+
+
+
+pm1001lhrDwlSwBank1Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 1 loaded  :This OID indicates 
+        a software is loaded in SW bank 
+        1  <Help>  This status indicates 
+        if the SW bank 1 contains SW package
+        "
+	  ::= { pm1001lhrDwlswBanksUsed 5 }
+
+
+
+pm1001lhrDwlSwBank2Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 2 active  :This OID indicates 
+        the module is working on SW bank 
+        2  <Help>  This status indicates 
+        if the SW bank 2 is active or standby
+        "
+	  ::= { pm1001lhrDwlswBanksUsed 2 }
+
+
+
+pm1001lhrDwlSwBank1Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 1 active  :This OID indicates 
+        the module is working on SW bank 
+        1  <Help>  This status indicates 
+        if the SW bank 1 is active or standby
+        "
+	  ::= { pm1001lhrDwlswBanksUsed 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the gwBanksUsed article
+--- *****************************************************
+pm1001lhrDwlgwBanksUsed OBJECT IDENTIFIER ::= { pm1001lhrDwlOther 2 }
+
+
+
+
+pm1001lhrDwlGwBank4Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 4 loaded  :This OID indicates 
+        a gateware is loaded in GW bank 
+        4
+        "
+	  ::= { pm1001lhrDwlgwBanksUsed 8 }
+
+
+
+pm1001lhrDwlGwBank3Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 3 loaded  :This OID indicates 
+        a gateware is loaded in GW bank 
+        3  <Help>  This status indicates 
+        if the GW bank 3 contains GW package
+        "
+	  ::= { pm1001lhrDwlgwBanksUsed 7 }
+
+
+
+pm1001lhrDwlGwBank2Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 2 loaded  :This OID indicates 
+        a gateware is loaded in GW bank 
+        2
+        "
+	  ::= { pm1001lhrDwlgwBanksUsed 6 }
+
+
+
+pm1001lhrDwlGwBank1Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 1 loaded  :This OID indicates 
+        a gateware is loaded in GW bank 
+        1  <Help>  This status indicates 
+        if the GW bank 1 contains GW package
+        "
+	  ::= { pm1001lhrDwlgwBanksUsed 5 }
+
+
+
+pm1001lhrDwlGwBank4Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 4 active  :This OID indicates 
+        the module is working on GW bank 
+        4
+        "
+	  ::= { pm1001lhrDwlgwBanksUsed 4 }
+
+
+
+pm1001lhrDwlGwBank3Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 3 active  :This OID indicates 
+        the module is working on GW bank 
+        3  <Help>  This status indicates 
+        if the GW bank 3 is active or standby
+        "
+	  ::= { pm1001lhrDwlgwBanksUsed 3 }
+
+
+
+pm1001lhrDwlGwBank2Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 2 active  :This OID indicates 
+        the module is working on GW bank 
+        2
+        "
+	  ::= { pm1001lhrDwlgwBanksUsed 2 }
+
+
+
+pm1001lhrDwlGwBank1Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 1 active  :This OID indicates 
+        the module is working on GW bank 
+        1  <Help>  This status indicates 
+        if the GW bank 1 is active or standby
+        "
+	  ::= { pm1001lhrDwlgwBanksUsed 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group accessCAisCsf
+--- *****************************************************
+
+pm1001lhrCfgAccessCAisCsf OBJECT IDENTIFIER ::= { pm1001lhrConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startup
+--- *****************************************************
+
+pm1001lhrCfgStartup OBJECT IDENTIFIER ::= { pm1001lhrConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pm1001lhrtablelineStartup OBJECT IDENTIFIER ::= { pm1001lhrCfgStartup 1 }
+
+
+
+pm1001lhrCfgsystConfLine1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line 1 :This 
+        register configures the default 
+        initialisation settings on Line 
+        port 1.
+        "
+	  ::= { pm1001lhrtablelineStartup 2 }
+
+
+
+pm1001lhrCfgnetConfMod OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Protocol on Module :This 
+        register configures the default 
+        initialisation protocol on the
+         module.
+        "
+	  ::= { pm1001lhrtablelineStartup 3 }
+
+
+
+pm1001lhrCfglineOptions1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Options on Active Line 
+        Port :This register configures
+         the default options on the active 
+        line port
+        "
+	  ::= { pm1001lhrtablelineStartup 5 }
+
+
+
+pm1001lhrCfgsystConfLine2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line 2 :This 
+        register configures the default 
+        initialisation settings on Line 
+        port 2.
+        "
+	  ::= { pm1001lhrtablelineStartup 6 }
+
+
+
+pm1001lhrCfglineOptions2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Options on Active Line 
+        Port :This register configures
+         the default options on the active 
+        line port
+        "
+	  ::= { pm1001lhrtablelineStartup 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 21AB
+--- *****************************************************
+
+pm1001lhrCfgXfpTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCfgXfpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm1001lhrCfgStartup 2 }
+
+
+pm1001lhrCfgXfpEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCfgXfpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startup 
+        table
+        "
+	INDEX   { pm1001lhrCfgXfpIndex }
+	::= { pm1001lhrCfgXfpTable 1 }
+
+
+Pm1001lhrCfgXfpEntry ::=
+	SEQUENCE {
+	pm1001lhrCfgXfpIndex
+		INTEGER,
+	pm1001lhrCfgSystConfXfpPortn
+		Unsigned32,
+	pm1001lhrCfgDataRateConfXfpPortn
+		Unsigned32
+	}
+
+
+pm1001lhrCfgXfpIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the xfp table
+        "
+	::= { pm1001lhrCfgXfpEntry 1 }
+
+
+pm1001lhrCfgSystConfXfpPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on XFP Port :This 
+        register configures the default 
+        initialisation settings on XFP
+         port.
+        "
+	::= { pm1001lhrCfgXfpEntry 3 }
+
+
+pm1001lhrCfgDataRateConfXfpPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+        "
+        :
+        "
+	::= { pm1001lhrCfgXfpEntry 4 }
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pm1001lhrCfgLabels OBJECT IDENTIFIER ::= { pm1001lhrConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm1001lhrCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm1001lhrCfgLabels 1 }
+
+
+pm1001lhrCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pm1001lhrCfgLabelclientIndex }
+	::= { pm1001lhrCfgLabelclientTable 1 }
+
+
+Pm1001lhrCfgLabelclientEntry ::=
+	SEQUENCE {
+	pm1001lhrCfgLabelclientIndex
+		INTEGER,
+	pm1001lhrCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pm1001lhrCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pm1001lhrCfgLabelclientEntry 1 }
+
+
+pm1001lhrCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pm1001lhrCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm1001lhrCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm1001lhrCfgLabels 2 }
+
+
+pm1001lhrCfgLabellineEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pm1001lhrCfgLabellineIndex }
+	::= { pm1001lhrCfgLabellineTable 1 }
+
+
+Pm1001lhrCfgLabellineEntry ::=
+	SEQUENCE {
+	pm1001lhrCfgLabellineIndex
+		INTEGER,
+	pm1001lhrCfgLabellinePortn
+		DisplayString
+	}
+
+
+pm1001lhrCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pm1001lhrCfgLabellineEntry 1 }
+
+
+pm1001lhrCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pm1001lhrCfgLabellineEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table Group startuptlh
+--- *****************************************************
+
+pm1001lhrCfgStartuptlh OBJECT IDENTIFIER ::= { pm1001lhrConfig 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 25A8
+--- *****************************************************
+
+pm1001lhrCfgOtxtlhTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCfgOtxtlhEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm1001lhrCfgStartuptlh 1 }
+
+
+pm1001lhrCfgOtxtlhEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCfgOtxtlhEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startuptlh 
+        table
+        "
+	INDEX   { pm1001lhrCfgOtxtlhIndex }
+	::= { pm1001lhrCfgOtxtlhTable 1 }
+
+
+Pm1001lhrCfgOtxtlhEntry ::=
+	SEQUENCE {
+	pm1001lhrCfgOtxtlhIndex
+		INTEGER,
+	pm1001lhrCfgNuPortn
+		Unsigned32,
+	pm1001lhrCfgLineDitherRatePortn
+		Unsigned32,
+	pm1001lhrCfgLineDitherFhzPortn
+		Unsigned32,
+	pm1001lhrCfgLinePwrLaserPortn
+		Unsigned32,
+	pm1001lhrCfgLineFCurrentPortn
+		Unsigned32,
+	pm1001lhrCfgLineGridCurrentPortn
+		Unsigned32,
+	pm1001lhrCfgFPortn
+		Unsigned32,
+	pm1001lhrCfgReservedPortn
+		Unsigned32,
+	pm1001lhrCfgLinePhotodiodeModePortn
+		Unsigned32,
+	pm1001lhrCfgLinePhotodiodeValuePortn
+		Unsigned32
+	}
+
+
+pm1001lhrCfgOtxtlhIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the otxtlh 
+        table
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 1 }
+
+
+pm1001lhrCfgNuPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+        "
+        :
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 3 }
+
+
+pm1001lhrCfgLineDitherRatePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line OTX TLH FM amplitude 
+        :This register configures the start-up 
+        width of the frequency modulation 
+        of the Line OTX TLH
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 4 }
+
+
+pm1001lhrCfgLineDitherFhzPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line OTX TLH FM frequency 
+        :This register configures the start-up 
+        frequency of the frequency modulation 
+        of the Line OTX TLH
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 5 }
+
+
+pm1001lhrCfgLinePwrLaserPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Defaut Line OTX TLH output Power 
+        :This register configures the start-up 
+        output power of the Line OTX TLH 
+         (Unit = dBm)
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 6 }
+
+
+pm1001lhrCfgLineFCurrentPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line OTX TLH Channel :This 
+        register configures the start-up 
+        laser channel of the Line OTX TLH
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 7 }
+
+
+pm1001lhrCfgLineGridCurrentPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line OTX TLH Grid :This 
+        register configures the start-up 
+        laser grid of the Line OTX TLH
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 8 }
+
+
+pm1001lhrCfgFPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line OTX TLH lowest Freq 
+        :This register configures the start-up 
+        lowest frequency supported on the 
+        Line OTX TLH
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 9 }
+
+
+pm1001lhrCfgReservedPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+        "
+        :
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 10 }
+
+
+pm1001lhrCfgLinePhotodiodeModePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line OTX TLH APD mode
+         :This register configures the
+         start-up APD mode of the Line
+         OTX TLH
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 11 }
+
+
+pm1001lhrCfgLinePhotodiodeValuePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Line OTX TLH APD atten. 
+        :This register configures the start-up 
+        APD attenuation on the Line OTX 
+        TLH
+        "
+	::= { pm1001lhrCfgOtxtlhEntry 12 }
+
+
+--- *****************************************************
+---     LEAF for the table Group startuptablefive
+--- *****************************************************
+
+pm1001lhrCfgStartuptablefive OBJECT IDENTIFIER ::= { pm1001lhrConfig 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0005
+--- *****************************************************
+
+pm1001lhrCfgOtxtlhcapabilitiesTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm1001lhrCfgOtxtlhcapabilitiesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm1001lhrCfgStartuptablefive 1 }
+
+
+pm1001lhrCfgOtxtlhcapabilitiesEntry OBJECT-TYPE
+	SYNTAX Pm1001lhrCfgOtxtlhcapabilitiesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startuptablefive 
+        table
+        "
+	INDEX   { pm1001lhrCfgOtxtlhcapabilitiesIndex }
+	::= { pm1001lhrCfgOtxtlhcapabilitiesTable 1 }
+
+
+Pm1001lhrCfgOtxtlhcapabilitiesEntry ::=
+	SEQUENCE {
+	pm1001lhrCfgOtxtlhcapabilitiesIndex
+		INTEGER,
+	pm1001lhrCfgComponentTypePortn
+		Unsigned32,
+	pm1001lhrCfgMiscellaneousPortn
+		Unsigned32,
+	pm1001lhrCfgFirstChannelPortn
+		Unsigned32,
+	pm1001lhrCfgLastChannelPortn
+		Unsigned32,
+	pm1001lhrCfgGridPortn
+		Unsigned32
+	}
+
+
+pm1001lhrCfgOtxtlhcapabilitiesIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the otxtlhcapabilities 
+        table
+        "
+	::= { pm1001lhrCfgOtxtlhcapabilitiesEntry 1 }
+
+
+pm1001lhrCfgComponentTypePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Component parameters :This OID 
+        defines the component parameters
+        "
+	::= { pm1001lhrCfgOtxtlhcapabilitiesEntry 3 }
+
+
+pm1001lhrCfgMiscellaneousPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Miscellaneous default settings 
+        :This OID defines the miscellaneous 
+        parameters
+        "
+	::= { pm1001lhrCfgOtxtlhcapabilitiesEntry 4 }
+
+
+pm1001lhrCfgFirstChannelPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Number of the first channel of 
+        the component :This OID defines 
+        the first channel number of the 
+        PM
+        "
+	::= { pm1001lhrCfgOtxtlhcapabilitiesEntry 5 }
+
+
+pm1001lhrCfgLastChannelPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Number of the last channel of
+         the component :This OID defines 
+        the last channel number of the
+         PM
+        "
+	::= { pm1001lhrCfgOtxtlhcapabilitiesEntry 6 }
+
+
+pm1001lhrCfgGridPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Grid value of the component :This 
+        OID defines the grid of the PM
+        "
+	::= { pm1001lhrCfgOtxtlhcapabilitiesEntry 7 }
+
+
+
+pm1001lhrCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pm1001lhrConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pm1001lhrtrapLineNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last Line which generates a trap"
+	::= { pm1001lhrtraps 3 }
+
+pm1001lhrtrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pm1001lhrtraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     LINE TRAPS
+--- *****************************************************
+
+pm1001lhrLineTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm1001lhrAlmLineDdmWarningPortn, pm1001lhrtrapLineNumber, pm1001lhrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM1001LHR Line Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pm1001lhrAlmLineDdmWarningPortn "on", pm1001lhrtrapLineNumber "$2", pm1001lhrtrapBoardNumber "$3"}
+	--&MESG        "DDM Warning appears on Line Port $2 of PM1001LHR in Slot $3 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pm1001lhrtraps 30 }
+
+pm1001lhrLineTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm1001lhrAlmLineDdmWarningPortn, pm1001lhrtrapLineNumber, pm1001lhrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM1001LHR Line Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM1001LHR Line Not Urgent ON" }
+	--&MATCH       { pm1001lhrAlmLineDdmWarningPortn "on", pm1001lhrtrapLineNumber "$2", pm1001lhrtrapBoardNumber "$3"}
+	--&MESG        "DDM Warning disappears on Line Port $2 of PM1001LHR in Slot $3 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pm1001lhrtraps 31 }
+
+pm1001lhrLineTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm1001lhrAlmLineDdmAlmPortn, pm1001lhrtrapLineNumber, pm1001lhrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM1001LHR Line Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm1001lhrAlmLineDdmAlmPortn "on", pm1001lhrtrapLineNumber "$2", pm1001lhrtrapBoardNumber "$3"}
+	--&MESG        "DDM Alarm appears on Line Port $2 of PM1001LHR in Slot $3 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pm1001lhrtraps 32 }
+
+pm1001lhrLineTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm1001lhrAlmLineDdmAlmPortn, pm1001lhrtrapLineNumber, pm1001lhrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM1001LHR Line Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM1001LHR Line Urgent ON" }
+	--&MATCH       { pm1001lhrAlmLineDdmAlmPortn "on", pm1001lhrtrapLineNumber "$2", pm1001lhrtrapBoardNumber "$3"}
+	--&MESG        "DDM Alarm disappears on Line Port $2 of PM1001LHR in Slot $3 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pm1001lhrtraps 33 }
+
+pm1001lhrLineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm1001lhrAlmLineFailPortn , pm1001lhrAlmLineHwFailPortn , pm1001lhrtrapLineNumber, pm1001lhrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM1001LHR Line Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pm1001lhrAlmLineFailPortn "on", pm1001lhrAlmLineHwFailPortn "*", pm1001lhrtrapLineNumber "$3", pm1001lhrtrapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Down on PM1001LHR in Slot $4 ($A)"
+	
+	--&FILTNAME    "PM1001LHR Line HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm1001lhrAlmLineFailPortn "*", pm1001lhrAlmLineHwFailPortn "on", pm1001lhrtrapLineNumber "$3", pm1001lhrtrapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Down on PM1001LHR in Slot $4 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pm1001lhrtraps 34 }
+
+pm1001lhrLineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm1001lhrAlmLineFailPortn , pm1001lhrAlmLineHwFailPortn , pm1001lhrtrapLineNumber, pm1001lhrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM1001LHR Line Fail OFF"
+	--&ACTIONS     { log,  normal }
+	--&CLEARS      { "PM1001LHR Line Fail ON" }
+	--&MATCH       { pm1001lhrAlmLineFailPortn "on", pm1001lhrAlmLineHwFailPortn "*", pm1001lhrtrapLineNumber "$3", pm1001lhrtrapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Up on PM1001LHR in Slot $4 ($A)"
+
+	--&FILTNAME    "PM1001LHR Line HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm1001lhrAlmLineFailPortn "*", pm1001lhrAlmLineHwFailPortn "on", pm1001lhrtrapLineNumber "$3", pm1001lhrtrapBoardNumber "$4"}
+	--&MESG        "Line Port $3 Up on PM1001LHR in Slot $4 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pm1001lhrtraps 35 }
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pm1001lhrPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm1001lhrAlmDefFuseB, pm1001lhrAlmDefFuseA , pm1001lhrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM1001LHR Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm1001lhrAlmDefFuseB "*", pm1001lhrAlmDefFuseA "on", pm1001lhrtrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PM1001LHR in Slot $3 ($A)"
+
+	--&FILTNAME    "PM1001LHR Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm1001lhrAlmDefFuseB "on", pm1001lhrAlmDefFuseA "*", pm1001lhrtrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PM1001LHR in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pm1001lhrtraps 50 }
+
+pm1001lhrPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm1001lhrAlmDefFuseB, pm1001lhrAlmDefFuseA , pm1001lhrtrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM1001LHR Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PM1001LHR Fuse A Fail ON", "PM1001LHR Fuse B Fail ON" }
+	--&MATCH       { pm1001lhrAlmDefFuseB "on", pm1001lhrAlmDefFuseA "on", pm1001lhrtrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PM1001LHR in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pm1001lhrtraps 51 }
+
+
+
+
+
+
+END

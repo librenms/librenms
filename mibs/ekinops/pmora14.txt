@@ -1,0 +1,2010 @@
+-- *****************************************************************
+-- EKINOPS-pmora14.TXT:  MIB
+--
+--MIB Part Number:3MI00216AAAB
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pmora14-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulepmora14 MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "Creation"
+
+	REVISION "201508310000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 72 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmora14alarms OBJECT IDENTIFIER ::= { modulepmora14 2 }	
+pmora14AlmOther OBJECT IDENTIFIER ::= { pmora14alarms 1 }
+pmora14AlmOtherNurg OBJECT IDENTIFIER ::= { pmora14AlmOther 1 }
+pmora14AlmOtherUrg OBJECT IDENTIFIER ::= { pmora14AlmOther 2 }
+pmora14AlmOtherCrit OBJECT IDENTIFIER ::= { pmora14AlmOther 3 }
+
+pmora14AlmClient OBJECT IDENTIFIER ::= { pmora14alarms 2 }
+pmora14AlmClientNurg OBJECT IDENTIFIER ::= { pmora14AlmClient 1 }
+pmora14AlmClientUrg OBJECT IDENTIFIER ::= { pmora14AlmClient 2 }
+pmora14AlmClientCrit OBJECT IDENTIFIER ::= { pmora14AlmClient 3 }
+	
+pmora14AlmLine OBJECT IDENTIFIER ::= { pmora14alarms 3 }
+pmora14AlmLineNurg OBJECT IDENTIFIER ::= { pmora14AlmLine 1 }
+pmora14AlmLineUrg OBJECT IDENTIFIER ::= { pmora14AlmLine 2 }
+pmora14AlmLineCrit OBJECT IDENTIFIER ::= { pmora14AlmLine 3 }
+
+pmora14measures OBJECT IDENTIFIER ::= { modulepmora14 3 }	
+pmora14MesrOther OBJECT IDENTIFIER ::= { pmora14measures 1 }	
+pmora14MesrClient OBJECT IDENTIFIER ::= { pmora14measures 2 }	
+pmora14MesrLine OBJECT IDENTIFIER ::= { pmora14measures 3 }	
+
+pmora14counters OBJECT IDENTIFIER ::= { modulepmora14 4 }
+pmora14CntOther OBJECT IDENTIFIER ::= { pmora14counters 1 }
+pmora14CntClient OBJECT IDENTIFIER ::= { pmora14counters 2 }
+pmora14CntLine OBJECT IDENTIFIER ::= { pmora14counters 3 }
+
+pmora14controlsWrite OBJECT IDENTIFIER ::= { modulepmora14 6 }
+pmora14CtrlOther OBJECT IDENTIFIER ::= { pmora14controlsWrite 1 }
+pmora14CtrlClient OBJECT IDENTIFIER ::= { pmora14controlsWrite 2 }
+pmora14CtrlLine OBJECT IDENTIFIER ::= { pmora14controlsWrite 3 }
+
+pmora14ri OBJECT IDENTIFIER ::= { modulepmora14 7 }
+pmora14riTable OBJECT IDENTIFIER ::= { pmora14ri 1 }
+
+pmora14Config OBJECT IDENTIFIER ::= { modulepmora14 9 }
+
+pmora14traps OBJECT IDENTIFIER ::= { modulepmora14 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+Pmora14PumpsMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on the Raman Module"
+    SYNTAX INTEGER {
+		ora14maxpowermode(0),
+		ora14gaincontrolmode(1),
+		ora14manualcontrolmode(2)
+
+           }
+
+
+
+Pmora14AprMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on APR"
+    SYNTAX INTEGER {
+		ora14aproffmode(0),
+		ora14aproscmode(1),
+		ora14aprbrratiomode(2)
+		ora14aprsbandmode(3)
+		ora14aprfullmode(4)
+
+           }
+
+
+
+Pmora14LineFiberTypeMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on APR"
+    SYNTAX INTEGER {
+		ora14g652mode(0),
+		ora14g655leafmode(1),
+		ora14g655truewavemode(2)
+		ora14g654mode(3)
+		ora14g653mode(4)
+
+           }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmora14RinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmora14ri 2 }
+  
+pmora14RinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmora14ri 3 }
+
+pmora14RinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmora14ri 4 }
+  
+pmora14RinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmora14ri 5 }
+
+pmora14RinvGwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "GW platform description: This OID contains the 
+         description of the gateware platform."
+  ::= { pmora14ri 6 }
+  
+
+
+
+pmora14RinvLineTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pmora14RinvLineEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the Lines on the selected module"
+      ::= { pmora14riTable 2 }
+
+pmora14RinvLineEntry OBJECT-TYPE
+        SYNTAX  Pmora14RinvLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the Line table"
+        INDEX   { pmora14RinvLineIndex }
+        ::= { pmora14RinvLineTable 1 }
+    
+
+
+Pmora14RinvLineEntry::=
+        SEQUENCE {
+          pmora14RinvLineIndex 
+              Integer32,
+          pmora14RinvportLine
+              DisplayString
+        }
+
+
+    pmora14RinvLineIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Line table"
+        ::= { pmora14RinvLineEntry 1 }
+
+
+    pmora14RinvportLine OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the Line: This OID contains the inventory for the Line"
+        ::= { pmora14RinvLineEntry 2 }
+
+ 
+
+
+  
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmora14AlmsynthAlm0 OBJECT IDENTIFIER ::= { pmora14AlmOtherCrit 0 }
+
+
+
+
+pmora14AlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm0 16 }
+
+
+
+pmora14AlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition   <Help> 
+         Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm0 15 }
+
+
+
+pmora14AlmInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Raman Module Not Initialized :This 
+        OID indicates that the initialisation 
+        of the Raman module is not completed 
+          <Help>  This status indicates 
+        if the Raman has been correctly 
+        initialized <Condtype> INIT_NOT_COMPL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5)  <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm0 10 }
+
+
+
+pmora14AlmModGlobFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM  <Help>  This alarm 
+         <Condtype> MOD_GLOB_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)   <Polarity> 
+        (2) 
+        "
+	  ::= { pmora14AlmsynthAlm0 9 }
+
+
+
+pmora14AlmAprOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Automatic Power Reduction :This 
+        OID indicates that the APR algorithm 
+        has been operated and the  output 
+        of the lasers are shutdown   <Help> 
+          The APR algorithm has been completed 
+         <Condtype> APR_ON <Probcause>
+         other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm0 2 }
+
+
+
+pmora14AlmMaintenanceMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Maintenance Mode :This OID indicates 
+        that the PM is in maintenance mode 
+          <Help>  This status indiates
+         if the module is currently in
+         maintenance mode <Condtype> MAINTENANCE_MODE 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmora14AlmsynthAlm2 OBJECT IDENTIFIER ::= { pmora14AlmOtherNurg 2 }
+
+
+
+
+pmora14AlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM.  <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm2 3 }
+
+
+
+pmora14AlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information.  <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmora14AlmsynthAlm2 2 }
+
+
+
+pmora14AlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory.  <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmora14AlmsynthAlm2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm7 article
+--- *****************************************************
+pmora14AlmsynthAlm7 OBJECT IDENTIFIER ::= { pmora14AlmLineUrg 7 }
+
+
+
+
+pmora14AlmLineFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line Port Failure :This OID indicates 
+        a failure on the line port <Help> 
+        This alarm indicates a failure
+         on the Line port <Condtype> LINE_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm7 12 }
+
+
+
+pmora14AlmPumpsTxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pumps Laser Shutdown :This OID 
+        indicates the power of the pumps 
+        are both on   <Help>  This status 
+        indicates if the pumps lasers are 
+        both OFF <Condtype> PUMPS_TX_OFF 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm7 5 }
+
+
+
+pmora14AlmLineHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line Port HW Failure :This OID 
+        indicates a failure on line port, 
+        most probably caused by a HW issue 
+        <Help> This alarm indicates a failure 
+        on the HW Line port <Condtype>
+         LINE_HW_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmora14AlmsynthAlm7 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientOraAlarms1 article
+--- *****************************************************
+pmora14AlmclientOraAlarms1 OBJECT IDENTIFIER ::= { pmora14AlmLineUrg 32 }
+
+
+
+
+pmora14AlmPump2TecAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 TEC Alarm :This OID indicates 
+        a transmit laser fail on pump 2 
+         <Help>  This alarm indicates if 
+        the laser of the pump2 is in fail 
+        condition <Condtype> PUMP2_TEC_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmclientOraAlarms1 4 }
+
+
+
+pmora14AlmPump1TecAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 TEC Alarm :This OID indicates 
+        a transmit laser fail on pump 1 
+         <Help>  This alarm indicates if 
+        the laser of the pump1 is in fail 
+        condition  <Condtype> PUMP1_TEC_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmclientOraAlarms1 3 }
+
+
+
+pmora14AlmPump2CurrentHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 Current High Alarm :This 
+        OID  indicates the Pump2 current 
+        is higher than the alarm threshold 
+        <Help>  This alarm indicates if 
+        the pump2 current is higher than 
+        the alarm threshold  <Condtype> 
+        PUMP2_CURRENT_HIGH_ALARM <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmclientOraAlarms1 2 }
+
+
+
+pmora14AlmPump1CurrentHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 Current High Alarm :This 
+        OID  indicates the Pump1 current 
+        is higher than the alarm threshold 
+        <Help>  This alarm indicates if 
+        the pump1 current is higher than 
+        the alarm threshold  <Condtype> 
+        PUMP1_CURRENT_HIGH_ALARM <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmclientOraAlarms1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the clientOraaWarnings article
+--- *****************************************************
+pmora14AlmclientOraaWarnings OBJECT IDENTIFIER ::= { pmora14AlmLineNurg 33 }
+
+
+
+
+pmora14AlmPump2TecWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 TEC Warning :This OID indicates 
+        a transmit laser fail on pump 2 
+         <Help>  This alarm indicates if 
+        the laser of the pump2 is in fail 
+        condition <Condtype> PUMP2_TEC_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmclientOraaWarnings 4 }
+
+
+
+pmora14AlmPump1TecWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 TEC Warning :This OID indicates 
+        a transmit laser fail on pump 1 
+         <Help>  This alarm indicates if 
+        the laser of the pump1 is in fail 
+        condition  <Condtype> PUMP1_TEC_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmclientOraaWarnings 3 }
+
+
+
+pmora14AlmPump2CurrentHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 Current High Warning :This 
+        OID  indicates the Pump2 current 
+        is higher than the warning threshold 
+        <Help>  This alarm indicates if 
+        the pump2 current is higher than 
+        the warning threshold  <Condtype> 
+        PUMP2_CURRENT_HIGH_WARNING <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmclientOraaWarnings 2 }
+
+
+
+pmora14AlmPump1CurrentHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 Current High Warning :This 
+        OID  indicates the Pump1 current 
+        is higher than the warning threshold 
+        <Help>  This alarm indicates if 
+        the pump1 current is higher than 
+        the warning threshold  <Condtype> 
+        PUMP1_CURRENT_HIGH_WARNING <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmclientOraaWarnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump1Alarms article
+--- *****************************************************
+pmora14Almpump1Alarms OBJECT IDENTIFIER ::= { pmora14AlmLineCrit 35 }
+
+
+
+
+pmora14AlmPump1TecFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 TEC Fail :This OID indicates 
+        that the TEC is in fail condition 
+        on pump 1  <Help>  This alarm indicates 
+        if the TEC of the pump1 is in fail 
+        condition  <Condtype> PUMP1_TEC_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14Almpump1Alarms 2 }
+
+
+
+pmora14AlmPump1Shutdown OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 Laser Shutdown :This OID 
+        indicates that the pump 1 is shutdown 
+         <Help>  This status indicates
+         if the pump1 is shutdown  <Condtype> 
+        PUMP1_SHUTDOWN <Probcause> informationalStatus(1000) 
+        <Alarmtype> other(1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmora14Almpump1Alarms 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump2Alarms article
+--- *****************************************************
+pmora14Almpump2Alarms OBJECT IDENTIFIER ::= { pmora14AlmLineCrit 36 }
+
+
+
+
+pmora14AlmPump2TecFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 TEC Fail :This OID indicates 
+        that the TEC is in fail condition 
+        on pump 2  <Help>  This alarm indicates 
+        if the TEC of the pump2 is in fail 
+        condition  <Condtype> PUMP2_TEC_FAIL 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14Almpump2Alarms 2 }
+
+
+
+pmora14AlmPump2Shutdown OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 Laser Shutdown :This OID 
+        indicates that the pump 2 is shutdown 
+         <Help>  This status indicates
+         if the pump2 is shutdown <Condtype> 
+        PUMP2_SHUTDOWN <Probcause> informationalStatus(1000) 
+        <Alarmtype> other(1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmora14Almpump2Alarms 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the fiberAlarms article
+--- *****************************************************
+pmora14AlmfiberAlarms OBJECT IDENTIFIER ::= { pmora14AlmLineUrg 72 }
+
+
+
+
+pmora14AlmStartupHighBackReflection OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Startup High Back Reflection :This 
+        OID  indicates that a High Back 
+        Reflection ratio is too high on 
+        startup <Help>  This alarm  indicates 
+        that a High Back Reflection ratio 
+        is too high on startup  <Condtype> 
+        STARTUP_HIGH_BACK_REFLECTION <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { pmora14AlmfiberAlarms 9 }
+
+
+
+pmora14AlmStartupLowSBand OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Startup Low S Band :This OID 
+         indicates that the input power 
+        over the S-Band is too low on startup 
+        <Help>  This alarm  indicates that 
+        the input power over the S-Band 
+        is too low on startup <Condtype> 
+        STARTUP_LOW_S_BAND <Probcause>
+         equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { pmora14AlmfiberAlarms 8 }
+
+
+
+pmora14AlmPartialAprSecurity OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Partial APR Security :This OID 
+        indicates at least one APR security 
+        switch has been disabled <Help> 
+         This alarm indicates at least
+         one APR security switch has been 
+        disabled <Condtype> PARTIAL_APR_SECURITY 
+        <Probcause> other (1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmfiberAlarms 7 }
+
+
+
+pmora14AlmOscFailed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Osc Failed :This OID  indicates 
+        that an OSC Loss of Frame is reported 
+        by the linked HCS amplifier <Help> 
+         This alarm  indicates that an
+         OSC Loss of Frame is reported
+         by the linked HCS amplifier <Condtype> 
+        OSC_FAILED <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmfiberAlarms 6 }
+
+
+
+pmora14AlmLineConnectorUnlocked OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line Connector Unlocked :This
+         OID  indicates the Fonrt panel 
+        Line connector is not locked <Help> 
+         This alarm  indicates the Fonrt 
+        panel Line connector is not locked 
+        <Condtype> LINE_CONNECTOR_UNLOCKED 
+        <Probcause> other (1) <Alarmtype> 
+        operationalViolation (8) <Polarity> 
+        (2) 
+        "
+	  ::= { pmora14AlmfiberAlarms 5 }
+
+
+
+pmora14AlmHighBackReflection OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        High Back Reflection :This OID 
+         indicates that a High Back Reflection 
+        ratio is too high <Help>  This
+         alarm  indicates that a High Back 
+        Reflection ratio is too high <Condtype> 
+        HIGH_BACK_REFLECTION <Probcause> 
+        other (1) <Alarmtype> operationalViolation 
+        (8) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmfiberAlarms 4 }
+
+
+
+pmora14AlmCBandLossOfSignal OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        C Band Loss Of Signal :This OID 
+         indicates that a  Loss of Signal 
+        is detected over the C-Band <Help> 
+         This alarm  indicates that a 
+         Loss of Signal is detected over 
+        the C-Band <Condtype> C_BAND_LOSS_OF_SIGNAL 
+        <Probcause> lossOfSignal (30) <Alarmtype> 
+        operationalViolation (8) <Polarity> 
+        (2) 
+        "
+	  ::= { pmora14AlmfiberAlarms 3 }
+
+
+
+pmora14AlmLowSBand OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Low S Band :This OID  indicates 
+        that the input power over the S-Band 
+        is too low <Help>  This alarm 
+         indicates that the input power 
+        over the S-Band is too low <Condtype> 
+        LOW_S_BAND <Probcause> other (1) 
+        <Alarmtype> operationalViolation 
+        (8) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmfiberAlarms 2 }
+
+
+
+pmora14AlmSBandLossOfSignal OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        S Band Loss Of Signal :This OID 
+         indicates that a  Loss of Signal 
+        is detected over the S-Band <Help> 
+         This alarm  indicates that a 
+         Loss of Signal is detected over 
+        the S-Band <Condtype> S_BAND_LOSS_OF_SIGNAL 
+        <Probcause> lossOfSignal (30) <Alarmtype> 
+        operationalViolation (8) <Polarity> 
+        (2) 
+        "
+	  ::= { pmora14AlmfiberAlarms 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleAlarms article
+--- *****************************************************
+pmora14AlmmoduleAlarms OBJECT IDENTIFIER ::= { pmora14AlmOtherUrg 74 }
+
+
+
+
+pmora14AlmModuleTempHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature High Alarm
+         :This OID indicates that the PM 
+        temperature is higher than the
+         alarm threshold  <Help>  This
+         alarm indicates if the module
+         temperature is higher than the 
+        alarm threshold  <Condtype> MODULE_TEMP_HIGH_ALARM 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmmoduleAlarms 2 }
+
+
+
+pmora14AlmModuleTempLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature Low Alarm :This 
+        OID indicates that the PM temperature 
+        if lower than the alarm threshold 
+        <Help>  This alarm indicates if 
+        the module temperature is lower 
+        than the alarm threshold  <Condtype> 
+        MODULE_TEMP_LOW_ALARM <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmmoduleAlarms 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleWarnings article
+--- *****************************************************
+pmora14AlmmoduleWarnings OBJECT IDENTIFIER ::= { pmora14AlmOtherNurg 75 }
+
+
+
+
+pmora14AlmModuleTempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature High Warning 
+        :This OID indicates that the PM 
+        temperature if higher than the
+         Warning threshold  <Help>  This 
+        alarm indicates if the module temperature 
+        is higher than the warning threshold 
+         <Condtype> MODULE_TEMP_HIGH_WARNING 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmmoduleWarnings 2 }
+
+
+
+pmora14AlmModuleTempLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature Low Warning 
+        :This OID indicates that the PM 
+        temperature if lower than the Warning 
+        threshold  <Help>  This alarm indicates 
+        if the module temperature is lower 
+        than the warning threshold  <Condtype> 
+        MODULE_TEMP_LOW_WARNING <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmora14AlmmoduleWarnings 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmora14Ctrlsynth0 OBJECT IDENTIFIER ::= { pmora14CtrlOther 0 }
+
+
+
+
+pmora14CtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmora14Ctrlsynth0 13 }
+
+
+
+pmora14CtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmora14Ctrlsynth0 9 }
+
+
+
+pmora14CtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmora14Ctrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmora14CtrlswMgnt OBJECT IDENTIFIER ::= { pmora14CtrlOther 5 }
+
+
+
+
+pmora14CtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmora14CtrlswMgnt 3 }
+
+
+
+pmora14CtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmora14CtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the aprMode article
+--- *****************************************************
+
+pmora14CtrlaprMode OBJECT-TYPE
+	  SYNTAX Pmora14AprMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        APR Mode :This OID selects the 
+        APR Mode  <Help>  This control
+         initiates the APR Mode
+        "
+	  ::= { pmora14CtrlOther 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmora14CtrlledTest OBJECT IDENTIFIER ::= { pmora14CtrlOther 73 }
+
+
+
+
+pmora14CtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmora14CtrlledTest 3 }
+
+
+
+pmora14CtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmora14CtrlledTest 2 }
+
+
+
+pmora14CtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmora14CtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the maintMode article
+--- *****************************************************
+pmora14CtrlmaintMode OBJECT IDENTIFIER ::= { pmora14CtrlOther 74 }
+
+
+
+
+pmora14CtrlMaintenance OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Maintenance Mode :This OID
+         sets the PM in maintenance mode 
+         <Help>  This control enables the 
+        maintenance mode of the module
+        "
+	  ::= { pmora14CtrlmaintMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the aprManualRestart article
+--- *****************************************************
+pmora14CtrlaprManualRestart OBJECT IDENTIFIER ::= { pmora14CtrlLine 75 }
+
+
+
+
+pmora14CtrlAprManualRestart OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        APR Manual Restart :This OID initiates 
+        the Restart mechanism to retrieve 
+        from the APR state.<Help> This
+         control initiates the Restart
+         mechanism to retrieve from the 
+        APR state.
+        "
+	  ::= { pmora14CtrlaprManualRestart 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     COUNTERS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+pmora14CntCountersReset  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Counters Reset:This OID resets and restarts all the counters"
+	::= { pmora14counters  259 }
+
+pmora14CntCountersStop  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Counters stop:This OID stops all the counters"
+	::= { pmora14counters 260 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the pump1CurrentMeas article
+--- *****************************************************
+
+pmora14Mesrpump1CurrentMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 Laser Current :This OID 
+        gives the Pump1 laser current (Current 
+        =AV/10) (Unit = mA)  <Help>  This 
+        measure gives the Pump1 Laser current
+        "
+	  ::= { pmora14MesrLine 64 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump1PowerMeas article
+--- *****************************************************
+
+pmora14Mesrpump1PowerMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 Tx Power :This OID gives 
+        the Pump1 power value (Power =AV/20) 
+         (Unit = mW)  <Help>  This measure 
+        gives the Pump1 Power value
+        "
+	  ::= { pmora14MesrLine 65 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump1TempMeas article
+--- *****************************************************
+
+pmora14Mesrpump1TempMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 Temperature :This OID gives 
+        the Pump1 TEC temperature (Temperature 
+        =AV/256) (Unit = C)<Help>  This 
+        measure gives the Pump1 TEC temperature
+        "
+	  ::= { pmora14MesrLine 66 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump1TecCurrentMeas article
+--- *****************************************************
+
+pmora14Mesrpump1TecCurrentMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 1 TEC Current :This OID gives 
+        the Pump1 TEC current (Current
+         =AV/10) (Unit = mA)  <Help>  This 
+        measure gives the Pump1 TEC current
+        "
+	  ::= { pmora14MesrLine 67 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump2CurrentMeas article
+--- *****************************************************
+
+pmora14Mesrpump2CurrentMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 Laser Current :This OID 
+        gives the Pump2 laser current (Current 
+        =AV/10) (Unit = mA) <Help>  This 
+        measure gives the Pump2 Laser current
+        "
+	  ::= { pmora14MesrLine 68 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump2PowerMeas article
+--- *****************************************************
+
+pmora14Mesrpump2PowerMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 Tx Power :This OID gives 
+        the Pump2 power value (Power =AV/20) 
+         (Unit = mW) <Help>  This measure 
+        gives the Pump2 Power value
+        "
+	  ::= { pmora14MesrLine 69 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump2TempMeas article
+--- *****************************************************
+
+pmora14Mesrpump2TempMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 Temperature :This OID gives 
+        the Pump2 TEC temperature (Temperature 
+        =AV/256) (Unit = C)  <Help>  This 
+        measure gives the Pump2 TEC temperature
+        "
+	  ::= { pmora14MesrLine 70 }
+
+
+
+--- *****************************************************
+---     LEAF for the pump2TecCurrentMeas article
+--- *****************************************************
+
+pmora14Mesrpump2TecCurrentMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pump 2 TEC Current :This OID gives 
+        the Pump2 TEC current (Current
+         =AV/10) (Unit = mA)  <Help>  This 
+        measure gives the Pump2 TEC current
+        "
+	  ::= { pmora14MesrLine 71 }
+
+
+
+--- *****************************************************
+---     LEAF for the totalPumpsPower article
+--- *****************************************************
+
+pmora14MesrtotalPumpsPower OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Total Pumps Power :This OID indicates 
+        the total pumps power (Power =
+         AV/20) (Unit = mW)  <Help>  This 
+        measure indicates the total pump 
+        power
+        "
+	  ::= { pmora14MesrLine 72 }
+
+
+
+--- *****************************************************
+---     LEAF for the inputCBandPower article
+--- *****************************************************
+
+pmora14MesrinputCBandPower OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Input C Band Power :This OID indicates 
+        the input power  over the C-Band 
+        (Power =(AV-32768)*0,005) (Unit 
+        = dBm) <Help>  This measure indicates 
+        the input power  over the C-Band
+        "
+	  ::= { pmora14MesrLine 73 }
+
+
+
+--- *****************************************************
+---     LEAF for the sBandPower article
+--- *****************************************************
+
+pmora14MesrsBandPower OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        S Band Power :This OID indicates 
+        the input power over the S-band 
+        (Power =(AV-32768)*0,005) (Unit 
+        = dBm) <Help>  This measure indicates 
+        the input power over the S-Band
+        "
+	  ::= { pmora14MesrLine 74 }
+
+
+
+--- *****************************************************
+---     LEAF for the backReflectionPumpPower article
+--- *****************************************************
+
+pmora14MesrbackReflectionPumpPower OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Back Reflection Pump Power :This 
+        OID indicates the Back Reflection 
+        Pump power (Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help>  This measure 
+        indicates the Back Reflection Pump 
+        power
+        "
+	  ::= { pmora14MesrLine 75 }
+
+
+
+--- *****************************************************
+---     LEAF for the backReflectionPumpRatio article
+--- *****************************************************
+
+pmora14MesrbackReflectionPumpRatio OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Back Reflection Pump Ratio :This 
+        OID indicates the Back Relfection 
+        Pump ration (Power =(AV-32768)*0,005) 
+        (Unit = dB) <Help>  This measure 
+        indicates the Back Reflection Pump 
+        ratio
+        "
+	  ::= { pmora14MesrLine 76 }
+
+
+
+--- *****************************************************
+---     LEAF for the pmTempMeas article
+--- *****************************************************
+
+pmora14MesrpmTempMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature :This OID gives 
+        the temperature of the PM  (Temperature 
+        =AV/256) (Unit = C)<Help>  This 
+        measure gives the temperature of 
+        the module
+        "
+	  ::= { pmora14MesrOther 80 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group noValue
+--- *****************************************************
+
+pmora14CfgNoValue OBJECT IDENTIFIER ::= { pmora14Config 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmora14tablelineStartup OBJECT IDENTIFIER ::= { pmora14CfgNoValue 1 }
+
+
+
+pmora14CfgoraModuleCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on the module 
+        :This OID configures the default 
+        initialisation settings of the
+         Raman module
+        "
+	  ::= { pmora14tablelineStartup 2 }
+
+
+
+pmora14CfgautoRestartDelay OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on autorestart 
+        delay :This OID configures the
+         default period on the autorestart
+        "
+	  ::= { pmora14tablelineStartup 3 }
+
+
+
+pmora14CfgramanGain OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on the Raman
+         Gain :This OID configures the
+         default gain on the Raman module
+        "
+	  ::= { pmora14tablelineStartup 4 }
+
+
+
+pmora14CfgramanMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Raman mode 
+        :This OID configures the default 
+        Raman mode
+        "
+	  ::= { pmora14tablelineStartup 5 }
+
+
+
+pmora14CfgtiltValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on the tilt value 
+        :This OID configures the default 
+        tilt on the line amplifier.
+        "
+	  ::= { pmora14tablelineStartup 6 }
+
+
+
+pmora14CfghighBackreflectionThreshold OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on the backreflection 
+        threshold :This OID configures
+         the default threshold on the backreflection
+        "
+	  ::= { pmora14tablelineStartup 7 }
+
+
+
+pmora14CfgsBandThreshold OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on the S band 
+        threshold :This OID configures
+         the default threshold on the S 
+        band
+        "
+	  ::= { pmora14tablelineStartup 8 }
+
+
+
+pmora14Cfgpump1ManualPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on the pump power 
+        :This OID configures the default 
+        value on the power
+        "
+	  ::= { pmora14tablelineStartup 9 }
+
+
+
+pmora14Cfgpump2ManualPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on the pump power 
+        :This OID configures the default 
+        value on the power
+        "
+	  ::= { pmora14tablelineStartup 10 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmora14CfgLabels OBJECT IDENTIFIER ::= { pmora14Config 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmora14CfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmora14CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmora14CfgLabels 1 }
+
+
+pmora14CfgLabelclientEntry OBJECT-TYPE
+	SYNTAX Pmora14CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmora14CfgLabelclientIndex }
+	::= { pmora14CfgLabelclientTable 1 }
+
+
+Pmora14CfgLabelclientEntry ::=
+	SEQUENCE {
+	pmora14CfgLabelclientIndex
+		INTEGER,
+	pmora14CfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmora14CfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmora14CfgLabelclientEntry 1 }
+
+
+pmora14CfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmora14CfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmora14CfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmora14CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmora14CfgLabels 2 }
+
+
+pmora14CfgLabellineEntry OBJECT-TYPE
+	SYNTAX Pmora14CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmora14CfgLabellineIndex }
+	::= { pmora14CfgLabellineTable 1 }
+
+
+Pmora14CfgLabellineEntry ::=
+	SEQUENCE {
+	pmora14CfgLabellineIndex
+		INTEGER,
+	pmora14CfgLabellinePortn
+		DisplayString
+	}
+
+
+pmora14CfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmora14CfgLabellineEntry 1 }
+
+
+pmora14CfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmora14CfgLabellineEntry 3 }
+
+
+
+pmora14CfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmora14Config 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmora14trapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmora14traps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     GLOBAL TRAPS
+--- *****************************************************
+
+pmora14LineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmora14AlmLineFail, pmora14AlmLineHwFail, pmora14trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMORA14 Line Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmora14AlmLineFail "on", pmora14AlmLineHwFail "*", pmora14trapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on PMORA14 in slot $3 ($A)"
+	
+	--&FILTNAME    "PMORA14 Line HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmora14AlmLineFail "*", pmora14AlmLineHwFail "on", pmora14trapBoardNumber "$3"}
+	--&MESG        "Critical Alarm appears on PMORA14 in slot $3 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmora14traps 34 }
+
+pmora14LineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmora14AlmLineFail, pmora14AlmLineHwFail, pmora14trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMORA14 Line Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMORA14 Line Fail ON"}
+	--&MATCH       { pmora14AlmLineFail "on", pmora14AlmLineHwFail "*", pmora14trapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on PMORA14 in slot $3 ($A)"
+	
+	--&FILTNAME    "PMORA14 Line HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmora14AlmLineFail "*", pmora14AlmLineHwFail "on", pmora14trapBoardNumber "$3"}
+	--&MESG        "Critical Alarm disappears on PMORA14 in slot $3 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmora14traps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     PORTS TRAPS
+--- *****************************************************
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmora14PowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmora14AlmDefFuseB, pmora14AlmDefFuseA , pmora14trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMORA Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmora14AlmDefFuseB "*", pmora14AlmDefFuseA "on", pmora14trapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMORA in Slot $3 ($A)"
+
+	--&FILTNAME    "PMORA Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmora14AlmDefFuseB "on", pmora14AlmDefFuseA "*", pmora14trapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMORA in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmora14traps 50 }
+pmora14PowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmora14AlmDefFuseB, pmora14AlmDefFuseA , pmora14trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMORA Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMORA Fuse A Fail ON", "PMORA Fuse B Fail ON" }
+	--&MATCH       { pmora14AlmDefFuseB "on", pmora14AlmDefFuseA "on", pmora14trapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMORA in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmora14traps 51 }
+
+
+
+
+
+
+END
