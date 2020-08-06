@@ -6,6 +6,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 15;
+$scale_min     = 0;
 
 if (isset($vars['cert_name'])) {
     $cert_name_list=array($vars['cert_name']);

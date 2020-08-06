@@ -1,8 +1,6 @@
 <?php
 /**
- * asuswrt-merlin.inc.php
- *
- * LibreNMS os polling module for AsusWRT-Merlin
+ * FsNmu.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +17,23 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2020 Hans Erasmus
+ * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
 
-list($ignore, $hardware, $version) = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
+namespace LibreNMS\OS;
 
-unset($ignore);
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\OS;
+
+class FsNmu extends OS implements OSDiscovery
+{
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $info = snmp_get_multi($this->getDevice(), ['vSerialNumber.0', 'vDeviceType.0', 'vSoftwareVerion.0'], '-OQUs', 'OAP-C1-OEO');
+        $device->serial = $info[0]['vSerialNumber'] ?? null;
+        $device->hardware = $info[0]['vDeviceType'] ?? null;
+        $device->version = $info[0]['vSoftwareVerion'] ?? null;
+    }
+}
