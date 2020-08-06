@@ -24,6 +24,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
@@ -32,12 +33,23 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class Openwrt extends OS implements
+    OSDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
+    /**
+     * Retrieve basic information about the OS / device
+     */
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $device->version = explode(' ', trim(snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'))[1];
+        $device->hardware = trim(snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.2.101.1', '-Osqnv'), '"');
+    }
+
     /**
      * Retrieve (and explode to array) list of network interfaces, and desired display name in LibreNMS.
      * This information is returned from the wireless device (router / AP) - as SNMP extend, with the name "interfaces".
