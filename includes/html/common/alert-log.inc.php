@@ -77,11 +77,12 @@ $common_output[] = '
     <table id="alertlog" class="table table-hover table-condensed table-striped">
         <thead>
         <tr>
-            <th data-column-id="status" data-sortable="false"></th>
+            <th data-column-id="status" data-sortable="false">State</th>
             <th data-column-id="time_logged" data-order="desc">Timestamp</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert">Alert</th>
+            <th data-column-id="severity">Severity</th>
         </tr>
         </thead>
     </table>

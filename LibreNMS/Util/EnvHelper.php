@@ -173,4 +173,36 @@ class EnvHelper
 
         return $value;
     }
+
+    /**
+     * Parse comma separated environment variable into an array.
+     *
+     * @param string $env_name
+     * @param mixed $default
+     * @param array $except Ignore these values and return the unexploded string
+     * @return array|mixed
+     */
+    public static function parseArray($env_name, $default = null, $except = [''])
+    {
+        $value = getenv($env_name);
+        if ($value === false) {
+            $value = $default;
+        }
+
+        if (is_string($value) && !in_array($value, $except)) {
+            $value = explode(',', $value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Detect if LibreNMS is installed from the official Docker image.
+     *
+     * @return bool
+     */
+    public static function librenmsDocker()
+    {
+        return getenv('LIBRENMS_DOCKER') === '1';
+    }
 }

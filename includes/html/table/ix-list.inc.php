@@ -29,7 +29,8 @@ $params = array($asn);
 
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`name` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`name` LIKE ?)";
+    $params[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(*) $sql";

@@ -200,12 +200,6 @@
                     @endif
                     @admin
                         <li role="presentation" class="divider"></li>
-                        @config('poller_modules.mib')
-                        <li><a href="{{ url('mib_assoc') }}"><i class="fa fa-file-text-o fa-fw fa-lg"
-                                                                aria-hidden="true"></i> @lang('MIB associations')</a>
-                        </li>
-                            <li role="presentation" class="divider"></li>
-                        @endconfig
                         @can('manage', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> @lang('Manage Groups')

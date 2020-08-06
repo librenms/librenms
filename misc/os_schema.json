@@ -369,9 +369,6 @@
         "empty_ifdescr": {
             "type": "boolean"
         },
-        "register_mibs": {
-            "type": "object"
-        },
         "bad_if": {
             "type": "array",
             "items": {

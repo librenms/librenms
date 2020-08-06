@@ -12,7 +12,11 @@ if (!Auth::user()->hasGlobalRead()) {
 $sql = " FROM entPhysical AS E, devices AS D WHERE $where AND D.device_id = E.device_id";
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`entPhysicalDescr` LIKE '%$searchPhrase%' OR `E`.`entPhysicalModelName` LIKE '%$searchPhrase%' OR `E`.`entPhysicalSerialNum` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE ? OR `E`.`entPhysicalDescr` LIKE ? OR `E`.`entPhysicalModelName` LIKE ? OR `E`.`entPhysicalSerialNum` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 if (isset($vars['string']) && strlen($vars['string'])) {

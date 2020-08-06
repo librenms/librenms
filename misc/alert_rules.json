@@ -508,5 +508,21 @@
   {
     "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSForcedShutdown\" && macros.state_sensor_critical = 1",
     "name": "UPS-NUT trimming incoming voltage"
+  },
+  {
+    "rule": "devices.os = \"qnap\" && sensors.sensor_type = \"systemPowerStatus\" && sensors.sensor_current = \"-1\"",
+    "name": "QNAP NAS has a failed power status"
+  },
+  {
+    "rule": "devices.os = \"qnap\" && sensors.sensor_type = \"systemFanStatus\" && sensors.sensor_current = \"-1\"",
+    "name": "QNAP NAS has a failed fan status"
+  },
+  {
+    "rule": "devices.os = \"qnap\" && sensors.sensor_type = \"raidStatus\" && sensors.sensor_current != \"0\"",
+    "name": "QNAP NAS has a bad RAID status"
+  },
+  {
+    "rule": "devices.os = \"qnap\" && sensors.sensor_type = \"diskSmartInfo\" && sensors.sensor_current != \"0\"",
+    "name": "QNAP NAS has a bad SMART disk status"
   }
 ]

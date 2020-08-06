@@ -27,7 +27,7 @@ namespace LibreNMS\Validations;
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Util\Env;
+use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
@@ -62,7 +62,7 @@ class User extends BaseValidation
         }
 
         // skip if docker image
-        if (Env::librenmsDocker()) {
+        if (EnvHelper::librenmsDocker()) {
             return;
         }
 

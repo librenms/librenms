@@ -230,15 +230,15 @@ function record_sensor_data($device, $all_sensors)
  */
 function poll_device($device, $force_module = false)
 {
-    global $device, $graphs;
+    global $device;
 
     $device_start = microtime(true);
 
-    $graphs = [];
     $attribs = DeviceCache::getPrimary()->getAttribs();
     $device['attribs'] = $attribs;
 
     load_os($device);
+    $os = \LibreNMS\OS::make($device);
 
     unset($array);
 
@@ -336,6 +336,7 @@ function poll_device($device, $force_module = false)
                     'poller' => $module_time,
                 );
                 data_update($device, 'poller-perf', $tags, $fields);
+                $os->enableGraph('poller_perf');
 
                 // remove old rrd
                 $oldrrd = rrd_name($device['hostname'], array('poller', $module, 'perf'));
@@ -351,18 +352,6 @@ function poll_device($device, $force_module = false)
                 echo "Module [ $module ] disabled globally.\n\n";
             }
         }
-        
-        if (!$force_module && !empty($graphs)) {
-            echo "Enabling graphs: ";
-            $graphs = collect($graphs)->keys();
-            DeviceCache::getPrimary()->graphs->keyBy('graph')->collect()->except($graphs)->each->delete(); // delete extra graphs
-            DeviceCache::getPrimary()->graphs() // create missing graphs
-                ->saveMany($graphs->diff(DeviceCache::getPrimary()->graphs->pluck('graph'))->map(function ($graph) {
-                    echo '+';
-                    return new DeviceGraph(['graph' => $graph]);
-                }));
-            echo PHP_EOL;
-        }
 
         // Ping response
         if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
@@ -377,6 +366,7 @@ function poll_device($device, $force_module = false)
             $update_array['last_ping_timetaken']   = $response['ping_time'];
 
             data_update($device, 'ping-perf', $tags, $fields);
+            $os->enableGraph('ping_perf');
         }
 
         $device_time  = round(microtime(true) - $device_start, 3);
@@ -392,12 +382,24 @@ function poll_device($device, $force_module = false)
             );
 
             data_update($device, 'poller-perf', $tags, $fields);
+            $os->enableGraph('poller_modules_perf');
         }
 
         if (!$force_module) {
             // don't update last_polled time if we are forcing a specific module to be polled
             $update_array['last_polled']           = array('NOW()');
             $update_array['last_polled_timetaken'] = $device_time;
+
+            echo "Enabling graphs: ";
+            DeviceGraph::deleted(function ($graph) {
+                echo '-';
+            });
+            DeviceGraph::created(function ($graph) {
+                echo '+';
+            });
+
+            $os->persistGraphs();
+            echo PHP_EOL;
         }
 
         $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
@@ -423,89 +425,6 @@ function poll_device($device, $force_module = false)
 
     return false; // device not polled
 }//end poll_device()
-
-/**
- * if no rrd_name parameter is passed, the MIB name is used as the rrd_file_name
- */
-function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs, $rrd_name = null)
-{
-    echo "This is poll_mib_def Processing\n";
-    $mib = null;
-
-    list($mib, $file) = explode(':', $mib_name_table, 2);
-
-    if (is_null($rrd_name)) {
-        if (str_i_contains($mib_name_table, 'UBNT')) {
-            $rrd_name = strtolower($mib);
-        } else {
-            $rrd_name = strtolower($file);
-        }
-    }
-
-    $rrd_def = new RrdDefinition();
-    $oidglist  = array();
-    $oidnamelist = array();
-    foreach ($mib_oids as $oid => $param) {
-        $oidindex  = $param[0];
-        $oiddsname = $param[1];
-        $oiddsdesc = $param[2];
-        $oiddstype = $param[3];
-        $oiddsopts = $param[4];
-
-        if (empty($oiddsopts)) {
-            $rrd_def->addDataset($oiddsname, $oiddstype, null, 100000000000);
-        } else {
-            $min = array_key_exists('min', $oiddsopts) ? $oiddsopts['min'] : null;
-            $max = array_key_exists('max', $oiddsopts) ? $oiddsopts['max'] : null;
-            $heartbeat = array_key_exists('heartbeat', $oiddsopts) ? $oiddsopts['heartbeat'] : null;
-            $rrd_def->addDataset($oiddsname, $oiddstype, $min, $max, $heartbeat);
-        }
-
-        if ($oidindex != '') {
-            $fulloid = $oid.'.'.$oidindex;
-        } else {
-            $fulloid = $oid;
-        }
-
-        // Add to oid GET list
-        $oidglist[] = $fulloid;
-        $oidnamelist[] = $oiddsname;
-    }//end foreach
-
-    // Implde for LibreNMS Version
-    $oidilist = implode(' ', $oidglist);
-
-    $snmpdata = snmp_get_multi($device, $oidilist, '-OQUs', $mib);
-    if (isset($GLOBALS['exec_status']['exitcode']) && $GLOBALS['exec_status']['exitcode'] !== 0) {
-        print_debug('  ERROR, bad snmp response');
-        return false;
-    }
-
-    $oid_count = 0;
-    $fields = array();
-    foreach ($oidglist as $fulloid) {
-        list($splitoid, $splitindex) = explode('.', $fulloid, 2);
-        $val = $snmpdata[$splitindex][$splitoid];
-        if (is_numeric($val)) {
-            $fields[$oidnamelist[$oid_count]] = $val;
-        } elseif (preg_match("/^\"(.*)\"$/", $val, $number) && is_numeric($number[1])) {
-            $fields[$oidnamelist[$oid_count]] = $number[1];
-        } else {
-            $fields[$oidnamelist[$oid_count]] = 'U';
-        }
-        $oid_count++;
-    }
-
-    $tags = compact('rrd_def');
-    data_update($device, $rrd_name, $tags, $fields);
-
-    foreach ($mib_graphs as $graphtoenable) {
-        $graphs[$graphtoenable] = true;
-    }
-
-    return true;
-}//end poll_mib_def()
-
 
 function get_main_serial($device)
 {

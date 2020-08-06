@@ -136,9 +136,9 @@ if ($device['os'] == 'netscaler') {
     $tags = compact('rrd_def');
     data_update($device, 'netscaler-stats-tcp', $tags, $fields);
 
-    $graphs['netscaler_tcp_conn'] = true;
-    $graphs['netscaler_tcp_bits'] = true;
-    $graphs['netscaler_tcp_pkts'] = true;
+    $os->enableGraph('netscaler_tcp_conn');
+    $os->enableGraph('netscaler_tcp_bits');
+    $os->enableGraph('netscaler_tcp_pkts');
 }//end if
 
 unset($oids_gauge, $oids_counter, $oids, $data, $tags, $fields, $rrd_def, $shorten, $short_replacement);

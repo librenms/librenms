@@ -15,11 +15,11 @@ $status    = 'error';
 $message   = 'unknown error';
 $parameters = clean($_POST['search_in_conf_textbox']);
 if (isset($parameters)) {
-    $status  = 'ok';
     $message = 'Queried';
-    $output = search_oxidized_config($parameters);
+    if ($output = search_oxidized_config($parameters)) {
+        $status  = 'ok';
+    }
 } else {
-    $status  = 'error';
     $message = 'ERROR: Could not query';
 }
 echo display(_json_encode(array(
