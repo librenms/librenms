@@ -190,7 +190,7 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     }
 
     $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = trim(external_exec($cmd, $device));
 
     foreach (explode("\n", $data) as $entry) {
         [$oid,$value]  = explode('=', $entry, 2);
@@ -226,7 +226,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     $data = [];
     foreach (array_chunk($oids, $oid_limit) as $chunk) {
         $cmd = gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir);
-        $result = trim(external_exec($cmd));
+        $result = trim(external_exec($cmd, $device));
         if ($result) {
             $data = array_merge($data, explode("\n", $result));
         }
@@ -275,7 +275,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 
     $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\\\" \n\r");
+    $data = trim(external_exec($cmd, $device), "\\\" \n\r");
 
     recordSnmpStatistic('snmpget', $time_start);
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
@@ -304,7 +304,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 
     $snmpcmd  = [Config::get('snmpgetnext', 'snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\" \n\r");
+    $data = trim(external_exec($cmd, $device), "\" \n\r");
 
     recordSnmpStatistic('snmpgetnext', $time_start);
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
@@ -336,7 +336,7 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
     }
     $snmpcmd  = [Config::get('snmpgetnext', 'snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\" \n\r");
+    $data = trim(external_exec($cmd, $device), "\" \n\r");
 
     foreach (explode("\n", $data) as $entry) {
         [$oid,$value]  = explode('=', $entry, 2);
@@ -387,7 +387,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     $time_start = microtime(true);
 
     $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = trim(external_exec($cmd, $device));
 
     $data = str_replace('"', '', $data);
     $data = str_replace('End of MIB', '', $data);
@@ -410,7 +410,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 function snmpwalk_cache_cip($device, $oid, $array = array(), $mib = 0)
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OsnQ', $mib);
-    $data      = trim(external_exec($cmd));
+    $data      = trim(external_exec($cmd, $device));
 
     // echo("Caching: $oid\n");
     foreach (explode("\n", $data) as $entry) {
@@ -446,7 +446,7 @@ function snmp_cache_ifIndex($device)
 {
     // FIXME: this is not yet using our own snmp_*
     $cmd = gen_snmpwalk_cmd($device, 'ifIndex', '-OQs', 'IF-MIB');
-    $data      = trim(external_exec($cmd));
+    $data      = trim(external_exec($cmd, $device));
 
     $array = array();
     foreach (explode("\n", $data) as $entry) {
@@ -647,7 +647,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), 
 {
     d_echo("communityStringIndexing $strIndexing\n");
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib, $mibdir, $strIndexing);
-    $data = rtrim(external_exec($cmd));
+    $data = rtrim(external_exec($cmd, $device));
 
     $line = strtok($data, "\n");
     while ($line !== false) {
@@ -681,7 +681,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), 
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpflags, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = trim(external_exec($cmd, $device));
 
     foreach (explode("\n", $data) as $entry) {
         [$oid,$value] = explode('=', $entry, 2);
@@ -703,7 +703,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
     global $debug;
 
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
-    $data = trim(external_exec($cmd));
+    $data = trim(external_exec($cmd, $device));
 
     foreach (explode("\n", $data) as $entry) {
         [$oid,$value] = explode('=', $entry, 2);
@@ -799,7 +799,7 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     $cmd = array_merge($cmd, (array)$options);
     $cmd[] = $oid;
 
-    return trim(external_exec($cmd));
+    return trim(external_exec($cmd, $device));
 }
 
 /**

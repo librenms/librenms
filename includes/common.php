@@ -22,6 +22,7 @@ use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 use LibreNMS\Util\OS;
+use LibreNMS\Enum\Alert;
 
 function generate_priority_label($priority)
 {
@@ -81,7 +82,7 @@ function graylog_severity_label($severity)
  * @param array $command
  * @return null|string
  */
-function external_exec($command)
+function external_exec($command, $device)
 {
     global $debug, $vdebug;
 
@@ -118,6 +119,13 @@ function external_exec($command)
 
     $proc->run();
     $output = $proc->getOutput();
+
+    if ($proc->getExitCode()) {
+        Log::event('Unsupported SNMP Algorithm', $device['device_id'], 'poller', Alert::ERROR);
+        if ($debug && !$vdebug) {
+            print($proc->getErrorOutput());
+        }
+    }
 
     if ($debug && !$vdebug) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
