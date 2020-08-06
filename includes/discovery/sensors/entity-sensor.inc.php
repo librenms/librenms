@@ -71,6 +71,7 @@ if (!empty($entity_oids)) {
             if ($descr) {
                 $descr = rewrite_entity_descr($descr);
             } else {
+                // Better sensor names for Arista EOS. Remove some redundancy and improve them so they reflect to which unit they belong.
                 if ($device['os'] === 'arista_eos') {
                     $descr = $entity_array[$index]['entPhysicalDescr'];
                     if (preg_match("/(Input|Output) (voltage|current) sensor/i", $descr) || Str::startsWith($descr, 'Power supply') || preg_match('/^(Power Supply|Hotspot|Inlet|Board)/i', $descr)) {
@@ -80,6 +81,7 @@ if (!empty($entity_oids)) {
                         $descr = preg_replace('/(temp|temperature) sensor$/i', '', $descr);
                     }
                 }
+                // End better sensor names for Arista EOS.
                 $descr = rewrite_entity_descr($descr);
             }
             $valid_sensor = check_entity_sensor($descr, $device);
@@ -201,22 +203,10 @@ if (!empty($entity_oids)) {
                             $group = $string[0];
                         } else {
                             $group = preg_replace('/PwrCon/i', '', $string[0]);
-                            //$descr = preg_replace('/^.*?(PwrCon)/i', '', $descr);
                         }
                         $descr = preg_replace('/^.*?(PwrCon)[0-9]*/i', '', $descr);
-                    }
-                    /*
-                    if (preg_match("/Cpu/i", $descr)) {
-                        $group = preg_match("/CpucardPwrCon/i", $descr) ? 'CPU Card': 'System';
-                        $descr = Str::replaceFirst('CpucardPwrCon', '', $descr);
-                    }
-                    if (preg_match("/Switchcard/i", $descr)) {
-                        $descr = Str::replaceFirst('SwitchcardPwrCon', '', $descr);
-                        $group = "Switch Card";
-                    }
-                    */
-                    // I only know replies for Trident platform. If you have another please add to the preg_match
-                    elseif (preg_match("/^(Trident.*|Jericho[0-9]|FM6000)/i", $descr)) {
+                    } elseif (preg_match("/^(Trident.*|Jericho[0-9]|FM6000)/i", $descr)) {
+                        // I only know replies for Trident|Jericho|FM6000 platform. If you have another please add to the preg_match
                         $group = "Platform";
                     } elseif (preg_match("/^(Power|PSU)/i", $descr)) {
                         $group = "PSUs";
