@@ -3,12 +3,16 @@ import LibreNMS
 import json
 import logging
 import os
-import psutil
 import pymysql
 import subprocess
 import threading
 import sys
 import time
+
+try:
+    import psutil
+except ImportError:
+    pass
 
 from datetime import timedelta
 from datetime import datetime
@@ -297,7 +301,11 @@ class Service:
         signal(SIGQUIT, self.terminate)  # capture sigquit and exit gracefully
         signal(SIGINT, self.terminate)  # capture sigint and exit gracefully
         signal(SIGHUP, self.reload)  # capture sighup and restart gracefully
-        signal(SIGCHLD, self.reap)  # capture sigchld and reap the process
+
+        if 'psutil' not in sys.modules:
+            warning("psutil is not available, polling gap possible")
+        else:
+            signal(SIGCHLD, self.reap)  # capture sigchld and reap the process
 
     def reap_psutil(self):
         """
@@ -308,9 +316,9 @@ class Service:
             try:
                 cmd = p.cmdline() # cmdline is uncached, so needs to go here to avoid NoSuchProcess
                 status = p.status()
-                pid = p.pid
 
                 if status == psutil.STATUS_ZOMBIE:
+                    pid = p.pid
                     r = os.waitpid(p.pid, os.WNOHANG)
                     warning('Reaped long running job "%s" in state %s with PID %d - job returned %d', cmd, status,  r[0], r[1])
             except (OSError, psutil.NoSuchProcess):
@@ -521,7 +529,12 @@ class Service:
             return
 
         info('Restarting service... ')
-        self._stop_managers()
+        
+        if 'psutil' not in sys.modules:
+            warning("psutil is not available, polling gap possible")
+            self._stop_managers_and_wait()
+        else:
+            self._stop_managers()
         self._release_master()
 
         python = sys.executable
