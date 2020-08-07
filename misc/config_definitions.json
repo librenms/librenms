@@ -1547,9 +1547,9 @@
         "fping6": {
             "default": "fping6",
             "group": "external",
-            "section": "executable",
+            "section": "binaries",
             "order": 1,
-            "type": "text"
+            "type": "executable"
         },
         "fping_options.count": {
             "default": 3,
