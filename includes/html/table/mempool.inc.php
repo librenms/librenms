@@ -28,7 +28,9 @@ if (!Auth::user()->hasGlobalRead()) {
 
 $sql .= " WHERE $where";
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`hostname` LIKE '%$searchPhrase%' OR `mempool_descr` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`hostname` LIKE ? OR `mempool_descr` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`mempool_id`) $sql";

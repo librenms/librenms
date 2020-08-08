@@ -34,6 +34,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
+
+    // Device Tabs
+    Route::group(['prefix' => 'device/{device}', 'namespace' => 'Device\Tabs', 'as' => 'device.'], function () {
+        Route::put('notes', 'NotesController@update')->name('notes.update');
+    });
+
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
         ->name('device')->where(['vars' => '.*']);
 
@@ -43,7 +49,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     });
 
     // admin pages
-    Route::group(['guard' => 'admin'], function () {
+    Route::group(['middleware' => ['can:admin']], function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
         Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');

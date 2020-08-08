@@ -34,8 +34,6 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
     cisco-qfp: true
-register_mibs:
-    ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
 discovery:
     -
         sysDescr:

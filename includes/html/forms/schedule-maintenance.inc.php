@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserPref;
 use Illuminate\Support\Str;
 
 /*
@@ -150,7 +151,7 @@ if ($sub_type == 'new-maintenance') {
                 }
 
                 $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
-                if ($notes && $type = 'device' && get_user_pref('add_schedule_note_to_device', false)) {
+                if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
                     $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
                     $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
                     dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);

@@ -86,6 +86,10 @@ class DynamicConfigItem implements \ArrayAccess
             return (bool)preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', $value);
         } elseif (in_array($this->type, ['text', 'password'])) {
             return !is_array($value);
+        } elseif ($this->type === 'executable') {
+            return is_file($value) && is_executable($value);
+        } elseif ($this->type === 'directory') {
+            return is_dir($value);
         }
 
         return false;

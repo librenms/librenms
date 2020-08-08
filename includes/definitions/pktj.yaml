@@ -8,15 +8,6 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 processor_stacked: true
-register_mibs:
-    rxCounter: GANDI-MIB
-    txCounter: GANDI-MIB
-    dropCounter: GANDI-MIB
-    acldropCounter: GANDI-MIB
-    ratedropCounter: GANDI-MIB
-    KNIrxCounter: GANDI-MIB
-    KNItxCounter: GANDI-MIB
-    KNIdropCounter: GANDI-MIB
 discovery:
     -
         sysDescr_regex: '/^Linux/'

@@ -5,7 +5,7 @@ print_optionbar_start();
 $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'nfsen',
+    'tab'    => 'netflow',
     );
 
 echo generate_link('General', $link_array, array('nfsen' => 'general'));

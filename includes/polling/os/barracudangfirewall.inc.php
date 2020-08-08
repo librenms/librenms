@@ -27,5 +27,5 @@ if (is_numeric($sessions)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'barracuda_firewall_sessions', $tags, $fields);
-    $graphs['barracuda_firewall_sessions'] = true;
+    $os->enableGraph('barracuda_firewall_sessions');
 }

@@ -24,7 +24,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-errorCount', $tags, $fields);
-        $graphs['canopy_generic_errorCount'] = true;
+        $os->enableGraph('canopy_generic_errorCount');
         unset($rrd_filename, $fecInErrorsCount, $fecOutErrorsCount);
     }
 
@@ -36,7 +36,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-crcErrors', $tags, $fields);
-        $graphs['canopy_generic_crcErrors'] = true;
+        $os->enableGraph('canopy_generic_crcErrors');
     }
 
     $vertical = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.2.2.117.0", "-Ovqn", ""));
@@ -54,7 +54,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-signalHV', $tags, $fields);
-        $graphs['canopy_generic_signalHV'] = true;
+        $os->enableGraph('canopy_generic_signalHV');
         unset($rrd_filename, $vertical, $horizontal, $combined);
     }
 
@@ -67,7 +67,7 @@ if (strstr($hardware, 'CMM') == false) {
     //     );
     //     $tags = compact('rrd_def');
     //     data_update($device, 'canopy-generic-rssi', $tags, $fields);
-    //     $graphs['canopy_generic_rssi'] = true;
+    //     $os->enableGraph('canopy_generic_rssi');
     //     unset($rrd_filename, $rssi);
     // }
 
@@ -79,7 +79,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-jitter', $tags, $fields);
-        $graphs['canopy_generic_jitter'] = true;
+        $os->enableGraph('canopy_generic_jitter');
         unset($rrd_filename, $jitter);
     }
 
@@ -96,7 +96,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-450-slaveHV', $tags, $fields);
-        $graphs['canopy_generic_450_slaveHV'] = true;
+        $os->enableGraph('canopy_generic_450_slaveHV');
         unset($rrd_filename, $horizontal, $vertical);
     }
 
@@ -108,7 +108,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-450-slaveSSR', $tags, $fields);
-        $graphs['canopy_generic_450_slaveSSR'] = true;
+        $os->enableGraph('canopy_generic_450_slaveSSR');
         unset($rrd_filename, $ssr);
     }
 
@@ -124,7 +124,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-450-slaveSNR', $tags, $fields);
-        $graphs['canopy_generic_450_slaveSNR'] = true;
+        $os->enableGraph('canopy_generic_450_slaveSNR');
         unset($rrd_filename, $horizontal, $vertical);
     }
 }
@@ -146,7 +146,7 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
     //     );
     //     $tags = compact('rrd_def');
     //     data_update($device, 'canopy-generic-whispGPSStats', $tags, $fields);
-    //     $graphs['canopy_generic_whispGPSStats'] = true;
+    //     $os->enableGraph('canopy_generic_whispGPSStats');
     //     unset($rrd_filename, $gpsStatus);
     // }
 
@@ -162,7 +162,7 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-gpsStats', $tags, $fields);
-        $graphs['canopy_generic_gpsStats'] = true;
+        $os->enableGraph('canopy_generic_gpsStats');
         unset($rrd_filename, $visible, $tracked);
     }
 }
@@ -180,7 +180,7 @@ if (strstr($version, 'AP') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-450-linkRadioDbm', $tags, $fields);
-        $graphs['canopy_generic_450_linkRadioDbm'] = true;
+        $os->enableGraph('canopy_generic_450_linkRadioDbm');
         unset($rrd_filename, $horizontal, $horizontal);
     }
 
@@ -192,10 +192,10 @@ if (strstr($version, 'AP') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-450-powerlevel', $tags, $fields);
-        $graphs['canopy_generic_450_powerlevel'] = true;
+        $os->enableGraph('canopy_generic_450_powerlevel');
         unset($lastLevel);
     }
-    
+
     // Implemented
     // $horizontal = str_replace('"', "", snmp_get($device, "signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
     // $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"));
@@ -209,7 +209,7 @@ if (strstr($version, 'AP') == false) {
     //     );
     //     $tags = compact('rrd_def');
     //     data_update($device, 'canopy-generic-450-ptpSNR', $tags, $fields);
-    //     $graphs['canopy_generic_450_ptpSNR'] = true;
+    //     $os->enableGraph('canopy_generic_450_ptpSNR');
     //     unset($rrd_filename, $horizontal, $horizontal);
     // }
 
@@ -221,7 +221,7 @@ if (strstr($version, 'AP') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-450-masterSSR', $tags, $fields);
-        $graphs['canopy_generic_450_masterSSR'] = true;
+        $os->enableGraph('canopy_generic_450_masterSSR');
         unset($rrd_filename, $ssr);
     }
 
@@ -246,7 +246,7 @@ if (strstr($version, 'AP') == false) {
             );
             $tags = compact('rrd_def');
             data_update($device, 'canopy-generic-radioDbm', $tags, $fields);
-            $graphs['canopy_generic_radioDbm'] = true;
+            $os->enableGraph('canopy_generic_radioDbm');
             unset($rrd_filename, $dbmRadio, $minRadio, $maxRadio, $avgRadio);
         }
     }
@@ -261,7 +261,7 @@ if (strstr($version, 'AP')) {
     $freq = $multi_get_array[0]["WHISP-APS-MIB::currentRadioFreqCarrier"];
     $downlinkutilization = $multi_get_array[0]["WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization"];
     $uplinkutilization = $multi_get_array[0]["WHISP-APS-MIB::frUtlLowTotalUplinkUtilization"];
-    
+
     if (is_numeric($registered) && is_numeric($failed)) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('regCount', 'GAUGE', 0, 15000)
@@ -272,7 +272,7 @@ if (strstr($version, 'AP')) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'canopy-generic-regCount', $tags, $fields);
-        $graphs['canopy_generic_regCount'] = true;
+        $os->enableGraph('canopy_generic_regCount');
         unset($rrd_filename, $registered, $failed);
     }
 
@@ -289,7 +289,7 @@ if (strstr($version, 'AP')) {
     //     );
     //     $tags = compact('rrd_def');
     //     data_update($device, 'canopy-generic-freq', $tags, $fields);
-    //     $graphs['canopy_generic_freq'] = true;
+    //     $os->enableGraph('canopy_generic_freq');
     //     unset($rrd_filename, $freq);
     // }
 
@@ -304,7 +304,7 @@ if (strstr($version, 'AP')) {
     //     );
     //     $tags = compact('rrd_def');
     //     data_update($device, 'canopy-generic-frameUtilization', $tags, $fields);
-    //     $graphs['canopy-generic-frameUtilization'] = true;
+    //     $os->enableGraph('canopy-generic-frameUtilization');
     //     unset($rrd_filename, $downlinkutilization, $uplinkutilization);
     // }
 }

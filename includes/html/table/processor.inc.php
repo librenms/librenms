@@ -28,7 +28,9 @@ if (!Auth::user()->hasGlobalRead()) {
 
 $sql .= " WHERE $where";
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`hostname` LIKE '%$searchPhrase%' OR `processor_descr` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`hostname` LIKE ? OR `processor_descr` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`processor_id`) $sql";
