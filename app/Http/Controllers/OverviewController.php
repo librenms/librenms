@@ -114,7 +114,9 @@ class OverviewController extends Controller
             $user_list = [];
         }
 
-        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets', 'user_list'));
+        $unselected_user_id = '0';
+
+        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets', 'user_list', 'unselected_user_id'));
     }
 
     public function simple(Request $request)

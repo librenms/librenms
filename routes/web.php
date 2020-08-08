@@ -90,6 +90,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         // form ajax handlers, perhaps should just be page controllers
         Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
             Route::resource('widget-settings', 'WidgetSettingsController');
+            Route::post('copy-dashboard', 'CopyDashboardController@store');
         });
 
         // js select2 data controllers

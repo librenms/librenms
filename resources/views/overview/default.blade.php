@@ -51,14 +51,14 @@
         @if (count($user_list))
         <div class="btn-group btn-lg" style="position:absolute;right:0px;">
             <div class="btn-group">
-            <select class="form-control" id=dashboard_copy_target name=dashboard_copy_target>
-                <option value="0"> Copy Dashboard to </option>
+            <select class="form-control" id=dashboard_copy_target name=dashboard_copy_target onchange="dashboard_copy_user_select()">
+                <option value="{{ $unselected_user_id }}"> Copy Dashboard to </option>
             @foreach ($user_list as $user)
                 <option value="{{ $user->user_id }}"> {{ $user->username }} </option>
             @endforeach
             </select>
             </div>
-            <button class="btn btn-primary" href="#copy_dash" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="Copy Dashboard"><i class="fa fa-copy fa-fw"></i></button>
+            <button id="do_copy_dashboard" class="btn btn-primary" href="#copy_dash" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="Copy Dashboard"><i class="fa fa-copy fa-fw"></i></button>
         </div>
         @endif
         <div class="dash-collapse" id="add_dash" style="display: none;" >
@@ -485,31 +485,49 @@
         });
     }
 
-    function dashboard_copy(data) {
-        if (! confirm('Do you really want to copy your Dashboard to selected User?')) {
-            return;
+    function dashboard_copy_user_select() {
+        var user_id = document.getElementById("dashboard_copy_target").value;
+
+        if (user_id == {{ $unselected_user_id }}) {
+            button_disabled = true;
+        } else {
+            button_disabled = false;
         }
 
-        var user_id = document.getElementById("dashboard_copy_target").value;
-        var dashboard_id = {{ $dashboard->dashboard_id }};
+        $("#do_copy_dashboard").prop('disabled', button_disabled);
+    }
 
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: 'copy-dashboard', user_id: user_id, dashboard_id: dashboard_id},
-            dataType: "json",
-            success: function (data) {
-                if( data.status == "ok" ) {
-                    toastr.success(data.message);
-                }
-                else {
+    function dashboard_copy(data) {
+        var target_user_id = document.getElementById("dashboard_copy_target").value;
+        var dashboard_id = {{ $dashboard->dashboard_id }};
+        var username = $("#dashboard_copy_target option:selected").text().trim();
+
+        if (target_user_id == {{ $unselected_user_id }}) {
+            toastr.warning('No target selected to copy Dashboard to');
+        } else {
+//            if (! confirm("Do you really want to copy this Dashboard to User '" + username + "'?")) {
+//                return;
+//            }
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ url('/ajax/form/copy-dashboard') }}',
+                data: {target_user_id: target_user_id, dashboard_id: dashboard_id},
+                dataType: "json",
+                success: function (data) {
+                    if( data.status == "ok" ) {
+                        toastr.success(data.message);
+                    } else {
+                        toastr.error(data.message);
+                    }
+                },
+                error: function(data) {
                     toastr.error(data.message);
                 }
-            },
-            error: function(data) {
-                toastr.error(data.message);
-            }
-        });
+            });
+            $("#dashboard_copy_target option:eq({{ $unselected_user_id }})").prop('selected', true);
+            dashboard_copy_user_select();
+        }
     }
 
     function widget_dom(data) {
@@ -647,5 +665,6 @@
         dashboard_add($('#add_form'));
     @endif
 
+dashboard_copy_user_select();
 </script>
 @endpush
