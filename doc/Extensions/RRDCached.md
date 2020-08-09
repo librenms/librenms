@@ -43,11 +43,11 @@ so you can view the disk I/O usage delta.
 
 # Installation Manual for
 
-1. [RRDCached installation Ubuntu 16](#RRDCached-installation-Ubuntu-16)
-1. [RRDCached installation Debian Buster](#RRDCached-installation-Debian-Buster)
-1. [RRDCached installation Debian Stretch](#RRDCached-installation-Debian-Stretch)
-1. [RRDCached installation CentOS 7](#RRDCached-installation-CentOS-7)
-1. [RRDCached installation CentOS 6](#RRDCached-installation-CentOS-6)
+1. [RRDCached installation Ubuntu 16](#rrdcached-installation-ubuntu-16)
+1. [RRDCached installation Debian Buster](#rrdcached-installation-debian-buster)
+1. [RRDCached installation Debian Stretch](#rrdcached-installation-debian-stretch)
+1. [RRDCached installation CentOS 7 or 8](#rrdcached-installation-centos-7-or-8)
+1. [RRDCached installation CentOS 6](#rrdcached-installation-centos-6)
 1. [Securing RRCached](#Securing-RRCached)
 
 
@@ -210,7 +210,7 @@ $config['rrdcached'] = "IPADDRESS:42217";
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
 
-## RRDCached installation CentOS 7/8
+## RRDCached installation CentOS 7 or 8
 
 1: Create `/etc/systemd/system/rrdcached.service` with this content:
 

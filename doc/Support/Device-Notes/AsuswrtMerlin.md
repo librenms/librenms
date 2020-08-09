@@ -1,21 +1,21 @@
-source: doc/Support/Device-Notes/Openwrt.md
+source: doc/Support/Device-Notes/AsuswrtMerlin.md
 path: blob/master/doc/
 
-To use Wireless Sensors on Openwrt, an agent of sorts is required. The
-purpose of the agent is to execute on the client (Openwrt) side, to ensure
+To use Wireless Sensors on AsuswrtMerlin, an agent of sorts is required. The
+purpose of the agent is to execute on the client (AsuswrtMerlin) side, to ensure
 that the needed Wireless Sensor information is returned for SNMP queries (from LibreNMS).
 
 # Installation
 
-## Openwrt
+## AsuswrtMerlin
 
-Two items are required on the Openwrt side - scripts to generate the necessary information (for
+Two items are required on the AsuswrtMerlin side - scripts to generate the necessary information (for
 SNMP replies), and an SNMP extend configuration update (to return the information vs. the expected
 query).
 
 1: Install the scripts:
 
-Copy the scripts from librenms-agent/snmp/Openwrt - preferably inside /etc/librenms on Openwrt (and add this
+Copy the scripts from librenms-agent/snmp/Openwrt - preferably inside /etc/librenms on AsuswrtMerlin (and add this
 directory to /etc/sysupgrade.conf, to survive firmware updates).
 
 The only file that needs to be edited is wlInterfaces.txt, which is a mapping from the wireless interfaces, to
@@ -25,7 +25,7 @@ wlan0,wl-2.4G
 wlan1,wl-5.0G
 ```
 
-2: Update the Openwrt SNMP configuration, adding extend support for the Wireless Sensor queries:
+2: Update the AsuswrtMerlin SNMP configuration, adding extend support for the Wireless Sensor queries:
 
 `vi /etc/config/snmpd`, adding the following entries (assuming the scripts are installed in /etc/librenms, and are executable),
 and update the network interfaces as needed to match the hardware,
@@ -121,7 +121,7 @@ NOTE, on the LibreNMS machine, ensure that snmp-mibs-downloader is installed.
 
 NOTE, on the AsuswrtMerlin machine, ensure that distro is installed (i.e. that the OS is correctly detected!).
 
-3: Restart the snmp service on Openwrt:
+3: Restart the snmp service on AsuswrtMerlin:
 
 `service snmpd restart`
 

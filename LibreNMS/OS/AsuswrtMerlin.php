@@ -1,6 +1,6 @@
 <?php
 /**
- * Openwrt.php
+ * AsuswrtMerlin.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
-class Openwrt extends OS implements
+class AsuswrtMerlin extends OS implements
     OSDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
@@ -46,8 +46,9 @@ class Openwrt extends OS implements
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-        $device->version = explode(' ', trim(snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'))[1];
-        $device->hardware = trim(snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.2.101.1', '-Osqnv'), '"');
+        $info = explode(' ', trim(snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
+        $device->hardware = $info[1];
+        $device->version = $info[2];
     }
 
     /**

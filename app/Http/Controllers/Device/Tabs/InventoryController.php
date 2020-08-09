@@ -41,9 +41,7 @@ class InventoryController implements DeviceTab
 
             if ($device->entityPhysical()->exists()) {
                 $this->type = 'entphysical';
-            }
-
-            if ($device->hostResources()->exists()) {
+            } elseif ($device->hostResources()->exists()) {
                 $this->type = 'hrdevice';
             }
         }
