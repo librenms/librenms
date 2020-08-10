@@ -21,8 +21,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 <your name>
- * @author     <your name> <your email>
+ * @copyright  2020 KanREN, Inc.
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Snmptrap\Handlers;
