@@ -38,7 +38,7 @@ class CopyDashboardController extends Controller
         $target_user_id = $request->get('target_user_id');
         $dashboard_id = $request->get('dashboard_id');
 
-        $dashboard = Dashboard::where(['dashboard_id' => $dashboard_id, 'user_id' => Auth::id()])->first()->toArray();
+        $dashboard = Dashboard::where(['dashboard_id' => $dashboard_id, 'user_id' => Auth::id()])->first();
 
         $success = true;
 
@@ -47,24 +47,21 @@ class CopyDashboardController extends Controller
         }
 
         if ($success) {
-            unset($dashboard['dashboard_id']);
-            $dashboard['user_id'] = $target_user_id;
-            $dashboard['dashboard_name'] .= '_' . Auth::user()->username;
-
-            $dashboard_copy = new Dashboard();
-            $dashboard_copy->fill($dashboard);
-            $success &= $dashboard_copy->save();
+            $dashboard_copy = $dashboard->replicate()->fill([
+                'user_id' => $target_user_id,
+                'dashboard_name' => $dashboard['dashboard_name'] .= '_' . Auth::user()->username,
+            ]);
+            $success = $dashboard_copy->save();
         }
 
         if ($success) {
-            $widgets = UserWidget::where(['dashboard_id' => $dashboard_id, 'user_id' => Auth::id()])->get()->toArray();
+            $widgets = UserWidget::where(['dashboard_id' => $dashboard_id, 'user_id' => Auth::id()])->get();
 
             foreach ($widgets as $widget) {
-                $widget['user_id'] = $target_user_id;
-                $widget['dashboard_id'] = $dashboard_copy->dashboard_id;
-
-                $widget_copy = new UserWidget();
-                $widget_copy->fill($widget);
+                $widget_copy = $widget->replicate()->fill([
+                    'user_id' => $target_user_id,
+                    'dashboard_id' => $dashboard_copy->dashboard_id,
+                ]);
                 $success &= $widget_copy->save();
             }
         }
