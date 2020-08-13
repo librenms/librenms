@@ -48,7 +48,7 @@ class Endrun extends OS implements OSDiscovery
         } else {
             $info = snmp_get_multi($this->getDevice(), ['cntpVersion.0', 'cdmaVersion.0', 'snmpSetSerialNo.0'], '-OQUs', 'TEMPUSLXUNISON-MIB:SNMPv2-MIB');
             // The cntpVersion string output is rather long. Ex. Tempus LX CDMA 6010-0042-000 v 5.70 - Wed Oct 1 04:39:21 UTC 2014
-            preg_match('/(.+) v (.+) - /', $info[0]['cntpVersion'], $matches);
+            $preg_match('/(.+) v (.+) - /', $info[0]['cntpVersion'], $matches);
             $device->hardware = $matches[1] ?? null;
             $device->version = $matches[2] ?? null;
         }
