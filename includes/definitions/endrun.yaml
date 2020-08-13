@@ -17,9 +17,8 @@ discovery:
           value: 'Tempus LX CDMA'
           # -  
     -
-      sysDescr: Linux
+      sysDescr: 
       snmpget:
-              #oid: .1.3.6.1.4.13827.12.1.16.0     
           oid: sysDescr.0
           op: 'contains'
           value: 'Sonoma'
