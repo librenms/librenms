@@ -9,10 +9,10 @@
                     "sysContact": null,
                     "version": "5.70",
                     "hardware": "Tempus LX CDMA 6010-0042-000",
-                    "features": null,
+                    "features": "F/W 5.11 FPGA 0416",
                     "os": "endrun",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "1882136009",
                     "icon": "endrun.png",
                     "location": null
                 }
@@ -27,10 +27,10 @@
                     "sysContact": "<private>",
                     "version": "5.70",
                     "hardware": "Tempus LX CDMA 6010-0042-000",
-                    "features": null,
+                    "features": "F/W 5.11 FPGA 0416",
                     "os": "endrun",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "1882136009",
                     "icon": "endrun.png",
                     "location": "<private>"
                 }
