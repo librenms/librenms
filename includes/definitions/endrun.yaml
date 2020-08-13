@@ -17,7 +17,7 @@ discovery:
           value: 'Tempus LX CDMA'
           # -  
     -
-      sysDescr: 
+      sysDescr: Linux 
       snmpget:
           oid: sysDescr.0
           op: 'contains'
