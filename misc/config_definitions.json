@@ -908,6 +908,11 @@
                     "type": "environment"
                 },
                 {
+                    "icon": "oob-management.png",
+                    "text": "OOB Management",
+                    "type": "OOB Management"
+                },
+                {
                     "icon": "loadbalancer.png",
                     "text": "Load Balancers",
                     "type": "loadbalancer"
