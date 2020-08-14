@@ -227,6 +227,13 @@ $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
+
+### Database config
+$config['db_host'] = 'example.com';
+$config['db_port'] = '3306';
+$config['db_user'] = 'librenms';
+$config['db_pass'] = 'examplepassword';
+$config['db_name'] = 'librenms';
 ```
 
 `/etc/cron.d/librenms`
@@ -254,6 +261,13 @@ $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
+
+### Database config
+$config['db_host'] = 'example.com';
+$config['db_port'] = '3306';
+$config['db_user'] = 'librenms';
+$config['db_pass'] = 'examplepassword';
+$config['db_name'] = 'librenms';
 ```
 
 `/etc/cron.d/librenms`
@@ -279,6 +293,13 @@ $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
+
+### Database config
+$config['db_host'] = 'example.com';
+$config['db_port'] = '3306';
+$config['db_user'] = 'librenms';
+$config['db_pass'] = 'examplepassword';
+$config['db_name'] = 'librenms';
 ```
 
 `/etc/cron.d/librenms`
@@ -289,4 +310,20 @@ Runs discovery and polling for groups 2 and 3.
 */5 *   * * *   librenms    /opt/librenms/discovery.php -h new >> /dev/null 2>&1
 */5 *   * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 15  0   * * *   librenms    /opt/librenms/daily.sh >> /dev/null 2>&1
+```
+
+In addition, you may need to modify `/opt/librenms/.env` to point to the host of your MySQL instance. The file will look like the following:
+
+```
+APP_KEY=[APP_KEY]
+
+DB_HOST=example.com
+DB_DATABASE=librenms
+DB_USERNAME=librenms
+DB_PASSWORD=examplepassword
+
+APP_URL=[APP_URL]
+NODE_ID=[NODE_ID]
+DB_PORT=3306
+LIBRENMS_USER=librenms
 ```
