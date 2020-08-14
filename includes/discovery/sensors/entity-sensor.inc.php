@@ -199,7 +199,7 @@ if (!empty($entity_oids)) {
                             $group = "SFPs";
                     } elseif (preg_match('/PwrCon/', $descr)) {
                         $string = explode(' ', $descr);
-                        if (preg_match('/PwrCon[0-9]/', $string[0])){
+                        if (preg_match('/PwrCon[0-9]/', $string[0])) {
                             $group = $string[0];
                         } else {
                             $group = preg_replace('/PwrCon/i', '', $string[0]);
@@ -215,7 +215,6 @@ if (!empty($entity_oids)) {
                         $descr = Str::replaceLast('temp sensor', '', $descr);
                     }
                     // End grouping sensors
-
                 }
                 discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $group);
             }
