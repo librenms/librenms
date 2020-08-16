@@ -461,6 +461,9 @@ function delete_device($id)
     dbQuery("DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?", array($id));
     dbQuery("DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?", array($id));
 
+    //Remove Outages
+    \App\Models\Availability::where('device_id', $id)->delete();
+    \App\Models\DeviceOutage::where('device_id', $id)->delete();
 
     \App\Models\Port::where('device_id', $id)
         ->with('device')
