@@ -126,6 +126,8 @@
 
                         <li><a href="{{ url('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
                                                                 aria-hidden="true"></i> @lang('Inventory')</a></li>
+                        <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
+                                                               aria-hidden="true"></i> @lang('Outages')</a></li>
                         @if($package_count)
                             <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
                                                                                  aria-hidden="true"></i> @lang('Packages')
