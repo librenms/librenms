@@ -166,8 +166,7 @@ mkdir -p /var/cache/librenms/
 installed. In Debian-based systems for example you can achieve this by:
 
 ```
-apt-get install python3-pycurl 
-pip3 install urlgrabber
+apt-get install python3-pycurl python3-urlgrabber
 ```
 
 5: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
