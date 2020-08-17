@@ -32,7 +32,7 @@ class Matrix extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-	$server    = $this->config['matrix-server'];
+        $server    = $this->config['matrix-server'];
         $room      = $this->config['matrix-room'];
         $authtoken = $this->config['matrix-authtoken'];
         $message   = $this->config['matrix-message'];
@@ -44,7 +44,7 @@ class Matrix extends Transport
         $request_opts = [];
         $request_heads = [];
 
-	$host = "https://".$server."/_matrix/client/r0/rooms/".urlencode($room)."/send/m.room.message/".$obj['uid'];
+        $host = "https://".$server."/_matrix/client/r0/rooms/".urlencode($room)."/send/m.room.message/".$obj['uid'];
 
         $request_heads['Authorization'] = "Bearer $authtoken";
         $request_heads['Content-Type'] = "application/json";
@@ -52,15 +52,15 @@ class Matrix extends Transport
 
         foreach ($obj as $p_key => $p_val) {
             $message = str_replace("{{ $" . $p_key . ' }}', $p_val, $message);
-	}
+        }
 
-	$body = array('body'=>$message, 'msgtype'=>'m.text');
+        $body = array('body'=>$message, 'msgtype'=>'m.text');
 
         $client = new \GuzzleHttp\Client();
         $request_opts['proxy'] = get_guzzle_proxy();
         $request_opts['headers'] = $request_heads;
         $request_opts['body'] = json_encode($body);
-	$res = $client->request('PUT', $host, $request_opts);
+        $res = $client->request('PUT', $host, $request_opts);
 
         $code = $res->getStatusCode();
         if ($code != 200) {
