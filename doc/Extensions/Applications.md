@@ -162,11 +162,11 @@ that it is owned by the user running the SNMP daemon.
 mkdir -p /var/cache/librenms/
 ```
 
-4: Verify it is working by running /etc/snmp/apache-stats.py Packages `urlgrabber` and `pycurl` for python3 needs to be
+4: Verify it is working by running /etc/snmp/apache-stats.py Package `urllib` for python3 needs to be
 installed. In Debian-based systems for example you can achieve this by:
 
 ```
-apt-get install python3-pycurl python3-urlgrabber
+apt-get install python3-urllib3
 ```
 
 5: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
