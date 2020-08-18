@@ -44,7 +44,8 @@ class Matrix extends Transport
         $request_opts = [];
         $request_heads = [];
 
-        $host = "https://".$server."/_matrix/client/r0/rooms/".urlencode($room)."/send/m.room.message/".$obj['uid'];
+	$server = preg_replace('/\/$/','',$server);
+        $host = $server."/_matrix/client/r0/rooms/".urlencode($room)."/send/m.room.message/".$obj['uid'];
 
         $request_heads['Authorization'] = "Bearer $authtoken";
         $request_heads['Content-Type'] = "application/json";
@@ -79,9 +80,9 @@ class Matrix extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'Matrix-Server',
+                    'title' => 'Matrix-Server URL',
                     'name' => 'matrix-server',
-                    'descr' => 'Matrix server',
+                    'descr' => 'Matrix server URL up to the matrix api-part (for example: https://matrix.example.com/)',
                     'type' => 'text',
                 ],
                 [
