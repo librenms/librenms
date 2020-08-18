@@ -133,10 +133,10 @@ if (Auth::user()->hasGlobalAdmin()) {
         $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json'), true);
 
         if (!empty($node_info['last']['start'])) {
-            $node_info['last']['start']=date(Config::get('dateformat.long'), strtotime($node_info['last']['start'] . ' UTC'));
+            $node_info['last']['start']=date(Config::get('dateformat.long'), strtotime($node_info['last']['start']));
         }
         if (!empty($node_info['last']['end'])) {
-            $node_info['last']['end']=date(Config::get('dateformat.long'), strtotime($node_info['last']['end'] . ' UTC'));
+            $node_info['last']['end']=date(Config::get('dateformat.long'), strtotime($node_info['last']['end']));
         }
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
