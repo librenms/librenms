@@ -44,8 +44,7 @@ class Mgnt2TrapNMSEvent implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $msg = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason')); 
+        $msg = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason'));
         Log::event($msg, $device->device_id, 'trap', 2);
     }
 }
-
