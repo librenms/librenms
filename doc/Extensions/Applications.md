@@ -163,7 +163,7 @@ mkdir -p /var/cache/librenms/
 ```
 
 4: Verify it is working by running /etc/snmp/apache-stats.py Package `urllib3` for python3 needs to be
-installed. In Debian-based systems for example you can achieve this by:
+installed. In Debian-based systems for example you can achieve this by issuing:
 
 ```
 apt-get install python3-urllib3
