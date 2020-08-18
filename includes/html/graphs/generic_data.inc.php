@@ -165,7 +165,8 @@ $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
 
 if (!empty($port['ifSpeed'])) {
-    $rrd_options .= " LINE2:{$port['ifSpeed']}#000000:'Port Speed " . format_si($port['ifSpeed']) . "bps\\n'";
+    $speed_line_type = Request::get('port_speed_zoom', Config::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';
+    $rrd_options .= " $speed_line_type:{$port['ifSpeed']}#000000:'Port Speed " . format_si($port['ifSpeed']) . "bps\\n'";
 }
 
 // Linear prediction of trend
