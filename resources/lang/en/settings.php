@@ -864,10 +864,6 @@ return [
             'url' => [
                 'description' => 'URL to your Oxidized API',
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)'
-            ],
-            'datetime_format' => [
-                'description' => 'Enable convert from UTC time',
-                'help' => 'Convert to php.ini default timezone and this datetime format. Clean for disable.'
             ]
         ],
         'password' => [

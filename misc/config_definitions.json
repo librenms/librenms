@@ -3943,13 +3943,6 @@
                 "value": "url"
             }
         },
-        "oxidized.datetime_format": {
-            "default": "Y-m-d H:i:s",
-            "group": "external",
-            "section": "oxidized",
-            "order": 6,
-            "type": "text"
-        },
         "page_refresh": {
             "default": 300,
             "type": "integer",
