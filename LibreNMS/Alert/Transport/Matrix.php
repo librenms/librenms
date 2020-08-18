@@ -44,7 +44,7 @@ class Matrix extends Transport
         $request_opts = [];
         $request_heads = [];
 
-	$server = preg_replace('/\/$/','',$server);
+        $server = preg_replace('/\/$/', '', $server);
         $host = $server."/_matrix/client/r0/rooms/".urlencode($room)."/send/m.room.message/".$obj['uid'];
 
         $request_heads['Authorization'] = "Bearer $authtoken";
