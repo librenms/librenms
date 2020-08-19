@@ -63,8 +63,8 @@ class Mgnt2TrapNMSEvent implements SnmptrapHandler
         if ($probCause == 'other') {
             $probCause = 'Unknown';
         }
-        
-        if ($alarmObj == 'module'){
+
+        if ($alarmObj == 'module') {
             $msg = "Alarm on slot $slot, $sourcePm. Issue: $probMsg. Possible Cause: $probCause";
         } elseif ($alarmObj == 'port') {
             $msg = "Alarm on slot $slot, $sourcePm, Port: $portType $portNum. Issue: $probMsg. Possible Cause: $probCause";
