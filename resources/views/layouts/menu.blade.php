@@ -105,6 +105,11 @@
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
                                                                          aria-hidden="true"></i> @lang('RIPE NCC API')
                                     </a></li>
+                                @config('smokeping.integration')
+                                <li><a href="{{ \LibreNMS\Config::get('smokeping.url') }}"><i class="fa fa-line-chart fa-fw fa-lg"
+                                                                       aria-hidden="true"></i> @lang('Smokeping')</a>
+                                </li>
+                                @endconfig
                                 @config('oxidized.enabled')
                                 <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
                                                                        aria-hidden="true"></i> @lang('Oxidized')</a>
