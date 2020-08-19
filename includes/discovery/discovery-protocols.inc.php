@@ -238,6 +238,16 @@ if (($device['os'] == 'routeros')) {
             foreach ($lldp_instance as $entry_instance => $lldp) {
                 // normalize MAC address if present
                 $remote_port_mac = '';
+                if (($device['os'] == 'enos') || ($device['os'] == 'cnos')) {
+                        if (($lldp['lldpRemPortIdSubtype'] == 7) || ($lldp['lldpRemPortIdSubtype'] == 5)) { // 7 or 5 = macaddress on ibm/lenovo {
+                            $remote_port_mac = str_replace(array(' ',':', '-'), '', strtolower($lldp['lldpRemChassisId']));
+                        }
+                } else {
+                        if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
+                                $remote_port_mac = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemPortId']));
+                        }
+                }
+                
                 if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
                     $remote_port_mac = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemPortId']));
                 }
@@ -283,6 +293,10 @@ if (($device['os'] == 'routeros')) {
                     $lldp['lldpRemPortId'] = (string)($n_slot * 1000 + $n_port);
                 }
 
+                if ($remote_device['os'] == 'enos') {
+                    $lldp['lldpRemPortId'] = 'Ethernet' . $lldp['lldpRemPortId'];
+                }
+                
                 $remote_port_id = find_port_id(
                     $lldp['lldpRemPortDesc'],
                     $lldp['lldpRemPortId'],
