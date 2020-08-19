@@ -1,5 +1,6 @@
 mib: TAIT-INFRA93SERIES-MIB
 modules:
+    sensors:
         state:
             data:
                 -
