@@ -41,12 +41,8 @@ foreach ($port_stats as $index => $port) {
 
     /*
      * Split up ifName and drop the EKIPS/Chassis
-    */ 
-    $intName = array_filter(multiexplode(["/","(",")"], $port['ifName']));
-
-    array_shift($intName);
-    array_shift($intName);
-
+     */
+    $intName = preg_split("/[\/,\(,\)]/", $port['ifName']);
 
     // Make ifDescr slot/card/int
 
@@ -57,13 +53,6 @@ foreach ($port_stats as $index => $port) {
     $ifAlias = $intName[3];
 
     $port_stats[$index]['ifAlias'] = $ifAlias;
-    $port_stats[$index]['ifDescr' ] = $ifDescr;
+    $port_stats[$index]['ifDescr'] = $ifDescr;
 
 }
-
-function multiexplode ($delimiters,$string) {
-
-    $ready = str_replace($delimiters, $delimiters[0], $string);
-    $launch = explode($delimiters[0], $ready);
-    return  $launch;
-}  
