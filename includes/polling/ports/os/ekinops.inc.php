@@ -46,11 +46,11 @@ foreach ($port_stats as $index => $port) {
 
     // Make ifDescr slot/card/int
 
-    $ifDescr = $intName[0] . '/' . $intName[1] . '/' . $intName[2];
+    $ifDescr = $intName[2] . '/' . $intName[3] . '/' . $intName[4];
 
     // Make ifAlias descr
 
-    $ifAlias = $intName[3];
+    $ifAlias = $intName[5];
 
     $port_stats[$index]['ifAlias'] = $ifAlias;
     $port_stats[$index]['ifDescr'] = $ifDescr;
