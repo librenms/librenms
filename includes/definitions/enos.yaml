@@ -1,0 +1,11 @@
+os: enos
+text: 'Enterprise Network Operating System'
+type: network
+icon: lenovo
+group: lenovo
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    -
+        sysDescr:
+            - 'Lenovo RackSwitch'
