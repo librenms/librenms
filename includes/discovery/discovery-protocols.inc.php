@@ -247,10 +247,6 @@ if (($device['os'] == 'routeros')) {
                                 $remote_port_mac = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemPortId']));
                         }
                 }
-                
-                if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
-                    $remote_port_mac = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemPortId']));
-                }
 
                 $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
 
