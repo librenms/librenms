@@ -47,6 +47,7 @@ return [
         'CPS-MIB::upsTurnedOff' => \LibreNMS\Snmptrap\Handlers\CpUpsTurnedOff::class,
         'CPS-MIB::upsWokeUp' => \LibreNMS\Snmptrap\Handlers\CpUpsWokeUp::class,
         'EKINOPS-MGNT2-NMS-MIB::mgnt2TrapNMSEvent' => \LibreNMS\Snmptrap\Handlers\Mgnt2TrapNMSEvent::class,
+        'EKINOPS-MGNT2-NMS-MIB::mgnt2TrapNMSAlarm' => \LibreNMS\Snmptrap\Handlers\Mgnt2TrapNMSAlarm::class,
         'ENTITY-MIB::entConfigChange' => \LibreNMS\Snmptrap\Handlers\EntityDatabaseConfigChanged::class,
         'EQUIPMENT-MIB::equipStatusTrap' => \LibreNMS\Snmptrap\Handlers\EquipStatusTrap::class,
         'FORTINET-CORE-MIB::fnTrapMemThreshold' => \LibreNMS\Snmptrap\Handlers\FnTrapMemThreshold::class,
