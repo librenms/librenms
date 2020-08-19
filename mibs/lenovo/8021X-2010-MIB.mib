@@ -1,0 +1,3447 @@
+-- *********************************************************************
+--   
+-- IEEE8021X-PAE-MIB : MIB for IEEE 802.1X (802.1X-2010 + 802.1Xbx)
+--   
+-- *********************************************************************
+
+IEEE8021X-PAE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Gauge32,
+    Counter32,
+    Counter64,
+    Unsigned32,
+    Integer32
+        FROM SNMPv2-SMI
+    MacAddress,
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    RowPointer,
+    TimeStamp,
+    TimeInterval,
+    RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    SecySCI
+        FROM IEEE8021-SECY-MIB;
+
+ieee8021XPaeMIB MODULE-IDENTITY
+    LAST-UPDATED    "201404101619Z"
+    ORGANIZATION    "IEEE 802.1 Working Group"
+    CONTACT-INFO
+      " WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+        WG-EMail: stds-802-1@ieee.org
+        Contact: Mick Seaman
+        Postal: C/O IEEE 802.1 Working Group
+                IEEE Standards Association
+                445 Hoes Lane
+                P.O. Box 1331
+                Piscataway
+                NJ 08855-1331
+                USA
+                E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION
+        "The MIB module for managing the Port Access Entity (PAE)
+        functions of IEEE 802.1X (Revision of 802.1X-2004).
+        The PAE functions managed are summarized in Figure 12-3 of
+        IEEE 802.1X and include EAPOL PACP support for authentication
+        (EAP Supplicant and/or Authenticator), MACsec Key Agreement
+        (MKA), EAPOL, and transmission and reception of network
+        announcements.
+
+        The following acronyms and definitions are used in this MIB.
+
+        AN : Association Number, a number that is concatenated with a
+            MACsec Secure Channel Identifier to identify a Secure
+            Association (SA).
+
+        Announcer : EAPOL-Announcement transmission functionality.
+
+        Authenticator : An entity that facilitates authentication of
+            other entities attached to the same LAN.
+
+        CA : secure Connectivity Association: A security relationship,
+            established and maintained by key agreement protocols, that
+            comprises a fully connected subset of the service access
+            points in stations attached to a single LAN that are to be
+            supported by MACsec.
+
+        CAK : secure Connectivity Association Key, a secret key
+            possessed by members of a given CA.
+
+        CKN : secure Connectivity Association Key Name (CKN), a text
+            that identifies a CAK.
+
+        Common Port : An instance of the MAC Internal Sublayer Service
+            used by the SecY or PAC to provide transmission and
+            reception of frames for both the Controlled and
+            Uncontrolled Ports.
+
+        Controlled Port : The access point used to provide the secure
+            MAC Service to a client of a PAC or SecY.
+
+        CP state machine : Controlled Port state machine is capable of
+            controlling a SecY or a PAC.  The CP supports
+            interoperability with unauthenticated systems that are not
+            port-based network access control capable, or that lack 
+            MKA.  When the access controlled port is supported by a
+            SecY, the CP is capable of controlling the SecY so as to
+            provide unsecured connectivity to systems that implement a
+            PAC.
+
+        EAP : Extensible Authentication Protocol, RFC3748.
+
+        EAPOL : EAP over LANs.
+
+        KaY : Key Agreement Entity, a PAE entity responsible for MKA.
+
+        Key Server : Elected by MKA, to transport a succession of SAKs,
+            for use by MACsec, to the other member(s) of a CA.
+
+        KMD : Key Management Domain, a string identifying systems that
+             share cached CAKs.
+
+        Listener : The role is to receive the network announcement
+            parameters in the authentication process.
+
+        Logon Process : The Logon Process is responsible for the
+            managing the use of authentication credentials, for
+            initiating use of the PAE's Supplicant and or Authenticator
+            functionality, for deriving CAK, CKN tuples from PAE
+            results, for maintaining PSKs (Pre-Sharing Keys), and for
+            managing MKA instances.  In the absence of successful
+            authentication, key agreement, or support for MAC Security,
+            the Logon Process determines whether the CP state machine
+            should provide unauthenticated connectivity or
+            authenticated but unsecured connectivity.
+
+        MKA : MACsec Key Agreement protocol allows PAEs, each
+            associated with a port that is an authenticated member of a
+            secure connectivity association (CA) or a potential CA, to
+            discover other PAEs attached to the same LAN, to confirm
+            mutual possession of a CAK and hence to prove a past mutual
+            authentication, to agree the secret keys (SAKs) used by
+            MACsec for symmetric shared key cryptography, and to ensure
+            that the data protected by MACsec has not been delayed.
+
+        MKPDU : MACsec Key Agreement Protocol Data Unit.
+
+        MPDU : MAC Protocol Data Unit.
+
+        NID : Network Identity, a UTF-8 string identifying an network
+             or network service.
+
+        PAE : Port Access Entity, the protocol entity associated with a
+             Port.  It can support the protocol functionality
+             associated with the Authenticator, the Supplicant, or
+             both.
+
+        PAC : Port Access Controller, a protocol-less shim that
+             provides control over frame transmission and reception by
+             clients attached to its Controlled Port, and uses the MAC
+             Service provided by a Common Port.  The access control
+             decision is made by the PAE, typically taking into
+             account the success or failure of mutual authentication
+             and authorization of the PAE's peer(s), and is
+             communicated by the PAE using the LMI to set the PAC's
+             Controlled Port enabled/disable.  Two different interfaces
+             'Controlled Port' and 'Uncontrolled Port', are associated
+             with a PAC, and that for each instance of a PAC, two
+             ifTable rows (one for each interface) run on top of an
+             ifTable row representing the 'Common Port' interface,
+             such as a row with ifType = 'ethernetCsmacd(6)'.
+
+             For example :
+            -----------------------------------------------------------
+            |                            |                            |
+            |   Controlled Port          |   Uncontrolled Port        |
+            |      Interface             |      Interface             |
+            |    (ifEntry = j)           |     (ifEntry = k)          |
+            | (ifType =                  | (ifType =                  |
+            |  macSecControlledIF(231))  |  macSecUncontrolledIF(232))|
+            |                            |                            |
+            |---------------------------------------------------------|
+            |                                                         |
+            |                    Physical Interface                   |
+            |                      (ifEntry = i)                      |
+            |                (ifType = ethernetCsmacd(6))             |
+            |_________________________________________________________|
+                        i, j, k are ifIndex to indicate
+                       an interface stack in the ifTable.
+                        Figure : PAC Interface Stack
+
+             The 'Controlled Port' is the service point to provide one
+             instance of the secure MAC service in a PAC.  The
+             'Uncontrolled Port' is the service point to provide one
+             instance of the insecure MAC service in a PAC.
+
+        PACP : Port Access Controller Protocol.
+
+        Port Identifier : A 16-bit number that is unique within the
+            scope of the address of the port.
+
+        Real Port : Indicates the PAE is for a real port.  A port that
+            is not created on demand by the mechanisms specified in
+            this standard, but that can transmit and receive frames for
+            one or more virtual ports.
+
+        SC : Secure Channel, a security relationship used to provide
+            security guarantees for frames transmitted from one member
+            of a CA to the others.  An SC is supported by a sequence of
+            SAs thus allowing the periodic use of fresh keys without
+            terminating the relationship.
+
+        SA : Secure Association, a security relationship that provides
+            security guarantees for frames transmitted from one member
+            of a CA to the others. Each SA is supported by a single
+            secret key, or a single set of keys where the cryptographic
+            operations used to protect one frame require more than one
+            key. 
+
+        SAK : Secure Association key, the secret key used by an SA.
+
+        SCI : Secure Channel Identifier, a globally unique identifier
+            for a secure channel, comprising a globally unique MAC
+            Address and a Port Identifier, unique within the system
+            allocated that address.
+
+        secured connectivity : Data transfer between two or 'Controlled
+            Ports' that is protected by MACsec.
+
+        SecY : MAC Security Entity, the entity that operates the MAC
+            Security protocol within a system.
+
+        Supplicant : An entity at one end of a point-to-point LAN
+            segment that seeks to be authenticated by an Authenticator
+            attached to the other end of that link.
+            
+        Suspension: Temporary suspension of MKA operation to facilitate
+            in-service control plane software upgrades without
+            disrupting existing secure connectivity.
+
+        Uncontrolled Port : The access point used to provide the
+            insecure MAC Service to a client of a SecY or PAC.
+
+        Virtual Port : Indicates the PAE is for a virtual port.  A MAC
+            Service or Internal Sublayer service access point that is
+            created on demand.  Virtual ports can be used to provide
+            separate secure connectivity associations over the same
+            LAN."
+    REVISION        "201404101619Z"
+    DESCRIPTION
+        "Update published as part of IEEE 802.1Xbx (Amendment to
+        IEEE 802.1X-2010)"
+    REVISION        "200910011650Z"
+    DESCRIPTION
+        "Initial version of this MIB module.  Published as part of
+        IEEE P802.1X (Revision of IEEE Standard 802.1X-2009)"
+    ::= { iso(1) iso-identified-organization(3) ieee(111)
+          standards-association-numbered-series-standards(2)
+          lan-man-stds(802) ieee802dot1(1) ieee802dot1mibs(1) 15 }
+
+-- ------------------------------------------------------------------ --
+-- Textual Conventions
+-- ------------------------------------------------------------------ --
+
+Ieee8021XPaeCKN ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates the CAK name to identify
+        the Connectivity Association Key (CAK) which is the root key
+        in the MACsec Key Agreement key hierarchy.  All potential
+        members of the CA use the same CKN."
+
+    REFERENCE       "IEEE 802.1X Clause 5.4, Clause 9.3.1, Clause 6.2"
+    SYNTAX          OCTET STRING (SIZE (1..16))
+
+Ieee8021XPaeCKNOrNull ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates the CAK name to identify
+        the Connectivity Association Key (CAK) which is the root key
+        in the MACsec Key Agreement key hierarchy.  All potential
+        members of the CA use the same CKN.
+
+        If this is a zero length value, then the NULL string means
+        CKN information is applicable." 
+
+    REFERENCE       "IEEE 802.1X Clause 5.4, Clause 9.3.1, Clause 6.2"
+    SYNTAX          OCTET STRING (SIZE (0..16))
+
+Ieee8021XPaeKMD ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates a Key Management Domain
+        (KMD).
+
+        KMD is a string of UTF-8 characters that names the transmitting
+        authenticator's key management domain."
+
+    REFERENCE       "IEEE 802.1X Clause 12.6"
+    SYNTAX          OCTET STRING (SIZE (0..253))
+
+Ieee8021XPaeNID ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates a Network Identifier (NID).
+
+        Each network is identified by a NID, a UTF-8 string used by
+        network attached systems to select a network profile."
+
+    REFERENCE       "IEEE 802.1X Clause 12.6, Clause 10.1"
+    SYNTAX          OCTET STRING (SIZE (1..100))
+
+Ieee8021XPaeNIDOrNull ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates a Network Identifier (NID).
+
+        Each network is identified by a NID, a UTF-8 string used by
+        network attached systems to select a network profile.
+
+        If this is a zero length value, then the NULL string for
+        NID information is applicable." 
+
+    REFERENCE       "IEEE 802.1X Clause 12.6, Clause 10.1"
+    SYNTAX          OCTET STRING (SIZE (0..100))
+
+Ieee8021XMkaKeyServerPriority ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates a Key Server priority
+        information.
+
+        Each MKA participant encodes a Key Server Priority, an 8-bit
+        integer, in each MKPDU.  Each participant selects the live
+        participant advertising the highest priority as its Key Server
+        provided that participant has not selected another as its Key
+        Server or is unwilling to act as the Key Server.  If a Key
+        Server cannot be selected SAKs are not distributed.  In the
+        event of a tie for highest priority Key Server, the member with
+        the highest priority SCI is chosen.  For consistency with other
+        uses of the SCI's MAC Address component as a priority,
+        numerically lower values of the Key Server Priority and SCI are
+        accorded the highest priority.  The Table 9-2 contains
+        recommendations for the use of priority values for various
+        system roles. Participants that will never act as a Key Server
+        should advertise priority 0xFF."
+
+    REFERENCE       "IEEE 802.1X Clause 9.5, Table 9-2"
+    SYNTAX          OCTET STRING (SIZE (1))
+
+Ieee8021XMkaMI ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates a Member Identifier (MI).
+
+        The MI is a 96-bit random value chosen when the MKA Instance
+        begins, used with a 32-bit MN to protect against replay attacks
+        and to record liveliness in the Live Peer List or potential
+        liveliness in the Potential Peer List. If the MN wraps, a new
+        random MI value is chosen and the MN begins again at 1."
+
+    REFERENCE       "IEEE 802.1X Clause 9.4.2"
+    SYNTAX          OCTET STRING (SIZE (12))
+
+Ieee8021XMkaMN ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates a Member Number (MN).
+
+        The MN is a 32-bit value which begins at 1 and increases for
+        each MKPDU transmitted.  It is used with the MI to protect
+        against replay attacks and to record liveliness in the Live
+        Peers List or potential liveliness in the Potential Peer List.
+        If the MN wraps, a new random MI value is chosen and the MN
+        begins again at a value of 1."
+
+    REFERENCE       "IEEE 802.1X Clause 9.4.2"
+    SYNTAX          Unsigned32 (1..2147483648)
+
+Ieee8021XMkaKN ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates a Key Number (KN) used in
+        MKA.
+
+        The MN is a 32-bit integer assigned by that Key Server
+        (sequentially, beginning with 1)."
+
+    REFERENCE       "IEEE 802.1X Clause 9.8"
+    SYNTAX          Unsigned32 (1..2147483648)
+
+Ieee8021XPaeNIDCapabilites ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates the combinations of
+        authentication and protection capabilities supported for a
+        NID. Any set of these combinations can be supported."
+
+    REFERENCE       "IEEE 802.1X Clause 10.1, Table 11-8"
+    SYNTAX          BITS {
+                        eap(0),
+                        eapMka(1),
+                        eapMkaMacSec(2),
+                        mka(3),
+                        mkaMacSec(4),
+                        higherLayer(5), -- WebAuth
+                        higherLayerFallback(6), -- WebAuth
+                        vendorSpecific(7)
+                    }
+
+Ieee8021XPaeNIDAccessStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates the transmitter's
+        Controlled Port operational status and current level of
+        access resulting from authentication and the consequent
+        authorization controls applied by that port's clients.
+
+        'noAccess' : Other than to authentication services, and to
+            services announced as available in the absence of
+            authentication (unauthenticated).
+
+        'remedialAccess' : The access granted is severely limited,
+            possibly to remedial services.
+
+        'restrictedAccess' : The Controlled Port is operational, but
+            restrictions have been applied by the network that can
+            limit access to some resources.
+
+        'expectedAccess' : The Controlled Port is operational, and
+            access provided is as expected for successful
+            authentication and authorization for the NID."
+
+    REFERENCE       "IEEE 802.1X Clause 10.1, Table 11-8"
+    SYNTAX          INTEGER  {
+                        noAccess(0),
+                        remedialAccess(1),
+                        restrictedAccess(2),
+                        expectedAccess(3)
+                    }
+
+Ieee8021XPaeNIDUnauthenticatedStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention indicates the access capabilities of
+        the port's clients without authentication.
+
+        'noAccess' : Other than to authentication services (see
+            Ieee8021XPaeNIDCapabilites information.
+
+        'fallbackAccess' : Limited access can be provided after
+            authentication failure.
+
+        'limitedAccess' : Immediate limited access is available
+            without authentication.
+
+        'openAccess' : Immediate access is available without
+            authentication."
+
+    REFERENCE       "IEEE 802.1X Clause 10.1, Table 11-8"
+    SYNTAX          INTEGER  {
+                        noAccess(0),
+                        fallbackAccess(1),
+                        limitedAccess(2),
+                        openAccess(3)
+                    }
+
+-- ------------------------------------------------------------------ --
+-- Groups in the IEEE 802.1X MIB
+-- ------------------------------------------------------------------ --
+
+ieee8021XPaeMIBNotifications  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIB 0 }
+
+ieee8021XPaeMIBObjects  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIB 1 }
+
+ieee8021XPaeMIBConformance  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIB 2 }
+
+-- ------------------------------------------------------------------ --
+-- Management Objects in the IEEE 802.1X MIB
+-- ------------------------------------------------------------------ --
+
+ieee8021XPaeSystem  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBObjects 1 }
+
+ieee8021XPaeLogon  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBObjects 2 }
+
+ieee8021XPaeAuthenticator  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBObjects 3 }
+
+ieee8021XPaeSupplicant  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBObjects 4 }
+
+ieee8021XPaeEapol  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBObjects 5 }
+
+ieee8021XPaeKaY  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBObjects 6 }
+
+ieee8021XPaeNetworkIdentifier  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBObjects 7 }
+
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE System Group
+-- ------------------------------------------------------------------ --
+--   
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE System Objects
+-- ------------------------------------------------------------------ --
+
+ieee8021XPaeSysAccessControl OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object enables or disables port-based network access
+        control for all the system's ports.  Setting this control
+        object to 'false' causes the following actions :
+            . Deletes any virtual ports previously instantiated.
+            . Terminates authentication exchanges and MKA instances'
+              operation.
+            . Each real port PAE behaves as if no virtual ports
+              created.
+            . All the PAEs' Supplicant, Authenticator, and KaY are
+              disabled.
+            . Logon Process(es) behave as if the object
+              ieee8021XNidUnauthAllowed was 'immediate'.
+            . Announcements can be transmitted, both periodically and
+              in response to announcement requests (conveyed by
+              EAPOL-Starts or EAPOL-Announcement-Reqs) but are sent
+              with a single NULL NID.
+            . Objects announcementAccessStatus and announceAccessStatus
+              have the 'noAccess' value, announcementAccessRequested is
+              'false', object announcementUnauthAccess has the
+              'openAccess' value.
+
+        The control variable settings for each real port PAE in the
+        ieee8021XPaePortTable are unaffected, and will be used once the
+        object is set to 'true'.
+
+        This configured value for this object shall be stored in
+        persistent memory and remain unchanged across a
+        re-initialization of the management system of the entity."
+    REFERENCE
+        "IEEE 802.1X Clause 12.9.1, Figure 12-3 PAE
+            System.systemAccessControl" 
+    ::= { ieee8021XPaeSystem 1 }
+
+ieee8021XPaeSysAnnouncements OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Setting this control object to 'false' causes each PAE in this
+        system to behave as if the PAE's Announcement functionality is 
+        disabled.  The independent controls for each PAE apply if
+        this object is 'true'.
+
+        This configured value for this object shall be stored in
+        persistent memory and remain unchanged across a
+        re-initialization of the management system of the entity."
+    REFERENCE
+        "IEEE 802.1X Clause 12.9.1, Figure 12-3 PAE
+             System.systemAnnouncements" 
+    ::= { ieee8021XPaeSystem 2 }
+
+ieee8021XPaeSysEapolVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The EAPOL protocol version for this system."
+    REFERENCE
+        "IEEE 802.1X Clause 12.9.1, Clause 11.3, Figure 12-3 PAE
+             System.eapolProtocolVersion" 
+    ::= { ieee8021XPaeSystem 3 }
+
+ieee8021XPaeSysMkaVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MKA protocol version for this system."
+    REFERENCE       "IEEE 802.1X Clause 12.9.1" 
+    ::= { ieee8021XPaeSystem 4 }
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Port Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XPaePortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XPaePortEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of system level information for each port supported by
+        the Port Access Entity.  An entry appears in this table for
+        each port of this system.
+
+        For the writeable objects in this table, the configured value
+        shall be stored in persistent memory and remain unchanged
+        across a re-initialization of the management system of the
+        entity."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3 PAE"
+    ::= { ieee8021XPaeSystem 5 }
+
+ieee8021XPaePortEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XPaePortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Port number, protocol version, and
+        initialization control for a Port.
+
+         If the PAE has been dynamically instantiated to support an
+         existing or potential virtual port, the Uncontrolled Port
+         interface and Controlled Port interface are allocated by the
+         real port's PAE."
+    INDEX           { ieee8021XPaePortNumber } 
+    ::= { ieee8021XPaePortTable 1 }
+
+Ieee8021XPaePortEntry ::= SEQUENCE {
+        ieee8021XPaePortNumber              InterfaceIndex,
+        ieee8021XPaePortType                INTEGER,
+        ieee8021XPaeControlledPortNumber    InterfaceIndex,
+        ieee8021XPaeUncontrolledPortNumber  InterfaceIndex,
+        ieee8021XPaeCommonPortNumber        InterfaceIndex,
+        ieee8021XPaePortInitialize          TruthValue,
+        ieee8021XPaePortCapabilities        BITS,
+        ieee8021XPaePortVirtualPortsEnable  TruthValue,
+        ieee8021XPaePortMaxVirtualPorts     Unsigned32,
+        ieee8021XPaePortCurrentVirtualPorts Gauge32,
+        ieee8021XPaePortVirtualPortStart    TruthValue,
+        ieee8021XPaePortVirtualPortPeerMAC  MacAddress,
+        ieee8021XPaePortLogonEnable         TruthValue,
+        ieee8021XPaePortAuthenticatorEnable TruthValue,
+        ieee8021XPaePortSupplicantEnable    TruthValue,
+        ieee8021XPaePortKayMkaEnable        TruthValue,
+        ieee8021XPaePortAnnouncerEnable     TruthValue,
+        ieee8021XPaePortListenerEnable      TruthValue
+}
+
+ieee8021XPaePortNumber OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An interface index indicates the port number associated with
+        this port.  Each PAE is uniquely identified by a port number.
+        The port number used is unique amongst all port numbers for
+        the system, and directly or indirectly identifies the
+        Uncontrolled Port that supports the PAE.
+
+        If the PAE indicates a real port, ieee8021XPaePortType object
+        in the same row is 'realPort', the port number shall be the
+        same as the ieee8021XPaeCommonPortNumber object in the same row
+        for the associated PAC or SecY.
+
+        If the PAE indicates a virtual port, ieee8021XPaePortType
+        object in the same row is 'virtualPort', this port number
+        should be the same as the uncontrolledPortNumber object in the
+        same row for the associated PAC or SecY."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 1 }
+
+ieee8021XPaePortType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        realPort(1),
+                        virtualPort(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The port type of the PAE.
+
+        realPort(1) : indicates the PAE is for a real port.
+
+        virtualPort(2) : indicates the PAE is for a virtual port."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 2 }
+
+ieee8021XPaeControlledPortNumber OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "An interface index indicates the port number associated with
+        PAC or SecY's Controlled Port."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 3 }
+
+ieee8021XPaeUncontrolledPortNumber OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "An interface index indicates the port number associated with
+        PAC or SecY's Uncontrolled Port.  If the PAE supports a
+        real port, this port number can be the same as the
+        ieee8021XPaeCommonPortNumber object in the same row, otherwise
+        it shall not be the same."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 4 }
+
+ieee8021XPaeCommonPortNumber OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "An interface index indicates the port number associated with
+        PAC or SecY's 'Common Port'.  All the virtual ports created
+        for a given real port share the same 'Common Port' and
+        ieee8021XPaeCommonPortNumber in the same row."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 5 }
+
+ieee8021XPaePortInitialize OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The initialization control for this Port. Setting this object
+        'true' causes the Port to be reinitialized, terminating (and
+        potentially restarting) authentication exchanges and MKA
+        operation.
+
+        If the port is a real port, any virtual ports previously
+        instantiated are deleted.  Virtual ports can be reinstantiated
+        through normal protocol operation.
+
+        The object value reverts to 'false' once initialization
+        has completed."
+    REFERENCE       "802.1X Clause 12.9.3, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 6 }
+
+ieee8021XPaePortCapabilities OBJECT-TYPE
+    SYNTAX          BITS {
+                        suppImplemented(0),
+                        authImplemented(1),
+                        mkaImplemented(2),
+                        macsecImplemented(3),
+                        announcementsImplemented(4),
+                        listenerImplemented(5),
+                        virtualPortsImplemented(6)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The capabilities of this PAE port.
+
+        'suppImplemented' : A PACP EAP supplicant functions are
+            implemented in this PAE if this bit is on.
+
+        'authImplemented' : A PACP EAP authenticator functions are
+            implemented in this PAE if this bit is on.
+
+        'mkaImplemented' : The KaY MKA functions are implemented
+            in this PAE if this bit is on.
+
+        'macsecImplemented' : The MACsec functions in the
+            Controlled Port are implemented in this PAE if this
+            bit is on.
+
+        'announcementsImplemented' : The EAPOL announcement can be
+            sent in this PAE if this bit is on.
+
+        'listenerImplemented' : This PAE can receive EAPOL announcement
+            if this bit is on.
+
+        'virtualPortsImplemented' : Virtual Port functions are
+            implemented in this PAE if this bit is on."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 7 }
+
+ieee8021XPaePortVirtualPortsEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Enable or disable to Virtual Ports function for this Real Port
+        PAE, the object ieee8021XPaePortType in the same row has the
+        value 'realPort'.  If this PAE is not a Real Port, this object
+        should be read only and returns 'false'.
+
+        This object will be read only and returns 'false' if the value
+        of the object ieee8021XPaePortCapabilities in the same row has
+        the bit 'virtualPortsImplemented' off."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 8 }
+
+ieee8021XPaePortMaxVirtualPorts OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of virtual ports can be supported in this
+        port."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 9 }
+
+ieee8021XPaePortCurrentVirtualPorts OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current number of virtual ports is running in this port."
+    REFERENCE       "802.1X Clause 12.9.2, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 10 }
+
+ieee8021XPaePortVirtualPortStart OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be 'true' if the virtual port is created by
+        receipt of an EAPOL-Start packet."
+    REFERENCE       "802.1X Clause 12.7, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 11 }
+
+ieee8021XPaePortVirtualPortPeerMAC OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The source MAC address of the received EAPOL-Start if
+        ieee8021XPaePortVirtualPortStart is set 'true'.
+
+        If ieee8021XPaePortVirtualPortStart is not 'true' in the same
+        row, the value of this object should be 00-00-00-00-00-00."
+    REFERENCE       "802.1X Clause 12.7, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 12 }
+
+ieee8021XPaePortLogonEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Enable or disable to transmit network announcement
+        information."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 13 }
+
+ieee8021XPaePortAuthenticatorEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Enable or disable to the Authenticator function in this PAE.
+
+        This object will be read only and returns 'false' if the value
+        of the object ieee8021XPaePortCapabilities in the same row has
+        the bit 'authImplemented' Off."
+    REFERENCE       "802.1X Clause 8.4, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 14 }
+
+ieee8021XPaePortSupplicantEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Enable or disable to the Supplicant function in this PAE.
+
+        This object will be read only and returns 'false' if the value
+        of the object ieee8021XPaePortCapabilities in the same row has
+        the bit 'suppImplemented' off."
+    REFERENCE       "802.1X Clause 8.4, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 15 }
+
+ieee8021XPaePortKayMkaEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Enable or disable the MKA protocol function in this PAE.
+
+        This object will be read only and returns 'false' if the value
+        of the object ieee8021XPaePortCapabilities in the same row has
+        the bit 'mkaImplemented' off."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 16 }
+
+ieee8021XPaePortAnnouncerEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Enable or disable the network Announcer function in this PAE.
+
+        This object will be read only and returns 'false' if the value
+        of the object ieee8021XPaePortCapabilities in the same row has
+        the bit 'announcementsImplemented' off."
+    REFERENCE       "802.1X Clause 10.4, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 17 }
+
+ieee8021XPaePortListenerEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Enable or disable the network Listener function in this PAE.
+
+        This object will be read only and returns 'false' if the value
+        of the object ieee8021XPaePortCapabilities in the same row has
+        the bit 'listenerImplemented' off."
+    REFERENCE       "802.1X Clause 10.4, Figure 12-3" 
+    ::= { ieee8021XPaePortEntry 18 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAC Port Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XPacPortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XPacPortEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of system level information for each interface
+        supported by PAC.
+
+        This table will be instantiated if the value of the object
+        ieee8021XPaePortCapabilities in the corresponding entry of the
+        ieee8021XPaePortTable has the bit 'macsecImplemented' off.
+
+        For the writeable objects in this table, the configured value
+        shall be stored in persistent memory and remain unchanged
+        across a re-initialization of the management system of the
+        entity."
+    REFERENCE       "IEEE 802.1X Clause 6.4, Clause 14"
+    ::= { ieee8021XPaeSystem 6 }
+
+ieee8021XPacPortEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XPacPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing PAC management information applicable to
+        a particular interface."
+    INDEX           { ieee8021XPacPortControlledPortNumber } 
+    ::= { ieee8021XPacPortTable 1 }
+
+Ieee8021XPacPortEntry ::= SEQUENCE {
+        ieee8021XPacPortControlledPortNumber    InterfaceIndex,
+        ieee8021XPacPortAdminPt2PtMAC           INTEGER,
+        ieee8021XPacPortOperPt2PtMAC            TruthValue
+}
+
+ieee8021XPacPortControlledPortNumber OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The index to identify the 'Controlled Port' interface for a PAC."
+    REFERENCE       "IEEE 802.1X Clause 6.4"
+    ::= { ieee8021XPacPortEntry 1 }
+
+ieee8021XPacPortAdminPt2PtMAC OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        forceTrue(1),
+                        forceFalse(2),
+                        auto(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "An object to control the service connectivity to at most one
+        other system.  The ieee8021XPacPortOperPt2PtMAC indicates
+        operational status of the service connectivity for this PAC.
+
+        'forceTrue' : allows only one service connection to the
+                       other system.
+
+        'forceFalse' : no restriction on the number of service
+                        connections to the other systems.
+
+        'auto' : means the service connectivity is determined by the
+                  service providing entity."
+    REFERENCE       "IEEE 802.1X Clause 6.4"
+    DEFVAL          { auto } 
+    ::= { ieee8021XPacPortEntry 2 }
+
+ieee8021XPacPortOperPt2PtMAC OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "An object to reflect the current service connectivity status.
+
+        'true' : means the service connectivity of this PAC
+             Controlled Port provides at most one other system.
+
+        'false' : means the service connectivity of this PAC could
+             provide more than one other system."
+    REFERENCE       "IEEE 802.1X Clause 6.4" 
+    ::= { ieee8021XPacPortEntry 3 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Logon Process Group
+-- ------------------------------------------------------------------ --
+--   
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Logon Process Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XPaePortLogonTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XPaePortLogonEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of system level information for each port to support
+        the Logon Process(es) status information.
+
+        This table will be instantiated if the object
+        ieee8021XPaePortLogonEnable in the corresponding entry of the
+        ieee8021XPaePortTable is 'true'."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3"
+    ::= { ieee8021XPaeLogon 1 }
+
+ieee8021XPaePortLogonEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XPaePortLogonEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains Logon Process status information for the
+        PAE."
+    INDEX           { ieee8021XPaePortNumber } 
+    ::= { ieee8021XPaePortLogonTable 1 }
+
+Ieee8021XPaePortLogonEntry ::= SEQUENCE {
+        ieee8021XPaePortLogonConnectStatus INTEGER,
+        ieee8021XPaePortPortValid          TruthValue
+}
+
+ieee8021XPaePortLogonConnectStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        pending(1),
+                        unauthenticated(2),
+                        authenticated(3),
+                        secure(4)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The Logon Process sets this variable to one of the following
+        values, to indicate to the CP state machine if, and how,
+        connectivity is to be provided through the Controlled Port :
+
+        'pending' : Prevent connectivity by disabling the
+            Controlled Port of this PAE.
+
+        'unauthenticated' : Provide unsecured connectivity, enabling
+            the Controlled Port of this PAE.
+
+        'authenticated' : Provide unsecured connectivity but with
+            authentication, enabling Controlled Port of this PAE.
+
+        'secure' : Provide secure connectivity, using SAKs provided by
+            the KaY (when available) and enabling Controlled Port when
+            those keys are installed and in use."
+    REFERENCE       "802.1X Clause 12.3, Figure 12-3" 
+    ::= { ieee8021XPaePortLogonEntry 1 }
+
+ieee8021XPaePortPortValid OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be set 'true' if Controlled Port communication
+        is secured as specified by the MACsec."
+    REFERENCE       "802.1X Clause 12.3, Figure 12-3" 
+    ::= { ieee8021XPaePortLogonEntry 2 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Session Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XPaePortSessionTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XPaePortSessionEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of system level information for each port to support
+        Logon Process(es) session information.  This table maintains
+        session statistics for its associated Controlled Port,
+        suitable for communication to a RADIUS or other AAA server at
+        the end of a session for accounting purpose.
+
+        This table will be instantiated if the object
+        ieee8021XPaePortLogonEnable in the corresponding entry of the
+        ieee8021XPaePortTable is 'true'."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3"
+    ::= { ieee8021XPaeLogon 2 }
+
+ieee8021XPaePortSessionEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XPaePortSessionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains Logon Process session information for the
+        PAE.  A session, an entry, begins when the operation of
+        Controlled Port becomes 'true' and ends when it becomes
+        'false'.
+
+        The counts of frames and octets can be derived from those
+        maintained to support from Interface MIB counters for the
+        SecY's or the PAC's Controlled Port, but differs in that the
+        counts are zeroed when the session begins."
+    INDEX           { ieee8021XPaeSessionControlledPortNumber } 
+    ::= { ieee8021XPaePortSessionTable 1 }
+
+Ieee8021XPaePortSessionEntry ::= SEQUENCE {
+        ieee8021XPaeSessionControlledPortNumber   InterfaceIndex,
+        ieee8021XPaePortSessionOctetsRx           Counter64,
+        ieee8021XPaePortSessionOctetsTx           Counter64,
+        ieee8021XPaePortSessionPktsRx             Counter64,
+        ieee8021XPaePortSessionPktsTx             Counter64,
+        ieee8021XPaePortSessionId                 SnmpAdminString,
+        ieee8021XPaePortSessionStartTime          TimeStamp,
+        ieee8021XPaePortSessionIntervalTime       TimeInterval,
+        ieee8021XPaePortSessionTerminate          INTEGER,
+        ieee8021XPaePortSessionUserName           SnmpAdminString
+}
+
+ieee8021XPaeSessionControlledPortNumber OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The index to identify the 'Controlled Port' interface's session
+        information for a PAE."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 1 }
+
+ieee8021XPaePortSessionOctetsRx OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of octets received in this session of this PAE.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the management system, and at
+        other times as indicated by the value of
+        ieee8021XPaePortSessionStartTime."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 2 }
+
+ieee8021XPaePortSessionOctetsTx OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of octets transmitted in this session of this PAE.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the management system, and at
+        other times as indicated by the value of
+        ieee8021XPaePortSessionStartTime."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 3 }
+
+ieee8021XPaePortSessionPktsRx OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets received in this session of this PAE.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the management system, and at
+        other times as indicated by the value of
+        ieee8021XPaePortSessionStartTime."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 4 }
+
+ieee8021XPaePortSessionPktsTx OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets transmitted in this session of this PAE.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the management system, and at
+        other times as indicated by the value of
+        ieee8021XPaePortSessionStartTime."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 5 }
+
+ieee8021XPaePortSessionId OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (3..253))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The session identifier for this session of the PAE.  A UTF-8
+        string, uniquely identifying the session within the context of
+        the PAE's system."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 6 }
+
+ieee8021XPaePortSessionStartTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The starting time of this session."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 7 }
+
+ieee8021XPaePortSessionIntervalTime OBJECT-TYPE
+    SYNTAX          TimeInterval
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The duration time of the session has been last."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 8 }
+
+ieee8021XPaePortSessionTerminate OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        macOperFailed(1),
+                        sysAccessDisableOrPortInit(2),
+                        receiveEapolLogOff(3),
+                        eapReauthFailure(4),
+                        mkaFailure(5),
+                        newSessionBegin(6),
+                        notTerminateYet(7)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The reason for the session termination, one of the following :
+
+        'macOperFailed' : 'Common Port' for this PAE is not
+            operational.
+
+        'sysAccessDisableOrPortInit' : The ieee8021XPaeSysAccessControl
+            object is set to 'false' or initialization process of this
+            PAE is invoked.
+
+        'receiveEapolLogOff' : The PAE has received EAPOL-Logoff
+            frame.
+
+        'eapReauthFailure' : EAP reauthentication has failed.
+
+        'mkaFailure' : MKA failure or other MKA termination.
+
+        'newSessionBegin' : New session beginning.
+
+        'notTerminateYet' : Not Terminated Yet."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 9 }
+
+ieee8021XPaePortSessionUserName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..253))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The session user name for this session in the PAE.  A UTF-8
+        string, representing the identity of the peer Supplicant.
+
+        If no such information, zero length string will return."
+    REFERENCE       "802.1X Clause 12.5.1, Figure 12-3" 
+    ::= { ieee8021XPaePortSessionEntry 10 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Logon Process NID Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XLogonNIDTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XLogonNIDEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Logon Process may use Network Identities (NIDs) to manage
+        its use of authentication credentials, cached CAKs, and
+        announcements.  This table provides the NID information for
+        Logon Process.
+
+        For the writeable objects in this table, the configured value
+        shall be stored in persistent memory and remain unchanged
+        across a re-initialization of the management system of the
+        entity."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3"
+    ::= { ieee8021XPaeLogon 3 }
+
+ieee8021XLogonNIDEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XLogonNIDEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry provides the NID information for a Logon Process."
+    INDEX           { ieee8021XPaePortNumber } 
+    ::= { ieee8021XLogonNIDTable 1 }
+
+Ieee8021XLogonNIDEntry ::= SEQUENCE {
+        ieee8021XLogonNIDConnectedNID Ieee8021XPaeNID,
+        ieee8021XLogonNIDRequestedNID Ieee8021XPaeNIDOrNull,
+        ieee8021XLogonNIDSelectedNID  Ieee8021XPaeNIDOrNull
+}
+
+ieee8021XLogonNIDConnectedNID OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNID
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The NID associated with the current connectivity (possibly
+        unauthenticated) provided by the operation of the CP state
+        machine.
+
+        This object can differ from both the ieee8021XLogonNIDSelectedNID and
+        the ieee8021XLogonNIDRequestedNID objects in the same row if
+        authenticated connectivity (either secure or unsecured) has
+        already been established, and EAP authentication and MKA
+        operation for both of the latter have not met the necessary
+        conditions (as specified by the control variables unauthAllowed
+        and unsecureAllowed)."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XLogonNIDEntry 1 }
+
+ieee8021XLogonNIDRequestedNID OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNIDOrNull
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The NID marked as access requested in announcements, as
+        determined from EAPOL-Start frames.  The default of this object
+        is as the configured value of object ieee8021XLogonNIDSelectedNID.
+
+        This object information provides context for the PAE's EAP
+        Authenticator.  If no EAPOL-Start frame has been received since
+        the PAE's 'Common Port' became operational, or the last
+        EAPOL-Start frame received for the port did not contain a
+        requested NID, the object will take on the value of the object
+        ieee8021XLogonNIDSelectedNID in the same row."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XLogonNIDEntry 2 }
+
+ieee8021XLogonNIDSelectedNID OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNIDOrNull
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The NID currently configured for use by an access 'Controlled
+        Port' when transmitting EAPOL-Start frames.  The default of
+        this object is empty string.
+
+        This object may be either explicitly configured by management
+        or determined by the PAE using NID selection algorithms.  If no
+        authentication is in progress, and the current connectivity is
+        terminated and then starts again, ieee8021XLogonNIDConnectedNID will
+        take on the value of ieee8021XLogonNIDRequestedNID (though a PAE
+        NID's election algorithm, if used, can subsequently select
+        another NID)."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3"
+    DEFVAL          { "" } 
+    ::= { ieee8021XLogonNIDEntry 3 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The PAE Authenticator Group
+-- ------------------------------------------------------------------ --
+--   
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Authenticator Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XAuthenticatorTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XAuthenticatorEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table that contains the configuration objects for the
+        Authenticator PAE associated with each port.  This table will
+        be instantiated if the object ieee8021XPaePortAuthenticatorEnable in
+        the corresponding entry of the ieee8021XPaePortTable is 'true'.
+
+        For the writeable objects in this table, the configured value
+        shall be stored in persistent memory and remain unchanged
+        across a re-initialization of the management system of the
+        entity."
+    REFERENCE       "802.1X Clause 8, Figure 12-3"
+    ::= { ieee8021XPaeAuthenticator 1 }
+
+ieee8021XAuthenticatorEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XAuthenticatorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry that contains the Authenticator configuration objects
+        for the PAE."
+    INDEX           { ieee8021XPaePortNumber } 
+    ::= { ieee8021XAuthenticatorTable 1 }
+
+Ieee8021XAuthenticatorEntry ::= SEQUENCE {
+        ieee8021XAuthPaeAuthenticate  TruthValue,
+        ieee8021XAuthPaeAuthenticated TruthValue,
+        ieee8021XAuthPaeFailed        TruthValue,
+        ieee8021XAuthPaeReAuthEnabled TruthValue,
+        ieee8021XAuthPaeQuietPeriod   Unsigned32,
+        ieee8021XAuthPaeReauthPeriod  Unsigned32,
+        ieee8021XAuthPaeRetryMax      Unsigned32,
+        ieee8021XAuthPaeRetryCount    Gauge32
+}
+
+ieee8021XAuthPaeAuthenticate OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be set 'true' by the PAE authenticator to
+        request authentication, and if this object is 'true',
+        reauthentication is allowed.
+
+        This object will be 'false' while the PAE authenticator revokes
+        authentication."
+    REFERENCE       "IEEE 802.1X Clause 8, Figure 12-3" 
+    ::= { ieee8021XAuthenticatorEntry 1 }
+
+ieee8021XAuthPaeAuthenticated OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be set 'true' by PACP if the PAE authenticator
+        currently authenticated, and 'false' if the authentication
+        fails or is revoked."
+    REFERENCE       "IEEE 802.1X Clause 8, Figure 12-3" 
+    ::= { ieee8021XAuthenticatorEntry 2 }
+
+ieee8021XAuthPaeFailed OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be set 'true' by PACP if the authentication
+        has failed or has been terminated.  The cause could be a
+        failure returned by EAP, either immediately or following a
+        reauthentication, an excessive number of attempts to
+        authenticate (either immediately or upon reauthentication), or
+        the authenticator deasserting authenticate, the object
+        authPaeAuthenticate in the same row is 'false'.  The PACP
+        will set the object authPaeAuthenticated false as well as
+        setting the object 'true'."
+    REFERENCE       "IEEE 802.1X Clause 8, Figure 12-3" 
+    ::= { ieee8021XAuthenticatorEntry 3 }
+
+ieee8021XAuthPaeReAuthEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is set 'true' if PACP should initiate
+        reauthentication periodically, 'false' otherwise .  Reading
+        this object always returns 'false'."
+    REFERENCE       "IEEE 802.1X Clause 8.9, Figure 12-3" 
+    ::= { ieee8021XAuthenticatorEntry 4 }
+
+ieee8021XAuthPaeQuietPeriod OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates a waiting period after a failed
+        authentication attempt, before another attempt is permitted."
+    REFERENCE       "IEEE 802.1X Clause 8.6, Figure 12-3"
+    DEFVAL          { 60 } 
+    ::= { ieee8021XAuthenticatorEntry 5 }
+
+ieee8021XAuthPaeReauthPeriod OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the time period of the reauthentication
+        to the supplicant."
+    REFERENCE       "IEEE 802.1X Clause 8.6, Figure 12-3"
+    DEFVAL          { 3600 } 
+    ::= { ieee8021XAuthenticatorEntry 6 }
+
+ieee8021XAuthPaeRetryMax OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "times"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of authentication attempts before failure is
+        reported to the Logon Process, and the authPaeQuietPeriod 
+        timer imposed before further attempts are permitted."
+    REFERENCE       "IEEE 802.1X Clause 8.9, Figure 12-3"
+    DEFVAL          { 2 } 
+    ::= { ieee8021XAuthenticatorEntry 7 }
+
+ieee8021XAuthPaeRetryCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "times"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The count of the number of authentication attempts."
+    REFERENCE       "IEEE 802.1X Clause 8.9" 
+    ::= { ieee8021XAuthenticatorEntry 8 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Supplicant Group
+-- ------------------------------------------------------------------ --
+--   
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Supplicant Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XSupplicantTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XSupplicantEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table that contains the configuration objects for the
+        Supplicant PAE associated with each port.
+
+        For the writeable objects in this table, the configured value
+        shall be stored in persistent memory and remain unchanged
+        across a re-initialization of the management system of the
+        entity."
+    REFERENCE       "802.1X Clause 8, Figure 8-6, Figure 12-3"
+    ::= { ieee8021XPaeSupplicant 1 }
+
+ieee8021XSupplicantEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XSupplicantEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The configuration information for an Supplicant PAE."
+    INDEX           { ieee8021XPaePortNumber } 
+    ::= { ieee8021XSupplicantTable 1 }
+
+Ieee8021XSupplicantEntry ::= SEQUENCE {
+        ieee8021XSuppPaeAuthenticate  TruthValue,
+        ieee8021XSuppPaeAuthenticated TruthValue,
+        ieee8021XSuppPaeFailed        TruthValue,
+        ieee8021XSuppPaeHelloPeriod   Unsigned32,
+        ieee8021XSuppPaeRetryMax      Unsigned32,
+        ieee8021XSuppPaeRetryCount    Gauge32
+}
+
+ieee8021XSuppPaeAuthenticate OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be set 'true' by the PAE supplicant to request
+        authentication, and if this object is 'true', reauthentication
+        is allowed.
+
+        This object will be 'false' while the PAE supplicant revokes
+        authentication."
+    REFERENCE       "IEEE 802.1X Clause 8.4, Figure 8-6, Figure 12-3" 
+    ::= { ieee8021XSupplicantEntry 1 }
+
+ieee8021XSuppPaeAuthenticated OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be set 'true' by PACP if the PAE supplicant
+        currently authenticated, and 'false' if the authentication
+        fails or is revoked."
+    REFERENCE       "IEEE 802.1X Clause 8.4, Figure 8-6, Figure 12-3" 
+    ::= { ieee8021XSupplicantEntry 2 }
+
+ieee8021XSuppPaeFailed OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be set 'true' by PACP if the authentication
+        has failed or has been terminated.  The cause could be a
+        failure returned by EAP, either immediately or following a
+        reauthentication, an excessive number of attempts to
+        authenticate (either immediately or upon reauthentication), or
+        the supplicant deasserting authenticate, the object
+        ieee8021XSuppPaeAuthenticate in the same row is 'false'.  The PACP
+        will set the object ieee8021XSuppPaeAuthenticated false as well as
+        setting the object 'true'."
+    REFERENCE       "IEEE 802.1X Clause 8.4, Figure 8-6, Figure 12-3" 
+    ::= { ieee8021XSupplicantEntry 3 }
+
+ieee8021XSuppPaeHelloPeriod OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicated a waiting time period after a failed
+        authentication attempt, before another attempt is permitted."
+    REFERENCE       "IEEE 802.1X Clause 8.6, Figure 8-6, Figure 12-3"
+    DEFVAL          { 60 } 
+    ::= { ieee8021XSupplicantEntry 4 }
+
+ieee8021XSuppPaeRetryMax OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "times"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of authentication attempts before failure is
+        reported to the Logon Process, and the ieee8021XSuppPaeHelloPeriod
+        timer imposed before further attempts are permitted."
+    REFERENCE       "IEEE 802.1X Clause 8.7, Figure 8-6, Figure 12-3"
+    DEFVAL          { 2 } 
+    ::= { ieee8021XSupplicantEntry 5 }
+
+ieee8021XSuppPaeRetryCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "times"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The count of the number of authentication attempts."
+    REFERENCE       "IEEE 802.1X Clause 8.7, Figure 8-6, Figure 12-3" 
+    ::= { ieee8021XSupplicantEntry 6 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE EAPOL Statistics Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XEapolStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XEapolStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table in system level contains the EAPOL statistics and
+        diagnostics information supported by PAE."
+    REFERENCE       "802.1X Clause 12.8, Figure 12-3"
+    ::= { ieee8021XPaeEapol 1 }
+
+ieee8021XEapolStatsEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XEapolStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains the EAPOL statistics and diagnostics
+        information for a PAE."
+    INDEX           { ieee8021XPaePortNumber } 
+    ::= { ieee8021XEapolStatsTable 1 }
+
+Ieee8021XEapolStatsEntry ::= SEQUENCE {
+        ieee8021XEapolInvalidFramesRx         Counter32,
+        ieee8021XEapolEapLengthErrorFramesRx  Counter32,
+        ieee8021XEapolAnnouncementFramesRx    Counter32,
+        ieee8021XEapolAnnouncementReqFramesRx Counter32,
+        ieee8021XEapolPortUnavailableFramesRx Counter32,
+        ieee8021XEapolStartFramesRx           Counter32,
+        ieee8021XEapolEapFramesRx             Counter32,
+        ieee8021XEapolLogoffFramesRx          Counter32,
+        ieee8021XEapolMkNoCknFramesRx         Counter32,
+        ieee8021XEapolMkInvalidFramesRx       Counter32,
+        ieee8021XEapolLastRxFrameVersion      Unsigned32,
+        ieee8021XEapolLastRxFrameSource       MacAddress,
+        ieee8021XEapolSuppEapFramesTx         Counter32,
+        ieee8021XEapolLogoffFramesTx          Counter32,
+        ieee8021XEapolAnnouncementFramesTx    Counter32,
+        ieee8021XEapolAnnouncementReqFramesTx Counter32,
+        ieee8021XEapolStartFramesTx           Counter32,
+        ieee8021XEapolAuthEapFramesTx         Counter32,
+        ieee8021XEapolMkaFramesTx             Counter32
+}
+
+ieee8021XEapolInvalidFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of invalid EAPOL frames of any type that have been
+        received by this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 1 }
+
+ieee8021XEapolEapLengthErrorFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL frames that the Packet Body Length does not
+        match a Packet Body that is contained within the octets of the
+        received EAPOL MPDU in this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 2 }
+
+ieee8021XEapolAnnouncementFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-Announcement frames that have been received
+        by this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 3 }
+
+ieee8021XEapolAnnouncementReqFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-Announcement-Req frames that have been
+        received by this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 4 }
+
+ieee8021XEapolPortUnavailableFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL frames that are discarded because their
+        processing would require the creation of a virtual port, for
+        which there are inadequate or constrained resources, or an
+        existing virtual port and no such port currently exists.  If
+        virtual port is not supported, this object should be always 0."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 5 }
+
+ieee8021XEapolStartFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-Start frames that have been received by
+        this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 6 }
+
+ieee8021XEapolEapFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-EAP frames that have been received by
+        this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 7 }
+
+ieee8021XEapolLogoffFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-Logoff frames that have been received by
+        this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 8 }
+
+ieee8021XEapolMkNoCknFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of MKPDUs received with MKA not enabled or CKN not
+        recognized in this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 9 }
+
+ieee8021XEapolMkInvalidFramesRx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of MKPDUs failing in message authentication on
+        receipt process in this PAE."
+    REFERENCE       "802.1X Clause 12.8.1, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 10 }
+
+ieee8021XEapolLastRxFrameVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The version of last received EAPOL frame by this PAE."
+    REFERENCE       "802.1X Clause 12.8.2, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 11 }
+
+ieee8021XEapolLastRxFrameSource OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The source MAC address of last received EAPOL frame by this
+        PAE."
+    REFERENCE       "802.1X Clause 12.8.2, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 12 }
+
+ieee8021XEapolSuppEapFramesTx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-EAP frames that have been transmitted by
+        the supplicant of this PAE."
+    REFERENCE       "802.1X Clause 12.8.3, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 13 }
+
+ieee8021XEapolLogoffFramesTx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-Logoff frames that have been transmitted by
+        this PAE."
+    REFERENCE       "802.1X Clause 12.8.3, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 14 }
+
+ieee8021XEapolAnnouncementFramesTx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-Announcement frames that have been
+        transmitted by this PAE."
+    REFERENCE       "802.1X Clause 12.8.3, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 15 }
+
+ieee8021XEapolAnnouncementReqFramesTx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-Announcement-Req frames that have been
+        transmitted by this PAE."
+    REFERENCE       "802.1X Clause 12.8.3, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 16 }
+
+ieee8021XEapolStartFramesTx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-Start frames that have been received by
+        this PAE."
+    REFERENCE       "802.1X Clause 12.8.3, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 17 }
+
+ieee8021XEapolAuthEapFramesTx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-EAP frames that have been transmitted by
+        the authenticator of this PAE."
+    REFERENCE       "802.1X Clause 12.8.3, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 18 }
+
+ieee8021XEapolMkaFramesTx OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of EAPOL-MKA frames with no CKN information that
+        have been transmitted by this PAE."
+    REFERENCE       "802.1X Clause 12.8.3, Figure 12-3" 
+    ::= { ieee8021XEapolStatsEntry 19 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE KaY Group
+-- ------------------------------------------------------------------ --
+--   
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE KaY Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XKayMkaTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XKayMkaEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of system level information for each interface
+        supported by the KaY (Key Agreement Entity).  This table will
+        be instantiated if the object ieee8021XPaePortKayMkaEnable in
+        the corresponding entry of the ieee8021XPaePortTable is 'true'.
+
+        The following terms are used to identify roles within the MKA
+        protocol or protocol scenarios and the MIB description :
+
+        participant : An instance of MKA, transmitting and receiving
+            frames protected by keys derived from a single CAK, and
+            operating with positive intent, obeying the protocol.
+
+        member: A participant that possesses the CAK that can be used
+            to prove liveness and to obtain membership in the CA under
+            discussion.
+
+        actor: The participant under discussion, usually in the KaY
+            being described.
+
+        partners: Participants or members attached to the same LAN as
+            the actor, excluding the actor.
+
+        principal actor: The actor controlling the PAC or SecY
+            associated with the KaY.
+
+        Each participant selects the live participant advertising the
+        highest priority as its key server provided that participant
+        has not selected another as its key server or is unwilling to
+        act as the key server.  If a key server cannot be selected SAKs
+        are not distributed.  In the event of a tie for highest
+        priority key server, the member with the highest priority SCI
+        is chosen.  For consistency with other uses of the SCI's MAC
+        Address component as a priority, numerically lower values of
+        the key server priority and SCI are accorded the highest
+        priority.
+
+        For the writeable objects in this table, the configured value
+        shall be stored in persistent memory and remain unchanged
+        across a re-initialization of the management system of the
+        entity."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3"
+    ::= { ieee8021XPaeKaY 1 }
+
+ieee8021XKayMkaEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XKayMkaEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing KaY MKA management information applicable
+        to a particular interface."
+    INDEX           { ieee8021XPaePortNumber } 
+    ::= { ieee8021XKayMkaTable 1 }
+
+Ieee8021XKayMkaEntry ::= SEQUENCE {
+        ieee8021XKayMkaActive
+            TruthValue,
+        ieee8021XKayMkaAuthenticated
+            TruthValue,
+        ieee8021XKayMkaSecured
+            TruthValue,
+        ieee8021XKayMkaFailed
+            TruthValue,
+        ieee8021XKayMkaActorSCI
+            SecySCI,
+        ieee8021XKayMkaActorsPriority
+            Ieee8021XMkaKeyServerPriority,
+        ieee8021XKayMkaKeyServerPriority
+            Ieee8021XMkaKeyServerPriority,
+        ieee8021XKayMkaKeyServerSCI
+            SecySCI,
+        ieee8021XKayAllowedJoinGroup
+            TruthValue,
+        ieee8021XKayAllowedFormGroup
+            TruthValue,
+        ieee8021XKayCreateNewGroup
+            TruthValue,
+        ieee8021XKayMacSecCapability
+            INTEGER,
+        ieee8021XKayMacSecDesired
+            TruthValue,
+        ieee8021XKayMacSecProtect
+            TruthValue,
+        ieee8021XKayMacSecReplayProtect
+            TruthValue,
+        ieee8021XKayMacSecValidate
+            TruthValue,
+        ieee8021XKayMacSecConfidentialityOffset
+            Integer32,
+        ieee8021XKayMkaTxKN
+            Ieee8021XMkaKN,
+        ieee8021XKayMkaTxAN
+            RowPointer,
+        ieee8021XKayMkaRxKN
+            Ieee8021XMkaKN,
+        ieee8021XKayMkaRxAN
+            RowPointer,
+        ieee8021XKayMkaSuspendFor
+            INTEGER,
+        ieee8021XKayMkaSuspendOnRequest
+            TruthValue,
+        ieee8021XKayMkaSuspendedWhile
+            INTEGER
+}
+
+ieee8021XKayMkaActive OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be 'true' if there is at least one MKA active
+        actor, transmitting MKPDUs"
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 1 }
+
+ieee8021XKayMkaAuthenticated OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be 'true' if the principal actor,
+        i.e. the actor controlling the PAC or SecY associated with
+        the KaY, has determined that Controlled Port communication
+        communication should proceed without MACsec."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 2 }
+
+ieee8021XKayMkaSecured OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be 'true' if the principal actor has
+        determined that communication should use MACsec."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 3 }
+
+ieee8021XKayMkaFailed OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be 'true' if the object
+        ieee8021XKayMkaSecured in
+        the same row is 'false' and MKA Life Time has elapsed since an
+        MKA participant was last created."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Table 9-3, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 4 }
+
+ieee8021XKayMkaActorSCI OBJECT-TYPE
+    SYNTAX          SecySCI
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The SCI assigned by the system to the port, applies to all the
+        port's MKA actors."
+    REFERENCE
+        "IEEE 802.1X Clause 9.16, Figure 12-3
+         IEEE 802.1AE Clause 7.1.2, 10.7.1" 
+    ::= { ieee8021XKayMkaEntry 5 }
+
+ieee8021XKayMkaActorsPriority OBJECT-TYPE
+    SYNTAX          Ieee8021XMkaKeyServerPriority
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The Key Server priority for all the port's MKA actors.  Each
+        participant encodes a key server priority, an 8-bit integer, in
+        each MKPDU."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Table 9-2, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 6 }
+
+ieee8021XKayMkaKeyServerPriority OBJECT-TYPE
+    SYNTAX          Ieee8021XMkaKeyServerPriority
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The priority of the elected Key Server through MKA in the CA."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Table 9-2, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 7 }
+
+ieee8021XKayMkaKeyServerSCI OBJECT-TYPE
+    SYNTAX          SecySCI
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The SCI for key server for the MKA principal actor.  The length
+        of this object is 0 if there is no principal actor, or that
+        actor has no live peers.  This object matches the
+        ieee8021XKayMkaActorSCI object in the same row if the actor is
+        the key server."
+    REFERENCE
+        "IEEE 802.1X Clause 9.16, Figure 12-3
+         IEEE 802.1AE Clause 7.1.2, 10.7.1" 
+    ::= { ieee8021XKayMkaEntry 8 }
+
+ieee8021XKayAllowedJoinGroup OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be 'true' if the KaY will accept Group CAKs
+        distributed by MKA protocol."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 9 }
+
+ieee8021XKayAllowedFormGroup OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object will be 'true' if the KaY will attempt to use
+        point-to-point CAKs to distribute a group CAK, if it is the
+        Key Server for the MKA instances for all the point-to-point CAKs."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 10 }
+
+ieee8021XKayCreateNewGroup OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is set 'true' if a new Group CAK is to be
+        distributed if the KaY is the Key Server for the MKA instances
+        for all the point-to-point CAKs.  This object will be set 'false'
+        by the KaY when distribution is complete."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 11 }
+
+ieee8021XKayMacSecCapability OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        noMACsec(0),
+                        macSecCapability1(1),
+                        macSecCapability2(2),
+                        macSecCapability3(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether MACsec is implemented, and if so
+        whether the implementation provides integrity protection only,
+        integrity and integrity with confidentiality, or integrity and
+        integrity with confidentiality with a selectable confidentiality offset
+        of 0, 30, or 50 octets (see IEEE Std 802.1AE).
+
+        'noMACsec' : the MACsec is not implemented.
+
+        'macSecCapability1' :  capable in 'integrity protection without
+             confidentiality'.
+
+        'macSecCapability2' :  capable in 'integrity protection without
+             confidentiality' and integrity protection and confidentiali
+              with a confidentiality offset 0',.
+
+        'macSecCapability3' :  capable in 'integrity protection without
+             confidentiality' and integrity protection and confidentiali
+              with a confidentiality offset 0, 30 or 50'."
+    REFERENCE
+        "IEEE 802.1X Clause 9.6.1, Clause 9.16, Figure 12-3, Table 11-6"
+    ::= { ieee8021XKayMkaEntry 12 }
+
+ieee8021XKayMacSecDesired OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object will be set 'true' if the MKA participants desire
+        the use of MACsec to protect frames with this KaY."
+    REFERENCE
+        "IEEE 802.1X Clause 9.6.1, Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 13 }
+
+ieee8021XKayMacSecProtect OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The status of the MACsec protection function for this KaY.
+
+        'true' : then the status of the MACsec protection function will
+            be as object secyIfProtectFramesEnable object configured
+            in the IEEE8021-SECY-MIB.
+        'false' : then the MACsec protection function is disabled by
+            this KaY."
+    REFERENCE
+        "IEEE 802.1X Clause 9.6.1, Clause 9.16, Figure 12-2,
+         Figure 12-3, IEEE 802.1AE IEEE8021-SECY-MIB" 
+    ::= { ieee8021XKayMkaEntry 14 }
+
+ieee8021XKayMacSecReplayProtect OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The status of the MACsec replay protection function for this
+        KaY.
+
+        'true' : then the status of the MACsec replay protection
+            function will be as secyIfReplayProtectEnable object
+            configured in the IEEE8021-SECY-MIB.
+        'false' : then the MACsec replay protection function is
+            disabled by this KaY."
+    REFERENCE
+        "IEEE 802.1X Clause 9.6.1, Clause 9.16, Figure 12-2,
+         Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 15 }
+
+ieee8021XKayMacSecValidate OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The status of the MACsec validation function for this KaY.
+
+        'true' : then the status of the MACsec validation function
+            will be as secyIfValidateFrames object configured in the
+            IEEE8021-SECY-MIB.
+        'false' : then the MACsec validation function is enabled but
+            only for checking without filtering out invalid frames by
+            the SecY."
+    REFERENCE
+        "IEEE 802.1X Clause 9.6.1, Clause 9.16, Figure 12-2,
+         Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 16 }
+
+ieee8021XKayMacSecConfidentialityOffset OBJECT-TYPE
+    SYNTAX          Integer32 (0 | 30 | 50)
+    UNITS           "bytes"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The confidentiality protection offset options for the selected
+        cipher suite in the MACsec.  If the cipher suite does not have
+        this capability, the configured value of the object will not
+        apply to the cipher suite."
+    REFERENCE
+        "IEEE 802.1X Clause 9.7.1, Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 17 }
+
+ieee8021XKayMkaTxKN OBJECT-TYPE
+    SYNTAX          Ieee8021XMkaKN
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The key number assigned by the key server to the SAK currently
+        being used for transmission.  This object will be 0 if MACsec
+        is not being used or the key number is not available yet."
+    REFERENCE       "IEEE 802.1X Clause 9.8, Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 18 }
+
+ieee8021XKayMkaTxAN OBJECT-TYPE
+    SYNTAX          RowPointer
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The AN assigned by the key server for use with the key number
+        for transmission.
+
+        This row pointer will point to an entry in the secyTxSATable
+        which the secyTxSCEncodingSA object also points to in the
+        IEEE8021-SECY-MIB.
+
+        If MACsec is not in use or the AN is not identified yet, the
+        value of this object shall be set to the OBJECT IDENTIFIER
+        { 0 0 }."
+    REFERENCE
+        "IEEE 802.1X Clause 9.9, Clause 9.16, Figure 12-3,
+         IEEE8021-SECY-MIB" 
+    ::= { ieee8021XKayMkaEntry 19 }
+
+ieee8021XKayMkaRxKN OBJECT-TYPE
+    SYNTAX          Ieee8021XMkaKN
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The key number assigned by the key server to the oldest SAK
+        currently being used for reception.  It is the same as the key
+        number for transmission if a single SAK is currently in use.
+        This object will be 0 if MACsec is not being used or the key
+        number is not available yet."
+    REFERENCE       "IEEE 802.1X Clause 9.8, Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaEntry 20 }
+
+ieee8021XKayMkaRxAN OBJECT-TYPE
+    SYNTAX          RowPointer
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The AN assigned by the key server for use with the key number
+        for reception.  It is the same as AN for transmission if a
+        single SAK is currently in use.
+
+        This row pointer will point to an entry in the secyRxSATable
+        which the secyRxSCCurrentSA object also points to in the
+        IEEE8021-SECY-MIB.
+
+        If MACsec is not in use or the AN is not identified yet, the
+        value of this object shall be set to the OBJECT IDENTIFIER
+        { 0 0 }."
+    REFERENCE
+        "IEEE 802.1X Clause 9.6.1, Clause 9.16, Figure 12-3,
+         IEEE8021-SECY-MIB" 
+    ::= { ieee8021XKayMkaEntry 21 }
+
+ieee8021XKayMkaSuspendFor OBJECT-TYPE
+    SYNTAX INTEGER (1..120)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Set by management to a non-zero number of seconds between 1
+        and MKA Suspension Limit to initiate a suspension (9.18) of
+        that duration (if the KaY's principal actor is the Key
+        Server) or to request a suspension (otherwise)"
+    REFERENCE "IEEE 802.1X Clause 9.16, Figure 12-3"
+    ::= { ieee8021XKayMkaEntry 22 }
+
+ieee8021XKayMkaSuspendOnRequest OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The status of the suspendOnRequest function for this KaY.
+        'true' : then the KaY's principal actor will initiate a
+        suspension if it is the Key Server and another participant
+        has requested a suspension by transmitting a non-zero value
+        of its suspendFor parameter
+        'false' : then the KaY will not initiate a suspension on
+        request from another participant."
+    REFERENCE "IEEE 802.1X Clause 9.16, Figure 12-3"
+    ::= { ieee8021XKayMkaEntry 23 }
+
+ieee8021XKayMkaSuspendedWhile OBJECT-TYPE
+    SYNTAX INTEGER (1..126)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Read by management to determine if a suspension is in
+        progress and to discover the remaining duration of that
+        suspension. May be set directly to coordinate in-service
+        upgrades."
+    REFERENCE "IEEE 802.1X Clause 5.11.4, Clause 9.16, Clause 9.18.5,
+               Clause 9.18.6, Figure 12-3"
+    ::= { ieee8021XKayMkaEntry 24 }
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE KaY MKA Participants Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XKayMkaParticipantTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XKayMkaParticipantEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table for each MKA participant supported by the KaY MKA
+        entity.
+
+        For the writeable objects in this table, the configured value
+        shall be stored in persistent memory and remain unchanged
+        across a re-initialization of the management system of the
+        entity."
+    REFERENCE       "IEEE 802.1X Clause 9.14, Clause 9.16, Figure 12-3"
+    ::= { ieee8021XPaeKaY 2 }
+
+ieee8021XKayMkaParticipantEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XKayMkaParticipantEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing KaY MKA management information applicable
+        to a MKA participant."
+    INDEX           { ieee8021XPaePortNumber, ieee8021XKayMkaPartCKN } 
+    ::= { ieee8021XKayMkaParticipantTable 1 }
+
+Ieee8021XKayMkaParticipantEntry ::= SEQUENCE {
+        ieee8021XKayMkaPartCKN             Ieee8021XPaeCKN,
+        ieee8021XKayMkaPartKMD             Ieee8021XPaeKMD,
+        ieee8021XKayMkaPartNID             Ieee8021XPaeNID,
+        ieee8021XKayMkaPartCached          TruthValue,
+        ieee8021XKayMkaPartActive          TruthValue,
+        ieee8021XKayMkaPartRetain          TruthValue,
+        ieee8021XKayMkaPartActivateControl INTEGER,
+        ieee8021XKayMkaPartPrincipal       TruthValue,
+        ieee8021XKayMkaPartDistCKN         Ieee8021XPaeCKNOrNull,
+        ieee8021XKayMkaPartRowStatus       RowStatus
+}
+
+ieee8021XKayMkaPartCKN OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeCKN
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The CKN information for this MKA participant."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaParticipantEntry 1 }
+
+ieee8021XKayMkaPartKMD OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeKMD
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The KMD information for this MKA participant."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Clause 12.6, Figure 12-3" 
+    ::= { ieee8021XKayMkaParticipantEntry 2 }
+
+ieee8021XKayMkaPartNID OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNID
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The NID information for this MKA participant."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Clause 12.6, Figure 12-3" 
+    ::= { ieee8021XKayMkaParticipantEntry 3 }
+
+ieee8021XKayMkaPartCached OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is set 'true' by the KaY if the participant's
+        parameters are cached.  If this object is 'true', this object
+        can be set 'false' cleared by management to remove the
+        participant's parameters from the cache."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaParticipantEntry 4 }
+
+ieee8021XKayMkaPartActive OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is set 'true' if the participant is active, i.e. is
+        currently transmitting periodic MKPDUs."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    DEFVAL { false }
+    ::= { ieee8021XKayMkaParticipantEntry 5 }
+
+ieee8021XKayMkaPartRetain OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is set 'true' to retain the participant in the
+        cache, even if the KaY would normally remove it (due to lack
+        of use for example)"
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaParticipantEntry 6 }
+
+ieee8021XKayMkaPartActivateControl OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        default(1),
+                        disabled(2),
+                        onOperUp(3),
+                        always(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is for controlling the participant's behavior when
+        the participant is activated.
+        
+        'default' : the participant is from cached entries created by
+            the KaY as part of normal operation, without explicit
+            management, and is activated according to the
+            implementation dependent policies of the KaY.
+
+        'disabled' : the participant allows the cache information to
+            be retained, but disabled for indefinite period.
+
+        'onOperUp' : causing the participant to be activated when the
+            PAE's 'Uncontrolled Port' becomes operational and when the
+            PAE resumes following suspension.
+
+        'always' : causing the participant to remain active all the
+            time, even in the continued absence of partners.
+
+        If the object changed to disabled(1) or onOperUp(3), the
+        participant ceases operation immediately and receipt of MKPDUs
+        with a matching CKN during a subsequent period of twice MKA
+        lifetime will not cause the participant to become active once
+        more."
+    REFERENCE       "IEEE 802.1X Clause 9.14, Clause 9.16, Figure 12-3"
+    ::= { ieee8021XKayMkaParticipantEntry 7 }
+
+ieee8021XKayMkaPartPrincipal OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is set 'true' if the participant is currently the
+        principal actor."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    DEFVAL { false }
+    ::= { ieee8021XKayMkaParticipantEntry 8 }
+
+ieee8021XKayMkaPartDistCKN OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeCKNOrNull
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The CKN for the last CAK distributed either by the actor or one
+        of its partners.  Empty string for this object will be provided if
+        this participant has not been used to distribute a CAK or the
+        participant is not active, i.e. the object
+        ieee8021XKayMkaPartActive in the same row is 'false'."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    DEFVAL { "" }
+    ::= { ieee8021XKayMkaParticipantEntry 9 }
+ 
+ieee8021XKayMkaPartRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The object to create the parameters for the supported
+        participant information in the system.
+
+        If the participant information is from downloaded policies,
+        this object is 'active'."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3"
+    ::= { ieee8021XKayMkaParticipantEntry 10 }
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE MKA Peer List Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XKayMkaPeerListTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XKayMkaPeerListEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table containing the lists of Live Peers and Potential Peers,
+        for all MKA instances for which the KaY is active."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3"
+    ::= { ieee8021XPaeKaY 3 }
+
+ieee8021XKayMkaPeerListEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XKayMkaPeerListEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table entry for one of the peers for one of the MKA
+        instances for which this KaY is an active participant."
+    INDEX           { ieee8021XPaePortNumber, ieee8021XKayMkaPartCKN,
+                      ieee8021XKayMkaPeerListMI } 
+    ::= { ieee8021XKayMkaPeerListTable 1 }
+
+Ieee8021XKayMkaPeerListEntry ::= SEQUENCE {
+        ieee8021XKayMkaPeerListMI   Ieee8021XMkaMI,
+        ieee8021XKayMkaPeerListMN   Ieee8021XMkaMN,
+        ieee8021XKayMkaPeerListType INTEGER,
+        ieee8021XKayMkaPeerListSCI  SecySCI
+}
+
+ieee8021XKayMkaPeerListMI OBJECT-TYPE
+    SYNTAX          Ieee8021XMkaMI
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The peer entry's MI information in the peer list of this active
+        participant in MKA protocol."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaPeerListEntry 1 }
+
+ieee8021XKayMkaPeerListMN OBJECT-TYPE
+    SYNTAX          Ieee8021XMkaMN
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The peer entry's latest MN information in the peer list of this
+        active participant in MKA protocol."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaPeerListEntry 2 }
+
+ieee8021XKayMkaPeerListType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        livePeerList(1),
+                        potentialPeerList(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The peer entry's type in the peer list of this active
+        participant in MKA protocol.
+
+        'livePeerList' : the peer entry is in the Live Peer List.
+
+        'potentialPeerList' : the peer entry is in the Potential
+            Peer List."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaPeerListEntry 3 }
+
+ieee8021XKayMkaPeerListSCI OBJECT-TYPE
+    SYNTAX          SecySCI
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The SCI information of the peer entry in the peer list of this
+        active participant in MKA protocol."
+    REFERENCE       "IEEE 802.1X Clause 9.16, Figure 12-3" 
+    ::= { ieee8021XKayMkaPeerListEntry 4 }
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE NID Group
+-- ------------------------------------------------------------------ --
+--   
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE NID Configuration Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XNidConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XNidConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table that contains the configuration objects for the network
+        announcement information for the Logon Process.
+
+        The detail operation of the Logon Process can vary depending on
+        the port-based network access control applications, and on the
+        capabilities supported by that implementation including, for
+        example, network discovery and roaming.  This table specifies
+        control variables that facilitate behaviors that are
+        potentially useful in a range of applications.  Implementations
+        may use and augment the variables specified, or may use
+        variables specific to the implementation.
+
+        For the writeable objects in this table, the configured value
+        shall be stored in persistent memory and remain unchanged
+        across a re-initialization of the management system of the
+        entity."
+    REFERENCE       "802.1X Clause 8, Figure 8-6, Figure 12-3"
+    ::= { ieee8021XPaeNetworkIdentifier 1 }
+
+ieee8021XNidConfigEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XNidConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains network announcement parameters for a NID."
+    INDEX           { IMPLIED ieee8021XNidNID } 
+    ::= { ieee8021XNidConfigTable 1 }
+
+Ieee8021XNidConfigEntry ::= SEQUENCE {
+        ieee8021XNidNID                   Ieee8021XPaeNID,
+        ieee8021XNidUseEap                INTEGER,
+        ieee8021XNidUnauthAllowed         INTEGER,
+        ieee8021XNidUnsecuredAllowed      INTEGER,
+        ieee8021XNidUnauthenticatedAccess Ieee8021XPaeNIDUnauthenticatedStatus,
+        ieee8021XNidAccessCapabilities    Ieee8021XPaeNIDCapabilites,
+        ieee8021XNidKMD                   Ieee8021XPaeKMD,
+        ieee8021XNidRowStatus             RowStatus
+}
+
+ieee8021XNidNID OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNID
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The network identifier to identify NID configuration in the
+        PAE."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XNidConfigEntry 1 }
+
+ieee8021XNidUseEap OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        never(1),
+                        immediate(2),
+                        mkaFail(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Determines when the Logon Process will initiate EAP, if the
+        Supplicant and or Authenticator are enabled, and takes one of
+        the following values:
+
+        'never' : Never.
+
+        'immediate' : Immediately, concurrently with the use of MKA
+            with any cached CAK(s).
+
+        'mkaFail' : Not until MKA has failed, if a prior CAK has been
+            cached."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XNidConfigEntry 2 }
+
+ieee8021XNidUnauthAllowed OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        never(1),
+                        immediate(2),
+                        authFail(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Determines when the Logon Process will tell the CP state
+        machine to provide unauthenticated connectivity, and takes one
+        of the following values:
+
+        'never' : Never.
+
+        'immediate' : Immediately, independently of any current or
+            future attempts to authenticate using the PAE or MKA.
+
+        'authFail' : Not until an attempt has been made to
+            authenticate using EAP, unless neither the Supplicant nor
+            the Authenticator is enabled, and MKA has attempted to use
+            any cached CAK (unless the KaY is not enabled)."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XNidConfigEntry 3 }
+
+ieee8021XNidUnsecuredAllowed OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        never(1),
+                        immediate(2),
+                        mkaFail(3),
+                        mkaServer(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Determines when the Logon Process will tell the CP state
+        machine to provide authenticated but unsecured connectivity,
+        takes one of the following values:
+
+        'never' : Never.
+
+        'immediate' : Immediately, to provide connectivity
+            concurrently with the use of MKA with any CAK acquired
+            through EAP.
+
+        'mkaFail' : Not until MKA has failed, or is not enabled.
+
+        'mkaServer' : Only if directed by the MKA server."
+    REFERENCE       "802.1X Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XNidConfigEntry 4 }
+
+ieee8021XNidUnauthenticatedAccess OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNIDUnauthenticatedStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The configured access capability of the port's clients without
+        authentication in this NID."
+    REFERENCE       "802.1X Clause 12.5, Clause 10.1, Figure 12-3" 
+    ::= { ieee8021XNidConfigEntry 5 }
+
+ieee8021XNidAccessCapabilities OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNIDCapabilites
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The authentication and protection capabilities supported for
+        the NID."
+    REFERENCE       "802.1X Clause 12.5, Clause 10.1, Figure 12-3" 
+    ::= { ieee8021XNidConfigEntry 6 }
+
+ieee8021XNidKMD OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeKMD
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The configured KMD information for this NID."
+    REFERENCE       "802.1X Clause 10.4, Figure 12-3" 
+    ::= { ieee8021XNidConfigEntry 7 }
+
+ieee8021XNidRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The object to create the parameters for the supported Network
+        Announcement information in the system.
+
+        If the Network Announcement information of the entry is from
+        downloaded policies, this object is 'active'."
+    REFERENCE       "802.1X Clause 10.4, Figure 12-3" 
+    ::= { ieee8021XNidConfigEntry 8 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Announce Information Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XAnnounceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XAnnounceEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table contains the status information that the Announcers
+        announce in the network announcement of the PAE system.
+
+        This table will be instantiated if the object
+        ieee8021XPaePortAnnouncerEnable in the corresponding entry of
+        the ieee8021XPaePortTable is 'true'."
+    REFERENCE       "802.1X Clause 8, Figure 8-6, Figure 12-3"
+    ::= { ieee8021XPaeNetworkIdentifier 2 }
+
+ieee8021XAnnounceEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XAnnounceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains an Announcer's status information."
+    INDEX           { ieee8021XPaePortNumber,
+                      IMPLIED ieee8021XAnnounceNID } 
+    ::= { ieee8021XAnnounceTable 1 }
+
+Ieee8021XAnnounceEntry ::= SEQUENCE {
+        ieee8021XAnnounceNID          Ieee8021XPaeNID,
+        ieee8021XAnnounceAccessStatus Ieee8021XPaeNIDAccessStatus
+}
+
+ieee8021XAnnounceNID OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNID
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The NID information to identify a transmitting network
+        announcement for the PAE."
+    REFERENCE       "802.1X Clause 10.4, Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XAnnounceEntry 1 }
+
+ieee8021XAnnounceAccessStatus OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNIDAccessStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object information reflects connectivity as a result of
+        authentication attempts of this NID for this Announcer."
+    REFERENCE
+        "802.1X Clause 10.4, Clause 10.1, Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XAnnounceEntry 2 }
+ 
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Announcement Information Table
+-- ------------------------------------------------------------------ --
+
+ieee8021XAnnouncementTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XAnnouncementEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table contains the status information that the Listeners
+        receive in the network announcement of the PAE system.
+
+        This table will be instantiated if the object
+        ieee8021XPaePortListenerEnable in the corresponding entry of the
+        ieee8021XPaePortTable is 'true'."
+    REFERENCE       "802.1X Clause 10.4, Figure 12-3"
+    ::= { ieee8021XPaeNetworkIdentifier 3 }
+
+ieee8021XAnnouncementEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XAnnouncementEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains a Listener's status information."
+    INDEX           { ieee8021XPaePortNumber,
+                      IMPLIED ieee8021XAnnouncementNID } 
+    ::= { ieee8021XAnnouncementTable 1 }
+
+Ieee8021XAnnouncementEntry ::= SEQUENCE {
+        ieee8021XAnnouncementNID             Ieee8021XPaeNID,
+        ieee8021XAnnouncementKMD             Ieee8021XPaeKMD,
+        ieee8021XAnnouncementSpecific        TruthValue,
+        ieee8021XAnnouncementAccessStatus    Ieee8021XPaeNIDAccessStatus,
+        ieee8021XAnnouncementAccessRequested TruthValue,
+        ieee8021XAnnouncementUnauthAccess    Ieee8021XPaeNIDUnauthenticatedStatus,
+        ieee8021XAnnouncementCapabilities    Ieee8021XPaeNIDCapabilites
+}
+
+ieee8021XAnnouncementNID OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNID
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The NID information to identify a received network announcement
+        for the PAE."
+    REFERENCE       "802.1X Clause 10.4, Figure 12-3" 
+    ::= { ieee8021XAnnouncementEntry 1 }
+
+ieee8021XAnnouncementKMD OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeKMD
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The KMD information for this received network announcement of
+        the PAE."
+    REFERENCE       "802.1X Clause 10.4, Figure 12-3" 
+    ::= { ieee8021XAnnouncementEntry 2 }
+
+ieee8021XAnnouncementSpecific OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the received announcement information was
+        specific to the receiving PAE, not generic for all systems attached
+        to the LAN." 
+    REFERENCE       "802.1X Clause 10.1, 10.4, Figure 12-3" 
+    ::= { ieee8021XAnnouncementEntry 3 }
+
+ieee8021XAnnouncementAccessStatus OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNIDAccessStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object information reflects connectivity as a result of
+        authentication attempts for this received network announcement
+        of the PAE."
+    REFERENCE       "802.1X Clause 10.4, Clause 10.1, Figure 12-3" 
+    ::= { ieee8021XAnnouncementEntry 4 }
+
+ieee8021XAnnouncementAccessRequested OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The authenticated access has been requested for this particular
+        NID or not."
+    REFERENCE       "802.1X Clause 10.4, Clause 10.1, Figure 12-3" 
+    ::= { ieee8021XAnnouncementEntry 5 }
+
+ieee8021XAnnouncementUnauthAccess OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNIDUnauthenticatedStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The access capability of the port's clients without
+        authentication in this received network announcement of the
+        PAE.
+
+        'openAccess', 'limitedAccess' should not be returned if the
+        object ieee8021XNidUnauthAllowed is 'immediate'."
+    REFERENCE
+        "802.1X Clause 10.1, Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XAnnouncementEntry 6 }
+
+ieee8021XAnnouncementCapabilities OBJECT-TYPE
+    SYNTAX          Ieee8021XPaeNIDCapabilites
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The announcement capabilities of this received network
+        announcement for this PAE."
+    REFERENCE       "802.1X Clause 10.1, Clause 12.5, Figure 12-3" 
+    ::= { ieee8021XAnnouncementEntry 7 }
+
+-- ------------------------------------------------------------------ --
+-- The 802.1X PAE Announcement Cipher Suite Information Table
+-- ------------------------------------------------------------------ --
+ 
+ieee8021XAnnouncementCipherSuitesTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Ieee8021XAnnouncementCipherSuitesEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table contains the Cipher Suites information that the Listeners
+        receive in the network announcement of the PAE system.
+
+        This table will be instantiated if the object
+        ieee8021XPaePortListenerEnable in the corresponding entry of the
+        ieee8021XPaePortTable is 'true'."
+    REFERENCE       "802.1X Clause 10.4, Clause 11.13.3, Figure 11-21, Figure 12-3"
+    ::= { ieee8021XPaeNetworkIdentifier 4 }
+
+ieee8021XAnnouncementCipherSuitesEntry OBJECT-TYPE
+    SYNTAX          Ieee8021XAnnouncementCipherSuitesEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains the Cipher Suite information which a Listener has
+        reveived from network announcement."
+    INDEX           { ieee8021XPaePortNumber,
+                      ieee8021XAnnouncementNID,
+                      ieee8021XAnnouncementCipherSuite }
+    ::= { ieee8021XAnnouncementCipherSuitesTable 1 }
+
+Ieee8021XAnnouncementCipherSuitesEntry ::= SEQUENCE {
+        ieee8021XAnnouncementCipherSuite         OCTET STRING,
+        ieee8021XAnnouncementCipherCapability    Unsigned32
+}
+
+ieee8021XAnnouncementCipherSuite OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (8))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The identifier for the announced cipher suite.  This is a
+        global unique 64-bit (EUI-64) identifier to identify a cipher
+        suite."
+    REFERENCE
+        "802.1X Clause 10.4, Figure 12-3, 802.1AE-2006 Clause 14"
+    ::= { ieee8021XAnnouncementCipherSuitesEntry 1 }
+
+ieee8021XAnnouncementCipherCapability OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The capability of a Cipher Suite received from the network
+        announcement by the Listener.
+
+        A 2 octets Cipher Suite dependent implementation capability field
+        precedes each Cipher Suite reference number. If the Cipher Suite,
+        ieee8021XAnnouncementCipherSuite, identifies the Default Cipher
+        Suite (specified in IEEE Std 802.1AE), the two least significant
+        bits of the implementation capability field encode the MACsec
+        Capability parameter specified in Table 11-7 and the fourteen more
+        significant bits are as 0 and ignored on receipt."
+    REFERENCE
+        "802.1X Clause 11.13.3, Figure 11-21"
+    ::= { ieee8021XAnnouncementCipherSuitesEntry 2 }
+
+-- ------------------------------------------------------------------ --
+-- 802.1X Conformance
+-- ------------------------------------------------------------------ --
+
+ieee8021XPaeCompliances  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBConformance 1 }
+
+ieee8021XPaeGroups  OBJECT IDENTIFIER
+    ::= { ieee8021XPaeMIBConformance 2 }
+
+
+-- ------------------------------------------------------------------ --
+-- 802.1X Compliance Statements
+-- ------------------------------------------------------------------ --
+
+ieee8021XPaeCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for device support of
+        Port Access Control."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ieee8021XPaeSystemGroup,
+                        ieee8021XPaeLogonGroup,
+                        ieee8021XPaeEapolStatsGroup
+                    }
+
+    GROUP           ieee8021XPacGroup
+    DESCRIPTION
+        "This group is mandatory for systems that does not support
+        the MACsec functions of the PAE."
+
+    GROUP           ieee8021XPaeAuthConfigGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the
+        Authenticator functions of the PAE."
+
+    GROUP           ieee8021XPaeSuppConfigGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the
+        Supplicant functions of the PAE."
+
+    GROUP           ieee8021XPaeKaYMkaGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the KaY
+        MKA functions of the PAE."
+
+    GROUP           ieee8021XPaeNetworkIdentifierGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the
+        network announcement functions of the PAE."
+
+    GROUP           ieee8021XPaeAnnouncerGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the
+        network announcement and the Announcer functions of the
+        PAE."
+
+    GROUP           ieee8021XPaeListenerGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support
+        the network announcement and the Listener functions of the
+        PAE."
+
+    OBJECT          ieee8021XKayMacSecConfidentialityOffset
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-write access is not required.  This may be read-only."
+
+    OBJECT          ieee8021XNidUseEap
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidUnauthAllowed
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidUnsecuredAllowed
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidUnauthenticatedAccess
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidAccessCapabilities
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidKMD
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidRowStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+    ::= { ieee8021XPaeCompliances 1 }
+    
+    ieee8021XPaeV2Compliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for device support of
+        Port Access Control as specified in 802.1X-2010
+        amended by 802.1Xbx."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ieee8021XPaeSystemGroup,
+                        ieee8021XPaeLogonGroup,
+                        ieee8021XPaeEapolStatsGroup
+                    }
+
+    GROUP           ieee8021XPacGroup
+    DESCRIPTION
+        "This group is mandatory for systems that does not support
+        the MACsec functions of the PAE."
+
+    GROUP           ieee8021XPaeAuthConfigGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the
+        Authenticator functions of the PAE."
+
+    GROUP           ieee8021XPaeSuppConfigGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the
+        Supplicant functions of the PAE."
+
+    GROUP           ieee8021XPaeKaYMkaGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the KaY
+        MKA functions of the PAE."
+
+    GROUP           ieee8021XPaeNetworkIdentifierGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the
+        network announcement functions of the PAE."
+
+    GROUP           ieee8021XPaeAnnouncerGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support the
+        network announcement and the Announcer functions of the
+        PAE."
+
+    GROUP           ieee8021XPaeListenerGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support
+        the network announcement and the Listener functions of the
+        PAE."
+
+    GROUP           ieee8021XPaeKaYIsupgradeGroup
+    DESCRIPTION
+        "This group is mandatory for systems that support KaY MKA
+        in-service upgrades."
+
+    OBJECT          ieee8021XKayMacSecConfidentialityOffset
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-write access is not required.  This may be read-only."
+
+    OBJECT          ieee8021XNidUseEap
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidUnauthAllowed
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidUnsecuredAllowed
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidUnauthenticatedAccess
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidAccessCapabilities
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidKMD
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+
+    OBJECT          ieee8021XNidRowStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required.  This may be
+        read-only."
+    ::= { ieee8021XPaeCompliances 2 }
+
+
+ieee8021XPaeSystemGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XPaeSysAccessControl,
+                        ieee8021XPaeSysAnnouncements,
+                        ieee8021XPaeSysEapolVersion,
+                        ieee8021XPaeSysMkaVersion,
+                        ieee8021XPaePortType,
+                        ieee8021XPaeControlledPortNumber,
+                        ieee8021XPaeUncontrolledPortNumber,
+                        ieee8021XPaeCommonPortNumber,
+                        ieee8021XPaePortInitialize,
+                        ieee8021XPaePortCapabilities,
+                        ieee8021XPaePortVirtualPortsEnable,
+                        ieee8021XPaePortMaxVirtualPorts,
+                        ieee8021XPaePortCurrentVirtualPorts,
+                        ieee8021XPaePortVirtualPortStart,
+                        ieee8021XPaePortVirtualPortPeerMAC,
+                        ieee8021XPaePortLogonEnable,
+                        ieee8021XPaePortAuthenticatorEnable,
+                        ieee8021XPaePortSupplicantEnable,
+                        ieee8021XPaePortKayMkaEnable,
+                        ieee8021XPaePortAnnouncerEnable,
+                        ieee8021XPaePortListenerEnable
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing system information for a PAE
+        system and a PAE port status and control information."
+    ::= { ieee8021XPaeGroups 1 }
+
+ieee8021XPacGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XPacPortAdminPt2PtMAC,
+                        ieee8021XPacPortOperPt2PtMAC
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing information of a PAC in the
+        system."
+    ::= { ieee8021XPaeGroups 2 }
+
+ieee8021XPaeLogonGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XPaePortLogonConnectStatus,
+                        ieee8021XPaePortPortValid,
+                        ieee8021XPaePortSessionOctetsRx,
+                        ieee8021XPaePortSessionOctetsTx,
+                        ieee8021XPaePortSessionPktsRx,
+                        ieee8021XPaePortSessionPktsTx,
+                        ieee8021XPaePortSessionId,
+                        ieee8021XPaePortSessionStartTime,
+                        ieee8021XPaePortSessionIntervalTime,
+                        ieee8021XPaePortSessionTerminate,
+                        ieee8021XPaePortSessionUserName
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing information of a Logon
+        Process in the system."
+    ::= { ieee8021XPaeGroups 3 }
+
+ieee8021XPaeAuthConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XAuthPaeAuthenticate,
+                        ieee8021XAuthPaeAuthenticated,
+                        ieee8021XAuthPaeFailed,
+                        ieee8021XAuthPaeReAuthEnabled,
+                        ieee8021XAuthPaeQuietPeriod,
+                        ieee8021XAuthPaeReauthPeriod,
+                        ieee8021XAuthPaeRetryMax,
+                        ieee8021XAuthPaeRetryCount
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing configuration information of
+        an Authenticator in the system."
+    ::= { ieee8021XPaeGroups 4 }
+
+ieee8021XPaeSuppConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XSuppPaeAuthenticate,
+                        ieee8021XSuppPaeAuthenticated,
+                        ieee8021XSuppPaeFailed,
+                        ieee8021XSuppPaeHelloPeriod,
+                        ieee8021XSuppPaeRetryMax,
+                        ieee8021XSuppPaeRetryCount
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing configuration information of
+        a Supplicant in the system."
+    ::= { ieee8021XPaeGroups 5 }
+
+ieee8021XPaeEapolStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XEapolInvalidFramesRx,
+                        ieee8021XEapolEapLengthErrorFramesRx,
+                        ieee8021XEapolAnnouncementFramesRx,
+                        ieee8021XEapolAnnouncementReqFramesRx,
+                        ieee8021XEapolPortUnavailableFramesRx,
+                        ieee8021XEapolStartFramesRx,
+                        ieee8021XEapolEapFramesRx,
+                        ieee8021XEapolLogoffFramesRx,
+                        ieee8021XEapolMkNoCknFramesRx,
+                        ieee8021XEapolMkInvalidFramesRx,
+                        ieee8021XEapolLastRxFrameVersion,
+                        ieee8021XEapolLastRxFrameSource,
+                        ieee8021XEapolSuppEapFramesTx,
+                        ieee8021XEapolLogoffFramesTx,
+                        ieee8021XEapolAnnouncementFramesTx,
+                        ieee8021XEapolAnnouncementReqFramesTx,
+                        ieee8021XEapolStartFramesTx,
+                        ieee8021XEapolAuthEapFramesTx,
+                        ieee8021XEapolMkaFramesTx
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing counters and diagnostic
+        information for the EAPOL in the system."
+    ::= { ieee8021XPaeGroups 6 }
+
+ieee8021XPaeKaYMkaGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XKayMkaActive,
+                        ieee8021XKayMkaAuthenticated,
+                        ieee8021XKayMkaSecured,
+                        ieee8021XKayMkaFailed,
+                        ieee8021XKayMkaActorSCI,
+                        ieee8021XKayMkaActorsPriority,
+                        ieee8021XKayMkaKeyServerPriority,
+                        ieee8021XKayMkaKeyServerSCI,
+                        ieee8021XKayAllowedJoinGroup,
+                        ieee8021XKayAllowedFormGroup,
+                        ieee8021XKayCreateNewGroup,
+                        ieee8021XKayMacSecCapability,
+                        ieee8021XKayMacSecDesired,
+                        ieee8021XKayMacSecProtect,
+                        ieee8021XKayMacSecReplayProtect,
+                        ieee8021XKayMacSecValidate,
+                        ieee8021XKayMacSecConfidentialityOffset,
+                        ieee8021XKayMkaTxKN,
+                        ieee8021XKayMkaTxAN,
+                        ieee8021XKayMkaRxKN,
+                        ieee8021XKayMkaRxAN,
+                        ieee8021XKayMkaPartKMD,
+                        ieee8021XKayMkaPartNID,
+                        ieee8021XKayMkaPartCached,
+                        ieee8021XKayMkaPartActive,
+                        ieee8021XKayMkaPartRetain,
+                        ieee8021XKayMkaPartActivateControl,
+                        ieee8021XKayMkaPartPrincipal,
+                        ieee8021XKayMkaPartDistCKN,
+                        ieee8021XKayMkaPartRowStatus,
+                        ieee8021XKayMkaPeerListMN,
+                        ieee8021XKayMkaPeerListType,
+                        ieee8021XKayMkaPeerListSCI
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing monitoring and controlling
+        information of a KaY MKA in the system."
+    ::= { ieee8021XPaeGroups 7 }
+
+ieee8021XPaeNetworkIdentifierGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XLogonNIDConnectedNID,
+                        ieee8021XLogonNIDRequestedNID,
+                        ieee8021XLogonNIDSelectedNID,
+                        ieee8021XNidUseEap,
+                        ieee8021XNidUnauthAllowed,
+                        ieee8021XNidUnsecuredAllowed,
+                        ieee8021XNidUnauthenticatedAccess,
+                        ieee8021XNidAccessCapabilities,
+                        ieee8021XNidKMD,
+                        ieee8021XNidRowStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing monitoring and controlling
+        information of an NID in the system."
+    ::= { ieee8021XPaeGroups 8 }
+
+ieee8021XPaeAnnouncerGroup OBJECT-GROUP
+    OBJECTS         { ieee8021XAnnounceAccessStatus }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing status information for
+        an Announcer in the system."
+    ::= { ieee8021XPaeGroups 9 }
+
+ieee8021XPaeListenerGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XAnnouncementKMD,
+                        ieee8021XAnnouncementSpecific,
+                        ieee8021XAnnouncementAccessStatus,
+                        ieee8021XAnnouncementAccessRequested,
+                        ieee8021XAnnouncementUnauthAccess,
+                        ieee8021XAnnouncementCapabilities,
+                        ieee8021XAnnouncementCipherCapability
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing status information for
+        a Listener in the system."
+    ::= { ieee8021XPaeGroups 10 }
+
+ieee8021XPaeKaYIsupgradeGroup OBJECT-GROUP
+    OBJECTS         {
+                        ieee8021XKayMkaSuspendFor,
+                        ieee8021XKayMkaSuspendOnRequest,
+                        ieee8021XKayMkaSuspendedWhile
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing monitoring and control
+        for MKA support of in-service upgrades."
+    ::= { ieee8021XPaeGroups 11 }
+    
+END
+
