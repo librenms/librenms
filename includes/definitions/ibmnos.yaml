@@ -1,5 +1,5 @@
 os: ibmnos
-text: 'IBM Networking Operating System'
+text: 'Network Operating System'
 type: network
 icon: ibmos
 over:
