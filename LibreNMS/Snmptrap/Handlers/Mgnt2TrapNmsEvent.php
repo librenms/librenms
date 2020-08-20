@@ -32,7 +32,7 @@ use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class Mgnt2TrapNMSEvent implements SnmptrapHandler
+class Mgnt2TrapNmsEvent implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -44,7 +44,24 @@ class Mgnt2TrapNMSEvent implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $msg = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason'));
+        $eventObj = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogObjectClassIdentifier'));
+        $sourcePm = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourcePm'));
+        $slot = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogBoardNumber'));
+        $portType = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourcePortType'));
+        $portNum = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogSourcePortNumber'));
+        $logReason = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason'));
+        $logAdd = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText'));
+
+        // Adding additional info if it exists.
+        if (!is_null($probAdd)) {
+            $logReason = "$logReason Additional info: $logAdd";
+        }
+
+        if ($alarmObj == 'port') {
+            $msg = "Alarm on slot $slot, $sourcePm, Port: $portType $portNum. Issue: $logReason.";
+        } else {
+            $msg = "Event on slot $slot, $sourcePm. Issue: $logReason.";
+        }
         Log::event($msg, $device->device_id, 'trap', 2);
     }
 }

@@ -32,7 +32,7 @@ use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class Mgnt2TrapNMSEvent implements SnmptrapHandler
+class Mgnt2TrapNmsAlarm implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -56,7 +56,7 @@ class Mgnt2TrapNMSEvent implements SnmptrapHandler
 
         // Adding additional info if it exists.
         if (!is_null($probAdd)) {
-            $probMsg = $probSpecific . "Additional info: " . $probAdd;
+            $probSpecific = "$probSpecific Additional info: $probAdd";
         }
 
         // Changing other to unknown
@@ -65,9 +65,9 @@ class Mgnt2TrapNMSEvent implements SnmptrapHandler
         }
 
         if ($alarmObj == 'module') {
-            $msg = "Alarm on slot $slot, $sourcePm. Issue: $probMsg. Possible Cause: $probCause";
+            $msg = "Alarm on slot $slot, $sourcePm. Issue: $probSpecific. Possible Cause: $probCause";
         } elseif ($alarmObj == 'port') {
-            $msg = "Alarm on slot $slot, $sourcePm, Port: $portType $portNum. Issue: $probMsg. Possible Cause: $probCause";
+            $msg = "Alarm on slot $slot, $sourcePm, Port: $portType $portNum. Issue: $probSpecific. Possible Cause: $probCause";
         }
 
         switch ($alarmSeverity) {
