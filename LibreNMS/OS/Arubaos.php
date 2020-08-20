@@ -26,8 +26,9 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -36,6 +37,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class Arubaos extends OS implements
+    OsDiscovery,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
@@ -44,6 +46,26 @@ class Arubaos extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+
+        // ArubaOS (MODEL: Aruba3600), Version 6.1.2.2 (29541)
+        preg_match('/MODEL: ([^)]+)/', $device->sysDescr, $model_match);
+        preg_match('/Version ([^ ]+)/', $device->sysDescr, $version_match);
+        $device->hardware = $model_match[1] ?? null;
+        $device->version = $version_match[1] ?? null;
+
+        $aruba_info = snmp_get_multi($this->getDevice(), [
+            'wlsxSwitchRole.0',
+            'wlsxSwitchMasterIp.0',
+            'wlsxSwitchLicenseSerialNumber.0'
+        ], '-OQUs', 'WLSX-SWITCH-MIB');
+
+        $device->features = $aruba_info[0]['wlsxSwitchRole'] == 'master' ? 'Master Controller' : "Local Controller for {$aruba_info[0]['wlsxSwitchMasterIp']}";
+        $device->serial = $aruba_info[0]['wlsxSwitchLicenseSerialNumber'];
+    }
+
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
