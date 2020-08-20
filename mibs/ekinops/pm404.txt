@@ -1,0 +1,4329 @@
+-- *****************************************************************
+-- EKINOPS-Pm404.TXT:  MIB
+--
+--MIB Part Number:3MI00301AFAD
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pm404-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePm404 MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Pm404 hardware."
+	REVISION "200704040000Z"
+	DESCRIPTION
+	  "Initial Version."
+	REVISION "200709190000Z"
+	DESCRIPTION
+	  "Add loopbacks on line1 and line2"
+	REVISION "200711210000Z"
+	DESCRIPTION
+	  "Update Ekinops address,Helps on objects, Ports Labels"
+	REVISION "200904210000Z"
+	DESCRIPTION
+	  "Update of Mib number"
+	REVISION "200908170000Z"
+	DESCRIPTION
+	  "CondType parameters insertion"
+	REVISION "200912140000Z"
+	DESCRIPTION
+	  "Correction on Traps on Line 2"
+	REVISION "201002240000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS"
+	REVISION "201011050000Z"
+	DESCRIPTION
+	  "Formulas in comments"
+	REVISION "201012170000Z"
+	DESCRIPTION
+	  "Fix on Smpc trap"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201403250000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201412150000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 25 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pm404alarms OBJECT IDENTIFIER ::= { modulePm404 2 }	
+pm404AlmOther OBJECT IDENTIFIER ::= { pm404alarms 1 }
+pm404AlmOtherNurg OBJECT IDENTIFIER ::= { pm404AlmOther 1 }
+pm404AlmOtherUrg OBJECT IDENTIFIER ::= { pm404AlmOther 2 }
+pm404AlmOtherCrit OBJECT IDENTIFIER ::= { pm404AlmOther 3 }
+
+pm404AlmClient OBJECT IDENTIFIER ::= { pm404alarms 2 }
+pm404AlmClientNurg OBJECT IDENTIFIER ::= { pm404AlmClient 1 }
+pm404AlmClientUrg OBJECT IDENTIFIER ::= { pm404AlmClient 2 }
+pm404AlmClientCrit OBJECT IDENTIFIER ::= { pm404AlmClient 3 }
+	
+pm404AlmLine OBJECT IDENTIFIER ::= { pm404alarms 3 }
+pm404AlmLineNurg OBJECT IDENTIFIER ::= { pm404AlmLine 1 }
+pm404AlmLineUrg OBJECT IDENTIFIER ::= { pm404AlmLine 2 }
+pm404AlmLineCrit OBJECT IDENTIFIER ::= { pm404AlmLine 3 }
+
+
+pm404measures OBJECT IDENTIFIER ::= { modulePm404 3 }	
+pm404MesrOther OBJECT IDENTIFIER ::= { pm404measures 1 }	
+pm404MesrClient OBJECT IDENTIFIER ::= { pm404measures 2 }	
+pm404MesrLine OBJECT IDENTIFIER ::= { pm404measures 3 }	
+
+
+pm404counters OBJECT IDENTIFIER ::= { modulePm404 4 }
+pm404CntOther OBJECT IDENTIFIER ::= { pm404counters 1 }
+pm404CntClient OBJECT IDENTIFIER ::= { pm404counters 2 }
+pm404CntLine OBJECT IDENTIFIER ::= { pm404counters 3 }
+
+
+pm404controlsWrite OBJECT IDENTIFIER ::= { modulePm404 6 }
+pm404CtrlOther OBJECT IDENTIFIER ::= { pm404controlsWrite 1 }
+pm404CtrlClient OBJECT IDENTIFIER ::= { pm404controlsWrite 2 }
+pm404CtrlLine OBJECT IDENTIFIER ::= { pm404controlsWrite 3 }
+
+pm404ri OBJECT IDENTIFIER ::= { modulePm404 7 }
+pm404riTable OBJECT IDENTIFIER ::= { pm404ri 1 }
+
+
+pm404Config OBJECT IDENTIFIER ::= { modulePm404 9 }
+
+pm404traps OBJECT IDENTIFIER ::= { modulePm404 10 }
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pm404RinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pm404ri 2 }
+
+pm404RinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pm404ri 3 }
+  
+pm404RinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pm404ri 4 }
+  
+pm404RinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pm404ri 5 }
+  
+pm404RinvGwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "GW platform desciption: This OID contains the 
+         description of the Gateware platform."
+  ::= { pm404ri 6 }
+
+pm404RinvLine1Table OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pm404RinvLine1Entry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the SFPs on the selected module"
+      ::= { pm404riTable 1 }
+
+pm404RinvLine1Entry OBJECT-TYPE
+        SYNTAX  Pm404RinvLine1Entry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the Line1 SFP table"
+        INDEX   { pm404RinvLine1Index }
+        ::= { pm404RinvLine1Table 1 }
+    
+
+
+Pm404RinvLine1Entry::=
+        SEQUENCE {
+          pm404RinvLine1Index 
+              Integer32,
+          pm404RinvSfpLine1
+              DisplayString
+        }
+
+
+    pm404RinvLine1Index OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Line1 SFP table"
+        ::= { pm404RinvLine1Entry 1 }
+
+
+    pm404RinvSfpLine1 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the SFP: This OID contains the inventory for the Line1 SFP"
+        ::= { pm404RinvLine1Entry 2 }
+
+
+
+
+
+pm404RinvLine2Table OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pm404RinvLine2Entry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the SFPs on the selected module"
+      ::= { pm404riTable 2 }
+
+pm404RinvLine2Entry OBJECT-TYPE
+        SYNTAX  Pm404RinvLine2Entry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the Line SFP table"
+        INDEX   { pm404RinvLine2Index }
+        ::= { pm404RinvLine2Table 1 }
+    
+
+
+Pm404RinvLine2Entry::=
+        SEQUENCE {
+          pm404RinvLine2Index 
+              Integer32,
+          pm404RinvsfpLine2
+              DisplayString
+        }
+
+
+    pm404RinvLine2Index OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for SFP table"
+        ::= { pm404RinvLine2Entry 1 }
+
+
+    pm404RinvsfpLine2 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the SFP: This OID contains the inventory for the Line2 SFP"
+        ::= { pm404RinvLine2Entry 2 }
+
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pm404AlmsynthAlm0 OBJECT IDENTIFIER ::= { pm404AlmOtherCrit 0 }
+
+
+
+
+pm404AlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm404AlmsynthAlm0 16 }
+
+
+
+pm404AlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pm404AlmsynthAlm0 15 }
+
+
+
+pm404AlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pm404AlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pm404AlmsynthAlm2 OBJECT IDENTIFIER ::= { pm404AlmOtherNurg 2 }
+
+
+
+
+pm404AlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> other
+         (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pm404AlmsynthAlm2 4 }
+
+
+
+pm404AlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pm404AlmsynthAlm2 3 }
+
+
+
+pm404AlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pm404AlmsynthAlm2 2 }
+
+
+
+pm404AlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pm404AlmsynthAlm2 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pm404AlmsynthAlmLine1 articles
+--- *********************************************************
+
+pm404AlmsynthAlmLine1Table OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404AlmsynthAlmLine1Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404AlmsynthAlmLine1
+         Article
+        "
+	::= { pm404AlmClientCrit 8 }
+
+
+pm404AlmsynthAlmLine1Entry OBJECT-TYPE
+	SYNTAX Pm404AlmsynthAlmLine1Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404AlmsynthAlmLine1 
+        table
+        "
+	INDEX   { pm404AlmsynthAlmLine1Index }
+	::= { pm404AlmsynthAlmLine1Table 1 }
+
+
+Pm404AlmsynthAlmLine1Entry ::=
+	SEQUENCE {
+	pm404AlmsynthAlmLine1Index
+		INTEGER,
+	pm404AlmLine1FailAccPortn
+		EkiOnOff,
+	pm404AlmLine1SfpDdmAlmPortn
+		EkiOnOff,
+	pm404AlmLine1SfpDdmWarningPortn
+		EkiOnOff,
+	pm404AlmLine1DwCaisPortn
+		EkiOnOff,
+	pm404AlmLine1LocalOosPortn
+		EkiOnOff,
+	pm404AlmLine1LsdPortn
+		EkiOnOff,
+	pm404AlmLine1HwFailAccPortn
+		EkiOnOff,
+	pm404AlmLine1DdmAbsentPortn
+		EkiOnOff,
+	pm404AlmLine1SfpAbsentPortn
+		EkiOnOff
+	}
+
+
+pm404AlmsynthAlmLine1Index OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404AlmsynthAlmLine1 
+        table
+        "
+	::= { pm404AlmsynthAlmLine1Entry 1 }
+
+
+pm404AlmLine1FailAccPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 Access Fail :This OID indicates 
+        a failure on the Line 1 port <Condtype> 
+        LINE1_FAIL_ACC_A <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pm404AlmsynthAlmLine1Entry 13 }
+
+
+pm404AlmLine1SfpDdmAlmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Alarm On Line 1 SFP DDM :This
+         OID indicates an alarm is being 
+        received from the Line 1 SFP DDM 
+         <Help>  This alarm indicates if 
+        a DDM Alarm has been detected on 
+        the line 1 transceiver <Condtype> 
+        LINE1_SFP_DDM_ALM_A <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	::= { pm404AlmsynthAlmLine1Entry 11 }
+
+
+pm404AlmLine1SfpDdmWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Warning On Line 1 SFP DDM :This 
+        OID indicates a warning is being 
+        received from the Line 1 SFP DDM 
+         <Help>  This alarm indicates if 
+        a DDM Warning has been detected 
+        on the line 1 transceiver <Condtype> 
+        LINE1_SFP_DDM_WARNING_A <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	::= { pm404AlmsynthAlmLine1Entry 10 }
+
+
+pm404AlmLine1DwCaisPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 AIS Inserted :This OID
+         indicates a CAIS has been inserted 
+        on the output Line 1 port.  <Help> 
+         This status indicates if a Line 
+        Alarm Indication Signal is currently 
+        inserted on the line 1 interface 
+        <Condtype> LINE1_DW_CAIS_A <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pm404AlmsynthAlmLine1Entry 9 }
+
+
+pm404AlmLine1LocalOosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+         Line 1 Port In Service :This
+         OID indicates that the local Line 
+        1 port is In Service (1) or Out 
+        of Service (2)  <Help>  This status 
+        indicates if the line port 1 is 
+        in service <Condtype> LINE1_LOCAL_OOS_A 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pm404AlmsynthAlmLine1Entry 7 }
+
+
+pm404AlmLine1LsdPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Laser Shutdown :This 
+        OID indicates the Line 1 SFP transmitter 
+        output has shut down.   <Help>
+          This status indicates if the
+         line 1 transceiver laser is ON 
+        or OFF <Condtype> LINE1_LSD_A <Probcause> 
+        other (1) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404AlmsynthAlmLine1Entry 6 }
+
+
+pm404AlmLine1HwFailAccPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 HW Fail :This OID indicates 
+        a failure on Line 1 port, most
+         probably caused by a HW issue. 
+        <Condtype> LINE1_HW_FAIL_ACC_A
+         <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pm404AlmsynthAlmLine1Entry 5 }
+
+
+pm404AlmLine1DdmAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        DDM Supported On Line 1 SFP :This 
+        OID indicates that the Line 1 SFP 
+        module does not support the Digital 
+        Diagnostic Monitoring function
+          <Help>  This status indicates 
+        if the line transceiver includes 
+        the DDM feature <Condtype> LINE1_DDM_ABSENT_A 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pm404AlmsynthAlmLine1Entry 3 }
+
+
+pm404AlmLine1SfpAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Absent :This OID indicates 
+        that the SFP module is not present 
+        in the Line 1 port.  <Help>  This 
+        alarm indicates if the line 1 transceiver 
+        is present. <Condtype> LINE1_SFP_ABSENT_A 
+        <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) <Event> ObjectCDINV
+        "
+	::= { pm404AlmsynthAlmLine1Entry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404AlmsynthAlmLine2 articles
+--- *********************************************************
+
+pm404AlmsynthAlmLine2Table OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404AlmsynthAlmLine2Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404AlmsynthAlmLine2
+         Article
+        "
+	::= { pm404AlmLineCrit 12 }
+
+
+pm404AlmsynthAlmLine2Entry OBJECT-TYPE
+	SYNTAX Pm404AlmsynthAlmLine2Entry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404AlmsynthAlmLine2 
+        table
+        "
+	INDEX   { pm404AlmsynthAlmLine2Index }
+	::= { pm404AlmsynthAlmLine2Table 1 }
+
+
+Pm404AlmsynthAlmLine2Entry ::=
+	SEQUENCE {
+	pm404AlmsynthAlmLine2Index
+		INTEGER,
+	pm404AlmLine2FailPortn
+		EkiOnOff,
+	pm404AlmLine2DdmAlmPortn
+		EkiOnOff,
+	pm404AlmLine2DdmWarningPortn
+		EkiOnOff,
+	pm404AlmLine2DwCaisPortn
+		EkiOnOff,
+	pm404AlmLine2LocalOosPortn
+		EkiOnOff,
+	pm404AlmLine2LsdPortn
+		EkiOnOff,
+	pm404AlmLine2HwFailPortn
+		EkiOnOff,
+	pm404AlmLine2DdmAbsentPortn
+		EkiOnOff,
+	pm404AlmLine2SfpAbsentPortn
+		EkiOnOff
+	}
+
+
+pm404AlmsynthAlmLine2Index OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404AlmsynthAlmLine2 
+        table
+        "
+	::= { pm404AlmsynthAlmLine2Entry 1 }
+
+
+pm404AlmLine2FailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 Access Fail :This OID indicates 
+        a failure on the Line 2 port <Condtype> 
+        LINE2_FAIL_A <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pm404AlmsynthAlmLine2Entry 13 }
+
+
+pm404AlmLine2DdmAlmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Alarm On Line 2 SFP DDM :This
+         OID indicates an alarm is being 
+        received from the Line 2 SFP DDM 
+         <Help>  This alarm indicates if 
+        a DDM Alarm has been detected on 
+        the line 2 transceiver <Condtype> 
+        LINE2_DDM_ALM_A <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pm404AlmsynthAlmLine2Entry 11 }
+
+
+pm404AlmLine2DdmWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Warning On Line 2 SFP DDM :This 
+        OID indicates a warning is being 
+        received from the Line 2 SFP DDM 
+         <Help>  This alarm indicates if 
+        a DDM Warning has been detected 
+        on the line 2 transceiver <Condtype> 
+        LINE2_DDM_WARNING_A <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	::= { pm404AlmsynthAlmLine2Entry 10 }
+
+
+pm404AlmLine2DwCaisPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 AIS Inserted :This OID
+         indicates a CAIS has been inserted 
+        on the output Line 2 port.  <Help> 
+         This status indicates if a Line 
+        Alarm Indication Signal is currently 
+        inserted on the line 2 interface 
+        <Condtype> LINE2_DW_CAIS_A <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	::= { pm404AlmsynthAlmLine2Entry 9 }
+
+
+pm404AlmLine2LocalOosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+         Line 2 Port In Servicee :This 
+        OID indicates that the local Line 
+        2 port is In Service (1) or Out 
+        of Service (2)  <Help>  This status 
+        indicates if the line port 2 is 
+        in service <Condtype> LINE2_LOCAL_OOS_A 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pm404AlmsynthAlmLine2Entry 7 }
+
+
+pm404AlmLine2LsdPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Laser Shutdown :This 
+        OID indicates the Line 2 SFP transmitter 
+        output has shut down.   <Help>
+          This status indicates if the
+         line 2 transceiver laser is ON 
+        or OFF <Condtype> LINE2_LSD_A <Probcause> 
+        other (1) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404AlmsynthAlmLine2Entry 6 }
+
+
+pm404AlmLine2HwFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 HW Fail :This OID indicates 
+        a failure on Line 2 port, most
+         probably caused by a HW issue. 
+        <Condtype> LINE2_HW_FAIL_A <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	::= { pm404AlmsynthAlmLine2Entry 5 }
+
+
+pm404AlmLine2DdmAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        DDM Supported On Line 2 SFP :This 
+        OID indicates that the Line 2 SFP 
+        module does not support the Digital 
+        Diagnostic Monitoring function
+          <Help>  This status indicates 
+        if the line transceiver includes 
+        the DDM feature <Condtype> LINE2_DDM_ABSENT_A 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pm404AlmsynthAlmLine2Entry 3 }
+
+
+pm404AlmLine2SfpAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Absent :This OID indicates 
+        that the SFP module is not present 
+        in the Line 2 port.  <Help>  This 
+        alarm indicates if the line 2 transceiver 
+        is present. <Condtype> LINE2_SFP_ABSENT_A 
+        <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) <Event> ObjectCDINV
+        "
+	::= { pm404AlmsynthAlmLine2Entry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Almline1AccessioAlm articles
+--- *********************************************************
+
+pm404Almline1AccessioAlmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Almline1AccessioAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Almline1AccessioAlm 
+        Article
+        "
+	::= { pm404AlmClientCrit 16 }
+
+
+pm404Almline1AccessioAlmEntry OBJECT-TYPE
+	SYNTAX Pm404Almline1AccessioAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Almline1AccessioAlm 
+        table
+        "
+	INDEX   { pm404Almline1AccessioAlmIndex }
+	::= { pm404Almline1AccessioAlmTable 1 }
+
+
+Pm404Almline1AccessioAlmEntry ::=
+	SEQUENCE {
+	pm404Almline1AccessioAlmIndex
+		INTEGER,
+	pm404AlmLine1ErrSigCdrPortn
+		EkiOnOff,
+	pm404AlmLine1LosCdrPortn
+		EkiOnOff,
+	pm404AlmLine1LosPortn
+		EkiOnOff,
+	pm404AlmLine1LasFailPortn
+		EkiOnOff
+	}
+
+
+pm404Almline1AccessioAlmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Almline1AccessioAlm 
+        table
+        "
+	::= { pm404Almline1AccessioAlmEntry 1 }
+
+
+pm404AlmLine1ErrSigCdrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Error Signal On CDR On Line 1
+         : <Condtype> LINE1__ERR_SIG_CDR_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline1AccessioAlmEntry 8 }
+
+
+pm404AlmLine1LosCdrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Loss Of Signal On CDR On Line
+         1 : <Condtype> LINE1_LOS_CDR_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline1AccessioAlmEntry 7 }
+
+
+pm404AlmLine1LosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Loss Of Optical Signal On Line 
+        1 :This OID indicates that no signal 
+        is present on the SFP of the Line 
+        1 port  <Help>  This alarm indicates 
+        if an optical signal is detected 
+        on the line 1 transceiver input 
+        <Condtype> LINE1_LOS_A <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        physicalViolation (9) <Polarity> 
+        (2) 
+        "
+	::= { pm404Almline1AccessioAlmEntry 5 }
+
+
+pm404AlmLine1LasFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Tx Failed :This OID 
+        indicates that the transmitter
+         fails for the SFP plugged into 
+        the Line 1 port (this alarm reports 
+        the transmitter failure alarm generated 
+        by the SFPs)  <Help>  This alarm 
+        indicates if the laser of the line 
+        1 transceiver is in fail condition 
+        <Condtype> LINE1_LAS_FAIL_A <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1AccessioAlmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Almline2AccessioAlm articles
+--- *********************************************************
+
+pm404Almline2AccessioAlmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Almline2AccessioAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Almline2AccessioAlm 
+        Article
+        "
+	::= { pm404AlmLineCrit 20 }
+
+
+pm404Almline2AccessioAlmEntry OBJECT-TYPE
+	SYNTAX Pm404Almline2AccessioAlmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Almline2AccessioAlm 
+        table
+        "
+	INDEX   { pm404Almline2AccessioAlmIndex }
+	::= { pm404Almline2AccessioAlmTable 1 }
+
+
+Pm404Almline2AccessioAlmEntry ::=
+	SEQUENCE {
+	pm404Almline2AccessioAlmIndex
+		INTEGER,
+	pm404AlmLine2ErrSigCdrPortn
+		EkiOnOff,
+	pm404AlmLine2LosCdrPortn
+		EkiOnOff,
+	pm404AlmLine2LosPortn
+		EkiOnOff,
+	pm404AlmLine2LasFailPortn
+		EkiOnOff
+	}
+
+
+pm404Almline2AccessioAlmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Almline2AccessioAlm 
+        table
+        "
+	::= { pm404Almline2AccessioAlmEntry 1 }
+
+
+pm404AlmLine2ErrSigCdrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Error Signal On CDR On Line 2
+         : <Condtype> LINE2__ERR_SIG_CDR_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline2AccessioAlmEntry 8 }
+
+
+pm404AlmLine2LosCdrPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Loss Of Signal On CDR On Line
+         2 : <Condtype> LINE2_LOS_CDR_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline2AccessioAlmEntry 7 }
+
+
+pm404AlmLine2LosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Loss Of Optical Signal On Line 
+        2 :This OID indicates that no signal 
+        is present on the SFP of the Line 
+        2 port  <Help>  This alarm indicates 
+        if an optical signal is detected 
+        on the line 2 transceiver input 
+        <Condtype> LINE2_LOS_A <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        physicalViolation (9) <Polarity> 
+        (2) 
+        "
+	::= { pm404Almline2AccessioAlmEntry 5 }
+
+
+pm404AlmLine2LasFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Tx Failed :This OID 
+        indicates that the transmitter
+         fails for the SFP plugged into 
+        the Line 2 port (this alarm reports 
+        the transmitter failure alarm generated 
+        by the SFPs)  <Help>  This alarm 
+        indicates if the laser of the line 
+        2 transceiver is in fail condition 
+        <Condtype> LINE2_LAS_FAIL_A <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2AccessioAlmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Almline1SfpAlmDdm articles
+--- *********************************************************
+
+pm404Almline1SfpAlmDdmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Almline1SfpAlmDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Almline1SfpAlmDdm 
+        Article
+        "
+	::= { pm404AlmClientUrg 24 }
+
+
+pm404Almline1SfpAlmDdmEntry OBJECT-TYPE
+	SYNTAX Pm404Almline1SfpAlmDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Almline1SfpAlmDdm 
+        table
+        "
+	INDEX   { pm404Almline1SfpAlmDdmIndex }
+	::= { pm404Almline1SfpAlmDdmTable 1 }
+
+
+Pm404Almline1SfpAlmDdmEntry ::=
+	SEQUENCE {
+	pm404Almline1SfpAlmDdmIndex
+		INTEGER,
+	pm404AlmLine1RxPwrHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine1RxPwrLowAlaPortn
+		EkiOnOff,
+	pm404AlmLine1TempHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine1TempLowAlaPortn
+		EkiOnOff,
+	pm404AlmLine1VccHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine1VccLowAlaPortn
+		EkiOnOff,
+	pm404AlmLine1TxBiasHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine1TxBiasLowAlaPortn
+		EkiOnOff,
+	pm404AlmLine1Line1TxPwrHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine1TxPwrLowAlaPortn
+		EkiOnOff
+	}
+
+
+pm404Almline1SfpAlmDdmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Almline1SfpAlmDdm 
+        table
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 1 }
+
+
+pm404AlmLine1RxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Rx Power High :Alarm 
+        indicating that the SFP input power 
+        of port is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE1_RX_PWR_HIGH_ALA_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 17 }
+
+
+pm404AlmLine1RxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Rx Power Low :Alarm 
+        indicating that the SFP input power 
+        of port is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE1_RX_PWR_LOW_ALA_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 16 }
+
+
+pm404AlmLine1TempHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Temp High :Alarm indicating 
+        that the SFP temperature of port 
+        is higher than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        LINE1_TEMP_HIGH_ALA_A <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 9 }
+
+
+pm404AlmLine1TempLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Temp Low :Alarm indicating 
+        that the SFP temperature of port 
+        is lower than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        LINE1_TEMP_LOW_ALA_A <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 8 }
+
+
+pm404AlmLine1VccHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Power Supply High :Alarm 
+        indicating that the SFP power supply 
+        of port is higher than the threshold 
+        value written in the SFP EEPROM 
+         <Condtype> LINE1_VCC_HIGH_ALA_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 7 }
+
+
+pm404AlmLine1VccLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Power Supply Low :Alarm 
+        indicating that the SFP power supply 
+        of port is lower than the threshold 
+        value written in the SFP EEPROM 
+         <Condtype> LINE1_VCC_LOW_ALA_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 6 }
+
+
+pm404AlmLine1TxBiasHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Bias High :Alarm indicating 
+        that the SFP laser bias current 
+        of port is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE1_TX_BIAS_HIGH_ALA_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 5 }
+
+
+pm404AlmLine1TxBiasLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Bias Low :Alarm indicating 
+        that the SFP laser bias current 
+        of port is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE1_TX_BIAS_LOW_ALA_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 4 }
+
+
+pm404AlmLine1Line1TxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Tx Power High :Alarm 
+        indicating that the SFP output
+         power of port is higher than the 
+        threshold value written in the
+         SFP EEPROM <Condtype> LINE1_LINE1_TX_PWR_HIGH_ALA_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 3 }
+
+
+pm404AlmLine1TxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Tx Power Low :Alarm 
+        indicating that the SFP output
+         power of port is lower than the 
+        threshold value written in the
+         SFP EEPROM <Condtype> LINE1_TX_PWR_LOW_ALA_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpAlmDdmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Almline2SfpAlmDdm articles
+--- *********************************************************
+
+pm404Almline2SfpAlmDdmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Almline2SfpAlmDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Almline2SfpAlmDdm 
+        Article
+        "
+	::= { pm404AlmLineUrg 28 }
+
+
+pm404Almline2SfpAlmDdmEntry OBJECT-TYPE
+	SYNTAX Pm404Almline2SfpAlmDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Almline2SfpAlmDdm 
+        table
+        "
+	INDEX   { pm404Almline2SfpAlmDdmIndex }
+	::= { pm404Almline2SfpAlmDdmTable 1 }
+
+
+Pm404Almline2SfpAlmDdmEntry ::=
+	SEQUENCE {
+	pm404Almline2SfpAlmDdmIndex
+		INTEGER,
+	pm404AlmLine2RxPwrHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine2RxPwrLowAlaPortn
+		EkiOnOff,
+	pm404AlmLine2TempHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine2TempLowAlaPortn
+		EkiOnOff,
+	pm404AlmLine2VccHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine2VccLowAlaPortn
+		EkiOnOff,
+	pm404AlmLine2TxBiasHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine2TxBiasLowAlaPortn
+		EkiOnOff,
+	pm404AlmLine2Line2TxPwrHighAlaPortn
+		EkiOnOff,
+	pm404AlmLine2TxPwrLowAlaPortn
+		EkiOnOff
+	}
+
+
+pm404Almline2SfpAlmDdmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Almline2SfpAlmDdm 
+        table
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 1 }
+
+
+pm404AlmLine2RxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Rx Power High :Alarm 
+        indicating that the SFP input power 
+        of port is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE2_RX_PWR_HIGH_ALA_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 17 }
+
+
+pm404AlmLine2RxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Rx Power Low :Alarm 
+        indicating that the SFP input power 
+        of port is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE2_RX_PWR_LOW_ALA_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 16 }
+
+
+pm404AlmLine2TempHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Temp High :Alarm indicating 
+        that the SFP temperature of port 
+        is higher than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        LINE2_TEMP_HIGH_ALA_A <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 9 }
+
+
+pm404AlmLine2TempLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Temp Low :Alarm indicating 
+        that the SFP temperature of port 
+        is lower than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        LINE2_TEMP_LOW_ALA_A <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 8 }
+
+
+pm404AlmLine2VccHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Power Supply High :Alarm 
+        indicating that the SFP power supply 
+        of port is higher than the threshold 
+        value written in the SFP EEPROM 
+         <Condtype> LINE2_VCC_HIGH_ALA_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 7 }
+
+
+pm404AlmLine2VccLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Power Supply Low :Alarm 
+        indicating that the SFP power supply 
+        of port is lower than the threshold 
+        value written in the SFP EEPROM 
+         <Condtype> LINE2_VCC_LOW_ALA_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 6 }
+
+
+pm404AlmLine2TxBiasHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Bias High :Alarm indicating 
+        that the SFP laser bias current 
+        of port is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE2_TX_BIAS_HIGH_ALA_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 5 }
+
+
+pm404AlmLine2TxBiasLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Bias Low :Alarm indicating 
+        that the SFP laser bias current 
+        of port is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE2_TX_BIAS_LOW_ALA_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 4 }
+
+
+pm404AlmLine2Line2TxPwrHighAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Tx Power High :Alarm 
+        indicating that the SFP output
+         power of port is higher than the 
+        threshold value written in the
+         SFP EEPROM <Condtype> LINE2_LINE2_TX_PWR_HIGH_ALA_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 3 }
+
+
+pm404AlmLine2TxPwrLowAlaPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Tx Power Low :Alarm 
+        indicating that the SFP output
+         power of port is lower than the 
+        threshold value written in the
+         SFP EEPROM <Condtype> LINE2_TX_PWR_LOW_ALA_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpAlmDdmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Almline1SfpWarnDdm articles
+--- *********************************************************
+
+pm404Almline1SfpWarnDdmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Almline1SfpWarnDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Almline1SfpWarnDdm 
+        Article
+        "
+	::= { pm404AlmClientNurg 32 }
+
+
+pm404Almline1SfpWarnDdmEntry OBJECT-TYPE
+	SYNTAX Pm404Almline1SfpWarnDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Almline1SfpWarnDdm 
+        table
+        "
+	INDEX   { pm404Almline1SfpWarnDdmIndex }
+	::= { pm404Almline1SfpWarnDdmTable 1 }
+
+
+Pm404Almline1SfpWarnDdmEntry ::=
+	SEQUENCE {
+	pm404Almline1SfpWarnDdmIndex
+		INTEGER,
+	pm404AlmLine1RxPwrHighWngPortn
+		EkiOnOff,
+	pm404AlmLine1RxPwrLowWngPortn
+		EkiOnOff,
+	pm404AlmLine1TempHighWngPortn
+		EkiOnOff,
+	pm404AlmLine1TempLowWngPortn
+		EkiOnOff,
+	pm404AlmLine1VccHighWngPortn
+		EkiOnOff,
+	pm404AlmLine1VccLowWngPortn
+		EkiOnOff,
+	pm404AlmLine1TxBiasHighWngPortn
+		EkiOnOff,
+	pm404AlmLine1TxBiasLowWngPortn
+		EkiOnOff,
+	pm404AlmLine1TxPwrHighWngPortn
+		EkiOnOff,
+	pm404AlmLine1TxPwLowWngPortn
+		EkiOnOff
+	}
+
+
+pm404Almline1SfpWarnDdmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Almline1SfpWarnDdm 
+        table
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 1 }
+
+
+pm404AlmLine1RxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Rx Power High Warning 
+        :Warning indicating that the SFP 
+        input power of port is higher than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> LINE1_RX_PWR_HIGH_WNG_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 17 }
+
+
+pm404AlmLine1RxPwrLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Rx Power Low Warning 
+        :Warning indicating that the SFP 
+        input power of port is lower than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> LINE1_RX_PWR_LOW_WNG_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 16 }
+
+
+pm404AlmLine1TempHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Temp High Warning :Warning 
+        indicating that the SFP temperature 
+        of port is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE1_TEMP_HIGH_WNG_A 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 9 }
+
+
+pm404AlmLine1TempLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Temp Low Warning :Warning 
+        indicating that the SFP temperature 
+        of port is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE1_TEMP_LOW_WNG_A 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 8 }
+
+
+pm404AlmLine1VccHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Power Supply High Warning 
+        :Warning indicating that the SFP 
+        power supply of port is higher
+         than the threshold value written 
+        in the SFP EEPROM  <Condtype> LINE1_VCC_HIGH_WNG_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 7 }
+
+
+pm404AlmLine1VccLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Power Supply Low Warning 
+        :Warning indicating that the SFP 
+        power supply of port is lower than 
+        the threshold value written in
+         the SFP EEPROM  <Condtype> LINE1_VCC_LOW_WNG_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 6 }
+
+
+pm404AlmLine1TxBiasHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Bias High Warning :Warning 
+        indicating that the SFP laser bias 
+        current of port is higher than
+         the threshold value written in 
+        the SFP EEPROM <Condtype> LINE1_TX_BIAS_HIGH_WNG_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 5 }
+
+
+pm404AlmLine1TxBiasLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Bias Low Warning :Warning 
+        indicating that the SFP laser bias 
+        current of port is lower than the 
+        threshold value written in the
+         SFP EEPROM <Condtype> LINE1_TX_BIAS_LOW_WNG_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 4 }
+
+
+pm404AlmLine1TxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Tx Power High Warning 
+        :Warning indicating that the SFP 
+        output power of port is higher
+         than the threshold value written 
+        in the SFP EEPROM <Condtype> LINE1_TX_PWR_HIGH_WNG_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 3 }
+
+
+pm404AlmLine1TxPwLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Tx Power Low Warning 
+        :Warning indicating that the SFP 
+        output power of port is lower than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> LINE1_TX_PW_LOW_WNG_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline1SfpWarnDdmEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Almline2SfpWarnDdm articles
+--- *********************************************************
+
+pm404Almline2SfpWarnDdmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Almline2SfpWarnDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Almline2SfpWarnDdm 
+        Article
+        "
+	::= { pm404AlmLineNurg 36 }
+
+
+pm404Almline2SfpWarnDdmEntry OBJECT-TYPE
+	SYNTAX Pm404Almline2SfpWarnDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Almline2SfpWarnDdm 
+        table
+        "
+	INDEX   { pm404Almline2SfpWarnDdmIndex }
+	::= { pm404Almline2SfpWarnDdmTable 1 }
+
+
+Pm404Almline2SfpWarnDdmEntry ::=
+	SEQUENCE {
+	pm404Almline2SfpWarnDdmIndex
+		INTEGER,
+	pm404AlmLine2RxPwrHighWngPortn
+		EkiOnOff,
+	pm404AlmLine2RxPwrLowWngPortn
+		EkiOnOff,
+	pm404AlmLine2TempHighWngPortn
+		EkiOnOff,
+	pm404AlmLine2TempLowWngPortn
+		EkiOnOff,
+	pm404AlmLine2VccHighWngPortn
+		EkiOnOff,
+	pm404AlmLine2VccLowWngPortn
+		EkiOnOff,
+	pm404AlmLine2TxBiasHighWngPortn
+		EkiOnOff,
+	pm404AlmLine2TxBiasLowWngPortn
+		EkiOnOff,
+	pm404AlmLine2TxPwrHighWngPortn
+		EkiOnOff,
+	pm404AlmLine2TxPwLowWngPortn
+		EkiOnOff
+	}
+
+
+pm404Almline2SfpWarnDdmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Almline2SfpWarnDdm 
+        table
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 1 }
+
+
+pm404AlmLine2RxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Rx Power High Warning 
+        :Warning indicating that the SFP 
+        input power of port is higher than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> LINE2_RX_PWR_HIGH_WNG_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 17 }
+
+
+pm404AlmLine2RxPwrLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Rx Power Low Warning 
+        :Warning indicating that the SFP 
+        input power of port is lower than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> LINE2_RX_PWR_LOW_WNG_A 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 16 }
+
+
+pm404AlmLine2TempHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Temp High Warning :Warning 
+        indicating that the SFP temperature 
+        of port is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE2_TEMP_HIGH_WNG_A 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 9 }
+
+
+pm404AlmLine2TempLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Temp Low Warning :Warning 
+        indicating that the SFP temperature 
+        of port is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> LINE2_TEMP_LOW_WNG_A 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 8 }
+
+
+pm404AlmLine2VccHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Power Supply High Warning 
+        :Warning indicating that the SFP 
+        power supply of port is higher
+         than the threshold value written 
+        in the SFP EEPROM  <Condtype> LINE2_VCC_HIGH_WNG_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 7 }
+
+
+pm404AlmLine2VccLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Power Supply Low Warning 
+        :Warning indicating that the SFP 
+        power supply of port is lower than 
+        the threshold value written in
+         the SFP EEPROM  <Condtype> LINE2_VCC_LOW_WNG_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 6 }
+
+
+pm404AlmLine2TxBiasHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Bias High Warning :Warning 
+        indicating that the SFP laser bias 
+        current of port is higher than
+         the threshold value written in 
+        the SFP EEPROM <Condtype> LINE2_TX_BIAS_HIGH_WNG_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 5 }
+
+
+pm404AlmLine2TxBiasLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Bias Low Warning :Warning 
+        indicating that the SFP laser bias 
+        current of port is lower than the 
+        threshold value written in the
+         SFP EEPROM <Condtype> LINE2_TX_BIAS_LOW_WNG_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 4 }
+
+
+pm404AlmLine2TxPwrHighWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Tx Power High Warning 
+        :Warning indicating that the SFP 
+        output power of port is higher
+         than the threshold value written 
+        in the SFP EEPROM <Condtype> LINE2_TX_PWR_HIGH_WNG_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 3 }
+
+
+pm404AlmLine2TxPwLowWngPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Tx Power Low Warning 
+        :Warning indicating that the SFP 
+        output power of port is lower than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> LINE2_TX_PW_LOW_WNG_A 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pm404Almline2SfpWarnDdmEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pm404Ctrlsynth0 OBJECT IDENTIFIER ::= { pm404CtrlOther 0 }
+
+
+
+
+pm404CtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pm404Ctrlsynth0 13 }
+
+
+
+pm404CtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pm404Ctrlsynth0 9 }
+
+
+
+pm404CtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pm404Ctrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pm404Ctrlsynth4 OBJECT IDENTIFIER ::= { pm404CtrlOther 4 }
+
+
+
+
+pm404CtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pm404Ctrlsynth4 2 }
+
+
+
+pm404CtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pm404Ctrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pm404CtrlswMgnt OBJECT IDENTIFIER ::= { pm404CtrlOther 5 }
+
+
+
+
+pm404CtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pm404CtrlswMgnt 3 }
+
+
+
+pm404CtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pm404CtrlswMgnt 2 }
+
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlline1SfpOnoff articles
+--- *********************************************************
+
+pm404Ctrlline1SfpOnoffTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Ctrlline1SfpOnoffEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlline1SfpOnoff 
+        Article
+        "
+	::= { pm404CtrlClient 16 }
+
+
+pm404Ctrlline1SfpOnoffEntry OBJECT-TYPE
+	SYNTAX Pm404Ctrlline1SfpOnoffEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlline1SfpOnoff 
+        table
+        "
+	INDEX   { pm404Ctrlline1SfpOnoffIndex }
+	::= { pm404Ctrlline1SfpOnoffTable 1 }
+
+
+Pm404Ctrlline1SfpOnoffEntry ::=
+	SEQUENCE {
+	pm404Ctrlline1SfpOnoffIndex
+		INTEGER,
+	pm404Ctrlline1SfpOnoffPortn
+		EkiState
+	}
+
+
+pm404Ctrlline1SfpOnoffIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlline1SfpOnoff 
+        table
+        "
+	::= { pm404Ctrlline1SfpOnoffEntry 1 }
+
+
+pm404Ctrlline1SfpOnoffPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Laser Shutdown :This 
+        OID switches off the SFP  <Help> 
+         This control defines the laser 
+        state of the line 1 transceiver
+        "
+	::= { pm404Ctrlline1SfpOnoffEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlline1Loopback articles
+--- *********************************************************
+
+pm404Ctrlline1LoopbackTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Ctrlline1LoopbackEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlline1Loopback 
+        Article
+        "
+	::= { pm404CtrlClient 17 }
+
+
+pm404Ctrlline1LoopbackEntry OBJECT-TYPE
+	SYNTAX Pm404Ctrlline1LoopbackEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlline1Loopback 
+        table
+        "
+	INDEX   { pm404Ctrlline1LoopbackIndex }
+	::= { pm404Ctrlline1LoopbackTable 1 }
+
+
+Pm404Ctrlline1LoopbackEntry ::=
+	SEQUENCE {
+	pm404Ctrlline1LoopbackIndex
+		INTEGER,
+	pm404Ctrlline1LoopbackPortn
+		EkiState
+	}
+
+
+pm404Ctrlline1LoopbackIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlline1Loopback 
+        table
+        "
+	::= { pm404Ctrlline1LoopbackEntry 1 }
+
+
+pm404Ctrlline1LoopbackPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 Facility Loopback :This 
+        OID operates a Client Facility
+         Loopback, looping client input 
+        signal on the client output port. 
+        The loop is located on the client 
+        transceiver  <Help> This maintenance 
+        parameter operates a Client Facility 
+        Loopback, looping client input
+         signal on the client output port. 
+        The loop is located on the client 
+        transceiver
+        "
+	::= { pm404Ctrlline1LoopbackEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlline1LoopbackTerm articles
+--- *********************************************************
+
+pm404Ctrlline1LoopbackTermTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Ctrlline1LoopbackTermEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlline1LoopbackTerm 
+        Article
+        "
+	::= { pm404CtrlClient 18 }
+
+
+pm404Ctrlline1LoopbackTermEntry OBJECT-TYPE
+	SYNTAX Pm404Ctrlline1LoopbackTermEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlline1LoopbackTerm 
+        table
+        "
+	INDEX   { pm404Ctrlline1LoopbackTermIndex }
+	::= { pm404Ctrlline1LoopbackTermTable 1 }
+
+
+Pm404Ctrlline1LoopbackTermEntry ::=
+	SEQUENCE {
+	pm404Ctrlline1LoopbackTermIndex
+		INTEGER,
+	pm404Ctrlline1LoopbackTermPortn
+		EkiState
+	}
+
+
+pm404Ctrlline1LoopbackTermIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlline1LoopbackTerm 
+        table
+        "
+	::= { pm404Ctrlline1LoopbackTermEntry 1 }
+
+
+pm404Ctrlline1LoopbackTermPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 Terminal Loopback :This 
+        OID operates a Client Terminal
+         Loopback, looping client input 
+        signal on the client output port. 
+        The loop is located on the line 
+        transceiver  <Help> This maintenance 
+        parameter operates a Client Terminal 
+        Loopback, looping client input
+         signal on the client output port. 
+        The loop is located on the line 
+        transceiver
+        "
+	::= { pm404Ctrlline1LoopbackTermEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlline1OosMode articles
+--- *********************************************************
+
+pm404Ctrlline1OosModeTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Ctrlline1OosModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlline1OosMode
+         Article
+        "
+	::= { pm404CtrlClient 20 }
+
+
+pm404Ctrlline1OosModeEntry OBJECT-TYPE
+	SYNTAX Pm404Ctrlline1OosModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlline1OosMode 
+        table
+        "
+	INDEX   { pm404Ctrlline1OosModeIndex }
+	::= { pm404Ctrlline1OosModeTable 1 }
+
+
+Pm404Ctrlline1OosModeEntry ::=
+	SEQUENCE {
+	pm404Ctrlline1OosModeIndex
+		INTEGER,
+	pm404Ctrlline1OosModePortn
+		EkiState
+	}
+
+
+pm404Ctrlline1OosModeIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlline1OosMode 
+        table
+        "
+	::= { pm404Ctrlline1OosModeEntry 1 }
+
+
+pm404Ctrlline1OosModePortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 Port Out Of Service :This 
+        OID sets the port Out Of Service 
+         <Help>  This controls defines
+         the service state of the line
+         1 port
+        "
+	::= { pm404Ctrlline1OosModeEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlprotocol articles
+--- *********************************************************
+
+pm404CtrlprotocolTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404CtrlprotocolEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlprotocol Article
+        "
+	::= { pm404CtrlClient 48 }
+
+
+pm404CtrlprotocolEntry OBJECT-TYPE
+	SYNTAX Pm404CtrlprotocolEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlprotocol 
+        table
+        "
+	INDEX   { pm404CtrlprotocolIndex }
+	::= { pm404CtrlprotocolTable 1 }
+
+
+Pm404CtrlprotocolEntry ::=
+	SEQUENCE {
+	pm404CtrlprotocolIndex
+		INTEGER,
+	pm404CtrlprotocolPortn
+		EkiProtocol
+	}
+
+
+pm404CtrlprotocolIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlprotocol 
+        table
+        "
+	::= { pm404CtrlprotocolEntry 1 }
+
+
+pm404CtrlprotocolPortn OBJECT-TYPE
+	SYNTAX  EkiProtocol
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Lines Bitrate: This OID sets the 
+        protocol of the lines port.
+        "
+	::= { pm404CtrlprotocolEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlline2SfpOnoff articles
+--- *********************************************************
+
+pm404Ctrlline2SfpOnoffTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Ctrlline2SfpOnoffEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlline2SfpOnoff 
+        Article
+        "
+	::= { pm404CtrlLine 64 }
+
+
+pm404Ctrlline2SfpOnoffEntry OBJECT-TYPE
+	SYNTAX Pm404Ctrlline2SfpOnoffEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlline2SfpOnoff 
+        table
+        "
+	INDEX   { pm404Ctrlline2SfpOnoffIndex }
+	::= { pm404Ctrlline2SfpOnoffTable 1 }
+
+
+Pm404Ctrlline2SfpOnoffEntry ::=
+	SEQUENCE {
+	pm404Ctrlline2SfpOnoffIndex
+		INTEGER,
+	pm404Ctrlline2SfpOnoffPortn
+		EkiState
+	}
+
+
+pm404Ctrlline2SfpOnoffIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlline2SfpOnoff 
+        table
+        "
+	::= { pm404Ctrlline2SfpOnoffEntry 1 }
+
+
+pm404Ctrlline2SfpOnoffPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Laser Shutdown :This 
+        OID switches off the SFP  <Help> 
+         This control defines the laser 
+        state of the line 2 transceiver
+        "
+	::= { pm404Ctrlline2SfpOnoffEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlline2OosMode articles
+--- *********************************************************
+
+pm404Ctrlline2OosModeTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Ctrlline2OosModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlline2OosMode
+         Article
+        "
+	::= { pm404CtrlLine 65 }
+
+
+pm404Ctrlline2OosModeEntry OBJECT-TYPE
+	SYNTAX Pm404Ctrlline2OosModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlline2OosMode 
+        table
+        "
+	INDEX   { pm404Ctrlline2OosModeIndex }
+	::= { pm404Ctrlline2OosModeTable 1 }
+
+
+Pm404Ctrlline2OosModeEntry ::=
+	SEQUENCE {
+	pm404Ctrlline2OosModeIndex
+		INTEGER,
+	pm404Ctrlline2OosModePortn
+		EkiState
+	}
+
+
+pm404Ctrlline2OosModeIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlline2OosMode 
+        table
+        "
+	::= { pm404Ctrlline2OosModeEntry 1 }
+
+
+pm404Ctrlline2OosModePortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 Port Out Of Service :This 
+        OID sets the port Out Of Service 
+         <Help>  This controls defines
+         the service state of the line
+         2 port
+        "
+	::= { pm404Ctrlline2OosModeEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlline2Loopback articles
+--- *********************************************************
+
+pm404Ctrlline2LoopbackTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Ctrlline2LoopbackEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlline2Loopback 
+        Article
+        "
+	::= { pm404CtrlLine 66 }
+
+
+pm404Ctrlline2LoopbackEntry OBJECT-TYPE
+	SYNTAX Pm404Ctrlline2LoopbackEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlline2Loopback 
+        table
+        "
+	INDEX   { pm404Ctrlline2LoopbackIndex }
+	::= { pm404Ctrlline2LoopbackTable 1 }
+
+
+Pm404Ctrlline2LoopbackEntry ::=
+	SEQUENCE {
+	pm404Ctrlline2LoopbackIndex
+		INTEGER,
+	pm404Ctrlline2LoopbackPortn
+		EkiState
+	}
+
+
+pm404Ctrlline2LoopbackIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlline2Loopback 
+        table
+        "
+	::= { pm404Ctrlline2LoopbackEntry 1 }
+
+
+pm404Ctrlline2LoopbackPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 Facility Loopback :This 
+        OID operates a Line Facility Loopback, 
+        looping line input signal on the 
+        line output port. The loop is located 
+        on the line transceiver. If the 
+        Line signal carries DCC, the management 
+        network is impacted  <Help> This 
+        maintenance parameter operates
+         a Line Facility Loopback, looping 
+        line input signal on the line output 
+        port. The loop is located on the 
+        line transceiver. If the Line signal 
+        carries DCC, the management network 
+        is impacted
+        "
+	::= { pm404Ctrlline2LoopbackEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Ctrlline2LoopbackTerm articles
+--- *********************************************************
+
+pm404Ctrlline2LoopbackTermTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Ctrlline2LoopbackTermEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Ctrlline2LoopbackTerm 
+        Article
+        "
+	::= { pm404CtrlLine 67 }
+
+
+pm404Ctrlline2LoopbackTermEntry OBJECT-TYPE
+	SYNTAX Pm404Ctrlline2LoopbackTermEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Ctrlline2LoopbackTerm 
+        table
+        "
+	INDEX   { pm404Ctrlline2LoopbackTermIndex }
+	::= { pm404Ctrlline2LoopbackTermTable 1 }
+
+
+Pm404Ctrlline2LoopbackTermEntry ::=
+	SEQUENCE {
+	pm404Ctrlline2LoopbackTermIndex
+		INTEGER,
+	pm404Ctrlline2LoopbackTermPortn
+		EkiState
+	}
+
+
+pm404Ctrlline2LoopbackTermIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Ctrlline2LoopbackTerm 
+        table
+        "
+	::= { pm404Ctrlline2LoopbackTermEntry 1 }
+
+
+pm404Ctrlline2LoopbackTermPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 Terminal Loopback :This 
+        OID operates a Line Terminal Loopback, 
+        looping line input signal on the 
+        line output port. The loop is located 
+        on all client transceivers  <Help> 
+        This maintenance parameter operates 
+        a Line Terminal Loopback, looping 
+        line input signal on the line output 
+        port. The loop is located on all 
+        client transceivers.
+        "
+	::= { pm404Ctrlline2LoopbackTermEntry 2 }
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pm404CtrlledTest OBJECT IDENTIFIER ::= { pm404CtrlOther 72 }
+
+
+
+
+pm404CtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pm404CtrlledTest 3 }
+
+
+
+pm404CtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pm404CtrlledTest 2 }
+
+
+
+pm404CtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pm404CtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleOosMode article
+--- *****************************************************
+pm404CtrlmoduleOosMode OBJECT IDENTIFIER ::= { pm404CtrlOther 73 }
+
+
+
+
+pm404CtrlModuleOosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Out Of Service :This OID sets 
+        the PM Out Of Service  <Help> 
+         This control defines the service 
+        state of the complete module
+        "
+	  ::= { pm404CtrlmoduleOosMode 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline1Temperature articles
+--- *********************************************************
+
+pm404Mesrline1TemperatureTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline1TemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline1Temperature 
+        Article
+        "
+	::= { pm404MesrClient 16 }
+
+
+pm404Mesrline1TemperatureEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline1TemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline1Temperature 
+        table
+        "
+	INDEX   { pm404Mesrline1TemperatureIndex }
+	::= { pm404Mesrline1TemperatureTable 1 }
+
+
+Pm404Mesrline1TemperatureEntry ::=
+	SEQUENCE {
+	pm404Mesrline1TemperatureIndex
+		INTEGER,
+	pm404Mesrline1TemperaturePortn
+		INTEGER 
+	}
+
+
+pm404Mesrline1TemperatureIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline1Temperature 
+        table
+        "
+	::= { pm404Mesrline1TemperatureEntry 1 }
+
+
+pm404Mesrline1TemperaturePortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Temperature :This OID 
+        gives the temperature value of
+         the  SFP, read from the DDM (Digital 
+        Diagnostic Monitoring) (Temperature 
+        = AV/256) (Unit = C)  <Help>  This 
+        measure gives the temperature of 
+        the line 1 transceiver
+        "
+	::= { pm404Mesrline1TemperatureEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline2Temperature articles
+--- *********************************************************
+
+pm404Mesrline2TemperatureTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline2TemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline2Temperature 
+        Article
+        "
+	::= { pm404MesrLine 20 }
+
+
+pm404Mesrline2TemperatureEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline2TemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline2Temperature 
+        table
+        "
+	INDEX   { pm404Mesrline2TemperatureIndex }
+	::= { pm404Mesrline2TemperatureTable 1 }
+
+
+Pm404Mesrline2TemperatureEntry ::=
+	SEQUENCE {
+	pm404Mesrline2TemperatureIndex
+		INTEGER,
+	pm404Mesrline2TemperaturePortn
+		INTEGER 
+	}
+
+
+pm404Mesrline2TemperatureIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline2Temperature 
+        table
+        "
+	::= { pm404Mesrline2TemperatureEntry 1 }
+
+
+pm404Mesrline2TemperaturePortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Temperature :This OID 
+        gives the temperature value of
+         the  SFP, read from the DDM (Digital 
+        Diagnostic Monitoring) (Temperature 
+        = AV/256) (Unit = C)  <Help>  This 
+        measure gives the temperature of 
+        the line 2 transceiver
+        "
+	::= { pm404Mesrline2TemperatureEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline1Volt articles
+--- *********************************************************
+
+pm404Mesrline1VoltTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline1VoltEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline1Volt Article
+        "
+	::= { pm404MesrClient 24 }
+
+
+pm404Mesrline1VoltEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline1VoltEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline1Volt 
+        table
+        "
+	INDEX   { pm404Mesrline1VoltIndex }
+	::= { pm404Mesrline1VoltTable 1 }
+
+
+Pm404Mesrline1VoltEntry ::=
+	SEQUENCE {
+	pm404Mesrline1VoltIndex
+		INTEGER,
+	pm404Mesrline1VoltPortn
+		INTEGER 
+	}
+
+
+pm404Mesrline1VoltIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline1Volt 
+        table
+        "
+	::= { pm404Mesrline1VoltEntry 1 }
+
+
+pm404Mesrline1VoltPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Power Supply :This
+         OID gives the 3V3 voltage value 
+        of the SFP plugged into port, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Voltage = AV/10000) 
+        (Unit = V)  <Help>  This measure 
+        gives the 3V3 voltage of the line 
+        1 transceiver
+        "
+	::= { pm404Mesrline1VoltEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline2Volt articles
+--- *********************************************************
+
+pm404Mesrline2VoltTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline2VoltEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline2Volt Article
+        "
+	::= { pm404MesrLine 28 }
+
+
+pm404Mesrline2VoltEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline2VoltEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline2Volt 
+        table
+        "
+	INDEX   { pm404Mesrline2VoltIndex }
+	::= { pm404Mesrline2VoltTable 1 }
+
+
+Pm404Mesrline2VoltEntry ::=
+	SEQUENCE {
+	pm404Mesrline2VoltIndex
+		INTEGER,
+	pm404Mesrline2VoltPortn
+		INTEGER 
+	}
+
+
+pm404Mesrline2VoltIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline2Volt 
+        table
+        "
+	::= { pm404Mesrline2VoltEntry 1 }
+
+
+pm404Mesrline2VoltPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Power Supply :This
+         OID gives the 3V3 voltage value 
+        of the  SFP, read from the DDM
+         (Digital Diagnostic Monitoring) 
+        (Voltage = AV/10000) (Unit = V) 
+         <Help>  This measure gives the 
+        3V3 voltage of the line 2 transceiver
+        "
+	::= { pm404Mesrline2VoltEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline1TxBias articles
+--- *********************************************************
+
+pm404Mesrline1TxBiasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline1TxBiasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline1TxBias Article
+        "
+	::= { pm404MesrClient 32 }
+
+
+pm404Mesrline1TxBiasEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline1TxBiasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline1TxBias 
+        table
+        "
+	INDEX   { pm404Mesrline1TxBiasIndex }
+	::= { pm404Mesrline1TxBiasTable 1 }
+
+
+Pm404Mesrline1TxBiasEntry ::=
+	SEQUENCE {
+	pm404Mesrline1TxBiasIndex
+		INTEGER,
+	pm404Mesrline1TxBiasPortn
+		INTEGER 
+	}
+
+
+pm404Mesrline1TxBiasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline1TxBias 
+        table
+        "
+	::= { pm404Mesrline1TxBiasEntry 1 }
+
+
+pm404Mesrline1TxBiasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Laser Bias :This OID 
+        gives the bias value of the  SFP, 
+        read from the DDM (Digital Diagnostic 
+        Monitoring)  (Bias = AV/500) (Unit 
+        = mA)  <Help>  This measure gives 
+        the bias of the line 1 transceiver
+        "
+	::= { pm404Mesrline1TxBiasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline2TxBias articles
+--- *********************************************************
+
+pm404Mesrline2TxBiasTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline2TxBiasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline2TxBias Article
+        "
+	::= { pm404MesrLine 36 }
+
+
+pm404Mesrline2TxBiasEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline2TxBiasEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline2TxBias 
+        table
+        "
+	INDEX   { pm404Mesrline2TxBiasIndex }
+	::= { pm404Mesrline2TxBiasTable 1 }
+
+
+Pm404Mesrline2TxBiasEntry ::=
+	SEQUENCE {
+	pm404Mesrline2TxBiasIndex
+		INTEGER,
+	pm404Mesrline2TxBiasPortn
+		INTEGER 
+	}
+
+
+pm404Mesrline2TxBiasIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline2TxBias 
+        table
+        "
+	::= { pm404Mesrline2TxBiasEntry 1 }
+
+
+pm404Mesrline2TxBiasPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Laser Bias :This OID 
+        gives the bias value of the  SFP, 
+        read from the DDM (Digital Diagnostic 
+        Monitoring) (Bias = AV/500)  (Unit 
+        = mA)  <Help>  This measure gives 
+        the bias of the line 2 transceiver
+        "
+	::= { pm404Mesrline2TxBiasEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline1TxPower articles
+--- *********************************************************
+
+pm404Mesrline1TxPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline1TxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline1TxPower
+         Article
+        "
+	::= { pm404MesrClient 40 }
+
+
+pm404Mesrline1TxPowerEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline1TxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline1TxPower 
+        table
+        "
+	INDEX   { pm404Mesrline1TxPowerIndex }
+	::= { pm404Mesrline1TxPowerTable 1 }
+
+
+Pm404Mesrline1TxPowerEntry ::=
+	SEQUENCE {
+	pm404Mesrline1TxPowerIndex
+		INTEGER,
+	pm404Mesrline1TxPowerPortn
+		INTEGER 
+	}
+
+
+pm404Mesrline1TxPowerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline1TxPower 
+        table
+        "
+	::= { pm404Mesrline1TxPowerEntry 1 }
+
+
+pm404Mesrline1TxPowerPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Tx Power :This OID
+         gives the transmit power value 
+        of the  SFP, read from the DDM
+         (Digital Diagnostic Monitoring) 
+        (Power = 10*log(AV)-40) (Unit = 
+        dBm)  <Help>  This measure gives 
+        the Tx optical power of the line 
+        1 transceiver
+        "
+	::= { pm404Mesrline1TxPowerEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline2TxPower articles
+--- *********************************************************
+
+pm404Mesrline2TxPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline2TxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline2TxPower
+         Article
+        "
+	::= { pm404MesrLine 44 }
+
+
+pm404Mesrline2TxPowerEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline2TxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline2TxPower 
+        table
+        "
+	INDEX   { pm404Mesrline2TxPowerIndex }
+	::= { pm404Mesrline2TxPowerTable 1 }
+
+
+Pm404Mesrline2TxPowerEntry ::=
+	SEQUENCE {
+	pm404Mesrline2TxPowerIndex
+		INTEGER,
+	pm404Mesrline2TxPowerPortn
+		INTEGER 
+	}
+
+
+pm404Mesrline2TxPowerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline2TxPower 
+        table
+        "
+	::= { pm404Mesrline2TxPowerEntry 1 }
+
+
+pm404Mesrline2TxPowerPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Tx Power :This OID
+         gives the transmit power value 
+        of the  SFP, read from the DDM
+         (Digital Diagnostic Monitoring) 
+        (Power = 10*log(AV)-40) (Unit = 
+        dBm)  <Help>  This measure gives 
+        the Tx optical power of the line 
+        2 transceiver
+        "
+	::= { pm404Mesrline2TxPowerEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline1RxPower articles
+--- *********************************************************
+
+pm404Mesrline1RxPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline1RxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline1RxPower
+         Article
+        "
+	::= { pm404MesrClient 48 }
+
+
+pm404Mesrline1RxPowerEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline1RxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline1RxPower 
+        table
+        "
+	INDEX   { pm404Mesrline1RxPowerIndex }
+	::= { pm404Mesrline1RxPowerTable 1 }
+
+
+Pm404Mesrline1RxPowerEntry ::=
+	SEQUENCE {
+	pm404Mesrline1RxPowerIndex
+		INTEGER,
+	pm404Mesrline1RxPowerPortn
+		INTEGER 
+	}
+
+
+pm404Mesrline1RxPowerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline1RxPower 
+        table
+        "
+	::= { pm404Mesrline1RxPowerEntry 1 }
+
+
+pm404Mesrline1RxPowerPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 1 SFP Rx Power :This OID
+         gives the receive power value
+         of the  SFP, read in the DDM (Digital 
+        Diagnostic Monitoring) (Power = 
+        10*log(AV)-40) (Unit = dBm)  <Help> 
+         This measure gives the Rx optical 
+        power of the line 1 transceiver
+        "
+	::= { pm404Mesrline1RxPowerEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pm404Mesrline2RxPower articles
+--- *********************************************************
+
+pm404Mesrline2RxPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404Mesrline2RxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pm404Mesrline2RxPower
+         Article
+        "
+	::= { pm404MesrLine 52 }
+
+
+pm404Mesrline2RxPowerEntry OBJECT-TYPE
+	SYNTAX Pm404Mesrline2RxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pm404Mesrline2RxPower 
+        table
+        "
+	INDEX   { pm404Mesrline2RxPowerIndex }
+	::= { pm404Mesrline2RxPowerTable 1 }
+
+
+Pm404Mesrline2RxPowerEntry ::=
+	SEQUENCE {
+	pm404Mesrline2RxPowerIndex
+		INTEGER,
+	pm404Mesrline2RxPowerPortn
+		INTEGER 
+	}
+
+
+pm404Mesrline2RxPowerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pm404Mesrline2RxPower 
+        table
+        "
+	::= { pm404Mesrline2RxPowerEntry 1 }
+
+
+pm404Mesrline2RxPowerPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line 2 SFP Rx Power :This OID
+         gives the receive power value
+         of the  SFP, read in the DDM (Digital 
+        Diagnostic Monitoring) (Power = 
+        10*log(AV)-40) (Unit = dBm)  <Help> 
+         This measure gives the Rx optical 
+        power of the line 2 transceiver
+        "
+	::= { pm404Mesrline2RxPowerEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pm404CfgLsd OBJECT IDENTIFIER ::= { pm404Config 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm404CfgLine1LsdTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404CfgLine1LsdEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm404CfgLsd 1 }
+
+
+pm404CfgLine1LsdEntry OBJECT-TYPE
+	SYNTAX Pm404CfgLine1LsdEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the lsd table
+        "
+	INDEX   { pm404CfgLine1LsdIndex }
+	::= { pm404CfgLine1LsdTable 1 }
+
+
+Pm404CfgLine1LsdEntry ::=
+	SEQUENCE {
+	pm404CfgLine1LsdIndex
+		INTEGER,
+	pm404CfgLine1LsdModePortn
+		Unsigned32,
+	pm404CfgLine1AccessioCtrbInsPortn
+		Unsigned32,
+	pm404CfgLine2AccessioCtrbInsPortn
+		Unsigned32
+	}
+
+
+pm404CfgLine1LsdIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the line1Lsd 
+        table
+        "
+	::= { pm404CfgLine1LsdEntry 1 }
+
+
+pm404CfgLine1LsdModePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        CAIS mode  on Lines Port :This 
+        register selects the way to activate 
+        the laser upon CAIS/CSF criteria 
+        detection on Port
+        "
+	::= { pm404CfgLine1LsdEntry 3 }
+
+
+pm404CfgLine1AccessioCtrbInsPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        CAIS contributors on Line 1 Port 
+        :This register selects the contributors 
+        to upstream CAIS/CSF on Port
+        "
+	::= { pm404CfgLine1LsdEntry 4 }
+
+
+pm404CfgLine2AccessioCtrbInsPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        CAIS contributors on Lne 2 Port 
+        :This register selects the contributors 
+        to downstream CAIS/CSF on Port
+        "
+	::= { pm404CfgLine1LsdEntry 7 }
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+pm404CfgStartUp OBJECT IDENTIFIER ::= { pm404Config 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm404CfgLine1StartupTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404CfgLine1StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm404CfgStartUp 1 }
+
+
+pm404CfgLine1StartupEntry OBJECT-TYPE
+	SYNTAX Pm404CfgLine1StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startUp 
+        table
+        "
+	INDEX   { pm404CfgLine1StartupIndex }
+	::= { pm404CfgLine1StartupTable 1 }
+
+
+Pm404CfgLine1StartupEntry ::=
+	SEQUENCE {
+	pm404CfgLine1StartupIndex
+		INTEGER,
+	pm404CfgLine1TrscvCtrlPortn
+		Unsigned32,
+	pm404CfgLine1ProtocolPortn
+		Unsigned32,
+	pm404CfgLine1OosModePortn
+		Unsigned32
+	}
+
+
+pm404CfgLine1StartupIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the line1Startup 
+        table
+        "
+	::= { pm404CfgLine1StartupEntry 1 }
+
+
+pm404CfgLine1TrscvCtrlPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Settings on  Line 1 TRSCV 
+        :This  register configures the
+         default initialisation settings 
+        on client transceiver.
+        "
+	::= { pm404CfgLine1StartupEntry 3 }
+
+
+pm404CfgLine1ProtocolPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Protocol on Line 1 :This 
+        register configures the default 
+        initialisation protocol on the
+         port.
+        "
+	::= { pm404CfgLine1StartupEntry 4 }
+
+
+pm404CfgLine1OosModePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Settings on  Line 1 TRSCV 
+        :This  register configures the
+         default initialisation settings 
+        on client transceiver.
+        "
+	::= { pm404CfgLine1StartupEntry 5 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm404CfgLine2StartupTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404CfgLine2StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm404CfgStartUp 2 }
+
+
+pm404CfgLine2StartupEntry OBJECT-TYPE
+	SYNTAX Pm404CfgLine2StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startUp 
+        table
+        "
+	INDEX   { pm404CfgLine2StartupIndex }
+	::= { pm404CfgLine2StartupTable 1 }
+
+
+Pm404CfgLine2StartupEntry ::=
+	SEQUENCE {
+	pm404CfgLine2StartupIndex
+		INTEGER,
+	pm404CfgLine2TrscvCtrlPortn
+		Unsigned32,
+	pm404CfgLine2OosModePortn
+		Unsigned32
+	}
+
+
+pm404CfgLine2StartupIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the line2Startup 
+        table
+        "
+	::= { pm404CfgLine2StartupEntry 1 }
+
+
+pm404CfgLine2TrscvCtrlPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Settings on Line 2 TRSCV 
+        :This  register configures the
+         default initialisation settings 
+        on line transceiver.
+        "
+	::= { pm404CfgLine2StartupEntry 3 }
+
+
+pm404CfgLine2OosModePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default Settings on Line 2 TRSCV 
+        :This  register configures the
+         default initialisation settings 
+        on line transceiver.
+        "
+	::= { pm404CfgLine2StartupEntry 4 }
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pm404CfgLabels OBJECT IDENTIFIER ::= { pm404Config 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm404CfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm404CfgLabels 1 }
+
+
+pm404CfgLabelclientEntry OBJECT-TYPE
+	SYNTAX Pm404CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pm404CfgLabelclientIndex }
+	::= { pm404CfgLabelclientTable 1 }
+
+
+Pm404CfgLabelclientEntry ::=
+	SEQUENCE {
+	pm404CfgLabelclientIndex
+		INTEGER,
+	pm404CfgLabelclientPortn
+		DisplayString
+	}
+
+
+pm404CfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pm404CfgLabelclientEntry 1 }
+
+
+pm404CfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pm404CfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pm404CfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pm404CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pm404CfgLabels 2 }
+
+
+pm404CfgLabellineEntry OBJECT-TYPE
+	SYNTAX Pm404CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pm404CfgLabellineIndex }
+	::= { pm404CfgLabellineTable 1 }
+
+
+Pm404CfgLabellineEntry ::=
+	SEQUENCE {
+	pm404CfgLabellineIndex
+		INTEGER,
+	pm404CfgLabellinePortn
+		DisplayString
+	}
+
+
+pm404CfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pm404CfgLabellineEntry 1 }
+
+
+pm404CfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pm404CfgLabellineEntry 3 }
+
+
+
+pm404CfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pm404Config 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pm404trapPortNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last port which generates a trap"
+	::= { pm404traps 2 }
+
+pm404trapLineNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last Line which generates a trap"
+	::= { pm404traps 3 }
+
+pm404trapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pm404traps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     LINE2 TRAPS
+--- *****************************************************
+
+pm404Line2TrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine2DdmWarningPortn, pm404trapLineNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 2 Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pm404AlmLine2DdmWarningPortn "on", pm404trapLineNumber "$2", pm404trapBoardNumber "$3"}
+	--&MESG        "DDM Warning appears on Media Converter $2 of Line 2 of PM404 in slot $3 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pm404traps 30 }
+
+pm404Line2TrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine2DdmWarningPortn, pm404trapLineNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 2 Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PM404 Line 2 Not Urgent ON"}
+	--&MATCH       { pm404AlmLine2DdmWarningPortn "on", pm404trapLineNumber "$2", pm404trapBoardNumber "$3"}
+	--&MESG        "DDM Warning disappears on Media Converter $2 of Line 2 of PM404 in slot $3 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pm404traps 31 }
+
+pm404Line2TrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine2DdmAlmPortn, pm404trapLineNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 2 Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm404AlmLine2DdmAlmPortn "on", pm404trapLineNumber "$2", pm404trapBoardNumber "$3"}
+	--&MESG        "DDM Alarm appears on Media Converter $2 of Line 2 of PM404 in slot $3 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pm404traps 32 }
+
+pm404Line2TrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine2DdmAlmPortn, pm404trapLineNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 2 Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PM404 Line 2 Urgent ON"}
+	--&MATCH       { pm404AlmLine2DdmAlmPortn "on", pm404trapLineNumber "$2", pm404trapBoardNumber "$3"}
+	--&MESG        "DDM Alarm disappears on Media Converter $2 of Line 2 of PM404 in slot $3 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pm404traps 33 }
+
+pm404Line2TrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine2FailPortn , pm404AlmLine2HwFailPortn , pm404trapLineNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 2 Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pm404AlmLine2FailPortn "on", pm404AlmLine2HwFailPortn "*", pm404trapLineNumber "$3", pm404trapBoardNumber "$4"}
+	--&MESG        "Media Converter $3 of Line Port 2 Down on PM404 in Slot $4 ($A)"
+	
+	--&FILTNAME    "PM404 Line 2 HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm404AlmLine2FailPortn "*", pm404AlmLine2HwFailPortn "on", pm404trapLineNumber "$3", pm404trapBoardNumber "$4"}
+	--&MESG        "Media Converter $3 of Line Port 2 Down on PM404 in Slot $4 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pm404traps 34 }
+
+pm404Line2TrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine2FailPortn , pm404AlmLine2HwFailPortn , pm404trapLineNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 2 Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PM404 Line 2 Fail ON"}
+	--&MATCH       { pm404AlmLine2FailPortn "on", pm404AlmLine2HwFailPortn "*", pm404trapLineNumber "$3", pm404trapBoardNumber "$4"}
+	--&MESG        "Media Converter $3 of Line Port 2 Up on PM404 in Slot $4 ($A)"
+	
+	--&FILTNAME    "PM404 Line 2 HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm404AlmLine2FailPortn "*", pm404AlmLine2HwFailPortn "on", pm404trapLineNumber "$3", pm404trapBoardNumber "$4"}
+	--&MESG        "Media Converter $3 of Line Port 2 Up on PM404 in Slot $4 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pm404traps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     Line1 TRAPS
+--- *****************************************************
+
+pm404Line1TrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine1SfpDdmWarningPortn, pm404trapPortNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 1 Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pm404AlmLine1SfpDdmWarningPortn "on", pm404trapPortNumber "$2", pm404trapBoardNumber "$3"}
+	--&MESG        "DDM Warning appears on Media Converter $2 of Line 1 of PM404 in slot $3 ($A)"
+	DESCRIPTION "Not urgent client default is activated"
+	::= { pm404traps 40 }
+
+pm404Line1TrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine1SfpDdmWarningPortn, pm404trapPortNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 1 Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PM404 Line 1 Not Urgent ON"}
+	--&MATCH       { pm404AlmLine1SfpDdmWarningPortn "on", pm404trapPortNumber "$2", pm404trapBoardNumber "$3"}
+	--&MESG        "DDM Warning disappears on Media Converter $2 of Line 1 of PM404 in slot $3 ($A)"
+	DESCRIPTION "Not urgent client default disappeared"
+	::= { pm404traps 41 }
+
+pm404Line1TrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine1SfpDdmAlmPortn, pm404trapPortNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 1 Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm404AlmLine1SfpDdmAlmPortn "on", pm404trapPortNumber "$2", pm404trapBoardNumber "$3"}
+	--&MESG        "DDM Alarm appears on Media Converter $2 of Line 1 of PM404 in slot $3 ($A)"
+	DESCRIPTION "Urgent client default is activated"
+	::= { pm404traps 42 }
+
+pm404Line1TrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine1SfpDdmAlmPortn, pm404trapPortNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 1 Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PM404 Line 1 Urgent ON"}
+	--&MATCH       { pm404AlmLine1SfpDdmAlmPortn "on", pm404trapPortNumber "$2", pm404trapBoardNumber "$3"}
+	--&MESG        "DDM Alarm disappears on Media Converter $2 of Line 1 of PM404 in slot $3 ($A)"
+	DESCRIPTION "Urgent client default disappeared"
+	::= { pm404traps 43 }
+
+pm404Line1TrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine1FailAccPortn, pm404AlmLine1HwFailAccPortn, pm404trapPortNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 1 Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pm404AlmLine1FailAccPortn "on", pm404AlmLine1HwFailAccPortn "*", pm404trapPortNumber "$3", pm404trapBoardNumber "$4"}
+	--&MESG        "Media Converter $3 of Line Port 1 Down on PM404 in Slot $4 ($A)"
+	
+	--&FILTNAME    "PM404 Line 1 HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm404AlmLine1FailAccPortn "*", pm404AlmLine1HwFailAccPortn "on", pm404trapPortNumber "$3", pm404trapBoardNumber "$4"}
+	--&MESG        "Media Converter $3 of Line Port 1 Down on PM404 in Slot $4 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pm404traps 44 }
+
+pm404Line1TrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm404AlmLine1FailAccPortn, pm404AlmLine1HwFailAccPortn, pm404trapPortNumber, pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Line 1 Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PM404 Line 1 Fail ON"}
+	--&MATCH       { pm404AlmLine1FailAccPortn "on", pm404AlmLine1HwFailAccPortn "*", pm404trapPortNumber "$3", pm404trapBoardNumber "$4"}
+	--&MESG        "Media Converter $3 of Line Port 1 Up on PM404 in Slot $4 ($A)"
+	
+	--&FILTNAME    "PM404 Line 1 HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pm404AlmLine1FailAccPortn "*", pm404AlmLine1HwFailAccPortn "on", pm404trapPortNumber "$3", pm404trapBoardNumber "$4"}
+	--&MESG        "Media Converter $3 of Line Port 1 Up on PM404 in Slot $4 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pm404traps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pm404PowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pm404AlmDefFuseB, pm404AlmDefFuseA , pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm404AlmDefFuseB "*", pm404AlmDefFuseA "on", pm404trapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PM404 in Slot $3 ($A)"
+
+	--&FILTNAME    "PMMC Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pm404AlmDefFuseB "on", pm404AlmDefFuseA "*", pm404trapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PM404 in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pm404traps 50 }
+
+pm404PowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pm404AlmDefFuseB, pm404AlmDefFuseA , pm404trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM404 Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PM404 Fuse A Fail ON", "PM404 Fuse B Fail ON" }
+	--&MATCH       { pm404AlmDefFuseB "on", pm404AlmDefFuseA "on", pm404trapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PM404 in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pm404traps 51 }
+
+
+
+
+
+
+END

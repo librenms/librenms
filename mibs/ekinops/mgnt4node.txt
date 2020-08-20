@@ -1,0 +1,505 @@
+-- *****************************************************************
+-- MGNT4NODE.TXT:  MIB
+--
+--MIB Part Number:3MI01011AABA
+--MIB Version:01
+--
+-- Copyright (c) 2015 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-MGNT4NODE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiProtocol,
+	EkiApiState,
+	EkiLoadGWSW,
+	EkiLoadState,
+	EkiLoadPermutMethod,
+	EkiSynchroMode,
+	EkiLoadPermutMode	 
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString,
+	RowStatus
+                FROM SNMPv2-TC;
+
+mgnt4node MODULE-IDENTITY
+        LAST-UPDATED "201503030000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.fr"
+        DESCRIPTION
+          "MIB for the mgnt4node shelf."
+
+	REVISION "201205040000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "201503030000Z"
+	DESCRIPTION
+	  "Completion for Full Node"
+        ::= { ekinops 111 }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+
+
+   
+-- *****************************************************************
+--
+-- Mgnt4node MIB root mapping
+--
+-- *****************************************************************
+mgnt4nodeSNMPAgentData OBJECT IDENTIFIER ::= { mgnt4node 1 }
+mgnt4nodeHardware OBJECT IDENTIFIER ::= { mgnt4node 2}
+mgnt4nodeTraps OBJECT IDENTIFIER ::= { mgnt4node 3}
+mgnt4nodeSoftwareManagement OBJECT IDENTIFIER ::= { mgnt4node 4}
+mgnt4nodeConfigManagement OBJECT IDENTIFIER ::= { mgnt4node 5}
+mgnt4nodeRemoteInventory OBJECT IDENTIFIER ::= { mgnt4node 6}
+mgnt4nodeErrorCounters OBJECT IDENTIFIER ::= { mgnt4node 7}
+mgnt4nodePerf OBJECT IDENTIFIER ::= { mgnt4node 8}
+
+-- *****************************************************************
+--
+-- Mgnt4node SNMP Agent Data
+--
+-- *****************************************************************
+
+-- *************************
+-- Node IP Management
+-- *************************
+
+
+
+-- mgnt4nodeIPManagment OBJECT IDENTIFIER ::= { mgnt4nodeSNMPAgentData 1 }
+
+
+
+
+-- *************************
+-- Node Chassis Management
+-- *************************
+
+mgnt4nodeChassisManagement OBJECT IDENTIFIER ::= { mgnt4nodeSNMPAgentData 2 }
+
+mgnt4nodeChassisTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt4nodeChassisEntry 
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of Chassis available through the Node Controller"
+      ::= { mgnt4nodeChassisManagement 1 }
+
+mgnt4nodeChassisEntry OBJECT-TYPE
+        SYNTAX  Mgnt4nodeChassisEntry 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row Definition for the Chassis table"
+        INDEX   { mgnt4nodeIndexChassis }
+        ::= { mgnt4nodeChassisTable 1 }
+    
+
+
+Mgnt4nodeChassisEntry ::=
+        SEQUENCE {
+          mgnt4nodeIndexChassis 
+              Integer32,
+	  mgnt4nodeChassisNumber
+              Integer32,
+	  mgnt4nodeChassisIpAddress
+	      IpAddress,
+          mgnt4nodeChassisName
+              DisplayString,
+          mgnt4nodeChassisOperational
+              EkiOnOff,
+	  mgnt4nodeChassisType
+              DisplayString,
+	  mgnt4nodeChassisCapability
+              DisplayString,
+	  mgnt4nodeChassisSetUp
+              DisplayString,
+	  mgnt4nodeChassisPriority
+              DisplayString,
+	  mgnt4nodeChassisGroupNumber
+              Integer32,
+	  mgnt4nodeChassisRackNumber
+              Integer32      
+
+        }
+
+    mgnt4nodeIndexChassis OBJECT-TYPE
+        SYNTAX  Integer32(1..128)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Chassis table"
+        ::= { mgnt4nodeChassisEntry 1 }
+
+    mgnt4nodeChassisIpAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Chassis IP Address :This OID gives the IP Address in the node"
+        ::= { mgnt4nodeChassisEntry 2 }
+
+
+    mgnt4nodeChassisNumber OBJECT-TYPE
+        SYNTAX  Integer32(1..128)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Chassis number:This OID gives the chassis number in the node"
+        ::= { mgnt4nodeChassisEntry 3 }
+
+    mgnt4nodeChassisName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Chassis name:This OID gives the name of the chassis
+               in the node"
+        ::= { mgnt4nodeChassisEntry 4 }
+
+    mgnt4nodeChassisOperational OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Chassis Status:This OID gives the status of the chassis, as
+		connected to other chassis in the node"
+        ::= { mgnt4nodeChassisEntry 5 }
+
+    mgnt4nodeChassisType OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Chassis Type:This OID gives the type of the chassis in the node"
+        ::= { mgnt4nodeChassisEntry 6 }
+
+    mgnt4nodeChassisCapability OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Capability of the chassis:This OID gives the capability for 
+               the chassis to operate as a node (none,master,backup,any)"
+        ::= { mgnt4nodeChassisEntry 7 }
+
+    mgnt4nodeChassisSetUp OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Setup of the chassis:This OID gives the startup configuration 
+               of the chassis in the Mgnt4node (unknown,master, backup, slave) "
+        ::= { mgnt4nodeChassisEntry 8 }
+
+    mgnt4nodeChassisPriority OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Priority of the chassis:This OID gives the startup priority 
+               of the chassis in the Mgnt4node (auto,manual)"
+        ::= { mgnt4nodeChassisEntry 9 }
+
+
+    mgnt4nodeChassisGroupNumber OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Group Number : ffu"
+        ::= { mgnt4nodeChassisEntry 10 }
+
+    mgnt4nodeChassisRackNumber OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Rack Number : ffu"
+        ::= { mgnt4nodeChassisEntry 11 }
+
+
+
+
+
+
+-- *************************
+-- IP Management
+-- *************************
+
+mgnt4nodeIPmanagment OBJECT IDENTIFIER ::= { mgnt4nodeSNMPAgentData 1 }
+
+
+mgnt4nodeManagerIpAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Mgnt4nodeManagerIpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Manager IP address Table."
+    ::= { mgnt4nodeIPmanagment 1 }
+
+mgnt4nodeManagerIpAddressEntry OBJECT-TYPE
+    SYNTAX      Mgnt4nodeManagerIpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	""
+    INDEX   { mgnt4nodeManagerIpIndex }
+    ::= { mgnt4nodeManagerIpAddressTable 1 }
+
+Mgnt4nodeManagerIpAddressEntry ::= SEQUENCE {
+    mgnt4nodeManagerIpIndex         Integer32,
+    mgnt4nodeManagerIpAddress	   IpAddress,
+    mgnt4nodeManagerIpAddressTableRowStatus    RowStatus,
+    mgnt4nodeManagerTrapPort	   Integer32,
+    mgnt4nodeManagerEnableCtrl     EkiOnOff,
+    mgnt4nodeManagerEnableConfig   EkiOnOff,
+    mgnt4nodeManagerEnableEvent    EkiOnOff,
+    mgnt4nodeManagerEnableAlarmCrit EkiOnOff,
+    mgnt4nodeManagerEnableAlarmMajor EkiOnOff,
+    mgnt4nodeManagerEnableAlarmMinor EkiOnOff,
+    mgnt4nodeManagerRegistrationTimeout Integer32,
+    mgnt4nodeManagerEnableAlarmWarning EkiOnOff,
+    mgnt4nodeManagerEnableAlarmIndeterminate EkiOnOff
+}
+
+mgnt4nodeManagerIpIndex OBJECT-TYPE
+  SYNTAX Integer32(1..32)
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Index of the IP address of the manager"
+  ::= { mgnt4nodeManagerIpAddressEntry 1 }
+  
+mgnt4nodeManagerIpAddress OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "IP address of the manager:This OID defines the IP
+         address of the SNMP Manager attached to the Mgnt4"
+  ::= { mgnt4nodeManagerIpAddressEntry 2 }
+
+mgnt4nodeManagerIpAddressTableRowStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "The status of this row."
+  ::= { mgnt4nodeManagerIpAddressEntry 3 } 
+   
+mgnt4nodeManagerTrapPort OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Manager UDP port."
+  ::= { mgnt4nodeManagerIpAddressEntry 4 } 
+
+mgnt4nodeManagerEnableCtrl OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of Ctrl."
+  ::= { mgnt4nodeManagerIpAddressEntry 5 } 
+
+mgnt4nodeManagerEnableConfig OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of config."
+  ::= { mgnt4nodeManagerIpAddressEntry 6 } 
+
+mgnt4nodeManagerEnableEvent OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of event."
+  ::= { mgnt4nodeManagerIpAddressEntry 7 } 
+
+mgnt4nodeManagerEnableAlarmCrit OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of crit alarm."
+  ::= { mgnt4nodeManagerIpAddressEntry 8 } 
+
+mgnt4nodeManagerEnableAlarmMajor OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of major alarm."
+  ::= { mgnt4nodeManagerIpAddressEntry 9 } 
+
+mgnt4nodeManagerEnableAlarmMinor OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of minor alarm."
+  ::= { mgnt4nodeManagerIpAddressEntry 10 } 
+
+
+mgnt4nodeManagerRegistrationTimeout OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Time-out for manager activities."
+  ::= { mgnt4nodeManagerIpAddressEntry 11 } 
+
+mgnt4nodeManagerEnableAlarmWarning OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of warning alarm."
+  ::= { mgnt4nodeManagerIpAddressEntry 12 } 
+
+mgnt4nodeManagerEnableAlarmIndeterminate OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of indeterminate alarm."
+  ::= { mgnt4nodeManagerIpAddressEntry 13 } 
+
+
+
+mgnt4nodeNodeIpAddress OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+         "Node IP address :This OID defines
+          the Node IP address in node controller mode for the Mgnt2"
+  ::= { mgnt4nodeIPmanagment 8 }
+
+
+
+-- mgnt4nodeModulesManagement OBJECT IDENTIFIER ::= { mgnt4nodeSNMPAgentData 3 }
+-- section removed
+
+-- mgnt4nodeMibsTable OBJECT IDENTIFIER ::= { mgnt4nodeSNMPAgentData 4 }
+-- section removed
+
+
+
+
+mgnt4nodeName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Node name:This OID defines the name of the Node"
+  ::= { mgnt4nodeSNMPAgentData 5 }
+
+mgnt4nodeType OBJECT-TYPE
+  SYNTAX Integer32(0..128)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Equipment type:This OID defines the type of the Equipment"
+  ::= { mgnt4nodeSNMPAgentData 6 }
+
+
+
+-- mgnt4nodeTrapCount OBJECT IDENTIFIER ::= { mgnt4nodeSNMPAgentData 7 }
+-- section removed
+
+
+
+
+-- *****************************************************************
+--
+-- MGNT4 Board management
+--
+-- *****************************************************************
+
+
+mgnt4nodealarms OBJECT IDENTIFIER ::= { mgnt4nodeHardware 1}
+mgnt4nodecontrols OBJECT IDENTIFIER ::= { mgnt4nodeHardware 2}
+mgnt4nodeconfig OBJECT IDENTIFIER ::= { mgnt4nodeHardware 3}
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+
+
+
+
+
+END

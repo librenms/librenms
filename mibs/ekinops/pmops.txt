@@ -1,0 +1,2800 @@
+-- *****************************************************************
+-- EKINOPS-Pmops.TXT:  MIB
+--
+--MIB Part Number:3MI00303AFAD
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pmops-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePmops MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Pmops hardware."
+	REVISION "200712110000Z"
+	DESCRIPTION
+	  "Initial Version."
+	REVISION "200801230000Z"
+	DESCRIPTION
+	  "Helps on objects, Ports Labels"
+
+	REVISION "200909240000Z"
+	DESCRIPTION
+	  "CondType parameters insertion"
+	REVISION "201002260000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS"
+	REVISION "201005270000Z"
+	DESCRIPTION
+	  "Dummy INV for  NMS"
+	REVISION "201011040000Z"
+	DESCRIPTION
+	  "Formulas in comments"
+
+	REVISION "201012150000Z"
+	DESCRIPTION
+	  "Formulas in comments"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201403260000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201411210000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 30 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmopsalarms OBJECT IDENTIFIER ::= { modulePmops 2 }	
+pmopsAlmOther OBJECT IDENTIFIER ::= { pmopsalarms 1 }
+pmopsAlmOtherNurg OBJECT IDENTIFIER ::= { pmopsAlmOther 1 }
+pmopsAlmOtherUrg OBJECT IDENTIFIER ::= { pmopsAlmOther 2 }
+pmopsAlmOtherCrit OBJECT IDENTIFIER ::= { pmopsAlmOther 3 }
+
+pmopsAlmComa OBJECT IDENTIFIER ::= { pmopsalarms 2 }
+pmopsAlmComaNurg OBJECT IDENTIFIER ::= { pmopsAlmComa 1 }
+pmopsAlmComaUrg OBJECT IDENTIFIER ::= { pmopsAlmComa 2 }
+pmopsAlmComaCrit OBJECT IDENTIFIER ::= { pmopsAlmComa 3 }
+	
+pmopsAlmComb OBJECT IDENTIFIER ::= { pmopsalarms 3 }
+pmopsAlmCombNurg OBJECT IDENTIFIER ::= { pmopsAlmComb 1 }
+pmopsAlmCombUrg OBJECT IDENTIFIER ::= { pmopsAlmComb 2 }
+pmopsAlmCombCrit OBJECT IDENTIFIER ::= { pmopsAlmComb 3 }
+
+
+pmopsmeasures OBJECT IDENTIFIER ::= { modulePmops 3 }	
+pmopsMesrOther OBJECT IDENTIFIER ::= { pmopsmeasures 1 }	
+pmopsMesrComa OBJECT IDENTIFIER ::= { pmopsmeasures 2 }	
+pmopsMesrComb OBJECT IDENTIFIER ::= { pmopsmeasures 3 }	
+
+
+pmopscontrolsWrite OBJECT IDENTIFIER ::= { modulePmops 6 }
+pmopsCtrlOther OBJECT IDENTIFIER ::= { pmopscontrolsWrite 1 }
+pmopsCtrlComa OBJECT IDENTIFIER ::= { pmopscontrolsWrite 2 }
+pmopsCtrlComb OBJECT IDENTIFIER ::= { pmopscontrolsWrite 3 }
+
+pmopsri OBJECT IDENTIFIER ::= { modulePmops 7 }
+pmopsriTable OBJECT IDENTIFIER ::= { pmopsri 1 }
+
+
+pmopsConfig OBJECT IDENTIFIER ::= { modulePmops 9 }
+
+pmopstraps OBJECT IDENTIFIER ::= { modulePmops 10 }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+PmopsSwitchMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different switch mode for port"
+    SYNTAX INTEGER {
+		switchManual1(1),
+		switchManual2(2),
+		switchAuto(4),
+		switchAutoRevertive(8)
+           }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmopsRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmopsri 2 }
+
+pmopsRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmopsri 3 }
+  
+pmopsRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmopsri 4 }
+  
+pmopsRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmopsri 5 }
+
+pmopsRinvLine1SFP OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Inventory for the OPS: This OID contains the inventory for the OPS A"
+  ::= { pmopsri 6 }
+
+
+pmopsRinvLine2SFP OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Inventory for the OPS: This OID contains the inventory for the OPS B"
+  ::= { pmopsri 7 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmopsAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmopsAlmOtherCrit 0 }
+
+
+
+
+pmopsAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmsynthAlm0 16 }
+
+
+
+pmopsAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmsynthAlm0 15 }
+
+
+
+pmopsAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmopsAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmopsAlmsynthAlm2 OBJECT IDENTIFIER ::= { pmopsAlmOtherNurg 2 }
+
+
+
+
+pmopsAlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> other
+         (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlm2 4 }
+
+
+
+pmopsAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmsynthAlm2 3 }
+
+
+
+pmopsAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlm2 2 }
+
+
+
+pmopsAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlm2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlmComa article
+--- *****************************************************
+pmopsAlmsynthAlmComa OBJECT IDENTIFIER ::= { pmopsAlmComaCrit 8 }
+
+
+
+
+pmopsAlmComaFailAcc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fail_Acc :This OID indicates a 
+        failure on the OPS A <Condtype> 
+        COMA_FAIL_ACC <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComa 12 }
+
+
+
+pmopsAlmComaMeasAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Measure Alarm :This OID indicates 
+        an alarm is present coming out
+         of OPS A diagnostic monitoring 
+         <Help>  This alarm indicates if 
+        a diagnostic monitoring Alarm has 
+        been detected on the OPS A <Condtype> 
+        COMA_MEAS_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComa 10 }
+
+
+
+pmopsAlmComaMeasWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Measure Warning :This OID indicates 
+        a warning is present coming out 
+        of OPS A diagnostic  monitoring 
+         <Help>  This alarm indicates if 
+        a diagnostic monitoring Warning 
+        has been detected on the OPS A
+         <Condtype> COMA_MEAS_WNG <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComa 9 }
+
+
+
+pmopsAlmComaLocalOos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Out Of Service :This OID indicates 
+        that the OPS A is In Service (1) 
+        of Out or Service (2).   <Help> 
+         This status indicates if the OPS 
+        A is in service <Condtype> COMA_LOCAL_OOS 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComa 6 }
+
+
+
+pmopsAlmComaHwFailAcc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        HW_Fail_Acc :This OID indicates 
+        a hardware failure on the OPS A 
+        <Condtype> COMA_HW_FAIL_ACC <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComa 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlmComb article
+--- *****************************************************
+pmopsAlmsynthAlmComb OBJECT IDENTIFIER ::= { pmopsAlmCombCrit 9 }
+
+
+
+
+pmopsAlmCombFailAcc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fail_Acc :This OID indicates a 
+        failure on the OPS B <Condtype> 
+        COMB_FAIL_ACC <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComb 12 }
+
+
+
+pmopsAlmCombMeasAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Measure Alarm :This OID indicates 
+        an alarm is present coming out
+         of OPS B diagnostic monitoring 
+         <Help>  This alarm indicates if 
+        a diagnostic monitoring Alarm has 
+        been detected on the OPS B <Condtype> 
+        COMB_MEAS_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComb 10 }
+
+
+
+pmopsAlmCombMeasWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Measure Warning :This OID indicates 
+        a warning is present coming out 
+        of OPS B diagnostic monitoring
+          <Help>  This alarm indicates
+         if a diagnostic monitoring Warning 
+        has been detected on the OPS B
+         <Condtype> COMB_MEAS_WNG <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComb 9 }
+
+
+
+pmopsAlmCombLocalOos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Out Of Service :This OID indicates 
+        that the OPS B is In Service (1) 
+        of Out or Service (2).   <Help> 
+         This status indicates if the OPS 
+        B is in service <Condtype> COMB_LOCAL_OOS 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComb 6 }
+
+
+
+pmopsAlmCombHwFailAcc OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        HW_Fail_Acc :This OID indicates 
+        a hardware failure on the OPS B 
+        <Condtype> COMB_HW_FAIL_ACC <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmsynthAlmComb 4 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaAccessioAlm article
+--- *****************************************************
+pmopsAlmcomaAccessioAlm OBJECT IDENTIFIER ::= { pmopsAlmComaUrg 16 }
+
+
+
+
+pmopsAlmComaSwitchFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Switch Fail :This OID indicates 
+        the OPS A switch component in in 
+        fail condition  <Help>  This alarm 
+        indicates if the OPS A swithc is 
+        in fail condition <Condtype> COMA_SWITCH_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaAccessioAlm 8 }
+
+
+
+pmopsAlmComaSwitchPosition2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX2 Selected :This OID indicates 
+        the OPS A selects the RX 2 input 
+         <Help>  This status indicates
+         if the RX2 input is selected on 
+        the OPS A <Condtype> COMA_SWITCH_POSITION_2 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaAccessioAlm 6 }
+
+
+
+pmopsAlmComaSwitchPosition1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX1 Selected :This OID indicates 
+        the OPS A selects the RX 1 input 
+         <Help>  This status indicates
+         if the RX 1 input is selected
+         on the OPS A <Condtype> COMA_SWITCH_POSITION_1 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaAccessioAlm 5 }
+
+
+
+pmopsAlmComaLosTx2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TX2 Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Transmit 
+        2 of the OPS A  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the TX 2 of the 
+        OPS A  <Condtype> COMA_LOS_TX_2 
+        <Probcause> transmitFailure (55) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaAccessioAlm 4 }
+
+
+
+pmopsAlmComaLosTx1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TX1 Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Transmit 
+        1 of the OPS A  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the TX 1 of the 
+        OPS A  <Condtype> COMA_LOS_TX_1 
+        <Probcause> transmitFailure (55) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaAccessioAlm 3 }
+
+
+
+pmopsAlmComaLosRx2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX2 Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Receive 
+        2 of the OPS A  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the RX 2 of the 
+        OPS A  <Condtype> COMA_LOS_RX_2 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaAccessioAlm 2 }
+
+
+
+pmopsAlmComaLosRx1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX1 Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Receive 
+        1 of the OPS A  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the RX 1 of the 
+        OPS A  <Condtype> COMA_LOS_RX_1 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaAccessioAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaMeasAlm article
+--- *****************************************************
+pmopsAlmcomaMeasAlm OBJECT IDENTIFIER ::= { pmopsAlmComaUrg 17 }
+
+
+
+
+pmopsAlmComaRx2PwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx2 High Alarm : This OID indicates 
+        that Receive power or the OPS A 
+        is higher than the alarm threshold 
+        of the OPS A  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        A is too high <Condtype> COMA_RX2_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasAlm 8 }
+
+
+
+pmopsAlmComaRx2PwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx2 Low Alarm :This OID indicates 
+        that Receive power or the OPS A 
+        is lower than the alarm threshold 
+        of the OPS A  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        A is too low <Condtype> COMA_RX2_PWR_LOW_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasAlm 7 }
+
+
+
+pmopsAlmComaTx2PwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx2 High Alarm : This OID indicates 
+        that Transmit power or the OPS
+         A is higher than the alarm threshold 
+        of the OPS A  <Help>  This alarm 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        A is too high <Condtype> COMA_TX2_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasAlm 6 }
+
+
+
+pmopsAlmComaTx2PwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx2 Low Alarm :This OID indicates 
+        that Transmit power or the OPS
+         A is lower than the alarm threshold 
+        of the OPS A  <Help>  This alarm 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        A is too low <Condtype> COMA_TX2_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasAlm 5 }
+
+
+
+pmopsAlmComaRx1PwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx1 High Alarm : This OID indicates 
+        that Receive power or the OPS A 
+        is higher than the alarm threshold 
+        of the OPS A  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        A is too high <Condtype> COMA_RX1_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasAlm 4 }
+
+
+
+pmopsAlmComaRx1PwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx1 Low Alarm :This OID indicates 
+        that Receive power or the OPS A 
+        is lower than the alarm threshold 
+        of the OPS A  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        A is too low <Condtype> COMA_RX1_PWR_LOW_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasAlm 3 }
+
+
+
+pmopsAlmComaTx1PwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx1 High Alarm : This OID indicates 
+        that Transmit power or the OPS
+         A is higher than the alarm threshold 
+        of the OPS A  <Help>  This alarm 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        A is too high <Condtype> COMA_TX1_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasAlm 2 }
+
+
+
+pmopsAlmComaTx1PwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx1 Low Alarm :This OID indicates 
+        that Transmit power or the OPS
+         A is lower than the alarm threshold 
+        of the OPS A  <Help>  This alarm 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        A is too low <Condtype> COMA_TX1_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaMeasWng article
+--- *****************************************************
+pmopsAlmcomaMeasWng OBJECT IDENTIFIER ::= { pmopsAlmComaNurg 18 }
+
+
+
+
+pmopsAlmComaRx2PwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx2 High Warning : This OID indicates 
+        that Receive power or the OPS A 
+        is higher than the warning threshold 
+        of the OPS A  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        A is too high <Condtype> COMA_RX2_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasWng 8 }
+
+
+
+pmopsAlmComaRx2PwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx2 Low Warning :This OID indicates 
+        that Receive power or the OPS A 
+        is lower than the warning threshold 
+        of the OPS A  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        A is too low <Condtype> COMA_RX2_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasWng 7 }
+
+
+
+pmopsAlmComaTx2PwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx2 High Warning : This OID indicates 
+        that Transmit power or the OPS
+         A is higher than the warning threshold 
+        of the OPS A  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        A is too high <Condtype> COMA_TX2_PWR_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasWng 6 }
+
+
+
+pmopsAlmComaTx2PwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx2 Low Warning :This OID indicates 
+        that Transmit power or the OPS
+         A is lower than the warning threshold 
+        of the OPS A  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        A is too low <Condtype> COMA_TX2_PWR_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasWng 5 }
+
+
+
+pmopsAlmComaRx1PwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx1 High Warning : This OID indicates 
+        that Receive power or the OPS A 
+        is higher than the warning threshold 
+        of the OPS A  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        A is too high <Condtype> COMA_RX1_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasWng 4 }
+
+
+
+pmopsAlmComaRx1PwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx1 Low Warning :This OID indicates 
+        that Receive power or the OPS A 
+        is lower than the warning threshold 
+        of the OPS A  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        A is too low <Condtype> COMA_RX1_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasWng 3 }
+
+
+
+pmopsAlmComaTx1PwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx1 High Warning : This OID indicates 
+        that Transmit power or the OPS
+         A is higher than the warning threshold 
+        of the OPS A  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        A is too high <Condtype> COMA_TX1_PWR_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasWng 2 }
+
+
+
+pmopsAlmComaTx1PwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx1 Low Warning :This OID indicates 
+        that Transmit power or the OPS
+         A is lower than the warning threshold 
+        of the OPS A  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        A is too low <Condtype> COMA_TX1_PWR_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcomaMeasWng 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the combAccessioAlm article
+--- *****************************************************
+pmopsAlmcombAccessioAlm OBJECT IDENTIFIER ::= { pmopsAlmCombUrg 24 }
+
+
+
+
+pmopsAlmCombSwitchFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Switch Fail :This OID indicates 
+        the OPS B switch component in in 
+        fail condition  <Help>  This alarm 
+        indicates if the OPS B swithc is 
+        in fail condition <Condtype> COMB_SWITCH_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombAccessioAlm 8 }
+
+
+
+pmopsAlmCombSwitchPosition2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX2 Selected :This OID indicates 
+        the OPS B selects the RX 2 input 
+         <Help>  This status indicates
+         if the RX2 input is selected on 
+        the OPS B <Condtype> COMB_SWITCH_POSITION_2 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombAccessioAlm 6 }
+
+
+
+pmopsAlmCombSwitchPosition1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX1 Selected :This OID indicates 
+        the OPS B selects the RX 1 input 
+         <Help>  This status indicates
+         if the RX 1 input is selected
+         on the OPS B <Condtype> COMB_SWITCH_POSITION_1 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombAccessioAlm 5 }
+
+
+
+pmopsAlmCombLosTx2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TX2 Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Transmit 
+        2 of the OPS B  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the TX 2 of the 
+        OPS B  <Condtype> COMB_LOS_TX_2 
+        <Probcause> transmitFailure (55) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombAccessioAlm 4 }
+
+
+
+pmopsAlmCombLosTx1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TX1 Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Transmit 
+        1 of the OPS B  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the TX 1 of the 
+        OPS B  <Condtype> COMB_LOS_TX_1 
+        <Probcause> transmitFailure (55) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombAccessioAlm 3 }
+
+
+
+pmopsAlmCombLosRx2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX2 Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Receive 
+        2 of the OPS B  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the RX 2 of the 
+        OPS B  <Condtype> COMB_LOS_RX_2 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombAccessioAlm 2 }
+
+
+
+pmopsAlmCombLosRx1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX1 Loss Of Signal :This OID indicates 
+        that a LOS is detected on the Receive 
+        1 of the OPS B  <Help>  This alarm 
+        indicates if an optical signal
+         is detected on the RX 1 of the 
+        OPS B  <Condtype> COMB_LOS_RX_1 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombAccessioAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the combMeasAla article
+--- *****************************************************
+pmopsAlmcombMeasAla OBJECT IDENTIFIER ::= { pmopsAlmCombUrg 25 }
+
+
+
+
+pmopsAlmCombRx2PwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx2 High Alarm : This OID indicates 
+        that Receive power or the OPS B 
+        is higher than the alarm threshold 
+        of the OPS B  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        B is too high <Condtype> COMB_RX2_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasAla 8 }
+
+
+
+pmopsAlmCombRx2PwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx2 Low Alarm :This OID indicates 
+        that Receive power or the OPS B 
+        is lower than the alarm threshold 
+        of the OPS B  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        B is too low <Condtype> COMB_RX2_PWR_LOW_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasAla 7 }
+
+
+
+pmopsAlmCombTx2PwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx2 High Alarm : This OID indicates 
+        that Transmit power or the OPS
+         B is higher than the alarm threshold 
+        of the OPS B  <Help>  This alarm 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        B is too high <Condtype> COMB_TX2_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasAla 6 }
+
+
+
+pmopsAlmCombTx2PwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx2 Low Alarm :This OID indicates 
+        that Transmit power or the OPS
+         B is lower than the alarm threshold 
+        of the OPS B  <Help>  This alarm 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        B is too low <Condtype> COMB_TX2_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasAla 5 }
+
+
+
+pmopsAlmCombRx1PwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx1 High Alarm : This OID indicates 
+        that Receive power or the OPS B 
+        is higher than the alarm threshold 
+        of the OPS B  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        B is too high <Condtype> COMB_RX1_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasAla 4 }
+
+
+
+pmopsAlmCombRx1PwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx1 Low Alarm :This OID indicates 
+        that Receive power or the OPS B 
+        is lower than the alarm threshold 
+        of the OPS B  <Help>  This alarm 
+        indicates if the receive power
+         on the receive side of the OPS 
+        B is too low <Condtype> COMB_RX1_PWR_LOW_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasAla 3 }
+
+
+
+pmopsAlmCombTx1PwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx1 High Alarm : This OID indicates 
+        that Transmit power or the OPS
+         B is higher than the alarm threshold 
+        of the OPS B  <Help>  This alarm 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        B is too high <Condtype> COMB_TX1_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasAla 2 }
+
+
+
+pmopsAlmCombTx1PwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx1 Low Alarm :This OID indicates 
+        that Transmit power or the OPS
+         B is lower than the alarm threshold 
+        of the OPS B  <Help>  This alarm 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        B is too low <Condtype> COMB_TX1_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasAla 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the combMeasWng article
+--- *****************************************************
+pmopsAlmcombMeasWng OBJECT IDENTIFIER ::= { pmopsAlmCombNurg 26 }
+
+
+
+
+pmopsAlmCombRx2PwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx2 High Warning : This OID indicates 
+        that Receive power or the OPS B 
+        is higher than the warning threshold 
+        of the OPS B  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        B is too high <Condtype> COMB_RX2_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasWng 8 }
+
+
+
+pmopsAlmCombRx2PwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx2 Low Warning :This OID indicates 
+        that Receive power or the OPS B 
+        is lower than the warning threshold 
+        of the OPS B  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        B is too low <Condtype> COMB_RX2_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasWng 7 }
+
+
+
+pmopsAlmCombTx2PwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx2 High Warning : This OID indicates 
+        that Transmit power or the OPS
+         B is higher than the warning threshold 
+        of the OPS B  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        B is too high <Condtype> COMB_TX2_PWR_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasWng 6 }
+
+
+
+pmopsAlmCombTx2PwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx2 Low Warning :This OID indicates 
+        that Transmit power or the OPS
+         B is lower than the warning threshold 
+        of the OPS B  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        B is too low <Condtype> COMB_TX2_PWR_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasWng 5 }
+
+
+
+pmopsAlmCombRx1PwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx1 High Warning : This OID indicates 
+        that Receive power or the OPS B 
+        is higher than the warning threshold 
+        of the OPS B  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        B is too high <Condtype> COMB_RX1_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasWng 4 }
+
+
+
+pmopsAlmCombRx1PwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx1 Low Warning :This OID indicates 
+        that Receive power or the OPS B 
+        is lower than the warning threshold 
+        of the OPS B  <Help>  This warning 
+        indicates if the receive power
+         on the receive side of the OPS 
+        B is too low <Condtype> COMB_RX1_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasWng 3 }
+
+
+
+pmopsAlmCombTx1PwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx1 High Warning : This OID indicates 
+        that Transmit power or the OPS
+         B is higher than the warning threshold 
+        of the OPS B  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        B is too high <Condtype> COMB_TX1_PWR_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasWng 2 }
+
+
+
+pmopsAlmCombTx1PwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Tx1 Low Warning :This OID indicates 
+        that Transmit power or the OPS
+         B is lower than the warning threshold 
+        of the OPS B  <Help>  This warning 
+        indicates if the receive power
+         on the transmit side of the OPS 
+        B is too low <Condtype> COMB_TX1_PWR_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmcombMeasWng 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the modInitFailLevel2 article
+--- *****************************************************
+pmopsAlmmodInitFailLevel2 OBJECT IDENTIFIER ::= { pmopsAlmOtherUrg 70 }
+
+
+
+
+pmopsAlmThreshConfFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Thresh_Conf_Fail : <Condtype>
+         THRESH_CONF_FAIL <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmopsAlmmodInitFailLevel2 7 }
+
+
+
+pmopsAlmCalibReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Calib_Read_Fail : <Condtype> CALIB_READ_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmmodInitFailLevel2 6 }
+
+
+
+pmopsAlmGwIdentFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW_Ident_Fail :This OID indicates 
+        that GW identification has not
+         been read <Condtype> GW_IDENT_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmmodInitFailLevel2 5 }
+
+
+
+pmopsAlmConfReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Conf_Read_Fail : <Condtype> CONF_READ_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmmodInitFailLevel2 3 }
+
+
+
+pmopsAlmResetHwInitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reset_HW_Init_Fail : <Condtype> 
+        RESET_HW_INIT_FAIL <Probcause>
+         other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmmodInitFailLevel2 2 }
+
+
+
+pmopsAlmRegReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reg_Read_Fail : <Condtype> REG_READ_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmmodInitFailLevel2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the modInitFailLevel3 article
+--- *****************************************************
+pmopsAlmmodInitFailLevel3 OBJECT IDENTIFIER ::= { pmopsAlmOtherUrg 71 }
+
+
+
+
+pmopsAlmGwColdBootForced OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW_Cold_Boot_Forced : <Condtype> 
+        GW_COLD_BOOT_FORCED <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmopsAlmmodInitFailLevel3 5 }
+
+
+
+pmopsAlmOptIdentFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Opt_Ident_Fail : <Condtype> OPT_IDENT_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmopsAlmmodInitFailLevel3 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmopsCtrlsynth0 OBJECT IDENTIFIER ::= { pmopsCtrlOther 0 }
+
+
+
+
+pmopsCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmopsCtrlsynth0 13 }
+
+
+
+pmopsCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmopsCtrlsynth0 9 }
+
+
+
+pmopsCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmopsCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmopsCtrlsynth4 OBJECT IDENTIFIER ::= { pmopsCtrlOther 4 }
+
+
+
+
+pmopsCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmopsCtrlsynth4 2 }
+
+
+
+pmopsCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmopsCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmopsCtrlswMgnt OBJECT IDENTIFIER ::= { pmopsCtrlOther 5 }
+
+
+
+
+pmopsCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmopsCtrlswMgnt 3 }
+
+
+
+pmopsCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmopsCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaSwitchMode article
+--- *****************************************************
+
+pmopsCtrlcomaSwitchMode OBJECT-TYPE
+	  SYNTAX PmopsSwitchMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Switch Mode :This OID sets the 
+        switch mode of the OPS A  <Help> 
+         This control defines the switch 
+        mode of the OPS A (Manual 1, Manual 
+        2, Auto reversive or auto no reversive)
+        "
+	  ::= { pmopsCtrlComa 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the combSwitchMode article
+--- *****************************************************
+
+pmopsCtrlcombSwitchMode OBJECT-TYPE
+	  SYNTAX PmopsSwitchMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Switch Mode :This OID sets the 
+        switch mode of the OPS B  <Help> 
+         This control defines the switch 
+        mode of the OPS B (Manual 1, Manual 
+        2, Auto reversive or auto no reversive)
+        "
+	  ::= { pmopsCtrlComb 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaOosMode article
+--- *****************************************************
+pmopsCtrlcomaOosMode OBJECT IDENTIFIER ::= { pmopsCtrlComa 18 }
+
+
+
+
+pmopsCtrlComaOosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Out Of Service :This OID sets
+         the OPS A Out of Service  <Help> 
+         This controls defines the service 
+        state of the OPS A
+        "
+	  ::= { pmopsCtrlcomaOosMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the combOosMode article
+--- *****************************************************
+pmopsCtrlcombOosMode OBJECT IDENTIFIER ::= { pmopsCtrlComb 19 }
+
+
+
+
+pmopsCtrlCombOosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Out Of Service :This OID sets
+         the OPS B Out of Service  <Help> 
+         This controls defines the service 
+        state of the OPS B
+        "
+	  ::= { pmopsCtrlcombOosMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaRxPwrSetting1 article
+--- *****************************************************
+
+pmopsCtrlcomaRxPwrSetting1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX1 Loss Threshold :This OID sets 
+        the LOS detection threshold on
+         the RX1 of the OPS A (AV=Power/0.005 
+        + 32768) (Unit = dBm)  <Help> 
+         This control defines the LOS threshold 
+        (in dBm) on the RX1 of the OPS
+         A
+        "
+	  ::= { pmopsCtrlComa 24 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaRxPwrSetting2 article
+--- *****************************************************
+
+pmopsCtrlcomaRxPwrSetting2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX2 Loss Threshold :This OID sets 
+        the LOS detection threshold on
+         the RX2 of the OPS A (AV=Power/0.005 
+        + 32768) (Unit = dBm)  <Help> 
+         This control defines the LOS threshold 
+        (in dBm) on the RX2 of the OPS
+         A
+        "
+	  ::= { pmopsCtrlComa 25 }
+
+
+
+--- *****************************************************
+---     LEAF for the combRxPwrSetting1 article
+--- *****************************************************
+
+pmopsCtrlcombRxPwrSetting1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX1 Loss Threshold :This OID sets 
+        the LOS detection threshold on
+         the RX1 of the OPS B (AV=Power/0.005 
+        + 32768) (Unit = dBm)  <Help> 
+         This control defines the LOS threshold 
+        (in dBm) on the RX1 of the OPS
+         B
+        "
+	  ::= { pmopsCtrlComb 26 }
+
+
+
+--- *****************************************************
+---     LEAF for the combRxPwrSetting2 article
+--- *****************************************************
+
+pmopsCtrlcombRxPwrSetting2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX2 Loss Threshold :This OID sets 
+        the LOS detection threshold on
+         the RX2 of the OPS B (AV=Power/0.005 
+        + 32768) (Unit = dBm)  <Help> 
+         This control defines the LOS threshold 
+        (in dBm) on the RX2 of the OPS
+         B
+        "
+	  ::= { pmopsCtrlComb 27 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmopsCtrlledTest OBJECT IDENTIFIER ::= { pmopsCtrlOther 64 }
+
+
+
+
+pmopsCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmopsCtrlledTest 3 }
+
+
+
+pmopsCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmopsCtrlledTest 2 }
+
+
+
+pmopsCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmopsCtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the comaTxPower1 article
+--- *****************************************************
+
+pmopsMesrcomaTxPower1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TX1 Power :This OID gives the
+         transmit power value of the signal 
+        , read on the coupler output 1
+         (Power=(AV-32768)*0.005) (Unit 
+        = dBm)  <Help>  This measure gives 
+        the Transmit optical power on the 
+        TX1 of the OPS A
+        "
+	  ::= { pmopsMesrComa 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaTxPower2 article
+--- *****************************************************
+
+pmopsMesrcomaTxPower2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TX2 Power :This OID gives the
+         transmit power value of the signal 
+        , read on the coupler output 2
+         (Power=(AV-32768)*0.005) (Unit 
+        = dBm)  <Help>  This measure gives 
+        the Transmit optical power on the 
+        TX2 of the OPS A
+        "
+	  ::= { pmopsMesrComa 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaRxPower1 article
+--- *****************************************************
+
+pmopsMesrcomaRxPower1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX1 Power :This OID gives the
+         receive power value of the signal 
+        , read on the switch input 1 (Power=(AV-32768)*0.005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Receive optical power 
+        on the RX1 of the OPS A
+        "
+	  ::= { pmopsMesrComa 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the comaRxPower2 article
+--- *****************************************************
+
+pmopsMesrcomaRxPower2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX2 Power :This OID gives the
+         receive power value of the signal 
+        , read on the switch input 2 (Power=(AV-32768)*0.005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Receive optical power 
+        on the RX2 of the OPS A
+        "
+	  ::= { pmopsMesrComa 19 }
+
+
+
+--- *****************************************************
+---     LEAF for the combTxPower1 article
+--- *****************************************************
+
+pmopsMesrcombTxPower1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TX1 Power :This OID gives the
+         transmit power value of the signal 
+        , read on the coupler output 1
+         (Power=(AV-32768)*0.005) (Unit 
+        = dBm)  <Help>  This measure gives 
+        the Transmit optical power on the 
+        TX1 of the OPS B
+        "
+	  ::= { pmopsMesrComb 24 }
+
+
+
+--- *****************************************************
+---     LEAF for the combTxPower2 article
+--- *****************************************************
+
+pmopsMesrcombTxPower2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TX2 Power :This OID gives the
+         transmit power value of the signal 
+        , read on the coupler output 2
+          (Power=(AV-32768)*0.005) (Unit 
+        = dBm)  <Help>  This measure gives 
+        the Transmit optical power on the 
+        TX2 of the OPS B
+        "
+	  ::= { pmopsMesrComb 25 }
+
+
+
+--- *****************************************************
+---     LEAF for the combRxPower1 article
+--- *****************************************************
+
+pmopsMesrcombRxPower1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX1 Power :This OID gives the
+         receive power value of the signal 
+        , read on the switch input 1 (Power=(AV-32768)*0.005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Receive optical power 
+        on the RX1 of the OPS B
+        "
+	  ::= { pmopsMesrComb 26 }
+
+
+
+--- *****************************************************
+---     LEAF for the combRxPower2 article
+--- *****************************************************
+
+pmopsMesrcombRxPower2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        RX2 Power :This OID gives the
+         receive power value of the signal 
+        , read on the switch input 2  (Power=(AV-32768)*0.005) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Receive optical power 
+        on the RX2 of the OPS B
+        "
+	  ::= { pmopsMesrComb 27 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pmopsCfgLsd OBJECT IDENTIFIER ::= { pmopsConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmopstablecomaLsd OBJECT IDENTIFIER ::= { pmopsCfgLsd 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+pmopsCfgStartUp OBJECT IDENTIFIER ::= { pmopsConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmopstablecomaStartup OBJECT IDENTIFIER ::= { pmopsCfgStartUp 1 }
+
+
+
+pmopsCfgcomaSwitchMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on OPS A switch 
+        :This  register configures the
+         default switch mode on OPS A
+        "
+	  ::= { pmopstablecomaStartup 2 }
+
+
+
+pmopsCfgcomaRxPwrSetting1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on OPS A Rx Pwr 
+        1 :This register configures the 
+        default RX1 Loss threshold on the 
+        OPS A (Unit = dBm)
+        "
+	  ::= { pmopstablecomaStartup 3 }
+
+
+
+pmopsCfgcomaRxPwrSetting2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on OPS A Rx Pwr 
+        2 :This register configures the 
+        default RX2 Loss threshold on the 
+        OPS A (Unit = dBm)
+        "
+	  ::= { pmopstablecomaStartup 4 }
+
+
+
+pmopsCfgcomaOosMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Setting on OPS A  :This 
+         register configures the default 
+         modes on OPS A
+        "
+	  ::= { pmopstablecomaStartup 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmopstablecombStartup OBJECT IDENTIFIER ::= { pmopsCfgStartUp 2 }
+
+
+
+pmopsCfgcombSwitchMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on OPS B switch 
+        :This  register configures the
+         default switch mode on OPS B
+        "
+	  ::= { pmopstablecombStartup 2 }
+
+
+
+pmopsCfgcombRxPwrSetting1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on OPS B Rx Pwr 
+        1 :This register configures the 
+        default RX1 Loss threshold on the 
+        OPS B (Unit = dBm)
+        "
+	  ::= { pmopstablecombStartup 3 }
+
+
+
+pmopsCfgcombRxPwrSetting2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting on OPS B Rx Pwr 
+        2 :This register configures the 
+        default RX2 Loss threshold on the 
+        OPS B (Unit = dBm)
+        "
+	  ::= { pmopstablecombStartup 4 }
+
+
+
+pmopsCfgcombOosMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Setting on OPS B :This 
+         register configures the default 
+         modes on OPS B
+        "
+	  ::= { pmopstablecombStartup 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmopsCfgLabels OBJECT IDENTIFIER ::= { pmopsConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmopsCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmopsCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmopsCfgLabels 1 }
+
+
+pmopsCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmopsCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmopsCfgLabelclientIndex }
+	::= { pmopsCfgLabelclientTable 1 }
+
+
+PmopsCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmopsCfgLabelclientIndex
+		INTEGER,
+	pmopsCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmopsCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmopsCfgLabelclientEntry 1 }
+
+
+pmopsCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmopsCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmopsCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmopsCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmopsCfgLabels 2 }
+
+
+pmopsCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmopsCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmopsCfgLabellineIndex }
+	::= { pmopsCfgLabellineTable 1 }
+
+
+PmopsCfgLabellineEntry ::=
+	SEQUENCE {
+	pmopsCfgLabellineIndex
+		INTEGER,
+	pmopsCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmopsCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmopsCfgLabellineEntry 1 }
+
+
+pmopsCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmopsCfgLabellineEntry 3 }
+
+
+
+pmopsCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmopsConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmopstrapPortNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last port which generates a trap"
+	::= { pmopstraps 2 }
+
+pmopstrapLineNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last Line which generates a trap"
+	::= { pmopstraps 3 }
+
+pmopstrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmopstraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     ComB TRAPS
+--- *****************************************************
+
+pmopsComBTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmCombMeasWng, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS B Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmopsAlmCombMeasWng "on", pmopstrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on OPS B of PMOPS in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pmopstraps 30 }
+
+pmopsComBTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmCombMeasWng, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS B Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS B Not Urgent ON"}
+	--&MATCH       { pmopsAlmCombMeasWng "on", pmopstrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on OPS B of PMOPS in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pmopstraps 31 }
+
+pmopsComBTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmCombMeasAlm, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS B Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmopsAlmCombMeasAlm "on", pmopstrapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on OPS B of PMOPS in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pmopstraps 32 }
+
+pmopsComBTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmCombMeasAlm, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS B Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS B Urgent ON"}
+	--&MATCH       { pmopsAlmCombMeasAlm "on", pmopstrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on OPS B of PMOPS in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pmopstraps 33 }
+
+pmopsComBTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmCombFailAcc , pmopsAlmCombHwFailAcc, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS B Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmopsAlmCombFailAcc "on", pmopsAlmCombHwFailAcc "*", pmopstrapBoardNumber "$3"}
+	--&MESG        "Critical alarm appears on OPS B of PMOPS in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMOPS B HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmopsAlmCombFailAcc "*", pmopsAlmCombHwFailAcc "on", pmopstrapBoardNumber "$3"}
+	--&MESG        "Critical alarm appears on OPS B of PMOPS in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmopstraps 34 }
+
+pmopsComBTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmCombFailAcc , pmopsAlmCombHwFailAcc, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS B Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS B Fail ON" }
+	--&MATCH       { pmopsAlmCombFailAcc "on", pmopsAlmCombHwFailAcc "*", pmopstrapBoardNumber "$3"}
+	--&MESG        "Critical alarm disappears on OPS B of PMOPS in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOPS B HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmopsAlmCombFailAcc "*", pmopsAlmCombHwFailAcc "on", pmopstrapBoardNumber "$3"}
+	--&MESG        "Critical alarm disappears on OPS B of PMOPS in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmopstraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     ComA TRAPS
+--- *****************************************************
+
+pmopsComATrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmComaMeasWng, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS A Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmopsAlmComaMeasWng "on", pmopstrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on OPS A of PMOPS in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default is activated"
+	::= { pmopstraps 40 }
+
+pmopsComATrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmComaMeasWng, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS A Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS A Not Urgent ON"}
+	--&MATCH       { pmopsAlmComaMeasWng "on", pmopstrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on OPS A of PMOPS in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default disappeared"
+	::= { pmopstraps 41 }
+
+pmopsComATrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmComaMeasAlm, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS A Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmopsAlmComaMeasAlm "on", pmopstrapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on OPS A of PMOPS in slot $2 ($A)"
+	DESCRIPTION "Urgent client default is activated"
+	::= { pmopstraps 42 }
+
+pmopsComATrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmComaMeasAlm, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS A Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS A Urgent ON"}
+	--&MATCH       { pmopsAlmComaMeasAlm "on", pmopstrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on OPS A of PMOPS in slot $2 ($A)"
+	DESCRIPTION "Urgent client default disappeared"
+	::= { pmopstraps 43 }
+
+pmopsComATrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmComaFailAcc, pmopsAlmComaHwFailAcc, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS A Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmopsAlmComaFailAcc "on", pmopsAlmComaHwFailAcc "*", pmopstrapBoardNumber "$3"}
+	--&MESG        "Critical alarm appears on OPS A of PMOPS in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMOPS A HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmopsAlmComaFailAcc "*", pmopsAlmComaHwFailAcc "on", pmopstrapBoardNumber "$3"}
+	--&MESG        "Critical alarm appears on OPS A of PMOPS in Slot $3 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pmopstraps 44 }
+
+pmopsComATrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmComaFailAcc, pmopsAlmComaHwFailAcc, pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS A Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOPS A Fail ON" }
+	--&MATCH       { pmopsAlmComaFailAcc "on", pmopsAlmComaHwFailAcc "*", pmopstrapBoardNumber "$3"}
+	--&MESG        "Critical alarm disappears on OPS A of PMOPS in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOPS A HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmopsAlmComaFailAcc "*", pmopsAlmComaHwFailAcc "on", pmopstrapBoardNumber "$3"}
+	--&MESG        "Critical alarm disappears on OPS A of PMOPS in Slot $3 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pmopstraps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmopsPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmDefFuseB, pmopsAlmDefFuseA , pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmopsAlmDefFuseB "*", pmopsAlmDefFuseA "on", pmopstrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMOPS in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOPS Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmopsAlmDefFuseB "on", pmopsAlmDefFuseA "*", pmopstrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMOPS in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmopstraps 50 }
+
+pmopsPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmopsAlmDefFuseB, pmopsAlmDefFuseA , pmopstrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOPS Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMOPS Fuse A Fail ON", "PMOPS Fuse B Fail ON" }
+	--&MATCH       { pmopsAlmDefFuseB "on", pmopsAlmDefFuseA "on", pmopstrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMOPS in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmopstraps 51 }
+
+
+
+
+
+
+END

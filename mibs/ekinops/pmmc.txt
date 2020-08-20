@@ -1,0 +1,2657 @@
+-- *****************************************************************
+-- EKINOPS-PmMC.TXT:  MIB
+--
+--MIB Part Number:3MI00120AJAD
+--MIB Version:02
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-PmMC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePmMC MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Pmmc hardware."
+	REVISION "200701100000Z"
+	DESCRIPTION
+	  "Initial Version."
+	REVISION "200706290000Z"
+	DESCRIPTION
+	  "°C changed to C"
+	REVISION "200708230000Z"
+	DESCRIPTION
+	  "°Add Alarms Objects"
+	REVISION "200711210000Z"
+	DESCRIPTION
+	  "°Add Config Object, Update Ekinops address, Helps on objects, Ports Labels"
+	REVISION "200904100000Z"
+	DESCRIPTION
+	  "Cosmetics for mib compilers"
+	REVISION "200909180000Z"
+	DESCRIPTION
+	  "CondType Parameters insertion"
+	REVISION "201002250000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS"
+	REVISION "201011040000Z"
+	DESCRIPTION
+	  "Formulas and Event on XFP init"
+	REVISION "201012170000Z"
+	DESCRIPTION
+	  "Fix on Smpc trap"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201403260000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201412110000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 21 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmmcalarms OBJECT IDENTIFIER ::= { modulePmMC 2 }	
+pmmcAlmOther OBJECT IDENTIFIER ::= { pmmcalarms 1 }
+pmmcAlmOtherNurg OBJECT IDENTIFIER ::= { pmmcAlmOther 1 }
+pmmcAlmOtherUrg OBJECT IDENTIFIER ::= { pmmcAlmOther 2 }
+pmmcAlmOtherCrit OBJECT IDENTIFIER ::= { pmmcAlmOther 3 }
+
+pmmcAlmClient OBJECT IDENTIFIER ::= { pmmcalarms 2 }
+pmmcAlmClientNurg OBJECT IDENTIFIER ::= { pmmcAlmClient 1 }
+pmmcAlmClientUrg OBJECT IDENTIFIER ::= { pmmcAlmClient 2 }
+pmmcAlmClientCrit OBJECT IDENTIFIER ::= { pmmcAlmClient 3 }
+	
+pmmcAlmLine OBJECT IDENTIFIER ::= { pmmcalarms 3 }
+pmmcAlmLineNurg OBJECT IDENTIFIER ::= { pmmcAlmLine 1 }
+pmmcAlmLineUrg OBJECT IDENTIFIER ::= { pmmcAlmLine 2 }
+pmmcAlmLineCrit OBJECT IDENTIFIER ::= { pmmcAlmLine 3 }
+
+
+pmmcmeasures OBJECT IDENTIFIER ::= { modulePmMC 3 }	
+pmmcMesrOther OBJECT IDENTIFIER ::= { pmmcmeasures 1 }	
+pmmcMesrClient OBJECT IDENTIFIER ::= { pmmcmeasures 2 }	
+pmmcMesrLine OBJECT IDENTIFIER ::= { pmmcmeasures 3 }	
+
+
+pmmccontrolsWrite OBJECT IDENTIFIER ::= { modulePmMC 6 }
+pmmcCtrlOther OBJECT IDENTIFIER ::= { pmmccontrolsWrite 1 }
+pmmcCtrlClient OBJECT IDENTIFIER ::= { pmmccontrolsWrite 2 }
+pmmcCtrlLine OBJECT IDENTIFIER ::= { pmmccontrolsWrite 3 }
+
+pmmcri OBJECT IDENTIFIER ::= { modulePmMC 7 }
+
+
+pmmcConfig OBJECT IDENTIFIER ::= { modulePmMC 9 }
+
+pmmctraps OBJECT IDENTIFIER ::= { modulePmMC 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+PmmcBitRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different rates for a client and line ports"
+    SYNTAX INTEGER {
+		rateSTM16OC48(0),
+		rate1GBE(1),
+		rateSTM4OC12(2),
+		rateSTM1OC3(3),
+		rate2GFC(4),
+		rate1GFC(5),
+		rateFastEthernet(7),
+		rateSTM16FEC(8),
+		rateSTM4FEC(9),
+		rateSTM1FEC(10)
+           }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmmcRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmmcri 2 }
+
+  
+pmmcRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmmcri 4 }
+  
+pmmcRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmmcri 5 }
+  
+pmmcRinvLine1SFP OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Inventory for the SFP: This OID contains the inventory for the Port A SFP"
+  ::= { pmmcri 6 }
+
+
+pmmcRinvLine2SFP OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Inventory for the SFP: This OID contains the inventory for the Port B SFP"
+  ::= { pmmcri 7 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmmcAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmmcAlmOtherCrit 0 }
+
+
+
+
+pmmcAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm0 16 }
+
+
+
+pmmcAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm0 15 }
+
+
+
+pmmcAlmSynUnlock OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Synthesizer Not Locked :This OID 
+        indicates that the frequency synthesizer 
+        is not locked.  <Help>  This status 
+        indicates if the clock synthesizer 
+        is locked. <Condtype> SYN_UNLOCK 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm0 14 }
+
+
+
+pmmcAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm7 article
+--- *****************************************************
+pmmcAlmsynthAlm7 OBJECT IDENTIFIER ::= { pmmcAlmLineCrit 7 }
+
+
+
+
+pmmcAlmLine2Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 Failure :This OID indicates 
+        a failure on the Line 2 <Condtype> 
+        LINE2_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm7 12 }
+
+
+
+pmmcAlmLine2TrscvDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm DDM On Optical Module 2
+         :This OID indicates an alarm is 
+        present coming out of optical interface 
+        DDM on Line 2  <Help>  This alarm 
+        indicates if a DDM Alarm has been 
+        detected on the line 2 transceiver 
+        <Condtype> LINE2_TRSCV_DDM_ALM
+         <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm7 10 }
+
+
+
+pmmcAlmLine2TrscvDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning DDM On Optical Module
+         2 :This OID indicates a warning 
+        is present coming out of optical 
+        interface DDM on Line 2  <Help> 
+         This alarm indicates if a DDM
+         Warning has been detected on the 
+        line 2 transceiver <Condtype> LINE2_TRSCV_DDM_WARNING 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm7 9 }
+
+
+
+pmmcAlmLine2TrscvLsd OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Laser Shutdown :This 
+        OID indicates the optical output 
+        power is off on Line 2  <Help>
+          This status indicates if the
+         line 2 transceiver laser is ON 
+        or OFF <Condtype> LINE2_TRSCV_LSD 
+        <Probcause> other (1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm7 5 }
+
+
+
+pmmcAlmLine2HwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 HW Failure :This OID indicates 
+        a hardware failure on the Line
+         2 <Condtype> LINE2_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmmcAlmsynthAlm7 4 }
+
+
+
+pmmcAlmLine2TrscvDdmAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        DDM Supported On Line 2 SFP :This 
+        OID indicates that the transceiver 
+        module 2 does not support Digital 
+        Diagnostic Monitoring Functions 
+         <Help>  This status indicates
+         if the line 2 transceiver includes 
+        the DDM feature <Condtype> LINE2_TRSCV_DDM_ABSENT 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmmcAlmsynthAlm7 2 }
+
+
+
+pmmcAlmLine2TrscvAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Absent :This OID indicates 
+        that the transceiver module 2 is 
+        not present.  <Help>  This alarm 
+        indicates if the line 2 transceiver 
+        is present. <Condtype> LINE2_TRSCV_ABSENT 
+        <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) <Event> ObjectCDINV
+        "
+	  ::= { pmmcAlmsynthAlm7 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm8 article
+--- *****************************************************
+pmmcAlmsynthAlm8 OBJECT IDENTIFIER ::= { pmmcAlmClientCrit 8 }
+
+
+
+
+pmmcAlmLine1Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 Failure :This OID indicates 
+        a failure on the Line 1 <Condtype> 
+        LINE1_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm8 12 }
+
+
+
+pmmcAlmLine1TrscvDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm DDM On Optical Module 1
+         :This OID indicates an alarm is 
+        present coming out of optical interface 
+        DDM on Line 1  <Help>  This alarm 
+        indicates if a DDM Alarm has been 
+        detected on the line 1 transceiver 
+        <Condtype> LINE1_TRSCV_DDM_ALM
+         <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm8 10 }
+
+
+
+pmmcAlmLine1TrscvDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning DDM On Optical Module
+         1 :This OID indicates a warning 
+        is present coming out of optical 
+        interface DDM on Line 1  <Help> 
+         This alarm indicates if a DDM
+         Warning has been detected on the 
+        line 1 transceiver <Condtype> LINE1_TRSCV_DDM_WARNING 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm8 9 }
+
+
+
+pmmcAlmLine1TrscvLsd OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Laser Shutdown :This 
+        OID indicates the optical output 
+        power is off on Line 1  <Help>
+          This status indicates if the
+         line 1 transceiver laser is ON 
+        or OFF <Condtype> LINE1_TRSCV_LSD 
+        <Probcause> other (1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmsynthAlm8 5 }
+
+
+
+pmmcAlmLine1HwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 HW Failure :This OID indicates 
+        a hardware failure on the Line
+         1 <Condtype> LINE1_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmmcAlmsynthAlm8 4 }
+
+
+
+pmmcAlmLine1TrscvDdmAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        DDM Supported On Line 1 SFP :This 
+        OID indicates that the transceiver 
+        module 1 does not support Digital 
+        Diagnostic Monitoring Functions 
+         <Help>  This status indicates
+         if the line 1 transceiver includes 
+        the DDM feature <Condtype> LINE1_TRSCV_DDM_ABSENT 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmmcAlmsynthAlm8 2 }
+
+
+
+pmmcAlmLine1TrscvAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Absent :This OID indicates 
+        that the transceiver module 2 is 
+        not present.  <Help>  This alarm 
+        indicates if the line 1 transceiver 
+        is present. <Condtype> LINE1_TRSCV_ABSENT 
+        <Probcause> inputOutputDeviceError 
+        (24) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) <Event> ObjectCDINV
+        "
+	  ::= { pmmcAlmsynthAlm8 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1AccessioAlm article
+--- *****************************************************
+pmmcAlmline1AccessioAlm OBJECT IDENTIFIER ::= { pmmcAlmClientCrit 16 }
+
+
+
+
+pmmcAlmLine1Los OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Loss Of Optical Signal On Line 
+        1 :This OID indicates that no signal 
+        is present on the transceiver 1 
+         <Help>  This alarm indicates if 
+        an optical signal is detected on 
+        the line 1 transceiver input <Condtype> 
+        LINE1_LOS <Probcause> receiveFailure 
+        (41) <Alarmtype> physicalViolation 
+        (9) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1AccessioAlm 4 }
+
+
+
+pmmcAlmLine1LasFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Tx Failed :This OID 
+        indicates that the transmitter
+         fails for the transceiver plugged 
+        into the Line 1 (this alarm reports 
+        the transmitter failure alarm generated 
+        by the transceivers)  <Help>  This 
+        alarm indicates if the laser of 
+        the Line 1 transceiver is in fail 
+        condition <Condtype> LINE1_LAS_FAIL 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1AccessioAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1TrscvAlmDdm article
+--- *****************************************************
+pmmcAlmline1TrscvAlmDdm OBJECT IDENTIFIER ::= { pmmcAlmClientUrg 18 }
+
+
+
+
+pmmcAlmLine1RxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Rx Power High :Alarm indicating 
+        that the transceiver input power 
+        of Line 1 is higher than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE1_RX_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 16 }
+
+
+
+pmmcAlmLine1RxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Rx Power Low :Alarm indicating 
+        that the transceiver input power 
+        of Line 1 is lower than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE1_RX_PWR_LOW_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 15 }
+
+
+
+pmmcAlmLine1TempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Temp High :Alarm indicating 
+        that the transceiver temperature 
+        of Line 1 is higher than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE1_TEMP_HIGH_ALA 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 8 }
+
+
+
+pmmcAlmLine1TempLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Temp Low :Alarm indicating 
+        that the transceiver temperature 
+        of Line 1 is lower than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE1_TEMP_LOW_ALA 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 7 }
+
+
+
+pmmcAlmLine1VccHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Power Supply High :Alarm 
+        indicating that the transceiver 
+        power supply of Line 1 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM  <Condtype> 
+        LINE1_VCC_HIGH_ALA <Probcause>
+         powerProblem (36) <Alarmtype>
+         equipmentAlarm (5) <Polarity>
+         (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 6 }
+
+
+
+pmmcAlmLine1VccLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Power Supply Low :Alarm 
+        indicating that the transceiver 
+        power supply of Line 1 is lower 
+        than the threshold value written 
+        in the transceiver EEPROM  <Condtype> 
+        LINE1_VCC_LOW_ALA <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 5 }
+
+
+
+pmmcAlmLine1TxBiasHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Bias High :Alarm indicating 
+        that the transceiver laser bias 
+        current of Line 1 is higher than 
+        the threshold value written in
+         the transceiver EEPROM <Condtype> 
+        LINE1_TX_BIAS_HIGH_ALA <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 4 }
+
+
+
+pmmcAlmLine1TxBiasLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Bias Low :Alarm indicating 
+        that the transceiver laser bias 
+        current of Line 1 is lower than 
+        the threshold value written in
+         the transceiver EEPROM <Condtype> 
+        LINE1_TX_BIAS_LOW_ALA <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 3 }
+
+
+
+pmmcAlmLine1TxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Tx Power High :Alarm indicating 
+        that the transceiver output power 
+        of Line 1 is higher than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE1_TX_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 2 }
+
+
+
+pmmcAlmLine1TxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Tx Power Low :Alarm indicating 
+        that the transceiver output power 
+        of Line 1 is lower than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE1_TX_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvAlmDdm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1TrscvWarnDdm article
+--- *****************************************************
+pmmcAlmline1TrscvWarnDdm OBJECT IDENTIFIER ::= { pmmcAlmClientNurg 20 }
+
+
+
+
+pmmcAlmLine1RxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Rx Power High Warning
+         :Warning indicating that the transceiver 
+        input power of Line 1 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE1_RX_PWR_HIGH_WNG <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 16 }
+
+
+
+pmmcAlmLine1RxPwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Rx Power Low Warning :Warning 
+        indicating that the transceiver 
+        input power of Line 1 is lower
+         than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE1_RX_PWR_LOW_WNG <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 15 }
+
+
+
+pmmcAlmLine1TempHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Temp High Warning :Warning 
+        indicating that the transceiver 
+        temperature of Line 1 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE1_TEMP_HIGH_WNG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 8 }
+
+
+
+pmmcAlmLine1TempLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Temp Low Warning :Warning 
+        indicating that the transceiver 
+        temperature of Line 1 is lower
+         than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE1_TEMP_LOW_WNG <Probcause>
+         temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 7 }
+
+
+
+pmmcAlmLine1VccHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Power Supply High Warning 
+        :Warning indicating that the transceiver 
+        power supply of Line 1 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM  <Condtype> 
+        LINE1_VCC_HIGH_WNG <Probcause>
+         powerProblem (36) <Alarmtype>
+         equipmentAlarm (5) <Polarity>
+         (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 6 }
+
+
+
+pmmcAlmLine1VccLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Power Supply Low Warning 
+        :Warning indicating that the transceiver 
+        power supply of Line 1 is lower 
+        than the threshold value written 
+        in the transceiver EEPROM  <Condtype> 
+        LINE1_VCC_LOW_WNG <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 5 }
+
+
+
+pmmcAlmLine1TxBiasHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Bias High Warning :Warning 
+        indicating that the transceiver 
+        laser bias current of Line 1 is 
+        higher than the threshold value 
+        written in the transceiver EEPROM 
+        <Condtype> LINE1_TX_BIAS_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 4 }
+
+
+
+pmmcAlmLine1TxBiasLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Bias Low Warning :Warning 
+        indicating that the transceiver 
+        laser bias current of Line 1 is 
+        lower than the threshold value
+         written in the transceiver EEPROM 
+        <Condtype> LINE1_TX_BIAS_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 3 }
+
+
+
+pmmcAlmLine1TxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Tx Power High Warning
+         :Warning indicating that the transceiver 
+        output power of Line 1 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE1_TX_PWR_HIGH_WNG <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 2 }
+
+
+
+pmmcAlmLine1TxPwLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 1 Tx Power Low Warning :Warning 
+        indicating that the transceiver 
+        output power of Line 1 is lower 
+        than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE1_TX_PW_LOW_WNG <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1TrscvWarnDdm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1CdrAlm article
+--- *****************************************************
+pmmcAlmline1CdrAlm OBJECT IDENTIFIER ::= { pmmcAlmClientNurg 23 }
+
+
+
+
+pmmcAlmLine1CdrRefAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 CDR Reference Clock Absent 
+        :This OID indicates that the CDR 
+        reference clock is absent on Line 
+        1  <Help>  This alarm indicates 
+        if the reference clock is present 
+        on the line 1 CDR <Condtype> LINE1_CDR_REF_ABSENT 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1CdrAlm 3 }
+
+
+
+pmmcAlmLine1CdrLossoflock OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 CDR Loss Of Lock :This
+         OID indicates that the Line 1
+         CDR is not locked  <Help>  This 
+        alarm indicates if Line 1 CDR is 
+        correclty locked on the input signal 
+        <Condtype> LINE1_CDR_LOSSOFLOCK 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1CdrAlm 2 }
+
+
+
+pmmcAlmLine1CdrLossofsignal OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 CDR Loss Of Signal :This 
+        OID indicates that a Loss of electrical 
+        signal is detected on the Line
+         1 CDR  <Help>  This alarm indicates 
+        if an electrical signal is detected 
+        on the line 1 CDR <Condtype> LINE1_CDR_LOSSOFSIGNAL 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline1CdrAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2AccessioAlm article
+--- *****************************************************
+pmmcAlmline2AccessioAlm OBJECT IDENTIFIER ::= { pmmcAlmLineCrit 24 }
+
+
+
+
+pmmcAlmLine2Los OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Loss Of Optical Signal On Line 
+        2 :This OID indicates that no signal 
+        is present on the transceiver 2 
+         <Help>  This alarm indicates if 
+        an optical signal is detected on 
+        the line 2 transceiver input <Condtype> 
+        LINE2_LOS <Probcause> receiveFailure 
+        (41) <Alarmtype> physicalViolation 
+        (9) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2AccessioAlm 4 }
+
+
+
+pmmcAlmLine2LasFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Tx Failed :This OID 
+        indicates that the transmitter
+         fails for the transceiver plugged 
+        into the Line 1 (this alarm reports 
+        the transmitter failure alarm generated 
+        by the transceivers)  <Help>  This 
+        alarm indicates if the laser of 
+        the line 2 transceiver is in fail 
+        condition <Condtype> LINE2_LAS_FAIL 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2AccessioAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2TrscvAlmDdm article
+--- *****************************************************
+pmmcAlmline2TrscvAlmDdm OBJECT IDENTIFIER ::= { pmmcAlmLineUrg 26 }
+
+
+
+
+pmmcAlmLine2RxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Rx Power High :Alarm indicating 
+        that the transceiver input power 
+        of Line 2 is higher than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE2_RX_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 16 }
+
+
+
+pmmcAlmLine2RxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Rx Power Low :Alarm indicating 
+        that the transceiver input power 
+        of Line 2 is lower than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE2_RX_PWR_LOW_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 15 }
+
+
+
+pmmcAlmLine2TempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Temp High :Alarm indicating 
+        that the transceiver temperature 
+        of Line 2 is higher than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE2_TEMP_HIGH_ALA 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 8 }
+
+
+
+pmmcAlmLine2TempLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Temp Low :Alarm indicating 
+        that the transceiver temperature 
+        of Line 2 is lower than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE2_TEMP_LOW_ALA 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 7 }
+
+
+
+pmmcAlmLine2VccHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Power Supply High :Alarm 
+        indicating that the transceiver 
+        power supply of Line 2 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM  <Condtype> 
+        LINE2_VCC_HIGH_ALA <Probcause>
+         powerProblem (36) <Alarmtype>
+         equipmentAlarm (5) <Polarity>
+         (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 6 }
+
+
+
+pmmcAlmLine2VccLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Power Supply Low :Alarm 
+        indicating that the transceiver 
+        power supply of Line 2 is lower 
+        than the threshold value written 
+        in the transceiver EEPROM  <Condtype> 
+        LINE2_VCC_LOW_ALA <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 5 }
+
+
+
+pmmcAlmLine2TxBiasHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Bias High :Alarm indicating 
+        that the transceiver laser bias 
+        current of Line 2 is higher than 
+        the threshold value written in
+         the transceiver EEPROM <Condtype> 
+        LINE2_TX_BIAS_HIGH_ALA <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 4 }
+
+
+
+pmmcAlmLine2TxBiasLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Bias Low :Alarm indicating 
+        that the transceiver laser bias 
+        current of Line 2 is lower than 
+        the threshold value written in
+         the transceiver EEPROM <Condtype> 
+        LINE2_TX_BIAS_LOW_ALA <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 3 }
+
+
+
+pmmcAlmLine2TxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Tx Power High :Alarm indicating 
+        that the transceiver output power 
+        of Line 2 is higher than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE2_TX_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 2 }
+
+
+
+pmmcAlmLine2TxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Tx Power Low :Alarm indicating 
+        that the transceiver output power 
+        of Line 2 is lower than the threshold 
+        value written in the transceiver 
+        EEPROM <Condtype> LINE2_TX_PWR_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvAlmDdm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2TrscvWarnDdm article
+--- *****************************************************
+pmmcAlmline2TrscvWarnDdm OBJECT IDENTIFIER ::= { pmmcAlmLineNurg 28 }
+
+
+
+
+pmmcAlmLine2RxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Rx Power High Warning
+         :Warning indicating that the transceiver 
+        input power of Line 2 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE2_RX_PWR_HIGH_WNG <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 16 }
+
+
+
+pmmcAlmLine2RxPwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Rx Power Low Warning :Warning 
+        indicating that the transceiver 
+        input power of Line 2 is lower
+         than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE2_RX_PWR_LOW_WNG <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 15 }
+
+
+
+pmmcAlmLine2TempHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Temp High Warning :Warning 
+        indicating that the transceiver 
+        temperature of Line 2 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE2_TEMP_HIGH_WNG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 8 }
+
+
+
+pmmcAlmLine2TempLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Temp Low Warning :Warning 
+        indicating that the transceiver 
+        temperature of Line 2 is lower
+         than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE2_TEMP_LOW_WNG <Probcause>
+         temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 7 }
+
+
+
+pmmcAlmLine2VccHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Power Supply High Warning 
+        :Warning indicating that the transceiver 
+        power supply of Line 2 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM  <Condtype> 
+        LINE2_VCC_HIGH_WNG <Probcause>
+         powerProblem (36) <Alarmtype>
+         equipmentAlarm (5) <Polarity>
+         (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 6 }
+
+
+
+pmmcAlmLine2VccLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Power Supply Low Warning 
+        :Warning indicating that the transceiver 
+        power supply of Line 2 is lower 
+        than the threshold value written 
+        in the transceiver EEPROM  <Condtype> 
+        LINE2_VCC_LOW_WNG <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 5 }
+
+
+
+pmmcAlmLine2TxBiasHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Bias High Warning :Warning 
+        indicating that the transceiver 
+        laser bias current of Line 2 is 
+        higher than the threshold value 
+        written in the transceiver EEPROM 
+        <Condtype> LINE2_TX_BIAS_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 4 }
+
+
+
+pmmcAlmLine2TxBiasLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Bias Low Warning :Warning 
+        indicating that the transceiver 
+        laser bias current of Line 2 is 
+        lower than the threshold value
+         written in the transceiver EEPROM 
+        <Condtype> LINE2_TX_BIAS_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 3 }
+
+
+
+pmmcAlmLine2TxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Tx Power High Warning
+         :Warning indicating that the transceiver 
+        output power of Line 2 is higher 
+        than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE2_TX_PWR_HIGH_WNG <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 2 }
+
+
+
+pmmcAlmLine2TxPwLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        TRSCV 2 Tx Power Low Warning :Warning 
+        indicating that the transceiver 
+        output power of Line 2 is lower 
+        than the threshold value written 
+        in the transceiver EEPROM <Condtype> 
+        LINE2_TX_PW_LOW_WNG <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2TrscvWarnDdm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2CdrAlm article
+--- *****************************************************
+pmmcAlmline2CdrAlm OBJECT IDENTIFIER ::= { pmmcAlmLineNurg 31 }
+
+
+
+
+pmmcAlmLine2CdrRefAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 CDR Reference Clock Absent 
+        :This OID indicates that the CDR 
+        reference clock is absent on Line 
+        2  <Help>  This alarm indicates 
+        if the reference clock is present 
+        on the line 2 CDR <Condtype> LINE2_CDR_REF_ABSENT 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2CdrAlm 3 }
+
+
+
+pmmcAlmLine2CdrLossoflock OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 CDR Loss Of Lock :This
+         OID indicates that the Line 2
+         CDR is not locked  <Help>  This 
+        alarm indicates if Line 2 CDR is 
+        correclty locked on the input signal 
+        <Condtype> LINE2_CDR_LOSSOFLOCK 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2CdrAlm 2 }
+
+
+
+pmmcAlmLine2CdrLossofsignal OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 CDR Loss Of Signal :This 
+        OID indicates that a Loss of electrical 
+        signal is detected on the Line
+         2 CDR  <Help>  This alarm indicates 
+        if an electrical signal is detected 
+        on the line 2 CDR <Condtype> LINE2_CDR_LOSSOFSIGNAL 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmmcAlmline2CdrAlm 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmmcCtrlsynth0 OBJECT IDENTIFIER ::= { pmmcCtrlOther 0 }
+
+
+
+
+pmmcCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmmcCtrlsynth0 13 }
+
+
+
+pmmcCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmmcCtrlsynth0 9 }
+
+
+
+pmmcCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmmcCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmmcCtrlsynth4 OBJECT IDENTIFIER ::= { pmmcCtrlOther 4 }
+
+
+
+
+pmmcCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmmcCtrlsynth4 2 }
+
+
+
+pmmcCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmmcCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmmcCtrlswMgnt OBJECT IDENTIFIER ::= { pmmcCtrlOther 5 }
+
+
+
+
+pmmcCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmmcCtrlswMgnt 3 }
+
+
+
+pmmcCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmmcCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1TrscvOnoff article
+--- *****************************************************
+pmmcCtrlline1TrscvOnoff OBJECT IDENTIFIER ::= { pmmcCtrlClient 16 }
+
+
+
+
+pmmcCtrlLine1TrscvOnoff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Laser Shutdown :This 
+        OID switches off the transceiver 
+        on Line 1  <Help>  This control 
+        defines the laser state of the
+         line 1 transceiver
+        "
+	  ::= { pmmcCtrlline1TrscvOnoff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2TrscvOnoff article
+--- *****************************************************
+pmmcCtrlline2TrscvOnoff OBJECT IDENTIFIER ::= { pmmcCtrlLine 24 }
+
+
+
+
+pmmcCtrlLine2TrscvOnoff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Laser Shutdown :This 
+        OID switches off the transceiver 
+        on Line 2  <Help>  This control 
+        defines the laser state of the
+         line 2 transceiver
+        "
+	  ::= { pmmcCtrlline2TrscvOnoff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmmcCtrlledTest OBJECT IDENTIFIER ::= { pmmcCtrlOther 64 }
+
+
+
+
+pmmcCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmmcCtrlledTest 3 }
+
+
+
+pmmcCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmmcCtrlledTest 2 }
+
+
+
+pmmcCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmmcCtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the line1Temperature article
+--- *****************************************************
+
+pmmcMesrline1Temperature OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Temperature :This OID 
+        gives the temperature of the transceiver 
+        Line 1, read from the DDM (Digital 
+        Diagnostic Monitoring) (Temperature 
+        = AV/256) (Unit = C)  <Help>  This 
+        measure gives the temperature of 
+        the line 1 transceiver
+        "
+	  ::= { pmmcMesrClient 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1Volt article
+--- *****************************************************
+
+pmmcMesrline1Volt OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Power Supply :This
+         OID gives the voltage of the transceiver 
+        Line 1, read from the DDM (Digital 
+        Diagnostic Monitoring) (Voltage 
+        = AV/10000) (Unit = V)  <Help>
+          This measure gives the 3V3 voltage 
+        of the line 1 transceiver
+        "
+	  ::= { pmmcMesrClient 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1TxBias article
+--- *****************************************************
+
+pmmcMesrline1TxBias OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Laser Bias :This OID 
+        gives the bias value of the transceiver 
+        Line 1, read from the DDM (Digital 
+        Diagnostic Monitoring) (Bias =
+         AV/500) (Unit = mA)  <Help>  This 
+        measure gives the bias of the line 
+        1 transceiver
+        "
+	  ::= { pmmcMesrClient 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1TxPower article
+--- *****************************************************
+
+pmmcMesrline1TxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Tx Power :This OID
+         gives the transmit power value 
+        of the transceiver Line 1, read 
+        from the DDM (Digital   Diagnostic 
+        Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Tx optical power of the 
+        line 1 transceiver
+        "
+	  ::= { pmmcMesrClient 19 }
+
+
+
+--- *****************************************************
+---     LEAF for the line1RxPower article
+--- *****************************************************
+
+pmmcMesrline1RxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 1 SFP Rx Power :This OID
+         gives the receive power value
+         of the transceiver Line 1, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Rx optical power of the 
+        line 1 transceiver
+        "
+	  ::= { pmmcMesrClient 20 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2Temperature article
+--- *****************************************************
+
+pmmcMesrline2Temperature OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Temperature :This OID 
+        gives the temperature of the transceiver 
+        Line 2, read from the DDM (Digital 
+        Diagnostic Monitoring)  (Temperature 
+        = AV/256) (Unit = C)  <Help>  This 
+        measure gives the temperature of 
+        the line 2 transceiver
+        "
+	  ::= { pmmcMesrLine 24 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2Volt article
+--- *****************************************************
+
+pmmcMesrline2Volt OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Power Supply :This
+         OID gives the voltage of the transceiver 
+        Line 2, read from the DDM (Digital 
+        Diagnostic Monitoring) (Voltage 
+        = AV/10000) (Unit = V)  <Help>
+          This measure gives the 3V3 voltage 
+        of the line 2 transceiver
+        "
+	  ::= { pmmcMesrLine 25 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2TxBias article
+--- *****************************************************
+
+pmmcMesrline2TxBias OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Laser Bias :This OID 
+        gives the bias value of the transceiver 
+        Line 2, read from the DDM (Digital 
+        Diagnostic Monitoring) (Bias =
+         AV/500) (Unit = mA)  <Help>  This 
+        measure gives the bias of the line 
+        2 transceiver
+        "
+	  ::= { pmmcMesrLine 26 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2TxPower article
+--- *****************************************************
+
+pmmcMesrline2TxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Tx Power :This OID
+         gives the transmit power value 
+        of the transceiver Line 2, read 
+        from the DDM (Digital   Diagnostic 
+        Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Tx optical power of the 
+        line 2 transceiver
+        "
+	  ::= { pmmcMesrLine 27 }
+
+
+
+--- *****************************************************
+---     LEAF for the line2RxPower article
+--- *****************************************************
+
+pmmcMesrline2RxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Line 2 SFP Rx Power :This OID
+         gives the receive power value
+         of the transceiver Line 2, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Power = 10*log(AV)-40) 
+        (Unit = dBm)  <Help>  This measure 
+        gives the Rx optical power of the 
+        line 2 transceiver
+        "
+	  ::= { pmmcMesrLine 28 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pmmcCfgLsd OBJECT IDENTIFIER ::= { pmmcConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0012
+--- *****************************************************
+
+pmmctableclientLsd OBJECT IDENTIFIER ::= { pmmcCfgLsd 1 }
+
+
+
+pmmcCfglsdMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        CAIS mode  on Lines Port :This 
+        register selects the way to activate 
+        the laser upon CAIS/CSF criteria 
+        detection on Port
+        "
+	  ::= { pmmctableclientLsd 2 }
+
+
+
+pmmcCfgline1AccessioCtrb OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        CAIS contributors on Line 1 Port 
+        :This register selects the contributors 
+        to upstream CAIS/CSF on Port
+        "
+	  ::= { pmmctableclientLsd 3 }
+
+
+
+pmmcCfgline1CdrCtrb OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        CAIS contributors on Line 1 Port 
+        :This register selects the contributors 
+        to upstream CAIS/CSF on Port
+        "
+	  ::= { pmmctableclientLsd 4 }
+
+
+
+pmmcCfgline2AccessioCtrb OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        CAIS contributors on Line 2 Port 
+        :This register selects the contributors 
+        to downstream CAIS/CSF on Port
+        "
+	  ::= { pmmctableclientLsd 5 }
+
+
+
+pmmcCfgline2CdrCtrb OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        CAIS contributors on Line 2 Port 
+        :This register selects the contributors 
+        to downstream CAIS/CSF on Port
+        "
+	  ::= { pmmctableclientLsd 6 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+pmmcCfgStartUp OBJECT IDENTIFIER ::= { pmmcConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2111
+--- *****************************************************
+
+pmmctableclientStartup OBJECT IDENTIFIER ::= { pmmcCfgStartUp 1 }
+
+
+
+pmmcCfgline1TrscvCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on  Line 1 :This 
+         register configures the default 
+        initialisation settings on Line 
+        1.
+        "
+	  ::= { pmmctableclientStartup 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmmctablelineStartup OBJECT IDENTIFIER ::= { pmmcCfgStartUp 2 }
+
+
+
+pmmcCfgline2TrscvCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Line 2 :This 
+         register configures the default 
+        initialisation settings on Line 
+        2.
+        "
+	  ::= { pmmctablelineStartup 2 }
+
+
+
+pmmcCfgbitrateSelect OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Bitrate selection on Line 1/2
+         :This OID register configure the 
+        bitrate for the client and line 
+        interface (0=STS48 : 2,4 to 2,7 
+        Gb/s - 1=1GBE : 1,2 to 1,35 Gb/s 
+        - 2=STS12 : 600 to 675 Mb/s - 3=STS3 
+        : 150 to 168 Mb/s - 4=2GFC : 2
+         to 2,4 Gb/s - 5=1GFC : 1,0 to
+         1,2 Gb/s - 6=500 to 600 Mb/s - 
+        7=Fast Ethernet : 125 to 150 Mb/s 
+        - 8=STS48 + FEC : 2,4-2,7 Gb/s
+         - 9=STS12 + FEC : 600-675 Mb/s 
+        - 10=STS3 + FEC : 150-168 Mb/s
+              ).
+        "
+	  ::= { pmmctablelineStartup 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmmcCfgLabels OBJECT IDENTIFIER ::= { pmmcConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmmcCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmmcCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmmcCfgLabels 1 }
+
+
+pmmcCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmmcCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmmcCfgLabelclientIndex }
+	::= { pmmcCfgLabelclientTable 1 }
+
+
+PmmcCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmmcCfgLabelclientIndex
+		INTEGER,
+	pmmcCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmmcCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmmcCfgLabelclientEntry 1 }
+
+
+pmmcCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmmcCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmmcCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmmcCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmmcCfgLabels 2 }
+
+
+pmmcCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmmcCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmmcCfgLabellineIndex }
+	::= { pmmcCfgLabellineTable 1 }
+
+
+PmmcCfgLabellineEntry ::=
+	SEQUENCE {
+	pmmcCfgLabellineIndex
+		INTEGER,
+	pmmcCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmmcCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmmcCfgLabellineEntry 1 }
+
+
+pmmcCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmmcCfgLabellineEntry 3 }
+
+
+
+pmmcCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmmcConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmmctrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmmctraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     LINE 1 TRAPS
+--- *****************************************************
+
+pmmcLine1TrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine1TrscvDdmWarning, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 1 Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmmcAlmLine1TrscvDdmWarning "on", pmmctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Line 1 of PMMC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line 1 default is activated"
+	::= { pmmctraps 30 }
+
+pmmcLine1TrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine1TrscvDdmWarning, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 1 Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMMC Line 1 Not Urgent ON"}
+	--&MATCH       { pmmcAlmLine1TrscvDdmWarning "on", pmmctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Line 1 of PMMC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line 1 default disappeared"
+	::= { pmmctraps 31 }
+
+pmmcLine1TrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine1TrscvDdmAlm, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 1 Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmmcAlmLine1TrscvDdmAlm "on", pmmctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm appears on Line 1 of PMMC in slot $2 ($A)"
+	DESCRIPTION "Urgent Line 1 default is activated"
+	::= { pmmctraps 32 }
+
+pmmcLine1TrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine1TrscvDdmAlm, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 1 Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMMC Line 1 Urgent ON"}
+	--&MATCH       { pmmcAlmLine1TrscvDdmAlm "on", pmmctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Line 1 of PMMC in slot $2 ($A)"
+	DESCRIPTION "Urgent Line 1 default disappeared"
+	::= { pmmctraps 33 }
+
+pmmcLine1TrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine1Fail, pmmcAlmLine1HwFail, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 1 Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmmcAlmLine1Fail "on", pmmcAlmLine1HwFail "*", pmmctrapBoardNumber "$3"}
+	--&MESG        "Line Port 1 Down on PMMC in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMMC Line 1 HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmmcAlmLine1Fail "*", pmmcAlmLine1HwFail "on", pmmctrapBoardNumber "$3"}
+	--&MESG        "Line Port 1 Down on PMMC in Slot $3 ($A)"
+	DESCRIPTION "Critical Line 1 default is activated"
+	::= { pmmctraps 34 }
+
+pmmcLine1TrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine1Fail, pmmcAlmLine1HwFail, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 1 Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMMC Line 1 Fail ON"}
+	--&MATCH       { pmmcAlmLine1Fail "on", pmmcAlmLine1HwFail "*", pmmctrapBoardNumber "$3"}
+	--&MESG        "Line Port 1 Up on PMMC in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMMC Line 1 HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmmcAlmLine1Fail "*", pmmcAlmLine1HwFail "on", pmmctrapBoardNumber "$3"}
+	--&MESG        "Line Port 1 Up on PMMC in Slot $3 ($A)"
+	DESCRIPTION "Critical Line 1 default disappeared"
+	::= { pmmctraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     LINE 2 TRAPS
+--- *****************************************************
+
+pmmcLine2NotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine2TrscvDdmWarning, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 2 Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmmcAlmLine2TrscvDdmWarning "on", pmmctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Line 2 of PMMC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line 2 default is activated"
+	::= { pmmctraps 40 }
+
+pmmcLine2NotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine2TrscvDdmWarning, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 2 Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMMC Line 2 Not Urgent ON"}
+	--&MATCH       { pmmcAlmLine2TrscvDdmWarning "on", pmmctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Line 2 of PMMC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line 2 default disappeared"
+	::= { pmmctraps 41 }
+
+pmmcLine2UrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine2TrscvDdmAlm, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 2 Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmmcAlmLine2TrscvDdmAlm "on", pmmctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm appears on Line 2 of PMMC in slot $2 ($A)"
+	DESCRIPTION "Urgent Line 2 default is activated"
+	::= { pmmctraps 42 }
+
+pmmcLine2UrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine2TrscvDdmAlm, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 2 Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMMC Line 2 Urgent ON"}
+	--&MATCH       { pmmcAlmLine2TrscvDdmAlm "on", pmmctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Line 2 of PMMC in slot $2 ($A)"
+	DESCRIPTION "Urgent Line 2 default disappeared"
+	::= { pmmctraps 43 }
+
+pmmcLine2CritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine2Fail, pmmcAlmLine2HwFail, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 2 Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmmcAlmLine2Fail "on", pmmcAlmLine2HwFail "*", pmmctrapBoardNumber "$3"}
+	--&MESG        "Line Port 2 Down on PMMC in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMMC Line 2 HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmmcAlmLine2Fail "*", pmmcAlmLine2HwFail "on", pmmctrapBoardNumber "$3"}
+	--&MESG        "Line Port 2 Down on PMMC in Slot $3 ($A)"
+	DESCRIPTION "Critical Line 2 default is activated"
+	::= { pmmctraps 44 }
+
+pmmcLine2CritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmLine2Fail, pmmcAlmLine2HwFail, pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Line 2 Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      {"PMMC Line 2 Fail ON"}
+	--&MATCH       { pmmcAlmLine2Fail "on", pmmcAlmLine2HwFail "*", pmmctrapBoardNumber "$3"}
+	--&MESG        "Line Port 2 Up on PMMC in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMMC Line 2 HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmmcAlmLine2Fail "*", pmmcAlmLine2HwFail "on", pmmctrapBoardNumber "$3"}
+	--&MESG        "Line Port 2 Up on PMMC in Slot $3 ($A)"
+	DESCRIPTION "Critical Line 2 default disappeared"
+	::= { pmmctraps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmmcPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmDefFuseB, pmmcAlmDefFuseA , pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmmcAlmDefFuseB "*", pmmcAlmDefFuseA "on", pmmctrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMMC in Slot $3 ($A)"
+
+	--&FILTNAME    "PMMC Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmmcAlmDefFuseB "on", pmmcAlmDefFuseA "*", pmmctrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMMC in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmmctraps 50 }
+pmmcPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmmcAlmDefFuseB, pmmcAlmDefFuseA , pmmctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMMC Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMMC Fuse A Fail ON", "PMMC Fuse B Fail ON" }
+	--&MATCH       { pmmcAlmDefFuseB "on", pmmcAlmDefFuseA "on", pmmctrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMMC in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmmctraps 51 }
+
+
+
+
+
+
+END

@@ -1,0 +1,5081 @@
+-- *****************************************************************
+-- EKINOPS-PmDGE2.TXT:  MIB
+--
+--MIB Part Number:3MI00214AABD
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-PmDGE2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulepmdge2 MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Pmdge2 hardware."
+	REVISION "201210160000Z"
+	DESCRIPTION
+	  "Initial Version."
+	REVISION "201407020000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "201410160000Z"
+	DESCRIPTION
+	  "Channel formula"
+	REVISION "201502230000Z"
+	DESCRIPTION
+	  "Add measurements on channels"
+	REVISION "201509010000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201604190000Z"
+	DESCRIPTION
+	  "Label modification"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 65 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmdge2alarms OBJECT IDENTIFIER ::= { modulepmdge2 2 }	
+pmdge2AlmOther OBJECT IDENTIFIER ::= { pmdge2alarms 1 }
+pmdge2AlmOtherNurg OBJECT IDENTIFIER ::= { pmdge2AlmOther 1 }
+pmdge2AlmOtherUrg OBJECT IDENTIFIER ::= { pmdge2AlmOther 2 }
+pmdge2AlmOtherCrit OBJECT IDENTIFIER ::= { pmdge2AlmOther 3 }
+
+
+pmdge2measures OBJECT IDENTIFIER ::= { modulepmdge2 3 }	
+pmdge2MesrOther OBJECT IDENTIFIER ::= { pmdge2measures 1 }	
+
+
+pmdge2controlsWrite OBJECT IDENTIFIER ::= { modulepmdge2 6 }
+pmdge2CtrlOther OBJECT IDENTIFIER ::= { pmdge2controlsWrite 1 }
+pmdge2CtrlEqualizer OBJECT IDENTIFIER ::= { pmdge2controlsWrite 2 }
+pmdge2CtrlLine OBJECT IDENTIFIER ::= { pmdge2controlsWrite 3 }
+
+pmdge2ri OBJECT IDENTIFIER ::= { modulepmdge2 7 }
+pmdge2riTable OBJECT IDENTIFIER ::= { pmdge2ri 1 }
+
+pmdge2Config OBJECT IDENTIFIER ::= { modulepmdge2 9 }
+
+pmdge2traps OBJECT IDENTIFIER ::= { modulepmdge2 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+Pmdge2Grid ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different grids on line ports"
+    SYNTAX INTEGER {
+		dge2grid200(200),
+		dge2grid100(100),
+		dge2grid50(50)
+           }
+
+
+Pmdge2EqualizerMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes for the equalizer"
+    SYNTAX INTEGER {
+		dge2off(0),
+		dge2auto(1),
+		dge2manual(2)
+           }
+
+Pmdge2EqualizerReference ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different types for the equalizer"
+    SYNTAX INTEGER {
+		dge2refvalue(0),
+		dge2reflowest(1)
+           }
+
+
+Pmdge2Channel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Channel selection on line ports"
+    SYNTAX INTEGER {
+
+           }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmdge2RinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmdge2ri 2 }
+
+  
+pmdge2RinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmdge2ri 4 }
+  
+pmdge2RinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmdge2ri 5 }
+
+
+
+
+pmdge2RinvPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pmdge2RinvPortEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the Ports on the selected module"
+      ::= { pmdge2riTable 1 }
+
+pmdge2RinvPortEntry OBJECT-TYPE
+        SYNTAX  Pmdge2RinvPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the Port table"
+        INDEX   { pmdge2RinvPortIndex }
+        ::= { pmdge2RinvPortTable 1 }
+    
+
+
+Pmdge2RinvPortEntry::=
+        SEQUENCE {
+          pmdge2RinvPortIndex 
+              Integer32,
+          pmdge2RinvPort
+              DisplayString
+        }
+
+
+    pmdge2RinvPortIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Port table"
+        ::= { pmdge2RinvPortEntry 1 }
+
+
+    pmdge2RinvPort OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the Port: This OID contains the inventory for the Port"
+        ::= { pmdge2RinvPortEntry 2 }
+
+
+
+
+pmdge2RinvLineTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pmdge2RinvLineEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the Lines on the selected module"
+      ::= { pmdge2riTable 2 }
+
+pmdge2RinvLineEntry OBJECT-TYPE
+        SYNTAX  Pmdge2RinvLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the Line table"
+        INDEX   { pmdge2RinvLineIndex }
+        ::= { pmdge2RinvLineTable 1 }
+    
+
+
+Pmdge2RinvLineEntry::=
+        SEQUENCE {
+          pmdge2RinvLineIndex 
+              Integer32,
+          pmdge2RinvxfpLine
+              DisplayString
+        }
+
+
+    pmdge2RinvLineIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Line table"
+        ::= { pmdge2RinvLineEntry 1 }
+
+
+    pmdge2RinvxfpLine OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the Line: This OID contains the inventory for the Line"
+        ::= { pmdge2RinvLineEntry 2 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmdge2AlmsynthAlm0 OBJECT IDENTIFIER ::= { pmdge2AlmOtherCrit 0 }
+
+
+
+
+pmdge2AlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmsynthAlm0 16 }
+
+
+
+pmdge2AlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmsynthAlm0 15 }
+
+
+
+pmdge2AlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm7 article
+--- *****************************************************
+pmdge2AlmsynthAlm7 OBJECT IDENTIFIER ::= { pmdge2AlmOtherCrit 7 }
+
+
+
+
+pmdge2AlmSwitchAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Equalizer :This OID indicates 
+        an alarm is present coming out
+         of the switch  <Help>  This alarm 
+        indicates if an Alarm has been
+         detected on the switch <Condtype> 
+        SWITCH_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2)
+        "
+	  ::= { pmdge2AlmsynthAlm7 10 }
+
+
+
+pmdge2AlmSwitchDegrade OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Equalizer :This OID 
+        indicates a  warning is present 
+        coming out of the switch  <Help> 
+         This alarm indicates if a warning 
+        has been detected on the switch 
+        <Condtype> SWITCH_DEGRADE <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { pmdge2AlmsynthAlm7 9 }
+
+
+
+pmdge2AlmInitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalizer Not Ready :This OID
+         indicates the switch is not operational.
+ 
+         <Help>  This status indicates
+         if the switch has been correctly 
+        initialized <Condtype> INIT_NOT_COMPL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmsynthAlm7 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the switchAlarms article
+--- *****************************************************
+pmdge2AlmswitchAlarms OBJECT IDENTIFIER ::= { pmdge2AlmOtherUrg 16 }
+
+
+
+
+pmdge2AlmSwitchTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalizer Temperature High Alarm 
+        :Alarm indicating that the temperature 
+        of the Switch in the module is
+         higher than the alarm threshold 
+        value  <Help>  This Alarm indicates 
+        if the temperature of the Switch 
+        in the module is higher than the 
+        alarm threshold value. <Condtype> 
+        SWITCH_TEMP_HIGH_ALA <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmswitchAlarms 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the switchDegrade article
+--- *****************************************************
+pmdge2AlmswitchDegrade OBJECT IDENTIFIER ::= { pmdge2AlmOtherNurg 17 }
+
+
+
+
+pmdge2AlmSwitchTempHighDeg OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalizer Temperature High Warning 
+        :Warning indicating that the temperature 
+        of the Switch in the module is
+         higher than the warning threshold 
+        value.  <Help>  This Warning indicates 
+        if the temperature of the Switch 
+        in the module is higher than the 
+        warning threshold value. <Condtype> 
+        SWITCH_TEMP_HIGH_DEG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmswitchDegrade 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the equalizationStatus article
+--- *****************************************************
+pmdge2AlmequalizationStatus OBJECT IDENTIFIER ::= { pmdge2AlmOtherNurg 18 }
+
+
+
+
+pmdge2AlmLossOfSpectrum OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Optical Spectrum Absent :This
+         OID indicates the equalizer does 
+        not receive any active channel
+          <Help>  This status indicates 
+        that no spectrum is available and 
+        every channel is under a detection 
+        threshold <Condtype> LOSS_OF_SPECTRUM 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmequalizationStatus 7 }
+
+
+
+pmdge2AlmAttenuationOverRange OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Attenuator Out Of Range :This
+         OID indicates the equalizer is 
+        not able to work properly because, 
+        at least, one of the attenuators 
+        is out of range  <Help>  This status 
+        indicates that the attenuations 
+        monitored in the module are too 
+        high (must be less than 15dB) <Condtype> 
+        ATTENUATION_OVER_RANGE <Probcause> 
+        other (1) <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2)
+        "
+	  ::= { pmdge2AlmequalizationStatus 6 }
+
+
+
+pmdge2AlmPowerOverRange OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Rx Power Out Of Range :This OID 
+        indicates the equalizer is not
+         able to work properly because
+         the power monitored is out of
+         range <Help>  This status indicates 
+        that the received power monitored 
+        by the module is too high (must 
+        be less than 0dBm) <Condtype> POWER_OVER_RANGE 
+        <Probcause> thresholdCrossed (52) 
+        <Alarmtype> processingErrorAlarm 
+        (4) <Polarity> (2)
+        "
+	  ::= { pmdge2AlmequalizationStatus 5 }
+
+
+
+pmdge2AlmEqualizationOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalization Off :This OID indicates 
+        the equalization process is disable 
+        <Help>  This status indicates if 
+        the equalizer process is off <Condtype> 
+        EQUALIZATION_OFF <Probcause> thresholdCrossed 
+        (52) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmdge2AlmequalizationStatus 4 }
+
+
+
+pmdge2AlmEqualizationComplete OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalization Complete :This OID 
+        indicates the equalization process 
+        is complete <Help>  This status 
+        indicates if the equalizer process 
+        is complete <Condtype> EQUALIZATION_COMPLETE 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmequalizationStatus 3 }
+
+
+
+pmdge2AlmEqualizationInprogress OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalization In Progress :This 
+        OID indicates the equalization
+         process is in progress <Help>
+          This status indicates if the
+         equalizer process is in progress 
+        <Condtype> EQUALIZATION_INPROGRESS 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmequalizationStatus 2 }
+
+
+
+pmdge2AlmEqualizationFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalization Fail :This OID indicates 
+        the equalization process has failed 
+        <Help>  This status indicates if 
+        the Equalizer process has failed 
+        <Condtype> EQUALIZATION_FAIL <Probcause> 
+        thresholdCrossed (52) <Alarmtype> 
+        processingErrorAlarm (4) <Polarity> 
+        (2) 
+        "
+	  ::= { pmdge2AlmequalizationStatus 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleStatus article
+--- *****************************************************
+pmdge2AlmmoduleStatus OBJECT IDENTIFIER ::= { pmdge2AlmOtherUrg 66 }
+
+
+
+
+pmdge2AlmSwitchNotReady OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalizer Not Ready :This OID
+         indicates the switch is not operational.
+ 
+         <Help>   This status indicates 
+        if the Switch of the module has 
+        been correctly initialized <Condtype> 
+        SWITCH_NOT_READY <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmmoduleStatus 5 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleAlarms article
+--- *****************************************************
+pmdge2AlmmoduleAlarms OBJECT IDENTIFIER ::= { pmdge2AlmOtherUrg 67 }
+
+
+
+
+pmdge2AlmCaseTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Case Temperature High Alarm :Alarm 
+        indicating that the temperature 
+        of the case is higher than the
+         alarm threshold value  <Help>
+          This Alarm indicates if the temperature 
+        of the case is higher than the
+         alarm threshold value. <Condtype> 
+        CASE_TEMP_HIGH_ALA <Probcause>
+         temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmmoduleAlarms 4 }
+
+
+
+pmdge2AlmModuleTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature High Alarm
+         :Alarm indicating that the temperature 
+        of the module is higher than the 
+        alarm threshold value  <Help> 
+         This Alarm indicates if the temperature 
+        of the module is higher than the 
+        alarm threshold value. <Condtype> 
+        MODULE_TEMP_HIGH_ALA <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmmoduleAlarms 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleDegrad article
+--- *****************************************************
+pmdge2AlmmoduleDegrad OBJECT IDENTIFIER ::= { pmdge2AlmOtherUrg 68 }
+
+
+
+
+pmdge2AlmCaseTempHighDeg OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Case Temperature High Warning
+         :Alarm indicating that the temperature 
+        of the case is higher than the
+         warning threshold value  <Help> 
+         This Warning indicates if the
+         temperature of the case is higher 
+        than the warning threshold value. 
+        <Condtype> CASE_TEMP_HIGH_DEG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmmoduleDegrad 4 }
+
+
+
+pmdge2AlmModuleTempHighDeg OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature High Warning 
+        :Alarm indicating that the temperature 
+        of the module is higher than the 
+        warning threshold value  <Help> 
+         This Warning indicates if the
+         temperature of the module is higher 
+        than the warning threshold value. 
+        <Condtype> MODULE_TEMP_HIGH_DEG 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmdge2AlmmoduleDegrad 2 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmdge2Ctrlsynth0 OBJECT IDENTIFIER ::= { pmdge2CtrlOther 0 }
+
+
+
+
+pmdge2CtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmdge2Ctrlsynth0 13 }
+
+
+
+pmdge2CtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmdge2Ctrlsynth0 9 }
+
+
+
+pmdge2CtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmdge2Ctrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmdge2Ctrlsynth4 OBJECT IDENTIFIER ::= { pmdge2CtrlOther 4 }
+
+
+
+
+pmdge2CtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM
+        "
+	  ::= { pmdge2Ctrlsynth4 2 }
+
+
+
+pmdge2CtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM
+        "
+	  ::= { pmdge2Ctrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmdge2CtrlswMgnt OBJECT IDENTIFIER ::= { pmdge2CtrlOther 5 }
+
+
+
+
+pmdge2CtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Software Warm Reset :This OID, 
+        when set, causes a warm reset of 
+        the Software. This reset is not 
+        traffic affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmdge2CtrlswMgnt 3 }
+
+
+
+pmdge2CtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Software Cold Reset :This OID, 
+        when set, causes a cold reset of 
+        the Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmdge2CtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the switchCtrl article
+--- *****************************************************
+pmdge2CtrlswitchCtrl OBJECT IDENTIFIER ::= { pmdge2CtrlOther 16 }
+
+
+
+
+pmdge2CtrlAllChannelsHighLoss OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalizer Port Shut Down :This 
+        OID , when set, puts all the waves 
+        on a high attenuation mode.   <Help> 
+         This control sets the waves on 
+        a high attenuation mode
+        "
+	  ::= { pmdge2CtrlswitchCtrl 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the manualStart article
+--- *****************************************************
+pmdge2CtrlmanualStart OBJECT IDENTIFIER ::= { pmdge2CtrlOther 17 }
+
+
+
+
+pmdge2CtrlManualStart OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Manual Start :This OID is used 
+        to trigger the equalizer when in 
+        manual mode <Help>  This control 
+        starts the equalization in manual 
+        mode
+        "
+	  ::= { pmdge2CtrlmanualStart 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmdge2CtrlledTest OBJECT IDENTIFIER ::= { pmdge2CtrlOther 64 }
+
+
+
+
+pmdge2CtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmdge2CtrlledTest 3 }
+
+
+
+pmdge2CtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmdge2CtrlledTest 2 }
+
+
+
+pmdge2CtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmdge2CtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the switchTemp article
+--- *****************************************************
+
+pmdge2MesrswitchTemp OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Equalizer Temperature :This OID 
+        gives the temperature value of
+         the switch in the module (Temperature 
+        = AV/256) (Unit = C)   <Help> 
+          This measure gives the temperature 
+        value of the switch in the module
+        "
+	  ::= { pmdge2MesrOther 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the channelLowestPowerValue article
+--- *****************************************************
+
+pmdge2MesrchannelLowestPowerValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Lowest Power Value :This 
+        OID gives the channel lowest power 
+        value detected  in the module (Power 
+        =(AV-32768)*0,005) (Unit = dBm) 
+          <Help>   This measure gives the 
+        channel lowest power value detected 
+        on the fiber
+        "
+	  ::= { pmdge2MesrOther 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the channelNumber article
+--- *****************************************************
+
+pmdge2MesrchannelNumber OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Lowest Power Number :This 
+        OID gives the channel number having 
+        the lowest power value  detected 
+         in the module (Channel = AV/100) 
+          <Help>   This measure gives the 
+        channel  lowest power number detected 
+        on the fiber
+        "
+	  ::= { pmdge2MesrOther 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleTemp article
+--- *****************************************************
+
+pmdge2MesrmoduleTemp OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature :This OID gives 
+        the temperature value of the module 
+        (Temperature = AV/256) (Unit =
+         C)  <Help>   This measure gives 
+        the temperature value of the module
+        "
+	  ::= { pmdge2MesrOther 64 }
+
+
+
+--- *****************************************************
+---     LEAF for the targetRequest article
+--- *****************************************************
+
+pmdge2MesrtargetRequest OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Output Target :This OID gives
+         the channel Output Power value 
+         target (Target =(AV-32768)*0,005) 
+        (Unit = dBm)   <Help>   This measure 
+        gives the power output target value 
+        selected on the channels
+        "
+	  ::= { pmdge2MesrOther 65 }
+
+
+
+--- *****************************************************
+---     LEAF for the channelPresenceThreshold article
+--- *****************************************************
+
+pmdge2MesrchannelPresenceThreshold OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Presence Threshold :This 
+        OID gives the input threshold for 
+        a channel to be considered (Target 
+        =(AV-32768)*0,005) (Unit = dBm) 
+          <Help>   This measure gives back 
+        the input power value of the presence 
+        threshold selected on setup
+        "
+	  ::= { pmdge2MesrOther 66 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel1InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel1InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 72 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel2InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel2InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 73 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel3InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel3InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 74 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel4InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel4InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 75 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel5InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel5InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 76 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel6InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel6InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 77 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel7InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel7InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 78 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel8InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel8InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 79 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel9InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel9InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 80 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel10InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel10InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 81 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel11InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel11InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 82 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel12InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel12InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 83 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel13InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel13InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 84 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel14InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel14InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 85 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel15InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel15InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 86 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel16InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel16InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 87 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel17InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel17InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 88 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel18InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel18InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 89 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel19InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel19InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 90 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel20InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel20InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 91 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel21InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel21InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 92 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel22InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel22InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 93 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel23InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel23InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 94 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel24InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel24InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 95 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel25InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel25InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 96 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel26InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel26InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 97 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel27InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel27InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 98 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel28InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel28InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 99 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel29InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel29InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 100 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel30InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel30InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 101 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel31InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel31InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 102 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel32InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel32InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 103 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel33InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel33InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 104 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel34InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel34InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 105 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel35InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel35InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 106 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel36InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel36InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 107 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel37InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel37InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 108 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel38InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel38InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 109 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel39InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel39InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 110 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel40InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel40InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 111 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel41InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel41InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 112 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel42InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel42InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 113 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel43InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel43InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 114 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel44InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel44InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 115 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel45InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel45InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 116 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel46InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel46InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 117 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel47InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel47InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 118 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel48InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel48InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 119 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel49InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel49InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 120 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel50InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel50InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 121 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel51InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel51InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 122 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel52InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel52InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 123 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel53InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel53InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 124 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel54InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel54InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 125 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel55InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel55InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 126 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel56InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel56InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 127 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel57InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel57InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 128 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel58InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel58InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 129 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel59InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel59InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 130 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel60InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel60InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 131 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel61InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel61InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 132 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel62InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel62InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 133 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel63InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel63InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 134 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel64InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel64InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 135 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel65InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel65InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 136 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel66InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel66InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 137 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel67InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel67InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 138 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel68InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel68InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 139 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel69InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel69InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 140 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel70InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel70InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 141 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel71InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel71InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 142 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel72InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel72InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 143 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel73InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel73InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 144 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel74InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel74InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 145 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel75InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel75InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 146 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel76InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel76InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 147 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel77InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel77InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 148 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel78InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel78InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 149 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel79InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel79InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 150 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel80InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel80InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 151 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel81InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel81InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 152 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel82InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel82InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 153 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel83InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel83InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 154 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel84InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel84InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 155 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel85InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel85InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 156 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel86InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel86InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 157 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel87InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel87InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 158 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel88InputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel88InputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reference Power :This OID gives 
+        the channel Input Power value 
+         (Input Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Input Power
+        "
+	  ::= { pmdge2MesrOther 159 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel1OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel1OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 164 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel2OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel2OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 165 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel3OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel3OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 166 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel4OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel4OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 167 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel5OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel5OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 168 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel6OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel6OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 169 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel7OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel7OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 170 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel8OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel8OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 171 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel9OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel9OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 172 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel10OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel10OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 173 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel11OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel11OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 174 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel12OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel12OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 175 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel13OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel13OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 176 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel14OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel14OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 177 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel15OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel15OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 178 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel16OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel16OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 179 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel17OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel17OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 180 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel18OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel18OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 181 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel19OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel19OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 182 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel20OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel20OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 183 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel21OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel21OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 184 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel22OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel22OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 185 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel23OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel23OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 186 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel24OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel24OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 187 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel25OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel25OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 188 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel26OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel26OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 189 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel27OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel27OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 190 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel28OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel28OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 191 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel29OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel29OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 192 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel30OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel30OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 193 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel31OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel31OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 194 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel32OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel32OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 195 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel33OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel33OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 196 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel34OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel34OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 197 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel35OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel35OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 198 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel36OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel36OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 199 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel37OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel37OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 200 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel38OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel38OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 201 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel39OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel39OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 202 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel40OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel40OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 203 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel41OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel41OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 204 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel42OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel42OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 205 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel43OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel43OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 206 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel44OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel44OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 207 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel45OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel45OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 208 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel46OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel46OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 209 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel47OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel47OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 210 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel48OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel48OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 211 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel49OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel49OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 212 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel50OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel50OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 213 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel51OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel51OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 214 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel52OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel52OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 215 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel53OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel53OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 216 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel54OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel54OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 217 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel55OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel55OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 218 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel56OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel56OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 219 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel57OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel57OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 220 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel58OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel58OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 221 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel59OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel59OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 222 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel60OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel60OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 223 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel61OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel61OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 224 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel62OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel62OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 225 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel63OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel63OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 226 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel64OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel64OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 227 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel65OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel65OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 228 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel66OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel66OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 229 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel67OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel67OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 230 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel68OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel68OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 231 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel69OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel69OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 232 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel70OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel70OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 233 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel71OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel71OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 234 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel72OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel72OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 235 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel73OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel73OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 236 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel74OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel74OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 237 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel75OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel75OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 238 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel76OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel76OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 239 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel77OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel77OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 240 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel78OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel78OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 241 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel79OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel79OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 242 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel80OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel80OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 243 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel81OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel81OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 244 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel82OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel82OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 245 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel83OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel83OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 246 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel84OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel84OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 247 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel85OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel85OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 248 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel86OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel86OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 249 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel87OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel87OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 250 }
+
+
+
+--- *****************************************************
+---     LEAF for the channel88OutputPwr article
+--- *****************************************************
+
+pmdge2Mesrchannel88OutputPwr OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Channel Output Power :This OID 
+        gives the channel Output Power
+         value  (Output Power =(AV-32768)*0,005) 
+        (Unit = dBm) <Help> This measure 
+        indicates the channel Output Power
+        "
+	  ::= { pmdge2MesrOther 251 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pmdge2CfgLsd OBJECT IDENTIFIER ::= { pmdge2Config 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0012
+--- *****************************************************
+
+pmdge2tableclientLsd OBJECT IDENTIFIER ::= { pmdge2CfgLsd 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startup
+--- *****************************************************
+
+pmdge2CfgStartup OBJECT IDENTIFIER ::= { pmdge2Config 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2591
+--- *****************************************************
+
+pmdge2tableother OBJECT IDENTIFIER ::= { pmdge2CfgStartup 1 }
+
+
+
+pmdge2Cfggrid OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting of the grid  :This 
+        register selects the configuration 
+        of the grid used on setup
+        "
+	  ::= { pmdge2tableother 2 }
+
+
+
+pmdge2CfgequalizationReference OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting of the Equalization 
+        reference :This register selects 
+        the configuration of the equalizer 
+        reference used on setup
+        "
+	  ::= { pmdge2tableother 3 }
+
+
+
+pmdge2CfgequalizationMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting of the Equalization 
+        mode :This register selects the 
+        configuration of the equalizer
+         mode used on setup
+        "
+	  ::= { pmdge2tableother 4 }
+
+
+
+pmdge2CfgchannelPowerRefValue OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting of the channel 
+        power value :This register selects 
+        the configuration of the channel 
+        power reference  value used on
+         setup
+        "
+	  ::= { pmdge2tableother 5 }
+
+
+
+pmdge2CfgchannelPresenceThreshold OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting of the channel 
+        presence threshold :This register 
+        selects the configuration of the 
+        presence threshold used on setup
+        "
+	  ::= { pmdge2tableother 6 }
+
+
+
+pmdge2CfgmonitoringPortAtt OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting of the monitoring 
+        port attenuation :This register 
+        selects a predefined value of the 
+        attenuation on the monitoring port
+        "
+	  ::= { pmdge2tableother 7 }
+
+
+
+pmdge2CfgscanningPeriod OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default setting of the scanning 
+        period :This register selects a 
+        predefined value of the scanning 
+        period
+        "
+	  ::= { pmdge2tableother 8 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0005
+--- *****************************************************
+
+pmdge2tableother1 OBJECT IDENTIFIER ::= { pmdge2CfgStartup 2 }
+
+
+
+pmdge2CfgcomponentType OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Component parameters :This OID 
+        defines the component parameters
+        "
+	  ::= { pmdge2tableother1 2 }
+
+
+
+pmdge2Cfgmiscellaneous OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Miscellaneous default settings 
+        :This OID defines the miscellaneous 
+        parameters
+        "
+	  ::= { pmdge2tableother1 3 }
+
+
+
+pmdge2CfgfirstChannel OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Number of the first channel of 
+        the component :This OID defines 
+        the first channel number of the 
+        PM
+        "
+	  ::= { pmdge2tableother1 4 }
+
+
+
+pmdge2CfglastChannel OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Number of the last channel of
+         the component :This OID defines 
+        the last channel number of the
+         PM
+        "
+	  ::= { pmdge2tableother1 5 }
+
+
+
+pmdge2CfggridUsed OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Grid value of the component :This 
+        OID defines the grid of the PM
+        "
+	  ::= { pmdge2tableother1 6 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmdge2CfgLabels OBJECT IDENTIFIER ::= { pmdge2Config 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmdge2CfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmdge2CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmdge2CfgLabels 1 }
+
+
+pmdge2CfgLabelclientEntry OBJECT-TYPE
+	SYNTAX Pmdge2CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmdge2CfgLabelclientIndex }
+	::= { pmdge2CfgLabelclientTable 1 }
+
+
+Pmdge2CfgLabelclientEntry ::=
+	SEQUENCE {
+	pmdge2CfgLabelclientIndex
+		INTEGER,
+	pmdge2CfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmdge2CfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmdge2CfgLabelclientEntry 1 }
+
+
+pmdge2CfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmdge2CfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmdge2CfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmdge2CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmdge2CfgLabels 2 }
+
+
+pmdge2CfgLabellineEntry OBJECT-TYPE
+	SYNTAX Pmdge2CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmdge2CfgLabellineIndex }
+	::= { pmdge2CfgLabellineTable 1 }
+
+
+Pmdge2CfgLabellineEntry ::=
+	SEQUENCE {
+	pmdge2CfgLabellineIndex
+		INTEGER,
+	pmdge2CfgLabellinePortn
+		DisplayString
+	}
+
+
+pmdge2CfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmdge2CfgLabellineEntry 1 }
+
+
+pmdge2CfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmdge2CfgLabellineEntry 3 }
+
+
+
+pmdge2CfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmdge2Config 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmdge2trapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmdge2traps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmdge2PowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmdge2AlmDefFuseB, pmdge2AlmDefFuseA , pmdge2trapBoardNumber}
+	STATUS current
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmdge2traps 50 }
+pmdge2PowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmdge2AlmDefFuseB, pmdge2AlmDefFuseA , pmdge2trapBoardNumber}
+	STATUS current
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmdge2traps 51 }
+
+
+
+
+
+
+END

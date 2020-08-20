@@ -1,0 +1,2329 @@
+-- *****************************************************************
+-- EKINOPS-PmOSC.TXT:  MIB
+--
+--MIB Part Number:3MI00110AHAD
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-PmOSC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePmOSC MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops PmOsc hardware."
+	REVISION "200607030000Z"
+	DESCRIPTION
+	  "Initial Version."
+	REVISION "200705210000Z"
+	DESCRIPTION
+	  "OOS functionality insertion."
+	REVISION "200706280000Z"
+	DESCRIPTION
+	  "°C change to C."
+	REVISION "200711210000Z"
+	DESCRIPTION
+	  "Update Ekinops address, Helps on objects, Ports labels "
+	REVISION "200905180000Z"
+	DESCRIPTION
+	  "CondType parameters insertion"
+	REVISION "201002250000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS"
+	REVISION "201011040000Z"
+	DESCRIPTION
+	  "Formulas in comments"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201403270000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201412110000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 14 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmoscalarms OBJECT IDENTIFIER ::= { modulePmOSC 2 }	
+pmoscAlmOther OBJECT IDENTIFIER ::= { pmoscalarms 1 }
+pmoscAlmOtherNurg OBJECT IDENTIFIER ::= { pmoscAlmOther 1 }
+pmoscAlmOtherUrg OBJECT IDENTIFIER ::= { pmoscAlmOther 2 }
+pmoscAlmOtherCrit OBJECT IDENTIFIER ::= { pmoscAlmOther 3 }
+
+pmoscAlmClient OBJECT IDENTIFIER ::= { pmoscalarms 2 }
+pmoscAlmClientNurg OBJECT IDENTIFIER ::= { pmoscAlmClient 1 }
+pmoscAlmClientUrg OBJECT IDENTIFIER ::= { pmoscAlmClient 2 }
+pmoscAlmClientCrit OBJECT IDENTIFIER ::= { pmoscAlmClient 3 }
+	
+pmoscAlmLine OBJECT IDENTIFIER ::= { pmoscalarms 3 }
+pmoscAlmLineNurg OBJECT IDENTIFIER ::= { pmoscAlmLine 1 }
+pmoscAlmLineUrg OBJECT IDENTIFIER ::= { pmoscAlmLine 2 }
+pmoscAlmLineCrit OBJECT IDENTIFIER ::= { pmoscAlmLine 3 }
+
+
+pmoscmeasures OBJECT IDENTIFIER ::= { modulePmOSC 3 }	
+pmoscMesrOther OBJECT IDENTIFIER ::= { pmoscmeasures 1 }	
+pmoscMesrClient OBJECT IDENTIFIER ::= { pmoscmeasures 2 }	
+pmoscMesrLine OBJECT IDENTIFIER ::= { pmoscmeasures 3 }	
+
+
+pmosccontrolsWrite OBJECT IDENTIFIER ::= { modulePmOSC 6 }
+pmoscCtrlOther OBJECT IDENTIFIER ::= { pmosccontrolsWrite 1 }
+pmoscCtrlClient OBJECT IDENTIFIER ::= { pmosccontrolsWrite 2 }
+pmoscCtrlLine OBJECT IDENTIFIER ::= { pmosccontrolsWrite 3 }
+
+pmoscri OBJECT IDENTIFIER ::= { modulePmOSC 7 }
+
+
+pmoscConfig OBJECT IDENTIFIER ::= { modulePmOSC 9 }
+
+pmosctraps OBJECT IDENTIFIER ::= { modulePmOSC 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmoscRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmoscri 2 }
+
+  
+pmoscRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmoscri 4 }
+  
+pmoscRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmoscri 5 }
+  
+pmoscRinvPortASFP OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Inventory for the SFP: This OID contains the inventory for the Port A SFP"
+  ::= { pmoscri 6 }
+
+
+pmoscRinvPortBSFP OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Inventory for the SFP: This OID contains the inventory for the Port B SFP"
+  ::= { pmoscri 7 }
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmoscAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmoscAlmOtherCrit 0 }
+
+
+
+
+pmoscAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm0 16 }
+
+
+
+pmoscAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm0 15 }
+
+
+
+pmoscAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm7 article
+--- *****************************************************
+pmoscAlmsynthAlm7 OBJECT IDENTIFIER ::= { pmoscAlmLineCrit 7 }
+
+
+
+
+pmoscAlmPortbFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Port B Failure :This OID indicates 
+        a failure on the port B <Condtype> 
+        PORTB_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm7 12 }
+
+
+
+pmoscAlmPortbDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm DDM On SFP B :This OID indicates 
+        an alarm is present coming out
+         of optical interface DDM on port 
+        B  <Help>  This alarm indicates 
+        if a DDM Alarm has been detected 
+        on the port B transceiver <Condtype> 
+        PORTB_DDM_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm7 10 }
+
+
+
+pmoscAlmPortbDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning DDM On SFP B :This OID 
+        indicates a warning is present
+         coming out of optical interface 
+        DDM on port B  <Help>  This alarm 
+        indicates if a DDM Warning has
+         been detected on the port B transceiver 
+        <Condtype> PORTB_DDM_WARNING <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoscAlmsynthAlm7 9 }
+
+
+
+pmoscAlmPortbLocalOos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B In Service :This OID indicates 
+        that the Port B is In Service (1) 
+        of Out or Service (2)  <Help> 
+         This status indicates if the port 
+        B is in service <Condtype> PORTB_LOCAL_OOS 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmoscAlmsynthAlm7 6 }
+
+
+
+pmoscAlmPortbLsd OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Laser Shutdown :This OID 
+        indicates the optical output power 
+        is off on port B  <Help>  This
+         status indicates if the port B 
+        transceiver laser is ON or OFF
+         <Condtype> PORTB_LSD <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm7 5 }
+
+
+
+pmoscAlmPortbHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Port B HW Failure :This OID indicates 
+        a hardware failure on the port
+         B <Condtype> PORTB_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoscAlmsynthAlm7 4 }
+
+
+
+pmoscAlmPortbDdmAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        DDM Supported On SFP B :This OID 
+        indicates that the SFP module B 
+        does not support Digital Diagnostic 
+        Monitoring Functions  <Help>  This 
+        status indicates if the porr B
+         transceiver includes the DDM feature 
+        <Condtype> PORTB_DDM_ABSENT <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm7 2 }
+
+
+
+pmoscAlmPortbSfpAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Absent :This OID indicates 
+        that the SFP module B is not present. 
+         <Help>  This alarm indicates if 
+        the port B transceiver is present. 
+        <Condtype> PORTB_SFP_ABSENT <Probcause> 
+        inputOutputDeviceError (24) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDINV
+        "
+	  ::= { pmoscAlmsynthAlm7 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm8 article
+--- *****************************************************
+pmoscAlmsynthAlm8 OBJECT IDENTIFIER ::= { pmoscAlmClientCrit 8 }
+
+
+
+
+pmoscAlmPortaFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Port A Failure :This OID indicates 
+        a failure on the port A <Condtype> 
+        PORTA_FAIL <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm8 12 }
+
+
+
+pmoscAlmPortaDdmAlm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm DDM On SFP A :This OID indicates 
+        an alarm is present coming out
+         of optical interface DDM on port 
+        A  <Help>  This alarm indicates 
+        if a DDM Alarm has been detected 
+        on the port A transceiver <Condtype> 
+        PORTA_DDM_ALM <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm8 10 }
+
+
+
+pmoscAlmPortaDdmWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning DDM On SFP A :This OID 
+        indicates a warning is present
+         coming out of optical interface 
+        DDM on port A  <Help>  This alarm 
+        indicates if a DDM Warning has
+         been detected on the port A transceiver 
+        <Condtype> PORTA_DDM_WARNING <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoscAlmsynthAlm8 9 }
+
+
+
+pmoscAlmPortaLocalOos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A In Service :This OID indicates 
+        that the Port A is In Service (1) 
+        of Out or Service (2)  <Help> 
+         This status indicates if the port 
+        A is in service <Condtype> PORTA_LOCAL_OOS 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmoscAlmsynthAlm8 6 }
+
+
+
+pmoscAlmPortaLsd OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Laser Shutdown :This OID 
+        indicates the optical output power 
+        is off on port A  <Help>  This
+         status indicates if the port A 
+        transceiver laser is ON or OFF
+         <Condtype> PORTA_LSD <Probcause> 
+        informationalStatus(1000) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm8 5 }
+
+
+
+pmoscAlmPortaHwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Port A HW Failure :This OID indicates 
+        a hardware failure on the port
+         A <Condtype> PORTA_HW_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmoscAlmsynthAlm8 4 }
+
+
+
+pmoscAlmPortaDdmAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        DDM Supported On SFP A :This OID 
+        indicates that the SFP module A 
+        does not support Digital Diagnostic 
+        Monitoring Functions  <Help>  This 
+        status indicates if the port A
+         transceiver includes the DDM feature 
+        <Condtype> PORTA_DDM_ABSENT <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmsynthAlm8 2 }
+
+
+
+pmoscAlmPortaSfpAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Absent :This OID indicates 
+        that the SFP module A is not present. 
+         <Help>  This alarm indicates if 
+        the port A transceiver is present. 
+        <Condtype> PORTA_SFP_ABSENT <Probcause> 
+        inputOutputDeviceError (24) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDINV
+        "
+	  ::= { pmoscAlmsynthAlm8 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaAccessioAlm article
+--- *****************************************************
+pmoscAlmportaAccessioAlm OBJECT IDENTIFIER ::= { pmoscAlmClientCrit 16 }
+
+
+
+
+pmoscAlmPortaLos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Loss Of Optical Signal On SFP
+         A :This OID indicates that no
+         signal is present on the SFP A 
+         <Help>  This alarm indicates if 
+        an optical signal is detected on 
+        the port A transceiver input <Condtype> 
+        PORTA_LOS <Probcause> receiveFailure 
+        (41) <Alarmtype> physicalViolation 
+        (9) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaAccessioAlm 4 }
+
+
+
+pmoscAlmPortaLasFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Tx Failed :This OID indicates 
+        that the transmitter fails for
+         the SFP plugged into the port
+         A (this alarm reports the transmitter 
+        failure alarm generated by the
+         SFPs)  <Help>  This alarm indicates 
+        if the laser of the port A transceiver 
+        is in fail condition <Condtype> 
+        PORTA_LAS_FAIL <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaAccessioAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaSfpAlmDdm article
+--- *****************************************************
+pmoscAlmportaSfpAlmDdm OBJECT IDENTIFIER ::= { pmoscAlmClientUrg 18 }
+
+
+
+
+pmoscAlmPortaRxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Rx Power High :Alarm indicating 
+        that the SFP input power of port 
+        A is higher than the threshold
+         value written in the SFP EEPROM 
+        <Condtype> PORTA_RX_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpAlmDdm 16 }
+
+
+
+pmoscAlmPortaRxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Rx Power Low :Alarm indicating 
+        that the SFP input power of port 
+        A is lower than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        PORTA_RX_PWR_LOW_ALA <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpAlmDdm 15 }
+
+
+
+pmoscAlmPortaTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Temp High :Alarm indicating 
+        that the SFP temperature of port 
+        A is higher than the threshold
+         value written in the SFP EEPROM 
+        <Condtype> PORTA_TEMP_HIGH_ALA
+         <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpAlmDdm 8 }
+
+
+
+pmoscAlmPortaTempLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Temp Low :Alarm indicating 
+        that the SFP temperature of port 
+        A is lower than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        PORTA_TEMP_LOW_ALA <Probcause>
+         temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpAlmDdm 7 }
+
+
+
+pmoscAlmPortaTxBiasHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Bias High :Alarm indicating 
+        that the SFP laser bias current 
+        of port A is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTA_TX_BIAS_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpAlmDdm 4 }
+
+
+
+pmoscAlmPortaTxBiasLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Bias Low :Alarm indicating 
+        that the SFP laser bias current 
+        of port A is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTA_TX_BIAS_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpAlmDdm 3 }
+
+
+
+pmoscAlmPortaTxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Tx Power High :Alarm indicating 
+        that the SFP output power of port 
+        A is higher than the threshold
+         value written in the SFP EEPROM 
+        <Condtype> PORTA_TX_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpAlmDdm 2 }
+
+
+
+pmoscAlmPortaTxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Tx Power Low :Alarm indicating 
+        that the SFP output power of port 
+        A is lower than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        PORTA_TX_PWR_LOW_ALA <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpAlmDdm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaSfpWarnDdm article
+--- *****************************************************
+pmoscAlmportaSfpWarnDdm OBJECT IDENTIFIER ::= { pmoscAlmClientNurg 20 }
+
+
+
+
+pmoscAlmPortaRxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Rx Power High Warning :Warning 
+        indicating that the SFP input power 
+        of port A is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTA_RX_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpWarnDdm 16 }
+
+
+
+pmoscAlmPortaRxPwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Rx Power Low Warning :Warning 
+        indicating that the SFP input power 
+        of port A is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTA_RX_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpWarnDdm 15 }
+
+
+
+pmoscAlmPortaTempHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Temp High Warning :Warning 
+        indicating that the SFP temperature 
+        of port A is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTA_TEMP_HIGH_WNG
+         <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpWarnDdm 8 }
+
+
+
+pmoscAlmPortaTempLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Temp Low Warning :Warning 
+        indicating that the SFP temperature 
+        of port A is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTA_TEMP_LOW_WNG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpWarnDdm 7 }
+
+
+
+pmoscAlmPortaTxBiasHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Bias High Warning :Warning 
+        indicating that the SFP laser bias 
+        current of port A is higher than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> PORTA_TX_BIAS_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpWarnDdm 4 }
+
+
+
+pmoscAlmPortaTxBiasLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Bias Low Warning :Warning 
+        indicating that the SFP laser bias 
+        current of port A is lower than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> PORTA_TX_BIAS_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpWarnDdm 3 }
+
+
+
+pmoscAlmPortaTxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Tx Power High Warning :Warning 
+        indicating that the SFP output
+         power of port A is higher than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> PORTA_TX_PWR_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpWarnDdm 2 }
+
+
+
+pmoscAlmPortaTxPwLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Tx Power Low Warning :Warning 
+        indicating that the SFP output
+         power of port A is lower than
+         the threshold value written in 
+        the SFP EEPROM <Condtype> PORTA_TX_PW_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportaSfpWarnDdm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbAccessioAlm article
+--- *****************************************************
+pmoscAlmportbAccessioAlm OBJECT IDENTIFIER ::= { pmoscAlmLineCrit 24 }
+
+
+
+
+pmoscAlmPortbLos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Loss Of Optical Signal On SFP
+         B :This OID indicates that no
+         signal is present on the SFP B 
+         <Help>  This alarm indicates if 
+        an optical signal is detected on 
+        the port B transceiver input <Condtype> 
+        PORTB_LOS <Probcause> receiveFailure 
+        (41) <Alarmtype> physicalViolation 
+        (9) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbAccessioAlm 4 }
+
+
+
+pmoscAlmPortbLasFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Tx Failed :This OID indicates 
+        that the transmitter fails for
+         the SFP plugged into the port
+         A (this alarm reports the transmitter 
+        failure alarm generated by the
+         SFPs)  <Help>  This alarm indicates 
+        if the laser of the port B transceiver 
+        is in fail condition <Condtype> 
+        PORTB_LAS_FAIL <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbAccessioAlm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbSfpAlmDdm article
+--- *****************************************************
+pmoscAlmportbSfpAlmDdm OBJECT IDENTIFIER ::= { pmoscAlmLineUrg 26 }
+
+
+
+
+pmoscAlmPortbRxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Rx Power High :Alarm indicating 
+        that the SFP input power of port 
+        B is higher than the threshold
+         value written in the SFP EEPROM 
+        <Condtype> PORTB_RX_PWR_HIGH_ALA 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpAlmDdm 16 }
+
+
+
+pmoscAlmPortbRxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Rx Power Low :Alarm indicating 
+        that the SFP input power of port 
+        B is lower than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        PORTB_RX_PWR_LOW_ALA <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpAlmDdm 15 }
+
+
+
+pmoscAlmPortbTempHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Temp High :Alarm indicating 
+        that the SFP temperature of port 
+        B is higher than the threshold
+         value written in the SFP EEPROM 
+        <Condtype> PORTB_TEMP_HIGH_ALA
+         <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpAlmDdm 8 }
+
+
+
+pmoscAlmPortbTempLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Temp Low :Alarm indicating 
+        that the SFP temperature of port 
+        B is lower than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        PORTB_TEMP_LOW_ALA <Probcause>
+         temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpAlmDdm 7 }
+
+
+
+pmoscAlmPortbTxBiasHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Bias High :Alarm indicating 
+        that the SFP laser bias current 
+        of port B is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTB_TX_BIAS_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpAlmDdm 4 }
+
+
+
+pmoscAlmPortbTxBiasLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Bias Low :Alarm indicating 
+        that the SFP laser bias current 
+        of port B is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTB_TX_BIAS_LOW_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpAlmDdm 3 }
+
+
+
+pmoscAlmPortbTxPwrHighAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Tx Power High :Alarm indicating 
+        that the SFP output power of port 
+        B is higher than the threshold
+         value written in the SFP EEPROM 
+        <Condtype> PORTB_TX_PWR_HIGH_ALA 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpAlmDdm 2 }
+
+
+
+pmoscAlmPortbTxPwrLowAla OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Tx Power Low :Alarm indicating 
+        that the SFP output power of port 
+        B is lower than the threshold value 
+        written in the SFP EEPROM <Condtype> 
+        PORTB_TX_PWR_LOW_ALA <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpAlmDdm 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbSfpWarnDdm article
+--- *****************************************************
+pmoscAlmportbSfpWarnDdm OBJECT IDENTIFIER ::= { pmoscAlmLineNurg 28 }
+
+
+
+
+pmoscAlmPortbRxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Rx Power High Warning :Warning 
+        indicating that the SFP input power 
+        of port B is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTB_RX_PWR_HIGH_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpWarnDdm 16 }
+
+
+
+pmoscAlmPortbRxPwrLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Rx Power Low Warning :Warning 
+        indicating that the SFP input power 
+        of port B is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTB_RX_PWR_LOW_WNG 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpWarnDdm 15 }
+
+
+
+pmoscAlmPortbTempHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Temp High Warning :Warning 
+        indicating that the SFP temperature 
+        of port B is higher than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTB_TEMP_HIGH_WNG
+         <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpWarnDdm 8 }
+
+
+
+pmoscAlmPortbTempLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Temp Low Warning :Warning 
+        indicating that the SFP temperature 
+        of port B is lower than the threshold 
+        value written in the SFP EEPROM 
+        <Condtype> PORTB_TEMP_LOW_WNG <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpWarnDdm 7 }
+
+
+
+pmoscAlmPortbTxBiasHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Bias High Warning :Warning 
+        indicating that the SFP laser bias 
+        current of port B is higher than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> PORTB_TX_BIAS_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpWarnDdm 4 }
+
+
+
+pmoscAlmPortbTxBiasLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Bias Low Warning :Warning 
+        indicating that the SFP laser bias 
+        current of port B is lower than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> PORTB_TX_BIAS_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpWarnDdm 3 }
+
+
+
+pmoscAlmPortbTxPwrHighWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Tx Power High Warning :Warning 
+        indicating that the SFP output
+         power of port B is higher than 
+        the threshold value written in
+         the SFP EEPROM <Condtype> PORTB_TX_PWR_HIGH_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpWarnDdm 2 }
+
+
+
+pmoscAlmPortbTxPwLowWng OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Tx Power Low Warning :Warning 
+        indicating that the SFP output
+         power of port B is lower than
+         the threshold value written in 
+        the SFP EEPROM <Condtype> PORTB_TX_PW_LOW_WNG 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmoscAlmportbSfpWarnDdm 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmoscCtrlsynth0 OBJECT IDENTIFIER ::= { pmoscCtrlOther 0 }
+
+
+
+
+pmoscCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmoscCtrlsynth0 13 }
+
+
+
+pmoscCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmoscCtrlsynth0 9 }
+
+
+
+pmoscCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmoscCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmoscCtrlsynth4 OBJECT IDENTIFIER ::= { pmoscCtrlOther 4 }
+
+
+
+
+pmoscCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmoscCtrlsynth4 2 }
+
+
+
+pmoscCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmoscCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmoscCtrlswMgnt OBJECT IDENTIFIER ::= { pmoscCtrlOther 5 }
+
+
+
+
+pmoscCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Software Warm Reset :This OID, 
+        when set, causes a warm reset of 
+        the Software. This reset is not 
+        traffic affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmoscCtrlswMgnt 3 }
+
+
+
+pmoscCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Software Cold Reset :This OID, 
+        when set, causes a cold reset of 
+        the Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmoscCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaSfpOnoff article
+--- *****************************************************
+pmoscCtrlportaSfpOnoff OBJECT IDENTIFIER ::= { pmoscCtrlClient 16 }
+
+
+
+
+pmoscCtrlPortaSfpOnoff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Optical Laser Shutdown :This 
+        OID switches off the SFP A  <Help> 
+         This control defines the laser 
+        state of the port A transceiver
+        "
+	  ::= { pmoscCtrlportaSfpOnoff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaOosMode article
+--- *****************************************************
+pmoscCtrlportaOosMode OBJECT IDENTIFIER ::= { pmoscCtrlClient 17 }
+
+
+
+
+pmoscCtrlPortaOosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Port Out Of Service :This 
+        OID sets the Port A Out Of Service 
+         <Help>  This controls defines
+         the service state of the port
+         A
+        "
+	  ::= { pmoscCtrlportaOosMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbSfpOnoff article
+--- *****************************************************
+pmoscCtrlportbSfpOnoff OBJECT IDENTIFIER ::= { pmoscCtrlLine 24 }
+
+
+
+
+pmoscCtrlPortbSfpOnoff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Optical Laser Shutdown :This 
+        OID switches off the SFP B  <Help> 
+         This control defines the laser 
+        state of the port B transceiver
+        "
+	  ::= { pmoscCtrlportbSfpOnoff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbOosMode article
+--- *****************************************************
+pmoscCtrlportbOosMode OBJECT IDENTIFIER ::= { pmoscCtrlLine 25 }
+
+
+
+
+pmoscCtrlPortbOosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Port Out Of Service :This 
+        OID sets the Port B Out Of Service 
+         <Help>  This controls defines
+         the service state of the port
+         B
+        "
+	  ::= { pmoscCtrlportbOosMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmoscCtrlledTest OBJECT IDENTIFIER ::= { pmoscCtrlOther 64 }
+
+
+
+
+pmoscCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmoscCtrlledTest 3 }
+
+
+
+pmoscCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmoscCtrlledTest 2 }
+
+
+
+pmoscCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmoscCtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the moduleOosMode article
+--- *****************************************************
+pmoscCtrlmoduleOosMode OBJECT IDENTIFIER ::= { pmoscCtrlOther 65 }
+
+
+
+
+pmoscCtrlModuleOosMode OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Out Of Service :This OID sets 
+        the PM Out Of Service  <Help> 
+         This control defines the service 
+        state of the complete module
+        "
+	  ::= { pmoscCtrlmoduleOosMode 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the portaTemperature article
+--- *****************************************************
+
+pmoscMesrportaTemperature OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Temperature :This OID gives 
+        the temperature of the SFP A, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Temperature = AV/256) 
+        (Unit = C)  <Help>  This measure 
+        gives the temperature of the port 
+        A transceiver
+        "
+	  ::= { pmoscMesrClient 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaVolt article
+--- *****************************************************
+
+pmoscMesrportaVolt OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Power Supply :This OID gives 
+        the voltage of the SFP A, read
+         from the DDM (Digital Diagnostic 
+        Monitoring) (Voltage = AV/10000) 
+        (Unit = V)  <Help>  This measure 
+        gives the 3V3 voltage of the port 
+        A transceiver
+        "
+	  ::= { pmoscMesrClient 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaTxBias article
+--- *****************************************************
+
+pmoscMesrportaTxBias OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Laser Bias :This OID gives 
+        the bias value of the SFP A, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Bias = AV/500) (Unit 
+        = mA)  <Help>  This measure gives 
+        the bias of the port A transceiver
+        "
+	  ::= { pmoscMesrClient 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaTxPower article
+--- *****************************************************
+
+pmoscMesrportaTxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Tx Power :This OID gives 
+        the transmit power value of the 
+        SFP A, read from the DDM (Digital 
+          Diagnostic Monitoring) (Power 
+        = 10*log(AV)-40) (Unit = dBm) 
+         <Help>  This measure gives the 
+        Tx optical power of the port A
+         transceiver
+        "
+	  ::= { pmoscMesrClient 19 }
+
+
+
+--- *****************************************************
+---     LEAF for the portaRxPower article
+--- *****************************************************
+
+pmoscMesrportaRxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP A Rx Power :This OID gives 
+        the receive power value of the
+         SFP A, read from the DDM (Digital 
+        Diagnostic Monitoring) (Power = 
+        10*log(AV)-40) (Unit = dBm)  <Help> 
+         This measure gives the Rx optical 
+        power of the port A transceiver
+        "
+	  ::= { pmoscMesrClient 20 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbTemperature article
+--- *****************************************************
+
+pmoscMesrportbTemperature OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Temperature :This OID gives 
+        the temperature of the SFP B, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Temperature = AV/256) 
+        (Unit = C)  <Help>  This measure 
+        gives the temperature of the port 
+        B transceiver
+        "
+	  ::= { pmoscMesrLine 24 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbVolt article
+--- *****************************************************
+
+pmoscMesrportbVolt OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Power Supply :This OID gives 
+        the voltage of the SFP B, read
+         from the DDM (Digital Diagnostic 
+        Monitoring) (Voltage = AV/10000) 
+        (Unit = V)  <Help>  This measure 
+        gives the 3V3 voltage of the port 
+        B transceiver
+        "
+	  ::= { pmoscMesrLine 25 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbTxBias article
+--- *****************************************************
+
+pmoscMesrportbTxBias OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Laser Bias :This OID gives 
+        the bias value of the SFP B, read 
+        from the DDM (Digital Diagnostic 
+        Monitoring) (Bias = AV/500) (Unit 
+        = mA)  <Help>  This measure gives 
+        the bias of the port B transceiver
+        "
+	  ::= { pmoscMesrLine 26 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbTxPower article
+--- *****************************************************
+
+pmoscMesrportbTxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Tx Power :This OID gives 
+        the transmit power value of the 
+        SFP B, read from the DDM (Digital 
+          Diagnostic Monitoring) (Power 
+        = 10*log(AV)-40) (Unit = dBm) 
+         <Help>  This measure gives the 
+        Tx optical power of the port B
+         transceiver
+        "
+	  ::= { pmoscMesrLine 27 }
+
+
+
+--- *****************************************************
+---     LEAF for the portbRxPower article
+--- *****************************************************
+
+pmoscMesrportbRxPower OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SFP B Rx Power :This OID gives 
+        the receive power value of the
+         SFP B, read from the DDM (Digital 
+        Diagnostic Monitoring) (Power = 
+        10*log(AV)-40) (Unit = dBm)  <Help> 
+         This measure gives the Rx optical 
+        power of the port B transceiver
+        "
+	  ::= { pmoscMesrLine 28 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+pmoscCfgLsd OBJECT IDENTIFIER ::= { pmoscConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+pmoscCfgStartUp OBJECT IDENTIFIER ::= { pmoscConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2111
+--- *****************************************************
+
+pmosctableclientStartup OBJECT IDENTIFIER ::= { pmoscCfgStartUp 1 }
+
+
+
+pmoscCfgportaSfpCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on  Port A :This 
+         register configures the default 
+        initialisation settings on port 
+        A.
+        "
+	  ::= { pmosctableclientStartup 2 }
+
+
+
+pmoscCfgportaOosMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on  Port A :This 
+         register configures the default 
+        initialisation settings on port 
+        A.
+        "
+	  ::= { pmosctableclientStartup 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmosctablelineStartup OBJECT IDENTIFIER ::= { pmoscCfgStartUp 2 }
+
+
+
+pmoscCfgportbSfpCtrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on Port B :This 
+         register configures the default 
+        initialisation settings on port 
+        B.
+        "
+	  ::= { pmosctablelineStartup 2 }
+
+
+
+pmoscCfgportbOosMode OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on  Port B :This 
+         register configures the default 
+        initialisation settings on port 
+        B.
+        "
+	  ::= { pmosctablelineStartup 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmoscCfgLabels OBJECT IDENTIFIER ::= { pmoscConfig 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmoscCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmoscCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmoscCfgLabels 1 }
+
+
+pmoscCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmoscCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmoscCfgLabelclientIndex }
+	::= { pmoscCfgLabelclientTable 1 }
+
+
+PmoscCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmoscCfgLabelclientIndex
+		INTEGER,
+	pmoscCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmoscCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmoscCfgLabelclientEntry 1 }
+
+
+pmoscCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmoscCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmoscCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmoscCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmoscCfgLabels 2 }
+
+
+pmoscCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmoscCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmoscCfgLabellineIndex }
+	::= { pmoscCfgLabellineTable 1 }
+
+
+PmoscCfgLabellineEntry ::=
+	SEQUENCE {
+	pmoscCfgLabellineIndex
+		INTEGER,
+	pmoscCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmoscCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmoscCfgLabellineEntry 1 }
+
+
+pmoscCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmoscCfgLabellineEntry 3 }
+
+
+
+pmoscCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmoscConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmosctrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmosctraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     GLOBAL TRAPS
+--- *****************************************************
+
+pmoscPortaTrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortaDdmWarning, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port A Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmoscAlmPortaDdmWarning "on", pmosctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Port A of PMOSC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Port A default is activated"
+	::= { pmosctraps 30 }
+
+pmoscPortaTrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortaDdmWarning, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port A Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOSC Port A Not Urgent ON"}
+	--&MATCH       { pmoscAlmPortaDdmWarning "on", pmosctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Port A of PMOSC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Port A default disappeared"
+	::= { pmosctraps 31 }
+
+pmoscPortaTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortaDdmAlm, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port A Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoscAlmPortaDdmAlm "on", pmosctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on Port A of PMOSC in slot $2 ($A)"
+	DESCRIPTION "Urgent Port A default is activated"
+	::= { pmosctraps 32 }
+
+pmoscPortaTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortaDdmAlm, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port A Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOSC Port A Urgent ON"}
+	--&MATCH       { pmoscAlmPortaDdmAlm "on", pmosctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Port A of PMOSC in slot $2 ($A)"
+	DESCRIPTION "Urgent Port A default disappeared"
+	::= { pmosctraps 33 }
+
+pmoscPortaTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortaFail, pmoscAlmPortaHwFail, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port A Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmoscAlmPortaFail "on", pmoscAlmPortaHwFail "*", pmosctrapBoardNumber "$3"}
+	--&MESG        "Port A Down on PMOSC in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMOSC Port A HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoscAlmPortaFail "*", pmoscAlmPortaHwFail "on", pmosctrapBoardNumber "$3"}
+	--&MESG        "Port A Down on PMOSC in Slot $3 ($A)"
+	DESCRIPTION "Critical Port A default is activated"
+	::= { pmosctraps 34 }
+
+pmoscPortaTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortaFail, pmoscAlmPortaHwFail, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port A Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOSC Port A Fail ON" }
+	--&MATCH       { pmoscAlmPortaFail "on", pmoscAlmPortaHwFail "*", pmosctrapBoardNumber "$3"}
+	--&MESG        "Port A Up on PMOSC in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOSC Port A HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoscAlmPortaFail "*", pmoscAlmPortaHwFail "on", pmosctrapBoardNumber "$3"}
+	--&MESG        "Port A Up on PMOSC in Slot $3 ($A)"
+	DESCRIPTION "Critical Port A default disappeared"
+	::= { pmosctraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     PORTS TRAPS
+--- *****************************************************
+
+pmoscPortbNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortbDdmWarning, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port B Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmoscAlmPortbDdmWarning "on", pmosctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Port B of PMOSC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Port B default is activated"
+	::= { pmosctraps 40 }
+
+pmoscPortbNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortbDdmWarning, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port B Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOSC Port B Not Urgent ON"}
+	--&MATCH       { pmoscAlmPortbDdmWarning "on", pmosctrapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Port B of PMOSC in slot $2 ($A)"
+	DESCRIPTION "Not urgent Port B default disappeared"
+	::= { pmosctraps 41 }
+
+pmoscPortbUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortbDdmAlm, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port B Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoscAlmPortbDdmAlm "on", pmosctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on Port B of PMOSC in slot $2 ($A)"
+	DESCRIPTION "Urgent Port B default is activated"
+	::= { pmosctraps 42 }
+
+pmoscPortbUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortbDdmAlm, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port B Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOSC Port B Urgent ON"}
+	--&MATCH       { pmoscAlmPortbDdmAlm "on", pmosctrapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Port B of PMOSC in slot $2 ($A)"
+	DESCRIPTION "Urgent Port B default disappeared"
+	::= { pmosctraps 43 }
+
+pmoscPortbCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortbFail, pmoscAlmPortbHwFail, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port B Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmoscAlmPortbFail "on", pmoscAlmPortbHwFail "*", pmosctrapBoardNumber "$3"}
+	--&MESG        "Port B Down on PMOSC in Slot $3 ($A)"
+	
+	--&FILTNAME    "PMOSC Port B HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoscAlmPortbFail "*", pmoscAlmPortbHwFail "on", pmosctrapBoardNumber "$3"}
+	--&MESG        "Port B Down on PMOSC in Slot $3 ($A)"
+	DESCRIPTION "Critical Port B default is activated"
+	::= { pmosctraps 44 }
+
+pmoscPortbCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmPortbFail, pmoscAlmPortbHwFail, pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Port B Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PMOSC Port B Fail ON" }
+	--&MATCH       { pmoscAlmPortbFail "on", pmoscAlmPortbHwFail "*", pmosctrapBoardNumber "$3"}
+	--&MESG        "Port B Up on PMOSC in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOSC Port B HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmoscAlmPortbFail "*", pmoscAlmPortbHwFail "on", pmosctrapBoardNumber "$3"}
+	--&MESG        "Port B Up on PMOSC in Slot $3 ($A)"
+	DESCRIPTION "Critical Port B default disappeared"
+	::= { pmosctraps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmoscPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmDefFuseB, pmoscAlmDefFuseA , pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoscAlmDefFuseB "*", pmoscAlmDefFuseA "on", pmosctrapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PMOSC in Slot $3 ($A)"
+
+	--&FILTNAME    "PMOSC Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmoscAlmDefFuseB "on", pmoscAlmDefFuseA "*", pmosctrapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PMOSC in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmosctraps 50 }
+pmoscPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmoscAlmDefFuseB, pmoscAlmDefFuseA , pmosctrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PMOSC Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PMOSC Fuse A Fail ON", "PMOSC Fuse B Fail ON" }
+	--&MATCH       { pmoscAlmDefFuseB "on", pmoscAlmDefFuseA "on", pmosctrapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PMOSC in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmosctraps 51 }
+
+
+
+
+
+
+END

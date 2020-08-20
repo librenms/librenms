@@ -1,0 +1,1230 @@
+-- *****************************************************************
+-- EKINOPS-Trfan.TXT:  MIB
+--
+--MIB Part Number:3MI00121ABAF
+--MIB Version:01
+--
+-- Copyright (c) 2017 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Trfan-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+moduletrfan MODULE-IDENTITY
+        LAST-UPDATED "201706090000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@Ekinops.net"
+        DESCRIPTION
+          "MIB for the Ekinops Trfan hardware."
+
+	REVISION "201001040000Z"
+	DESCRIPTION
+	  "Initial Version."
+	REVISION "201010280000Z"
+	DESCRIPTION
+	  "Formula in comment"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201309020000Z"
+	DESCRIPTION
+	  "Cfg StartUp-Other modification"
+	REVISION "201403260000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201411250000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+	REVISION "201706090000Z"
+	DESCRIPTION
+	  "Modification of numbering of the fans"
+        ::= { ekinops 45 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+trfanalarms OBJECT IDENTIFIER ::= { moduletrfan 2 }	
+trfanAlmOther OBJECT IDENTIFIER ::= { trfanalarms 1 }
+trfanAlmOtherNurg OBJECT IDENTIFIER ::= { trfanAlmOther 1 }
+trfanAlmOtherUrg OBJECT IDENTIFIER ::= { trfanAlmOther 2 }
+trfanAlmOtherCrit OBJECT IDENTIFIER ::= { trfanAlmOther 3 }
+
+
+
+trfanmeasures OBJECT IDENTIFIER ::= { moduletrfan 3 }	
+trfanMesrOther OBJECT IDENTIFIER ::= { trfanmeasures 1 }	
+
+
+trfancontrolsWrite OBJECT IDENTIFIER ::= { moduletrfan 6 }
+trfanCtrlOther OBJECT IDENTIFIER ::= { trfancontrolsWrite 1 }
+
+trfanri OBJECT IDENTIFIER ::= { moduletrfan 7 }
+trfanriTable OBJECT IDENTIFIER ::= { trfanri 1 }
+
+
+trfanConfig OBJECT IDENTIFIER ::= { moduletrfan 9 }
+
+trfantraps OBJECT IDENTIFIER ::= { moduletrfan 10 }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+trfanRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { trfanri 2 }
+
+trfanRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { trfanri 3 }
+  
+trfanRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { trfanri 4 }
+  
+trfanRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { trfanri 5 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+trfanAlmsynthAlm0 OBJECT IDENTIFIER ::= { trfanAlmOtherCrit 0 }
+
+
+
+
+trfanAlmDefFuse OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse Fail :This OID indicates
+         that the fuse of the power input 
+        is in fail condition.  <Help> 
+         Status of the Fuse <Condtype>
+         DEF_FUSE <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmsynthAlm0 15 }
+
+
+
+trfanAlmAcknowledge OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm Ack. :This OID indicates 
+        the alarms have been acknowledged 
+        by the user (locally or remotely) 
+          <Help>  This status indicates 
+        the alarms have been acknowledged 
+        by the user (locally or remotely) 
+        <Condtype> ACKNOWLEDGE <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { trfanAlmsynthAlm0 13 }
+
+
+
+trfanAlmDefPowerB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input B Present :This OID 
+        indicates that there is not input 
+        power on the right power connector 
+        (B).  <Help>  This alarm indicates 
+        if the power input B is present 
+        (right power connector) <Condtype> 
+        DEF_POWER_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmsynthAlm0 12 }
+
+
+
+trfanAlmDefPowerA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input A Present :This OID 
+        indicates that there is not input 
+        power on the right power connector 
+        (A).  <Help>  This alarm indicates 
+        if the power input B is present 
+        (left power connector) <Condtype> 
+        DEF_POWER_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmsynthAlm0 11 }
+
+
+
+trfanAlmModuleGlobFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MODULE_GLOB_FAILURE 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { trfanAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm1 article
+--- *****************************************************
+trfanAlmsynthAlm1 OBJECT IDENTIFIER ::= { trfanAlmOtherCrit 1 }
+
+
+
+
+trfanAlmFansFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Fan Module Failure :This 
+        OID indicates that at least one 
+        of the six FAN unit of the FAN
+         module is in fail condition  <Help> 
+         This alarm indicates that one
+         of the six fans is in a fail condition 
+        <Condtype> FANS_FAILURE <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmsynthAlm1 10 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+trfanAlmsynthAlm2 OBJECT IDENTIFIER ::= { trfanAlmOtherNurg 2 }
+
+
+
+
+trfanAlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> other
+         (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { trfanAlmsynthAlm2 4 }
+
+
+
+trfanAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { trfanAlmsynthAlm2 3 }
+
+
+
+trfanAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { trfanAlmsynthAlm2 2 }
+
+
+
+trfanAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { trfanAlmsynthAlm2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the filterAlm article
+--- *****************************************************
+trfanAlmfilterAlm OBJECT IDENTIFIER ::= { trfanAlmOtherUrg 16 }
+
+
+
+
+trfanAlmFilterNotPresent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Dust Filter Presence :This OID 
+        indicates that the dust filter
+         is not present  <Help>  This alarm 
+        indicates that the dust filter
+         is not present <Condtype> FILTER_NOT_PRESENT 
+        <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmfilterAlm 15 }
+
+
+
+--- *****************************************************
+---     LEAF for the fansMgnt article
+--- *****************************************************
+trfanAlmfansMgnt OBJECT IDENTIFIER ::= { trfanAlmOtherUrg 20 }
+
+
+
+
+trfanAlmFanLowSpeed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan High Speed :This OID indicates 
+        the 6 fans of the TR-FAN are blowing 
+        at high speed  <Help>  This status 
+        indicates the 6 fans of the TR-FAN 
+        are blowing at high speed. <Condtype> 
+        FAN_LOW_SPEED <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { trfanAlmfansMgnt 14 }
+
+
+
+trfanAlmFansOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fans Fail :This OID indicates
+         the 6 fans of the TR-FAN are OFF 
+         <Help>  This alarm indicates the 
+        6 fans of the TR-FAN are OFF <Condtype> 
+        FANS_OFF <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmfansMgnt 13 }
+
+
+
+trfanAlmFan6Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #6 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan #6. Removal of the fan unit 
+        or no rotation sets the OID.  <Help> 
+         This alarm indicates if the FAN 
+        #6 is in fail condition <Condtype> 
+        FAN6_FAIL <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmfansMgnt 7 }
+
+
+
+trfanAlmFan5Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #5 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan #5. Removal of the fan unit 
+        or no rotation sets the OID.  <Help> 
+         This alarm indicates if the FAN 
+        #5 is in fail condition <Condtype> 
+        FAN5_FAIL <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmfansMgnt 6 }
+
+
+
+trfanAlmFan4Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #4 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan #4. Removal of the fan unit 
+        or no rotation sets the OID.  <Help> 
+         This alarm indicates if the FAN 
+        #4 is in fail condition <Condtype> 
+        FAN4_FAIL <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmfansMgnt 5 }
+
+
+
+trfanAlmFan3Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #3 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan #3. Removal of the fan unit 
+        or no rotation sets the OID.  <Help> 
+         This alarm indicates if the FAN 
+        #3 is in fail condition <Condtype> 
+        FAN3_FAIL <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmfansMgnt 4 }
+
+
+
+trfanAlmFan2Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #2 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan #2. Removal of the fan unit 
+        or no rotation sets the OID.  <Help> 
+         This alarm indicates if the FAN 
+        #2 is in fail condition <Condtype> 
+        FAN2_FAIL <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmfansMgnt 3 }
+
+
+
+trfanAlmFan1Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #1 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan #1. Removal of the fan unit 
+        or no rotation sets the OID.  <Help> 
+         This alarm indicates if the FAN 
+        #1 is in fail condition <Condtype> 
+        FAN1_FAIL <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmfansMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the pwrMgnt article
+--- *****************************************************
+trfanAlmpwrMgnt OBJECT IDENTIFIER ::= { trfanAlmOtherUrg 24 }
+
+
+
+
+trfanAlmPwr12v2Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Power 2 Fail :This OID indicates 
+        a failure on the power 2 of  the 
+        FAN module.  <Help>  This alarm 
+        indicates if one of the two powers 
+        converters of the FAN module is 
+        in fail condition <Condtype> PWR_12V_2_FAIL 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmpwrMgnt 14 }
+
+
+
+trfanAlmPwr12v1Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Power 1 Fail :This OID indicates 
+        a failure on the power 1 of  the 
+        FAN module.  <Help>  This alarm 
+        indicates if one of the two powers 
+        converters of the FAN module is 
+        in fail condition <Condtype> PWR_12V_1_FAIL 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { trfanAlmpwrMgnt 13 }
+
+
+
+--- *****************************************************
+---     LEAF for the modInitFailLevel2 article
+--- *****************************************************
+trfanAlmmodInitFailLevel2 OBJECT IDENTIFIER ::= { trfanAlmOtherUrg 70 }
+
+
+
+
+trfanAlmInvReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+         : <Condtype> INV_READ_FAIL <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { trfanAlmmodInitFailLevel2 4 }
+
+
+
+trfanAlmConfReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Conf_Read_Fail : <Condtype> CONF_READ_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { trfanAlmmodInitFailLevel2 3 }
+
+
+
+trfanAlmResetHwInitFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reset_HW_Init_Fail : <Condtype> 
+        RESET_HW_INIT_FAIL <Probcause>
+         other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { trfanAlmmodInitFailLevel2 2 }
+
+
+
+trfanAlmRegReadFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reg_Read_Fail : <Condtype> REG_READ_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { trfanAlmmodInitFailLevel2 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+trfanCtrlsynth0 OBJECT IDENTIFIER ::= { trfanCtrlOther 0 }
+
+
+
+
+trfanCtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>    This control restores 
+        the default configuration of the 
+        module
+        "
+	  ::= { trfanCtrlsynth0 13 }
+
+
+
+trfanCtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>    This
+         control saves the customer configuration 
+        on the module
+        "
+	  ::= { trfanCtrlsynth0 9 }
+
+
+
+trfanCtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { trfanCtrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+trfanCtrlsynth4 OBJECT IDENTIFIER ::= { trfanCtrlOther 4 }
+
+
+
+
+trfanCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { trfanCtrlsynth4 2 }
+
+
+
+trfanCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { trfanCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+trfanCtrlswMgnt OBJECT IDENTIFIER ::= { trfanCtrlOther 5 }
+
+
+
+
+trfanCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>    This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { trfanCtrlswMgnt 3 }
+
+
+
+trfanCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>    This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { trfanCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+trfanCtrlledTest OBJECT IDENTIFIER ::= { trfanCtrlOther 64 }
+
+
+
+
+trfanCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>    This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { trfanCtrlledTest 3 }
+
+
+
+trfanCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>    This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { trfanCtrlledTest 2 }
+
+
+
+trfanCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>    This control 
+        initiates a test leds turning all 
+        the LEDs to green
+        "
+	  ::= { trfanCtrlledTest 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the acknowledgeActiv article
+--- *****************************************************
+trfanCtrlacknowledgeActiv OBJECT IDENTIFIER ::= { trfanCtrlOther 65 }
+
+
+
+
+trfanCtrlAckActiv OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm Ack. :This OID is used to 
+        acknowledge the current active
+         alarms of the chassis  <Help>
+          This control is used to acknowledge 
+        the current active alarms of the 
+        chassis
+        "
+	  ::= { trfanCtrlacknowledgeActiv 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the voltMeas12v1 article
+--- *****************************************************
+
+trfanMesrvoltMeas12v1 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Internal 12V_1 :This OID gives 
+        the internal voltage value of the 
+        TRFAN  (Voltage = AV/500) (Unit 
+        = V)  <Help>   This measure gives 
+        the internal voltage value of the 
+        TRFAN
+        "
+	  ::= { trfanMesrOther 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the voltMeas12v2 article
+--- *****************************************************
+
+trfanMesrvoltMeas12v2 OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Internal 12V_2 :This OID gives 
+        the internal voltage value of the 
+        TRFAN (Voltage = AV/500) (Unit
+         = V)  <Help>   This measure gives 
+        the internal voltage value of the 
+        TRFAN
+        "
+	  ::= { trfanMesrOther 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the tempChassis article
+--- *****************************************************
+
+trfanMesrtempChassis OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Temperature :This OID
+         gives the temperature value of 
+        the Chassis (Temperature = AV/256) 
+         (Unit = C)  <Help>   This measure 
+        gives the temperature value of
+         the Chassis
+        "
+	  ::= { trfanMesrOther 64 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lsd
+--- *****************************************************
+
+trfanCfgLsd OBJECT IDENTIFIER ::= { trfanConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startUp
+--- *****************************************************
+
+trfanCfgStartUp OBJECT IDENTIFIER ::= { trfanConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+trfantableother OBJECT IDENTIFIER ::= { trfanCfgStartUp 1 }
+
+
+
+trfanCfglowspeedThresh OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fans Low Speed Threshold Temp
+         :This register selects the temperature 
+        threshold to trigger the fans to 
+        a low speed when the temperature 
+        is reaching that threshold when 
+        decreasing
+        "
+	  ::= { trfantableother 2 }
+
+
+
+trfanCfghighspeedThresh OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fans High Speed Threshold Temp 
+        :This register selects the temperature 
+        threshold to trigger the fans to 
+        a high speed when the temperature 
+        is reaching that threshold when 
+        increasing
+        "
+	  ::= { trfantableother 3 }
+
+
+
+trfanCfgtrfanMgnt OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Trfan Management :This register 
+        selects the features to manage
+         the Trfan
+        "
+	  ::= { trfantableother 10 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+trfanCfgLabels OBJECT IDENTIFIER ::= { trfanConfig 3 }
+
+
+
+
+trfanCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { trfanConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+trfantrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { trfantraps 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     FAN TRAPS
+--- *****************************************************
+
+trfanPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {trfanAlmDefPowerA, trfanAlmDefPowerB, trfanAlmPwr12v1Fail, trfanAlmPwr12v2Fail}
+	STATUS current
+	--&FILTNAME    "Power A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { trfanAlmDefPowerA "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Power A Fail in Slot $3 ($A)"
+
+	--&FILTNAME    "Power B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { trfanAlmDefPowerB "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Power B Fail in Slot $3 ($A)"
+
+	--&FILTNAME    "Power 12V1 Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { trfanAlmPwr12v1Fail "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Power 12V1 Fail in Slot $3 ($A)"
+
+	--&FILTNAME    "Power 12V2 Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { trfanAlmPwr12v2Fail "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Power 12V2 Fail in Slot $3 ($A)"
+	DESCRIPTION "Urgent power default is activated"
+	::= { trfantraps 32 }
+
+trfanPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {trfanAlmDefPowerA, trfanAlmDefPowerB, trfanAlmPwr12v1Fail, trfanAlmPwr12v2Fail}
+	STATUS current
+	--&FILTNAME    "Power A Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "Power A ON"}
+	--&MATCH       { trfanAlmDefPowerA "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Power A ON in Slot $3 ($A)"
+
+	--&FILTNAME    "Power B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "Power B ON"}
+	--&MATCH       { trfanAlmDefPowerB "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Power B ON in Slot $3 ($A)"
+
+	--&FILTNAME    "Power 12V1 Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "Power 12V1 ON"}
+	--&MATCH       { trfanAlmPwr12v1Fail "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Power 12V1 ON in Slot $3 ($A)"
+
+	--&FILTNAME    "Power 12V2 Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "Power 12V2 ON"}
+	--&MATCH       { trfanAlmPwr12v2Fail "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Power 12V2 ON in Slot $3 ($A)"
+	DESCRIPTION "Urgent power default disappeared"
+	::= { trfantraps 33 }
+
+trfanPowerTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {trfanAlmDefFuse}
+	STATUS current
+	--&FILTNAME    "TRFAN Fuse Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { trfanAlmDefFuse "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Fuse Fail on TRFAN in Slot $3 ($A)"
+	DESCRIPTION "Critical power default is activated"
+	::= { trfantraps 34 }
+
+trfanPowerTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {trfanAlmDefFuse}
+	STATUS current
+	--&FILTNAME    "TRFAN Fuse Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "TRFAN Fuse Fail ON"}
+	--&MATCH       { trfanAlmDefFuse "on", trfantrapBoardNumber "$3"}
+	--&MESG        "Fuse on TRFAN present in Slot $3 ($A)"
+	DESCRIPTION "Critical power default disappeared"
+	::= { trfantraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     Fan TRAPS
+--- *****************************************************
+
+trfanFanTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {trfanAlmFansFailure}
+	STATUS current
+	--&FILTNAME    "FANs Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { trfanAlmFansFailure "on", trfantrapBoardNumber "$3"}
+	--&MESG        "FAN Fail in Slot $3 ($A)"
+	DESCRIPTION "Critical fan default is activated"
+	::= { trfantraps 44 }
+
+trfanFanTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {trfanAlmFansFailure}
+	STATUS current
+	--&FILTNAME    "FANs Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "FANs Fail ON"}
+	--&MATCH       { trfanAlmFansFailure "on", trfantrapBoardNumber "$3"}
+	--&MESG        "FANs OK in Slot $3 ($A)"
+	DESCRIPTION "Critical fan default disappeared"
+	::= { trfantraps 45 }
+
+
+
+
+
+
+END

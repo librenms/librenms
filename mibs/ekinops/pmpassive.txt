@@ -1,0 +1,77 @@
+-- *****************************************************************
+-- EKINOPS-PmPassive.TXT:  MIB
+--
+--MIB Part Number:3MI00400AAAA
+--MIB Version:01
+--
+-- Copyright (c) 2007 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-PmPassive-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+modulePmPassive MODULE-IDENTITY
+        LAST-UPDATED "200701050000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          11, rue Louis de Broglie
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.fr"
+        DESCRIPTION
+          "MIB for the Ekinops passive board."
+	REVISION "200701050000Z"
+	DESCRIPTION
+	  "Initial Version."
+       ::= { ekinops 20 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmpassiveri OBJECT IDENTIFIER ::= { modulePmPassive 1 }
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+pmpassiveRinvHwPlatform OBJECT-TYPE
+  SYNTAX OCTET STRING
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmpassiveri 1 }
+ 
+
+
+END

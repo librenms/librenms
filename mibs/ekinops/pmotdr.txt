@@ -1,0 +1,2224 @@
+-- *****************************************************************
+-- EKINOPS-Pmotdr.TXT:  MIB
+--
+--MIB Part Number:3MI00125AAAA
+--MIB Version:03
+--
+-- Copyright (c) 2017 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-Pmotdr-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulePmotdr MODULE-IDENTITY
+        LAST-UPDATED "201711290000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.fr"
+        DESCRIPTION
+          "Creation."
+
+	REVISION "201710250000Z"
+	DESCRIPTION
+	  "Creation for PMOTDR"
+
+        ::= { ekinops 95 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmotdralarms OBJECT IDENTIFIER ::= { modulePmotdr 2 }	
+pmotdrAlmOther OBJECT IDENTIFIER ::= { pmotdralarms 1 }
+pmotdrAlmOtherNurg OBJECT IDENTIFIER ::= { pmotdrAlmOther 1 }
+pmotdrAlmOtherUrg OBJECT IDENTIFIER ::= { pmotdrAlmOther 2 }
+pmotdrAlmOtherCrit OBJECT IDENTIFIER ::= { pmotdrAlmOther 3 }
+
+pmotdrAlmClient OBJECT IDENTIFIER ::= { pmotdralarms 2 }
+pmotdrAlmClientNurg OBJECT IDENTIFIER ::= { pmotdrAlmClient 1 }
+pmotdrAlmClientUrg OBJECT IDENTIFIER ::= { pmotdrAlmClient 2 }
+pmotdrAlmClientCrit OBJECT IDENTIFIER ::= { pmotdrAlmClient 3 }
+	
+pmotdrAlmLine OBJECT IDENTIFIER ::= { pmotdralarms 3 }
+pmotdrAlmLineNurg OBJECT IDENTIFIER ::= { pmotdrAlmLine 1 }
+pmotdrAlmLineUrg OBJECT IDENTIFIER ::= { pmotdrAlmLine 2 }
+pmotdrAlmLineCrit OBJECT IDENTIFIER ::= { pmotdrAlmLine 3 }
+
+
+
+pmotdrmeasures OBJECT IDENTIFIER ::= { modulePmotdr 3 }	
+pmotdrMesrOther OBJECT IDENTIFIER ::= { pmotdrmeasures 1 }	
+pmotdrMesrClient OBJECT IDENTIFIER ::= { pmotdrmeasures 2 }	
+pmotdrMesrLine OBJECT IDENTIFIER ::= { pmotdrmeasures 3 }	
+
+
+
+pmotdrcontrolsWrite OBJECT IDENTIFIER ::= { modulePmotdr 6 }
+pmotdrCtrlOther OBJECT IDENTIFIER ::= { pmotdrcontrolsWrite 1 }
+pmotdrCtrlClient OBJECT IDENTIFIER ::= { pmotdrcontrolsWrite 2 }
+pmotdrCtrlLine OBJECT IDENTIFIER ::= { pmotdrcontrolsWrite 3 }
+
+pmotdrri OBJECT IDENTIFIER ::= { modulePmotdr 7 }
+pmotdrriTable OBJECT IDENTIFIER ::= { pmotdrri 1 }
+
+pmotdrdownload OBJECT IDENTIFIER ::= { modulePmotdr 8 }
+pmotdrDwlOther OBJECT IDENTIFIER ::= { pmotdrdownload 1 }
+pmotdrDwlClient OBJECT IDENTIFIER ::= { pmotdrdownload 2 }
+pmotdrDwlLine OBJECT IDENTIFIER ::= { pmotdrdownload 3 }
+
+
+pmotdrConfig OBJECT IDENTIFIER ::= { modulePmotdr 9 }
+
+pmotdrtraps OBJECT IDENTIFIER ::= { modulePmotdr 10 }
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+PmotdrMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Different modes on the OTDR SFP"
+    SYNTAX INTEGER {
+		manual(0),
+		auto(1)
+		}
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmotdrRinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmotdrri 2 }
+
+pmotdrRinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmotdrri 3 }
+  
+pmotdrRinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmotdrri 4 }
+  
+pmotdrRinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmotdrri 5 }
+  
+pmotdrRinvGwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "GW platform description: This OID contains the 
+         description of the Gateware platform."
+  ::= { pmotdrri 6 }
+
+
+--- ***Clients***
+
+---pmotdrRinvSfpTable OBJECT-TYPE
+---      SYNTAX  SEQUENCE OF PmotdrRinvSfpEntry
+---      MAX-ACCESS  not-accessible
+---      STATUS  current
+---      DESCRIPTION
+---              "List of the SFPs on the selected module"
+---      ::= { pmotdrriTable 1 }
+
+---pmotdrRinvSfpEntry OBJECT-TYPE
+---        SYNTAX  PmotdrRinvSfpEntry
+---        MAX-ACCESS  not-accessible
+---        STATUS  current
+---        DESCRIPTION
+---              "Row definition for the SFP table"
+---        INDEX   { pmotdrRinvSfpIndex }
+---        ::= { pmotdrRinvSfpTable 1 }
+    
+
+
+---PmotdrRinvSfpEntry::=
+---        SEQUENCE {
+---          pmotdrRinvSfpIndex 
+---              Integer32,
+---          pmotdrRinvsfp
+---             DisplayString
+---        }
+
+
+---    pmotdrRinvSfpIndex OBJECT-TYPE
+---        SYNTAX  Integer32(1..16)
+---        MAX-ACCESS  read-only
+---        STATUS  current
+---        DESCRIPTION
+---              "Index for SFP table"
+---        ::= { pmotdrRinvSfpEntry 1 }
+
+
+---    pmotdrRinvsfp OBJECT-TYPE
+---      SYNTAX  DisplayString
+---        MAX-ACCESS  read-only
+---        STATUS  current
+---        DESCRIPTION
+---              "Inventory for the SFP: This OID contains the inventory for the SFP"
+---        ::= { pmotdrRinvSfpEntry 2 }
+
+
+--- ***Lines***
+
+pmotdrRinvLineTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF PmotdrRinvLineEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the SFPs on the selected module"
+      ::= { pmotdrriTable 2 }
+
+pmotdrRinvLineEntry OBJECT-TYPE
+        SYNTAX  PmotdrRinvLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the SFP table"
+        INDEX   { pmotdrRinvLineIndex }
+        ::= { pmotdrRinvLineTable 1 }
+    
+
+
+PmotdrRinvLineEntry::=
+        SEQUENCE {
+          pmotdrRinvLineIndex 
+              Integer32,
+          pmotdrRinvxfpLine
+              DisplayString
+        }
+
+
+    pmotdrRinvLineIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for SFP table"
+        ::= { pmotdrRinvLineEntry 1 }
+
+
+    pmotdrRinvxfpLine OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the XFP: This OID contains the inventory for the XFP"
+        ::= { pmotdrRinvLineEntry 2 }
+
+
+
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmotdrAlmsynthAlm0 OBJECT IDENTIFIER ::= { pmotdrAlmOtherCrit 0 }
+
+
+
+
+pmotdrAlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition <Help> Status 
+        of the Fuse B <Condtype> DEF_FUSE_B 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmotdrAlmsynthAlm0 16 }
+
+
+
+pmotdrAlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition <Help> Status 
+        of the Fuse A <Condtype> DEF_FUSE_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmotdrAlmsynthAlm0 15 }
+
+
+
+pmotdrAlmModGlobFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the RM <Help> This alarm is 
+        set on detection of a failure originating 
+        from the equipment <Condtype> MOD_GLOB_FAIL 
+        <Probcause> other (1) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmotdrAlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmotdrAlmsynthAlm2 OBJECT IDENTIFIER ::= { pmotdrAlmOtherNurg 2 }
+
+
+
+
+pmotdrAlmCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Not Used :This OID, when set,
+         indicates that alarm correlation 
+        is not being performed. <Condtype> 
+        CORRELAT_OFF <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmotdrAlmsynthAlm2 4 }
+
+
+
+pmotdrAlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmotdrAlmsynthAlm2 3 }
+
+
+
+pmotdrAlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmotdrAlmsynthAlm2 2 }
+
+
+
+pmotdrAlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmotdrAlmsynthAlm2 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pmotdrAlmsynthAlmLine articles
+--- *********************************************************
+
+pmotdrAlmsynthAlmLineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrAlmsynthAlmLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrAlmsynthAlmLine
+         Article
+        "
+	::= { pmotdrAlmLineCrit 24 }
+
+
+pmotdrAlmsynthAlmLineEntry OBJECT-TYPE
+	SYNTAX PmotdrAlmsynthAlmLineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrAlmsynthAlmLine 
+        table
+        "
+	INDEX   { pmotdrAlmsynthAlmLineIndex }
+	::= { pmotdrAlmsynthAlmLineTable 1 }
+
+
+PmotdrAlmsynthAlmLineEntry ::=
+	SEQUENCE {
+	pmotdrAlmsynthAlmLineIndex
+		INTEGER,
+	pmotdrAlmLineFailPortn
+		EkiOnOff,
+	pmotdrAlmLineSfpDdmAlmPortn
+		EkiOnOff,
+	pmotdrAlmLineSfpDdmWarningPortn
+		EkiOnOff,
+	pmotdrAlmLineOosPortn
+		EkiOnOff,
+	pmotdrAlmLineHwFailPortn
+		EkiOnOff,
+	pmotdrAlmLineSfpOtdrAbsentPortn
+		EkiOnOff
+	}
+
+
+pmotdrAlmsynthAlmLineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrAlmsynthAlmLine 
+        table
+        "
+	::= { pmotdrAlmsynthAlmLineEntry 1 }
+
+
+pmotdrAlmLineFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port Failure :This OID indicates 
+        a failure on the line port <Help> 
+        This alarm indicates a failure
+         on the line port <Condtype> LINE_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmotdrAlmsynthAlmLineEntry 13 }
+
+
+pmotdrAlmLineSfpDdmAlmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+         : <Condtype> LINE_SFP_DDM_ALM 
+        <Probcause>  <Alarmtype> 
+        "
+	::= { pmotdrAlmsynthAlmLineEntry 11 }
+
+
+pmotdrAlmLineSfpDdmWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+         : <Condtype> LINE_SFP_DDM_WARNING 
+        <Probcause>  <Alarmtype> 
+        "
+	::= { pmotdrAlmsynthAlmLineEntry 10 }
+
+
+pmotdrAlmLineOosPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        OTDR Module Out Of Service :This 
+        OID indicates that the SFP is In 
+        Service or Out of Service<Help> 
+         This status indicates if the OTDR 
+        SFP is in service <Condtype> LINE_OOS 
+        <Probcause> informationalStatus(1000) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	::= { pmotdrAlmsynthAlmLineEntry 7 }
+
+
+pmotdrAlmLineHwFailPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Line Port HW Failure :This OID 
+        indicates a failure on line port, 
+        most probably caused by a HW issue 
+        <Help> This alarm indicates a failure 
+        on line port, most probably caused 
+        by a HW issue <Condtype> LINE_HW_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	::= { pmotdrAlmsynthAlmLineEntry 5 }
+
+
+pmotdrAlmLineSfpOtdrAbsentPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        OTDR Module Absent :This OID indicates 
+        that the OTDR SFP is not present. 
+         <Help> This alarm indicates if 
+        the OTDR SFP is absent  <Condtype> 
+        LINE_SFP_OTDR_ABSENT <Probcause> 
+        inputOutputDeviceError (24) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        <Event> ObjectCDSingleClientInv
+        "
+	::= { pmotdrAlmsynthAlmLineEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmotdrAlmlineAlmDdm articles
+--- *********************************************************
+
+pmotdrAlmlineAlmDdmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrAlmlineAlmDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrAlmlineAlmDdm Article
+        "
+	::= { pmotdrAlmLineCrit 40 }
+
+
+pmotdrAlmlineAlmDdmEntry OBJECT-TYPE
+	SYNTAX PmotdrAlmlineAlmDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrAlmlineAlmDdm 
+        table
+        "
+	INDEX   { pmotdrAlmlineAlmDdmIndex }
+	::= { pmotdrAlmlineAlmDdmTable 1 }
+
+
+PmotdrAlmlineAlmDdmEntry ::=
+	SEQUENCE {
+	pmotdrAlmlineAlmDdmIndex
+		INTEGER,
+	pmotdrAlmFaultDetectedPortn
+		EkiOnOff,
+	pmotdrAlmOtdrProcessingPortn
+		EkiOnOff,
+	pmotdrAlmTempLowAlarmPortn
+		EkiOnOff,
+	pmotdrAlmTempHighAlarmPortn
+		EkiOnOff
+	}
+
+
+pmotdrAlmlineAlmDdmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrAlmlineAlmDdm 
+        table
+        "
+	::= { pmotdrAlmlineAlmDdmEntry 1 }
+
+
+pmotdrAlmFaultDetectedPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Fault Detected :This OID indicates 
+        that the OTDR SFP has detected
+         one or several faults during the 
+        process<Help> Alarm indicating
+         that at least, one fault has been 
+        detected on the OTDR during the 
+        process <Condtype> FAULT_DETECTED 
+        <Probcause> other(1) <Alarmtype> 
+        other(1) <Polarity> (2) 
+        "
+	::= { pmotdrAlmlineAlmDdmEntry 11 }
+
+
+pmotdrAlmOtdrProcessingPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        OTDR Processing :This OID indicates 
+        that the OTDR SFP is processing 
+        a fault location<Help> Status indicating 
+        that the OTDR is processing the 
+        faults locations  <Condtype> OTDR_PROCESSING 
+        <Probcause> other(1) <Alarmtype> 
+        other(1) <Polarity> (2) 
+        "
+	::= { pmotdrAlmlineAlmDdmEntry 10 }
+
+
+pmotdrAlmTempLowAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        OTDR Temp Low Alarm :This OID
+         indicates that the Trscv temperature 
+        of port is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Alarm indicating that the 
+        Trscv temperature of port is lower 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         TEMP_LOW_ALARM_1 <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmotdrAlmlineAlmDdmEntry 5 }
+
+
+pmotdrAlmTempHighAlarmPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        OTDR Temp High Alarm :This OID 
+        indicates that the Trscv temperature 
+        of port is higher than the threshold 
+        value written in the Trscv EEPROM 
+        <Help> Alarm indicating that the 
+        Trscv temperature of port is higher 
+        than the threshold value written 
+        in the Trscv EEPROM <Condtype>
+         TEMP_HIGH_ALARM_1 <Probcause>
+         transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pmotdrAlmlineAlmDdmEntry 4 }
+
+
+--- *********************************************************
+---     TABLE for the pmotdrAlmlineSfpWarnDdm articles
+--- *********************************************************
+
+pmotdrAlmlineSfpWarnDdmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrAlmlineSfpWarnDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrAlmlineSfpWarnDdm 
+        Article
+        "
+	::= { pmotdrAlmLineCrit 56 }
+
+
+pmotdrAlmlineSfpWarnDdmEntry OBJECT-TYPE
+	SYNTAX PmotdrAlmlineSfpWarnDdmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrAlmlineSfpWarnDdm 
+        table
+        "
+	INDEX   { pmotdrAlmlineSfpWarnDdmIndex }
+	::= { pmotdrAlmlineSfpWarnDdmTable 1 }
+
+
+PmotdrAlmlineSfpWarnDdmEntry ::=
+	SEQUENCE {
+	pmotdrAlmlineSfpWarnDdmIndex
+		INTEGER,
+	pmotdrAlmTempLowWarningPortn
+		EkiOnOff,
+	pmotdrAlmTempHighWarningPortn
+		EkiOnOff
+	}
+
+
+pmotdrAlmlineSfpWarnDdmIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrAlmlineSfpWarnDdm 
+        table
+        "
+	::= { pmotdrAlmlineSfpWarnDdmEntry 1 }
+
+
+pmotdrAlmTempLowWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        OTDR Temp Low Warning :This OID 
+        indicates that the Trscv temperature 
+        is lower than the threshold value 
+        written in the Trscv EEPROM <Help> 
+        Warning indicating that the Trscv 
+        temperature is lower than the threshold 
+        value written in the Trscv EEPROM 
+        <Condtype> TEMP_LOW_WARNING_1 <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	::= { pmotdrAlmlineSfpWarnDdmEntry 5 }
+
+
+pmotdrAlmTempHighWarningPortn OBJECT-TYPE
+	SYNTAX  EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        OTDR Temp High Warning :This OID 
+        indicates that the Trscv temperature 
+        is higher than the threshold value 
+        written in the Trscv EEPROM <Help> 
+        Warning indicating that the Trscv 
+        temperature is higher than the
+         threshold value written in the 
+        Trscv EEPROM <Condtype> TEMP_HIGH_WARNING_1 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	::= { pmotdrAlmlineSfpWarnDdmEntry 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the confMgnt1 article
+--- *****************************************************
+pmotdrCtrlconfMgnt1 OBJECT IDENTIFIER ::= { pmotdrCtrlOther 1 }
+
+
+
+
+pmotdrCtrlConf2Clear1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        OID clears the configuration tables 
+        from configuration2 in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmotdrCtrlconfMgnt1 14 }
+
+
+
+pmotdrCtrlConf2Flash1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        OID saves the current configuration 
+        of the PM as configuration2 in
+         the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmotdrCtrlconfMgnt1 10 }
+
+
+
+pmotdrCtrlConf2Load1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables Set
+         Nb 2 :When set this OID enables 
+        loading from flash configuration2 
+        into the PM.
+        "
+	  ::= { pmotdrCtrlconfMgnt1 2 }
+
+
+
+pmotdrCtrlConf1Load1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables Set
+         Nb 1 :When set this OID enables 
+        loading from flash configuration1 
+        into the PM.
+        "
+	  ::= { pmotdrCtrlconfMgnt1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synth4 article
+--- *****************************************************
+pmotdrCtrlsynth4 OBJECT IDENTIFIER ::= { pmotdrCtrlOther 4 }
+
+
+
+
+pmotdrCtrlCorrelatOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Disable Alarm Correlation :This 
+        OID disables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmotdrCtrlsynth4 2 }
+
+
+
+pmotdrCtrlCorrelatOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Enable Alarm Correlation :This 
+        OID enables the alarm correlation 
+        in the PM.
+        "
+	  ::= { pmotdrCtrlsynth4 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmotdrCtrlswMgnt OBJECT IDENTIFIER ::= { pmotdrCtrlOther 5 }
+
+
+
+
+pmotdrCtrlLoadSwBank2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Software Nb 2 As Active :This 
+        OID, when set, loads the SW from 
+        bank2 into the PM. It must be followed 
+        by a reset.  <Help>  This controls 
+        selects the second SW bank as the 
+        active bank for the next module 
+        reset
+        "
+	  ::= { pmotdrCtrlswMgnt 6 }
+
+
+
+pmotdrCtrlLoadSwBank1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Software Nb 1 As Active :This 
+        OID, when set, loads the SW from 
+        bank1 into the PM. It must be followed 
+        by a reset.  <Help>  This controls 
+        selects the first SW bank as the 
+        active bank for the next module 
+        reset
+        "
+	  ::= { pmotdrCtrlswMgnt 5 }
+
+
+
+pmotdrCtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        PM. This reset is not traffic affecting, 
+        and the configuration of PM remains 
+        unchanged.  <Help>  This control 
+        initiates a warm reset of the module. 
+        "
+	  ::= { pmotdrCtrlswMgnt 3 }
+
+
+
+pmotdrCtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        PM. This reset is traffic affecting, 
+        and the configuration of PM is
+         reloaded on start-up.  <Help>
+          This control initiates a cold 
+        reset of the module. 
+        "
+	  ::= { pmotdrCtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the gwMgnt article
+--- *****************************************************
+pmotdrCtrlgwMgnt OBJECT IDENTIFIER ::= { pmotdrCtrlOther 6 }
+
+
+
+
+pmotdrCtrlLoadGwBank4 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 4 As Active :This 
+        OID, when set, loads the GW from 
+        bank4 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.
+        "
+	  ::= { pmotdrCtrlgwMgnt 8 }
+
+
+
+pmotdrCtrlLoadGwBank3 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 3 As Active :This 
+        OID, when set, loads the GW from 
+        bank3 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.  <Help>  This controls 
+        initiates a cold reset of the module 
+        and select the third GW bank as 
+        the active bank
+        "
+	  ::= { pmotdrCtrlgwMgnt 7 }
+
+
+
+pmotdrCtrlLoadGwBank2 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 2 As Active :This 
+        OID, when set, loads the GW from 
+        bank2 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.
+        "
+	  ::= { pmotdrCtrlgwMgnt 6 }
+
+
+
+pmotdrCtrlLoadGwBank1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Set Gateware Nb 1 As Active :This 
+        OID, when set, loads the GW from 
+        bank1 (Flash) into the PM. It is 
+        followed by an automatic gateware 
+        cold reset.  <Help>  This controls 
+        initiates a cold reset of the module 
+        and select the first GW bank as 
+        the active bank
+        "
+	  ::= { pmotdrCtrlgwMgnt 5 }
+
+
+
+pmotdrCtrlCurrentGwReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Active Gateware Reset :This OID, 
+        when set, resets the active gateware. 
+        It is traffic affecting.
+        "
+	  ::= { pmotdrCtrlgwMgnt 1 }
+
+
+
+--- *********************************************************
+---     TABLE for the pmotdrCtrlotdrProcessing articles
+--- *********************************************************
+
+pmotdrCtrlotdrProcessingTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrCtrlotdrProcessingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrCtrlotdrProcessing 
+        Article
+        "
+	::= { pmotdrCtrlLine 16 }
+
+
+pmotdrCtrlotdrProcessingEntry OBJECT-TYPE
+	SYNTAX PmotdrCtrlotdrProcessingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrCtrlotdrProcessing 
+        table
+        "
+	INDEX   { pmotdrCtrlotdrProcessingIndex }
+	::= { pmotdrCtrlotdrProcessingTable 1 }
+
+
+PmotdrCtrlotdrProcessingEntry ::=
+	SEQUENCE {
+	pmotdrCtrlotdrProcessingIndex
+		INTEGER,
+	pmotdrCtrlotdrProcessingPortn
+		EkiState
+	}
+
+
+pmotdrCtrlotdrProcessingIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrCtrlotdrProcessing 
+        table
+        "
+	::= { pmotdrCtrlotdrProcessingEntry 1 }
+
+
+pmotdrCtrlotdrProcessingPortn OBJECT-TYPE
+	SYNTAX  EkiState
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Start Processing :This OID starts 
+        the fault detection process on
+         the OTDR   <Help>  This control 
+        initiates the fault detection process 
+        on the OTDR
+        "
+	::= { pmotdrCtrlotdrProcessingEntry 2 }
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmotdrCtrlledTest OBJECT IDENTIFIER ::= { pmotdrCtrlOther 72 }
+
+
+
+
+pmotdrCtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmotdrCtrlledTest 3 }
+
+
+
+pmotdrCtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmotdrCtrlledTest 2 }
+
+
+
+pmotdrCtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmotdrCtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *********************************************************
+---     TABLE for the pmotdrMesrfaultCounter articles
+--- *********************************************************
+
+pmotdrMesrfaultCounterTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrMesrfaultCounterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrMesrfaultCounter 
+        Article
+        "
+	::= { pmotdrMesrLine 16 }
+
+
+pmotdrMesrfaultCounterEntry OBJECT-TYPE
+	SYNTAX PmotdrMesrfaultCounterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrMesrfaultCounter 
+        table
+        "
+	INDEX   { pmotdrMesrfaultCounterIndex }
+	::= { pmotdrMesrfaultCounterTable 1 }
+
+
+PmotdrMesrfaultCounterEntry ::=
+	SEQUENCE {
+	pmotdrMesrfaultCounterIndex
+		INTEGER,
+	pmotdrMesrfaultCounterPortn
+		INTEGER 
+	}
+
+
+pmotdrMesrfaultCounterIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrMesrfaultCounter 
+        table
+        "
+	::= { pmotdrMesrfaultCounterEntry 1 }
+
+
+pmotdrMesrfaultCounterPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Fault Counter :This OID gives
+         the number of fault detected (Number 
+        = AV_U16) (Unit = Faults) <Help> 
+        This measure gives the number of 
+        fault detected
+        "
+	::= { pmotdrMesrfaultCounterEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmotdrMesrfaultDistance articles
+--- *********************************************************
+
+pmotdrMesrfaultDistanceTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrMesrfaultDistanceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrMesrfaultDistance 
+        Article
+        "
+	::= { pmotdrMesrLine 20 }
+
+
+pmotdrMesrfaultDistanceEntry OBJECT-TYPE
+	SYNTAX PmotdrMesrfaultDistanceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrMesrfaultDistance 
+        table
+        "
+	INDEX   { pmotdrMesrfaultDistanceIndex }
+	::= { pmotdrMesrfaultDistanceTable 1 }
+
+
+PmotdrMesrfaultDistanceEntry ::=
+	SEQUENCE {
+	pmotdrMesrfaultDistanceIndex
+		INTEGER,
+	pmotdrMesrfaultDistancePortn
+		INTEGER 
+	}
+
+
+pmotdrMesrfaultDistanceIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrMesrfaultDistance 
+        table
+        "
+	::= { pmotdrMesrfaultDistanceEntry 1 }
+
+
+pmotdrMesrfaultDistancePortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Fault Distance :This OID gives 
+        the distance value of the fault 
+        detected (Distance = AV_U16*2)
+         (Unit = m) <Help> This measure 
+        gives the distance of the fault 
+        detected
+        "
+	::= { pmotdrMesrfaultDistanceEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmotdrMesropticalReturnLoss articles
+--- *********************************************************
+
+pmotdrMesropticalReturnLossTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrMesropticalReturnLossEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrMesropticalReturnLoss 
+        Article
+        "
+	::= { pmotdrMesrLine 24 }
+
+
+pmotdrMesropticalReturnLossEntry OBJECT-TYPE
+	SYNTAX PmotdrMesropticalReturnLossEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrMesropticalReturnLoss 
+        table
+        "
+	INDEX   { pmotdrMesropticalReturnLossIndex }
+	::= { pmotdrMesropticalReturnLossTable 1 }
+
+
+PmotdrMesropticalReturnLossEntry ::=
+	SEQUENCE {
+	pmotdrMesropticalReturnLossIndex
+		INTEGER,
+	pmotdrMesropticalReturnLossPortn
+		INTEGER 
+	}
+
+
+pmotdrMesropticalReturnLossIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrMesropticalReturnLoss 
+        table
+        "
+	::= { pmotdrMesropticalReturnLossEntry 1 }
+
+
+pmotdrMesropticalReturnLossPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Optical Return Loss :This OID
+         gives the Optical Return Loss
+         value on the fault detected (
+         Return Loss = AV_U16/4) (Unit
+         = dB) <Help> This measure gives 
+        the Optical Return Loss on the
+         fault detected
+        "
+	::= { pmotdrMesropticalReturnLossEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmotdrMesrlineSfpTemp articles
+--- *********************************************************
+
+pmotdrMesrlineSfpTempTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrMesrlineSfpTempEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrMesrlineSfpTemp
+         Article
+        "
+	::= { pmotdrMesrLine 28 }
+
+
+pmotdrMesrlineSfpTempEntry OBJECT-TYPE
+	SYNTAX PmotdrMesrlineSfpTempEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrMesrlineSfpTemp 
+        table
+        "
+	INDEX   { pmotdrMesrlineSfpTempIndex }
+	::= { pmotdrMesrlineSfpTempTable 1 }
+
+
+PmotdrMesrlineSfpTempEntry ::=
+	SEQUENCE {
+	pmotdrMesrlineSfpTempIndex
+		INTEGER,
+	pmotdrMesrlineSfpTempPortn
+		INTEGER 
+	}
+
+
+pmotdrMesrlineSfpTempIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrMesrlineSfpTemp 
+        table
+        "
+	::= { pmotdrMesrlineSfpTempEntry 1 }
+
+
+pmotdrMesrlineSfpTempPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Temperature :This OID gives the 
+        temperature value of the OTDR SFP 
+        (Temperature = AV_S16/256) (Unit 
+        = C) <Help> This measure gives
+         the temperature value of the OTDR 
+        SFP
+        "
+	::= { pmotdrMesrlineSfpTempEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmotdrMesrlineTxPower articles
+--- *********************************************************
+
+pmotdrMesrlineTxPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrMesrlineTxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrMesrlineTxPower
+         Article
+        "
+	::= { pmotdrMesrLine 32 }
+
+
+pmotdrMesrlineTxPowerEntry OBJECT-TYPE
+	SYNTAX PmotdrMesrlineTxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrMesrlineTxPower 
+        table
+        "
+	INDEX   { pmotdrMesrlineTxPowerIndex }
+	::= { pmotdrMesrlineTxPowerTable 1 }
+
+
+PmotdrMesrlineTxPowerEntry ::=
+	SEQUENCE {
+	pmotdrMesrlineTxPowerIndex
+		INTEGER,
+	pmotdrMesrlineTxPowerPortn
+		INTEGER 
+	}
+
+
+pmotdrMesrlineTxPowerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrMesrlineTxPower 
+        table
+        "
+	::= { pmotdrMesrlineTxPowerEntry 1 }
+
+
+pmotdrMesrlineTxPowerPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Output Power :This OID gives the 
+        output power value of the OTDR
+         SFP (Power = 10*log(AV_U16)-40) 
+        (Unit = dBm) <Help> This measure 
+        gives the output power value of 
+        the OTDR SFP
+        "
+	::= { pmotdrMesrlineTxPowerEntry 2 }
+
+
+--- *********************************************************
+---     TABLE for the pmotdrMesrlineRxPower articles
+--- *********************************************************
+
+pmotdrMesrlineRxPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrMesrlineRxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of pmotdrMesrlineRxPower
+         Article
+        "
+	::= { pmotdrMesrLine 36 }
+
+
+pmotdrMesrlineRxPowerEntry OBJECT-TYPE
+	SYNTAX PmotdrMesrlineRxPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the pmotdrMesrlineRxPower 
+        table
+        "
+	INDEX   { pmotdrMesrlineRxPowerIndex }
+	::= { pmotdrMesrlineRxPowerTable 1 }
+
+
+PmotdrMesrlineRxPowerEntry ::=
+	SEQUENCE {
+	pmotdrMesrlineRxPowerIndex
+		INTEGER,
+	pmotdrMesrlineRxPowerPortn
+		INTEGER 
+	}
+
+
+pmotdrMesrlineRxPowerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the pmotdrMesrlineRxPower 
+        table
+        "
+	::= { pmotdrMesrlineRxPowerEntry 1 }
+
+
+pmotdrMesrlineRxPowerPortn OBJECT-TYPE
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Input Power :This OID gives the 
+        intput power value of the OTDR
+         SFP (Power = 10*log(AV_U16)-40) 
+        (Unit = dBm) <Help> This measure 
+        gives the intput power value of 
+        the OTDR SFP
+        "
+	::= { pmotdrMesrlineRxPowerEntry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     DOWNLOAD
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the restartProcess article
+--- *****************************************************
+pmotdrDwlrestartProcess OBJECT IDENTIFIER ::= { pmotdrDwlOther 0 }
+
+
+
+
+pmotdrDwlColdRestartProcessed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Cold Restart :This OID indicates 
+        that the module last restart was 
+        a Cold RESTART
+        "
+	  ::= { pmotdrDwlrestartProcess 2 }
+
+
+
+pmotdrDwlWarmRestartProcessed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warm Restart :This OID indicates 
+        that the module last restart was 
+        a Warm RESTART
+        "
+	  ::= { pmotdrDwlrestartProcess 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swBanksUsed article
+--- *****************************************************
+pmotdrDwlswBanksUsed OBJECT IDENTIFIER ::= { pmotdrDwlOther 1 }
+
+
+
+
+pmotdrDwlSwBank2Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 2 loaded :This OID indicates 
+        a software is loaded in SW bank 
+        2  <Help>  This status indicates 
+        if the SW bank 2 contains SW package
+        "
+	  ::= { pmotdrDwlswBanksUsed 6 }
+
+
+
+pmotdrDwlSwBank1Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 1 loaded :This OID indicates 
+        a software is loaded in SW bank 
+        1  <Help>  This status indicates 
+        if the SW bank 1 contains SW package
+        "
+	  ::= { pmotdrDwlswBanksUsed 5 }
+
+
+
+pmotdrDwlSwBank2Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 2 active :This OID indicates 
+        the module is working on SW bank 
+        2  <Help>  This status indicates 
+        if the SW bank 2 is active or standby
+        "
+	  ::= { pmotdrDwlswBanksUsed 2 }
+
+
+
+pmotdrDwlSwBank1Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SW bank 1 active :This OID indicates 
+        the module is working on SW bank 
+        1  <Help>  This status indicates 
+        if the SW bank 1 is active or standby
+        "
+	  ::= { pmotdrDwlswBanksUsed 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the gwBanksUsed article
+--- *****************************************************
+pmotdrDwlgwBanksUsed OBJECT IDENTIFIER ::= { pmotdrDwlOther 2 }
+
+
+
+
+pmotdrDwlGwBank4Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 4 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        4
+        "
+	  ::= { pmotdrDwlgwBanksUsed 8 }
+
+
+
+pmotdrDwlGwBank3Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 3 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        3  <Help>  This status indicates 
+        if the GW bank 3 contains GW package
+        "
+	  ::= { pmotdrDwlgwBanksUsed 7 }
+
+
+
+pmotdrDwlGwBank2Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 2 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        2
+        "
+	  ::= { pmotdrDwlgwBanksUsed 6 }
+
+
+
+pmotdrDwlGwBank1Notempty OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 1 loaded :This OID indicates 
+        a gateware is loaded in GW bank 
+        1  <Help>  This status indicates 
+        if the GW bank 1 contains GW package
+        "
+	  ::= { pmotdrDwlgwBanksUsed 5 }
+
+
+
+pmotdrDwlGwBank4Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 4 active :This OID indicates 
+        the module is working on GW bank 
+        4
+        "
+	  ::= { pmotdrDwlgwBanksUsed 4 }
+
+
+
+pmotdrDwlGwBank3Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 3 active :This OID indicates 
+        the module is working on GW bank 
+        3  <Help>  This status indicates 
+        if the GW bank 3 is active or standby
+        "
+	  ::= { pmotdrDwlgwBanksUsed 3 }
+
+
+
+pmotdrDwlGwBank2Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 2 active :This OID indicates 
+        the module is working on GW bank 
+        2
+        "
+	  ::= { pmotdrDwlgwBanksUsed 2 }
+
+
+
+pmotdrDwlGwBank1Used OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        GW bank 1 active :This OID indicates 
+        the module is working on GW bank 
+        1  <Help>  This status indicates 
+        if the GW bank 1 is active or standby
+        "
+	  ::= { pmotdrDwlgwBanksUsed 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group startup
+--- *****************************************************
+
+pmotdrCfgStartup OBJECT IDENTIFIER ::= { pmotdrConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2190
+--- *****************************************************
+
+pmotdrCfgLinexr1StartupTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrCfgLinexr1StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmotdrCfgStartup 1 }
+
+
+pmotdrCfgLinexr1StartupEntry OBJECT-TYPE
+	SYNTAX PmotdrCfgLinexr1StartupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the startup 
+        table
+        "
+	INDEX   { pmotdrCfgLinexr1StartupIndex }
+	::= { pmotdrCfgLinexr1StartupTable 1 }
+
+
+PmotdrCfgLinexr1StartupEntry ::=
+	SEQUENCE {
+	pmotdrCfgLinexr1StartupIndex
+		INTEGER,
+	pmotdrCfgSfpModePortn
+		Unsigned32,
+	pmotdrCfgSfpPeriodPortn
+		Unsigned32,
+	pmotdrCfgLosInputThresholdPortn
+		Unsigned32
+	}
+
+
+pmotdrCfgLinexr1StartupIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the linexr1Startup 
+        table
+        "
+	::= { pmotdrCfgLinexr1StartupEntry 1 }
+
+
+pmotdrCfgSfpModePortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default mode on the SFP :This
+          register configures the default 
+        initialisation settings on the
+         SFP
+        "
+	::= { pmotdrCfgLinexr1StartupEntry 3 }
+
+
+pmotdrCfgSfpPeriodPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default period on the SFP :This 
+         register configures the default 
+        initialisation settings of the
+         launching period of the SFP
+        "
+	::= { pmotdrCfgLinexr1StartupEntry 4 }
+
+
+pmotdrCfgLosInputThresholdPortn OBJECT-TYPE
+	SYNTAX  Unsigned32 (0..65536)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default threshold setting on the 
+        SFP :This  register configures
+         the default initialisation settings 
+        of the input threshold
+        "
+	::= { pmotdrCfgLinexr1StartupEntry 6 }
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmotdrCfgLabels OBJECT IDENTIFIER ::= { pmotdrConfig 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 0003
+--- *****************************************************
+
+pmotdrCfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmotdrCfgLabels 1 }
+
+
+pmotdrCfgLabelclientEntry OBJECT-TYPE
+	SYNTAX PmotdrCfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmotdrCfgLabelclientIndex }
+	::= { pmotdrCfgLabelclientTable 1 }
+
+
+PmotdrCfgLabelclientEntry ::=
+	SEQUENCE {
+	pmotdrCfgLabelclientIndex
+		INTEGER,
+	pmotdrCfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmotdrCfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmotdrCfgLabelclientEntry 1 }
+
+
+pmotdrCfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmotdrCfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table 0004
+--- *****************************************************
+
+pmotdrCfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PmotdrCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmotdrCfgLabels 2 }
+
+
+pmotdrCfgLabellineEntry OBJECT-TYPE
+	SYNTAX PmotdrCfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmotdrCfgLabellineIndex }
+	::= { pmotdrCfgLabellineTable 1 }
+
+
+PmotdrCfgLabellineEntry ::=
+	SEQUENCE {
+	pmotdrCfgLabellineIndex
+		INTEGER,
+	pmotdrCfgLabellinePortn
+		DisplayString
+	}
+
+
+pmotdrCfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmotdrCfgLabellineEntry 1 }
+
+
+pmotdrCfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmotdrCfgLabellineEntry 3 }
+
+
+
+pmotdrCfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmotdrConfig 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmotdrtrapPortNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last port which generates a trap"
+	::= { pmotdrtraps 2 }
+
+pmotdrtrapLineNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last Line which generates a trap"
+	::= { pmotdrtraps 3 }
+
+pmotdrtrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmotdrtraps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     LINE TRAPS
+--- *****************************************************
+
+pmotdrLineTrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmotdrAlmLineFailPortn , pmotdrAlmLineHwFailPortn , pmotdrtrapLineNumber, pmotdrtrapBoardNumber}
+	STATUS current
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmotdrtraps 34 }
+
+pmotdrLineTrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmotdrAlmLineFailPortn , pmotdrAlmLineHwFailPortn , pmotdrtrapLineNumber, pmotdrtrapBoardNumber}
+	STATUS current
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmotdrtraps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     CLIENT TRAPS
+--- *****************************************************
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmotdrPowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmotdrAlmDefFuseB, pmotdrAlmDefFuseA , pmotdrtrapBoardNumber}
+	STATUS current
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmotdrtraps 50 }
+
+pmotdrPowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmotdrAlmDefFuseB, pmotdrAlmDefFuseA , pmotdrtrapBoardNumber}
+	STATUS current
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmotdrtraps 51 }
+
+
+
+
+
+
+END

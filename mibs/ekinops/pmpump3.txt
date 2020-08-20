@@ -1,0 +1,2588 @@
+-- *****************************************************************
+-- EKINOPS-Pmpump3.TXT:  MIB
+--
+--MIB Part Number:3MI00207ABAD
+--MIB Version:01
+--
+-- Copyright (c) 2016 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-PmPump3-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiMode,
+	EkiProtocol,
+	EkiApiState,
+	EkiSynchroMode,
+	EkiMeasureType
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	Counter32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString
+                FROM SNMPv2-TC;
+
+modulepmpump3 MODULE-IDENTITY
+        LAST-UPDATED "201605230000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "Creation"
+
+	REVISION "201009010000Z"
+	DESCRIPTION
+	  "Creation"
+	REVISION "201012150000Z"
+	DESCRIPTION
+	  "Add inventory of the lasers"
+	REVISION "201109200000Z"
+	DESCRIPTION
+	  "OOS insertion"
+	REVISION "201207040000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201403260000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201411250000Z"
+	DESCRIPTION
+	  "Labels cosmetic updates"
+	REVISION "201605230000Z"
+	DESCRIPTION
+	  "New AlarmType – synthesisAlarm (12)"
+        ::= { ekinops 49 }
+
+
+
+--- *****************************************************
+---     LEAF LEVEL 2
+--- *****************************************************
+
+
+pmpump3alarms OBJECT IDENTIFIER ::= { modulepmpump3 2 }	
+pmpump3AlmOther OBJECT IDENTIFIER ::= { pmpump3alarms 1 }
+pmpump3AlmOtherNurg OBJECT IDENTIFIER ::= { pmpump3AlmOther 1 }
+pmpump3AlmOtherUrg OBJECT IDENTIFIER ::= { pmpump3AlmOther 2 }
+pmpump3AlmOtherCrit OBJECT IDENTIFIER ::= { pmpump3AlmOther 3 }
+
+pmpump3AlmClient OBJECT IDENTIFIER ::= { pmpump3alarms 2 }
+pmpump3AlmClientNurg OBJECT IDENTIFIER ::= { pmpump3AlmClient 1 }
+pmpump3AlmClientUrg OBJECT IDENTIFIER ::= { pmpump3AlmClient 2 }
+pmpump3AlmClientCrit OBJECT IDENTIFIER ::= { pmpump3AlmClient 3 }
+	
+pmpump3AlmLine OBJECT IDENTIFIER ::= { pmpump3alarms 3 }
+pmpump3AlmLineNurg OBJECT IDENTIFIER ::= { pmpump3AlmLine 1 }
+pmpump3AlmLineUrg OBJECT IDENTIFIER ::= { pmpump3AlmLine 2 }
+pmpump3AlmLineCrit OBJECT IDENTIFIER ::= { pmpump3AlmLine 3 }
+
+
+pmpump3measures OBJECT IDENTIFIER ::= { modulepmpump3 3 }	
+pmpump3MesrOther OBJECT IDENTIFIER ::= { pmpump3measures 1 }	
+pmpump3MesrClient OBJECT IDENTIFIER ::= { pmpump3measures 2 }	
+pmpump3MesrLine OBJECT IDENTIFIER ::= { pmpump3measures 3 }	
+
+
+pmpump3controlsWrite OBJECT IDENTIFIER ::= { modulepmpump3 6 }
+pmpump3CtrlOther OBJECT IDENTIFIER ::= { pmpump3controlsWrite 1 }
+pmpump3CtrlClient OBJECT IDENTIFIER ::= { pmpump3controlsWrite 2 }
+pmpump3CtrlLine OBJECT IDENTIFIER ::= { pmpump3controlsWrite 3 }
+
+pmpump3ri OBJECT IDENTIFIER ::= { modulepmpump3 7 }
+pmpump3riTable OBJECT IDENTIFIER ::= { pmpump3ri 1 }
+
+pmpump3Config OBJECT IDENTIFIER ::= { modulepmpump3 9 }
+
+pmpump3traps OBJECT IDENTIFIER ::= { modulepmpump3 10 }
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     REMOTE INVENTORY
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+pmpump3RinvReloadInventory OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reload the inventory: This OID triggers an 
+         inventory reload."
+  ::= { pmpump3ri 2 }
+
+pmpump3RinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "HW platform description: This OID contains the 
+         description of the Hardware platform."
+  ::= { pmpump3ri 3 }
+  
+pmpump3RinvModulePlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Module platform description: This OID contains the 
+         description of the Module."
+  ::= { pmpump3ri 4 }
+  
+pmpump3RinvSwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "SW platform description: This OID contains the 
+         description of the Software platform."
+  ::= { pmpump3ri 5 }
+
+
+
+
+pmpump3RinvLaser1Table OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pmpump3RinvLaser1Entry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the lasers on the selected module"
+      ::= { pmpump3riTable 1 }
+
+pmpump3RinvLaser1Entry OBJECT-TYPE
+        SYNTAX  Pmpump3RinvLaser1Entry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the laser table"
+        INDEX   { pmpump3RinvLaser1Index }
+        ::= { pmpump3RinvLaser1Table 1 }
+    
+
+Pmpump3RinvLaser1Entry::=
+        SEQUENCE {
+          pmpump3RinvLaser1Index 
+              Integer32,
+          pmpump3RinvLaser1
+              DisplayString
+        }
+
+
+    pmpump3RinvLaser1Index OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for laser table"
+        ::= { pmpump3RinvLaser1Entry 1 }
+
+
+    pmpump3RinvLaser1 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the laser: This OID contains the inventory for the laser"
+        ::= { pmpump3RinvLaser1Entry 2 }
+
+
+
+
+
+pmpump3RinvLaser2Table OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Pmpump3RinvLaser2Entry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of the lasers on the selected module"
+      ::= { pmpump3riTable 2 }
+
+pmpump3RinvLaser2Entry OBJECT-TYPE
+        SYNTAX  Pmpump3RinvLaser2Entry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row definition for the laser table"
+        INDEX   { pmpump3RinvLaser2Index }
+        ::= { pmpump3RinvLaser2Table 1 }
+    
+
+Pmpump3RinvLaser2Entry::=
+        SEQUENCE {
+          pmpump3RinvLaser2Index 
+              Integer32,
+          pmpump3RinvLaser2
+              DisplayString
+        }
+
+
+    pmpump3RinvLaser2Index OBJECT-TYPE
+        SYNTAX  Integer32(1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for laser table"
+        ::= { pmpump3RinvLaser2Entry 1 }
+
+
+    pmpump3RinvLaser2 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Inventory for the laser: This OID contains the inventory for the laser"
+        ::= { pmpump3RinvLaser2Entry 2 }
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+pmpump3AlmsynthAlm0 OBJECT IDENTIFIER ::= { pmpump3AlmOtherCrit 0 }
+
+
+
+
+pmpump3AlmDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition  <Help>
+          Status of the Fuse B <Condtype> 
+        DEF_FUSE_B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlm0 16 }
+
+
+
+pmpump3AlmDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition  <Help>
+          Status of the Fuse A <Condtype> 
+        DEF_FUSE_A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlm0 15 }
+
+
+
+pmpump3AlmModGlobFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Failure :This OID is set 
+        on detection of a failure originating 
+        from the PM <Condtype> MOD_GLOB_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm2 article
+--- *****************************************************
+pmpump3AlmsynthAlm2 OBJECT IDENTIFIER ::= { pmpump3AlmOtherNurg 2 }
+
+
+
+
+pmpump3AlmConfTableLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Load :This OID 
+         is at 1 during the loading of
+         configuration tables in the modules 
+        RAM. <Condtype> CONF_TABLE_LOAD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlm2 3 }
+
+
+
+pmpump3AlmInvUpload OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Inventory Upload :This OID is
+         at 1 during the uploading of PM 
+        inventory information. <Condtype> 
+        INV_UPLOAD <Probcause> other (1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmpump3AlmsynthAlm2 2 }
+
+
+
+pmpump3AlmConfTableSave OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Configuration Save :This OID 
+        is at 1 during the saving of a
+         new configuration table in the 
+        module Flash memory. <Condtype> 
+        CONF_TABLE_SAVE <Probcause> other 
+        (1) <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { pmpump3AlmsynthAlm2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlmLaser1 article
+--- *****************************************************
+pmpump3AlmsynthAlmLaser1 OBJECT IDENTIFIER ::= { pmpump3AlmClientCrit 8 }
+
+
+
+
+pmpump3AlmLaser1Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Failure :This 
+        OID indicates a failure on the
+         pump <Condtype> LASER1_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser1 12 }
+
+
+
+pmpump3AlmLaser1Alm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Booster / IL1 Pump DDM 
+        :This OID indicates an alarm is 
+        present coming out of the IL1 pump 
+        DDM <Condtype> LASER1_ALM <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser1 10 }
+
+
+
+pmpump3AlmLaser1Warning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Booster / IL1 Pump
+         DDM :This OID indicates a warning 
+        is present coming out of IL1 pump 
+        DDM <Condtype> LASER1_WARNING <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser1 9 }
+
+
+
+pmpump3AlmLaser1Oos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump In Service
+         :This OID indicates that the IL1 
+        pump is In Service (1) of Out or 
+        Service (2)  <Help>   This status 
+        indicates if the IL1 pump is in 
+        service <Condtype> LASER1_OOS <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser1 6 }
+
+
+
+pmpump3AlmLaser1TxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Output Shutdown 
+        :This OID indicates the IL1 pump 
+        optical output power is on.  <Help> 
+         This status indicates if the IL1 
+        laser pump is ON or OFF <Condtype> 
+        LASER1_TX_OFF <Probcause> other 
+        (1) <Alarmtype> equipmentAlarm
+         (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser1 5 }
+
+
+
+pmpump3AlmLaser1HwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump HW Failure
+         :This OID indicates a failure
+         on IL1 pump, most probably caused 
+        by a HW issue <Condtype> LASER1_HW_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser1 4 }
+
+
+
+pmpump3AlmLaser1InitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Not Ready :This 
+        OID indicates that the IL1 pump 
+        is not operational. <Condtype>
+         LASER1_INIT_NOT_COMPL <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser1 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlmLaser2 article
+--- *****************************************************
+pmpump3AlmsynthAlmLaser2 OBJECT IDENTIFIER ::= { pmpump3AlmClientCrit 9 }
+
+
+
+
+pmpump3AlmLaser2Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump Failure :This 
+        OID indicates a failure on the
+         pump <Condtype> LASER2_FAIL <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser2 12 }
+
+
+
+pmpump3AlmLaser2Alm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm On Pre-Amp / IL2 Pump DDM 
+        :This OID indicates an alarm is 
+        present coming out of IL2 pump
+         DDM <Condtype> LASER2_ALM <Probcause> 
+        equipmentMalfunction (16) <Alarmtype> 
+        synthesisAlarm (12)  <Polarity> 
+        (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser2 10 }
+
+
+
+pmpump3AlmLaser2Warning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Warning On Pre-Amp / IL2 Pump
+         DDM :This OID indicates a warning 
+        is present coming out of the IL2 
+        pump DDM <Condtype> LASER2_WARNING 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser2 9 }
+
+
+
+pmpump3AlmLaser2Oos OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump In Service
+         :This OID indicates that the IL2 
+        pump is In Service (1) of Out or 
+        Service (2)  <Help>   This status 
+        indicates if the IL2 pump is in 
+        service <Condtype> LASER2_OOS <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser2 6 }
+
+
+
+pmpump3AlmLaser2TxOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump Output Shutdown 
+        :This OID indicates the IL2 pump 
+        optical output power is on.  <Help> 
+         This status indicates if the IL2 
+        laser pump is ON or OFF <Condtype> 
+        LASER2_TX_OFF <Probcause> other 
+        (1) <Alarmtype> equipmentAlarm
+         (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser2 5 }
+
+
+
+pmpump3AlmLaser2HwFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump HW Failure
+         :This OID indicates a failure
+         on IL2 pump, most probably caused 
+        by a HW issue <Condtype> LASER2_HW_FAIL 
+        <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> synthesisAlarm 
+        (12)  <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser2 4 }
+
+
+
+pmpump3AlmLaser2InitNotCompl OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump Not Ready :This 
+        OID indicates that the IL2 pump 
+        is not operational. <Condtype>
+         LASER2_INIT_NOT_COMPL <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmsynthAlmLaser2 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1Alarms1 article
+--- *****************************************************
+pmpump3Almlaser1Alarms1 OBJECT IDENTIFIER ::= { pmpump3AlmClientUrg 16 }
+
+
+
+
+pmpump3AlmLaser1BiasHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Bias High Alarm
+         :This OID indicates that the Bias 
+        is higher than the alarm threshold 
+        of the IL1 pump.  <Help>  This
+         alarm indicates if the IL2 bias 
+        is too high <Condtype> LASER1_BIAS_HIGH_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms1 8 }
+
+
+
+pmpump3AlmLaser1BiasLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Bias Low Alarm :This 
+        OID indicates that the Bias is
+         lower than the alarm threshold 
+        of the IL1 pump.  <Help>  This
+         alarm indicates if the IL2 bias 
+        is too low <Condtype> LASER1_BIAS_LOW_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms1 7 }
+
+
+
+pmpump3AlmLaser1OutputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pwr High Alarm :This 
+        OID indicates that the Transmit 
+        Power is higher than the alarm
+         threshold of the IL1 pump.  <Help> 
+         This alarm indicates if the IL1 
+        power is too high <Condtype> LASER1_OUTPUT_PWR_HIGH_ALARM 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms1 6 }
+
+
+
+pmpump3AlmLaser1OutputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pwr Low Alarm :This 
+        OID indicates that the Transmit 
+        Power is lower than the alarm threshold 
+        of the IL1 pump.  <Help>  This
+         alarm indicates if the IL1 power 
+        is too low <Condtype> LASER1_OUTPUT_PWR_LOW_ALARM 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms1 5 }
+
+
+
+pmpump3AlmLaser1VthHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Vth High Alarm :This 
+        OID indicates that the thermistor 
+        voltage is higher than the alarm 
+        threshold of the IL1 pump.  <Help> 
+         This alarm indicates if the IL1 
+        power is too high <Condtype> LASER1_VTH_HIGH_ALARM 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms1 4 }
+
+
+
+pmpump3AlmLaser1VthLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Vth Low Alarm :This 
+        OID indicates that the thermistor 
+        voltage is lower than the alarm 
+        threshold of the IL1 pump.  <Help> 
+         This alarm indicates if the IL1 
+        power is too low <Condtype> LASER1_VTH_LOW_ALARM 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms1 3 }
+
+
+
+pmpump3AlmLaser1TempHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Temp High Alarm
+         :This OID indicates that the pump 
+        temperature  is higher than the 
+        alarm threshold of the IL1 pump. 
+         <Help>  This alarm indicates if 
+        the IL1 pump temperature is too 
+        high <Condtype> LASER1_TEMP_HIGH_ALARM 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms1 2 }
+
+
+
+pmpump3AlmLaser1TempLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Temp Low Alarm :This 
+        OID indicates that the pump temperature 
+         is lower than the alarm threshold 
+        of the IL1 pump.  <Help>  This
+         alarm indicates if the IL1 pump 
+        temperature is too low <Condtype> 
+        LASER1_TEMP_LOW_ALARM <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1Warnings article
+--- *****************************************************
+pmpump3Almlaser1Warnings OBJECT IDENTIFIER ::= { pmpump3AlmClientNurg 17 }
+
+
+
+
+pmpump3AlmLaser1BiasHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Bias High Warning 
+        :This OID indicates that the Bias 
+        is higher than the warning threshold 
+        of the IL1 pump.  <Help>  This
+         warning indicates if the IL1 bias 
+        is too high <Condtype> LASER1_BIAS_HIGH_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Warnings 8 }
+
+
+
+pmpump3AlmLaser1BiasLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Bias Low Warning 
+        :This OID indicates that the Bias 
+        is lower than the warning threshold 
+        of the IL1 pump.  <Help>  This
+         warning indicates if the IL1 bias 
+        is too low <Condtype> LASER1_BIAS_LOW_WARNING 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Warnings 7 }
+
+
+
+pmpump3AlmLaser1OutputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pwr High Warning 
+        :This OID indicates that the Transmit 
+        Power is higher than the warning 
+        threshold of the IL1 pump.  <Help> 
+         This warning indicates if the
+         IL1 power is too high <Condtype> 
+        LASER1_OUTPUT_PWR_HIGH_WARNING
+         <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Warnings 6 }
+
+
+
+pmpump3AlmLaser1OutputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pwr Low Warning
+         :This OID indicates that the Transmit 
+        Power is lower than the warning 
+        threshold of the IL1 pump.   <Help> 
+         This warning indicates if the
+         IL1 power is too low <Condtype> 
+        LASER1_OUTPUT_PWR_LOW_WARNING <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Warnings 5 }
+
+
+
+pmpump3AlmLaser1VthHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Vth High Warning 
+        :This OID indicates that the thermistor 
+        voltage is higher than the warning 
+        threshold of the IL1 pump.  <Help> 
+         This warning indicates if the
+         IL1 power is too high <Condtype> 
+        LASER1_VTH_HIGH_WARNING <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Warnings 4 }
+
+
+
+pmpump3AlmLaser1VthLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Vth Low Warning
+         :This OID indicates that the thermistor 
+        voltage is lower than the warning 
+        threshold of the IL1 pump.   <Help> 
+         This warning indicates if the
+         IL1 power is too low <Condtype> 
+        LASER1_VTH_LOW_WARNING <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Warnings 3 }
+
+
+
+pmpump3AlmLaser1TempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Temp High Warning 
+        :This OID indicates that the pump 
+        temperature  is higher than the 
+        warning threshold of the IL1 pump. 
+         <Help>  This warning indicates 
+        if the IL1 pump temperature is
+         too high <Condtype> LASER1_TEMP_HIGH_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Warnings 2 }
+
+
+
+pmpump3AlmLaser1TempLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Temp Low Warning 
+        :This OID indicates that the pump 
+        temperature  is lower than the
+         warning threshold of the IL1 pump. 
+         <Help>  This warning indicates 
+        if the IL1 pump temperature is
+         too low <Condtype> LASER1_TEMP_LOW_WARNING 
+        <Probcause> performanceDegraded 
+        (35) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Warnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1Alarms2 article
+--- *****************************************************
+pmpump3Almlaser1Alarms2 OBJECT IDENTIFIER ::= { pmpump3AlmClientCrit 19 }
+
+
+
+
+pmpump3AlmLaser1ExtLsd OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Laser Shutdown :This 
+        OID indicates that the laser of 
+        the pump is shut down  <Help> 
+         This status indicates that the 
+        laser of the pump is shut down
+         <Condtype> LASER1_EXT_LSD <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms2 6 }
+
+
+
+pmpump3AlmLaser1OaDisconnectedLsd OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Link Disconnected 
+        :This OID indicates that the link 
+        betwenn the amplifier and the pump 
+        is open  <Help>  This alarm indicates 
+        that the OA or the fiber is not 
+        present <Condtype> LASER1_OA_DISCONNECTED_LSD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms2 5 }
+
+
+
+pmpump3AlmLaser1AlmTecDev OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 TEC Deviation :This 
+        OID indicates that the loop control 
+        of the TEC is in fail condition 
+         <Help>  This alarm indicates if 
+        the loop control of the TEC is
+         in fail condition <Condtype> LASER1_ALM_TEC_DEV 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms2 4 }
+
+
+
+pmpump3AlmLaser1AlmTecPower OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 TEC Pw :This OID 
+        indicates that the TEC power supply 
+        is in fail condition .  <Help>
+          This alarm indicates if the TEC 
+        power is in fail condition <Condtype> 
+        LASER1_ALM_TEC_POWER <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms2 3 }
+
+
+
+pmpump3AlmLaser1AlmTemp OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Temperature Alarm 
+        :This OID indicates that the temperature 
+        of the current driver has reached 
+        the internal limitation.   <Help> 
+         This alarm indicates if the temperature 
+        has reached its limitation <Condtype> 
+        LASER1_ALM_TEMP <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms2 2 }
+
+
+
+pmpump3AlmLaser1AlmCurrent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Current Alarm :This 
+        OID indicates that maximum current 
+        has reached the internal limitation 
+         <Help>  This alarm indicates if 
+        the current has reached its limitation 
+         <Condtype> LASER1_ALM_CURRENT
+         <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser1Alarms2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2Alarms1 article
+--- *****************************************************
+pmpump3Almlaser2Alarms1 OBJECT IDENTIFIER ::= { pmpump3AlmLineUrg 24 }
+
+
+
+
+pmpump3AlmLaser2BiasHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Bias High Alarm
+         :This OID indicates that the Bias 
+        is higher than the alarm threshold 
+        of the IL1 Optical Module  <Help> 
+         This alarm indicates if the IL2 
+        bias is too high <Condtype> LASER2_BIAS_HIGH_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms1 8 }
+
+
+
+pmpump3AlmLaser2BiasLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Bias Low Alarm :This 
+        OID indicates that the Bias is
+         lower than the alarm threshold 
+        of the IL1 Optical Module  <Help> 
+         This alarm indicates if the IL2 
+        bias is too low <Condtype> LASER2_BIAS_LOW_ALARM 
+        <Probcause> pumpFailure (39) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms1 7 }
+
+
+
+pmpump3AlmLaser2OutputPwrHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pwr High Alarm :This 
+        OID indicates that the Transmit 
+        Power is higher than the alarm
+         threshold of the IL1 Optical Module 
+         <Help>  This alarm indicates if 
+        the IL2 power is too high <Condtype> 
+        LASER2_OUTPUT_PWR_HIGH_ALARM <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms1 6 }
+
+
+
+pmpump3AlmLaser2OutputPwrLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pwr Low Alarm :This 
+        OID indicates that the Transmit 
+        Power is lower than the alarm threshold 
+        of the IL1 Optical Module  <Help> 
+         This alarm indicates if the IL2 
+        power is too low <Condtype> LASER2_OUTPUT_PWR_LOW_ALARM 
+        <Probcause> transmitterFailure
+         (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms1 5 }
+
+
+
+pmpump3AlmLaser2VthHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Vth High Alarm :This 
+        OID indicates that the Receive
+         Power is higher than the alarm 
+        threshold of the IL2 Optical Module 
+         <Help>  This alarm indicates if 
+        the IL2 power is too high <Condtype> 
+        LASER2_VTH_HIGH_ALARM <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms1 4 }
+
+
+
+pmpump3AlmLaser2VthLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Vth Low Alarm :This 
+        OID indicates that the Receive
+         Power is lower than the alarm
+         threshold of the IL2 Optical Module 
+         <Help>  This alarm indicates if 
+        the IL2 power is too low <Condtype> 
+        LASER2_VTH_LOW_ALARM <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms1 3 }
+
+
+
+pmpump3AlmLaser2TempHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Temp High Alarm
+         :This OID indicates that the Gain 
+        is higher than the alarm threshold 
+        of the IL1 Module  <Help>  This 
+        alarm indicates if the IL2 pump 
+        temperature is too high <Condtype> 
+        LASER2_TEMP_HIGH_ALARM <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms1 2 }
+
+
+
+pmpump3AlmLaser2TempLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Temp Low Alarm :This 
+        OID indicates that the Gain is
+         lower than the alarm threshold 
+        of the IL1 Module  <Help>  This 
+        alarm indicates if the IL2 pump 
+        temperature is too low <Condtype> 
+        LASER2_TEMP_LOW_ALARM <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2Warnings article
+--- *****************************************************
+pmpump3Almlaser2Warnings OBJECT IDENTIFIER ::= { pmpump3AlmLineNurg 25 }
+
+
+
+
+pmpump3AlmLaser2BiasHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Bias High Warning 
+        :This OID indicates that the Bias 
+        is higher than the Warning threshold 
+        of the IL1 Optical Module  <Help> 
+         This warning indicates if the
+         IL2 bias is too high <Condtype> 
+        LASER2_BIAS_HIGH_WARNING <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Warnings 8 }
+
+
+
+pmpump3AlmLaser2BiasLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Bias Low Warning 
+        :This OID indicates that the Bias 
+        is lower than the Warning threshold 
+        of the IL1 Optical Module  <Help> 
+         This warning indicates if the
+         IL2 bias is too low <Condtype> 
+        LASER2_BIAS_LOW_WARNING <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Warnings 7 }
+
+
+
+pmpump3AlmLaser2OutputPwrHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pwr High Warning 
+        :This OID indicates that the Transmit 
+        Power is higher than the Warning 
+        threshold of the IL1 Optical Module 
+         <Help>  This warning indicates 
+        if the IL2 power is too high <Condtype> 
+        LASER2_OUTPUT_PWR_HIGH_WARNING
+         <Probcause> transmitterFailure 
+        (56) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Warnings 6 }
+
+
+
+pmpump3AlmLaser2OutputPwrLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pwr Low Warning
+         :This OID indicates that the Transmit 
+        Power is lower than the Warning 
+        threshold of the IL1 Optical Module 
+         <Help>  This warning indicates 
+        if the IL2 power is too low <Condtype> 
+        LASER2_OUTPUT_PWR_LOW_WARNING <Probcause> 
+        transmitterFailure (56) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Warnings 5 }
+
+
+
+pmpump3AlmLaser2VthHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Vth High Warning 
+        :This OID indicates that the Receive 
+        Power is higher than the Warning 
+        threshold of the IL2 Optical Module 
+         <Help>  This warning indicates 
+        if the IL2 power is too high <Condtype> 
+        LASER2_VTH_HIGH_WARNING <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Warnings 4 }
+
+
+
+pmpump3AlmLaser2VthLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Vth Low Warning
+         :This OID indicates that the Receive 
+        Power is lower than the Warning 
+        threshold of the IL2 Optical Module 
+         <Help>  This warning indicates 
+        if the IL2 power is too low <Condtype> 
+        LASER2_VTH_LOW_WARNING <Probcause> 
+        receiveFailure (41) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Warnings 3 }
+
+
+
+pmpump3AlmLaser2TempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Temp High Warning 
+        :This OID indicates that the Gain 
+        is higher than the Warning threshold 
+        of the IL1 Module  <Help>  This 
+        warning indicates if the IL2 pump 
+        temperature is too high <Condtype> 
+        LASER2_TEMP_HIGH_WARNING <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Warnings 2 }
+
+
+
+pmpump3AlmLaser2TempLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Temp Low Warning 
+        :This OID indicates that the Gain 
+        is lower than the Warning threshold 
+        of the IL1 Module  <Help>  This 
+        warning indicates if the IL2 pump 
+        temperature is too low <Condtype> 
+        LASER2_TEMP_LOW_WARNING <Probcause> 
+        performanceDegraded (35) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Warnings 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2Alarms2 article
+--- *****************************************************
+pmpump3Almlaser2Alarms2 OBJECT IDENTIFIER ::= { pmpump3AlmLineCrit 27 }
+
+
+
+
+pmpump3AlmLaser2ExtLsd OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Laser Shutdown :This 
+        OID indicates that the laser of 
+        the pump is shut down  <Help> 
+         This status indicates that the 
+        laser of the pump is shut down
+         <Condtype> LASER2_EXT_LSD <Probcause> 
+        other (1) <Alarmtype> other (1) 
+        <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms2 6 }
+
+
+
+pmpump3AlmLaser2OaDisconnectedLsd OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump Link Disconnected 
+        :This OID indicates that the link 
+        betwenn the amplifier and the pump 
+        is open  <Help>  This alarm indicates 
+        that the OA or the fiber is not 
+        present <Condtype> LASER2_OA_DISCONNECTED_LSD 
+        <Probcause> other (1) <Alarmtype> 
+        other (1) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms2 5 }
+
+
+
+pmpump3AlmLaser2AlmTecDev OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 TEC Deviation :This 
+        OID indicates that the loop control 
+        of the TEC is in fail condition 
+         <Help>  This alarm indicates if 
+        the loop control of the TEC is
+         in fail condition <Condtype> LASER2_ALM_TEC_DEV 
+        <Probcause> receiveFailure (41) 
+        <Alarmtype> physicalViolation (9) 
+        <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms2 4 }
+
+
+
+pmpump3AlmLaser2AlmTecPower OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 TEC Pw :This OID 
+        indicates that the TEC power supply 
+        is in fail condition .  <Help>
+          This alarm indicates if the TEC 
+        power is in fail condition <Condtype> 
+        LASER2_ALM_TEC_POWER <Probcause> 
+        pumpFailure (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms2 3 }
+
+
+
+pmpump3AlmLaser2AlmTemp OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Temperature Alarm 
+        :This OID indicates that the temperature 
+        of the current driver has reached 
+        the internal limitation.   <Help> 
+         This alarm indicates if the temperature 
+        has reached its limitation <Condtype> 
+        LASER2_ALM_TEMP <Probcause> pumpFailure 
+        (39) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms2 2 }
+
+
+
+pmpump3AlmLaser2AlmCurrent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Current Alarm :This 
+        OID indicates that maximum current 
+        has reached the internal limitation 
+         <Help>  This alarm indicates if 
+        the current has reached its limitation 
+         <Condtype> LASER2_ALM_CURRENT
+         <Probcause> equipmentMalfunction 
+        (16) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3Almlaser2Alarms2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the pmAlarms article
+--- *****************************************************
+pmpump3AlmpmAlarms OBJECT IDENTIFIER ::= { pmpump3AlmOtherUrg 74 }
+
+
+
+
+pmpump3AlmTempHighAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature High Alarm
+         :This OID indicates that the PM 
+        temperature is higher than the
+         alarm threshold  <Help>  This
+         alarm indicates if the module
+         temperature is too high <Condtype> 
+        TEMP_HIGH_ALARM <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmpmAlarms 2 }
+
+
+
+pmpump3AlmTermpLowAlarm OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature Low Alarm :This 
+        OID indicates that the PM temperature 
+        if lower than the alarm threshold 
+         <Help>  This alarm indicates if 
+        the module temperature is too low 
+        <Condtype> TERMP_LOW_ALARM <Probcause> 
+        temperatureUnacceptable (51) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmpmAlarms 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the pmWarnings article
+--- *****************************************************
+pmpump3AlmpmWarnings OBJECT IDENTIFIER ::= { pmpump3AlmOtherNurg 75 }
+
+
+
+
+pmpump3AlmTempHighWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature High Warning 
+        :This OID indicates that the PM 
+        temperature if higher than the
+         Warning threshold  <Help>  This 
+        warning indicates if the module 
+        temperature is too high <Condtype> 
+        TEMP_HIGH_WARNING <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmpmWarnings 2 }
+
+
+
+pmpump3AlmTermpLowWarning OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature Low Warning 
+        :This OID indicates that the PM 
+        temperature if lower than the Warning 
+        threshold  <Help>  This warning 
+        indicates if the module temperature 
+        is too low <Condtype> TERMP_LOW_WARNING 
+        <Probcause> temperatureUnacceptable 
+        (51) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { pmpump3AlmpmWarnings 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth0 article
+--- *****************************************************
+pmpump3Ctrlsynth0 OBJECT IDENTIFIER ::= { pmpump3CtrlOther 0 }
+
+
+
+
+pmpump3CtrlConfClear OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Clear Configuration Tables :This 
+        bit clears the configuration tables 
+        from configuration in the flash. 
+         <Help>  This control restores
+         the default configuration of the 
+        module
+        "
+	  ::= { pmpump3Ctrlsynth0 13 }
+
+
+
+pmpump3CtrlConfFlash OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Write Configuration Tables :This 
+        bit saves the current configuration 
+        of the module as configuration
+         in the flash.  <Help>  This control 
+        saves the customer configuration 
+        on the module
+        "
+	  ::= { pmpump3Ctrlsynth0 9 }
+
+
+
+pmpump3CtrlConfLoad OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Load Configuration Tables :When 
+        set this enables loading from flash 
+        configuration1 into the module.
+        "
+	  ::= { pmpump3Ctrlsynth0 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swMgnt article
+--- *****************************************************
+pmpump3CtrlswMgnt OBJECT IDENTIFIER ::= { pmpump3CtrlOther 5 }
+
+
+
+
+pmpump3CtrlWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Warm Reset :This OID, when
+         set, causes a warm reset of the 
+        Software. This reset is not traffic 
+        affecting, and the configuration 
+        of the Sofwtare remains unchanged. 
+         <Help>  This control initiates 
+        a warm reset of the module.
+        "
+	  ::= { pmpump3CtrlswMgnt 3 }
+
+
+
+pmpump3CtrlColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM Cold Reset :This OID, when
+         set, causes a cold reset of the 
+        Software. This reset is traffic 
+        affecting, and the configuration 
+        of Software is reloaded on start-up. 
+         <Help>  This control initiates 
+        a cold reset of the module.
+        "
+	  ::= { pmpump3CtrlswMgnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1LaserOff article
+--- *****************************************************
+pmpump3Ctrllaser1LaserOff OBJECT IDENTIFIER ::= { pmpump3CtrlClient 32 }
+
+
+
+
+pmpump3CtrlLaser1LaserOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Laser Off :This 
+        OID switches OFF the laser of the 
+        IL1 pump.   <Help>  This control 
+        defines the laser state of the
+         IL1
+        "
+	  ::= { pmpump3Ctrllaser1LaserOff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1EffPwrOutSettingValue article
+--- *****************************************************
+
+pmpump3Ctrllaser1EffPwrOutSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Effective Output 
+        Power :This OID sets the value
+         of the effective output power
+         of the IL1 pump  (Unit = dBm)
+           <Help>  This control defines 
+        the IL1 effective output power
+         in dBm.
+        "
+	  ::= { pmpump3CtrlClient 37 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2LaserOff article
+--- *****************************************************
+pmpump3Ctrllaser2LaserOff OBJECT IDENTIFIER ::= { pmpump3CtrlLine 40 }
+
+
+
+
+pmpump3CtrlLaser2LaserOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Preampli / IL2 Pump Laser Off
+         :This OID switches OFF the laser 
+        of the IL2 pump.  <Help>  This
+         control defines the laser state 
+        of the IL2
+        "
+	  ::= { pmpump3Ctrllaser2LaserOff 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2EffPwrOutSettingValue article
+--- *****************************************************
+
+pmpump3Ctrllaser2EffPwrOutSettingValue OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Preampli / IL2 Effective Output 
+        Power :This OID sets the value
+         of the effective output power
+         of the IL2 pump  (Unit = dBm)
+          <Help>  This control defines
+         the IL2 effective output power 
+        in dBm.
+        "
+	  ::= { pmpump3CtrlLine 45 }
+
+
+
+--- *****************************************************
+---     LEAF for the ledTest article
+--- *****************************************************
+pmpump3CtrlledTest OBJECT IDENTIFIER ::= { pmpump3CtrlOther 73 }
+
+
+
+
+pmpump3CtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Leds Off :This OID switches off 
+        all the Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to OFF
+        "
+	  ::= { pmpump3CtrlledTest 3 }
+
+
+
+pmpump3CtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature. 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        to red
+        "
+	  ::= { pmpump3CtrlledTest 2 }
+
+
+
+pmpump3CtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature.  <Help>  This control
+         initiates a test leds turning
+         all the LEDs to green
+        "
+	  ::= { pmpump3CtrlledTest 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     MEASURES
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the laser1BiasMeas article
+--- *****************************************************
+
+pmpump3Mesrlaser1BiasMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Laser Bias
+         :This OID gives the pump laser 
+        current of the IL1 laser (Bias
+         = AV/20) (Unit = mA)  <Help> 
+         This measure gives the bias of 
+        the IL1 pump laser
+        "
+	  ::= { pmpump3MesrClient 16 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1VthMeas article
+--- *****************************************************
+
+pmpump3Mesrlaser1VthMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Temp. Reg.
+         Volt :This OID gives the Voltage 
+        of the Temperature Regulator of 
+        the IL1 laser (Voltage = AV/10000) 
+        (Unit = V)   <Help>   This measure 
+        gives the Voltage of the Temperature 
+        Regulator of the IL1 pump laser
+        "
+	  ::= { pmpump3MesrClient 17 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2BiasMeas article
+--- *****************************************************
+
+pmpump3Mesrlaser2BiasMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump Laser Bias
+         :This OID gives the pump laser 
+        current of the IL2 laser (Bias
+         = AV/20) (Unit = mA)  <Help> 
+         This measure gives the bias of 
+        the IL2 pump laser
+        "
+	  ::= { pmpump3MesrLine 24 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2VthMeas article
+--- *****************************************************
+
+pmpump3Mesrlaser2VthMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump Temp. Reg.
+         Volt :This OID gives the Voltage 
+        of the Temperature Regulator of 
+        the IL2 laser (Voltage = AV/10000) 
+        (Unit = V)  <Help>   This measure 
+        gives the Voltage of the Temperature 
+        Regulator of the IL2 pump laser
+        "
+	  ::= { pmpump3MesrLine 25 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1Pwr article
+--- *****************************************************
+
+pmpump3Mesrlaser1Pwr OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Power :This 
+        OID gives the power value provided 
+        by the external pump to the IL1 
+        (Power = AV/20) (Unit = mW)  <Help> 
+          This measure gives the power
+         provided by the pump to the IL1
+        "
+	  ::= { pmpump3MesrClient 36 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser1Temp article
+--- *****************************************************
+
+pmpump3Mesrlaser1Temp OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Booster / IL1 Pump Temperature 
+        :This OID gives the temperature 
+        value of the pump linked to the 
+        IL1 (Temperature = AV/256) (Unit 
+        = C)   <Help>  This measure gives 
+        the temperature value of the pump 
+        linked to the IL1
+        "
+	  ::= { pmpump3MesrClient 37 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2Pwr article
+--- *****************************************************
+
+pmpump3Mesrlaser2Pwr OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump Power : This 
+        OID gives the power value provided 
+        by the external pump to the IL2 
+        (Power = AV/20) (Unit = mW)  <Help> 
+          This measure gives the power
+         provided by the pump to the IL2
+        "
+	  ::= { pmpump3MesrLine 44 }
+
+
+
+--- *****************************************************
+---     LEAF for the laser2Temp article
+--- *****************************************************
+
+pmpump3Mesrlaser2Temp OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Pre-Amp / IL2 Pump Temperature 
+        :This OID gives the temperature 
+        value of the pump linked to the 
+        IL2 (Temperature = AV/256) (Unit 
+        = C)   <Help>  This measure gives 
+        the temperature value of the pump 
+        linked to the IL2
+        "
+	  ::= { pmpump3MesrLine 45 }
+
+
+
+--- *****************************************************
+---     LEAF for the tempMeas article
+--- *****************************************************
+
+pmpump3MesrtempMeas OBJECT-TYPE
+	  SYNTAX INTEGER (0..65535)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Module Temperature :This OID gives 
+        the temperature of the PM (Temperature 
+        = AV/256) (Unit = C)   <Help> 
+         This measure gives the temperature 
+        of the module
+        "
+	  ::= { pmpump3MesrOther 74 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the table Group noValue
+--- *****************************************************
+
+pmpump3CfgNoValue OBJECT IDENTIFIER ::= { pmpump3Config 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2111
+--- *****************************************************
+
+pmpump3tableclientStartup OBJECT IDENTIFIER ::= { pmpump3CfgNoValue 1 }
+
+
+
+pmpump3Cfglaser1Ctrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on IL1 pump Laser 
+        :This OID configures the default 
+        initialisation settings on the
+         IL1 pump laser.
+        "
+	  ::= { pmpump3tableclientStartup 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group lineStartUp
+--- *****************************************************
+
+pmpump3CfgLineStartUp OBJECT IDENTIFIER ::= { pmpump3Config 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table 2191
+--- *****************************************************
+
+pmpump3tablelineStartup OBJECT IDENTIFIER ::= { pmpump3CfgLineStartUp 1 }
+
+
+
+pmpump3Cfglaser2Ctrl OBJECT-TYPE
+	  SYNTAX Unsigned32 (0..65536)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Default Settings on IL2 pump Laser 
+        :This OID configures the default 
+        initialisation settings on the
+         IL2 pump laser.
+        "
+	  ::= { pmpump3tablelineStartup 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the table Group labels
+--- *****************************************************
+
+pmpump3CfgLabels OBJECT IDENTIFIER ::= { pmpump3Config 3 }
+
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmpump3CfgLabelclientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmpump3CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmpump3CfgLabels 1 }
+
+
+pmpump3CfgLabelclientEntry OBJECT-TYPE
+	SYNTAX Pmpump3CfgLabelclientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmpump3CfgLabelclientIndex }
+	::= { pmpump3CfgLabelclientTable 1 }
+
+
+Pmpump3CfgLabelclientEntry ::=
+	SEQUENCE {
+	pmpump3CfgLabelclientIndex
+		INTEGER,
+	pmpump3CfgLabelclientPortn
+		DisplayString
+	}
+
+
+pmpump3CfgLabelclientIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelclient 
+        table
+        "
+	::= { pmpump3CfgLabelclientEntry 1 }
+
+
+pmpump3CfgLabelclientPortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the Ports :These registers
+         configures the default initialisation 
+        settings of the labels of the ports.
+        "
+	::= { pmpump3CfgLabelclientEntry 3 }
+
+
+--- *****************************************************
+---     LEAF for the table NO_VALUE
+--- *****************************************************
+
+pmpump3CfgLabellineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pmpump3CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        List of  Article
+        "
+	::= { pmpump3CfgLabels 2 }
+
+
+pmpump3CfgLabellineEntry OBJECT-TYPE
+	SYNTAX Pmpump3CfgLabellineEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "
+        Row definition for the labels
+         table
+        "
+	INDEX   { pmpump3CfgLabellineIndex }
+	::= { pmpump3CfgLabellineTable 1 }
+
+
+Pmpump3CfgLabellineEntry ::=
+	SEQUENCE {
+	pmpump3CfgLabellineIndex
+		INTEGER,
+	pmpump3CfgLabellinePortn
+		DisplayString
+	}
+
+
+pmpump3CfgLabellineIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..128)
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+        "
+        Index definition for the labelline 
+        table
+        "
+	::= { pmpump3CfgLabellineEntry 1 }
+
+
+pmpump3CfgLabellinePortn OBJECT-TYPE
+	SYNTAX  DisplayString( SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+        "
+        Default settings on the label
+         of the lines :These registers
+         configures the default initialisation 
+        settings of the labels of the lines.
+        "
+	::= { pmpump3CfgLabellineEntry 3 }
+
+
+
+pmpump3CfgWriteConfiguration  OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Write configuration to module:This OID 
+	 writes the complete configuration to the module"
+	::= { pmpump3Config 257 }
+
+
+
+
+
+
+--- *****************************************************
+---     TRAP OBJECTS
+--- *****************************************************
+
+pmpump3trapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..64)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last module which generates a trap"
+	::= { pmpump3traps 4 }
+
+
+
+
+
+
+
+--- *****************************************************
+---     GLOBAL TRAPS
+--- *****************************************************
+
+pmpump3Laser2TrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser2Warning, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Pre-Amp/IL2 Pump Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmpump3AlmLaser2Warning "on", pmpump3trapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Pre-Amp/IL2 Pump of PM PUMP3 in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default is activated"
+	::= { pmpump3traps 30 }
+
+pmpump3Laser2TrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser2Warning, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Pre-Amp/IL2 Pump Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM PUMP3 Pre-Amp/IL2 Pump Not Urgent ON"}
+	--&MATCH       { pmpump3AlmLaser2Warning "on", pmpump3trapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Pre-Amp/IL2 Pump of PM PUMP3 in slot $2 ($A)"
+	DESCRIPTION "Not urgent Line default disappeared"
+	::= { pmpump3traps 31 }
+
+pmpump3Laser2TrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser2Alm, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Pre-Amp/IL2 Pump Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmpump3AlmLaser2Alm "on", pmpump3trapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on Pre-Amp/IL2 Pump of PM PUMP3 in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default is activated"
+	::= { pmpump3traps 32 }
+
+pmpump3Laser2TrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser2Alm, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Pre-Amp/IL2 Pump Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM PUMP3 Pre-Amp/IL2 Pump Urgent ON"}
+	--&MATCH       { pmpump3AlmLaser2Alm "on", pmpump3trapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Pre-Amp/IL2 Pump of PM PUMP3 in slot $2 ($A)"
+	DESCRIPTION "Urgent Line default disappeared"
+	::= { pmpump3traps 33 }
+
+pmpump3Laser2TrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser2Fail, pmpump3AlmLaser2HwFail, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Pre-Amp/IL2 Pump Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmpump3AlmLaser2Fail "on", pmpump3AlmLaser2HwFail "*", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Pre-Amp/IL2 Pump Down on PM PUMP3 in Slot $3 ($A)"
+	
+	--&FILTNAME    "PM PUMP3 Pre-Amp/IL2 Pump HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmpump3AlmLaser2Fail "*", pmpump3AlmLaser2HwFail "on", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Pre-Amp/IL2 Pump Down on PM PUMP3 in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default is activated"
+	::= { pmpump3traps 34 }
+
+pmpump3Laser2TrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser2Fail, pmpump3AlmLaser2HwFail, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Pre-Amp/IL2 Pump Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM PUMP3 Pre-Amp/IL2 Pump Fail ON" }
+	--&MATCH       { pmpump3AlmLaser2Fail "on", pmpump3AlmLaser2HwFail "*", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Pre-Amp/IL2 Pump Up on PM PUMP3 in Slot $3 ($A)"
+
+	--&FILTNAME    "PM PUMP3 Pre-Amp/IL2 Pump HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmpump3AlmLaser2Fail "*", pmpump3AlmLaser2HwFail "on", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Pre-Amp/IL2 Pump Up on PM PUMP3 in Slot $3 ($A)"
+	DESCRIPTION "Critical Line default disappeared"
+	::= { pmpump3traps 35 }
+
+
+
+
+
+
+--- *****************************************************
+---     PORTS TRAPS
+--- *****************************************************
+
+pmpump3Laser1TrapNotUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser1Warning, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Booster/IL1 Pump Not Urgent ON"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { pmpump3AlmLaser1Warning "on", pmpump3trapBoardNumber "$2"}
+	--&MESG        "DDM Warning appears on Booster/IL1 Pump of PM PUMP3 in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default is activated"
+	::= { pmpump3traps 40 }
+
+pmpump3Laser1TrapNotUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser1Warning, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Booster/IL1 Pump Not Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM PUMP3 Booster/IL1 Pump Not Urgent ON"}
+	--&MATCH       { pmpump3AlmLaser1Warning "on", pmpump3trapBoardNumber "$2"}
+	--&MESG        "DDM Warning disappears on Booster/IL1 Pump of PM PUMP3 in slot $2 ($A)"
+	DESCRIPTION "Not urgent client default disappeared"
+	::= { pmpump3traps 41 }
+
+pmpump3Laser1TrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser1Alm, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Booster/IL1 Pump Urgent ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmpump3AlmLaser1Alm "on", pmpump3trapBoardNumber "$2"}
+	--&MESG        "DDM Alarms appears on Booster/IL1 Pump of PM PUMP3 in slot $2 ($A)"
+	DESCRIPTION "Urgent client default is activated"
+	::= { pmpump3traps 42 }
+
+pmpump3Laser1TrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser1Alm, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Booster/IL1 Pump Urgent OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM PUMP3 Booster/IL1 Pump Urgent ON"}
+	--&MATCH       { pmpump3AlmLaser1Alm "on", pmpump3trapBoardNumber "$2"}
+	--&MESG        "DDM Alarm disappears on Booster/IL1 Pump of PM PUMP3 in slot $2 ($A)"
+	DESCRIPTION "Urgent client default disappeared"
+	::= { pmpump3traps 43 }
+
+pmpump3Laser1TrapCritGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser1Fail, pmpump3AlmLaser1HwFail, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Booster/IL1 Pump Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { pmpump3AlmLaser1Fail "on", pmpump3AlmLaser1HwFail "*", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Booster/IL1 Pump Down on PM PUMP3 in Slot $3 ($A)"
+	
+	--&FILTNAME    "PM PUMP3 Booster/IL1 Pump HW Fail ON (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmpump3AlmLaser1Fail "*", pmpump3AlmLaser1HwFail "on", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Booster/IL1 Pump Down on PM PUMP3 in Slot $3 ($A)"
+	DESCRIPTION "Critical client default is activated"
+	::= { pmpump3traps 44 }
+
+pmpump3Laser1TrapCritGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmLaser1Fail, pmpump3AlmLaser1HwFail, pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Booster/IL1 Pump Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "PM PUMP3 Booster/IL1 Pump Fail ON" }
+	--&MATCH       { pmpump3AlmLaser1Fail "on", pmpump3AlmLaser1HwFail "*", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Booster/IL1 Pump Up on PM PUMP3 in Slot $3 ($A)"
+
+	--&FILTNAME    "PM PUMP3 Booster/IL1 Pump HW Fail OFF (Hidden)"
+	--&ACTIONS     { info }
+	--&MATCH       { pmpump3AlmLaser1Fail "*", pmpump3AlmLaser1HwFail "on", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Booster/IL1 Pump Up on PM PUMP3 in Slot $3 ($A)"
+	DESCRIPTION "Critical client default disappeared"
+	::= { pmpump3traps 45 }
+
+
+
+
+
+
+--- *****************************************************
+---     HW TRAPS
+--- *****************************************************
+
+pmpump3PowerTrapUrgentGoesOn NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmDefFuseB, pmpump3AlmDefFuseA , pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmpump3AlmDefFuseB "*", pmpump3AlmDefFuseA "on", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Power Input A Fail on PM PUMP3 in Slot $3 ($A)"
+
+	--&FILTNAME    "PM PUMP3 Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { pmpump3AlmDefFuseB "on", pmpump3AlmDefFuseA "*", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Power Input B Fail on PM PUMP3 in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default is activated"
+	::= { pmpump3traps 50 }
+pmpump3PowerTrapUrgentGoesOff NOTIFICATION-TYPE
+	OBJECTS {pmpump3AlmDefFuseB, pmpump3AlmDefFuseA , pmpump3trapBoardNumber}
+	STATUS current
+	--&FILTNAME    "PM PUMP3 Fuse A&B Fail OFF"
+	--&ACTIONS     { log, normal}
+	--&CLEARS      { "PM PUMP3 Fuse A Fail ON", "PM PUMP3 Fuse B Fail ON" }
+	--&MATCH       { pmpump3AlmDefFuseB "on", pmpump3AlmDefFuseA "on", pmpump3trapBoardNumber "$3"}
+	--&MESG        "Power Inputs A and B Present on PM PUMP3 in Slot $3 ($A)"
+	DESCRIPTION "Urgent power supply default disappeared"
+	::= { pmpump3traps 51 }
+
+
+
+
+
+
+END
