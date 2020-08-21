@@ -32,10 +32,8 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\DBTestCase;
 
-class FgTrapVpnTunTest extends DBTestCase
+class FgTrapVpnTunTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testVpnTunDown()
     {
         $device = factory(Device::class)->create();

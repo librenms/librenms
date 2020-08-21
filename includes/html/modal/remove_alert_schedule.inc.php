@@ -13,7 +13,7 @@
  */
 
 if (Auth::user()->hasGlobalAdmin()) {
-?>
+    ?>
 
 <div class="modal fade bs-example-modal-sm" id="delete-maintenance" tabindex="-1" role="dialog" aria-labelledby="delete" aria-hidden="true">
     <div class="modal-dialog">
@@ -31,8 +31,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="sched-maintenance-removal" data-target="sched-maintenance-removal">Delete</button>
                     <input type="hidden" name="del_schedule_id" id="del_schedule_id">
-                    <input type="hidden" name="type" id="type" value="schedule-maintenance">
-                    <input type="hidden" name="sub_type" id="sub_type" value="del-maintenance">
+                    <input type="hidden" name="type" value="schedule-maintenance">
+                    <input type="hidden" name="sub_type" value="del-maintenance">
                 </form>
             </div>
         </div>
@@ -63,5 +63,5 @@ $('#sched-maintenance-removal').click('', function(e) {
 });
 
 </script>
-<?php
+    <?php
 }

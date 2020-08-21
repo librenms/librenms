@@ -1,4 +1,6 @@
-[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Travis Status](https://travis-ci.com/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
+[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master)
+[![Travis Status](https://travis-ci.com/librenms/librenms.svg?branch=master)](https://travis-ci.com/librenms/librenms)
 
 Introduction
 ------------
@@ -31,7 +33,7 @@ Participating
 -------------
 
 You can participate in the project by:
-- Talking to us on [Discord](https://t.libren.ms/discord) or [Twitter][3].
+- Talking to us on [Discord][4] or [Twitter][3].
 - Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
 - Cloning the [repo][2] and filing [pull requests][19] on github.
@@ -53,7 +55,7 @@ License
 
 Copyright (C) 2006-2012 Adam Armstrong <adama@memetic.org>
 
-Copyright (C) 2013-2017 by individual LibreNMS contributors
+Copyright (C) 2013-2020 by individual LibreNMS contributors
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -81,23 +83,20 @@ exception):
 
   Please see [Acknowledgements][17]
 
-[1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
-[4]: https://t.libren.ms/discord "Discord LibreNMS Server"
+[4]: https://discord.gg/librenms "Discord LibreNMS Server"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
 [6]: http://freenode.net/changuide "Freenode channel guidelines"
 [7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
 [11]: http://www.librenms.org/#downloads
-[12]: http://docs.librenms.org/General/Welcome-to-Observium-users/
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
 [15]: http://docs.librenms.org/General/Contributing/
 [16]: http://docs.librenms.org/
 [17]: http://docs.librenms.org/General/Acknowledgement/
-[18]: https://github.com/librenms/librenms/issues
 [19]: https://github.com/librenms/librenms/pulls
 
 

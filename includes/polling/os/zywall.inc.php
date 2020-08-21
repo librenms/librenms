@@ -16,5 +16,5 @@ if (is_numeric($sessions)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'zywall-sessions', $tags, $fields);
-    $graphs['zywall_sessions'] = true;
+    $os->enableGraph('zywall_sessions');
 }

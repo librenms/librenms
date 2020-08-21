@@ -9,4 +9,8 @@ over:
 discovery_modules:
     applications: true
 discovery:
-    - sysDescr: FreeBSD
+    -
+        sysDescr: FreeBSD
+        sysDescr_except:
+            - FreeNAS
+            - TrueNAS

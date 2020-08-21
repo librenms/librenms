@@ -31,11 +31,11 @@ if (count($components) > 0) {
         <?php
         // Display an additional row to show the error
         if ($array['status'] == 2) {
-        ?>
+            ?>
                     <tr class="<?php echo $class ?>">
                         <td>Error: <?php echo nl2br($array['error'])?></td>
                     </tr>
-        <?php
+            <?php
         }
     }
     ?>

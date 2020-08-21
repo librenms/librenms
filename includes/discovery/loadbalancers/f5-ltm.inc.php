@@ -31,7 +31,7 @@ $components = $components[$device['device_id']];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = array();
-$types = array($module, 'bigip', 'f5-ltm-vs', 'f5-ltm-pool', 'f5-ltm-poolmember');
+$types = array($module, 'bigip', 'f5-ltm-bwc', 'f5-ltm-vs', 'f5-ltm-pool', 'f5-ltm-poolmember');
 foreach ($components as $k => $v) {
     foreach ($types as $type) {
         if ($v['type'] == $type) {
@@ -109,11 +109,22 @@ if (!empty($ltmPoolEntry['name'])) {
     d_echo("No Pools Found\n");
 }
 
+echo "#### Unload disco module ltm-bwc ####\n\n";
+$ltmBwcEntry = [];
+//Check for Virtual Server Enries
+$ltmBwcEntry['name'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.13.1.3.1.1', 0);
+//If no BWC are found don't look for statistics
+if (!empty($ltmBwcEntry['name'])) {
+    d_echo("#### Bandwidth Controller Found\n");
+} else {
+    d_echo("No Bandwidth Controller Found\n");
+}
+
 /*
  * False == no object found - this is not an error, OID doesn't exist.
  * null  == timeout or something else that caused an error, OID may exist but we couldn't get it.
  */
-if (!empty($ltmVirtualServEntry) || !empty($ltmPoolEntry) || !empty($ltmPoolMemberEntry)) {
+if (!empty($ltmBwcEntry) || !empty($ltmVirtualServEntry) || !empty($ltmPoolEntry) || !empty($ltmPoolMemberEntry)) {
     // No Nulls, lets go....
     d_echo("Objects Found:\n");
 
@@ -165,6 +176,29 @@ if (!empty($ltmVirtualServEntry) || !empty($ltmPoolEntry) || !empty($ltmPoolMemb
                 d_echo("    Status:  ".$result['status']."\n");
                 d_echo("    Message: ".$result['error']."\n");
 
+                // Add this result to the master array.
+                $tblBigIP[] = $result;
+            }
+        }
+    }
+
+   // Process the BWC
+    if (is_array($ltmBwcEntry['name'])) {
+        foreach ($ltmBwcEntry['name'] as $oid => $value) {
+            $result = array();
+
+            // Find all Bandwidth Controller  names and UID's, then we can find everything else we need.
+            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.13.1.3.1.1.') !== false) {
+                list($null, $index) = explode('1.3.6.1.4.1.3375.2.2.13.1.3.1.1.', $oid);
+                $result['type'] = 'f5-ltm-bwc';
+                $result['UID'] = (string)$index;
+                $result['label'] = $value;
+                // The UID is far too long to have in a RRD filename, use a hash of it instead.
+                $result['hash'] = hash('crc32', $result['UID']);
+            }
+
+            // Do we have any results
+            if (count($result) > 0) {
                 // Add this result to the master array.
                 $tblBigIP[] = $result;
             }

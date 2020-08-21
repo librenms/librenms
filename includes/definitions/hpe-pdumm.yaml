@@ -8,5 +8,6 @@ over:
 mib_dir:
     - hp
 discovery:
-    - sysDescr:
-        - 'HP PDU Management Module'
+    -
+        sysDescr:
+            - 'HP PDU Management Module'

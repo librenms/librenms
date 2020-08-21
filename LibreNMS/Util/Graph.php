@@ -55,7 +55,7 @@ class Graph
 
         if ($device != null) {
             // find the MIB subtypes
-            $graphs = $device->graphs();
+            $graphs = $device->graphs->pluck('graph');
 
             foreach (Config::get('graph_types') as $type => $type_data) {
                 foreach (array_keys($type_data) as $subtype) {
@@ -80,5 +80,19 @@ class Graph
     public static function isMibGraph($type, $subtype)
     {
         return Config::get("graph_types.$type.$subtype.section") == 'mib';
+    }
+
+    public static function getOverviewGraphsForDevice($device)
+    {
+        if ($device->snmp_disable) {
+            return Config::getOsSetting('ping', 'over');
+        }
+
+        if ($graphs = Config::getOsSetting($device->os, 'over')) {
+            return $graphs;
+        }
+
+        $os_group = Config::getOsSetting($device->os, 'group');
+        return Config::get("os_group.$os_group.over", Config::get('os.default.over'));
     }
 }

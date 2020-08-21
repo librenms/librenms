@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use Exception;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -183,12 +184,12 @@ class MibTest extends TestCase
             while (($line = fgets($handle)) !== false) {
                 $trimmed = trim($line);
 
-                if (empty($trimmed) || starts_with($trimmed, '--')) {
+                if (empty($trimmed) || Str::startsWith($trimmed, '--')) {
                     continue;
                 }
 
                 $header .= " $trimmed";
-                if (str_contains($trimmed, 'DEFINITIONS')) {
+                if (Str::contains($trimmed, 'DEFINITIONS')) {
                     preg_match('/(\S+)\s+(?=DEFINITIONS)/', $header, $matches);
                     fclose($handle);
                     return $matches[1];

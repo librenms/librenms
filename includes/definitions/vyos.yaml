@@ -1,5 +1,6 @@
 os: vyos
 text: VyOS
+group: unix
 type: network
 ifname: true
 over:
@@ -7,6 +8,7 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }
 discovery:
-    - sysDescr_regex:
-        - '/^Vyatta VyOS/'
-        - '/^VyOS/i'
+    -
+        sysDescr_regex:
+            - '/^Vyatta VyOS/'
+            - '/^VyOS/i'

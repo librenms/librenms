@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -35,7 +36,7 @@ function get_service_status($device = null)
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ignore = 0, $disabled = 0)
+function add_service($device, $type, $desc, $ip = '', $param = "", $ignore = 0, $disabled = 0)
 {
 
     if (!is_array($device)) {
@@ -43,7 +44,7 @@ function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ign
     }
 
     if (empty($ip)) {
-        $ip = $device['hostname'];
+        $ip = Device::pollerTarget($device['hostname']);
     }
 
     $insert = array('device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled);

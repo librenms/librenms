@@ -45,14 +45,14 @@ if ($device['os'] != 'Snom') {
         $fields = array();
         foreach ($oids as $oid) {
             $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
-            $fields[$oid] = isset($data[0][$oid]) ? $data[0][$oid] : 'U';
+            $fields[substr($oid, 0, 19)] = isset($data[0][$oid]) ? $data[0][$oid] : 'U';
         }
 
         $tags = compact('rrd_def');
         data_update($device, 'netstats-snmp', $tags, $fields);
 
-        $graphs['netstat_snmp']     = true;
-        $graphs['netstat_snmp_pkt'] = true;
+        $os->enableGraph('netstat_snmp');
+        $os->enableGraph('netstat_snmp_pkt');
     }
 
     unset($oids, $data, $rrd_def, $fields, $tags);

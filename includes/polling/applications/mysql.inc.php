@@ -117,7 +117,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('IDBLBSe', 'GAUGE', 0, 125000000000)
     ->addDataset('IBLFh', 'DERIVE', 0, 125000000000)
     ->addDataset('IBLWn', 'DERIVE', 0, 125000000000)
-    ->addDataset('SRows', 'DERIVE', 0, 125000000000)
+    ->addDataset('SRows', 'COUNTER', 0, 125000000000)
     ->addDataset('SRange', 'DERIVE', 0, 125000000000)
     ->addDataset('SMPs', 'DERIVE', 0, 125000000000)
     ->addDataset('SScan', 'DERIVE', 0, 125000000000)
@@ -219,6 +219,8 @@ $mapping_status = array(
 
 $rrd_name = array('app', $name, $app_id, 'status');
 $rrd_def = new RrdDefinition();
+// because this sends different names for rrd and compared to other datastores, disable $fields name checks
+$rrd_def->disableNameChecking();
 
 $fields = array();
 foreach ($mapping_status as $desc => $id) {

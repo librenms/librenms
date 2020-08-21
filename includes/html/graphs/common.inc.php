@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\Clean;
+use LibreNMS\Config;
 
 if ($_GET['from']) {
     $from = parse_at_time($_GET['from']);
@@ -81,8 +82,18 @@ if (isset($scale_rigid)) {
     $rrd_options .= ' -r';
 }
 
+if (!isset($float_precision)) {
+    $float_precision = 2;
+}
+
 $rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';
-$rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
+
+if (Config::get('applied_site_style') == 'dark') {
+    $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text_dark') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color_dark'), '#');
+} else {
+    $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
+}
+
 
 if ($_GET['bg']) {
     $rrd_options .= ' -c CANVAS#' . Clean::alphaDash($_GET['bg']) . ' ';

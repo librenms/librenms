@@ -1,15 +1,18 @@
 <?php
 
 return [
+    'title' => 'Settings',
     'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Alerting',
+        'api' => 'API',
         'auth' => 'Authentication',
         'authorization' => 'Authorization',
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
         'discovery' => 'Discovery',
+        'graphing' => 'Graphing',
         'poller' => 'Poller',
         'system' => 'System',
         'webui' => 'Web UI',
@@ -18,6 +21,10 @@ return [
         'alerting' => [
             'general' => 'General Alert Settings',
             'email' => 'Email Options',
+            'rules' => 'Alert Rule Default Settings',
+        ],
+        'api' => [
+            'cors' => 'CORS',
         ],
         'auth' => [
             'general' => 'General Authentication Settings',
@@ -31,6 +38,7 @@ return [
             'general' => 'General Discovery Settings',
             'route' => 'Routes Discovery Module',
             'discovery_modules' => 'Discovery Modules',
+            'storage' => 'Storage Module'
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -40,11 +48,17 @@ return [
             'peeringdb' => 'PeeringDB Integration',
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
+            'smokeping' => 'Smokeping Integration'
         ],
         'poller' => [
+            'availability' => 'Device Availability',
             'distributed' => 'Distributed Poller',
+            'graphite' => 'Datastore: Graphite',
+            'influxdb' => 'Datastore: InfluxDB',
+            'opentsdb' => 'Datastore: OpenTSDB',
             'ping' => 'Ping',
-            'rrdtool' => 'RRDTool Setup',
+            'prometheus' => 'Datastore: Prometheus',
+            'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
         ],
@@ -60,6 +74,8 @@ return [
             'dashboard' => 'Dashboard Settings',
             'search' => 'Search Settings',
             'style' => 'Style',
+            'device' => 'Device Settings',
+            'worldmap' => 'World Map Settings'
         ]
     ],
     'settings' => [
@@ -72,6 +88,40 @@ return [
         'addhost_alwayscheckip' => [
             'description' => 'Check for duplicate IP when adding devices',
             'help' => 'If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.'
+        ],
+        'alert_rule' => [
+            'severity' => [
+                'description' => 'Severity',
+                'help' => 'Severity for an Alert'
+            ],
+            'max_alerts' => [
+                'description' => 'Max Alerts',
+                'help' => 'Count of Alerts to be sent'
+            ],
+            'delay' => [
+                'description' => 'Delay',
+                'help' => 'Delay before an Alert will be sent'
+            ],
+            'interval' => [
+                'description' => 'Interval',
+                'help' => 'Interval to be checked for this Alert'
+            ],
+            'mute_alerts' => [
+                'description' => 'Mute Alerts',
+                'help' => 'Should Alert only be seen in WebUI'
+            ],
+            'invert_rule_match' => [
+                'description' => 'Invert Rule Match',
+                'help' => 'Alert only if rule doesn\'t match'
+            ],
+            'recovery_alerts' => [
+                'description' => 'Recovery Alerts',
+                'help' => 'Notify if Alert recovers'
+            ],
+            'invert_map' => [
+                'description' => 'All devices except in list',
+                'help' => 'Alert only for Devices which are not listed'
+            ]
         ],
         'alert' => [
             'ack_until_clear' => [
@@ -145,6 +195,38 @@ return [
             'description' => 'Allow the given networks graph access',
             'help' => 'Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)'
         ],
+        'api' => [
+            'cors' => [
+                'allowheaders' => [
+                    'description' => 'Allow Headers',
+                    'help' => 'Sets the Access-Control-Allow-Headers response header',
+                ],
+                'allowcredentials' => [
+                    'description' => 'Allow Credentials',
+                    'help' => 'Sets the Access-Control-Allow-Credentials header',
+                ],
+                'allowmethods' => [
+                    'description' => 'Allowed Methods',
+                    'help' => 'Matches the request method.',
+                ],
+                'enabled' => [
+                    'description' => 'Enable CORS support for the API',
+                    'help' => 'Allows you to load api resources from a web client',
+                ],
+                'exposeheaders' => [
+                    'description' => 'Expose Headers',
+                    'help' => 'Sets the Access-Control-Expose-Headers response header',
+                ],
+                'maxage' => [
+                    'description' => 'Max Age',
+                    'help' => 'Sets the Access-Control-Max-Age response header',
+                ],
+                'origin' => [
+                    'description' => 'Allow Request Origins',
+                    'help' => 'Matches the request origin. Wildcards can be used, eg. *.mydomain.com',
+                ],
+            ],
+        ],
         'api_demo' => [
             'description' => 'This is the demo'
         ],
@@ -186,6 +268,10 @@ return [
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting users'
+        ],
+        'auth_ad_url' => [
+            'description' => 'Active Directory Server(s)',
+            'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com'
         ],
         'auth_ldap_attr' => [
             'uid' => [
@@ -362,7 +448,7 @@ return [
                 'description' => 'Cisco PW'
             ],
             'cisco-vrf-lite' => [
-                'description' => 'Cisco VRF List'
+                'description' => 'Cisco VRF Lite'
             ],
             'discovery-arp' => [
                 'description' => 'Discovery ARP'
@@ -463,7 +549,7 @@ return [
             'description' => 'Enable Distributed Polling (requires additional setup)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
         ],
-        'distributed_poller_group' => [
+        'default_poller_group' => [
             'description' => 'Default Poller Group',
             'help' => 'The default poller group all pollers should poll if none is set in config.php'
         ],
@@ -561,18 +647,46 @@ return [
         ],
         'geoloc' => [
             'api_key' => [
-                'description' => 'Geocoding API Key',
+                'description' => 'Mapping Engine API Key',
                 'help' => 'Geocoding API Key (Required to function)'
             ],
             'engine' => [
-                'description' => 'Geocoding Engine',
+                'description' => 'Mapping Engine',
                 'options' => [
                     'google' => 'Google Maps',
                     'openstreetmap' => 'OpenStreetMap',
                     'mapquest' => 'MapQuest',
                     'bing' => 'Bing Maps'
                 ]
+            ],
+            'latlng' => [
+                'description' => 'Attempt to Geocode Locations',
+                'help' => 'Try to lookup latitude and longitude via geocoding API during polling'
             ]
+        ],
+        'graphite' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Graphite'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Graphite server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the Graphite server'
+            ],
+            'prefix' => [
+                'description' => 'Prefix (Optional)',
+                'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots'
+            ]
+        ],
+        'graphing' => [
+            'availability' => [
+                'description' => 'Duration',
+                'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)'
+            ],
         ],
         'graylog' => [
             'base_uri' => [
@@ -614,9 +728,84 @@ return [
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.'
             ]
         ],
+        'html' => [
+            'device' => [
+                'primary_link' => [
+                    'description' => 'Primary Dropdown Link',
+                    'help' => 'Sets the primary link in the device dropdown menu'
+                ]
+            ],
+        ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.'
+        ],
+        'ignore_mount' => [
+            'description' => 'Mountpoints to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of this Mountpoints'
+        ],
+        'ignore_mount_network' => [
+            'description' => 'Ignore Network Mountpoints',
+            'help' => 'Don\'t monitor Disc Usage of Network Mountpoints'
+        ],
+        'ignore_mount_optical' => [
+            'description' => 'Ignore Optical Drives',
+            'help' => 'Don\'t monitor Disc Usage of optical Drives'
+        ],
+        'ignore_mount_removable' => [
+            'description' => 'Ignore Removable Drives',
+            'help' => 'Don\'t monitor Disc Usage of removable Devices'
+        ],
+        'ignore_mount_regexp' => [
+            'description' => 'Mountpoints matching Regex to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which are matching at least one of this Regular Expressions'
+        ],
+        'ignore_mount_string' => [
+            'description' => 'Mountpoints containing String to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which contains at least one of this Strings'
+        ],
+        'influxdb' => [
+            'db' => [
+                'description' => 'Database',
+                'help' => 'Name of the InfluxDB database to store metrics'
+            ],
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to InfluxDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the InfluxDB server to send data to'
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password to connect to InfluxDB, if required'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the InfluxDB server'
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'How long to wait for InfluxDB server, 0 means default timeout'
+            ],
+            'transport' => [
+                'description' => 'Transport',
+                'help' => 'The port to use to connect to the InfluxDB server',
+                'options' => [
+                    'http' => 'HTTP',
+                    'https' => 'HTTPS',
+                    'udp' => 'UDPRRRRRRR'
+                ]
+            ],
+            'username' => [
+                'description' => 'Username',
+                'help' => 'Username to connect to InfluxDB, if required'
+            ],
+            'verifySSL' => [
+                'description' => 'Verify SSL',
+                'help' => 'Verify the SSL certificate is valid and trusted'
+            ]
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool'
@@ -634,6 +823,10 @@ return [
         'mydomain' => [
             'description' => 'Primary Domain',
             'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.'
+        ],
+        'network_map_show_on_worldmap' => [
+            'description' => 'Display network links on the map',
+            'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)'
         ],
         'nfsen_enable' => [
             'description' => 'Enable NfSen',
@@ -682,6 +875,20 @@ return [
         ],
         'nmap' => [
             'description' => 'Path to nmap'
+        ],
+        'opentsdb' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to OpenTSDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the OpenTSDB server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the OpenTSDB server'
+            ]
         ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
@@ -846,6 +1053,9 @@ return [
             'aruba-controller' => [
                 'description' => 'Aruba Controller'
             ],
+            'availability' => [
+                'description' => 'Availability'
+            ],
             'entity-physical' => [
                 'description' => 'Entity Physical'
             ],
@@ -881,6 +1091,20 @@ return [
         'ports_purge' => [
             'description' => 'Ports older than (days)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'prometheus' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Prometheus Push Gateway'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Prometheus Push Gateway to send data to'
+            ],
+            'port' => [
+                'description' => 'Job',
+                'help' => 'Job label for exported metrics'
+            ]
         ],
         'public_status' => [
             'description' => 'Show status publicly',
@@ -1036,6 +1260,10 @@ return [
                 'release' => 'release'
             ]
         ],
+        'uptime_warning' => [
+            'description' => 'Show Device as warning if Uptime below (seconds)',
+            'help' => 'Shows Device as warning if Uptime is below this value. Default 24h'
+        ],
         'virsh' => [
             'description' => 'Path to virsh'
         ],
@@ -1085,9 +1313,38 @@ return [
                 'help' => 'Minimum Graph Height (default: 300)'
             ]
         ],
+        'device_location_map_open' => [
+            'description' => 'Location Map open',
+            'help' => 'Location Map is shown by default'
+        ],
+        'force_hostname_to_sysname' => [
+            'description' => 'show SysName instead of Hostname',
+            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device'
+        ],
+        'force_ip_to_sysname' => [
+            'description' => 'show SysName instead of IP Address',
+            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices'
+        ],
         'whois' => [
             'description' => 'Path to whois'
+        ],
+        'smokeping.integration' => [
+            'description' => 'Enable',
+            'help' => 'Enable smokeping integration'
+        ],
+        'smokeping.dir' => [
+            'description' => 'Path to rrds',
+            'help' => 'Full path to Smokeping RRDs'
+        ],
+        'smokeping.pings' => [
+            'description' => 'Pings',
+            'help' => 'Number of pings configured in Smokeping'
+        ],
+        'smokeping.url' => [
+            'description' => 'URL to smokeping',
+            'help' => 'Full URL to the smokeping gui'
         ]
+
     ],
     'twofactor' => [
         'description' => 'Enable Two-Factor Auth',
@@ -1107,5 +1364,7 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'executable' => ':value is not a valid executable',
+        'directory' => ':value is not a valid directory',
     ]
 ];

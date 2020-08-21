@@ -105,15 +105,15 @@ if ($data) {
             if (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's')) {
                 $stats[$oid] = '0';
             }
-            $fields[$oid] = $stats[$oid];
+            $fields[$oid_ds] = $stats[$oid];
         }
 
         $tags = compact('af', 'rrd_name', 'rrd_def');
         data_update($device, 'ipSystemStats', $tags, $fields);
 
         // FIXME per-AF?
-        $graphs['ipsystemstats_'.$af]         = true;
-        $graphs['ipsystemstats_'.$af.'_frag'] = true;
+        $os->enableGraph("ipsystemstats_$af");
+        $os->enableGraph("ipsystemstats_{$af}_frag");
     }//end foreach
 }//end if
 

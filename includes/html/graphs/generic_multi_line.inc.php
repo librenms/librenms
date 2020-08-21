@@ -17,7 +17,9 @@ require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
 
-$descr_len = 12;
+if (!isset($descr_len)) {
+    $descr_len = 12;
+}
 
 if ($nototal) {
     $descr_len += '2';
@@ -76,8 +78,8 @@ foreach ($rrd_list as $rrd) {
         }
     }
 
-    $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.2lf%s' . $units . ' GPRINT:' . $id . 'min:MIN:%5.2lf%s' . $units;
-    $rrd_optionsb .= ' GPRINT:' . $id . 'max:MAX:%5.2lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5.2lf%s$units\\n'";
+    $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.'.$float_precision.'lf%s' . $units . ' GPRINT:' . $id . 'min:MIN:%5.'.$float_precision.'lf%s' . $units;
+    $rrd_optionsb .= ' GPRINT:' . $id . 'max:MAX:%5.'.$float_precision.'lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5.".$float_precision."lf%s$units\\n'";
 
     $i++;
 }

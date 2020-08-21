@@ -142,16 +142,16 @@ class DeviceGroup extends BaseModel
 
     public function devices()
     {
-        return $this->belongsToMany('App\Models\Device', 'device_group_device', 'device_group_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Device::class, 'device_group_device', 'device_group_id', 'device_id');
     }
 
     public function services()
     {
-        return $this->belongsToMany('App\Models\Service', 'device_group_device', 'device_group_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Service::class, 'device_group_device', 'device_group_id', 'device_id');
     }
 
     public function users()
     {
-        return $this->belongsToMany('App\Models\User', 'devices_group_perms', 'device_group_id', 'user_id');
+        return $this->belongsToMany(\App\Models\User::class, 'devices_group_perms', 'device_group_id', 'user_id');
     }
 }

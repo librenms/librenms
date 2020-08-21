@@ -3,12 +3,13 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - st4InputCordName
-                    - st4LineLabel
-                    - st4PhaseLabel
-                    - st4OcpLabel
-                    - st4BranchLabel
+                -
+                    oid:
+                        - st4InputCordName
+                        - st4LineLabel
+                        - st4PhaseLabel
+                        - st4OcpLabel
+                        - st4BranchLabel
         current:
             data:
                 -

@@ -57,10 +57,6 @@ if (!function_exists('module_selected')) {
 require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/rrdtool.inc.php';
-require_once $install_dir . '/includes/influxdb.inc.php';
-require_once $install_dir . '/includes/prometheus.inc.php';
-require_once $install_dir . '/includes/opentsdb.inc.php';
-require_once $install_dir . '/includes/graphite.inc.php';
 require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/billing.php';
 require_once $install_dir . '/includes/syslog.php';
@@ -90,8 +86,8 @@ if (module_selected('alerts', $init_modules)) {
 }
 
 // Boot Laravel
-if (module_selected('auth', $init_modules)) {
-    \LibreNMS\Util\Laravel::bootWeb();
+if (module_selected('web', $init_modules)) {
+    \LibreNMS\Util\Laravel::bootWeb(module_selected('auth', $init_modules));
 } else {
     \LibreNMS\Util\Laravel::bootCli();
 }
@@ -138,11 +134,11 @@ try {
     exit();
 }
 
-if (module_selected('discovery', $init_modules) && !update_os_cache()) {
-    // load_all_os() is called by update_os_cache() if updated, no need to call twice
-    load_all_os();
+if (module_selected('discovery', $init_modules) && !\LibreNMS\Util\OS::updateCache(false)) {
+    // OS::loadAllDefinitions() is called by update_os_cache() if updated, no need to call twice
+    \LibreNMS\Util\OS::loadAllDefinitions(false, true);
 } elseif (module_selected('web', $init_modules)) {
-    load_all_os(!module_selected('nodb', $init_modules));
+    \LibreNMS\Util\OS::loadAllDefinitions(!module_selected('nodb', $init_modules), true);
 }
 
 if (module_selected('web', $init_modules)) {

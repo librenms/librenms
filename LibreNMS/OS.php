@@ -26,6 +26,9 @@
 namespace LibreNMS;
 
 use App\Models\Device;
+use App\Models\DeviceGraph;
+use DeviceCache;
+use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -43,17 +46,18 @@ class OS implements ProcessorDiscovery
     }
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
-    private $device_model;
+    private $graphs; // stores device graphs
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
-     * @param $device
+     * @param array $device
      */
     private function __construct(&$device)
     {
         $this->device = &$device;
+        $this->graphs = [];
     }
 
     /**
@@ -83,11 +87,30 @@ class OS implements ProcessorDiscovery
      */
     public function getDeviceModel()
     {
-        if (is_null($this->device_model)) {
-            $this->device_model = Device::find($this->getDeviceId());
-        }
+        return DeviceCache::get($this->getDeviceId());
+    }
 
-        return $this->device_model;
+    /**
+     * Enable a graph for this device
+     *
+     * @param string $name
+     */
+    public function enableGraph($name)
+    {
+        $this->graphs[$name] = true;
+    }
+
+    public function persistGraphs()
+    {
+        $device = $this->getDeviceModel();
+        $graphs = collect(array_keys($this->graphs));
+
+        // delete extra graphs
+        $device->graphs->keyBy('graph')->collect()->except($graphs)->each->delete();
+        // create missing graphs
+        $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(function ($graph) {
+            return new DeviceGraph(['graph' => $graph]);
+        }));
     }
 
     public function preCache()
@@ -111,7 +134,7 @@ class OS implements ProcessorDiscovery
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
-        if (str_contains($oid, '.')) {
+        if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
             return null;
         }
@@ -136,7 +159,7 @@ class OS implements ProcessorDiscovery
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {
-        if (str_contains($oid, '.')) {
+        if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
             return null;
         }

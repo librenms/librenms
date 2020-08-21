@@ -9,7 +9,7 @@
 | you a convenient way to create models for testing and seeding your
 | database. Just tell the factory how a default model should look.
 |
-*/
+ */
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
@@ -43,24 +43,24 @@ $factory->state(App\Models\User::class, 'read', function ($faker) {
 
 $factory->define(\App\Models\Bill::class, function (Faker\Generator $faker) {
     return [
-        'bill_name' => $faker->text
+        'bill_name' => $faker->text,
     ];
 });
 
 $factory->define(\App\Models\Device::class, function (Faker\Generator $faker) {
     return [
-        'hostname'      => $faker->domainWord.'.'.$faker->domainName,
-        'ip'            => $faker->randomElement([$faker->ipv4, $faker->ipv6]),
-        'status'        => $status = random_int(0, 1),
+        'hostname' => $faker->domainWord . '.' . $faker->domainName,
+        'ip' => $faker->randomElement([$faker->ipv4, $faker->ipv6]),
+        'status' => $status = random_int(0, 1),
         'status_reason' => $status == 0 ? $faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
     ];
 });
 
 $factory->define(\App\Models\Port::class, function (Faker\Generator $faker) {
     return [
-        'ifIndex'      => $faker->unique()->numberBetween(),
-        'ifName'       => $faker->text(20),
-        'ifDescr'      => $faker->text(255),
+        'ifIndex' => $faker->unique()->numberBetween(),
+        'ifName' => $faker->text(20),
+        'ifDescr' => $faker->text(255),
         'ifLastChange' => $faker->unixTime(),
     ];
 });
@@ -101,7 +101,7 @@ $factory->define(\App\Models\Ipv4Address::class, function (Faker\Generator $fake
 
 $factory->define(\App\Models\Ipv4Network::class, function (Faker\Generator $faker) {
     return [
-        'ipv4_network'   => $faker->ipv4 . '/' . $faker->numberBetween(0, 32),
+        'ipv4_network' => $faker->ipv4 . '/' . $faker->numberBetween(0, 32),
     ];
 });
 
@@ -117,5 +117,60 @@ $factory->define(\App\Models\Syslog::class, function (Faker\Generator $faker) {
         'timestamp' => Carbon::now(),
         'program' => $faker->asciify(str_repeat('*', $faker->numberBetween(0, 32))),
         'msg' => $faker->text(),
+    ];
+});
+
+$factory->define(\App\Models\Vminfo::class, function (Faker\Generator $faker) {
+    return [
+        'vm_type' => $faker->text(16),
+        'vmwVmVMID' => $faker->randomDigit,
+        'vmwVmDisplayName' => $faker->domainWord . '.' . $faker->domainName,
+        'vmwVmGuestOS' => $faker->text(128),
+        'vmwVmMemSize' => $faker->randomDigit,
+        'vmwVmCpus' => $faker->randomDigit,
+        'vmwVmState' => $faker->randomElement(['powered on', 'powered off', 'suspended']),
+    ];
+});
+
+$factory->define(\App\Models\OspfNbr::class, function (Faker\Generator $faker) {
+    return [
+        'id' => $faker->randomDigit,
+        'ospfNbrIpAddr' => $faker->ipv4,
+        'ospfNbrAddressLessIndex' => $faker->randomDigit,
+        'ospfNbrRtrId' => $faker->ipv4,
+        'ospfNbrOptions' => 0,
+        'ospfNbrPriority' => 1,
+        'ospfNbrEvents' => $faker->randomDigit,
+        'ospfNbrLsRetransQLen' => 0,
+        'ospfNbmaNbrStatus' => 'active',
+        'ospfNbmaNbrPermanence' => 'dynamic',
+        'ospfNbrHelloSuppressed' => 'false',
+    ];
+});
+
+$factory->define(\App\Models\OspfPort::class, function (Faker\Generator $faker) {
+    return [
+        'id' => $faker->randomDigit,
+        'ospf_port_id' => $faker->randomDigit,
+        'ospfIfIpAddress' => $faker->ipv4,
+        'ospfAddressLessIf' => $faker->randomDigit,
+        'ospfIfAreaId' => '0.0.0.0',
+    ];
+});
+
+$factory->define(\App\Models\Component::class, function (Faker\Generator $faker) {
+    return [
+        'device_id' => $faker->randomDigit,
+        'type' => $faker->regexify('[A-Za-z0-9]{4,20}'),
+    ];
+});
+$factory->define(\App\Models\Sensor::class, function (Faker\Generator $faker) {
+    $sensor_class = ['airflow','ber','charge','chromatic_dispersion','cooling','count','current','dbm','delay','eer','fanspeed','frequency','humidity','load','loss','power','power_consumed','power_factor','pressure','quality_factor','runtime','signal','snr','state','temperature','voltage','waterflow'];
+    $sensor_oid = ".1.3.6.1.4.1.4115.1.4.3.3." . $faker->numberBetween(0, 10) . "." . $faker->numberBetween(0, 10) . "." . $faker->numberBetween(0, 10);
+    return [
+        'sensor_index' => $faker->randomDigit,
+        'sensor_class' => $faker->randomElement($sensor_class),
+        'sensor_current' => $faker->randomDigit,
+        'sensor_oid' => $sensor_oid,
     ];
 });

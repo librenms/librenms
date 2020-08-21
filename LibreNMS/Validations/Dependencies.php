@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Util\Env;
+use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
@@ -40,7 +40,7 @@ class Dependencies extends BaseValidation
      */
     public function validate(Validator $validator)
     {
-        if (Env::librenmsDocker()) {
+        if (EnvHelper::librenmsDocker()) {
             $validator->ok("Installed from the official Docker image; no Composer required");
             return;
         }
@@ -68,13 +68,13 @@ class Dependencies extends BaseValidation
         $dep_check = shell_exec($validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev --dry-run');
         preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
         if (!empty($dep_missing[0])) {
-            $result = ValidationResult::fail("Missing dependencies!", "composer install --no-dev");
+            $result = ValidationResult::fail("Missing dependencies!", $validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev');
             $result->setList("Dependencies", $dep_missing[1]);
             $validator->result($result);
         }
         preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
         if (!empty($dep_outdated[0])) {
-            $result = ValidationResult::fail("Outdated dependencies", "composer install --no-dev");
+            $result = ValidationResult::fail("Outdated dependencies", $validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev');
             $result->setList("Dependencies", $dep_outdated[1]);
         }
 

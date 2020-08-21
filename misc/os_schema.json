@@ -137,6 +137,9 @@
                 "ucd-diskio": {
                     "type": "boolean"
                 },
+                "sensors": {
+                    "type": "boolean"
+                },
                 "services": {
                     "type": "boolean"
                 },
@@ -195,6 +198,9 @@
                     "type": "boolean"
                 },
                 "junose-atm-vp": {
+                    "type": "boolean"
+                },
+                "mpls": {
                     "type": "boolean"
                 },
                 "netscaler-vsvr": {
@@ -329,6 +335,9 @@
                 "libvirt-vminfo": {
                     "type": "boolean"
                 },
+                "mpls": {
+                    "type": "boolean"
+                },
                 "ip6-addresses": {
                     "type": "boolean"
                 }
@@ -360,9 +369,6 @@
         "empty_ifdescr": {
             "type": "boolean"
         },
-        "register_mibs": {
-            "type": "object"
-        },
         "bad_if": {
             "type": "array",
             "items": {
@@ -376,6 +382,12 @@
             }
         },
         "bad_iftype": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "bad_ifoperstatus": {
             "type": "array",
             "items": {
                 "type": "string"
@@ -518,7 +530,8 @@
                 "not_contains",
                 "not_regex",
                 "in_array",
-                "not_in_array"
+                "not_in_array",
+                "exists"
             ]
         }
     }

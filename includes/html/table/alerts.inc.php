@@ -60,14 +60,19 @@ if (!$show_recovered) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $where .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%' OR `sysName` LIKE '%$searchPhrase%')";
+    $where .= " AND (`timestamp` LIKE ? OR `rule` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
 if (!Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= " AND `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
@@ -98,7 +103,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
 
 $rulei = 0;
 $format = $vars['format'];
@@ -132,20 +137,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '" class="collapse">' . $fault_detail . '</div></div>';
 
     $severity = $alert['severity'];
-    switch ($severity) {
-        case 'critical':
-            $severity_ico = '<span class="alert-status label-danger">&nbsp;</span>';
-            break;
-        case 'warning':
-            $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
-            break;
-        case 'ok':
-            $severity_ico = '<span class="alert-status label-success">&nbsp;</span>';
-            break;
-        default:
-            $severity_ico = '<span class="alert-status label-info">&nbsp;</span>';
-            break;
-    }
+    $severity_ico = '<span class="alert-status label-' . alert_layout($severity)['background_color'] . '">&nbsp;</span>';
 
     if ($alert['state'] == 3) {
         $severity .= ' <strong>+</strong>';

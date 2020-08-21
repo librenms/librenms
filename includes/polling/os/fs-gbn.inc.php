@@ -4,7 +4,7 @@ if (!empty($matches[2])) {
     $version .= " (" . trim($matches[2]) . ")";
 }
 
-// List of OIDs for HW recognition, add any potential HW OID here. 
+// List of OIDs for HW recognition, add any potential HW OID here.
 $hwOidList = [
     '.1.3.6.1.4.1.13464.1.2.1.1.2.15.0',    //GBNPlatformOAM-MIB::productName.0
  ];

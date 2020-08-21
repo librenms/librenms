@@ -16,7 +16,7 @@ class CreateMplsServicesTable extends Migration
         Schema::create('mpls_services', function (Blueprint $table) {
             $table->increments('svc_id');
             $table->unsignedInteger('svc_oid');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->enum('svcRowStatus', array('active', 'notInService', 'notReady', 'createAndGo', 'createAndWait', 'destroy'))->nullable();
             $table->enum('svcType', array('unknown', 'epipe', 'tls', 'vprn', 'ies', 'mirror', 'apipe', 'fpipe', 'ipipe', 'cpipe', 'intTls', 'evpnIsaTls'))->nullable();
             $table->unsignedInteger('svcCustId')->nullable();

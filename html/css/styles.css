@@ -822,6 +822,22 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   color: #999999;
 }
 
+.sensor-low, a.sensor-low, a.sensor-low:visited {
+  color: #c11;
+}
+
+.sensor-high, a.sensor-high, a.sensor-high:visited {
+  color: #c11;
+}
+
+.sensor-ok, a.sensor-ok, a.sensor-ok:visited {
+  color: #11a;
+}
+
+a.sensor-ok:hover, a.sensor-low:hover, a.sensor-high:hover {
+  color: #990099;
+}
+
 #top {
   height:17px;
   padding:2px 21px 0px 21px;
@@ -2361,4 +2377,8 @@ label {
     visibility: visible;
     opacity: 1;
     transition: opacity .15s;
+}
+
+#manage-device-groups-table > thead > tr > th:last-child {
+    min-width: 7%;
 }

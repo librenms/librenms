@@ -8,13 +8,13 @@
                     "sysDescr": "ExtremeXOS (X650-24x(SSns)) version 15.3.5.2 v1535b2-patch1-14 by release-manager on Fri Jun 16 08:43:13 EDT 2017",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "xos",
                     "type": "network",
                     "serial": null,
-                    "icon": "extreme.svg"
+                    "icon": "extreme.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "15.3.5.2",
                     "hardware": "Summit X650-24x(SSns)",
                     "features": "v1535b2-patch1-14 Jun 16 2017",
-                    "location": "<private>",
                     "os": "xos",
                     "type": "network",
                     "serial": null,
-                    "icon": "extreme.svg"
+                    "icon": "extreme.svg",
+                    "location": "<private>"
                 }
             ]
         }

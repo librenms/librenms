@@ -36,7 +36,7 @@ if (!Auth::check()) {
 $status    = 'error';
 $message   = 'unknown error';
 
-$dashboard_name = display($_REQUEST['dashboard_name']);
+$dashboard_name = trim($_REQUEST['dashboard_name']);
 
 if (!empty($dashboard_name) && ($dash_id = dbInsert(['dashboard_name' => $dashboard_name, 'user_id' => Auth::id()], 'dashboards'))) {
     $status  = 'ok';

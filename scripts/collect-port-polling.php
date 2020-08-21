@@ -2,6 +2,7 @@
 <?php
 
 use LibreNMS\Config;
+use Illuminate\Support\Str;
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -10,8 +11,8 @@ $init_modules = array();
 require $install_dir . '/includes/init.php';
 $options = getopt('dh:e:', array("help"));
 
-Config::set('norrd', true);
-Config::set('noinfluxdb', true);
+Config::set('rrd.enable', false);
+Config::set('influxdb.enable', false);
 Config::set('nographite', true);
 
 function print_help()
@@ -36,7 +37,7 @@ if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
         $where = "AND `device_id` = ?";
         $params = array($options['h']);
-    } elseif (str_contains($options['h'], ',')) {
+    } elseif (Str::contains($options['h'], ',')) {
         $device_ids = array_map('trim', explode(',', $options['h']));
         $device_ids = array_filter($device_ids, 'is_numeric');
         $where = 'AND `device_id` in ' . dbGenPlaceholders(count($device_ids));

@@ -1,0 +1,86 @@
+-- ********************************************************************
+        LAN DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, IpAddress,Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+
+-- The Enterprises Number
+                peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+		productMib  OBJECT IDENTIFIER ::= { peplink 200 }
+
+		generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+		lanMib OBJECT IDENTIFIER ::= { generalMib 3 }
+
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+                lanInfo MODULE-IDENTITY
+                       	LAST-UPDATED "201305220000Z"		-- 05 22, 2013 at 12:00 GMT
+			ORGANIZATION
+				"PEPLINK"
+			CONTACT-INFO
+				""
+			DESCRIPTION
+			    	"MIB module for LAN."
+		::= { lanMib 1 }
+
+-- Local type define ----------------------------------------------------------
+PortSpeedType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Describe the port speed and type."
+    SYNTAX       INTEGER {
+                     unknown(0),
+                     auto(1),
+                     fullDulplex10(2),
+                     halfDulplex10(3),
+                     fullDulplex100(4),
+                     halfDulplex100(5),
+                     fullDulplex1000(6),
+                     halfDulplex1000(7)
+                 }
+
+
+-- #####################################################################
+-- 
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+	lanStatus OBJECT IDENTIFIER ::= { lanInfo 1 }
+
+		lanIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"LAN IP address."
+			::= { lanStatus 1 }
+
+		lanSubnetMask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"LAN subnet mask."
+			::= { lanStatus 2 }
+
+		lanSpeed OBJECT-TYPE
+			SYNTAX		PortSpeedType
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION	"LAN speed status (Auto/10baseT-FD/
+						10baseT-HD/100baseTx-FD/100baseTx-HD/1000baseTx-FD/
+						1000baseTx-HD."
+			::= { lanStatus 3 }
+END

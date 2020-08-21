@@ -14,7 +14,7 @@ one. This is needed in order for alerting to work properly.**
 ## Pre installed plugins
 
 Note: Plugins will only load if they are prefixed with "check_" and
-they have that prefix stripped out when displaying in the "Add Serice"
+they have that prefix stripped out when displaying in the "Add Service"
 GUI "Type" dropdown list.
 
 Plugins come from two main places
@@ -154,3 +154,18 @@ disable ICMP testing for any device by switching `Disable ICMP Test`
 setting (Edit -> Misc) to ON.
 
 Service checks will never be polled on disabled devices.
+
+## CHECK_MRPE
+
+In most cases, only Nagios plugins that run against a remote host with the -H option are available as services.  However, if you're remote host is running the [Check_MK agent](Agent-Setup.md) you may be able to use MRPE to monitor Nagios plugins that only execute locally as services.
+
+For example, consider the fairly common check_cpu.sh Nagios plugin.
+If you added..
+
+> cpu_check /usr/lib/nagios/plugins/check_cpu.sh -c 95 -w 75
+
+...to `/etc/check_mk/mrpe.cfg` on your remote host, you should be able to check its output by configuring a service using the [check_mrpe](https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/check_mrpe) script.
+
+ - Add [check_mrpe](https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/check_mrpe) to the Nagios plugins directory on your LibreNMS server and make it executable.
+- In LibreNMS, add a new service to the desired device with the type mrpe.
+- Enter the IP address of the remote host and in parameters enter `-a cpu_check` (this should match the name used at the beginning of the line in the mrpe.cfg file).

@@ -41,7 +41,7 @@ if ($device['os_group'] == "cisco") {
             $tags = compact('rrd_def');
             data_update($device, 'cisco-iosdsp', $tags, $fields);
 
-            $graphs['cisco-iosdsp'] = true;
+            $os->enableGraph('cisco-iosdsp');
             echo(" Cisco IOS DSP ");
         }
         unset($rrd_def, $total, $active, $tags, $fields);

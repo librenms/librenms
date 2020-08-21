@@ -12,7 +12,7 @@ $oids = [
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 $version    = $data[0]['sysProductVersion'];
 $hardware   = $data[0]['sysPlatformInfoMarketingName'];
-$serial     = $data[0]['sysProductVersion'];
+$serial     = $data[0]['sysGeneralChassisSerialNum'];
 unset($data, $oids);
 
 
@@ -85,7 +85,7 @@ if (is_numeric($data[0]['sysClientsslStatTotNativeConns']) && is_numeric($data[0
     );
     $tags = compact('rrd_def');
     data_update($device, 'bigip_system_tps', $tags, $fields);
-    $graphs['bigip_system_tps'] = true;
+    $os->enableGraph('bigip_system_tps');
 }
 
 

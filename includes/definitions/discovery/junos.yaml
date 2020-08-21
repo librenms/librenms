@@ -1,28 +1,29 @@
-mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB:JUNIPER-ALARM-MIB:JUNIPER-VIRTUALCHASSIS-MIB
+mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB:JUNIPER-ALARM-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-RPM-MIB
 modules:
     processors:
-          data:
-              -
-                  oid: jnxOperatingEntry
-                  value: jnxOperatingCPU
-                  num_oid: '.1.3.6.1.4.1.2636.3.1.13.1.8.{{ $index }}'
-                  descr: jnxOperatingDescr
-                  skip_values:
+        data:
+            -
+                oid: jnxOperatingEntry
+                value: jnxOperatingCPU
+                num_oid: '.1.3.6.1.4.1.2636.3.1.13.1.8.{{ $index }}'
+                descr: jnxOperatingDescr
+                skip_values:
                     -
-                      oid: jnxOperatingBuffer
-                      op: '='
-                      value: 0
-              -
-                  oid: jnxJsSPUMonitoringObjectsEntry
-                  value: jnxJsSPUMonitoringCPUUsage
-                  num_oid: '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.4.{{ $index }}'
-                  descr: '{{ $jnxJsSPUMonitoringNodeDescr }}'
+                        oid: jnxOperatingBuffer
+                        op: '='
+                        value: 0
+            -
+                oid: jnxJsSPUMonitoringObjectsEntry
+                value: jnxJsSPUMonitoringCPUUsage
+                num_oid: '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.4.{{ $index }}'
+                descr: '{{ $jnxJsSPUMonitoringNodeDescr }}'
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - ifDescr
-                    - jnxFruName
+                -
+                    oid:
+                        - ifDescr
+                        - jnxFruName
         chromatic_dispersion:
             data:
                 -
@@ -118,6 +119,17 @@ modules:
                     divisor: 1000
                     descr: '{{ $ifDescr }} Tx Bias'
                     index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'
+        loss:
+            data:
+                -
+                    oid: jnxRpmResultsSummaryTable
+                    value: jnxRpmResSumPercentLost
+                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $index_string }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    group: RPM Probes
+                    entPhysicalIndex_measured: 'probes'
+                    descr: '{{ $index }} Probe Loss'
+                    index: 'jnxRpmResSumPercentLost.{{ $index }}'
         count:
             data:
                 -
@@ -129,7 +141,7 @@ modules:
                     descr: 'Node {{ $jnxJsSPUMonitoringNodeIndex }} FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} Flow Count'
                     index: 'jnxJsSPUMonitoringCurrentFlowSession.{{ $index }}'
                     skip_values:
-                     - 0
+                        - 0
                 -
                     oid: jnxJsSPUMonitoringObjectsTable
                     value: jnxJsSPUMonitoringCurrentCPSession
@@ -139,7 +151,7 @@ modules:
                     descr: 'Node {{ $jnxJsSPUMonitoringNodeIndex }} FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} CP Flow Count'
                     index: 'jnxJsSPUMonitoringCurrentCPSession.{{ $index }}'
                     skip_values:
-                     - 0
+                        - 0
         state:
             data:
                 -
@@ -163,12 +175,12 @@ modules:
                         - { value: 2, descr: off, graph: 1, generic: 0 }
                         - { value: 3, descr: on, graph: 1, generic: 2 }
                 -
-                    oid: jnxFruState
+                    oid: jnxFruTable
                     value: jnxFruState
                     num_oid: '.1.3.6.1.4.1.2636.3.1.15.1.8.{{ $index }}'
-                    descr: '{{ $jnxFruName }}'
-                    skip_values: 2
-                    index: '{{ $index }}'
+                    descr: jnxFruName
+                    index: 'jnxFruName.{{ $index }}'
+                    skip_value_lt: 3
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: empty, graph: 1, generic: 3 }

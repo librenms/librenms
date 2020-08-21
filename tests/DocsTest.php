@@ -1,6 +1,6 @@
 <?php
 /**
- * DocTest.php
+ * DocsTest.php
  *
  * Tests for Docs.
  *
@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use Symfony\Component\Yaml\Yaml;
 
-class DocTest extends TestCase
+class DocsTest extends TestCase
 {
     private $hidden_pages = [
         'API/API-Docs.md',
@@ -57,12 +57,20 @@ class DocTest extends TestCase
         'Installation/Installation-Ubuntu-1404-Nginx.md',
         'Installation/Installation-Ubuntu-1604-Apache.md',
         'Installation/Installation-Ubuntu-1604-Nginx.md',
+        'Installation/Installation-Ubuntu-1804-Nginx.md',
+        'Installation/Installation-Ubuntu-1804-Apache.md',
+        'Installation/Installation-Debian-10-Nginx.md',
+        'Installation/Installation-CentOS-7-Nginx.md',
+        'Installation/Installation-CentOS-7-Apache.md',
         'Installation/Installing-LibreNMS.md',
         'Support/Support-New-OS.md',
         'Installation/Ubuntu-image.md',
         'Installation/CentOS-image.md',
     ];
-    
+
+    /**
+     * @group docs
+     */
     public function testDocExist()
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));

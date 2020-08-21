@@ -27,6 +27,7 @@ include 'rrdcached.inc.php';
 
 $nototal = 1;
 $colours = 'mixed';
+$descr_len = 16;
 
 $rrd_list = array(
     array (

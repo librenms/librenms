@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Fping;
 use Symfony\Component\Process\Process;
 
 class FpingTest extends TestCase
@@ -45,7 +46,7 @@ class FpingTest extends TestCase
             "exitcode" => 0,
         ];
 
-        $actual = fping('192.168.1.3');
+        $actual = app()->make(Fping::class)->ping('192.168.1.3');
 
         $this->assertSame($expected, $actual);
     }
@@ -66,7 +67,7 @@ class FpingTest extends TestCase
             "exitcode" => 0,
         ];
 
-        $actual = fping('192.168.1.7');
+        $actual = app()->make(Fping::class)->ping('192.168.1.7');
 
         $this->assertSame($expected, $actual);
     }
@@ -87,7 +88,7 @@ class FpingTest extends TestCase
             "exitcode" => 1,
         ];
 
-        $actual = fping('192.168.53.1');
+        $actual = app()->make(Fping::class)->ping('192.168.53.1');
 
         $this->assertSame($expected, $actual);
     }
@@ -113,7 +114,7 @@ OUT;
             "exitcode" => 1,
         ];
 
-        $actual = fping('192.168.1.2');
+        $actual = app()->make(Fping::class)->ping('192.168.1.2');
 
         $this->assertSame($expected, $actual);
     }

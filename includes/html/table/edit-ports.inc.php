@@ -8,7 +8,10 @@ $sql = 'FROM `ports` WHERE `device_id` = ?';
 $param = array($device_id);
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`ifName` LIKE '%$searchPhrase%' OR `ifAlias` LIKE '%$searchPhrase%' OR `ifDescr` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`ifName` LIKE ? OR `ifAlias` LIKE ? OR `ifDescr` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`port_id`) $sql";
@@ -50,8 +53,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
     // Mark interfaces which are OperDown (but not AdminDown) yet not ignored or disabled, or up yet ignored or disabled
     // - as to draw the attention to a possible problem.
 
-
-    $isportbad = ($port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] != 'down') ? 1 : 0;
+    $isportbad = ($port['ifOperStatus'] != 'up' && $port['ifAdminStatus'] != 'down') ? 1 : 0;
     $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
     $outofsync = $dowecare ? " class='red'" : '';
     $checked = '';

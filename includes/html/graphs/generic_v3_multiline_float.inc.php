@@ -92,11 +92,11 @@ foreach ($rrd_list as $rrd) {
     if ($addarea === 1) {
         $rrd_options .= ' AREA:'.$g_defname.$i.'#'.$colour.$transparency.":''$stack";
     }
-    $rrd_options .= ' GPRINT:'.$t_defname.$i.':LAST:%6.2lf%s GPRINT:'.$t_defname.$i.'min:MIN:%6.2lf%s';
-    $rrd_options .= ' GPRINT:'.$t_defname.$i.'max:MAX:%6.2lf%s GPRINT:'.$t_defname.$i.":AVERAGE:'%6.2lf%s\\n'";
+    $rrd_options .= ' GPRINT:'.$t_defname.$i.':LAST:%6.'.$float_precision.'lf%s GPRINT:'.$t_defname.$i.'min:MIN:%6.'.$float_precision.'lf%s';
+    $rrd_options .= ' GPRINT:'.$t_defname.$i.'max:MAX:%6.'.$float_precision.'lf%s GPRINT:'.$t_defname.$i.":AVERAGE:'%6.".$float_precision."lf%s\\n'";
 
     if ($printtotal === 1) {
-        $rrd_options .= ' GPRINT:tot'.$rrd['ds'].$i.":%6.2lf%s'".rrdtool_escape($total_units)."'";
+        $rrd_options .= ' GPRINT:tot'.$rrd['ds'].$i.":%6.".$float_precision."lf%s'".rrdtool_escape($total_units)."'";
     }
 
     $rrd_options .= " COMMENT:'\\n'";

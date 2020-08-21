@@ -30,14 +30,14 @@ UCD-SNMP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
-    Integer32, Opaque, enterprises, Counter32
+    Integer32, Opaque, enterprises, Counter32, Unsigned32
         FROM SNMPv2-SMI
 
     TEXTUAL-CONVENTION, DisplayString, TruthValue
 	FROM SNMPv2-TC;
 
 ucdavis MODULE-IDENTITY
-    LAST-UPDATED "200611220000Z"
+    LAST-UPDATED "200901190000Z"
     ORGANIZATION "University of California, Davis"
     CONTACT-INFO    
 	"This mib is no longer being maintained by the University of
@@ -53,21 +53,38 @@ ucdavis MODULE-IDENTITY
          email:    net-snmp-coders@lists.sourceforge.net
         "
     DESCRIPTION
+	"This file defines the private UCD SNMP MIB extensions."
+
+    REVISION	 "201105140000Z"
+    DESCRIPTION
+	"New objects for monitoring CPU Steal, Guest and Nice values"
+
+    REVISION	 "200901190000Z"
+    DESCRIPTION
+	"New 64-bit objects for monitoring large disk usage"
+
+    REVISION	 "200611220000Z"
+    DESCRIPTION
 	"Clarify behaviour of objects in the memory & systemStats groups
          (including updated versions of malnamed mem*Text objects).
          Define suitable TCs to describe error reporting/fix behaviour."
-    REVISION	 "200611220000Z"
-    DESCRIPTION
-	"Added ssCpuRawSoftIRQ for Linux (2.6) and forgotten raw swap counters."
+
     REVISION	 "200404070000Z"
     DESCRIPTION
-	"Deprecate the non-raw objects."
+	"Added ssCpuRawSoftIRQ for Linux (2.6) and forgotten raw swap counters."
+
     REVISION	 "200209050000Z"
     DESCRIPTION
-	"This file defines the private UCD SNMP MIB extensions."
+	"Deprecate the non-raw objects."
+
+    REVISION	 "200109200000Z"
+    DESCRIPTION
+	"Group to monitor log files"
+
     REVISION	 "200101170000Z"
     DESCRIPTION
 	"Added raw CPU and IO counters."
+
     REVISION	 "9912090000Z"
     DESCRIPTION
 	"SMIv2 version converted from older MIB definitions."
@@ -109,8 +126,10 @@ ucdExperimental       OBJECT IDENTIFIER ::= { ucdavis 13 }
 --   lmSensors        OBJECT IDENTIFIER ::= { ucdExperimental 16 } - LM-SENSORS-MIB
 
 
--- These are the returned values of the agent type.
--- returned to:  .iso.org.dod.internet.mgmt.mib-2.system.sysObjectID.0 
+-- These are the old returned values of the agent type.
+-- originally returned to:  .iso.org.dod.internet.mgmt.mib-2.system.sysObjectID.0 
+-- Current versions of the agent return an equivalent OID from the netSnmpAgentOIDs
+-- tree (defined in NET-SNMP-TC), which includes values for some additional O/Ss
 
 ucdSnmpAgent      OBJECT IDENTIFIER ::= { ucdavis 250 }
 hpux9             OBJECT IDENTIFIER ::= { ucdSnmpAgent 1 }
@@ -127,6 +146,9 @@ bsdi              OBJECT IDENTIFIER ::= { ucdSnmpAgent 11 }
 openbsd           OBJECT IDENTIFIER ::= { ucdSnmpAgent 12 }
 win32		  OBJECT IDENTIFIER ::= { ucdSnmpAgent 13 } -- unlucky
 hpux11            OBJECT IDENTIFIER ::= { ucdSnmpAgent 14 }
+aix               OBJECT IDENTIFIER ::= { ucdSnmpAgent 15 }
+macosx            OBJECT IDENTIFIER ::= { ucdSnmpAgent 16 }
+dragonfly         OBJECT IDENTIFIER ::= { ucdSnmpAgent 17 }
 unknown           OBJECT IDENTIFIER ::= { ucdSnmpAgent 255 }
 
 
@@ -658,7 +680,13 @@ DskEntry ::= SEQUENCE {
     dskPercent		Integer32,
     dskPercentNode	Integer32,
     dskErrorFlag	UCDErrorFlag,
-    dskErrorMsg		DisplayString
+    dskErrorMsg		DisplayString,
+    dskTotalLow		Unsigned32,
+    dskTotalHigh	Unsigned32,
+    dskAvailLow		Unsigned32,
+    dskAvailHigh	Unsigned32,
+    dskUsedLow		Unsigned32,
+    dskUsedHigh		Unsigned32
 }
 
 dskIndex OBJECT-TYPE
@@ -710,7 +738,9 @@ dskTotal OBJECT-TYPE
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION  
-	"Total size of the disk/partion (kBytes)"
+	"Total size of the disk/partion (kBytes).
+	 For large disks (>2Tb), this value will
+	 latch at INT32_MAX (2147483647)."
     ::= { dskEntry 6 } 
 
 dskAvail OBJECT-TYPE
@@ -718,7 +748,9 @@ dskAvail OBJECT-TYPE
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION  
-	"Available space on the disk"
+	"Available space on the disk.
+	 For large lightly-used disks (>2Tb), this
+	 value will latch at INT32_MAX (2147483647)."
     ::= { dskEntry 7 } 
 
 dskUsed OBJECT-TYPE
@@ -726,7 +758,9 @@ dskUsed OBJECT-TYPE
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION  
-	"Used space on the disk"
+	"Used space on the disk.
+	 For large heavily-used disks (>2Tb), this
+	 value will latch at INT32_MAX (2147483647)."
     ::= { dskEntry 8 } 
 
 dskPercent OBJECT-TYPE
@@ -744,6 +778,60 @@ dskPercentNode OBJECT-TYPE
     DESCRIPTION  
 	"Percentage of inodes used on disk"
     ::= { dskEntry 10 } 
+
+dskTotalLow OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Total size of the disk/partion (kBytes).
+	Together with dskTotalHigh composes 64-bit number."
+    ::= { dskEntry 11 }
+
+dskTotalHigh OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Total size of the disk/partion (kBytes).
+	Together with dskTotalLow composes 64-bit number."
+    ::= { dskEntry 12 }
+
+dskAvailLow OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Available space on the disk (kBytes).
+	Together with dskAvailHigh composes 64-bit number."
+    ::= { dskEntry 13 }
+
+dskAvailHigh OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Available space on the disk (kBytes).
+	Together with dskAvailLow composes 64-bit number."
+    ::= { dskEntry 14 }
+
+dskUsedLow OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Used space on the disk (kBytes).
+	Together with dskUsedHigh composes 64-bit number."
+    ::= { dskEntry 15 }
+
+dskUsedHigh OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Used space on the disk (kBytes).
+	Together with dskUsedLow composes 64-bit number."
+    ::= { dskEntry 16 }
 
 dskErrorFlag OBJECT-TYPE
     SYNTAX	UCDErrorFlag
@@ -817,7 +905,7 @@ laLoad OBJECT-TYPE
 
 laConfig OBJECT-TYPE
     SYNTAX	DisplayString
-    MAX-ACCESS	read-only
+    MAX-ACCESS	read-write
     STATUS	current
     DESCRIPTION
 	"The watch point for load-averages to signal an
@@ -1347,6 +1435,58 @@ ssRawSwapOut OBJECT-TYPE
     DESCRIPTION
         "Number of blocks swapped out"
     ::= { systemStats 63 }
+
+ssCpuRawSteal OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of 'ticks' (typically 1/100s) spent
+         by the hypervisor code to run other VMs even
+         though the CPU in the current VM had something runnable.
+
+         This object will not be implemented on hosts where
+         the underlying operating system does not measure
+         this particular CPU metric.
+
+         On a multi-processor system, the 'ssCpuRaw*'
+         counters are cumulative over all CPUs, so their
+         sum will typically be N*100 (for N processors)."
+    ::= { systemStats 64 }
+
+ssCpuRawGuest OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of 'ticks' (typically 1/100s) spent
+         by the CPU to run a virtual CPU (guest).
+
+         This object will not be implemented on hosts where
+         the underlying operating system does not measure
+         this particular CPU metric.
+
+         On a multi-processor system, the 'ssCpuRaw*'
+         counters are cumulative over all CPUs, so their
+         sum will typically be N*100 (for N processors)."
+    ::= { systemStats 65 }
+
+ssCpuRawGuestNice OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of 'ticks' (typically 1/100s) spent
+         by the CPU to run a niced virtual CPU (guest).
+
+         This object will not be implemented on hosts where
+         the underlying operating system does not measure
+         this particular CPU metric.
+
+         On a multi-processor system, the 'ssCpuRaw*'
+         counters are cumulative over all CPUs, so their
+         sum will typically be N*100 (for N processors)."
+    ::= { systemStats 66 }
 
 -- possibly used in the future:
 --

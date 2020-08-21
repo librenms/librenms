@@ -8,13 +8,13 @@
                     "sysDescr": "2N IP Force",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "heliosip",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "2n.svg"
+                    "icon": "2n.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "2.22.0.31.8",
                     "hardware": "2N IP Force",
                     "features": null,
-                    "location": "Front Door",
                     "os": "heliosip",
                     "type": "appliance",
                     "serial": "54-2354-8708",
-                    "icon": "2n.svg"
+                    "icon": "2n.svg",
+                    "location": "Front Door"
                 }
             ]
         }
@@ -51,10 +51,12 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifHighSpeed_prev": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -160,11 +162,13 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 100000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,

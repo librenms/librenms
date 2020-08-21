@@ -5,70 +5,12 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {
-    if ($device['os'] == 'timos') {
-        $bgpPeersCache =snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
-        foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode(".", $key);
-            $vrfInstance = $oid[0];
-            $address = str_replace($oid[0].".".$oid[1].".", '', $key);
-            if (strlen($address) > 15) {
-                $address = IP::fromHexString($address)->compressed();
-            }
-            $bgpPeers[$vrfInstance][$address] = $value;
-        }
-        unset($bgpPeersCache);
-
-        foreach ($bgpPeers as $vrfOid => $vrf) {
-            $vrfId = dbFetchCell('SELECT vrf_id from `vrfs` WHERE vrf_oid = ?', [$vrfOid]);
-            foreach ($vrf as $address => $value) {
-                $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
-
-                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]) < '1') {
-                    $peers = [
-                        'device_id' => $device['device_id'],
-                        'vrf_id' => $vrfId,
-                        'bgpPeerIdentifier' => $address,
-                        'bgpPeerRemoteAs' => $value['tBgpPeerNgPeerAS4Byte'],
-                        'bgpPeerState' => 'idle',
-                        'bgpPeerAdminStatus' => 'stop',
-                        'bgpLocalAddr' => '0.0.0.0',
-                        'bgpPeerRemoteAddr' => '0.0.0.0',
-                        'bgpPeerInUpdates' => 0,
-                        'bgpPeerOutUpdates' => 0,
-                        'bgpPeerInTotalMessages' => 0,
-                        'bgpPeerOutTotalMessages' => 0,
-                        'bgpPeerFsmEstablishedTime' => 0,
-                        'bgpPeerInUpdateElapsedTime' => 0,
-                        'astext' => $astext,
-                    ];
-                    dbInsert($peers, 'bgpPeers');
-                    if (Config::get('autodiscovery.bgp')) {
-                        $name = gethostbyaddr($address);
-                        discover_new_device($name, $device, 'BGP');
-                    }
-                    echo '+';
-                } else {
-                    dbUpdate(['bgpPeerRemoteAs' => $value['tBgpPeerNgPeerAS4Byte'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-                    echo '.';
-                }
-            }
-        }
-        // clean up peers
-        $peers = dbFetchRows('SELECT `B`.`vrf_id` AS `vrf_id`, `bgpPeerIdentifier`, `vrf_oid` FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
-        foreach ($peers as $value) {
-            $vrfId = $value['vrf_id'];
-            $vrfOid = $value['vrf_oid'];
-            $address = $value['bgpPeerIdentifier'];
-
-            if (empty($bgpPeers[$vrfOid][$address])) {
-                $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-
-                echo str_repeat('-', $deleted);
-                echo PHP_EOL;
-            }
-        }
+    //
+    // Load OS specific file
+    //
+    if (file_exists(Config::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php")) {
+        include Config::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php";
     }
-    unset($bgpPeers);
 
     if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
@@ -76,7 +18,7 @@ if (Config::get('enable_bgp')) {
         $vrfs_lite_cisco = array(array('context_name'=>''));
     }
 
-    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-Oqvn', 'BGP4-MIB');
+    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
 
     foreach ($vrfs_lite_cisco as $vrf) {
         $device['context_name'] = $vrf['context_name'];
@@ -101,7 +43,7 @@ if (Config::get('enable_bgp')) {
 
             if (empty($peers_data)) {
                 $bgp4_mib = true;
-                $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-Oq', 'BGP4-MIB');
+                $peers_data = preg_replace('/= /', '', snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB'));
             }
         } else {
             echo 'No BGP on host';
@@ -128,7 +70,6 @@ if (Config::get('enable_bgp')) {
                         if ($peer2 === true) {
                             $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                         }
-
                         if (empty($af_data)) {
                             $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                             $peer2 = false;
@@ -140,11 +81,6 @@ if (Config::get('enable_bgp')) {
 
                 // build the list
                 if (!empty($af_data)) {
-                    $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
-                }
-                if ($device['os'] == 'vrp') {
-                    d_echo("VRP:");
-                    $af_data = snmpwalk_cache_oid($device, 'hwBgpPeers', $af_data, 'HUAWEI-BGP-VPN-MIB');
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
 

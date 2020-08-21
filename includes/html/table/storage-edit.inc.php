@@ -6,7 +6,11 @@ $sql = " FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `
 $param[] = $device_id;
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `S`.`storage_descr` LIKE '%$searchPhrase%' OR `S`.`storage_perc` LIKE '%$searchPhrase%' OR `S`.`storage_perc_warn` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE ? OR `S`.`storage_descr` LIKE ? OR `S`.`storage_perc` LIKE ? OR `S`.`storage_perc_warn` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`storage_id`) $sql";
@@ -37,12 +41,15 @@ $sql = "SELECT * $sql";
 foreach (dbFetchRows($sql, $param) as $drive) {
     $perc = round($drive['storage_perc'], 0);
     $perc_warn = round($drive['storage_perc_warn'], 0);
+    $size = formatStorage($drive['storage_size']);
     $response[] = array(
         'storage_id' => $drive['storage_id'],
         'hostname' => generate_device_link($drive),
         'storage_descr' => $drive['storage_descr'],
         'storage_perc' => $perc . "%",
-        'storage_perc_warn' => $perc_warn);
+        'storage_perc_warn' => $perc_warn,
+        'storage_size' => $size
+    );
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);

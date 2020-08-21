@@ -28,6 +28,7 @@
 
 use LibreNMS\Config;
 use LibreNMS\Alert\AlertRules;
+use LibreNMS\Data\Store\Datastore;
 
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
@@ -114,47 +115,14 @@ EOH;
     if (isset($options['v'])) {
         $vdebug = true;
     }
-    update_os_cache(true); // Force update of OS Cache
-}
-
-if (isset($options['r'])) {
-    Config::set('norrd', true);
-}
-
-if (isset($options['f'])) {
-    Config::set('noinfluxdb', true);
-}
-
-if (isset($options['p'])) {
-    $prometheus = false;
-}
-
-if (isset($options['g'])) {
-    Config::set('nographite', true);
-}
-
-if (Config::get('base_url') !== true && Config::get('influxdb.enable') === true) {
-    $influxdb = influxdb_connect();
-} else {
-    $influxdb = false;
-}
-
-if (Config::get('base_url') !== true && Config::get('graphite.enable') === true) {
-    $graphite = fsockopen(Config::get('graphite.host'), Config::get('graphite.port'));
-    if ($graphite !== false) {
-        echo "Connection made to " . Config::get('graphite.host') . " for Graphite support\n";
-    } else {
-        echo "Connection to " . Config::get('graphite.host') . " has failed, Graphite support disabled\n";
-        Config::set('nographite', true);
-    }
-} else {
-    $graphite = false;
+    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
 // If we've specified modules with -m, use them
 $module_override = parse_modules('poller', $options);
+set_debug($debug);
 
-rrdtool_initialize();
+$datastore = Datastore::init($options);
 
 echo "Starting polling run:\n\n";
 $polled_devices = 0;
@@ -175,6 +143,14 @@ foreach (dbFetch($query) as $device) {
         $unreachable_devices++;
     }
 
+    // Update device_groups
+    echo "### Start Device Groups ###\n";
+    $dg_start = microtime(true);
+    $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
+    d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
+    d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
+    echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
+
     echo "#### Start Alerts ####\n";
     $rules = new AlertRules();
     $rules->runRules($device['device_id']);
@@ -185,10 +161,6 @@ foreach (dbFetch($query) as $device) {
 $poller_end  = microtime(true);
 $poller_run  = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
-
-if ($graphite !== false) {
-    fclose($graphite);
-}
 
 if ($polled_devices) {
     dbInsert(array(
@@ -209,8 +181,7 @@ if (!isset($options['q'])) {
 }
 
 logfile($string);
-rrdtool_close();
-
+Datastore::terminate();
 // Remove this for testing
 // print_r(get_defined_vars());
 

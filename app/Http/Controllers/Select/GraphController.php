@@ -29,6 +29,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
 
@@ -100,7 +101,7 @@ class GraphController extends Controller
     private function formatGraph($top, $graph)
     {
         $text = $graph;
-        if (str_contains('_', $graph)) {
+        if (Str::contains('_', $graph)) {
             list($type, $subtype) = explode('_', $graph, 2);
         } else {
             $type = $graph;
@@ -131,18 +132,18 @@ class GraphController extends Controller
             $terms = preg_split('/[ _-]/', $search, 2);
             $first = array_shift($terms);
 
-            if (str_contains($type, $first)) {
+            if (Str::contains($type, $first)) {
                 // search matches type, show all unless there are more terms.
                 if (!empty($terms)) {
                     $sub_search = array_shift($terms);
                     $graphs = $graphs->filter(function ($graph) use ($sub_search) {
-                        return str_contains(strtolower($graph), $sub_search);
+                        return Str::contains(strtolower($graph), $sub_search);
                     });
                 }
             } else {
                 // if the type matches, don't filter the sub values
                 $graphs = $graphs->filter(function ($graph) use ($search) {
-                    return str_contains(strtolower($graph), $search);
+                    return Str::contains(strtolower($graph), $search);
                 });
             }
         }

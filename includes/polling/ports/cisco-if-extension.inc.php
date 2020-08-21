@@ -49,5 +49,5 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
      */
     $ifName = $port['ifName'];
     $tags = compact('ifName', 'rrd_name', 'rrd_def');
-    rrdtool_data_update($device, 'drops', $tags, $rrd_data);
+    data_update($device, 'drops', $tags, $rrd_data);
 }

@@ -26,6 +26,7 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Validator;
 
 class Configuration extends BaseValidation
@@ -41,6 +42,14 @@ class Configuration extends BaseValidation
         // Test transports
         if (Config::get('alerts.email.enable') == true) {
             $validator->warn('You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4');
+        }
+
+        if (config('app.debug')) {
+            $validator->warn('Debug enabled.  This is a security risk.');
+        }
+
+        if (Eloquent::isConnected() && !\DB::table('devices')->exists()) {
+            $validator->warn('You have no devices.', 'Consider adding a device such as localhost: ' . $validator->getBaseURL() . '/addhost');
         }
     }
 }

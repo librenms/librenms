@@ -9,4 +9,4 @@ over:
     - { graph: device_wireless_rssi, text: Sat Signal Level }
 discovery:
     -
-      sysObjectID: .1.3.6.1.4.1.1429.2.2.6.5
+        sysObjectID: .1.3.6.1.4.1.1429.2.2.6.5

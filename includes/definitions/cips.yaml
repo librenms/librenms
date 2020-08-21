@@ -27,5 +27,6 @@ discovery_modules:
 mib_dir:
     - cisco
 discovery:
-    - sysDescr_regex:
-        - '/^Cisco Intrusion Prevention System/'
+    -
+        sysDescr_regex:
+            - '/^Cisco Intrusion Prevention System/'

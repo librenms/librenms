@@ -6,6 +6,8 @@
 
 @if($node_count)
 <div class="pull-right">
+<input type="checkbox" class="custom-control-input" id="showparentdevicepath" onChange="highlightNode()" @if($showparentdevicepath) checked @endif>
+<label class="custom-control-label" for="showparentdevicepath">@lang('Highlight Dependencies to Root Device')</label>
 <select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightNode()";>
 <option value="0">None</option>
 <option value="{{ $isolated_device_id }}">@lang('Isolated Devices')</option>
@@ -51,7 +53,8 @@
 
     function highlightNode(e) {
         highlight_node = document.getElementById("highlight_node").value;
-        window.location.href = 'maps/devicedependency?group={{ $group_id }}&highlight_node=' + highlight_node;
+        showparentdevicepath = document.getElementById("showparentdevicepath").checked ? 1: 0;
+        window.location.href = 'maps/devicedependency?group={{ $group_id }}&highlight_node=' + highlight_node + '&showparentdevicepath=' + showparentdevicepath;
     }
 
     $('#highlight_node option[value="{{$highlight_node}}"]').prop('selected', true);

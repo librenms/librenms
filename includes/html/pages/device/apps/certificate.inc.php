@@ -1,6 +1,6 @@
 <?php
 
-$domain_list = get_domains_with_certificates($device, $app['app_id']);
+$domain_list = get_arrays_with_application($device, $app['app_id'], 'certificate');
 
 print_optionbar_start();
 

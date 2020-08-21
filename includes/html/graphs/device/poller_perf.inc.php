@@ -11,6 +11,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+use LibreNMS\Config;
 
 $scale_min = '0';
 
@@ -20,7 +21,11 @@ $rrd_filename = rrd_name($device['hostname'], 'poller-perf');
 
 $rrd_options .= ' DEF:poller='.$rrd_filename.':poller:AVERAGE';
 $rrd_options .= " 'COMMENT:Seconds      Cur     Min     Max     Avg\\n'";
-$rrd_options .= ' LINE1.25:poller#36393D:Poller';
+if (Config::get('applied_site_style') == 'dark') {
+    $rrd_options .= ' LINE1.25:poller#63636d:Poller';
+} else {
+    $rrd_options .= ' LINE1.25:poller#36393d:Poller';
+}
 $rrd_options .= ' GPRINT:poller:LAST:%6.2lf  GPRINT:poller:MIN:%6.2lf';
 $rrd_options .= " GPRINT:poller:MAX:%6.2lf  'GPRINT:poller:AVERAGE:%6.2lf\\n'";
 

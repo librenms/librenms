@@ -75,4 +75,4 @@ if (Auth::user()->hasGlobalAdmin()) {
     </script>
     <?php
 }
-    ?>
+?>

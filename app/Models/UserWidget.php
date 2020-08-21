@@ -17,16 +17,16 @@ class UserWidget extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     public function widget()
     {
-        return $this->hasOne('App\Models\Widget', 'widget_id');
+        return $this->hasOne(\App\Models\Widget::class, 'widget_id');
     }
 
     public function dashboard()
     {
-        return $this->belongsTo('App\Models\Dashboard', 'dashboard_id');
+        return $this->belongsTo(\App\Models\Dashboard::class, 'dashboard_id');
     }
 }

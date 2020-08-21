@@ -11,6 +11,7 @@ return [
     |
     */
 
+    'title' => 'Wireless',
     'ap-count' => [
         'short' => 'APs',
         'long' => 'AP Count',
@@ -64,7 +65,7 @@ return [
     'noise-floor' => [
         'short' => 'Noise Floor',
         'long' => 'Noise Floor',
-        'unit' => 'dBm/Hz',
+        'unit' => 'dBm',
     ],
     'power' => [
         'short' => 'Power/Signal',

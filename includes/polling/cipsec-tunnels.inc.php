@@ -94,6 +94,7 @@ if ($device['os_group'] == 'cisco') {
 
         $rrd_name = array('ipsectunnel', $address);
         $rrd_def = new RrdDefinition();
+        $rrd_def->disableNameChecking();
         foreach ($oids as $oid) {
             $oid_ds = str_replace('cipSec', '', $oid);
             $rrd_def->addDataset($oid_ds, 'COUNTER', null, 1000000000);
@@ -114,7 +115,7 @@ if ($device['os_group'] == 'cisco') {
             $tags = compact('address', 'rrd_name', 'rrd_def');
             data_update($device, 'ipsectunnel', $tags, $fields);
 
-            // $graphs['ipsec_tunnels'] = TRUE;
+            // $os->enableGraph('ipsec_tunnels');
         }
     }//end foreach
 

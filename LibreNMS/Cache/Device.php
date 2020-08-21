@@ -46,7 +46,7 @@ class Device
      *
      * @param int $device_id
      */
-    public function setPrimary($device_id)
+    public function setPrimary(int $device_id)
     {
         $this->primary = $device_id;
     }
@@ -57,13 +57,13 @@ class Device
      * @param int $device_id
      * @return \App\Models\Device
      */
-    public function get($device_id) : \App\Models\Device
+    public function get(?int $device_id) : \App\Models\Device
     {
-        if (!array_key_exists($device_id, $this->devices)) {
+        if (!is_null($device_id) && !array_key_exists($device_id, $this->devices)) {
             return $this->load($device_id);
         }
 
-        return $this->devices[$device_id] ?: new \App\Models\Device;
+        return $this->devices[$device_id] ?? new \App\Models\Device;
     }
 
     /**
@@ -80,7 +80,7 @@ class Device
             return $this->load($hostname, 'hostname');
         }
 
-        return $this->devices[$device_id] ?: new \App\Models\Device;
+        return $this->devices[$device_id] ?? new \App\Models\Device;
     }
 
     /**
@@ -89,7 +89,7 @@ class Device
      * @param int $device_id
      * @return \App\Models\Device
      */
-    public function refresh($device_id) : \App\Models\Device
+    public function refresh(?int $device_id) : \App\Models\Device
     {
         unset($this->devices[$device_id]);
         return $this->get($device_id);
@@ -111,7 +111,6 @@ class Device
             return new \App\Models\Device;
         }
 
-        $device->loadOs();
         $this->devices[$device->device_id] = $device;
         return $device;
     }

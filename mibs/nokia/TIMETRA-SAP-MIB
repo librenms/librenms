@@ -4122,7 +4122,19 @@ SapEgrQosQueueStatsEntry         ::= SEQUENCE
     sapEgrQosQueueStatsDroppedInProfOctets Counter64,
     sapEgrQosQueueStatsForwardedOutProfOctets Counter64,
     sapEgrQosQueueStatsDroppedOutProfOctets Counter64,
-    sapEgrQosCustId                  TmnxCustId
+    sapEgrQosCustId                  TmnxCustId,
+    sapEgrQosQStatsFwdExdProfPkts    Counter64,
+    sapEgrQosQStatsDrpExdProfPkts    Counter64,
+    sapEgrQosQStatsFwdExdProfOcts    Counter64,
+    sapEgrQosQStatsDrpExdProfOcts    Counter64,
+    sapEgrQosQStatsFwdInPlusProfPkts Counter64,
+    sapEgrQosQStatsDrpInPlusProfPkts Counter64,
+    sapEgrQosQStatsFwdInPlusProfOcts Counter64,
+    sapEgrQosQStatsDrpInPlusProfOcts Counter64,
+    sapEgrQosQStatsFwdPkts           Counter64,
+    sapEgrQosQStatsDrpPkts           Counter64,
+    sapEgrQosQStatsFwdOcts           Counter64,
+    sapEgrQosQStatsDrpOcts           Counter64
 }
 
 sapEgrQosQueueId                 OBJECT-TYPE
@@ -4212,6 +4224,102 @@ sapEgrQosCustId                  OBJECT-TYPE
     DESCRIPTION
         "The Customer ID for the associated service."
     ::= { sapEgrQosQueueStatsEntry 10 }
+
+sapEgrQosQStatsFwdExdProfPkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of exceed-profile packets forwarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 11 }
+
+sapEgrQosQStatsDrpExdProfPkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of exceed-profile packets discarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 12 }
+
+sapEgrQosQStatsFwdExdProfOcts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of exceed-profile octets forwarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 13 }
+
+sapEgrQosQStatsDrpExdProfOcts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of exceed-profile octets discarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 14 }
+
+sapEgrQosQStatsFwdInPlusProfPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inplus-profile packets forwarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 15 }
+
+sapEgrQosQStatsDrpInPlusProfPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inplus-profile packets discarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 16 }
+
+sapEgrQosQStatsFwdInPlusProfOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inplus-profile octets forwarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 17 }
+
+sapEgrQosQStatsDrpInPlusProfOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inplus-profile octets discarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 18 }
+
+sapEgrQosQStatsFwdPkts           OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets forwarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 19 }
+
+sapEgrQosQStatsDrpPkts           OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets discarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 20 }
+
+sapEgrQosQStatsFwdOcts           OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets forwarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 21 }
+
+sapEgrQosQStatsDrpOcts           OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets discarded on this egress queue."
+    ::= { sapEgrQosQueueStatsEntry 22 }
 
 sapIngQosSchedStatsTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapIngQosSchedStatsEntry
@@ -9660,14 +9768,14 @@ MsapPlcyEntry                    ::= SEQUENCE
     msapPlcyCpmProtPolicyId          TCpmProtPolicyID,
     msapPlcyCpmProtMonitorMac        TruthValue,
     msapPlcySubMgmtDefSubId          TmnxDefSubIdSource,
-    msapPlcySubMgmtDefSubIdStr       TNamedItemOrEmpty,
+    msapPlcySubMgmtDefSubIdStr       TLNamedItemOrEmpty,
     msapPlcySubMgmtDefSubProfile     TNamedItemOrEmpty,
     msapPlcySubMgmtDefSlaProfile     TNamedItemOrEmpty,
     msapPlcySubMgmtDefAppProfile     TNamedItemOrEmpty,
     msapPlcySubMgmtSubIdPlcy         TPolicyStatementNameOrEmpty,
     msapPlcySubMgmtSubscriberLimit   TmnxSapSubscriberLimit,
     msapPlcySubMgmtProfiledTrafOnly  TruthValue,
-    msapPlcySubMgmtNonSubTrafSubId   TNamedItemOrEmpty,
+    msapPlcySubMgmtNonSubTrafSubId   TLNamedItemOrEmpty,
     msapPlcySubMgmtNonSubTrafSubProf TNamedItemOrEmpty,
     msapPlcySubMgmtNonSubTrafSlaProf TNamedItemOrEmpty,
     msapPlcySubMgmtNonSubTrafAppProf TNamedItemOrEmpty,
@@ -9807,7 +9915,7 @@ msapPlcySubMgmtDefSubId          OBJECT-TYPE
     ::= { msapPlcyEntry 7 }
 
 msapPlcySubMgmtDefSubIdStr       OBJECT-TYPE
-    SYNTAX      TNamedItemOrEmpty
+    SYNTAX      TLNamedItemOrEmpty
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -9904,7 +10012,7 @@ msapPlcySubMgmtProfiledTrafOnly  OBJECT-TYPE
     ::= { msapPlcyEntry 14 }
 
 msapPlcySubMgmtNonSubTrafSubId   OBJECT-TYPE
-    SYNTAX      TNamedItemOrEmpty
+    SYNTAX      TLNamedItemOrEmpty
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16222,6 +16330,19 @@ sapNotifyIfName                  OBJECT-TYPE
         "The value of the object sapNotifyIfName specifies the interface name
          used to refer to L3 interface."
     ::= { tmnxSapNotifyObjs 28 }
+
+sapNotifyPortState               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up    (1),
+        down  (2),
+        other (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sapNotifyPortState specifies the status of the
+         port for the particular sap as Up, Down, or Other."
+    ::= { tmnxSapNotifyObjs 29 }
 
 sapTmplTblLastChanged            OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -27411,7 +27532,8 @@ tmnxSap7xxxV16v0Compliance       MODULE-COMPLIANCE
             tmnxSapTmplFilterNameV16v0Group,
             tmnxSapL2tpv3ExtGroup,
             tmnxSapIngressQinqV16v0Group,
-            tmnxSapBaseStatsAggregateGroup
+            tmnxSapBaseStatsAggregateGroup,
+            sapNotifyObjsPortStateGroup
         }
     ::= { tmnxSapCompliances 130 }
 
@@ -27713,7 +27835,9 @@ tmnxSap7xxxV19v0Compliance       MODULE-COMPLIANCE
             tmnxSapVlanQosPlcyV19v0Group,
             tmnxSapEgrAggRateCIRV19v0Group,
             tmnxSapIgPlcyPlcerStatV19v0Group,
-            tmnxSapIngressAggRateV19v0Group
+            tmnxSapIngressAggRateV19v0Group,
+            sapNotifyObjsPortStateGroup,
+            tmnxSapQosStatsV19v0Group
         }
     ::= { tmnxSapCompliances 132 }
 
@@ -33403,6 +33527,37 @@ tmnxSapIngressAggRateV19v0Group  OBJECT-GROUP
          Aggregate Rate on Nokia SROS series systems in release 19.0."
     ::= { tmnxSapGroups 542 }
 
+sapNotifyObjsPortStateGroup      OBJECT-GROUP
+    OBJECTS     {
+        sapNotifyPortState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting notifications of the state of the port
+         on Nokia SROS systems."
+    ::= { tmnxSapGroups 544 }
+
+tmnxSapQosStatsV19v0Group        OBJECT-GROUP
+    OBJECTS     {
+        sapEgrQosQStatsFwdExdProfPkts,
+        sapEgrQosQStatsDrpExdProfPkts,
+        sapEgrQosQStatsFwdExdProfOcts,
+        sapEgrQosQStatsDrpExdProfOcts,
+        sapEgrQosQStatsFwdInPlusProfPkts,
+        sapEgrQosQStatsDrpInPlusProfPkts,
+        sapEgrQosQStatsFwdInPlusProfOcts,
+        sapEgrQosQStatsDrpInPlusProfOcts,
+        sapEgrQosQStatsFwdPkts,
+        sapEgrQosQStatsDrpPkts,
+        sapEgrQosQStatsFwdOcts,
+        sapEgrQosQStatsDrpOcts
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP Ingress/Egress QoS
+         capabilities on Nokia SROS series systems in release 19.0."
+    ::= { tmnxSapGroups 545 }
+
 tmnxDCSapCompliances             OBJECT IDENTIFIER ::= { tmnxSapConformance 3 }
 
 tmnxDCSapGroups                  OBJECT IDENTIFIER ::= { tmnxSapConformance 4 }
@@ -33767,7 +33922,8 @@ sapDHCPSubAuthError              NOTIFICATION-TYPE
 
 sapPortStateChangeProcessed      NOTIFICATION-TYPE
     OBJECTS     {
-        sapNotifyPortId
+        sapNotifyPortId,
+        sapNotifyPortState
     }
     STATUS      current
     DESCRIPTION
@@ -33775,7 +33931,8 @@ sapPortStateChangeProcessed      NOTIFICATION-TYPE
          has finished processing an access port state change event, and that
          the operating status of all the affected SAPs has been updated
          accordingly. The value of the sapNotifyPortId object indicates the ID
-         of the port that experienced the state change."
+         of the port that experienced the state change. The value of the
+         sapNotifyPortState object indicates the current state of the port."
     ::= { sapTraps 21 }
 
 sapDHCPLseStateMobilityError     NOTIFICATION-TYPE

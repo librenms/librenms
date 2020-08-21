@@ -17,7 +17,7 @@ IMPORTS
         FROM UCD-SNMP-MIB;
 
 ucdDiskIOMIB MODULE-IDENTITY
-    LAST-UPDATED "200001260000Z"
+    LAST-UPDATED "200504200000Z"
     ORGANIZATION "University of California, Davis"
     CONTACT-INFO    
 	"This mib is no longer being maintained by the University of
@@ -34,13 +34,19 @@ ucdDiskIOMIB MODULE-IDENTITY
         "
     DESCRIPTION
         "This MIB module defines objects for disk IO statistics."
+
+    REVISION     "200504200000Z"
+    DESCRIPTION
+        "Add 64 bit counters. Patch from Dan Nelson."
+
+    REVISION     "200202130000Z"
+    DESCRIPTION
+        "Add 1, 5 and 15-minute load average objects"
+
     REVISION     "200001260000Z"
     DESCRIPTION
         "SMIv2 version derived from older definitions contained
          in the VEST-INTERNETT-MIB module."
-    REVISION     "200504200000Z"
-    DESCRIPTION
-        "Add 64 bit counters. Patch from Dan Nelson."
     ::= { ucdExperimental 15 }
 
 diskIOTable OBJECT-TYPE
@@ -67,6 +73,9 @@ DiskIOEntry ::= SEQUENCE {
     diskIONWritten      Counter32,
     diskIOReads         Counter32,
     diskIOWrites        Counter32,
+    diskIOLA1           Integer32,
+    diskIOLA5           Integer32,
+    diskIOLA15          Integer32,
     diskIONReadX        Counter64,
     diskIONWrittenX     Counter64
 }

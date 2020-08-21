@@ -12,7 +12,11 @@ if (!Auth::user()->hasGlobalRead()) {
 $sql = " FROM entPhysical AS E, devices AS D WHERE $where AND D.device_id = E.device_id";
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`entPhysicalDescr` LIKE '%$searchPhrase%' OR `E`.`entPhysicalModelName` LIKE '%$searchPhrase%' OR `E`.`entPhysicalSerialNum` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE ? OR `E`.`entPhysicalDescr` LIKE ? OR `E`.`entPhysicalModelName` LIKE ? OR `E`.`entPhysicalSerialNum` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 if (isset($vars['string']) && strlen($vars['string'])) {
@@ -61,11 +65,11 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `D`.`device_id` AS `device_id`, `D`.`hostname` AS `hostname`,`entPhysicalDescr` AS `description`, `entPhysicalName` AS `name`, `entPhysicalModelName` AS `model`, `entPhysicalSerialNum` AS `serial` $sql";
+$sql = "SELECT `D`.`device_id` AS `device_id`, `D`.`os` AS `os`, `D`.`hostname` AS `hostname`, `D`.`sysName` AS `sysName`,`entPhysicalDescr` AS `description`, `entPhysicalName` AS `name`, `entPhysicalModelName` AS `model`, `entPhysicalSerialNum` AS `serial` $sql";
 
 foreach (dbFetchRows($sql, $param) as $invent) {
     $response[] = array(
-                   'hostname'    => generate_device_link($invent, shortHost($invent['hostname'])),
+                   'hostname'    => generate_device_link($invent),
                    'description' => $invent['description'],
                    'name'        => $invent['name'],
                    'model'       => $invent['model'],

@@ -25,17 +25,17 @@ $pagetitle[] = 'Oxidized';
             <div class="tab-content">
                 <div class="tab-pane fade in active" id="list">
                     <div class="table-responsive">
-                        <button type='submit' class='btn btn-success btn-sm' name='btn-reload-nodes' id='btn-reload-nodes'><i class='fa fa-refresh'></i> Reload node list</button>
                         <table id="oxidized-nodes" class="table table-hover table-condensed table-striped">
                             <thead>
                             <tr>
-                                <th data-column-id="hostname" data-order="desc">Hostname</th>
+                                <th data-column-id="id" data-visible="false">ID</th>
+                                <th data-column-id="hostname" data-formatter="hostname" data-order="asc">Hostname</th>
                                 <th data-column-id="sysname" data-visible=" <?php echo (!Config::get('force_ip_to_sysname')  ? 'true' : 'false') ?>">SysName</th>
-                                <th data-column-id="last_status">Last Status</th>
+                                <th data-column-id="last_status" data-formatter="status">Last Status</th>
                                 <th data-column-id="last_update">Last Update</th>
                                 <th data-column-id="model">Model</th>
                                 <th data-column-id="group">Group</th>
-                                <th data-column-id="actions"></th>
+                                <th data-column-id="actions" data-formatter="actions"></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -65,7 +65,43 @@ $pagetitle[] = 'Oxidized';
     </div>
 </div>
 <script>
-
+    var grid = $("#oxidized-nodes").bootgrid({
+        templates: {
+            header: '<div id="{{ctx.id}}" class="{{css.header}}"><div class="row">\
+                        <div class="col-sm-8 actionBar">\
+                            <span class="pull-left">\
+                                <button type="submit" class="btn btn-success btn-sm" name="btn-reload-nodes" id="btn-reload-nodes"\
+                                title="Update Oxidized\'s node list from LibreNMS data"><i class="fa fa-refresh"></i>\
+                                Reload node list</button>\
+                            </span>\
+                        </div>\
+                        <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div>\
+                    </div></div>'
+            },
+        rowCount: [50, 100, 250, -1],                
+        formatters: {
+            "hostname": function(column, row) {
+                if (row.id) {
+                    return '<a href="/device/device=' + row.id + '">' + row.hostname + '</a>';
+                } else {
+                    return row.hostname;
+                }
+            },
+            "actions": function(column, row) {
+                if (row.id) {
+                    return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + row.id + 
+                            '" id="btn-refresh-node-devId' + row.id + '" onclick="refresh_oxidized_node(\'' + row.hostname + '\');" title="Refetch config">' +
+                            '<i class="fa fa-refresh"></i></button> ' +
+                            '<a href="device/device=' + row.id + '/tab=showconfig/" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
+                }
+            },
+            "status": function(column, row) {
+                var color = ((row.last_status == 'success') ? 'success' : 'danger');
+                return '<i class="fa fa-square text-' + color + '" title="' + row.last_status + '"></i>';
+            }
+        }
+    });
+    
     $("[name='btn-search']").on('click', function (event) {
         event.preventDefault();
         var $this = $(this);
@@ -81,11 +117,16 @@ $pagetitle[] = 'Oxidized';
             success: function (data) {
                 $('#search-output').empty();
                 $("#search-output").show();
-                if (data.output)
-                    $('#search-output').append('Config appears on the following device(s):<br />');
+                if (data.output) {
+                    $('#search-output').append('<p>Config appears on the following device(s):</p>');
                     $.each(data.output, function (row, value) {
-                        $('#search-output').append(value['full_name'] + '<br />');
-                });
+                        if (value['dev_id']) {
+                            $('#search-output').append('<p><a href="device/device=' + value['dev_id'] + '/tab=showconfig/">' + value['full_name'] + '</p>');
+                        } else {
+                            $('#search-output').append('<p>' + value['full_name'] + '</p>');
+                        }
+                        });
+                }
             },
             error: function () {
                 toastr.error('Error');

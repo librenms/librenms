@@ -11,8 +11,10 @@ discovery_modules:
 poller_modules:
     toner: true
 discovery:
-    - sysDescr:
-        - JETDIRECT
-        - HP ETHERNET MULTI-ENVIRONMENT
-    - sysObjectID_regex:
-        - '/^.1.3.6.1.4.1.11.1$/'
+    -
+        sysDescr:
+            - JETDIRECT
+            - HP ETHERNET MULTI-ENVIRONMENT
+    -
+        sysObjectID_regex:
+            - '/^.1.3.6.1.4.1.11.1$/'

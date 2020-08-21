@@ -75,7 +75,7 @@ if (!is_numeric($alert_id)) {
     if (dbUpdate($data, 'alerts', 'id=?', [$alert_id]) >= 0) {
         if (in_array($state, [2, 22])) {
             $alert_info = dbFetchRow("SELECT `alert_rules`.`name`,`alerts`.`device_id` FROM `alert_rules` LEFT JOIN `alerts` ON `alerts`.`rule_id` = `alert_rules`.`id` WHERE `alerts`.`id` = ?", [$alert_id]);
-            log_event("$username acknowledged alert {$alert_info['name']}", $alert_info['device_id'], 'alert', 2, $alert_id);
+            log_event("$username acknowledged alert {$alert_info['name']} note: $ack_msg", $alert_info['device_id'], 'alert', 2, $alert_id);
         }
         $message = 'Alert acknowledged status changed.';
         $status  = 'ok';

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 if ($device['os_group'] == 'cisco') {
     echo ' CISCO-ENTITY-SENSOR: ';
 
@@ -115,7 +117,11 @@ if ($device['os_group'] == 'cisco') {
                     $multiplier = '1000000000';
                 }
 
-                if (is_numeric($entry['entSensorPrecision']) && $entry['entSensorPrecision'] > '0') {
+                if (is_numeric($entry['entSensorPrecision'])
+                        && $entry['entSensorPrecision'] > '0'
+                        // Workaround for a Cisco SNMP bug
+                        && $entry['entSensorPrecision'] != '1615384784'
+                ) {
                     $divisor = $divisor.str_pad('', $entry['entSensorPrecision'], '0');
                 }
 
@@ -130,25 +136,40 @@ if ($device['os_group'] == 'cisco') {
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (is_array($t_oids[$index])) {
                     foreach ($t_oids[$index] as $t_index => $key) {
+                        // Skip invalid treshold values
+                        if ($key['entSensorThresholdValue'] == '-32768') {
+                            continue;
+                        }
                         // Critical Limit
-                        if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
+                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
+                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         // Warning Limit
-                        if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'minor' && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                             $warn_limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'minor' && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             $warn_limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
                     }//end foreach
                 }//end if
+
+                // If temperature sensor, set low thresholds to -1 and -5. Many sensors don't return low thresholds, therefore LibreNMS takes the runtime low
+                // Also changing 0 values (not just null) as Libre loses these somewhere along the line and shows an empty value in the Web UI
+                if ($type == 'temperature') {
+                    if ($warn_limit_low == 0) {
+                        $warn_limit_low = -1;
+                    }
+                    if ($limit_low == 0) {
+                        $limit_low = -5;
+                    }
+                }
 
                 // End Threshold code
                 $ok = true;
@@ -164,7 +185,7 @@ if ($device['os_group'] == 'cisco') {
                             break;
                         }
                         if ($entity_array[$phys_index]['entPhysicalClass'] === 'port') {
-                            if (str_contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
+                            if (Str::contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
                                 list(, $tmp_ifindex) = explode(".", $entity_array[$phys_index][0]['entAliasMappingIdentifier']);
                                 $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
                                 if (is_array($tmp_port)) {
