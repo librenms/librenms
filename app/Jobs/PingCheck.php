@@ -101,9 +101,11 @@ class PingCheck implements ShouldQueue
 
         d_echo($this->process->getCommandLine() . PHP_EOL);
 
+        $all_hostnames = $this->devices->map(function ($device, $key) { return Device::pollerTarget($device); })->all();
+
         // send hostnames to stdin to avoid overflowing cli length limits
         $ordered_device_list = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
-        ->merge($this->devices->keys())
+        ->merge($all_hostnames)
             ->unique()
             ->implode(PHP_EOL);
 
@@ -156,7 +158,7 @@ class PingCheck implements ShouldQueue
 
         /** @var Builder $query */
         $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
+            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
             ->orderBy('max_depth');
 
         if ($this->groups) {
