@@ -313,17 +313,18 @@ class PingCheck implements ShouldQueue
      *
      * @param $devices
      */
-    private function updateDeviceHostnames($devices) {
-        $devices_updated_hostname = clone $devices;
+    private function updateDeviceHostnames($devices)
+    {
+        $updated_devices = clone $devices;
 
         foreach ($devices as $hostname => $device) {
             $updated_hostname = $device["overwrite_ip"] ?: $device["hostname"];
             if ($updated_hostname != $hostname) {
-                $devices_updated_hostname[$updated_hostname] = $devices_updated_hostname[$hostname];
-                unset($devices_updated_hostname[$hostname]);
+                $updated_devices[$updated_hostname] = $updated_devices[$hostname];
+                unset($updated_devices[$hostname]);
             }
         }
 
-        return $devices_updated_hostname;
+        return $updated_devices;
     }
 }
