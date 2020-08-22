@@ -52,13 +52,14 @@ specific version, you will need to disable updates in config.php.
 ## Access/Credentials
 
 To access your newly imported VM, those ports are forwarded from your machine to the VM: 8080 for WebUI and 2023 for SSH.
+If running a converted image on VMWare/ESXi, the ports are 80 for webserver and 22 for SSH.
 Remember to edit/remove them if you change (and you should) the VM network configuration.
 
-- WebUI (http://localhost:8080)
+- WebUI (http://localhost:8080) or (http://VM_IP:80)
   - username: librenms
   - password: `D32fwefwef`
   
-- SSH (ssh://localhost:2023)
+- SSH (ssh://localhost:2023) or (ssh://VM_IP:22)
   - username: librenms
   - password: `CDne3fwdfds`
 
