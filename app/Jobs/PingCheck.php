@@ -101,15 +101,9 @@ class PingCheck implements ShouldQueue
 
         d_echo($this->process->getCommandLine() . PHP_EOL);
 
-        $all_hostnames = $this->devices->map(
-            function ($device) {
-                return Device::pollerTarget($device);
-            }
-        )->all();
-
         // send hostnames to stdin to avoid overflowing cli length limits
         $ordered_device_list = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
-        ->merge($all_hostnames)
+        ->merge($this->devices->keys())
             ->unique()
             ->implode(PHP_EOL);
 
@@ -169,7 +163,7 @@ class PingCheck implements ShouldQueue
             $query->whereIn('poller_group', $this->groups);
         }
 
-        $this->devices = $query->get()->keyBy('hostname');
+        $this->devices = $this->updateDeviceHostnames($query->get()->keyBy('hostname'));
 
         // working collections
         $this->tiered = $this->devices->groupBy('max_depth', true);
@@ -311,5 +305,25 @@ class PingCheck implements ShouldQueue
             // create a new tier containing this data
             $this->deferred->put($device->max_depth, collect([$device->hostname => $data]));
         }
+    }
+
+    /**
+     * Updates the device's hostnames to the overwrite IP if it exists
+     *
+     *
+     * @param $devices
+     */
+    private function updateDeviceHostnames($devices) {
+        $devices_updated_hostname = clone $devices;
+
+        foreach ($devices as $hostname => $device) {
+            $updated_hostname = $device["overwrite_ip"] ?: $device["hostname"];
+            if ($updated_hostname != $hostname) {
+                $devices_updated_hostname[$updated_hostname] = $devices_updated_hostname[$hostname];
+                unset($devices_updated_hostname[$hostname]);
+            }
+        }
+
+        return $devices_updated_hostname;
     }
 }
