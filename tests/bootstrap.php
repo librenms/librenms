@@ -24,8 +24,6 @@
  */
 
 use LibreNMS\Config;
-use LibreNMS\DB\Eloquent;
-use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Snmpsim;
 
 $install_dir = realpath(__DIR__ . '/..');

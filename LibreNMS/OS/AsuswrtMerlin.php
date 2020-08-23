@@ -40,15 +40,12 @@ class AsuswrtMerlin extends OS implements
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
-    /**
-     * Retrieve basic information about the OS / device
-     */
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-        $info = explode(' ', trim(snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
-        $device->hardware = $info[1];
-        $device->version = $info[2];
+        $info = explode(' ', snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'));
+        $device->hardware = $info[1] ?? null;
+        $device->version = $info[2] ?? null;
     }
 
     /**
