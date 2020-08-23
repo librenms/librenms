@@ -164,9 +164,8 @@ class PingCheck implements ShouldQueue
         }
 
         $this->devices = $query->get()->keyBy(function ($device) {
-                return Device::pollerTarget(json_decode(json_encode($device), true));
-            }
-        );
+            return Device::pollerTarget(json_decode(json_encode($device), true));
+        });
 
         // working collections
         $this->tiered = $this->devices->groupBy('max_depth', true);
