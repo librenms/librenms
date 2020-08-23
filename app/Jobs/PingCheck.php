@@ -163,7 +163,10 @@ class PingCheck implements ShouldQueue
             $query->whereIn('poller_group', $this->groups);
         }
 
-        $this->devices = $this->updateDeviceHostnames($query->get()->keyBy('hostname'));
+        $this->devices = $query->get()->keyBy(function ($device) {
+                return Device::pollerTarget(json_decode(json_encode($device), true));
+            }
+        );
 
         // working collections
         $this->tiered = $this->devices->groupBy('max_depth', true);
@@ -305,26 +308,5 @@ class PingCheck implements ShouldQueue
             // create a new tier containing this data
             $this->deferred->put($device->max_depth, collect([$device->hostname => $data]));
         }
-    }
-
-    /**
-     * Updates the device's hostnames to the overwrite IP if it exists
-     *
-     *
-     * @param $devices
-     */
-    private function updateDeviceHostnames($devices)
-    {
-        $updated_devices = clone $devices;
-
-        foreach ($devices as $hostname => $device) {
-            $updated_hostname = $device["overwrite_ip"] ?: $device["hostname"];
-            if ($updated_hostname != $hostname) {
-                $updated_devices[$updated_hostname] = $updated_devices[$hostname];
-                unset($updated_devices[$hostname]);
-            }
-        }
-
-        return $updated_devices;
     }
 }
