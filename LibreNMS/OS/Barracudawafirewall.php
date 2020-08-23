@@ -1,6 +1,6 @@
 <?php
 /**
- * Zywall.php
+ * Barracudawafirewall.php
  *
  * -Description-
  *
@@ -26,36 +26,15 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\OS\Shared\Zyxel;
-use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\OS;
 
-class Zywall extends Zyxel implements OSDiscovery, OSPolling
+class Barracudawafirewall extends OS implements OSDiscovery
 {
     public function discoverOS(): void
     {
-        parent::discoverOS();
-
         $device = $this->getDeviceModel();
-        $device->hardware = $device->hardware ?: $device->sysDescr;
-        // ZYXEL-ES-COMMON::sysSwVersionString.0
-        $pos = strpos($device->version, 'ITS');
-        if ($pos) {
-            $device->version = substr($device->version, 0, $pos);
-        }
-    }
-
-    public function pollOS()
-    {
-        $sessions = snmp_get($this->getDevice(), '.1.3.6.1.4.1.890.1.6.22.1.6.0', '-Ovq');
-        if (is_numeric($sessions)) {
-            $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
-            $fields = [
-                'sessions' => $sessions,
-            ];
-            $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'zywall-sessions', $tags, $fields);
-            $this->enableGraph('zywall_sessions');
-        }
+        $device->version = snmp_get($this->getDevice(), 'currentFirmwareVersion.0', '-Oqv', 'BWS-MIB') ?: null;
+        $device->serial = snmp_get($this->getDevice(), 'systemSerialNumber.0', '-Oqv', 'BWS-MIB') ?: null;
+        $device->version = substr($device->version, 0, strrpos($device->version, '(')) ?: null;
     }
 }

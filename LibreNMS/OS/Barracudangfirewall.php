@@ -1,6 +1,6 @@
 <?php
 /**
- * Zywall.php
+ * Barracudangfirewall.php
  *
  * -Description-
  *
@@ -27,35 +27,32 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\OS\Shared\Zyxel;
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Zywall extends Zyxel implements OSDiscovery, OSPolling
+class Barracudangfirewall extends OS implements OSDiscovery, OSPolling
 {
+
     public function discoverOS(): void
     {
-        parent::discoverOS();
-
         $device = $this->getDeviceModel();
-        $device->hardware = $device->hardware ?: $device->sysDescr;
-        // ZYXEL-ES-COMMON::sysSwVersionString.0
-        $pos = strpos($device->version, 'ITS');
-        if ($pos) {
-            $device->version = substr($device->version, 0, $pos);
+        if ($device->sysObjectID == '.1.3.6.1.4.1.10704.1.10') {
+            $device->hardware = $device->sysName;
         }
     }
 
     public function pollOS()
     {
-        $sessions = snmp_get($this->getDevice(), '.1.3.6.1.4.1.890.1.6.22.1.6.0', '-Ovq');
+        // TODO move to count sensor
+        $sessions = snmp_get($this->getDevice(), 'firewallSessions64.8.102.119.83.116.97.116.115.0', '-OQv', 'PHION-MIB');
+
         if (is_numeric($sessions)) {
-            $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
-            $fields = [
-                'sessions' => $sessions,
-            ];
+            $rrd_def = RrdDefinition::make()->addDataset('fw_sessions', 'GAUGE', 0);
+            $fields = ['fw_sessions' => $sessions];
+
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'zywall-sessions', $tags, $fields);
-            $this->enableGraph('zywall_sessions');
+            app('Datastore')->put($this->getDevice(), 'barracuda_firewall_sessions', $tags, $fields);
+            $this->enableGraph('barracuda_firewall_sessions');
         }
     }
 }

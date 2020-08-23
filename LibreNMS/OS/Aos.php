@@ -36,16 +36,9 @@ class Aos extends OS implements OSDiscovery, ProcessorDiscovery
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-        if (Str::contains($device->sysDescr, 'Enterprise')) {
-            [, , $device->hardware, $device->version] = explode(' ', $device->sysDescr);
-        } elseif (Str::contains($device->sysObjectID, '1.3.6.1.4.1.6486.800.1.1.2.2.4')) {
+        if (Str::contains($device->sysObjectID, '1.3.6.1.4.1.6486.800.1.1.2.2.4')) {
             $device->hardware = snmp_get($this->getDevice(), '.1.3.6.1.4.1.89.53.4.1.6.1', '-Osqv', 'RADLAN-Physicaldescription-MIB'); //RADLAN-Physicaldescription-MIB::rlPhdStackProductID
             $device->version = snmp_get($this->getDevice(), '.1.3.6.1.4.1.89.53.14.1.2.1', '-Osqv', 'RADLAN-Physicaldescription-MIB'); //RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion
-        } elseif (Str::contains($device->sysObjectID, ".1.3.6.1.4.1.6486.800.1.1.2.1.10")) {
-            $sys = snmp_translate($device->sysObjectID, 'ALCATEL-IND1-DEVICES', null, null, $this->getDevice());
-            preg_match('/deviceOmniSwitch(....)(.+)/', $sys, $model); // deviceOmniSwitch6400P24
-            $device->hardware = 'OS' . $model[1] . '-' . $model[2];
-            $device->version = $device->sysDescr;
         } else {
             [, $device->hardware, $device->version] = explode(' ', $device->sysDescr);
         }
