@@ -1,0 +1,13 @@
+os: ekinops-360
+text: 'Ekinops 360'
+type: network
+icon: ekinops
+group: ekinops
+over:
+   - { graph: device_dbm, text: dbm }
+   - { graph: device_temperature, text: Temperature }
+discovery:
+  - sysObjectID:
+      - .1.3.6.1.4.1.20044
+  - mib_dir:
+      - ekinops
