@@ -38,10 +38,43 @@ use App\Models\MplsTunnelCHop;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\OS;
 
-class Timos extends OS implements MplsDiscovery, MplsPolling
+class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDiscovery
 {
+
+   /**
+     * Discover wireless Rx (Received Signal Strength). This is in dBm. Type is power.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * ALU-MICROWAVE-MIB::aluMwRadioLocalRxMainPower
+     * @return array
+     */
+    public function discoverWirelesspower()
+    {
+        $name = $this->getCacheByIndex('aluMwRadioName', 'ALU-MICROWAVE-MIB');
+        $rsl = snmpwalk_cache_oid($this->getDevice(), 'aluMwRadioLocalRxMainPower', array(), 'ALU-MICROWAVE-MIB');
+
+        $sensors = array();
+        $divisor = 10;
+
+        foreach ($rsl as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6527.6.1.2.2.7.1.3.1.2.' . $index,
+                'Nokia-Packet-MW-Rx',
+                $index,
+                "Rx ({$name[$index]})",
+                $data['aluMwRadioLocalRxMainPower'] / $divisor,
+                '1',
+                '10'
+            );
+        }
+        return $sensors;
+    }
+
     /**
      * @param tmnxEnacpVal
      * @return encapsulation string
