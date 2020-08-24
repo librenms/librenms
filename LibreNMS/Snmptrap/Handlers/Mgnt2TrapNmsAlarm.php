@@ -71,7 +71,7 @@ class Mgnt2TrapNmsAlarm implements SnmptrapHandler
         }
 
         switch ($alarmSeverity) {
-            case 'clear':
+            case 'cleared':
                 $severity = 1;
                 break;
             case 'critical':

@@ -2,7 +2,6 @@ os: ekinops
 text: 'Ekinops Optical'
 type: network
 icon: ekinops
-logo: ekinops
 group: ekinops
 discovery:
    - sysObjectID:
@@ -11,7 +10,6 @@ mib_dir:
    - ekinops
 discovery_modules:
     ports-stack: false
-    entity-state: false
     cisco-vrf-lite: false
     hr-device: false
     discovery-protocols: false
