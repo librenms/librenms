@@ -292,4 +292,9 @@ class OS implements ProcessorDiscovery, OSDiscovery
 
         return $this->device['dynamic_discovery'] ?? [];
     }
+
+    public function hasYamlDiscovery(string $module = null)
+    {
+        return $module ? isset($this->getDiscovery()['modules'][$module]) : !empty($this->getDiscovery());
+    }
 }

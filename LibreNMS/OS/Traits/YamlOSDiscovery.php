@@ -26,6 +26,7 @@
 namespace LibreNMS\OS\Traits;
 
 use Illuminate\Support\Arr;
+use Log;
 
 trait YamlOSDiscovery
 {
@@ -49,6 +50,8 @@ trait YamlOSDiscovery
         $oids = Arr::only($os_yaml, $this->fields);
         $mib = $os_yaml['mib'] ?? $yaml['mib'] ?? null;
         $data = snmp_get_multi_oid($this->getDevice(), $oids, '-OUQ', $mib);
+
+        Log::debug("Yaml OS data:", $data);
 
         foreach($oids as $field => $oid) {
             $device->$field = $data[$oid] ?? $device->$field;

@@ -32,13 +32,22 @@ use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
-use LibreNMS\OS\Ios;
+use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\Util\IP;
 
 class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
 {
+    use YamlOSDiscovery {
+        YamlOSDiscovery::discoverOS as discoverYamlOS;
+    }
     public function discoverOS(): void
     {
+        // yaml discovery overrides this
+        if ($this->hasYamlDiscovery('os')) {
+            $this->discoverYamlOS();
+            return;
+        }
+
         $device = $this->getDeviceModel();
         $device->serial = $this->getMainSerial();
         $hardware = null;
