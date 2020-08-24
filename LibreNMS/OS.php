@@ -31,12 +31,14 @@ use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\UcdResources;
+use LibreNMS\OS\Traits\YamlOSDiscovery;
 
-class OS implements ProcessorDiscovery
+class OS implements ProcessorDiscovery, OSDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -44,6 +46,7 @@ class OS implements ProcessorDiscovery
     use UcdResources {
         UcdResources::discoverProcessors as discoverUcdProcessors;
     }
+    use YamlOSDiscovery;
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
@@ -52,6 +55,7 @@ class OS implements ProcessorDiscovery
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
+     *
      * @param array $device
      */
     private function __construct(&$device)
@@ -140,7 +144,7 @@ class OS implements ProcessorDiscovery
         }
 
         if (!isset($this->cache['cache_oid'][$oid])) {
-            $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib, null, $snmpflags);
+            $data = snmpwalk_cache_oid($this->getDevice(), $oid, [], $mib, null, $snmpflags);
             $this->cache['cache_oid'][$oid] = array_map('current', $data);
         }
 
@@ -236,17 +240,17 @@ class OS implements ProcessorDiscovery
     protected function pollWirelessChannelAsFrequency($sensors, $callback = null)
     {
         if (empty($sensors)) {
-            return array();
+            return [];
         }
 
-        $oids = array();
+        $oids = [];
         foreach ($sensors as $sensor) {
             $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
         }
 
         $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids);
 
-        $data = array();
+        $data = [];
         foreach ($oids as $id => $oid) {
             if (isset($callback)) {
                 $channel = call_user_func($callback, $snmp_data[$oid]);
@@ -275,5 +279,17 @@ class OS implements ProcessorDiscovery
         }
 
         return $processors;
+    }
+
+    public function getDiscovery()
+    {
+        if (!array_key_exists('dynamic_discovery', $this->device)) {
+            $file = base_path('/includes/definitions/discovery/' . $this->getName() . '.yaml');
+            if (file_exists($file)) {
+                $this->device['dynamic_discovery'] = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+            }
+        }
+
+        return $this->device['dynamic_discovery'] ?? [];
     }
 }
