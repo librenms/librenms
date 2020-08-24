@@ -18,6 +18,6 @@ if (empty($hardware) && empty($version)) {
     $temp_data = snmp_get_multi_oid($device, ['.1.3.6.1.4.1.3320.3.6.10.1.5.0', '.1.3.6.1.4.1.3320.3.6.10.1.6.0',  '.1.3.6.1.4.1.3320.3.6.10.1.4'], '-OQv', 'NMS-CHASSIS');
     $hardware =  $temp_data['.1.3.6.1.4.1.3320.3.6.10.1.5.0'];
     $version = $temp_data['.1.3.6.1.4.1.3320.3.6.10.1.6.0'];
-	$serial = $temp_data['.1.3.6.1.4.1.3320.3.6.10.1.4.0'];
+    $serial = $temp_data['.1.3.6.1.4.1.3320.3.6.10.1.4.0'];
     unset($temp_data);
 }
