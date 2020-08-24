@@ -78,7 +78,7 @@ function cleanPort($interface, $device = null)
     }
 
     if ($device['os'] == 'speedtouch') {
-        list($interface['label']) = explode('thomson', $interface['label']);
+        [$interface['label']] = explode('thomson', $interface['label']);
     }
 
     if (is_array(Config::get('rewrite_if'))) {
@@ -1247,11 +1247,11 @@ function short_hrDeviceDescr($dev)
 
 function short_port_descr($desc)
 {
-    list($desc) = explode('(', $desc);
-    list($desc) = explode('[', $desc);
-    list($desc) = explode('{', $desc);
-    list($desc) = explode('|', $desc);
-    list($desc) = explode('<', $desc);
+    [$desc] = explode('(', $desc);
+    [$desc] = explode('[', $desc);
+    [$desc] = explode('{', $desc);
+    [$desc] = explode('|', $desc);
+    [$desc] = explode('<', $desc);
     $desc       = trim($desc);
 
     return $desc;
@@ -1332,45 +1332,6 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
         return $ipmiSensorsNames[$hardwareId][$sensorIpmi];
     }
     return $sensorIpmi;
-}
-
-/**
- * @param $ceragon_type
- * @param $device
- * @return bool|mixed|string
- */
-function rewrite_ceraos_hardware($ceragon_type, $device)
-{
-    if (strstr($ceragon_type, '.2281.1.10')) {
-        $hardware = 'IP10 Family';
-    } elseif (strstr($ceragon_type, '.2281.1.20.1.1.2')) {
-        $hardware = 'IP-20A 1RU';
-    } elseif (strstr($ceragon_type, '.2281.1.20.1.1.4')) {
-        $hardware = 'IP-20 Evolution LH 1RU';
-    } elseif (strstr($ceragon_type, '.2281.1.20.1.1')) {
-        $hardware = 'IP-20N 1RU';
-    } elseif (strstr($ceragon_type, '.2281.1.20.1.2.2')) {
-        $hardware = 'IP-20A 2RU';
-    } elseif (strstr($ceragon_type, '.2281.1.20.1.2.4')) {
-        $hardware = 'IP-20 Evolution 2RU';
-    } elseif (strstr($ceragon_type, '.2281.1.20.1.2')) {
-        $hardware = 'IP-20N 2RU';
-    } elseif (strstr($ceragon_type, '.2281.1.20.1.3.1')) {
-        $hardware = 'IP-20G';
-    } elseif (strstr($ceragon_type, '.2281.1.20.1.3.2')) {
-        $hardware = 'IP-20GX';
-    } elseif (strstr($ceragon_type, '.2281.1.20.2.2.2')) {
-        $hardware = 'IP-20S';
-    } elseif (strstr($ceragon_type, '.2281.1.20.2.2.3')) {
-        $hardware = 'IP-20E (hardware release 1)';
-    } elseif (strstr($ceragon_type, '.2281.1.20.2.2.4')) {
-        $hardware = 'IP-20E (hardware release 2)';
-    } elseif (strstr($ceragon_type, '.2281.1.20.2.2')) {
-        $hardware = 'IP-20C';
-    } else {
-        $hardware = snmp_get($device, 'genEquipInventoryCardName', '-Oqv', 'MWRM-UNIT-NAME');
-    }
-    return $hardware;
 }
 
 /**
