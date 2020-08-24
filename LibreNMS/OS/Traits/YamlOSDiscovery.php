@@ -48,12 +48,14 @@ trait YamlOSDiscovery
         }
 
         $oids = Arr::only($os_yaml, $this->fields);
-        $data = snmp_get_multi_oid($this->getDevice(), $oids, '-OUQ');
+        $data = snmp_get_multi_oid($this->getDevice(), $oids);
 
         Log::debug("Yaml OS data:", $data);
 
         foreach($oids as $field => $oid) {
-            $device->$field = $data[$oid] ?? $device->$field;
+            // translate all to numeric to make it easier to match
+            $numeric_oid = oid_is_numeric($oid) ? $oid : snmp_translate($oid, 'ALL', null, null, $this->getDevice());
+            $device->$field = $data[$numeric_oid] ?? $device->$field;
         }
     }
 
