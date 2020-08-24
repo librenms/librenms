@@ -2,7 +2,6 @@
   {
     "rule": "macros.device_down = \"1\"",
     "name": "Devices up/down",
-    "default": false
   },
   {
     "rule": "macros.device_down = \"1\" && devices.status_reason = \"icmp\"",
@@ -24,13 +23,11 @@
     "rule": "bgpPeers.bgpPeerState != \"established\" && macros.device_up = \"1\" && bgpPeers.bgpPeerAdminStatus != \"stop\"",
     "name": "BGP Session down",
     "extra": "{\"count\": 1}",
-    "default": true
   },
   {
     "rule": "bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && bgpPeers.bgpPeerState = \"established\" && macros.device_up = \"1\"",
     "name": "BGP Session established",
     "extra": "{\"count\": 1}",
-    "default": true
   },
   {
     "rule": "macros.port_down = \"1\"",
@@ -77,13 +74,11 @@
     "rule": "wireless_sensors.sensor_type == \"arubaos\" && wireless_sensors.sensor_class == \"ap-count\" && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\" && wireless_sensors.sensor_current <= `wireless_sensors.sensor_limit_low_warn` && wireless_sensors.sensor_current > `wireless_sensors.sensor_limit_low`",
     "name": "Aruba Wireless AP Count Low Warning",
     "severity": "warning",
-    "default": false
   },
   {
     "rule": "wireless_sensors.sensor_type == \"arubaos\" && wireless_sensors.sensor_class == \"ap-count\" && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\" && wireless_sensors.sensor_current <= `wireless_sensors.sensor_limit_low`",
     "name": "Aruba Wireless AP Count Low Critical",
     "severity": "critical",
-    "default": false
   },
   {
     "rule": "macros.state_sensor_critical && sensors.sensor_alert = 1",
@@ -93,7 +88,6 @@
   {
     "rule": "macros.state_sensor_warning && sensors.sensor_alert = 1",
     "name": "State Sensor Warning",
-    "default": false
   },
   {
     "rule": "macros.bill_quota_over_quota >= \"75\"",
@@ -438,24 +432,20 @@
  {
     "rule": "customoids.customoid_current >= `customoids.customoid_limit` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID over limit",
-    "default": true
   },
   {
     "rule": "customoids.customoid_current <= `customoids.customoid_limit_low` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID under limit",
-    "default": true
   },
   {
     "rule": "customoids.customoid_current >= `customoids.customoid_limit_warn` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID over warning limit",
     "severity": "warning",
-    "default": true
   },
   {
     "rule": "customoids.customoid_current <= `customoids.customoid_limit_low_warn` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID under warning limit",
     "severity": "warning",
-    "default": true
   },
   {
     "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSOnBattery\" && macros.state_sensor_warning = 1",
