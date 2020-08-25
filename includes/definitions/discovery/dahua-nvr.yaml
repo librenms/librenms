@@ -1,5 +1,9 @@
 mib: DAHUA-SNMP-MIB
 modules:
+    os:
+        hardware: DAHUA-SNMP-MIB::deviceType.0
+        version: DAHUA-SNMP-MIB::softwareRevision.0
+        serial: DAHUA-SNMP-MIB::serialNumber.0
     processors:
         data:
             -
