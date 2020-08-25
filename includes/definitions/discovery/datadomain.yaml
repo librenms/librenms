@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/Data Domain OS (?<version>.*)/'
+        hardware: DATA-DOMAIN-MIB::systemHardwareDevice
