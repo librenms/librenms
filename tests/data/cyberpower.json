@@ -12,7 +12,7 @@
                     "features": null,
                     "os": "cyberpower",
                     "type": "power",
-                    "serial": null,
+                    "serial": "ABCFT1000001",
                     "icon": "cyberpower.svg",
                     "location": null
                 }
@@ -30,7 +30,7 @@
                     "features": null,
                     "os": "cyberpower",
                     "type": "power",
-                    "serial": null,
+                    "serial": "ABCFT1000001",
                     "icon": "cyberpower.svg",
                     "location": "<private>"
                 }
