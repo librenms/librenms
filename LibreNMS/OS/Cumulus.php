@@ -1,6 +1,8 @@
 <?php
-/**
- * cumulus.inc.php
+/*
+ * Cumulus.php
+ *
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
- * @copyright  2018 Ryan Finney
- * @author     https://github.com/theherodied/
+ * @link       http://librenms.org
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$data = snmp_getnext_multi($device, 'entPhysicalDescr entPhysicalSoftwareRev entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB');
-$hardware = $data['entPhysicalDescr'];
-$serial = $data['entPhysicalSerialNum'];
-$version = preg_replace('/^Cumulus Linux /', '', $data['entPhysicalSoftwareRev']);
+namespace LibreNMS\OS;
+
+class Cumulus extends \LibreNMS\OS
+{
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $data = snmp_getnext_multi($this->getDevice(), ['entPhysicalDescr', 'entPhysicalSoftwareRev', 'entPhysicalSerialNum'], '-OQUs', 'ENTITY-MIB');
+        $device->hardware = $data['entPhysicalDescr'];
+        $device->serial = $data['entPhysicalSerialNum'];
+        $device->version = preg_replace('/^Cumulus Linux /', '', $data['entPhysicalSoftwareRev']);
+    }
+}
