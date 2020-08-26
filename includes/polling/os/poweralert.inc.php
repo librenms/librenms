@@ -7,6 +7,7 @@
 // .1.3.6.1.4.1.850.100.1.1.4.0 = STRING: "9942AY0AC796000912"
 // .1.3.6.1.4.1.850.10.2.2.1.12.1 = STRING: "This Is My Location"
 $hardware    = snmp_get($device, 'upsIdentModel.0', '-Ovq', 'UPS-MIB');
+$hardware    = trim(str_replace('TRIPP LITE','',$hardware));
 $location    = trim(snmp_get($device, '.1.3.6.1.4.1.850.10.2.2.1.12.1', '-Ovq', 'TRIPPLITE-MIB'), '"');
 $sysName     = trim(snmp_get($device, '.1.3.6.1.2.1.33.1.1.5.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
 $serial      = trim(snmp_get($device, '.1.3.6.1.4.1.850.100.1.1.4.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
