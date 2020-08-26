@@ -31,7 +31,7 @@ before_install:
 
 install:
   - travis_retry composer install --no-interaction --prefer-dist --no-suggest
-  - pip3 install --user snmpsim PyMySQL pylint
+  - pip3 install --user snmpsim PyMySQL pylint "isort<5"
   - test -n "$SKIP_WEB_CHECK" || php artisan dusk:update --detect
 
 after_failure:
