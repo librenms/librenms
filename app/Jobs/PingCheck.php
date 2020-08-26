@@ -156,14 +156,16 @@ class PingCheck implements ShouldQueue
 
         /** @var Builder $query */
         $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
+            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
             ->orderBy('max_depth');
 
         if ($this->groups) {
             $query->whereIn('poller_group', $this->groups);
         }
 
-        $this->devices = $query->get()->keyBy('hostname');
+        $this->devices = $query->get()->keyBy(function ($device) {
+            return Device::pollerTarget(json_decode(json_encode($device), true));
+        });
 
         // working collections
         $this->tiered = $this->devices->groupBy('max_depth', true);
