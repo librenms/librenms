@@ -37,7 +37,6 @@ class CopyDashboardController extends Controller
     {
         $target_user_id = $request->get('target_user_id');
         $dashboard_id = $request->get('dashboard_id');
-
         $dashboard = Dashboard::where(['dashboard_id' => $dashboard_id, 'user_id' => Auth::id()])->first();
 
         $success = true;
