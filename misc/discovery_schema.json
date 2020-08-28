@@ -8,6 +8,27 @@
         "modules": {
             "type": "object",
             "properties": {
+                "os": {
+                    "type": "object",
+                    "properties": {
+                        "sysDescr_regex": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": ["string", "array"]
+                        },
+                        "hardware": {
+                            "type": ["string", "array"]
+                        },
+                        "features": {
+                            "type": ["string", "array"]
+                        },
+                        "serial": {
+                            "type": ["string", "array"]
+                        }
+                    },
+                    "additionalProperties": false
+                },
                 "processors": {
                     "type": "object",
                     "properties": {

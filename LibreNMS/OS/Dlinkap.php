@@ -31,6 +31,16 @@ use LibreNMS\OS;
 
 class Dlinkap extends OS implements ProcessorDiscovery
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $firmware_oid = $device->sysObjectID . '.5.1.1.0';
+        $hardware_oid = $device->sysObjectID . '.5.1.5.0';
+
+        $device->version = snmp_get($device, $firmware_oid, '-Oqv') ?: null;
+        $device->hardware = trim($device->sysDescr . ' ' . snmp_get($device, $hardware_oid, '-Oqv'));
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -39,7 +49,7 @@ class Dlinkap extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        return array(
+        return [
             Processor::discover(
                 'dlinkap-cpu',
                 $this->getDeviceId(),
@@ -48,6 +58,6 @@ class Dlinkap extends OS implements ProcessorDiscovery
                 'Processor',
                 100
             )
-        );
+        ];
     }
 }

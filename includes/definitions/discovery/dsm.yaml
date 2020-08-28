@@ -1,5 +1,9 @@
 mib: SYNOLOGY-SYSTEM-MIB:SYNOLOGY-RAID-MIB:SYNOLOGY-DISK-MIB
 modules:
+    os:
+        hardware: SYNOLOGY-SYSTEM-MIB::modelName.0
+        version: SYNOLOGY-SYSTEM-MIB::version.0
+        serial: SYNOLOGY-SYSTEM-MIB::serialNumber.0
     sensors:
         temperature:
             data:
