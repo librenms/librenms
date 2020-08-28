@@ -3697,6 +3697,9 @@
             "default": "/usr/lib/nagios/plugins",
             "type": "directory"
         },
+        "nets": {
+            "type": "array"
+        },
         "network_map_items": {
             "default": [
                 "xdp",
