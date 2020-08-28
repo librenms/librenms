@@ -30,7 +30,7 @@
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
     $pre_cache['ifoSysProductIndex'] = snmp_get($device, '.1.3.6.1.4.1.21362.101.1.1.0', '-Oqv'); // .ifotecSystem.ifoSysProductIndex
     
-    if($pre_cache['ifoSysProductIndex'] != NULL){
+    if ($pre_cache['ifoSysProductIndex'] != NULL) {
         //echo "ifoSysProductIndex : " . $pre_cache['ifoSysProductIndex'] . "\n";
 
         $virtual_tables = [
