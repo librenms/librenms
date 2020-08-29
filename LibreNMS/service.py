@@ -22,6 +22,7 @@ from time import sleep
 from socket import gethostname
 from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_DFL
 from uuid import uuid1
+from systemd.daemon import notify, Notification
 
 
 class ServiceConfig:
@@ -380,6 +381,7 @@ class Service:
                     self.reap_flag = False
 
                 master_lock = self._acquire_master()
+                notify(Notification.WATCHDOG)
                 if master_lock:
                     if not self.is_master:
                         info("{} is now the master dispatcher".format(self.config.name))
