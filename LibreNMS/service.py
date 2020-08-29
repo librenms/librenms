@@ -688,7 +688,7 @@ class Service:
 
         if logfile_mdiff > self.config.poller.frequency:
             critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
-            self.shutdown()
+            self.restart()
         else:
             info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
