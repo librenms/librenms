@@ -277,11 +277,8 @@ class Service:
         self._lm = self.create_lock_manager()
         self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance, 'maintenance')
         self.stats_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.log_performance_stats, 'performance')
-        if self.config.watchdog_enabled:
-            info("Starting watchdog timer for log file: {}".format(self.config.watchdog_logfile))
-            self.watchdog_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.logfile_watchdog, 'watchdog')
-        else:
-            info("Watchdog is disabled.")
+        info("Starting watchdog timer for log file: {}".format(self.config.watchdog_logfile))
+        self.watchdog_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.logfile_watchdog, 'watchdog')
         self.is_master = False
 
     def attach_signals(self):
@@ -332,7 +329,6 @@ class Service:
         try:
             while not self.terminate_flag:
                 master_lock = self._acquire_master()
-                notify("WATCHDOG=1")
                 if master_lock:
                     if not self.is_master:
                         info("{} is now the master dispatcher".format(self.config.name))
@@ -599,6 +595,8 @@ class Service:
             exception("Unable to log performance statistics - is the database still online?")
 
     def logfile_watchdog(self):
+        # notify systemd service watchdog service
+        notify("WATCHDOG=1")
 
         try:
             # check that lofgile has been written to within last poll period
@@ -607,9 +605,12 @@ class Service:
             error("Log file not found! {}".format(e))
             return
 
-        if logfile_mdiff > self.config.poller.frequency:
-            critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
-            self.restart()
+        if self.config.watchdog_enabled:
+            if logfile_mdiff > self.config.poller.frequency:
+                critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
+                self.restart()
+            else:
+                info("Watchdog is disabled. - service would have been restarted")
         else:
             info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
