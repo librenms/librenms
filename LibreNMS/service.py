@@ -17,7 +17,7 @@ from time import sleep
 from socket import gethostname
 from signal import signal, SIGTERM
 from uuid import uuid1
-from systemd.daemon import notify, Notification
+from systemd.daemon import notify
 
 
 class ServiceConfig:
@@ -332,7 +332,7 @@ class Service:
         try:
             while not self.terminate_flag:
                 master_lock = self._acquire_master()
-                notify(Notification.WATCHDOG)
+                notify("WATCHDOG=1")
                 if master_lock:
                     if not self.is_master:
                         info("{} is now the master dispatcher".format(self.config.name))
