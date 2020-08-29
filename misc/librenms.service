@@ -10,6 +10,7 @@ User=librenms
 Group=librenms
 RestartSec=2
 Restart=always
+WatchdogSec=120s
 
 [Install]
 WantedBy=multi-user.target
