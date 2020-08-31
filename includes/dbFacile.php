@@ -210,8 +210,9 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
     }
 
     try {
-        $result = Eloquent::DB()->update($sql, (array)$data);
-
+        Eloquent::DB()->transaction(function () {
+            $result = Eloquent::DB()->update($sql, (array)$data);
+        }, 5};
         recordDbStatistic('update', $time_start);
         return $result;
     } catch (PDOException $pdoe) {
