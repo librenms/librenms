@@ -29,24 +29,16 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
     //echo " ifotec.inc.php : get version " . $device['sysObjectID'] . "\n";
 
     $ifoSysProductIndex = snmp_get($device, '.1.3.6.1.4.1.21362.101.1.1.0', '-Oqv');
-    if ($ifoSysProductIndex != NULL) {
-
+    if ($ifoSysProductIndex != null) {
         $ifoSysSoftware   = snmp_get($device, '.1.3.6.1.4.1.21362.101.1.2.1.7.' . $ifoSysProductIndex, '-Oqv');
         $ifoSysBootloader = snmp_get($device, '.1.3.6.1.4.1.21362.101.1.2.1.8.' . $ifoSysProductIndex, '-Oqv');
         $version = $ifoSysSoftware . " (Bootloader " . $ifoSysBootloader . ")";
 
-
         $serial   = snmp_get($device, '.1.3.6.1.4.1.21362.101.1.2.1.5.' . $ifoSysProductIndex, '-Oqv');
-
-        
-    } else {
-        //echo "  ifotec.inc.php : ifoSysProductIndex NONE\n";
-    } 
-
+    }
 } else {
     $ifoSysProductIndex = 0;
 }
-
 
 // sysDecr = (<product_reference> . ' : ' . <product_description>) OR (<product_reference>)
 list($hardware) = explode(' : ', $device['sysDescr'], 2);

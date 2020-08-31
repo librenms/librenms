@@ -22,15 +22,13 @@
  * @copyright  LibreNMS contributors
  * @author     Cedric MARMONIER
  */
-
 // To see : https://docs.librenms.org/Developing/os/Health-Information/
-
 //echo "#### Call pre-cache ifotec.inc.php #########################################################\n";
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
     $pre_cache['ifoSysProductIndex'] = snmp_get($device, '.1.3.6.1.4.1.21362.101.1.1.0', '-Oqv'); // .ifotecSystem.ifoSysProductIndex
     
-    if ($pre_cache['ifoSysProductIndex'] != NULL) {
+    if ($pre_cache['ifoSysProductIndex'] != null) {
         //echo "ifoSysProductIndex : " . $pre_cache['ifoSysProductIndex'] . "\n";
 
         $virtual_tables = [
@@ -43,7 +41,6 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
             'ifoTempLowThldWarning'  => '/\.1\.3\.6\.1\.4\.1\.21362\.101\.2\.1\.1\.9\.'  . $pre_cache['ifoSysProductIndex'] . '\.(\d+)/',
             'ifoTempHighThldWarning' => '/\.1\.3\.6\.1\.4\.1\.21362\.101\.2\.1\.1\.10\.' . $pre_cache['ifoSysProductIndex'] . '\.(\d+)/',
         ];
-
 
         // .ifoTemperatureTable.ifoTemperatureEntry.<ifoSysProductIndex>
         $data = snmp_walk($device, '.1.3.6.1.4.1.21362.101.2.1.1', '-OQn');
@@ -70,10 +67,8 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
             }
         }
     }
-
 }
 
 unset($data);
 
 //echo "#### END pre-cache ifotec.inc.php #########################################################\n\n";
-

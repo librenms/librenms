@@ -22,44 +22,33 @@
  * @copyright  LibreNMS contributors
  * @author     Cedric MARMONIER
  */
-
 // To see : https://docs.librenms.org/Developing/os/Health-Information/
-
-
 
 // *************************************************************
 //echo "#### Call discovery.temperature ifotec.inc.php #########################################################\n";
 
 $index = 0;
 foreach ($pre_cache['ifoTemperatureTable'] as $ifoSensor) {
-
     //echo "  create ifotec sensor : " . $ifoSensor['ifoTempDescr']['value'] . "\n";
 
     discover_sensor(
         $valid['sensor'],
         'temperature',
-        $device,
-        
+        $device,        
         $ifoSensor['ifoTempValue']['oid'],
         $ifoSensor['ifoTempName']['value'], // each sensor id must be unique
         'ifotecSensor',
         $ifoSensor['ifoTempDescr']['value'],
-        
         10, // divider
         1, // multiplier
-        
         $ifoSensor['ifoTempLowThldAlarm']['value'] / 10,
         $ifoSensor['ifoTempLowThldWarning']['value'] / 10,
         $ifoSensor['ifoTempHighThldWarning']['value'] / 10,
         $ifoSensor['ifoTempHighThldAlarm']['value'] / 10,
-        
         $ifoSensor['ifoTempValue']['value'] / 10
     );
 
-
     $index++;
-
 }
 
 //echo "#### END discovery.temperature ifotec.inc.php #########################################################\n\n";
-
