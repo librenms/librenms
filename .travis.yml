@@ -11,7 +11,7 @@ jobs:
   fast_finish: true
   include:
   - php: 7.4
-    dist: bionic
+    dist: focal
     env: SKIP_STYLE_CHECK=1 SKIP_WEB_CHECK=1
   - php: 7.3
     dist: bionic
@@ -39,6 +39,8 @@ install:
 
 after_failure:
   - tail /tmp/snmpsimd.log
+  - cat storage/logs/*.log
+  - cat logs/*.log
 
 after_success:
   - scripts/deploy-docs.sh
