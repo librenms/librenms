@@ -42,6 +42,5 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
 
 // sysDecr = (<product_reference> . ' : ' . <product_description>) OR (<product_reference>)
 list($hardware) = explode(' : ', $device['sysDescr'], 2);
-$hardware = $hardware;
 
 //echo "#### END polling ifotec.inc.php #########################################################\n\n";
