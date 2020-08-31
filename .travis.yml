@@ -1,4 +1,4 @@
-sudo: required
+os: linux
 language: php
 addons:
   chrome: stable
@@ -7,14 +7,17 @@ services:
 env:
   global:
     APP_ENV=testing
-matrix:
+jobs:
   fast_finish: true
   include:
   - php: 7.4
+    dist: bionic
     env: SKIP_STYLE_CHECK=1 SKIP_WEB_CHECK=1
   - php: 7.3
+    dist: bionic
     env: SKIP_UNIT_CHECK=1
   - php: 7.2
+    dist: bionic
     env: SKIP_STYLE_CHECK=1 SKIP_WEB_CHECK=1 EXECUTE_BUILD_DOCS=true
 
 cache:
@@ -31,7 +34,7 @@ before_install:
 
 install:
   - travis_retry composer install --no-interaction --prefer-dist --no-suggest
-  - pip3 install --user snmpsim PyMySQL pylint "isort<5"
+  - pip3 install --user snmpsim PyMySQL pylint
   - test -n "$SKIP_WEB_CHECK" || php artisan dusk:update --detect
 
 after_failure:
