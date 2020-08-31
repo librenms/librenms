@@ -68,7 +68,5 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
         }
     }
 }
-
-unset($data);
-
 //echo "#### END pre-cache ifotec.inc.php #########################################################\n\n";
+unset($data);

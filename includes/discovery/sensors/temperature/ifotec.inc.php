@@ -34,7 +34,7 @@ foreach ($pre_cache['ifoTemperatureTable'] as $ifoSensor) {
     discover_sensor(
         $valid['sensor'],
         'temperature',
-        $device,        
+        $device,
         $ifoSensor['ifoTempValue']['oid'],
         $ifoSensor['ifoTempName']['value'], // each sensor id must be unique
         'ifotecSensor',
