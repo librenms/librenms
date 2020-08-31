@@ -4091,13 +4091,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.availability": {
-            "order": 25,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "poller_modules.os": {
             "order": 320,
             "group": "poller",
