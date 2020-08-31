@@ -45,7 +45,7 @@ class Outcome:
     TERMINATED = 6
 
 
-POLLER_GROUP = 0
+POLLER_GROUP = '0'
 VERBOSE_LEVEL = 0
 THREADS = 32
 CONFIG = {}
@@ -175,7 +175,7 @@ Example: """ + __file__ + """ -P 192.168.0.0/24""")
         parser.error("Could not execute: {}\n{}".format(' '.join(e.cmd), e.output.decode().rstrip()))
         exit(2)
 
-    POLLER_GROUP = args.group or CONFIG.get('distributed_poller_group').split(',')[0]
+    POLLER_GROUP = args.group or ((string)CONFIG.get('distributed_poller_group')).split(',')[0]
 
     #######################
     # Build network lists #
