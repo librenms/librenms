@@ -40,15 +40,24 @@ class Ifotec extends OS implements OSDiscovery
         if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.21362.100.')) {
             $ifoSysProductIndex = snmp_get($this->getDevice(), '.1.3.6.1.4.1.21362.101.1.1.0', '-Oqv');
             //echo "  ifoSysProductIndex : " . $ifoSysProductIndex . "\n";
-            if ($ifoSysProductIndex != null) {
-                $ifoSysSoftware   = snmp_get($this->getDevice(), '.1.3.6.1.4.1.21362.101.1.2.1.7.' . $ifoSysProductIndex, '-Oqv');
-                $ifoSysBootloader = snmp_get($this->getDevice(), '.1.3.6.1.4.1.21362.101.1.2.1.8.' . $ifoSysProductIndex, '-Oqv');
-                $device->version  = $ifoSysSoftware . " (Bootloader " . $ifoSysBootloader . ")";
-
-                $device->serial   = snmp_get($this->getDevice(), '.1.3.6.1.4.1.21362.101.1.2.1.5.' . $ifoSysProductIndex, '-Oqv');
+            if ($ifoSysProductIndex !== null) {
+                $oids = [
+                    '21362.101.1.2.1.5.' . $ifoSysProductIndex,
+                    '21362.101.1.2.1.7.' . $ifoSysProductIndex,
+                    '21362.101.1.2.1.8.' . $ifoSysProductIndex
+                ];
+                $oids2 = [
+                    '.1.3.6.1.4.1.' . $oids[0],
+                    '.1.3.6.1.4.1.' . $oids[1],
+                    '.1.3.6.1.4.1.' . $oids[2]
+                ];
+                //$data = snmp_get_multi($this->getDevice(), $oids, '-Oqv');
+                $data = snmp_get_multi($this->getDevice(), $oids2, ['-Oqv']);
+                //var_dump($data);
+                //echo "   data[] : " . $data[$oids[0]]['enterprises'] . "\n";
+                $device->version  = $data[$oids[1]]['enterprises'] . " (Bootloader " . $data[$oids[2]]['enterprises'] . ")";
+                $device->serial   = $data[$oids[0]]['enterprises'];
             }
-        } else {
-            $ifoSysProductIndex = 0;
         }
 
         // sysDecr = (<product_reference> . ' : ' . <product_description>) OR (<product_reference>)
