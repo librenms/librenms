@@ -53,4 +53,3 @@ foreach ($tables as $tablevalue) {
         }
     }
 }
-

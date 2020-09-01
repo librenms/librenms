@@ -13,4 +13,3 @@
 $snmp_value = snmp_get($device, $sensor['sensor_oid'], '-Ovqn', "QUANTASTOR-SYS-STATS");
 preg_match('/([0-9]+)/', $snmp_value, $value);
 $sensor_value = trim($value[0]);
-
