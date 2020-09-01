@@ -52,7 +52,7 @@ class Ifotec extends OS implements OSDiscovery
                     '.1.3.6.1.4.1.' . $oids[2]
                 ];
                 //$data = snmp_get_multi($this->getDevice(), $oids, '-Oqv');
-                $data = snmp_get_multi($this->getDevice(), $oids2, ['-Oqv']);
+                $data = snmp_get_multi($this->getDevice(), $oids2, ['-OQUs']);
                 //var_dump($data);
                 //echo "   data[] : " . $data[$oids[0]]['enterprises'] . "\n";
                 $device->version  = $data[$oids[1]]['enterprises'] . " (Bootloader " . $data[$oids[2]]['enterprises'] . ")";
