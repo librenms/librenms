@@ -55,7 +55,7 @@ class Mgnt2TrapNmsAlarm implements SnmptrapHandler
         $alarmSeverity = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSeverity'));
 
         // Adding additional info if it exists.
-        if (!is_null($probAdd)) {
+        if ($probAdd == " ") {
             $probSpecific = "$probSpecific Additional info: $probAdd";
         }
 
@@ -64,10 +64,10 @@ class Mgnt2TrapNmsAlarm implements SnmptrapHandler
             $probCause = 'Unknown';
         }
 
-        if ($alarmObj == 'module') {
-            $msg = "Alarm on slot $slot, $sourcePm. Issue: $probSpecific. Possible Cause: $probCause";
-        } elseif ($alarmObj == 'port') {
-            $msg = "Alarm on slot $slot, $sourcePm, Port: $portType $portNum. Issue: $probSpecific. Possible Cause: $probCause";
+        if ($alarmObj == 'port') {
+            $msg = "Alarm on slot $slot, $sourcePm Port: $portType $portNum Issue: $probSpecific Possible Cause: $probCause";
+        } else {
+            $msg = "Alarm on slot $slot, $sourcePm Issue: $probSpecific Possible Cause: $probCause";
         }
 
         switch ($alarmSeverity) {
