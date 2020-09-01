@@ -22,15 +22,11 @@
  * @copyright  LibreNMS contributors
  * @author     Cedric MARMONIER
  */
-// To see : https://docs.librenms.org/Developing/os/Health-Information/
-//echo "#### Call pre-cache ifotec.inc.php #########################################################\n";
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
     $pre_cache['ifoSysProductIndex'] = snmp_get($device, '.1.3.6.1.4.1.21362.101.1.1.0', '-Oqv'); // .ifotecSystem.ifoSysProductIndex
     
     if ($pre_cache['ifoSysProductIndex'] != null) {
-        //echo "ifoSysProductIndex : " . $pre_cache['ifoSysProductIndex'] . "\n";
-
         $virtual_tables = [
             'ifoTempName'            => '/\.1\.3\.6\.1\.4\.1\.21362\.101\.2\.1\.1\.3\.'  . $pre_cache['ifoSysProductIndex'] . '\.(\d+)/',
             'ifoTempDescr'           => '/\.1\.3\.6\.1\.4\.1\.21362\.101\.2\.1\.1\.4\.'  . $pre_cache['ifoSysProductIndex'] . '\.(\d+)/',
@@ -51,11 +47,8 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
             foreach ($virtual_tables as $vt_name => $vt_regex) {
                 if (preg_match($vt_regex, $oid, $matches)) {
                     $index = $matches[1];
-                    //$id = $matches[2];
 
-                    //$pre_cache[$vt_name][$index] = ['value' => $value, 'id' => $id];
                     $pre_cache['ifoTemperatureTable'][$index][$vt_name] = ['value' => $value, 'oid' => $oid];
-                    //echo "  add entry in ifoTemperatureTable : " . $vt_name . "." . $index . " = " . $value . "\n";
 
                     $processed = true;
                     break;  // skip rest
@@ -68,5 +61,4 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
         }
     }
 }
-//echo "#### END pre-cache ifotec.inc.php #########################################################\n\n";
 unset($data);

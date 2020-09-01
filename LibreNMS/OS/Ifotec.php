@@ -33,13 +33,11 @@ class Ifotec extends OS implements OSDiscovery
 {
     public function discoverOS(): void
     {
-        //echo "#### Call discoverOS ifotec.php #########################################################\n";
         $device = $this->getDeviceModel();
 
-        //echo "  sysObjectID : " . $device->sysObjectID . "\n";
         if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.21362.100.')) {
             $ifoSysProductIndex = snmp_get($this->getDevice(), '.1.3.6.1.4.1.21362.101.1.1.0', '-Oqv');
-            //echo "  ifoSysProductIndex : " . $ifoSysProductIndex . "\n";
+
             if ($ifoSysProductIndex !== null) {
                 $oids = [
                     '21362.101.1.2.1.5.' . $ifoSysProductIndex,
@@ -51,18 +49,13 @@ class Ifotec extends OS implements OSDiscovery
                     '.1.3.6.1.4.1.' . $oids[1],
                     '.1.3.6.1.4.1.' . $oids[2]
                 ];
-                //$data = snmp_get_multi($this->getDevice(), $oids, '-Oqv');
                 $data = snmp_get_multi($this->getDevice(), $oids2, ['-OQUs']);
-                //var_dump($data);
-                //echo "   data[] : " . $data[$oids[0]]['enterprises'] . "\n";
                 $device->version  = $data[$oids[1]]['enterprises'] . " (Bootloader " . $data[$oids[2]]['enterprises'] . ")";
                 $device->serial   = $data[$oids[0]]['enterprises'];
             }
         }
 
-        // sysDecr = (<product_reference> . ' : ' . <product_description>) OR (<product_reference>)
+        // sysDecr struct = (<product_reference> . ' : ' . <product_description>) OR (<product_reference>)
         list($device->hardware) = explode(' : ', $device->sysDescr, 2);
-
-        //echo "#### END discoverOS ifotec.php #########################################################\n\n";
     }
 }
