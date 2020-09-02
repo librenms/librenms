@@ -1479,11 +1479,10 @@ function device_has_ip($ip, $poller_group = '0')
 
     if (isset($ip_address) && $ip_address->port) {
         $device = $ip_address->port->device;
-        if (Config::get('remote_poller')) {
-            if ($device->poller_group == $poller_group) {
-                return $device;
-            }
-        } else {
+        if (!Config::get('remote_poller')) {
+            return $device;
+        }
+        if ($device->poller_group == $poller_group) {
             return $device;
         }
     }
