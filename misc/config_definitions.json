@@ -3697,6 +3697,9 @@
             "default": "/usr/lib/nagios/plugins",
             "type": "directory"
         },
+        "nets": {
+            "type": "array"
+        },
         "network_map_items": {
             "default": [
                 "xdp",
@@ -4089,13 +4092,6 @@
             "group": "poller",
             "section": "poller_modules",
             "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.availability": {
-            "order": 25,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
             "type": "boolean"
         },
         "poller_modules.os": {
