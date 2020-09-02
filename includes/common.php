@@ -82,9 +82,11 @@ function graylog_severity_label($severity)
  * @param array $command
  * @return null|string
  */
-function external_exec($command, $device)
+function external_exec($command)
 {
     global $debug, $vdebug;
+
+    $device = DeviceCache::getPrimary();
 
     $proc = new \Symfony\Component\Process\Process($command);
     $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
@@ -119,9 +121,12 @@ function external_exec($command, $device)
 
     $proc->run();
     $output = $proc->getOutput();
-
+    
+    d_echo;
+    print("Exitcode: " . $proc->getExitCode());
     if ($proc->getExitCode()) {
-        Log::event('Unsupported SNMP Algorithm', $device['device_id'], 'poller', Alert::ERROR);
+        //Log::event('Unsupported SNMP Algorithm', $device['device_id'], 'poller', Alert::ERROR);
+        Log::event('Unsupported SNMP Algorithm - ' . $proc->getExitCode(), $device['device_id'], 'poller', Alert::ERROR);
         if ($debug && !$vdebug) {
             print($proc->getErrorOutput());
         }
@@ -829,9 +834,6 @@ function version_info($remote = false)
     $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
         Config::get('snmpget', 'snmpget') . ' -V 2>&1'
     )));
-    $output['openssl_ver'] = explode(' ', rtrim(shell_exec(
-        Config::get('openssl', 'openssl') . ' version 2>&1'
-    )))[1];
 
     return $output;
 }//end version_info()
@@ -842,21 +844,13 @@ function version_info($remote = false)
  */
 function snmpv3_sha2_capable()
 {
-    $netsnmp_minimum = '5.8.0';
-    $openssl_minimum = '1.1.0';
+    $ret = shell_exec(Config::get('snmpget', 'snmpget') . ' --help 2>&1| grep SHA');
 
-    $version_info = version_info();
+    $parts = explode('|', $ret);
 
-    $netsnmp_ver = explode(' ', $version_info['netsnmp_ver'])[1];
-    $openssl_ver = $version_info['openssl_ver'];
-
-    if (version_compare($netsnmp_ver, $netsnmp_minimum, '<')) {
+    if (count($parts) <= 2) {
         return false;
     }
-    if (version_compare($openssl_ver, $openssl_minimum, '<')) {
-        return false;
-    }
-
     return true;
 }
 
