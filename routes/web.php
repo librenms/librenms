@@ -118,6 +118,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('customers', 'CustomersController');
             Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
+            Route::post('outages', 'OutagesController');
             Route::post('fdb-tables', 'FdbTablesController');
             Route::post('routes', 'RoutesTablesController');
             Route::post('graylog', 'GraylogController');

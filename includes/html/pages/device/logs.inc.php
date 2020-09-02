@@ -24,6 +24,17 @@ echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo '<strong>Logging</strong>  &#187; ';
 
+if ($vars['section'] == 'outages') {
+    echo '<span class="pagemenu-selected">';
+}
+
+echo generate_link('Outages', $vars, array('section' => 'outages'));
+if ($vars['section'] == 'outages') {
+    echo '</span>';
+}
+
+echo ' | ';
+
 if ($vars['section'] == 'eventlog') {
     echo '<span class="pagemenu-selected">';
 }
@@ -71,6 +82,10 @@ switch ($vars['section']) {
         break;
     case 'graylog':
         include 'includes/html/pages/device/logs/'.$vars['section'].'.inc.php';
+        break;
+    case 'outages':
+        $vars['fromdevice'] = true;
+        include 'includes/html/pages/outages.inc.php';
         break;
 
     default:
