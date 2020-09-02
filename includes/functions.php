@@ -1528,7 +1528,7 @@ function host_exists($hostname, $sysName = null, $poller_group = '0')
     $query = "SELECT COUNT(*) FROM `devices` WHERE (`hostname`=? OR `overwrite_ip`=?)";
     $params = array($hostname, $hostname);
 
-    if (!empty($sysName) && !Config::get('allow_duplicate_sysName')) {{
+    if (!empty($sysName) && !Config::get('allow_duplicate_sysName')) {
         $query .= " OR `sysName`=?";
         $params[] = $sysName;
 
