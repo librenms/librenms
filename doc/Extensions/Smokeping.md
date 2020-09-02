@@ -230,7 +230,7 @@ Verify: `sudo systemctl status smokeping`
 
 ## Verify in LibreNMS
 
-Within LibreNMS, you should now have a new device sub-tab called Ping
+Within LibreNMS, you should now see the Smokeping graphs under Latency tab.
 
 --------------
 # Pre-Existing Smokeping Installation
