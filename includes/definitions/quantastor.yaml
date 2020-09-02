@@ -36,8 +36,7 @@ poller_modules:
 processor_stacked: true
 discovery:
     -
-        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
         snmpget:
-            oid: storageSystem-ProductId.0
+            oid: QUANTASTOR-SYS-STATS::storageSystem-ProductId.0
             op: starts
-            value: "QUANTASTOR"
+            value: 'QUANTASTOR'

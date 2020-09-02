@@ -1,6 +1,6 @@
 <?php
 /**
- * QuantaStor.php
+ * Quantastor.php
  *
  * OSNEXUS QuantaStor OS
  *
@@ -28,7 +28,7 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
-class QuantaStor extends OS implements OSDiscovery
+class Quantastor extends OS implements OSDiscovery
 {
     public function discoverOS(): void
     {
