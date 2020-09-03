@@ -123,9 +123,9 @@ def get_config_data(install_dir):
     try:
         proc = subprocess.Popen(config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
         return proc.communicate()[0].decode()
-    except Exception as e:
-        print("ERROR: Could not execute: %s" % config_cmd)
-        print(e)
+    except Exception as exc:
+        logger.error("ERROR: Could not execute: %s" % config_cmd)
+        logger.error('exc'.format(exc))
         sys.exit(2)
 
 # Database functions #######################################################
@@ -140,6 +140,6 @@ def db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname):
 
         return MySQLdb.connect(**options)
     except Exception as dbexc:
-        print('ERROR: Could not connect to MySQL database!')
-        print('ERROR: %s' % dbexc)
+        logger.error('ERROR: Could not connect to MySQL database!')
+        logger.error('exc'.format(exc))
         sys.exit(2)
