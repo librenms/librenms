@@ -186,7 +186,6 @@ def get_config_data(install_dir):
     else:
         logger.error("ERROR: Could not execute: %s" % config_cmd)
         logger.error("exit code: {0}. Output:\n{1}".format(exit_code, values))
-        logger.error('exc'.format(exc))
         sys.exit(2)
 
 # Database functions #######################################################
