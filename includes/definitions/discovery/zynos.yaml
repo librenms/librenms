@@ -23,7 +23,7 @@ modules:
     sensors:
         fanspeed:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: zyxelHwMonitorFanRpmTable
@@ -43,8 +43,6 @@ modules:
                     index: 'fanRpmCurValue.{{ $index }}'
                     low_limit: fanRpmLowThresh
         temperature:
-            options:
-                skip_values_lt: 0
             data:
                 -
                     oid: zyxelHwMonitorTemperatureTable
@@ -84,7 +82,7 @@ modules:
                             value: 'Temperature'
         voltage:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
                 divisor: 1000
             data:
                 -
