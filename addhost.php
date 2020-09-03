@@ -17,7 +17,7 @@ use LibreNMS\Exceptions\HostUnreachableException;
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('Pbsg:p:f::');
+$options = getopt('Pbg:p:f::');
 
 if (isset($options['g']) && $options['g'] >= 0) {
     $cmd = array_shift($argv);
@@ -63,12 +63,6 @@ if (isset($options['P'])) {
 }
 
 if (isset($options['b'])) {
-    $cmd = array_shift($argv);
-    array_shift($argv);
-    array_unshift($argv, $cmd);
-}
-
-if (isset($options['s'])) {
     $cmd = array_shift($argv);
     array_shift($argv);
     array_unshift($argv, $cmd);
@@ -204,10 +198,6 @@ if (!empty($argv[1])) {
         }
     }//end if
 
-    if (isset($options['s'])) {
-        $additional['poller_group_specific'] = true;
-    }
-
     try {
         $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
         $device = device_by_id_cache($device_id);
@@ -243,7 +233,6 @@ if (!empty($argv[1])) {
         Valid port assoc modes are: ' . join(', ', $valid_assoc_modes) . '
     -b Add the host with SNMP if it replies to it, otherwise only ICMP.
     -P Add the host with only ICMP, no SNMP or OS discovery.
-    -s only checks for duplicate IPs of devices belonging to the same poller group.
 
     %rRemember to run discovery for the host afterwards.%n
 '

@@ -549,7 +549,6 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $ip = $host;
     }
 
-
     if ($force_add !== true && $device = device_has_ip($ip, $poller_group)) {
         $message = "Cannot add $host, already have device with this IP $ip";
         if ($ip != $device->hostname) {

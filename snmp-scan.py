@@ -113,9 +113,7 @@ def scan_host(scan_ip):
         try:
             arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or scan_ip]
             if args.ping:
-                arguments.insert(len(arguments) - 1, args.ping)
-            if args.poller_group_specific:
-                arguments.insert(len(arguments) - 1, args.poller_group_specific)
+                arguments.insert(3, args.ping)
             add_output = check_output(arguments)
             return Result(scan_ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
@@ -145,7 +143,6 @@ Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two add
 Example: 192.168.0.1/32 will be treated as a single host address""")
     parser.add_argument('-P', '--ping', action='store_const', const="-b", default="", help="""Add the device as an ICMP only device if it replies to ping but not SNMP.
 Example: """ + __file__ + """ -P 192.168.0.0/24""")
-    parser.add_argument('-s', '--poller_group_specific', action='store_const', const="-s", default="", help="Only checks for duplicate hosts belongong to the same poller group.")
     parser.add_argument('-t', dest='threads', type=int,
                         help="How many IPs to scan at a time.  More will increase the scan speed," +
                              " but could overload your system. Default: {}".format(THREADS))
