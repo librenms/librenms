@@ -30,11 +30,19 @@ use Log;
 
 trait YamlOSDiscovery
 {
+    private $dbFields = [
+        'version',
+        'hardware',
+        'features',
+        'serial',
+    ];
+
     private $fields = [
         'version',
         'hardware',
         'features',
         'serial',
+        'location',
     ];
 
     public function discoverOS(): void
@@ -52,21 +60,35 @@ trait YamlOSDiscovery
 
         Log::debug("Yaml OS data:", $data);
 
-        foreach($oids as $field => $oid_list) {
-            // translate all to numeric to make it easier to match
-            foreach (Arr::wrap($oid_list) as $oid) {
-                $numeric_oid = oid_is_numeric($oid) ? $oid : snmp_translate($oid, 'ALL', null, null, $this->getDevice());
-                $device->$field = $data[$numeric_oid] ?? $device->$field;
-                continue 1;
+        foreach ($oids as $field => $oid_list) {
+            if ($value = $this->findFirst($data, $oid_list)) {
+                if ($field == 'location') {
+                    $device->setLocation($value);
+                    continue;
+                }
+
+                $device->$field = $value;
             }
         }
+    }
+
+    private function findFirst($data, $oids)
+    {
+        foreach (Arr::wrap($oids) as $oid) {
+            // translate all to numeric to make it easier to match
+            $numeric_oid =  oid_is_numeric($oid) ? $oid : snmp_translate($oid, 'ALL', null, null, $this->getDevice());
+            if (!empty($data[$numeric_oid])) {
+                return $data[$numeric_oid];
+            }
+        }
+        return null;
     }
 
     private function parseRegex($regex, $subject)
     {
         if (preg_match($regex, $subject, $matches)) {
             $device = $this->getDeviceModel();
-            foreach ($this->fields as $field) {
+            foreach ($this->dbFields as $field) {
                 $device->$field = $matches[$field] ?? null;
             }
         }

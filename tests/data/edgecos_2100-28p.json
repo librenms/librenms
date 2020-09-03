@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "EC1806001051",
                     "icon": "edge-core.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

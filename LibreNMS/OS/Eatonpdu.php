@@ -1,8 +1,8 @@
 <?php
 /**
- * e3meterdc.inc.php
+ * Eatonpdu.php
  *
- * LibreNMS os poller module for Zyxel devices
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,27 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2020 PipoCanaja
- * @author     PipoCanaja
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$oids = ['NETTRACK-E3METER-CTR-SNMP-MIB::e3ConcentratorFWVersion'];
-$e3meter = snmp_get_multi_oid($device, $oids, '-OUQnt');
+namespace LibreNMS\OS;
 
-$version = $e3meter['.1.3.6.1.4.1.21695.1.10.1.1'];
+class Eatonpdu extends \LibreNMS\OS
+{
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
 
-unset(
-    $e3meter
-);
+        $data = snmp_get_multi($this->getDevice(), [
+            'partNumber.0',
+            'objectName.0',
+            'firmwareVersion.0',
+            'serialNumber.0',
+        ], '-OQUs', 'EATON-EPDU-MIB:PDU-MIB');
+
+        $device->hardware = trim($data[0]['partNumber'] . ' ' . $data[0]['objectName']) ?: null;
+        $device->version = $data[0]['firmwareVersion'] ?? null;
+        $device->serial = $data[0]['serialNumber'] ?? null;
+    }
+}

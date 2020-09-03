@@ -25,6 +25,9 @@
                         },
                         "serial": {
                             "type": ["string", "array"]
+                        },
+                        "location": {
+                            "type": ["string", "array"]
                         }
                     },
                     "additionalProperties": false

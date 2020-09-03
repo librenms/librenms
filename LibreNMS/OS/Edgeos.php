@@ -1,6 +1,6 @@
 <?php
 /**
- * enexus.inc.php
+ * Edgeos.php
  *
  * -Description-
  *
@@ -19,17 +19,21 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Barry O'Donovan
- * @author     BArry O'Donovan <barry@lightnet.ie>
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$location = snmp_get($device, 'powerSystemSite.0', '-Ovqa', 'SP2-MIB');
-$hardware = snmp_get($device, 'powerSystemModel.0', '-Ovqa', 'SP2-MIB');
-$sw_version1 = snmp_get($device, 'controlUnitSwVersion.1', '-Ovqa', 'SP2-MIB');
-$sw_version2 = snmp_get($device, 'controlUnitSwVersion.2', '-Ovqa', 'SP2-MIB');
-if (!empty($sw_version1)) {
-    $version = $sw_version1;
-} elseif (!empty($sw_version2)) {
-    $version = $sw_version2;
+namespace LibreNMS\OS;
+
+class Edgeos extends \LibreNMS\OS
+{
+    public function discoverOS(): void
+    {
+        parent::discoverOS(); // yaml
+
+        $hw = snmp_get($this->getDevice(), ['.1.3.6.1.2.1.25.4.2.1.5.3818', '.1.3.6.1.2.1.25.4.2.1.5.3819'], '-Ovq');
+        if (preg_match('/(?<=UBNT )(.*)(?= running on)/', $hw, $matches)) {
+            $this->getDeviceModel()->hardware = $matches[0];
+        }
+    }
 }
-$serial = snmp_get($device, 'powerSystemSerialNumber.0', '-Ovqa', 'SP2-MIB');

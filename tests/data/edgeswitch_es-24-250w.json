@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "F03E34F342C3",
                     "icon": "ubiquiti.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "S26-PYA346",
                     "icon": "generic.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -35,6 +35,7 @@ class OS implements Module
 {
     public function discover(\LibreNMS\OS $os)
     {
+        $this->updateLocation($os);
         if ($os instanceof OSDiscovery) {
             // null out values in case they aren't filled.
             $os->getDeviceModel()->fill([
@@ -43,12 +44,10 @@ class OS implements Module
                 'features' => null,
                 'serial' => null,
                 'icon' => null,
-//            'location_id' => null, // TODO set location
             ]);
 
             $os->discoverOS();
         }
-
         $this->handleChanges($os);
     }
 
@@ -75,9 +74,11 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
+            if (!empty($location)) {
+                $deviceModel->setLocation($location);
+            }
         }
 
-        $this->updateLocation($os, $location ?? null);
         $this->handleChanges($os);
     }
 
@@ -104,7 +105,7 @@ class OS implements Module
     {
         $device = $os->getDeviceModel();
         if ($device->override_sysLocation == 0) {
-            $device->setLocation($altLocation ?? snmp_get($os->getDevice(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
+            $device->setLocation(snmp_get($os->getDevice(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
         }
 
         // make sure the location has coordinates
