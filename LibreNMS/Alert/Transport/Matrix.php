@@ -43,9 +43,10 @@ class Matrix extends Transport
     {
         $request_opts = [];
         $request_heads = [];
+        $txnid = rand(1111, 9999) . time();
 
         $server = preg_replace('/\/$/', '', $server);
-        $host = $server."/_matrix/client/r0/rooms/".urlencode($room)."/send/m.room.message/".$obj['uid'];
+        $host = $server."/_matrix/client/r0/rooms/".urlencode($room)."/send/m.room.message/".$txnid;
 
         $request_heads['Authorization'] = "Bearer $authtoken";
         $request_heads['Content-Type'] = "application/json";
