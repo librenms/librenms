@@ -32,7 +32,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "brocade.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

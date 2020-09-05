@@ -14,6 +14,21 @@
                         "sysDescr_regex": {
                             "type": "string"
                         },
+                        "version_regex": {
+                            "type": "string"
+                        },
+                        "hardware_regex": {
+                            "type": "string"
+                        },
+                        "features_regex": {
+                            "type": "string"
+                        },
+                        "serial_regex": {
+                            "type": "string"
+                        },
+                        "location_regex": {
+                            "type": "string"
+                        },
                         "version": {
                             "type": ["string", "array"]
                         },

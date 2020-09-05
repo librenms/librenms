@@ -56,7 +56,9 @@ trait YamlOSDiscovery
         }
 
         $oids = Arr::only($os_yaml, $this->fields);
-        $data = snmp_get_multi_oid($this->getDevice(), Arr::flatten($oids));
+        $numeric = $this->isNumeric($oids);
+        $flags = $numeric ? '-OUQn' : '-OUQ';
+        $data = snmp_get_multi_oid($this->getDevice(), array_unique(Arr::flatten($oids)), $flags);
 
         Log::debug("Yaml OS data:", $data);
 
@@ -67,18 +69,24 @@ trait YamlOSDiscovery
                     continue;
                 }
 
-                $device->$field = $value;
+                // extract via regex if requested
+                if (isset($os_yaml["{$field}_regex"])) {
+                    unset($extracted_match);
+                    preg_match($os_yaml["{$field}_regex"], $value, $extracted_match);
+                }
+
+                $device->$field = $extracted_match[$field] ?? $value;
             }
         }
     }
 
-    private function findFirst($data, $oids)
+    private function findFirst($data, $oids, $numeric = false)
     {
         foreach (Arr::wrap($oids) as $oid) {
             // translate all to numeric to make it easier to match
-            $numeric_oid =  oid_is_numeric($oid) ? $oid : snmp_translate($oid, 'ALL', null, null, $this->getDevice());
-            if (!empty($data[$numeric_oid])) {
-                return $data[$numeric_oid];
+            $oid = ($numeric && !oid_is_numeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDevice()) : $oid;
+            if (!empty($data[$oid])) {
+                return $data[$oid];
             }
         }
         return null;
@@ -92,5 +100,16 @@ trait YamlOSDiscovery
                 $device->$field = $matches[$field] ?? null;
             }
         }
+    }
+
+    private function isNumeric($oids)
+    {
+        foreach ($oids as $oid) {
+            if (oid_is_numeric($oid)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

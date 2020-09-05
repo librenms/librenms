@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "firebrick.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
