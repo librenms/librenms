@@ -517,11 +517,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": 1231716,
+                    "ifInUcastPkts": 1945877,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": 797236,
+                    "ifOutUcastPkts": 1098252,
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -533,11 +533,11 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": 229350676,
+                    "ifInOctets": 335955471,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": 483091494,
+                    "ifOutOctets": 585127805,
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -550,7 +550,7 @@
                     "ifOutNUcastPkts_prev": 0,
                     "ifOutNUcastPkts_delta": null,
                     "ifOutNUcastPkts_rate": null,
-                    "ifInDiscards": 8371,
+                    "ifInDiscards": 14549,
                     "ifInDiscards_prev": 0,
                     "ifInDiscards_delta": null,
                     "ifInDiscards_rate": null,
@@ -570,7 +570,7 @@
                     "ifOutBroadcastPkts_prev": 0,
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
-                    "ifInMulticastPkts": 115954,
+                    "ifInMulticastPkts": 176874,
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
@@ -912,7 +912,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
                     "processor_index": "196608",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 3,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -934,7 +934,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196610",
                     "processor_index": "196610",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -945,7 +945,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196611",
                     "processor_index": "196611",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -956,7 +956,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196612",
                     "processor_index": "196612",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -967,7 +967,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196613",
                     "processor_index": "196613",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -978,7 +978,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196614",
                     "processor_index": "196614",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 4,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -989,7 +989,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196615",
                     "processor_index": "196615",
                     "processor_type": "hr",
-                    "processor_usage": 2,
+                    "processor_usage": 4,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1000,7 +1000,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196616",
                     "processor_index": "196616",
                     "processor_type": "hr",
-                    "processor_usage": 3,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1022,7 +1022,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196618",
                     "processor_index": "196618",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1033,7 +1033,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196619",
                     "processor_index": "196619",
                     "processor_type": "hr",
-                    "processor_usage": 2,
+                    "processor_usage": 3,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1055,7 +1055,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196621",
                     "processor_index": "196621",
                     "processor_type": "hr",
-                    "processor_usage": 4,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1066,7 +1066,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196622",
                     "processor_index": "196622",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1077,7 +1077,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196623",
                     "processor_index": "196623",
                     "processor_type": "hr",
-                    "processor_usage": 2,
+                    "processor_usage": 1,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1099,7 +1099,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196625",
                     "processor_index": "196625",
                     "processor_type": "hr",
-                    "processor_usage": 3,
+                    "processor_usage": 1,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1110,7 +1110,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196626",
                     "processor_index": "196626",
                     "processor_type": "hr",
-                    "processor_usage": 2,
+                    "processor_usage": 3,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1121,7 +1121,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196627",
                     "processor_index": "196627",
                     "processor_type": "hr",
-                    "processor_usage": 2,
+                    "processor_usage": 1,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1132,7 +1132,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196628",
                     "processor_index": "196628",
                     "processor_type": "hr",
-                    "processor_usage": 4,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1143,7 +1143,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196629",
                     "processor_index": "196629",
                     "processor_type": "hr",
-                    "processor_usage": 3,
+                    "processor_usage": 2,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1154,7 +1154,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196630",
                     "processor_index": "196630",
                     "processor_type": "hr",
-                    "processor_usage": 7,
+                    "processor_usage": 1,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1165,7 +1165,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196631",
                     "processor_index": "196631",
                     "processor_type": "hr",
-                    "processor_usage": 1,
+                    "processor_usage": 3,
                     "processor_descr": "Intel Xeon E5-2620 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -1236,9 +1236,9 @@
                     "mempool_type": "hrstorage",
                     "mempool_precision": 1024,
                     "mempool_descr": "Physical memory",
-                    "mempool_perc": 87,
-                    "mempool_used": 29197975552,
-                    "mempool_free": 4480180224,
+                    "mempool_perc": 81,
+                    "mempool_used": 27247583232,
+                    "mempool_free": 6430572544,
                     "mempool_total": 33678155776,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
@@ -1252,9 +1252,9 @@
                     "mempool_type": "hrstorage",
                     "mempool_precision": 1024,
                     "mempool_descr": "Virtual memory",
-                    "mempool_perc": 82,
-                    "mempool_used": 29197975552,
-                    "mempool_free": 6478761984,
+                    "mempool_perc": 76,
+                    "mempool_used": 27247845376,
+                    "mempool_free": 8428892160,
                     "mempool_total": 35676737536,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
@@ -1269,8 +1269,8 @@
                     "mempool_precision": 1024,
                     "mempool_descr": "Swap space",
                     "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 1998581760,
+                    "mempool_used": 262144,
+                    "mempool_free": 1998319616,
                     "mempool_total": 1998581760,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
@@ -1300,6 +1300,34 @@
                 {
                     "context_name": "",
                     "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "172.16.10.1",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 1,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "0000:0000:0000:0000:0000:0000:0000:0001",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.5",
+                    "inetCidrRoutePfxLen": 128
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
                     "inetCidrRouteType": 3,
                     "inetCidrRouteProto": 2,
                     "inetCidrRouteNextHopAS": 0,
@@ -1310,6 +1338,62 @@
                     "inetCidrRouteNextHop": "0.0.0.0",
                     "inetCidrRoutePolicy": "zeroDotZero.2",
                     "inetCidrRoutePfxLen": 24
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "172.16.10.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.2",
+                    "inetCidrRoutePfxLen": 24
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 256,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "fe80:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.3",
+                    "inetCidrRoutePfxLen": 64
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "fe80:0000:0000:0000:0250:56ff:febb:3634",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.6",
+                    "inetCidrRoutePfxLen": 128
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 256,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "ff00:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.7",
+                    "inetCidrRoutePfxLen": 8
                 }
             ]
         }
@@ -1337,7 +1421,7 @@
                     "storage_descr": "/",
                     "storage_size": 115607240704,
                     "storage_units": 4096,
-                    "storage_used": 4060602368,
+                    "storage_used": 4253532160,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -1400,9 +1484,9 @@
                     "storage_index": "65",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/mnt/storage-pools/qs-7ed2f0cd-9ad0-8181-ab9b-ea211810d45f",
-                    "storage_size": 1785007964160,
+                    "storage_size": 1623948787712,
                     "storage_units": 131072,
-                    "storage_used": 1310720,
+                    "storage_used": 1966080,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -1413,9 +1497,9 @@
                     "storage_index": "66",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/mnt/storage-pools/qs-d552b444-aa3d-bd54-93d8-8a80406dd611",
-                    "storage_size": 5760195231744,
+                    "storage_size": 5660463202304,
                     "storage_units": 131072,
-                    "storage_used": 1310720,
+                    "storage_used": 1966080,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -1445,8 +1529,8 @@
                     "storage_descr": "/",
                     "storage_size": 115607240704,
                     "storage_units": 4096,
-                    "storage_used": 4060602368,
-                    "storage_free": 111546638336,
+                    "storage_used": 4253532160,
+                    "storage_free": 111353708544,
                     "storage_perc": 4,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
@@ -1508,10 +1592,10 @@
                     "storage_index": "65",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/mnt/storage-pools/qs-7ed2f0cd-9ad0-8181-ab9b-ea211810d45f",
-                    "storage_size": 1785007964160,
+                    "storage_size": 1623948787712,
                     "storage_units": 131072,
-                    "storage_used": 1310720,
-                    "storage_free": 1785006653440,
+                    "storage_used": 1966080,
+                    "storage_free": 1623946821632,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
@@ -1521,10 +1605,10 @@
                     "storage_index": "66",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/mnt/storage-pools/qs-d552b444-aa3d-bd54-93d8-8a80406dd611",
-                    "storage_size": 5760195231744,
+                    "storage_size": 5660463202304,
                     "storage_units": 131072,
-                    "storage_used": 1310720,
-                    "storage_free": 5760193921024,
+                    "storage_used": 1966080,
+                    "storage_free": 5660461236224,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
@@ -3394,10 +3478,10 @@
                     "group": "HDD",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 32,
-                    "sensor_limit": 52,
+                    "sensor_current": 31,
+                    "sensor_limit": 51,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 22,
+                    "sensor_limit_low": 21,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3442,10 +3526,10 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34,
-                    "sensor_limit": 54,
+                    "sensor_current": 36,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3586,10 +3670,10 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 33,
-                    "sensor_limit": 53,
+                    "sensor_current": 36,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 23,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3610,10 +3694,10 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34,
-                    "sensor_limit": 54,
+                    "sensor_current": 36,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3634,10 +3718,10 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34,
-                    "sensor_limit": 54,
+                    "sensor_current": 36,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3658,10 +3742,10 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34,
-                    "sensor_limit": 54,
+                    "sensor_current": 36,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3682,10 +3766,10 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34,
-                    "sensor_limit": 54,
+                    "sensor_current": 36,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3706,10 +3790,10 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34,
-                    "sensor_limit": 54,
+                    "sensor_current": 36,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3730,10 +3814,10 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34,
-                    "sensor_limit": 54,
+                    "sensor_current": 36,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -5685,10 +5769,10 @@
                     "group": "HDD",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 32,
-                    "sensor_limit": 52,
+                    "sensor_current": 31,
+                    "sensor_limit": 51,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 22,
+                    "sensor_limit_low": 21,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -5734,15 +5818,15 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 43,
-                    "sensor_limit": 54,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 34,
+                    "sensor_prev": 36,
                     "user_func": null,
                     "state_name": null
                 },
@@ -5877,16 +5961,16 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 47,
-                    "sensor_limit": 53,
+                    "sensor_current": 46,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 23,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 33,
+                    "sensor_prev": 36,
                     "user_func": null,
                     "state_name": null
                 },
@@ -5902,15 +5986,15 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 47,
-                    "sensor_limit": 54,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 34,
+                    "sensor_prev": 36,
                     "user_func": null,
                     "state_name": null
                 },
@@ -5926,15 +6010,15 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 42,
-                    "sensor_limit": 54,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 34,
+                    "sensor_prev": 36,
                     "user_func": null,
                     "state_name": null
                 },
@@ -5949,16 +6033,16 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 48,
-                    "sensor_limit": 54,
+                    "sensor_current": 49,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 34,
+                    "sensor_prev": 36,
                     "user_func": null,
                     "state_name": null
                 },
@@ -5973,16 +6057,16 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 51,
-                    "sensor_limit": 54,
+                    "sensor_current": 52,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 34,
+                    "sensor_prev": 36,
                     "user_func": null,
                     "state_name": null
                 },
@@ -5998,15 +6082,15 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 47,
-                    "sensor_limit": 54,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 34,
+                    "sensor_prev": 36,
                     "user_func": null,
                     "state_name": null
                 },
@@ -6021,16 +6105,16 @@
                     "group": "LM-SENSORS",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 51,
-                    "sensor_limit": 54,
+                    "sensor_current": 52,
+                    "sensor_limit": 56,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
+                    "sensor_limit_low": 26,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 34,
+                    "sensor_prev": 36,
                     "user_func": null,
                     "state_name": null
                 }
@@ -6112,6 +6196,627 @@
                     "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
+                }
+            ]
+        }
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "mysql",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "os-updates",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "mysql",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "os-updates",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "3",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "ACs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "AdCs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "BRd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "BSt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CDe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CISt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CIt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CLd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CRe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CRSt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "Cs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CSt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CTMPDTs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CTMPFs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CTMPTs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CUe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "CUMi",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBCd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBFBl",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIAd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIAe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIFLg",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIFSc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIIAo",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIIs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBILg",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBILog",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIMRd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIMs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIRd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBISc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBIWr",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBLFh",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBLWn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBOWs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBPDBp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBPFe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBPMps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBPse",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBRd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBSRs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBSWs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBTNx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IBWr",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBLBSe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBRDd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBRId",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBRRd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "IDBRUd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "KRRs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "KRs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "KWR",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "KWs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "MaCs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "MUCs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "OdTs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "OFs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "OTs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "packages",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "os-updates"
+                },
+                {
+                    "metric": "QCeFy",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCHs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCIs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCLMPs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCNCd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCQICe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "QCs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SFJn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SFRJn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SMPs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SQs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SRange",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SRCk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SRe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SRows",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SScan",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SSn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_closing_tables",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_copying_to_tmp_table",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_end",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_freeing_items",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_init",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_locked",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_login",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_none",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_preparing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_reading_from_net",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_sending_data",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_sorting_result",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_statistics",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_updating",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "State_writing_to_net",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "TCd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "TLIe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "TLWd",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "TOC",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
                 }
             ]
         }
