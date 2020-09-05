@@ -1,12 +1,5 @@
 mib: QUANTASTOR-SYS-STATS:LM-SENSORS-MIB
 modules:
-    pre-cache:
-        data:
-            -
-                oid:
-                    - hwDiskTable
-                    - hwUnitTable
-                    - hwEnclosure
     sensors:
         temperature:
             data:
@@ -15,7 +8,7 @@ modules:
                     value: hwDisk-DriveTemp
                     num_oid: '.1.3.6.1.4.1.39324.1.1.48.1.1.30.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Disk {{ $index }}'
+                    descr: '{{ $hwDisk-Name }}'
                     group: 'HDD'
                     state_name: hwDisk-temp
                 -
@@ -23,7 +16,7 @@ modules:
                     value: lmTempSensorsValue
                     divisor: 1000
                     num_oid: '.1.3.6.1.4.1.2021.13.16.2.1.3.{{ $index }}'
-                    descr: 'System Temp {{ $index }}'
+                    descr: '{{ $lmTempSensorsDevice }}'
                     group: 'LM-SENSORS'
                     state_name: lmsensors-temps
         state:
@@ -36,37 +29,47 @@ modules:
                     group: 'Status'
                     state_name: license-status
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
                     oid: hwDiskTable
                     value: hwDisk-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.48.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Disk {{ $index }}'
+                    descr: '{{ $hwDisk-Name }} SN {{ $hwDisk-SerialNum }}'
                     group: 'HDD'
                     state_name: hwDisk-status
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
                     oid: hwUnitTable
                     value: hwUnit-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.49.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Array {{ $index }}'
+                    descr: '{{ $hwUnit-Name }}'
                     group: 'Array(s)'
                     state_name: hwUnit-status
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
                     oid: hwEnclosureTable
                     value: hwEnclosure-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.50.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Enclosure {{ $index }}'
+                    descr: 'Enclosure {{ $hwEnclosure-Name }}'
                     group: 'Enclosure(s)'
                     state_name: hwEnclosure-status
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                -
+                    oid: hwEnclosureTable
+                    value: hwEnclosure-AlarmCount
+                    num_oid: '.1.3.6.1.4.1.39324.1.1.50.1.1.22.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: 'Enclosure {{ $hwEnclosure-Name }} alarm'
+                    group: 'Enclosure(s)'
+                    state_name: hwEnclosure-alarms
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
                     oid: fcTargetPortTable
                     value: fcTargetPort-State
@@ -76,7 +79,7 @@ modules:
                     group: 'FC ports'
                     state_name: fctarget-state
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
                     oid: fcTargetPortTable
                     value: fcTargetPort-IsTargetModeEnabled
@@ -96,7 +99,7 @@ modules:
                     group: 'Temp sensor(s)'
                     state_name: hwEnclosure-tempsens
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
                     oid: hwEnclosureTable
                     value: hwEnclosure-PowerSupplyUnits
@@ -106,14 +109,24 @@ modules:
                     group: 'PSU sensor(s)'
                     state_name: hwEnclosure-psusens
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: hwEnclosureTable
-                    value: hwEnclosure-AlarmCount
-                    num_oid: '.1.3.6.1.4.1.39324.1.1.50.1.1.22.{{ $index }}'
+                    oid: storagePoolTable
+                    value: storagePool-State
+                    num_oid: '.1.3.6.1.4.1.39324.1.1.7.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Alarm(s)'
-                    group: 'Alarm(s)'
-                    state_name: hwEnclosure-alarms
+                    descr: 'Pool {{ $storagePool-Name }}'
+                    group: 'Pools'
+                    state_name: storagePool
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                -
+                    oid: storageVolumeTable
+                    value: storageVolume-State
+                    num_oid: '.1.3.6.1.4.1.39324.1.1.3.1.1.5.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: 'Volume {{ $storageVolume-Name }}'
+                    group: 'Volumes'
+                    state_name: storageVolume
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }

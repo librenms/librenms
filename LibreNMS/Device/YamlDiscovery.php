@@ -131,7 +131,7 @@ class YamlDiscovery
             $value = str_replace($search, $replace, $data[$name]);
 
             // search discovery data for values
-            $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
+            $value = preg_replace_callback('/{{ \$([a-zA-Z0-9\-.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
                 if (is_null($replace)) {
                     d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");

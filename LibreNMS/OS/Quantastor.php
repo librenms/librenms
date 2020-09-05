@@ -33,9 +33,10 @@ class Quantastor extends OS implements OSDiscovery
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-        $info = snmp_getnext_multi($this->getDevice(), 'storageSystem-ServiceVersion hwEnclosure-Vendor hwEnclosure-Model storageSystem-SerialNumber', '-OQUs', 'QUANTASTOR-SYS-STATS');
-        $device->version = $info['storageSystem-ServiceVersion'];
-        $device->hardware = $info['hwEnclosure-Vendor'] . ' ' . $info['hwEnclosure-Model'];
-        $device->serial = $info['storageSystem-SerialNumber'];
+        $info = snmp_get_multi_oid($this->getDevice(), 'storageSystem-ServiceVersion.0 hwEnclosure-Vendor.0 hwEnclosure-Model.0 storageSystem-SerialNumber.0', '-OQUs', 'QUANTASTOR-SYS-STATS');
+        $device->version = $info['storageSystem-ServiceVersion.0'];
+        $device->hardware = $info['hwEnclosure-Vendor.0'] . ' ' . $info['hwEnclosure-Model.0'];
+        $device->serial = $info['storageSystem-SerialNumber.0'];
+        unset($info);
     }
 }
