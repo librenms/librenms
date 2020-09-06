@@ -1,8 +1,8 @@
 <?php
-/**
- * Gigavue.php
+/*
+ * GrandstreamHt.php
  *
- * Gigamon GigaVUE OS
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,23 +19,28 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2020 Hans Erasmus
- * @author     Hans Erasmus <erasmushans27@gmail.com>
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\OS;
-
-class Gigavue extends OS implements OSDiscovery
+class GrandstreamHt extends \LibreNMS\OS
 {
     public function discoverOS(): void
     {
+        $oids = [
+            'serial' => '.1.3.6.1.4.1.42397.1.2.1.0.0',
+            'versionCore' => '.1.3.6.1.4.1.42397.1.2.3.2.0.0',
+            'versionBase' => '.1.3.6.1.4.1.42397.1.2.3.3.0.0'
+        ];
+        $data = snmp_get_multi_oid($this->getDevice(), $oids);
+
         $device = $this->getDeviceModel();
-        $info = snmp_getnext_multi($this->getDevice(), 'version serialNumber', '-OQUs', 'GIGAMON-SNMP-MIB');
-        $device->version = $info['version'];
-        $device->serial = $info['serialNumber'];
-        $device->hardware = $device->sysDescr;
+        $device->serial = $data[$oids['serial']] ?? null;
+        if (isset($data[$oids['versionCore']], $data[$oids['versionBase']])) {
+            $device->version = 'Core: ' . $data[$oids['versionCore']] . ', Base: ' . $data[$oids['versionBase']];
+        }
+
     }
 }
