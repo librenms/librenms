@@ -11,25 +11,28 @@ $unit_text    = 'Query/s';
 $rrd_filename = rrd_name($device['hostname'], array('app', 'unbound-queries', $app['app_id']));
 $array        = array(
     'type0',
-    'A',
-    'NS',
-    'CNAME',
-    'SOA',
-    'NULL',
-    'WKS',
-    'PTR',
-    'MX',
-    'TXT',
-    'AAAA',
-    'SRV',
-    'NAPTR',
-    'DS',
-    'DNSKEY',
-    'SPF',
-    'ANY',
+    'a',
+    'ns',
+    'cname',
+    'soa',
+    'null',
+    'wks',
+    'ptr',
+    'hinfo',
+    'mx',
+    'txt',
+    'aaaa',
+    'srv',
+    'naptr',
+    'ds',
+    'rrsig',
+    'dnskey',
+    'tlsa',
+    'spf',
+    'axfr',
+    'any',
     'other'
 );
-
 $colours      = 'merged';
 $rrd_list     = array();
 
