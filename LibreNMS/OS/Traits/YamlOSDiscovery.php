@@ -73,9 +73,14 @@ trait YamlOSDiscovery
                 if (isset($os_yaml["{$field}_regex"])) {
                     unset($extracted_match);
                     preg_match($os_yaml["{$field}_regex"], $value, $extracted_match);
+                    if (isset($extracted_match[$field])) {
+                        $value = $extracted_match[$field];
+                    }
                 }
 
-                $device->$field = $extracted_match[$field] ?? $value;
+                $device->$field = isset($os_yaml["{$field}_template"])
+                    ? $this->parseTemplate($os_yaml["{$field}_template"], $data)
+                    : $value;
             }
         }
     }
@@ -105,6 +110,13 @@ trait YamlOSDiscovery
                 }
             }
         }
+    }
+
+    private function parseTemplate($template, $data)
+    {
+        return preg_replace_callback('/{{ ([^ ]+) }}/', function ($matches) use ($data) {
+            return $data[$matches[1]] ?? '';
+        }, $template);
     }
 
     private function isNumeric($oids)

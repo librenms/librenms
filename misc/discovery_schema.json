@@ -11,6 +11,21 @@
                 "os": {
                     "type": "object",
                     "properties": {
+                        "version": {
+                            "type": ["string", "array"]
+                        },
+                        "hardware": {
+                            "type": ["string", "array"]
+                        },
+                        "features": {
+                            "type": ["string", "array"]
+                        },
+                        "serial": {
+                            "type": ["string", "array"]
+                        },
+                        "location": {
+                            "type": ["string", "array"]
+                        },
                         "sysDescr_regex": {
                             "type": ["string", "array"]
                         },
@@ -29,20 +44,20 @@
                         "location_regex": {
                             "type": "string"
                         },
-                        "version": {
-                            "type": ["string", "array"]
+                        "version_template": {
+                            "type": "string"
                         },
-                        "hardware": {
-                            "type": ["string", "array"]
+                        "hardware_template": {
+                            "type": "string"
                         },
-                        "features": {
-                            "type": ["string", "array"]
+                        "features_template": {
+                            "type": "string"
                         },
-                        "serial": {
-                            "type": ["string", "array"]
+                        "serial_template": {
+                            "type": "string"
                         },
-                        "location": {
-                            "type": ["string", "array"]
+                        "location_template": {
+                            "type": "string"
                         }
                     },
                     "additionalProperties": false

@@ -14,7 +14,7 @@
                     "type": "wireless",
                     "serial": null,
                     "icon": "ignitenet.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
