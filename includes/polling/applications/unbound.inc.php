@@ -23,22 +23,26 @@ foreach ($lines as $line) {
 $rrd_name =  array('app', $name,'queries',$app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('type0', 'DERIVE', 0, 125000000000)
-    ->addDataset('A', 'DERIVE', 0, 125000000000)
-    ->addDataset('NS', 'DERIVE', 0, 125000000000)
-    ->addDataset('CNAME', 'DERIVE', 0, 125000000000)
-    ->addDataset('SOA', 'DERIVE', 0, 125000000000)
-    ->addDataset('NULL', 'DERIVE', 0, 125000000000)
-    ->addDataset('WKS', 'DERIVE', 0, 125000000000)
-    ->addDataset('PTR', 'DERIVE', 0, 125000000000)
-    ->addDataset('MX', 'DERIVE', 0, 125000000000)
-    ->addDataset('TXT', 'DERIVE', 0, 125000000000)
-    ->addDataset('AAAA', 'DERIVE', 0, 125000000000)
-    ->addDataset('SRV', 'DERIVE', 0, 125000000000)
-    ->addDataset('NAPTR', 'DERIVE', 0, 125000000000)
-    ->addDataset('DS', 'DERIVE', 0, 125000000000)
-    ->addDataset('DNSKEY', 'DERIVE', 0, 125000000000)
-    ->addDataset('SPF', 'DERIVE', 0, 125000000000)
-    ->addDataset('ANY', 'DERIVE', 0, 125000000000)
+    ->addDataset('a', 'DERIVE', 0, 125000000000)
+    ->addDataset('ns', 'DERIVE', 0, 125000000000)
+    ->addDataset('cname', 'DERIVE', 0, 125000000000)
+    ->addDataset('soa', 'DERIVE', 0, 125000000000)
+    ->addDataset('null', 'DERIVE', 0, 125000000000)
+    ->addDataset('wks', 'DERIVE', 0, 125000000000)
+    ->addDataset('ptr', 'DERIVE', 0, 125000000000)
+    ->addDataset('hinfo', 'DERIVE', 0, 125000000000)
+    ->addDataset('mx', 'DERIVE', 0, 125000000000)
+    ->addDataset('txt', 'DERIVE', 0, 125000000000)
+    ->addDataset('aaaa', 'DERIVE', 0, 125000000000)
+    ->addDataset('srv', 'DERIVE', 0, 125000000000)
+    ->addDataset('naptr', 'DERIVE', 0, 125000000000)
+    ->addDataset('ds', 'DERIVE', 0, 125000000000)
+    ->addDataset('rrsig', 'DERIVE', 0, 125000000000)
+    ->addDataset('dnskey', 'DERIVE', 0, 125000000000)
+    ->addDataset('tlsa', 'DERIVE', 0, 125000000000)
+    ->addDataset('spf', 'DERIVE', 0, 125000000000)
+    ->addDataset('axfr', 'DERIVE', 0, 125000000000)
+    ->addDataset('any', 'DERIVE', 0, 125000000000)
     ->addDataset('other', 'DERIVE', 0, 125000000000);
 $fields = array (
     'type0' => $unbound['num.query.type.TYPE0'],
@@ -49,14 +53,18 @@ $fields = array (
     'null' => $unbound['num.query.type.NULL'],
     'wks' => $unbound['num.query.type.WKS'],
     'ptr' => $unbound['num.query.type.PTR'],
+    'hinfo' => $unbound['num.query.type.HINFO'],
     'mx' => $unbound['num.query.type.MX'],
     'txt' => $unbound['num.query.type.TXT'],
     'aaaa' => $unbound['num.query.type.AAAA'],
     'srv' => $unbound['num.query.type.SRV'],
     'naptr' => $unbound['num.query.type.NAPTR'],
     'ds' => $unbound['num.query.type.DS'],
+    'rrsig' => $unbound['num.query.type.RRSIG'],
     'dnskey' => $unbound['num.query.type.DNSKEY'],
+    'tlsa' => $unbound['num.query.type.TLSA'],
     'spf' => $unbound['num.query.type.SPF'],
+    'axfr' => $unbound['num.query.type.AXFR'],
     'any' => $unbound['num.query.type.ANY'],
     'other' => $unbound['num.query.type.other']
     );
@@ -93,7 +101,7 @@ $fields = array (
 $metrics['operations'] = $fields;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
- 
+
 #Unbound requestlist
 $rrd_name =  array('app', $name,'requestlist',$app_id);
 $rrd_def = RrdDefinition::make()
