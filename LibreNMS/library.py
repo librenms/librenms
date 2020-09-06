@@ -201,5 +201,5 @@ def db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname):
         return MySQLdb.connect(**options)
     except Exception as dbexc:
         logger.error('ERROR: Could not connect to MySQL database!')
-        logger.error('exc'.format(exc))
+        logger.error('{0}'.format(exc))
         sys.exit(2)
