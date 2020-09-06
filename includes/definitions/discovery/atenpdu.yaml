@@ -3,7 +3,7 @@ modules:
     sensors:
         power:
             options:
-                skip_values_lt: -200
+                skip_value_lt: -200
             data:
                 -
                     oid: ATEN-PE-CFG::outlet
@@ -16,7 +16,7 @@ modules:
                     high_limit: 2400
         current:
             options:
-                skip_values_lt: -200
+                skip_value_lt: -200
             data:
                 -
                     oid: ATEN-PE-CFG::outlet
@@ -29,7 +29,7 @@ modules:
                     high_limit: 10
         voltage:
             options:
-                skip_values_lt: -200
+                skip_value_lt: -200
             data:
                 -
                     oid: ATEN-PE-CFG::outlet
