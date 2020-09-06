@@ -14,7 +14,7 @@
                     "type": "appliance",
                     "serial": "1113-8637-D091",
                     "icon": "peplink.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
