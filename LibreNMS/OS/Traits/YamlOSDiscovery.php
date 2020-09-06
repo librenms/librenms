@@ -92,12 +92,17 @@ trait YamlOSDiscovery
         return null;
     }
 
-    private function parseRegex($regex, $subject)
+    private function parseRegex($regexes, $subject)
     {
-        if (preg_match($regex, $subject, $matches)) {
-            $device = $this->getDeviceModel();
-            foreach ($this->dbFields as $field) {
-                $device->$field = $matches[$field] ?? null;
+        $device = $this->getDeviceModel();
+
+        foreach (Arr::wrap($regexes) as $regex) {
+            if (preg_match($regex, $subject, $matches)) {
+                foreach ($this->dbFields as $field) {
+                    if (isset($matches[$field])) {
+                        $device->$field = $matches[$field];
+                    }
+                }
             }
         }
     }

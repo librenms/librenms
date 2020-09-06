@@ -12,7 +12,7 @@
                     "type": "object",
                     "properties": {
                         "sysDescr_regex": {
-                            "type": "string"
+                            "type": ["string", "array"]
                         },
                         "version_regex": {
                             "type": "string"

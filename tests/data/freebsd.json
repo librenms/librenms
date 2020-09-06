@@ -14,7 +14,7 @@
                     "type": "server",
                     "serial": null,
                     "icon": "freebsd.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

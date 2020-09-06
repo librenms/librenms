@@ -93,52 +93,6 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
             $serial = $agent_data['dmi']['system-serial-number'];
         }
     }
-} elseif ($device['os'] == "freebsd") {
-    $device['sysDescr'] = str_replace(" 0 ", " ", $device['sysDescr']);
-    list(,,$version) = explode(" ", $device['sysDescr']);
-    if (strstr($device['sysDescr'], "i386")) {
-        $hardware = "i386";
-    } elseif (strstr($device['sysDescr'], "amd64")) {
-        $hardware = "amd64";
-    } else {
-        $hardware = "i386";
-    }
-
-    # Distro "extend" support
-
-    # NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"distro\"
-    $features = snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB");
-
-    if (!$features) { # No "extend" support, try legacy UCD-MIB shell support
-        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
-    }
-
-    if (!$features) { # No "extend" support, try "exec" support
-        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
-    }
-
-    if (!$features) {
-        $features = 'GENERIC';
-    }
-
-    # Try detect using the extended option (dmidecode)
-    $version_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1", "-Oqv");
-    if (!$version_dmide) { # No "extend" support, try "exec" support
-        $version_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.101.1", "-Oqv");
-    }
-    $version_dmide = trim($version_dmide);
-
-    $hardware_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1", "-Oqv");
-    if (!$hardware_dmide) { # No "extend" support, try "exec" support
-        $hardware_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.101.1", "-Oqv");
-    }
-    $hardware_dmide = trim($hardware_dmide);
-    if ($hardware_dmide) {
-        $hardware = $hardware_dmide;
-        if ($version_dmide) {
-            $hardware = $hardware . " [" . $version_dmide . "]";
-        }
-    }
 } elseif ($device['os'] == "dragonfly") {
     list(,,$version,,,$features,,$hardware) = explode(" ", $device['sysDescr']);
 } elseif ($device['os'] == "netbsd") {
