@@ -109,12 +109,12 @@ def logger_get_logger(log_file=None, temp_log_file=None, debug=False):
 def command_runner(command, valid_exit_codes=None, timeout=300, shell=False, encoding='utf-8',
                    windows_no_window=False, **kwargs):
     """
+    Unix & Windows compatible subprocess wrapper that handles encoding, timeout, and
+    various exit codes.
+    Accepts subprocess.check_output and subprocess.popen arguments
     Whenever we can, we need to avoid shell=True in order to preseve better security
     Runs system command, returns exit code and stdout/stderr output, and logs output on error
     valid_exit_codes is a list of codes that don't trigger an error
-    
-    Accepts subprocess.check_output arguments
-        
     """
 
     # Set default values for kwargs
@@ -122,12 +122,17 @@ def command_runner(command, valid_exit_codes=None, timeout=300, shell=False, enc
     universal_newlines = kwargs.pop('universal_newlines', False)
     creationflags = kwargs.pop('creationflags', 0)
     if windows_no_window:
+        # Disable the following pylint error since the code also runs on nt platform, but
+        # triggers and error on Unix
+        # pylint: disable=E1101
         creationflags = creationflags | subprocess.CREATE_NO_WINDOW
 
     try:
         # universal_newlines=True makes netstat command fail under windows
         # timeout does not work under Python 2.7 with subprocess32 < 3.5
         # decoder may be unicode_escape for dos commands or utf-8 for powershell
+        # Disabling pylint error for the same reason as above
+        # pylint: disable=E1123
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=shell,
                                          timeout=timeout, universal_newlines=universal_newlines, encoding=encoding,
                                          errors=errors, creationflags=creationflags, **kwargs)
