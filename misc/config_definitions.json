@@ -4476,6 +4476,13 @@
             "section": "prometheus",
             "order": 2
         },
+        "prometheus.attach_sysname": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 3
+        },
         "public_status": {
             "default": false,
             "group": "auth",
