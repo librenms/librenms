@@ -686,8 +686,8 @@ return [
                 'help' => '匯出指標數據至 Prometheus Push Gateway'
             ],
             'url' => [
-                'description' => '伺服器位址',
-                'help' => '要傳送資料至 Prometheus Push Gateway 的主機 IP 或網址。'
+                'description' => '網址',
+                'help' => '要傳送資料至 Prometheus Push Gateway 的主機網址。'
             ],
             'job' => [
                 'description' => 'Job',
