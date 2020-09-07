@@ -10,7 +10,6 @@ modules:
                     index: '{{ $index }}'
                     descr: '{{ $hwDisk-Name }}'
                     group: 'HDD'
-                    state_name: hwDisk-temp
                 -
                     oid: lmTempSensors
                     value: lmTempSensorsValue
@@ -18,7 +17,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2021.13.16.2.1.3.{{ $index }}'
                     descr: '{{ $lmTempSensorsDevice }}'
                     group: 'LM-SENSORS'
-                    state_name: lmsensors-temps
         state:
             data:
                 -
