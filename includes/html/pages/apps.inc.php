@@ -346,6 +346,11 @@ $graphs['icecast']    = array(
     'memoryusage',
     'openfiles'
 );
+$graphs['opensips']    = array(
+    'load',
+    'memory',
+    'openfiles',
+);
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
