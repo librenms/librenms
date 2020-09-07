@@ -5,8 +5,7 @@ over:
     - { graph: device_current, text: Current }
     - { graph: device_temperature, text: Temperature }
     - { graph: device_voltage, text: Voltage }
-mib_dir:
-    - raritan
+mib_dir: raritan
 icon: raritan
 discovery:
     -

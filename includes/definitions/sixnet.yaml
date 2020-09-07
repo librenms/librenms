@@ -11,5 +11,4 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.20540.2.
-mib_dir:
-    - redlion
+mib_dir: redlion

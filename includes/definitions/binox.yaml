@@ -2,8 +2,7 @@ os: binox
 text: 'Telco Systems BiNOX'
 type: network
 icon: telco-systems
-mib_dir:
-    - telco-systems/binox
+mib_dir: telco-systems/binox
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

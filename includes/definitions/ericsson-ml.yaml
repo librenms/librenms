@@ -9,6 +9,5 @@ over:
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.193.223.2.1
-mib_dir:
-    - ericsson
+mib_dir: ericsson
 

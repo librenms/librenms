@@ -13,5 +13,4 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.6486.800.1.1.2.1. #aos6
-mib_dir:
-    - nokia
+mib_dir: nokia

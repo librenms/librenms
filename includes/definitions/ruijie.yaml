@@ -2,8 +2,7 @@ os: ruijie
 text: 'Ruijie Networks'
 type: network
 icon: ruijie
-mib_dir:
-    - ruijie
+mib_dir: ruijie
 discovery:
     -
         sysObjectID:

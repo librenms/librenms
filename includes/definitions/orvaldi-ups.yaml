@@ -3,8 +3,7 @@ text: Orvaldi UPS
 type: power
 icon: orvaldi
 rfc1628_compat: true
-mib_dir:
-    - orvaldi
+mib_dir: orvaldi
 over:
     - { graph: device_load, text: Load }
     - { graph: device_power, text: Power }

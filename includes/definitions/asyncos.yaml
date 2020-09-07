@@ -11,8 +11,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.15497.1
-mib_dir:
-    - cisco
+mib_dir: cisco
 poller_modules:
     ipmi: false
     bgp-peers: false

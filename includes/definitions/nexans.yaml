@@ -4,8 +4,7 @@ type: network
 icon: nexans
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-mib_dir:
-    - nexans
+mib_dir: nexans
 discovery:
     -
         sysObjectID:
