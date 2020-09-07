@@ -50,10 +50,8 @@ return [
             'unix-agent' => 'Unix-Agent Integration',
             'smokeping' => 'Smokeping Integration'
         ],
-        'graphing' => [
-            'availability' => 'Device Availability',
-        ],
         'poller' => [
+            'availability' => 'Device Availability',
             'distributed' => 'Distributed Poller',
             'graphite' => 'Datastore: Graphite',
             'influxdb' => 'Datastore: InfluxDB',

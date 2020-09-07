@@ -654,18 +654,6 @@
                 "/-K9W8-/"
             ]
         },
-        "graphing.availability": {
-            "group": "graphing",
-            "section": "availability",
-            "order": 0,
-            "default": [
-                "86400",
-                "604800",
-                "2592000",
-                "31536000"
-            ],
-            "type": "array"
-        },
         "bad_disk_regexp": {
             "default": [],
             "type": "array"
@@ -1269,6 +1257,18 @@
             "section": "distributed",
             "order": 2,
             "type": "integer"
+        },
+        "graphing.availability": {
+            "group": "poller",
+            "section": "availability",
+            "order": 10,
+            "default": [
+                "86400",
+                "604800",
+                "2592000",
+                "31536000"
+            ],
+            "type": "array"
         },
         "dot": {
             "default": "/usr/bin/dot",
@@ -3697,6 +3697,9 @@
             "default": "/usr/lib/nagios/plugins",
             "type": "directory"
         },
+        "nets": {
+            "type": "array"
+        },
         "network_map_items": {
             "default": [
                 "xdp",
@@ -4089,13 +4092,6 @@
             "group": "poller",
             "section": "poller_modules",
             "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.availability": {
-            "order": 25,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
             "type": "boolean"
         },
         "poller_modules.os": {
