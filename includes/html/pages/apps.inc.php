@@ -351,6 +351,11 @@ $graphs['opensips']    = array(
     'memory',
     'openfiles',
 );
+$graphs['voip-monitor']    = array(
+    'cpuload',
+    'memoryusage',
+    'openfiles'
+);
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
