@@ -100,6 +100,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - SNMP extend, Agent
+1. [Icecast](#icecast) - SNMP extend, Agent
 1. [Mailcow-dockerized postfix](#mailcow-dockerized-postfix) - SNMP extend
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Mdadm](#mdadm) - SNMP extend
@@ -777,6 +778,25 @@ You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
+# Icecast
+
+Shell script that reports load average/memory/open-files stats of Icecast
+## SNMP Extend
+
+1. Copy the shell script, icecast-stats.sh, to the desired host (the host must be added to LibreNMS devices) 
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/icecast-stats.sh -O /etc/snmp/icecast-stats.sh)
+```
+
+2: Make the script executable `chmod +x /etc/snmp/icecast-stats.sh`
+
+3. Verify it is working by running `/etc/snmp/icecast-stats.sh`
+
+4: Edit your snmpd.conf file (usually `/etc/snmp/icecast-stats.sh`) and add:
+
+```
+extend icecast /etc/snmp/icecast-stats.sh
+```
 # mailcow-dockerized postfix
 
 ## SNMP Extend
