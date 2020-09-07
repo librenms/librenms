@@ -1108,7 +1108,7 @@ return [
             'attach_sysname' => [
                 'description' => 'Attach Device sysName',
                 'help' => 'Attach sysName information put to Prometheus.'
-            ],
+            ]
         ],
         'public_status' => [
             'description' => 'Show status publicly',
