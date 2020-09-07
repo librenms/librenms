@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "waystream.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

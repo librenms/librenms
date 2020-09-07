@@ -89,7 +89,7 @@ trait YamlOSDiscovery
     {
         foreach (Arr::wrap($oids) as $oid) {
             // translate all to numeric to make it easier to match
-            $oid = ($numeric && !oid_is_numeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDevice()) : $oid;
+            $oid = (!$numeric && !oid_is_numeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDevice()) : $oid;
             if (!empty($data[$oid])) {
                 return $data[$oid];
             }
