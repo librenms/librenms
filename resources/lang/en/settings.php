@@ -1098,8 +1098,8 @@ return [
                 'help' => 'Exports metrics to Prometheus Push Gateway'
             ],
             'url' => [
-                'description' => 'Server',
-                'help' => 'The IP or hostname of the Prometheus Push Gateway to send data to'
+                'description' => 'URL',
+                'help' => 'The URL of the Prometheus Push Gateway to send data to'
             ],
             'Job' => [
                 'description' => 'Job',
