@@ -1104,7 +1104,7 @@ return [
             'port' => [
                 'description' => 'Job',
                 'help' => 'Job label for exported metrics'
-            ]
+            ],
             'attach_sysname' => [
                 'description' => 'Attach Device sysName',
                 'help' => 'Attach sysName information put to Prometheus.'
