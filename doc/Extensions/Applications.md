@@ -136,6 +136,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Unbound](#unbound) - SNMP extend, Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
+1. [Voip-monitor](#voip-monitor) - SNMP extend
 1. [ZFS](#zfs) - SNMP extend
 
 # Apache
@@ -1999,6 +2000,24 @@ extend sdfsinfo /etc/snmp/sdfsinfo
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+# Voip-monitor
+
+Shell script that reports cpu-load/memory/open-files files stats of Voip Monitor
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/voipmon-stats.sh
+   -O /etc/snmp/voipmon-stats.sh`
+
+2: Make the script executable: `chmod +x /etc/snmp/voipmon-stats.sh`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/voipmon-stats.sh`) and add:
+
+```
+extend voipmon /etc/snmp/voipmon-stats.sh
+```
 
 # ZFS
 
