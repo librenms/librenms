@@ -37,6 +37,5 @@ class Quantastor extends OS implements OSDiscovery
         $device->version = $info['storageSystem-ServiceVersion.0'];
         $device->hardware = $info['hwEnclosure-Vendor.0'] . ' ' . $info['hwEnclosure-Model.0'];
         $device->serial = $info['storageSystem-SerialNumber.0'];
-        unset($info);
     }
 }

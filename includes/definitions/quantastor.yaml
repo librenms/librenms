@@ -9,30 +9,11 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-discovery_modules:
-    ports-stack: false
-    fdb-table: false
-    bgp-peers: false
-    cisco-cef: false
-    vrf: false
-    vmware-vminfo: false
-    libvirt-vminfo: false
-    toner: false
-    loadbalancers: false
-    mpls: false
-    mef: false
-    stp: false
-    wireless: false
 poller_modules:
     bgp-peers: false
-    cisco-cef: false
-    wifi: false
     wireless: false
-    toner: false
     ospf: false
     stp: false
-    mef: false
-    mpls: false
 processor_stacked: true
 discovery:
     -
