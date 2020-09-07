@@ -113,6 +113,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [NTP Server/NTPD](#ntp-server-aka-ntpd) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
 1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
+1. [Opensips](#opensips) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Pi-hole](#pi-hole) - SNMP extend
@@ -1182,6 +1183,26 @@ extend ogs /etc/snmp/rocks.sh
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+# Opensips
+
+Script that reports load-average/memory/open-files stats of Opensips
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/opensips-stats.sh
+   -O /etc/snmp/opensips-stats.sh`
+
+2: Make the script executable: `chmod +x /etc/snmp/opensips-stats.sh`
+
+3. Verify it is working by running `/etc/snmp/opensips-stats.sh`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend opensips /etc/snmp/opensips-stats.sh
+```
 
 # OS Updates
 
