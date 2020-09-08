@@ -123,3 +123,4 @@ modules:
                         - { value: 1, generic: 1, graph: 0, descr: 'Degraded' }
                         - { value: 5, generic: 3, graph: 0, descr: 'Offline' }
                         - { value: 4, generic: 1, graph: 0, descr: 'Failure' }
+                        - { value: 6, generic: 2, graph: 0, descr: 'Migrating...' }
