@@ -6,8 +6,7 @@ nobulk: true
 over:
     - { graph: device_current, text: Load }
     - { graph: device_voltage, text: Voltage }
-mib_dir:
-    - eltek
+mib_dir: eltek
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.12148.9

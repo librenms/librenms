@@ -3,8 +3,7 @@ type: storage
 group: storage
 text: LenovoEMC
 icon: lenovo
-mib_dir:
-    - lenovo
+mib_dir: lenovo
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

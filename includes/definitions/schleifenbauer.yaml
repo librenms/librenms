@@ -7,8 +7,7 @@ over:
     - { graph: device_current, text: 'Current' }
     - { graph: device_voltage, text: 'Voltage' }
     - { graph: device_power, text: 'Power' }
-mib_dir:
-    - schleifenbauer
+mib_dir: schleifenbauer
 discovery:
     -
         sysObjectID:

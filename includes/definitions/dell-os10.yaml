@@ -3,9 +3,7 @@ text: 'Dell EMC Networking OS10 Enterprise'
 type: network
 icon: dell
 group: dell
-mib_dir:
-    - dell
-    - dell-os10
+mib_dir: dell
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

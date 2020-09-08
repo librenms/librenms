@@ -3,8 +3,7 @@ text: 'AIX'
 type: server
 icon: aix
 group: unix
-mib_dir:
-    - ibm
+mib_dir: ibm
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
