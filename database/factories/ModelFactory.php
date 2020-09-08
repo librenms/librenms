@@ -16,8 +16,8 @@
 namespace Database\Factories;
 
 use App\Models\Ipv4Network;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Util\IPv4;
 
 class ModelFactory extends Factory
@@ -38,7 +38,7 @@ class ModelFactory extends Factory
     {
         static $password;
 
-    return [
+        return [
         'auth_type' => 'mysql',
         'username' => $this->faker->unique()->userName,
         'realname' => $this->faker->name,
@@ -140,9 +140,9 @@ class ModelFactory extends Factory
     public function definition()
     {
         $prefix = $this->faker->numberBetween(0, 32);
-    $ip = new IPv4($this->faker->ipv4.'/'.$prefix);
+        $ip = new IPv4($this->faker->ipv4.'/'.$prefix);
 
-    return [
+        return [
         'ipv4_address' => $ip->uncompressed(),
         'ipv4_prefixlen' => $prefix,
         'port_id' => function () {
@@ -174,9 +174,9 @@ class ModelFactory extends Factory
     public function definition()
     {
         $facilities = ['kern', 'user', 'mail', 'daemon', 'auth', 'syslog', 'lpr', 'news', 'uucp', 'cron', 'authpriv', 'ftp', 'ntp', 'security', 'console', 'solaris-cron', 'local0', 'local1', 'local2', 'local3', 'local4', 'local5', 'local6', 'local7'];
-    $levels = ['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug'];
+        $levels = ['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug'];
 
-    return [
+        return [
         'facility' => $this->faker->randomElement($facilities),
         'priority' => $this->faker->randomElement($levels),
         'level' => $this->faker->randomElement($levels),
@@ -264,9 +264,9 @@ class ModelFactory extends Factory
     public function definition()
     {
         $sensor_class = ['airflow', 'ber', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dbm', 'delay', 'eer', 'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'power', 'power_consumed', 'power_factor', 'pressure', 'quality_factor', 'runtime', 'signal', 'snr', 'state', 'temperature', 'voltage', 'waterflow'];
-    $sensor_oid = '.1.3.6.1.4.1.4115.1.4.3.3.'.$this->faker->numberBetween(0, 10).'.'.$this->faker->numberBetween(0, 10).'.'.$this->faker->numberBetween(0, 10);
+        $sensor_oid = '.1.3.6.1.4.1.4115.1.4.3.3.'.$this->faker->numberBetween(0, 10).'.'.$this->faker->numberBetween(0, 10).'.'.$this->faker->numberBetween(0, 10);
 
-    return [
+        return [
         'sensor_index' => $this->faker->randomDigit,
         'sensor_class' => $this->faker->randomElement($sensor_class),
         'sensor_current' => $this->faker->randomDigit,
