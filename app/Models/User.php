@@ -38,7 +38,7 @@ class User extends Authenticatable
      * Test if this user has global read access
      * these users have a level of 5, 10 or 11 (demo).
      *
-     * @return boolean
+     * @return bool
      */
     public function hasGlobalRead()
     {
@@ -49,7 +49,7 @@ class User extends Authenticatable
      * Test if this user has global admin access
      * these users have a level of 10 or 11 (demo).
      *
-     * @return boolean
+     * @return bool
      */
     public function hasGlobalAdmin()
     {
@@ -59,7 +59,7 @@ class User extends Authenticatable
     /**
      * Test if the User is an admin.
      *
-     * @return boolean
+     * @return bool
      */
     public function isAdmin()
     {
@@ -67,7 +67,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Test if this user is the demo user
+     * Test if this user is the demo user.
      *
      * @return bool
      */
@@ -77,7 +77,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if this user has access to a device
+     * Check if this user has access to a device.
      *
      * @param Device|int $device can be a device Model or device id
      * @return bool
@@ -88,7 +88,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Helper function to hash passwords before setting
+     * Helper function to hash passwords before setting.
      *
      * @param string $password
      */
@@ -98,7 +98,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the given user can set the password for this user
+     * Check if the given user can set the password for this user.
      *
      * @param User $user
      * @return bool
@@ -120,7 +120,7 @@ class User extends Authenticatable
 
     /**
      * This restricts the query to only users that match the current auth method
-     * It is not needed when using user_id, but should be used for username and auth_id
+     * It is not needed when using user_id, but should be used for username and auth_id.
      *
      * @param Builder $query
      * @return Builder
@@ -146,17 +146,17 @@ class User extends Authenticatable
 
     public function setRealnameAttribute($realname)
     {
-        $this->attributes['realname'] = (string)$realname;
+        $this->attributes['realname'] = (string) $realname;
     }
 
     public function setDescrAttribute($descr)
     {
-        $this->attributes['descr'] = (string)$descr;
+        $this->attributes['descr'] = (string) $descr;
     }
 
     public function setEmailAttribute($email)
     {
-        $this->attributes['email'] = (string)$email;
+        $this->attributes['email'] = (string) $email;
     }
 
     public function setCanModifyPasswdAttribute($modify)
@@ -172,9 +172,10 @@ class User extends Authenticatable
     public function getDevicesAttribute()
     {
         // pseudo relation
-        if (!array_key_exists('devices', $this->relations)) {
+        if (! array_key_exists('devices', $this->relations)) {
             $this->setRelation('devices', $this->devices()->get());
         }
+
         return $this->getRelation('devices');
     }
 
@@ -188,7 +189,7 @@ class User extends Authenticatable
     public function devices()
     {
         // pseudo relation
-        return Device::query()->when(!$this->hasGlobalRead(), function ($query) {
+        return Device::query()->when(! $this->hasGlobalRead(), function ($query) {
             return $query->whereIn('device_id', Permissions::devicesForUser($this));
         });
     }

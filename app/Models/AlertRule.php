@@ -1,6 +1,6 @@
 <?php
 /**
- * app/Models/AlertRule.php
+ * app/Models/AlertRule.php.
  *
  * Model for access to alert_rules table data
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
@@ -44,7 +43,7 @@ class AlertRule extends BaseModel
     }
 
     /**
-     * Scope for only alert rules that are currently in alarm
+     * Scope for only alert rules that are currently in alarm.
      *
      * @param Builder $query
      * @return Builder
@@ -58,7 +57,7 @@ class AlertRule extends BaseModel
 
     /**
      * Scope to filter rules for devices permitted to user
-     * (do not use for admin and global read-only users)
+     * (do not use for admin and global read-only users).
      *
      * @param $query
      * @param User $user
@@ -70,7 +69,7 @@ class AlertRule extends BaseModel
             return $query;
         }
 
-        if (!$this->isJoined($query, 'alerts')) {
+        if (! $this->isJoined($query, 'alerts')) {
             $query->join('alerts', 'alerts.rule_id', 'alert_rules.id');
         }
 

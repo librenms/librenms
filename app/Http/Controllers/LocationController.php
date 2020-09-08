@@ -17,7 +17,6 @@ class LocationController extends Controller
             'maps_engine' => $maps_api ? Config::get('geoloc.engine') : '',
         ];
 
-
         $data['graph_template'] = '';
         Config::set('enable_lazy_load', false);
         $graph_array = [
@@ -30,7 +29,7 @@ class LocationController extends Controller
         foreach (Html::graphRow($graph_array) as $graph) {
             $data['graph_template'] .= "<div class='col-md-3'>";
             $data['graph_template'] .= str_replace('%7B%7Bid%7D%7D', '{{id}}', $graph); // restore handlebars
-            $data['graph_template'] .= "</div>";
+            $data['graph_template'] .= '</div>';
         }
 
         return view('locations', $data);

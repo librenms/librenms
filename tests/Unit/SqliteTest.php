@@ -1,6 +1,6 @@
 <?php
 /**
- * SqliteTest.php
+ * SqliteTest.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -44,8 +43,8 @@ class SqliteTest extends TestCase
         } catch (QueryException $queryException) {
             preg_match('/Migrating: (\w+)$/', Artisan::output(), $matches);
             $migration = $matches[1] ?? '?';
-            $output = isset($matches[1]) ? '' : "\n\n" . Artisan::output();
-            $this->fail($queryException->getMessage() . $output . "\n\nCould not run migration {$migration}) on SQLite");
+            $output = isset($matches[1]) ? '' : "\n\n".Artisan::output();
+            $this->fail($queryException->getMessage().$output."\n\nCould not run migration {$migration}) on SQLite");
         }
 
         $count = \DB::connection($this->connection)->table('alert_templates')->count();

@@ -37,7 +37,7 @@ class Device extends BaseModel
     }
 
     /**
-     * Returns IP/Hostname where polling will be targeted to
+     * Returns IP/Hostname where polling will be targeted to.
      *
      * @param string $device hostname which will be triggered
      *        array  $device associative array with device data
@@ -45,7 +45,7 @@ class Device extends BaseModel
      */
     public static function pollerTarget($device)
     {
-        if (!is_array($device)) {
+        if (! is_array($device)) {
             $ret = static::where('hostname', $device)->first(['hostname', 'overwrite_ip']);
             if (empty($ret)) {
                 return $device;
@@ -58,12 +58,13 @@ class Device extends BaseModel
         } else {
             return $device['hostname'];
         }
+
         return $overwrite_ip ?: $hostname;
     }
 
     public static function findByIp($ip)
     {
-        if (!IP::isValid($ip)) {
+        if (! IP::isValid($ip)) {
             return null;
         }
 
@@ -106,7 +107,7 @@ class Device extends BaseModel
 
     /**
      * Get the display name of this device (hostname) unless force_ip_to_sysname is set
-     * and hostname is an IP and sysName is set
+     * and hostname is an IP and sysName is set.
      *
      * @return string
      */
@@ -133,7 +134,7 @@ class Device extends BaseModel
 
     public function isUnderMaintenance()
     {
-        if (!$this->device_id) {
+        if (! $this->device_id) {
             return false;
         }
 
@@ -178,6 +179,7 @@ class Device extends BaseModel
         $length = \LibreNMS\Config::get('shorthost_target_length', $length);
         if ($length < strlen($name)) {
             $take = substr_count($name, '.', 0, $length) + 1;
+
             return implode('.', array_slice(explode('.', $name), 0, $take));
         }
 
@@ -192,7 +194,7 @@ class Device extends BaseModel
      */
     public function canAccess($user)
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -206,6 +208,7 @@ class Device extends BaseModel
     public function formatDownUptime($short = false)
     {
         $time = ($this->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
+
         return Time::formatInterval($time, $short);
     }
 
@@ -223,7 +226,7 @@ class Device extends BaseModel
         ];
 
         foreach ($options as $file) {
-            if (is_file(public_path() . "/$file")) {
+            if (is_file(public_path()."/$file")) {
                 return asset($file);
             }
         }
@@ -233,7 +236,7 @@ class Device extends BaseModel
 
     /**
      * Update the max_depth field based on parents
-     * Performs SQL query, so make sure all parents are saved first
+     * Performs SQL query, so make sure all parents are saved first.
      *
      * @param int $exclude exclude a device_id from being considered (used for deleting)
      */
@@ -241,7 +244,7 @@ class Device extends BaseModel
     {
         // optimize for memory instead of time
         $query = $this->parents()->getQuery();
-        if (!is_null($exclude)) {
+        if (! is_null($exclude)) {
             $query->where('device_id', '!=', $exclude);
         }
 
@@ -262,10 +265,9 @@ class Device extends BaseModel
 
     /**
      * Device dependency check to see if this node is standalone or not.
-     * Standalone is a special case where the device has no parents or children and is denoted by a max_depth of 0
+     * Standalone is a special case where the device has no parents or children and is denoted by a max_depth of 0.
      *
      * Only checks on root nodes (where max_depth is 1 or 0)
-     *
      */
     public function validateStandalone()
     {
@@ -289,12 +291,13 @@ class Device extends BaseModel
             return $item->attrib_type === $name;
         });
 
-        if (!$attrib) {
+        if (! $attrib) {
             $attrib = new DeviceAttrib(['attrib_type' => $name]);
             $this->attribs->push($attrib);
         }
 
         $attrib->attrib_value = $value;
+
         return (bool) $this->attribs()->save($attrib);
     }
 
@@ -309,6 +312,7 @@ class Device extends BaseModel
             // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
             // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
             $this->attribs->forget($attrib_index);
+
             return $deleted;
         }
 
@@ -565,6 +569,7 @@ class Device extends BaseModel
     {
         return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
     }
+
     public function ospfNbrs()
     {
         return $this->hasMany(\App\Models\OspfNbr::class, 'device_id');

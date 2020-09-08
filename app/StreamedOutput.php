@@ -1,6 +1,6 @@
 <?php
 /**
- * StreamedOutput.php
+ * StreamedOutput.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,7 +35,7 @@ class StreamedOutput extends StreamOutput
             throw new RuntimeException('Unable to write output.');
         }
 
-        echo $message . PHP_EOL;
+        echo $message.PHP_EOL;
 
         if (ob_get_level() > 0) {
             ob_flush();

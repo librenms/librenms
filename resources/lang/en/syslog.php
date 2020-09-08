@@ -37,5 +37,5 @@ return [
         '21' => 'local use 5  (local5)',
         '22' => 'local use 6  (local6)',
         '23' => 'local use 7  (local7)',
-    ]
+    ],
 ];

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePortsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -86,7 +85,7 @@ class CreatePortsTable extends Migration
             $table->unsignedInteger('poll_time')->nullable();
             $table->unsignedInteger('poll_prev')->nullable();
             $table->unsignedInteger('poll_period')->nullable();
-            $table->unique(['device_id','ifIndex']);
+            $table->unique(['device_id', 'ifIndex']);
         });
     }
 

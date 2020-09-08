@@ -1,6 +1,6 @@
 <?php
 /**
- * GraphController.php
+ * GraphController.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -59,7 +58,7 @@ class GraphController extends Controller
                     'text' => StringHelpers::niceCase($type),
                     'children' => $graphs->map(function ($graph) use ($type) {
                         return $this->formatGraph($type, $graph);
-                    })->values()
+                    })->values(),
                 ];
             }
         }
@@ -69,32 +68,32 @@ class GraphController extends Controller
             'peering' => 'Peering',
             'core' => 'Core',
             'custom' => 'Custom',
-            'ports' => 'Manual Ports'
+            'ports' => 'Manual Ports',
         ]), 'aggregators', $search);
         if ($aggregators->isNotEmpty()) {
             $data[] = [
                 'text' => 'Aggregators',
                 'children' => $aggregators->map(function ($text, $id) {
                     return compact('id', 'text');
-                })->values()
+                })->values(),
             ];
         }
 
         $billing = $this->filterTypeGraphs(collect([
-            'bill_bits' => 'Bill Bits'
+            'bill_bits' => 'Bill Bits',
         ]), 'bill', $search);
         if ($billing->isNotEmpty()) {
             $data[] = [
                 'text' => 'Bill',
                 'children' => $billing->map(function ($text, $id) {
                     return compact('id', 'text');
-                })->values()
+                })->values(),
             ];
         }
 
         return response()->json([
             'results' => $data,
-            'pagination' => ['more' => false]
+            'pagination' => ['more' => false],
         ]);
     }
 
@@ -108,12 +107,12 @@ class GraphController extends Controller
             $subtype = '';
         }
 
-        if (!Graph::isMibGraph($type, $subtype)) {
-            $text = ucwords($top . ' ' . str_replace(['_', '-'], ' ', $text));
+        if (! Graph::isMibGraph($type, $subtype)) {
+            $text = ucwords($top.' '.str_replace(['_', '-'], ' ', $text));
         }
 
         return [
-            'id' => $top . '_' . $graph,
+            'id' => $top.'_'.$graph,
             'text' => $text,
         ];
     }
@@ -134,7 +133,7 @@ class GraphController extends Controller
 
             if (Str::contains($type, $first)) {
                 // search matches type, show all unless there are more terms.
-                if (!empty($terms)) {
+                if (! empty($terms)) {
                     $sub_search = array_shift($terms);
                     $graphs = $graphs->filter(function ($graph) use ($sub_search) {
                         return Str::contains(strtolower($graph), $sub_search);

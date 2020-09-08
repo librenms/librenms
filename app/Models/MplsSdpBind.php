@@ -31,12 +31,12 @@ class MplsSdpBind extends Model implements Keyable
     // ---- Helper Functions ----
 
     /**
-     * Get a string that can identify a unique instance of this model
+     * Get a string that can identify a unique instance of this model.
      * @return string
      */
     public function getCompositeKey()
     {
-        return $this->sdp_oid . '-' . $this->svc_oid;
+        return $this->sdp_oid.'-'.$this->svc_oid;
     }
 
     // ---- Define Relationships ----

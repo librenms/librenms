@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePollerGroupsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

@@ -1,6 +1,6 @@
 <?php
 /**
- * Syslog.php
+ * Syslog.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -28,7 +27,7 @@ namespace App\Http\Controllers\Select;
 class SyslogController extends SelectController
 {
     /**
-     * Defines validation rules (will override base validation rules for select2 responses too)
+     * Defines validation rules (will override base validation rules for select2 responses too).
      *
      * @return array
      */
@@ -41,7 +40,7 @@ class SyslogController extends SelectController
     }
 
     /**
-     * Defines search fields will be searched in order
+     * Defines search fields will be searched in order.
      *
      * @param \Illuminate\Http\Request $request
      * @return array
@@ -52,7 +51,7 @@ class SyslogController extends SelectController
     }
 
     /**
-     * Defines the base query for this resource
+     * Defines the base query for this resource.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder

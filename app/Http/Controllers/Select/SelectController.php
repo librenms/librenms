@@ -1,6 +1,6 @@
 <?php
 /**
- * SelectController.php
+ * SelectController.php.
  *
  * Controller class for select2 ajax controllers.
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -42,7 +41,7 @@ abstract class SelectController extends PaginatedAjaxController
     }
 
     /**
-     * The default method called by the route handler
+     * The default method called by the route handler.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -66,7 +65,7 @@ abstract class SelectController extends PaginatedAjaxController
     {
         return response()->json([
             'results' => collect($paginator->items())->map([$this, 'formatItem']),
-            'pagination' => ['more' => $paginator->hasMorePages()]
+            'pagination' => ['more' => $paginator->hasMorePages()],
         ]);
     }
 
@@ -82,6 +81,7 @@ abstract class SelectController extends PaginatedAjaxController
     public function formatItem($model)
     {
         $attributes = collect($model->getAttributes());
+
         return [
             'id' => $attributes->count() == 1 ? $attributes->first() : $model->getKey(),
             'text' => $attributes->forget($model->getKeyName())->first(),

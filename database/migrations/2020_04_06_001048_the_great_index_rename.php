@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class TheGreatIndexRename extends Migration
 {
@@ -14,7 +14,7 @@ class TheGreatIndexRename extends Migration
     public function up()
     {
         // try to run index like this to hopefully allow mysql to optimize away the reindex
-        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql' && !$this->indexExists('wireless_sensors', 'wireless_sensors_sensor_type_index')) {
+        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql' && ! $this->indexExists('wireless_sensors', 'wireless_sensors_sensor_type_index')) {
             DB::statement('ALTER TABLE access_points DROP INDEX deleted, ADD INDEX access_points_deleted_index(deleted);');
             DB::statement('ALTER TABLE alerts DROP INDEX device_id, ADD INDEX alerts_device_id_index(device_id);');
             DB::statement('ALTER TABLE alerts DROP INDEX rule_id, ADD UNIQUE INDEX alerts_device_id_rule_id_unique(device_id, rule_id);');
@@ -165,6 +165,7 @@ class TheGreatIndexRename extends Migration
     private function indexExists($table, $name)
     {
         $indexes = Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes($table);
+
         return array_key_exists($name, $indexes);
     }
 }

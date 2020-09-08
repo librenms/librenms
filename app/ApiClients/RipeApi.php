@@ -1,6 +1,6 @@
 <?php
 /**
- * RipeWhoisApi.php
+ * RipeWhoisApi.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,7 +35,7 @@ class RipeApi extends BaseApi
     protected $abuse_uri = '/data/abuse-contact-finder/data.json';
 
     /**
-     * Get whois info
+     * Get whois info.
      *
      * @param string $resource ASN/IPv4/IPv6
      * @return array
@@ -46,13 +45,13 @@ class RipeApi extends BaseApi
     {
         return $this->makeApiCall($this->whois_uri, [
             'query' => [
-                'resource' => $resource
-            ]
+                'resource' => $resource,
+            ],
         ]);
     }
 
     /**
-     * Get Abuse contact
+     * Get Abuse contact.
      *
      * @param string $resource prefix, single IP address or ASN
      * @return array|mixed
@@ -62,8 +61,8 @@ class RipeApi extends BaseApi
     {
         return $this->makeApiCall($this->abuse_uri, [
             'query' => [
-                'resource' => $resource
-            ]
+                'resource' => $resource,
+            ],
         ]);
     }
 
@@ -81,11 +80,11 @@ class RipeApi extends BaseApi
             if (isset($response_data['status']) && $response_data['status'] == 'ok') {
                 return $response_data;
             } else {
-                throw new ApiException("RIPE API call failed", $response_data);
+                throw new ApiException('RIPE API call failed', $response_data);
             }
         } catch (RequestException $e) {
-            $message = 'RIPE API call to ' . $e->getRequest()->getUri() . ' failed: ';
-            $message .= $e->getResponse()->getReasonPhrase() . ' ' . $e->getResponse()->getStatusCode();
+            $message = 'RIPE API call to '.$e->getRequest()->getUri().' failed: ';
+            $message .= $e->getResponse()->getReasonPhrase().' '.$e->getResponse()->getStatusCode();
 
             throw new ApiException(
                 $message,

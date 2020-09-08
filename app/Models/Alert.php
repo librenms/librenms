@@ -1,6 +1,6 @@
 <?php
 /**
- * app/Models/Alert.php
+ * app/Models/Alert.php.
  *
  * Model for access to alerts table data
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
@@ -36,7 +35,7 @@ class Alert extends Model
     // ---- Query scopes ----
 
     /**
-     * Only select active alerts
+     * Only select active alerts.
      * @param Builder $query
      * @return Builder
      */
@@ -46,7 +45,7 @@ class Alert extends Model
     }
 
     /**
-     * Only select active alerts
+     * Only select active alerts.
      * @param Builder $query
      * @return Builder
      */

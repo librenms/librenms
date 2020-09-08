@@ -1,6 +1,6 @@
 <?php
 /**
- * LnmsCommand.php
+ * LnmsCommand.php.
  *
  * Convenience class for common command code
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -42,18 +41,19 @@ abstract class LnmsCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->setDescription(__('commands.' . $this->getName() . '.description'));
+        $this->setDescription(__('commands.'.$this->getName().'.description'));
     }
 
     public function isHidden()
     {
         $env = $this->getLaravel() ? $this->getLaravel()->environment() : getenv('APP_ENV');
+
         return $this->hidden || ($this->developer && $env !== 'production');
     }
 
     /**
      * Adds an argument. If $description is null, translate commands.command-name.arguments.name
-     * If you want the description to be empty, just set an empty string
+     * If you want the description to be empty, just set an empty string.
      *
      * @param string               $name        The argument name
      * @param int|null             $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
@@ -68,7 +68,7 @@ abstract class LnmsCommand extends Command
     {
         // use a generated translation location by default
         if (is_null($description)) {
-            $description = __('commands.' . $this->getName() . '.arguments.' . $name);
+            $description = __('commands.'.$this->getName().'.arguments.'.$name);
         }
 
         parent::addArgument($name, $mode, $description, $default);
@@ -78,7 +78,7 @@ abstract class LnmsCommand extends Command
 
     /**
      * Adds an option. If $description is null, translate commands.command-name.arguments.name
-     * If you want the description to be empty, just set an empty string
+     * If you want the description to be empty, just set an empty string.
      *
      * @param string                        $name        The option name
      * @param string|array|null             $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
@@ -94,7 +94,7 @@ abstract class LnmsCommand extends Command
     {
         // use a generated translation location by default
         if (is_null($description)) {
-            $description = __('commands.' . $this->getName() . '.options.' . $name);
+            $description = __('commands.'.$this->getName().'.options.'.$name);
         }
 
         parent::addOption($name, $shortcut, $mode, $description, $default);

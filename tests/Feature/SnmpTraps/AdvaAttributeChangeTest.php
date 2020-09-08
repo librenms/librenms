@@ -1,6 +1,6 @@
 <?php
 /**
- * AdvaAttributeChangeTest.php
+ * AdvaAttributeChangeTest.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -46,7 +45,7 @@ ADVA-MIB::neEventLogTimeStamp.150 2018-12-10,9:11:40.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Syslog server 1 IP version set to ipv6";
+        $message = 'Syslog server 1 IP version set to ipv6';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap IP version modified');
@@ -67,7 +66,7 @@ ADVA-MIB::neEventLogTimeStamp.150 2018-12-10,9:11:40.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Syslog server 1 IP address changed to 2001:49d0:3c0c:0:0:0:0:1";
+        $message = 'Syslog server 1 IP address changed to 2001:49d0:3c0c:0:0:0:0:1';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap IPv6 address modified');
@@ -88,7 +87,7 @@ ADVA-MIB::neEventLogTimeStamp.150 2018-12-10,9:11:40.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Syslog server 1 IP address changed to 192.168.1.1";
+        $message = 'Syslog server 1 IP address changed to 192.168.1.1';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap IPv4 address modified');
@@ -109,7 +108,7 @@ ADVA-MIB::neEventLogTimeStamp.150 2018-12-10,9:11:40.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Syslog server 1 port changed to 514";
+        $message = 'Syslog server 1 port changed to 514';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap port modified');
@@ -130,7 +129,7 @@ ADVA-MIB::neEventLogTimeStamp.155 2018-12-10,9:17:22.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "ACL 5 modified";
+        $message = 'ACL 5 modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap ACL entry modified');
@@ -151,7 +150,7 @@ ADVA-MIB::neEventLogTimeStamp.157 2018-12-10,9:18:43.6,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "MOTD/Banner modified";
+        $message = 'MOTD/Banner modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap banner modified');
@@ -173,7 +172,7 @@ ADVA-MIB::neEventLogTimeStamp.169 2018-12-10,9:28:57.1,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Time source set to ntp";
+        $message = 'Time source set to ntp';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap time source modified');
@@ -190,7 +189,7 @@ ADVA-MIB::neEventLogTimeStamp.169 2018-12-10,9:28:57.1,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Time source set to local";
+        $message = 'Time source set to local';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap time source modified');
@@ -211,7 +210,7 @@ ADVA-MIB::neEventLogTimeStamp.158 2018-12-10,9:20:33.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Daylight Savings Time enabled";
+        $message = 'Daylight Savings Time enabled';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap DST enabled');
@@ -227,7 +226,7 @@ ADVA-MIB::neEventLogTimeStamp.158 2018-12-10,9:20:33.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Daylight Savings Time disabled";
+        $message = 'Daylight Savings Time disabled';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap DST disabled');
@@ -243,7 +242,7 @@ ADVA-MIB::neEventLogTimeStamp.160 2018-12-10,10:21:30.3,-5:0";
 
         $trap = new Trap($trapText);
 
-        $message = "UTC offset (timezone) change to -05:00";
+        $message = 'UTC offset (timezone) change to -05:00';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap UTC offset modified');
@@ -265,7 +264,7 @@ ADVA-MIB::neEventLogTimeStamp.170 2018-12-10,9:30:17.0,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Primary NTP server IP changed to 192.168.2.2";
+        $message = 'Primary NTP server IP changed to 192.168.2.2';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap NTP primary server modified');
@@ -282,7 +281,7 @@ ADVA-MIB::neEventLogTimeStamp.170 2018-12-10,9:30:17.0,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Backup NTP server IP changed to 192.168.2.1";
+        $message = 'Backup NTP server IP changed to 192.168.2.1';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap NTP backup server modified');
@@ -307,13 +306,13 @@ ADVA-MIB::neEventLogTimeStamp.173 2018-12-10,9:32:18.1,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Authentication server 3 IP changed to 192.168.1.1";
+        $message = 'Authentication server 3 IP changed to 192.168.1.1';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Authentication server 3 secret changed";
+        $message = 'Authentication server 3 secret changed';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Authentication server 3 enabled";
+        $message = 'Authentication server 3 enabled';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap authentication server modified');
@@ -329,7 +328,7 @@ ADVA-MIB::neEventLogTimeStamp.173 2018-12-10,9:32:18.1,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Authentication server 3 disabled";
+        $message = 'Authentication server 3 disabled';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap authentication server disabled');
@@ -351,10 +350,10 @@ ADVA-MIB::neEventLogTimeStamp.175 2018-12-10,9:34:23.0,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Network Element name changed to adva-test-1";
+        $message = 'Network Element name changed to adva-test-1';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Network Element prompt changed to adva-test-1-prompt";
+        $message = 'Network Element prompt changed to adva-test-1-prompt';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap network element modified');
@@ -375,7 +374,7 @@ ADVA-MIB::neEventLogTimeStamp.177 2018-12-10,9:36:14.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "SNMP Dying Gasp is enabled";
+        $message = 'SNMP Dying Gasp is enabled';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap SNMP dying gasp enabled');
@@ -391,7 +390,7 @@ ADVA-MIB::neEventLogTimeStamp.177 2018-12-10,9:36:14.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "SNMP Dying Gasp is disabled";
+        $message = 'SNMP Dying Gasp is disabled';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap SNMP dying gasp disabled');
@@ -418,22 +417,22 @@ ADVA-MIB::neEventLogTimeStamp.188 2018-12-10,9:41:49.0,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Network Port 1-1-1-2 changed speed to speed-auto-100MB-full";
+        $message = 'Network Port 1-1-1-2 changed speed to speed-auto-100MB-full';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Network Port 1-1-1-2 changed media to copper";
+        $message = 'Network Port 1-1-1-2 changed media to copper';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Network Port 1-1-1-2 changed MDIX to crossed";
+        $message = 'Network Port 1-1-1-2 changed MDIX to crossed';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Network Port 1-1-1-2 AutoDiagnostic disabled";
+        $message = 'Network Port 1-1-1-2 AutoDiagnostic disabled';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Network Port 1-1-1-2 administrative state changed to in-service";
+        $message = 'Network Port 1-1-1-2 administrative state changed to in-service';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Network Port 1-1-1-2 MTU changed to 9000 bytes";
+        $message = 'Network Port 1-1-1-2 MTU changed to 9000 bytes';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap network port modified specific messages');
@@ -449,7 +448,7 @@ ADVA-MIB::neEventLogTimeStamp.188 2018-12-10,9:41:49.0,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Network Port 1-1-1-2 modified";
+        $message = 'Network Port 1-1-1-2 modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap network port modified generic message');
@@ -476,22 +475,22 @@ ADVA-MIB::neEventLogTimeStamp.214 2018-12-10,9:43:22.3,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Access Port 1-1-1-4 changed speed to speed-auto-1000MB-full";
+        $message = 'Access Port 1-1-1-4 changed speed to speed-auto-1000MB-full';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Access Port 1-1-1-4 changed media to fiber";
+        $message = 'Access Port 1-1-1-4 changed media to fiber';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Access Port 1-1-1-4 changed MDIX to not-applicable";
+        $message = 'Access Port 1-1-1-4 changed MDIX to not-applicable';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Access Port 1-1-1-4 AutoDiagnostic disabled";
+        $message = 'Access Port 1-1-1-4 AutoDiagnostic disabled';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Access Port 1-1-1-4 administrative state changed to maintenance";
+        $message = 'Access Port 1-1-1-4 administrative state changed to maintenance';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-        $message = "Access Port 1-1-1-4 MTU changed to 9000 bytes";
+        $message = 'Access Port 1-1-1-4 MTU changed to 9000 bytes';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap access port modified specific messages');
@@ -508,7 +507,7 @@ ADVA-MIB::neEventLogTimeStamp.214 2018-12-10,9:43:22.3,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Access Port 1-1-1-4 modified";
+        $message = 'Access Port 1-1-1-4 modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap access port modified gerneric messages');
@@ -532,7 +531,7 @@ ADVA-MIB::neEventLogTimeStamp.147 2018-12-10,9:7:28.1,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Access Flow 1-1-1-4-1 modified";
+        $message = 'Access Flow 1-1-1-4-1 modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap access flow modified');
@@ -553,7 +552,7 @@ ADVA-MIB::neEventLogTimeStamp.113 2018-12-10,8:58:43.7,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "LAG 1 modified";
+        $message = 'LAG 1 modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap LAG modified');
@@ -577,7 +576,7 @@ ADVA-MIB::neEventLogTimeStamp.217 2018-12-10,9:47:51.0,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "QoS on flow 1-1-1-3-1 modified";
+        $message = 'QoS on flow 1-1-1-3-1 modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap QoS flow policer');
@@ -599,7 +598,7 @@ ADVA-MIB::neEventLogTimeStamp.218 2018-12-10,9:47:51.0,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "QoS on flow 1-1-1-3-1 modified";
+        $message = 'QoS on flow 1-1-1-3-1 modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap QoS shaper');
@@ -621,7 +620,7 @@ ADVA-MIB::neEventLogTimeStamp.146 2018-12-10,9:7:28.1,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Shaper modified on access port 1-1-1-4-1 modified";
+        $message = 'Shaper modified on access port 1-1-1-4-1 modified';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmAttributeValueChangeTrap access port QoS shaper');

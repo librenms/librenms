@@ -1,6 +1,6 @@
 <?php
 /**
- * RuckusEventTest.php
+ * RuckusEventTest.php.
  *
  * -Description-
  *
@@ -19,7 +19,6 @@
  *
  * Tests generic Ruckus Wireless event trap handlers.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -45,7 +44,7 @@ RUCKUS-EVENT-MIB::ruckusEventClientMacAddr \"de:ad:be:ef:11:221.0.5.1.1.1.2.2\""
 
         $trap = new Trap($trapText);
 
-        $message = "Client de:ad:be:ef:11:22 associated";
+        $message = 'Client de:ad:be:ef:11:22 associated';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusEventAssocTrap');
@@ -63,7 +62,7 @@ RUCKUS-EVENT-MIB::ruckusEventClientMacAddr \"de:ad:be:ef:33:441.0.5.1.1.1.2.2\""
 
         $trap = new Trap($trapText);
 
-        $message = "Client de:ad:be:ef:33:44 disassociated";
+        $message = 'Client de:ad:be:ef:33:44 disassociated';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusEventDiassocTrap');
@@ -81,7 +80,7 @@ RUCKUS-EVENT-MIB::ruckusEventSetErrorOID Wrong Type (should be OBJECT IDENTIFIER
 
         $trap = new Trap($trapText);
 
-        $message = "SNMP set error on oid 1.3.6.1.2.1.25.1.1.0.5.1.1.1.2.2";
+        $message = 'SNMP set error on oid 1.3.6.1.2.1.25.1.1.0.5.1.1.1.2.2';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusEventSetErrorTrap');

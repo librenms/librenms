@@ -1,6 +1,6 @@
 <?php
 /**
- * Checks.php
+ * Checks.php.
  *
  * Pre-flight checks at various stages of booting
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -44,15 +43,15 @@ class Checks
                 null,
                 true
             );
-        };
+        }
     }
 
     /**
-     * Pre-boot dependency check
+     * Pre-boot dependency check.
      */
     public static function postAutoload()
     {
-        if (!class_exists(\Illuminate\Foundation\Application::class)) {
+        if (! class_exists(\Illuminate\Foundation\Application::class)) {
             self::printMessage(
                 'Error: Missing dependencies! Run the following command to fix:',
                 './scripts/composer_wrapper.php install --no-dev',
@@ -66,7 +65,7 @@ class Checks
         // check php extensions
         if ($missing = self::missingPhpExtensions()) {
             self::printMessage(
-                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
+                'Missing PHP extensions.  Please install and enable them on your LibreNMS server.',
                 $missing,
                 true
             );
@@ -74,12 +73,12 @@ class Checks
     }
 
     /**
-     * Post boot Toast messages
+     * Post boot Toast messages.
      */
     public static function postAuth()
     {
         // limit popup messages frequency
-        if (Cache::get('checks_popup_timeout') || !Auth::check()) {
+        if (Cache::get('checks_popup_timeout') || ! Auth::check()) {
             return;
         }
 
@@ -96,26 +95,26 @@ class Checks
             $warn_sec = Config::get('rrd.step', 300) * 3;
             if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($warn_sec))->exists()) {
                 $warn_min = $warn_sec / 60;
-                Toastr::warning('<a href="poller/log?filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
+                Toastr::warning('<a href="poller/log?filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last '.$warn_min.' minutes, you may want to check that out :)</a>', 'Devices unpolled');
             }
 
             // Directory access checks
             $rrd_dir = Config::get('rrd_dir');
-            if (!is_dir($rrd_dir)) {
-                Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . ">Validate your install</a>");
+            if (! is_dir($rrd_dir)) {
+                Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=".url('validate').'>Validate your install</a>');
             }
 
             $temp_dir = Config::get('temp_dir');
-            if (!is_dir($temp_dir)) {
-                Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . ">Validate your install</a>");
-            } elseif (!is_writable($temp_dir)) {
-                Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
+            if (! is_dir($temp_dir)) {
+                Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=".url('validate').'>Validate your install</a>');
+            } elseif (! is_writable($temp_dir)) {
+                Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='".url('validate')."'>Validate your install</a>");
             }
         }
     }
 
     /**
-     * Check the script is running as the right user (works before config is available)
+     * Check the script is running as the right user (works before config is available).
      */
     public static function runningUser()
     {
@@ -129,7 +128,7 @@ class Checks
             }
 
             self::printMessage(
-                'Error: You must run lnms as the user ' . get_current_user(),
+                'Error: You must run lnms as the user '.get_current_user(),
                 null,
                 true
             );
@@ -138,7 +137,7 @@ class Checks
 
     private static function printMessage($title, $content, $exit = false)
     {
-        $content = (array)$content;
+        $content = (array) $content;
 
         if (PHP_SAPI == 'cli') {
             $format = "%s\n\n%s\n\n";
@@ -161,14 +160,14 @@ class Checks
     private static function missingPhpExtensions()
     {
         // allow mysqli, but prefer mysqlnd
-        if (!extension_loaded('mysqlnd') && !extension_loaded('mysqli')) {
+        if (! extension_loaded('mysqlnd') && ! extension_loaded('mysqli')) {
             return ['mysqlnd'];
         }
 
         $required_modules = ['mbstring', 'pcre', 'curl', 'xml', 'gd'];
 
         return array_filter($required_modules, function ($module) {
-            return !extension_loaded($module);
+            return ! extension_loaded($module);
         });
     }
 }

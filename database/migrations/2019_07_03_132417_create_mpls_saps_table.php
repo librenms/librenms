@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMplsSapsTable extends Migration
 {
@@ -21,11 +21,11 @@ class CreateMplsSapsTable extends Migration
             $table->string('ifName', 255)->nullable();
             $table->unsignedInteger('device_id')->index();
             $table->string('sapEncapValue', 255)->nullable();
-            $table->enum('sapRowStatus', array('active', 'notInService', 'notReady', 'createAndGo', 'createAndWait', 'destroy'))->nullable();
-            $table->enum('sapType', array('unknown', 'epipe', 'tls', 'vprn', 'ies', 'mirror', 'apipe', 'fpipe', 'ipipe', 'cpipe', 'intTls', 'evpnIsaTls'))->nullable();
+            $table->enum('sapRowStatus', ['active', 'notInService', 'notReady', 'createAndGo', 'createAndWait', 'destroy'])->nullable();
+            $table->enum('sapType', ['unknown', 'epipe', 'tls', 'vprn', 'ies', 'mirror', 'apipe', 'fpipe', 'ipipe', 'cpipe', 'intTls', 'evpnIsaTls'])->nullable();
             $table->string('sapDescription', 80)->nullable();
-            $table->enum('sapAdminStatus', array('up', 'down'))->nullable();
-            $table->enum('sapOperStatus', array('up', 'down'))->nullable();
+            $table->enum('sapAdminStatus', ['up', 'down'])->nullable();
+            $table->enum('sapOperStatus', ['up', 'down'])->nullable();
             $table->bigInteger('sapLastMgmtChange')->nullable();
             $table->bigInteger('sapLastStatusChange')->nullable();
         });

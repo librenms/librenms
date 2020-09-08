@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateEntPhysicalStateTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -20,7 +19,7 @@ class CreateEntPhysicalStateTable extends Migration
             $table->string('group', 64);
             $table->string('key', 64);
             $table->string('value');
-            $table->index(['device_id','entPhysicalIndex'], 'device_id_index');
+            $table->index(['device_id', 'entPhysicalIndex'], 'device_id_index');
         });
     }
 

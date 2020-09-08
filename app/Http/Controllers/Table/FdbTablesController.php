@@ -1,6 +1,6 @@
 <?php
 /**
- * FdbTablesController.php
+ * FdbTablesController.php.
  *
  * FDB tables data for bootgrid display
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -59,7 +58,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * Defines the base query for this resource
+     * Defines the base query for this resource.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
@@ -78,7 +77,7 @@ class FdbTablesController extends TableController
     protected function search($search, $query, $fields = [])
     {
         if ($search = trim(\Request::get('searchPhrase'))) {
-            $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $search) . '%';
+            $mac_search = '%'.str_replace([':', ' ', '-', '.', '0x'], '', $search).'%';
             switch (\Request::get('searchby')) {
                 case 'mac':
                     return $query->where('ports_fdb.mac_address', 'like', $mac_search);
@@ -161,7 +160,7 @@ class FdbTablesController extends TableController
             'description' => '',
             'dnsname' => $ip_info['dns'],
             'first_seen' => 'unknown',
-            'last_seen' => 'unknown'
+            'last_seen' => 'unknown',
         ];
 
         // diffForHumans and doDateTimeString are not safe
@@ -176,11 +175,11 @@ class FdbTablesController extends TableController
             $item['interface'] = Url::portLink($fdb_entry->port, $fdb_entry->port->getShortLabel());
             $item['description'] = $fdb_entry->port->ifAlias;
             if ($fdb_entry->port->ifInErrors > 0 || $fdb_entry->port->ifOutErrors > 0) {
-                $item['interface'] .= ' ' . Url::portLink($fdb_entry->port, '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>');
+                $item['interface'] .= ' '.Url::portLink($fdb_entry->port, '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>');
             }
             if ($this->getMacCount($fdb_entry->port) == 1) {
                 // only one mac on this port, likely the endpoint
-                $item['interface'] .= ' <i class="fa fa-star fa-lg" style="color:green" aria-hidden="true" title="' . __('This indicates the most likely endpoint switchport') . '"></i>';
+                $item['interface'] .= ' <i class="fa fa-star fa-lg" style="color:green" aria-hidden="true" title="'.__('This indicates the most likely endpoint switchport').'"></i>';
             }
         }
 
@@ -252,7 +251,7 @@ class FdbTablesController extends TableController
      */
     protected function findIps($mac_address)
     {
-        if (!isset($this->ipCache[$mac_address])) {
+        if (! isset($this->ipCache[$mac_address])) {
             $ips = Ipv4Mac::where('mac_address', $mac_address)
                 ->groupBy('ipv4_address')
                 ->pluck('ipv4_address');
@@ -264,7 +263,7 @@ class FdbTablesController extends TableController
                 // don't try too many dns queries, this is the slowest part
                 foreach ($ips->take(3) as $ip) {
                     $hostname = gethostbyaddr($ip);
-                    if (!IP::isValid($hostname)) {
+                    if (! IP::isValid($hostname)) {
                         $dns = $hostname;
                         break;
                     }
@@ -286,7 +285,7 @@ class FdbTablesController extends TableController
      */
     protected function getMacCount($port)
     {
-        if (!isset($this->macCountCache[$port->port_id])) {
+        if (! isset($this->macCountCache[$port->port_id])) {
             $this->macCountCache[$port->port_id] = $port->fdbEntries()->count();
         }
 

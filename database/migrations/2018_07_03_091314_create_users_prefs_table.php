@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateUsersPrefsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -17,7 +16,7 @@ class CreateUsersPrefsTable extends Migration
             $table->unsignedInteger('user_id');
             $table->string('pref', 32);
             $table->string('value', 128);
-            $table->unique(['user_id','pref']);
+            $table->unique(['user_id', 'pref']);
         });
     }
 

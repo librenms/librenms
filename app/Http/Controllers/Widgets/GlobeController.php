@@ -1,6 +1,6 @@
 <?php
 /**
- * GlobeController.php
+ * GlobeController.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -80,7 +79,7 @@ class GlobeController extends WidgetController
                 });
                 $up = $devices_up->count();
                 $down_items = $devices_down->map(function ($device) {
-                    return $device->displayName() . ' DOWN';
+                    return $device->displayName().' DOWN';
                 });
             } elseif ($data['markers'] == 'ports') {
                 foreach ($location->devices as $device) {
@@ -90,13 +89,13 @@ class GlobeController extends WidgetController
                     $count += $device->ports->count();
                     $up += $ports_up->count();
                     $down_items = $ports_down->map(function ($port) use ($device) {
-                        return $device->displayName() . '/' . $port->getShortLabel() . ' DOWN';
+                        return $device->displayName().'/'.$port->getShortLabel().' DOWN';
                     });
                 }
             }
 
             // indicate the number of up items before the itemized down
-            $down_items->prepend($up .  '&nbsp;' . ucfirst($data['markers']) . '&nbsp;OK');
+            $down_items->prepend($up.'&nbsp;'.ucfirst($data['markers']).'&nbsp;OK');
 
             if ($count > 0) {
                 $locations->push([

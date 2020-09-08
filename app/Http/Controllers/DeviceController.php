@@ -63,7 +63,7 @@ class DeviceController extends Controller
         $device_id = $device->device_id;
         DeviceCache::setPrimary($device_id);
 
-        if (!$device->exists) {
+        if (! $device->exists) {
             abort(404);
         }
 
@@ -79,7 +79,7 @@ class DeviceController extends Controller
         }
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
-        $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->value('device_id');
+        $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname.'.'.Config::get('mydomain')])->value('device_id');
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
         $tabs = array_map(function ($class) {
@@ -91,17 +91,18 @@ class DeviceController extends Controller
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device);
         $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
-        if (!isset($device_links[$primary_device_link_name])) {
+        if (! isset($device_links[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($device_links);
         }
         $primary_device_link = $device_links[$primary_device_link_name];
         unset($device_links[$primary_device_link_name], $primary_device_link_name);
 
-        if (view()->exists('device.tabs.' . $current_tab)) {
-            return view('device.tabs.' . $current_tab, get_defined_vars());
+        if (view()->exists('device.tabs.'.$current_tab)) {
+            return view('device.tabs.'.$current_tab, get_defined_vars());
         }
 
         $tab_content = $this->renderLegacyTab($current_tab, $device, $data);
+
         return view('device.tabs.legacy', get_defined_vars());
     }
 
@@ -162,7 +163,7 @@ class DeviceController extends Controller
 
         // User defined device links
         foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $link) {
-            $device_links['custom' . ($index + 1)] = [
+            $device_links['custom'.($index + 1)] = [
                 'icon' => $link['icon'] ?? 'fa-external-link',
                 'url' => view(['template' => $link['url']], ['device' => $device])->__toString(),
                 'title' => $link['title'],
@@ -173,7 +174,7 @@ class DeviceController extends Controller
         // Web
         $device_links['web'] = [
             'icon' => 'fa-globe',
-            'url' => 'https://' . $device->hostname,
+            'url' => 'https://'.$device->hostname,
             'title' => __('Web'),
             'external' => true,
             'onclick' => 'http_fallback(this); return false;',
@@ -181,8 +182,8 @@ class DeviceController extends Controller
 
         // SSH
         $ssh_url = Config::has('gateone.server')
-            ? Config::get('gateone.server') . '?ssh=ssh://' . (Config::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']
-            : 'ssh://' . $device->hostname;
+            ? Config::get('gateone.server').'?ssh=ssh://'.(Config::get('gateone.use_librenms_user') ? Auth::user()->username.'@' : '').$device['hostname'].'&location='.$device['hostname']
+            : 'ssh://'.$device->hostname;
         $device_links['ssh'] = [
             'icon' => 'fa-lock',
             'url' => $ssh_url,
@@ -193,7 +194,7 @@ class DeviceController extends Controller
         // Telnet
         $device_links['telnet'] = [
             'icon' => 'fa-terminal',
-            'url' => 'telnet://' . $device->hostname,
+            'url' => 'telnet://'.$device->hostname,
             'title' => __('Telnet'),
             'external' => true,
         ];

@@ -1,6 +1,6 @@
 <?php
 /**
- * NetflowController.php
+ * NetflowController.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -34,7 +33,7 @@ class NetflowController implements DeviceTab
     public function visible(Device $device): bool
     {
         if (Config::get('nfsen_enable')) {
-            foreach ((array)Config::get('nfsen_rrds', []) as $nfsenrrds) {
+            foreach ((array) Config::get('nfsen_rrds', []) as $nfsenrrds) {
                 if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
                     $nfsenrrds .= '/';
                 }

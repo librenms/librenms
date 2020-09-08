@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateSlasTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -23,7 +22,7 @@ class CreateSlasTable extends Migration
             $table->boolean('status');
             $table->boolean('opstatus')->default(0);
             $table->boolean('deleted')->default(0);
-            $table->unique(['device_id','sla_nr']);
+            $table->unique(['device_id', 'sla_nr']);
         });
     }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * DashboardController.php
+ * DashboardController.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -35,7 +34,7 @@ class DashboardController extends SelectController
     }
 
     /**
-     * Defines the base query for this resource
+     * Defines the base query for this resource.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
@@ -51,7 +50,7 @@ class DashboardController extends SelectController
 
     public function formatItem($dashboard)
     {
-        /** @var Dashboard $dashboard */
+        /* @var Dashboard $dashboard */
         return [
             'id' => $dashboard->dashboard_id,
             'text' => $this->describe($dashboard),
@@ -61,6 +60,6 @@ class DashboardController extends SelectController
     private function describe($dashboard)
     {
         return "{$dashboard->user->username}: {$dashboard->dashboard_name} ("
-            . ($dashboard->access == 1 ? __('read-only') : __('read-write')) . ')';
+            .($dashboard->access == 1 ? __('read-only') : __('read-write')).')';
     }
 }

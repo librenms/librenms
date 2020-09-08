@@ -1,6 +1,6 @@
 <?php
 /**
- * TranslationGenerateCommand.php
+ * TranslationGenerateCommand.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -59,9 +58,9 @@ class TranslationGenerateCommand extends LnmsCommand
         $manifest = json_decode(file_get_contents($manifest_file), true);
         foreach (glob(public_path('js/lang/*.js')) as $file) {
             $file_name = str_replace(public_path(), '', $file);
-            $manifest[$file_name] = $file_name . '?id=' . substr(md5(file_get_contents($file)), 0, 20);
+            $manifest[$file_name] = $file_name.'?id='.substr(md5(file_get_contents($file)), 0, 20);
         }
 
-        file_put_contents($manifest_file, json_encode($manifest, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES) . PHP_EOL);
+        file_put_contents($manifest_file, json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL);
     }
 }

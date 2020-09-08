@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateMuninPluginsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,7 +24,7 @@ class CreateMuninPluginsTable extends Migration
             $table->string('mplug_args', 512)->nullable();
             $table->boolean('mplug_total')->default(0);
             $table->boolean('mplug_graph')->default(1);
-            $table->unique(['device_id','mplug_type']);
+            $table->unique(['device_id', 'mplug_type']);
         });
     }
 

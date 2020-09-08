@@ -30,11 +30,11 @@ class MplsTunnelArHop extends Model implements Keyable
     // ---- Helper Functions ----
 
     /**
-     * Get a string that can identify a unique instance of this model
+     * Get a string that can identify a unique instance of this model.
      * @return string
      */
     public function getCompositeKey()
     {
-        return $this->mplsTunnelARHopListIndex . '-' . $this->mplsTunnelARHopIndex;
+        return $this->mplsTunnelARHopListIndex.'-'.$this->mplsTunnelARHopIndex;
     }
 }

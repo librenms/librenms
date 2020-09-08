@@ -11,6 +11,6 @@ class ComponentPref extends Model
 
     public function setValueAttribute($value)
     {
-        $this->attributes['value'] = is_array($value) ? json_encode($value) : (string)$value;
+        $this->attributes['value'] = is_array($value) ? json_encode($value) : (string) $value;
     }
 }

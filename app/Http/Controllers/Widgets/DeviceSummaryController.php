@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceSummaryController.php
+ * DeviceSummaryController.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -40,8 +39,8 @@ abstract class DeviceSummaryController extends WidgetController
     {
         // init defaults we need to check config, so do it in construct
         $this->defaults = [
-            'show_services' => (int)Config::get('show_services', 1),
-            'summary_errors' => (int)Config::get('summary_errors', 0)
+            'show_services' => (int) Config::get('show_services', 1),
+            'summary_errors' => (int) Config::get('summary_errors', 0),
         ];
     }
 

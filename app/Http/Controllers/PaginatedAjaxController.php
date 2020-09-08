@@ -1,6 +1,6 @@
 <?php
 /**
- * AjaxController.php
+ * AjaxController.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -34,7 +33,7 @@ use Illuminate\Support\Collection;
 abstract class PaginatedAjaxController extends Controller
 {
     /**
-     * Default sort, column => direction
+     * Default sort, column => direction.
      * @var array
      */
     protected $default_sort = [];
@@ -47,7 +46,7 @@ abstract class PaginatedAjaxController extends Controller
     abstract protected function baseRules();
 
     /**
-     * Defines the base query for this resource
+     * Defines the base query for this resource.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
@@ -61,7 +60,7 @@ abstract class PaginatedAjaxController extends Controller
     abstract protected function formatResponse($paginator);
 
     /**
-     * Defines validation rules (will override base validation rules for select2 responses too)
+     * Defines validation rules (will override base validation rules for select2 responses too).
      *
      * @return array
      */
@@ -95,7 +94,7 @@ abstract class PaginatedAjaxController extends Controller
     }
 
     /**
-     * Defines sortable fields.  The incoming sort field should be the key, the sql column or DB::raw() should be the value
+     * Defines sortable fields.  The incoming sort field should be the key, the sql column or DB::raw() should be the value.
      *
      * @param \Illuminate\Http\Request $request
      * @return array
@@ -107,7 +106,7 @@ abstract class PaginatedAjaxController extends Controller
     }
 
     /**
-     * Format an item for display.  Default is pass-through
+     * Format an item for display.  Default is pass-through.
      *
      * @param Model $model
      * @return array|Collection|Model
@@ -127,9 +126,9 @@ abstract class PaginatedAjaxController extends Controller
     {
         if ($search) {
             $query->where(function ($query) use ($fields, $search) {
-                /** @var Builder $query */
+                /* @var Builder $query */
                 foreach ($fields as $field) {
-                    $query->orWhere($field, 'like', '%' . $search . '%');
+                    $query->orWhere($field, 'like', '%'.$search.'%');
                 }
             });
         }
@@ -198,7 +197,7 @@ abstract class PaginatedAjaxController extends Controller
 
     /**
      * Sometimes filter values need to be modified to work
-     * For example if the filter value is a string, when it needs to be an id
+     * For example if the filter value is a string, when it needs to be an id.
      *
      * @param string $field The field being filtered
      * @param mixed $value The current value

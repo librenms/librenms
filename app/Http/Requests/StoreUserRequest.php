@@ -38,7 +38,7 @@ class StoreUserRequest extends FormRequest
             'email' => 'nullable|email|max:64',
             'descr' => 'nullable|max:30|alpha_space',
             'level' => 'int',
-            'new_password' => 'required|confirmed|min:' . Config::get('password.min_length', 8),
+            'new_password' => 'required|confirmed|min:'.Config::get('password.min_length', 8),
             'dashboard' => 'int',
         ];
     }

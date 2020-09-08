@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateIpsecTunnelsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -22,7 +21,7 @@ class CreateIpsecTunnelsTable extends Migration
             $table->unsignedInteger('local_port');
             $table->string('tunnel_name', 96);
             $table->string('tunnel_status', 11);
-            $table->unique(['device_id','peer_addr']);
+            $table->unique(['device_id', 'peer_addr']);
         });
     }
 

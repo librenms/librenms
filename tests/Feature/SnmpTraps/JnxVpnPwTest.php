@@ -1,6 +1,6 @@
 <?php
 /**
- * JnxVpnPwTest.php
+ * JnxVpnPwTest.php.
  *
  * -Description-
  *
@@ -20,7 +20,6 @@
  *
  * Tests JnxVpnPwDown and JnxVpnPwUp traps from Juniper devices.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>

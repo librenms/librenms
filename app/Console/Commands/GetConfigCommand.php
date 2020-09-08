@@ -36,22 +36,25 @@ class GetConfigCommand extends LnmsCommand
         $setting = $this->argument('setting');
         if ($this->option('json')) {
             $this->line($setting ? json_encode(Config::get($setting)) : Config::toJson());
+
             return 0;
         }
 
-        if (!$setting) {
+        if (! $setting) {
             throw new \RuntimeException('Not enough arguments (missing: "setting").');
         }
 
         if (Config::has($setting)) {
             $output = Config::get($setting);
-            if (!is_string($output)) {
+            if (! is_string($output)) {
                 $output = var_export($output, 1);
             }
 
             $this->line($output);
+
             return 0;
         }
+
         return 1;
     }
 }

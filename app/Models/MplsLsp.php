@@ -36,12 +36,12 @@ class MplsLsp extends Model implements Keyable
     // ---- Helper Functions ----
 
     /**
-     * Get a string that can identify a unique instance of this model
+     * Get a string that can identify a unique instance of this model.
      * @return string
      */
     public function getCompositeKey()
     {
-        return $this->vrf_oid . '-' . $this->lsp_oid;
+        return $this->vrf_oid.'-'.$this->lsp_oid;
     }
 
     // ---- Define Relationships ----

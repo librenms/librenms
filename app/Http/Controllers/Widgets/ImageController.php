@@ -1,6 +1,6 @@
 <?php
 /**
- * ImageController.php
+ * ImageController.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -53,9 +52,9 @@ class ImageController extends WidgetController
 
         // bust cache
         if (Str::contains($data['image_url'], '?')) {
-            $data['image_url'] .= '&' . mt_rand();
+            $data['image_url'] .= '&'.mt_rand();
         } else {
-            $data['image_url'] .= '?' . mt_rand();
+            $data['image_url'] .= '?'.mt_rand();
         }
 
         return view('widgets.image', $data);
@@ -70,7 +69,7 @@ class ImageController extends WidgetController
     {
         if (is_null($this->settings)) {
             parent::getSettings();
-            if (!empty($this->settings['image_title'])) {
+            if (! empty($this->settings['image_title'])) {
                 $this->settings['title'] = $this->settings['image_title'];
             }
         }

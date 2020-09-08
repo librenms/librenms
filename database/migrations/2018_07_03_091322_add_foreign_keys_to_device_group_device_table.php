@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class AddForeignKeysToDeviceGroupDeviceTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,7 +17,6 @@ class AddForeignKeysToDeviceGroupDeviceTable extends Migration
             $table->foreign('device_id')->references('device_id')->on('devices')->onUpdate('RESTRICT')->onDelete('CASCADE');
         });
     }
-
 
     /**
      * Reverse the migrations.

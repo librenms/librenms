@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Models\BgpPeer;
 use App\Models\Dashboard;
 use App\Models\Device;
@@ -14,6 +12,7 @@ use App\Models\UserPref;
 use App\Models\UserWidget;
 use App\Models\Widget;
 use Auth;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
 use Toastr;
 
@@ -42,14 +41,12 @@ class OverviewController extends Controller
             return $dashboard->user_id == $user->user_id;
         });
 
-
-
-        if (!empty($request->dashboard) && isset($dashboards[$request->dashboard])) {
+        if (! empty($request->dashboard) && isset($dashboards[$request->dashboard])) {
             // specific dashboard
             $dashboard = $dashboards[$request->dashboard];
         } else {
-            $user_default_dash = (int)UserPref::getPref($user, 'dashboard');
-            $global_default = (int)Config::get('webui.default_dashboard_id');
+            $user_default_dash = (int) UserPref::getPref($user, 'dashboard');
+            $global_default = (int) Config::get('webui.default_dashboard_id');
 
             // load user default
             if (isset($dashboards[$user_default_dash])) {
@@ -58,21 +55,21 @@ class OverviewController extends Controller
             } elseif (isset($dashboards[$global_default])) {
                 $dashboard = $dashboards[$global_default];
             // load users first dashboard
-            } elseif (!empty($user_dashboards)) {
+            } elseif (! empty($user_dashboards)) {
                 $dashboard = $user_dashboards->first();
             }
 
             // specific dashboard was requested, but doesn't exist
-            if (isset($dashboard) && !empty($request->dashboard)) {
+            if (isset($dashboard) && ! empty($request->dashboard)) {
                 Toastr::error(
                     "Dashboard <code>#$request->dashboard</code> does not exist! Loaded <code>
-                    ".htmlentities($dashboard->dashboard_name)."</code> instead.",
-                    "Requested Dashboard Not Found!"
+                    ".htmlentities($dashboard->dashboard_name).'</code> instead.',
+                    'Requested Dashboard Not Found!'
                 );
             }
         }
 
-        if (!isset($dashboard)) {
+        if (! isset($dashboard)) {
             $dashboard = Dashboard::create([
                 'dashboard_name' => 'Default',
                 'user_id' => $user->user_id,
@@ -81,12 +78,12 @@ class OverviewController extends Controller
 
         $data = $dashboard
             ->widgets()
-            ->select(['user_widget_id','users_widgets.widget_id','title','widget','col','row','size_x','size_y','refresh'])
+            ->select(['user_widget_id', 'users_widgets.widget_id', 'title', 'widget', 'col', 'row', 'size_x', 'size_y', 'refresh'])
             ->join('widgets', 'widgets.widget_id', '=', 'users_widgets.widget_id')
             ->get();
 
         if ($data->isEmpty()) {
-            $data[] = array('user_widget_id'=>'0',
+            $data[] = ['user_widget_id'=>'0',
                             'widget_id'=>1,
                             'title'=>'Add a widget',
                             'widget'=>'placeholder',
@@ -94,15 +91,15 @@ class OverviewController extends Controller
                             'row'=>1,
                             'size_x'=>6,
                             'size_y'=>2,
-                            'refresh'=>60
-                        );
+                            'refresh'=>60,
+                        ];
         }
 
-        $bare                  = $request->bare;
-        $data                  = serialize(json_encode($data));
-        $dash_config           = unserialize(stripslashes($data));
+        $bare = $request->bare;
+        $data = serialize(json_encode($data));
+        $dash_config = unserialize(stripslashes($data));
         $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
-        $widgets               = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
+        $widgets = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
 
         return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets'));
     }
@@ -133,7 +130,6 @@ class OverviewController extends Controller
             ->limit(Config::get('front_page_down_box_limit'))
             ->with('device')
             ->get();
-
 
         // TODO: is inAlarm() equal to: bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != ''  ?
         if (Config::get('enable_bgp')) {

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateAlertTemplateMapTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -17,7 +16,7 @@ class CreateAlertTemplateMapTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('alert_templates_id');
             $table->unsignedInteger('alert_rule_id');
-            $table->index(['alert_templates_id','alert_rule_id'], 'alert_templates_id');
+            $table->index(['alert_templates_id', 'alert_rule_id'], 'alert_templates_id');
         });
     }
 

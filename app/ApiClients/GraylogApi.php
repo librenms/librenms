@@ -1,6 +1,6 @@
 <?php
 /**
- * GraylogApi.php
+ * GraylogApi.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -43,7 +42,7 @@ class GraylogApi
         if (empty($config)) {
             $base_uri = Config::get('graylog.server');
             if ($port = Config::get('graylog.port')) {
-                $base_uri .= ':' . $port;
+                $base_uri .= ':'.$port;
             }
 
             $config = [
@@ -58,11 +57,11 @@ class GraylogApi
 
     public function getStreams()
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return [];
         }
 
-        $uri = $this->api_prefix . '/streams';
+        $uri = $this->api_prefix.'/streams';
 
         $response = $this->client->get($uri);
         $data = json_decode($response->getBody(), true);
@@ -71,7 +70,7 @@ class GraylogApi
     }
 
     /**
-     * Query the Graylog server
+     * Query the Graylog server.
      *
      * @param string $query
      * @param int $range
@@ -83,13 +82,13 @@ class GraylogApi
      */
     public function query($query = '*', $range = 0, $limit = 0, $offset = 0, $sort = null, $filter = null)
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return [];
         }
 
         $uri = Config::get('graylog.base_uri');
-        if (!$uri) {
-            $uri = $this->api_prefix . '/search/universal/relative';
+        if (! $uri) {
+            $uri = $this->api_prefix.'/search/universal/relative';
         }
 
         $data = [
@@ -108,7 +107,7 @@ class GraylogApi
     }
 
     /**
-     * Build a simple query string that searches the messages field and/or filters by device
+     * Build a simple query string that searches the messages field and/or filters by device.
      *
      * @param string $search Search the message field for this string
      * @param Device $device
@@ -118,11 +117,11 @@ class GraylogApi
     {
         $query = [];
         if ($search) {
-            $query[] = 'message:"' . $search . '"';
+            $query[] = 'message:"'.$search.'"';
         }
 
         if ($device) {
-            $query[] = 'source: ("' . $this->getAddresses($device)->implode('" OR "') . '")';
+            $query[] = 'source: ("'.$this->getAddresses($device)->implode('" OR "').'")';
         }
 
         if (empty($query)) {
@@ -144,12 +143,12 @@ class GraylogApi
             $addresses = $addresses->merge($device->ipv4->pluck('ipv4_address')
                 ->filter(
                     function ($address) {
-                        return $address != "127.0.0.1";
+                        return $address != '127.0.0.1';
                     }
                 ))->merge($device->ipv6->pluck('ipv6_address')
                 ->filter(
                     function ($address) {
-                        return $address != "0000:0000:0000:0000:0000:0000:0000:0001";
+                        return $address != '0000:0000:0000:0000:0000:0000:0000:0001';
                     }
                 ));
         }

@@ -24,13 +24,14 @@ abstract class TestCase extends BaseTestCase
             $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
         }
     }
+
     public function dbTearDown()
     {
         if (getenv('DBTEST')) {
             try {
                 \LibreNMS\DB\Eloquent::DB()->rollBack();
             } catch (\Exception $e) {
-                $this->fail("Exception when rolling back transaction.\n" . $e->getTraceAsString());
+                $this->fail("Exception when rolling back transaction.\n".$e->getTraceAsString());
             }
         }
     }

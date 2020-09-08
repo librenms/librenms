@@ -1,6 +1,6 @@
 <?php
 /**
- * 2018_07_03_091314_create_transport_group_transport_table.php
+ * 2018_07_03_091314_create_transport_group_transport_table.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -28,7 +27,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateTransportGroupTransportTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -41,7 +39,6 @@ class CreateTransportGroupTransportTable extends Migration
             $table->unsignedInteger('transport_id');
         });
     }
-
 
     /**
      * Reverse the migrations.

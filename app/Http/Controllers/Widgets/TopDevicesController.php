@@ -1,6 +1,6 @@
 <?php
 /**
- * TopDevices.php
+ * TopDevices.php.
  *
  * -Description-
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -56,6 +55,7 @@ class TopDevicesController extends WidgetController
     public function title()
     {
         $settings = $this->getSettings();
+
         return isset($settings['title']) ? $settings['title'] : $this->title;
     }
 
@@ -110,7 +110,7 @@ class TopDevicesController extends WidgetController
     private function formatData($headers, $rows)
     {
         return [
-            'headers' => (array)$headers,
+            'headers' => (array) $headers,
             'rows' => $rows,
         ];
     }
@@ -124,7 +124,7 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        /** @var Builder $query */
+        /* @var Builder $query */
         return $query->with(['device' => function ($query) {
             $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
         }])
@@ -191,7 +191,7 @@ class TopDevicesController extends WidgetController
             }, function ($query) {
                 $query->has('device');
             })
-            ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) ' . $sort)
+            ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) '.$sort)
             ->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($port) {
@@ -235,7 +235,7 @@ class TopDevicesController extends WidgetController
 
         /** @var Builder $query */
         $query = $this->withDeviceQuery(Processor::hasAccess(Auth::user()), (new Processor)->getTable())
-            ->orderByRaw('AVG(`processor_usage`) ' . $sort)
+            ->orderByRaw('AVG(`processor_usage`) '.$sort)
             ->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($port) {
@@ -304,7 +304,7 @@ class TopDevicesController extends WidgetController
                 'type' => 'device_storage',
                 'legend' => 'no',
             ];
-            $overlib_content = Url::overlibContent($graph_array, $device->displayName() . ' - ' . $storage->storage_descr);
+            $overlib_content = Url::overlibContent($graph_array, $device->displayName().' - '.$storage->storage_descr);
 
             $link_array = $graph_array;
             $link_array['page'] = 'graphs';
@@ -321,7 +321,7 @@ class TopDevicesController extends WidgetController
                     $link,
                     Html::percentageBar(150, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']),
                     $overlib_content
-                )
+                ),
             ];
         });
 

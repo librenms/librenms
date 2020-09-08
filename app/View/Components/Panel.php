@@ -6,7 +6,6 @@ use Illuminate\View\Component;
 
 class Panel extends Component
 {
-
     /**
      * The Panel title.
      *
@@ -27,7 +26,6 @@ class Panel extends Component
      * @var string
      */
     public $footer_class;
-
 
     /**
      * Create a new component instance.

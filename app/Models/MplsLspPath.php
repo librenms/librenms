@@ -35,12 +35,12 @@ class MplsLspPath extends Model implements Keyable
     // ---- Helper Functions ----
 
     /**
-     * Get a string that can identify a unique instance of this model
+     * Get a string that can identify a unique instance of this model.
      * @return string
      */
     public function getCompositeKey()
     {
-        return $this->lsp_id . '-' . $this->path_oid;
+        return $this->lsp_id.'-'.$this->path_oid;
     }
 
     // ---- Define Relationships ----

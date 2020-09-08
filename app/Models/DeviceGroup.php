@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceGroup.php
+ * DeviceGroup.php.
  *
  * Dynamic groups of devices
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -39,17 +38,17 @@ class DeviceGroup extends BaseModel
     {
         parent::boot();
 
-        static::deleting(function (DeviceGroup $deviceGroup) {
+        static::deleting(function (self $deviceGroup) {
             $deviceGroup->devices()->detach();
         });
 
-        static::saving(function (DeviceGroup $deviceGroup) {
+        static::saving(function (self $deviceGroup) {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
             }
         });
 
-        static::saved(function (DeviceGroup $deviceGroup) {
+        static::saved(function (self $deviceGroup) {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->updateDevices();
             }
@@ -59,7 +58,7 @@ class DeviceGroup extends BaseModel
     // ---- Helper Functions ----
 
     /**
-     * Update devices included in this group (dynamic only)
+     * Update devices included in this group (dynamic only).
      */
     public function updateDevices()
     {
@@ -70,7 +69,7 @@ class DeviceGroup extends BaseModel
     }
 
     /**
-     * Update the device groups for the given device or device_id
+     * Update the device groups for the given device or device_id.
      *
      * @param Device|int $device
      * @return array
@@ -78,12 +77,12 @@ class DeviceGroup extends BaseModel
     public static function updateGroupsFor($device)
     {
         $device = ($device instanceof Device ? $device : Device::find($device));
-        if (!$device instanceof Device) {
+        if (! $device instanceof Device) {
             // could not load device
             return [
-                "attached" => [],
-                "detached" => [],
-                "updated" => [],
+                'attached' => [],
+                'detached' => [],
+                'updated' => [],
             ];
         }
 
@@ -101,7 +100,8 @@ class DeviceGroup extends BaseModel
                             ->where('devices.device_id', $device->device_id)
                             ->exists();
                     } catch (\Illuminate\Database\QueryException $e) {
-                        Log::error("Device Group '$device_group->name' generates invalid query: " . $e->getMessage());
+                        Log::error("Device Group '$device_group->name' generates invalid query: ".$e->getMessage());
+
                         return false;
                     }
                 }
@@ -116,13 +116,13 @@ class DeviceGroup extends BaseModel
     }
 
     /**
-     * Get a query builder parser instance from this device group
+     * Get a query builder parser instance from this device group.
      *
      * @return QueryBuilderFluentParser
      */
     public function getParser()
     {
-        return !empty($this->rules) ?
+        return ! empty($this->rules) ?
             QueryBuilderFluentParser::fromJson($this->rules) :
             QueryBuilderFluentParser::fromOld($this->pattern);
     }

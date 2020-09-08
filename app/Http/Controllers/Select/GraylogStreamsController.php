@@ -1,6 +1,6 @@
 <?php
 /**
- * GraylogStreamsController.php
+ * GraylogStreamsController.php.
  *
  * Select for the available streams from the graylog server.
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -34,7 +33,7 @@ use Log;
 class GraylogStreamsController extends Controller
 {
     /**
-     * The default method called by the route handler
+     * The default method called by the route handler.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -51,7 +50,7 @@ class GraylogStreamsController extends Controller
         $streams = [];
         try {
             $streams = collect($api->getStreams()['streams'])->filter(function ($stream) use ($search) {
-                return !$search || Str::contains(strtolower($stream['title']), $search) || Str::contains(strtolower($stream['description']), $search);
+                return ! $search || Str::contains(strtolower($stream['title']), $search) || Str::contains(strtolower($stream['description']), $search);
             })->map(function ($stream) {
                 $text = $stream['title'];
                 if ($stream['description']) {
@@ -66,7 +65,7 @@ class GraylogStreamsController extends Controller
 
         return response()->json([
             'results' => $streams,
-            'pagination' => ['more' => false]
+            'pagination' => ['more' => false],
         ]);
     }
 }

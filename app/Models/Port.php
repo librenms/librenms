@@ -14,13 +14,13 @@ class Port extends DeviceRelatedModel
     protected $primaryKey = 'port_id';
 
     /**
-     * Initialize this class
+     * Initialize this class.
      */
     public static function boot()
     {
         parent::boot();
 
-        static::deleting(function (Port $port) {
+        static::deleting(function (self $port) {
             // delete related data
             $port->adsl()->delete();
             $port->fdbEntries()->delete();
@@ -46,10 +46,10 @@ class Port extends DeviceRelatedModel
         });
     }
 
-        // ---- Helper Functions ----
+    // ---- Helper Functions ----
 
     /**
-     * Returns a human readable label for this port
+     * Returns a human readable label for this port.
      *
      * @return string
      */
@@ -71,13 +71,13 @@ class Port extends DeviceRelatedModel
             }
         }
 
-        foreach ((array)\LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
+        foreach ((array) \LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
             if (Str::contains(strtolower($label), strtolower($src))) {
                 $label = $val;
             }
         }
 
-        foreach ((array)\LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
+        foreach ((array) \LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
             $label = preg_replace($reg.'i', $val, $label);
         }
 
@@ -102,7 +102,7 @@ class Port extends DeviceRelatedModel
      */
     public function canAccess($user)
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -117,9 +117,10 @@ class Port extends DeviceRelatedModel
 
     public function getIfPhysAddressAttribute($mac)
     {
-        if (!empty($mac)) {
+        if (! empty($mac)) {
             return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
         }
+
         return null;
     }
 
@@ -225,7 +226,7 @@ class Port extends DeviceRelatedModel
             ['ignore', '=', 0],
             ['disabled', '=', 0],
         ])->where(function ($query) {
-            /** @var Builder $query */
+            /* @var Builder $query */
             $query->where('ifInErrors_delta', '>', 0)
                 ->orWhere('ifOutErrors_delta', '>', 0);
         });

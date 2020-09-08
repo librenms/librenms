@@ -44,8 +44,8 @@ class RemoveConfigDefinitionFromDb extends Migration
             $table->integer('config_group_order')->default(0);
             $table->string('config_sub_group', 50)->nullable();
             $table->integer('config_sub_group_order')->default(0);
-            $table->enum('config_hidden', ['0','1'])->default('0');
-            $table->enum('config_disabled', ['0','1'])->default('0');
+            $table->enum('config_hidden', ['0', '1'])->default('0');
+            $table->enum('config_disabled', ['0', '1'])->default('0');
         });
     }
 }

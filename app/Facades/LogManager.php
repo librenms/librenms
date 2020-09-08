@@ -1,6 +1,6 @@
 <?php
 /**
- * Log.php
+ * Log.php.
  *
  * Extending the built in logging to add an event logger function
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -31,7 +30,7 @@ use LibreNMS\Enum\Alert;
 class LogManager extends \Illuminate\Log\LogManager
 {
     /**
-     * Log events to the event table
+     * Log events to the event table.
      *
      * @param string $text message describing the event
      * @param \App\Models\Device|int $device device array or device_id

@@ -1,6 +1,6 @@
 <?php
 /**
- * LayoutComposer.php
+ * LayoutComposer.php.
  *
  * Provides data for the main layout
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -45,7 +44,7 @@ class LayoutComposer
             // short sections escape the html entities, reverse that
             $title = html_entity_decode(trim($view->getFactory()->getSection('title')), ENT_QUOTES);
             $title = str_replace('    ', ' : ', $title);
-            $title .= ' | ' . Config::get('page_title_suffix');
+            $title .= ' | '.Config::get('page_title_suffix');
         } else {
             $title = Config::get('page_title_suffix');
         }
@@ -53,7 +52,7 @@ class LayoutComposer
         Checks::postAuth();
 
         $show_menu = auth()->check();
-        if ($show_menu && Config::get('twofactor') && !session('twofactor')) {
+        if ($show_menu && Config::get('twofactor') && ! session('twofactor')) {
             $show_menu = empty(UserPref::getPref(auth()->user(), 'twofactor'));
         }
 

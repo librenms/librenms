@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateDeviceRelationshipsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -16,7 +15,7 @@ class CreateDeviceRelationshipsTable extends Migration
         Schema::create('device_relationships', function (Blueprint $table) {
             $table->unsignedInteger('parent_device_id')->default(0);
             $table->unsignedInteger('child_device_id')->index();
-            $table->primary(['parent_device_id','child_device_id']);
+            $table->primary(['parent_device_id', 'child_device_id']);
         });
     }
 

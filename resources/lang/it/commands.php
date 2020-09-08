@@ -35,5 +35,5 @@ return [
     ],
     'translation:generate' => [
         'description' => 'Generate updated json language files for use in the web frontend',
-    ]
+    ],
 ];
