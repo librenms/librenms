@@ -24,5 +24,4 @@
  */
 
 preg_match('/([0-9]+)/', $sensor_value, $temps);
-list(, $index) = explode('.', $sensor['sensor_index']);
 $sensor_value = $temps[0];
