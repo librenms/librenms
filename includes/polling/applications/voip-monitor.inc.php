@@ -17,8 +17,6 @@ if (!empty($agent_data[$name])) {
     $rawdata = snmp_get($device, $oid, $options, $mib);
 }
 
-
-
 # Format Data
 $lines = explode("\n", $rawdata);
 
@@ -36,7 +34,7 @@ $rrd_name =  array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('cpu', 'GAUGE', 0, 100)
     ->addDataset('kbyte', 'GAUGE', 0, 125000000000)
-    ->addDataset('openfiles', 'GAUGE', 0, 125000000000);;
+    ->addDataset('openfiles', 'GAUGE', 0, 125000000000);
 
 $fields = array(
     'cpu' => (float)$voip['CPU Load'],
@@ -49,4 +47,3 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 update_application($app, $rawdata, $fields);
-
