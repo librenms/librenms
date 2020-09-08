@@ -22,6 +22,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 
 class DefaultLegacySchemaSeeder extends Seeder
