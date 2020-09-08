@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "magicserialnumber",
                     "icon": "infinera.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

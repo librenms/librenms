@@ -28,11 +28,22 @@
 namespace LibreNMS\OS\Shared;
 
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\YamlOSDiscovery;
 
 class Zyxel extends OS
 {
+    use YamlOSDiscovery {
+        YamlOSDiscovery::discoverOS as discoverYamlOS;
+    }
+
     public function discoverOS(): void
     {
+        // yaml discovery overrides this
+        if ($this->hasYamlDiscovery('os')) {
+            $this->discoverYamlOS();
+            return;
+        };
+
         $oids = [
             '.1.3.6.1.4.1.890.1.15.3.1.11.0', // ZYXEL-ES-COMMON::sysProductModel.0
             '.1.3.6.1.4.1.890.1.15.3.1.6.0', // ZYXEL-ES-COMMON::sysSwVersionString.0

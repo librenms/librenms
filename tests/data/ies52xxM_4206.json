@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "S170Z34010399",
                     "icon": "zyxel.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

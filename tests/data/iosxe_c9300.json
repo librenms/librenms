@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "FCW2204L050",
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

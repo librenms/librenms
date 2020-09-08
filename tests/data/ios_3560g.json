@@ -308,7 +308,7 @@
                     "type": "network",
                     "serial": "FOC1426Y2AY",
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "FCW1929B68S",
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

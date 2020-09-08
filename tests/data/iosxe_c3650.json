@@ -65,7 +65,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
