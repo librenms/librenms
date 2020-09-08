@@ -34,4 +34,3 @@ $nototal   = 1;
 $unit_text = 'bytes';
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
-
