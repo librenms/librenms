@@ -18,7 +18,6 @@
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\RRD\RrdDefinition;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 function string_to_oid($string)
@@ -43,39 +42,35 @@ function prep_snmp_setting($device, $setting)
 
 /**
  * @param $device
- * @return array $extra will contain a list of mib dirs
+ * @return array will contain a list of mib dirs
  */
 function get_mib_dir($device)
 {
-    $extra = array();
+    $dirs = [];
 
     if (file_exists(Config::get('mib_dir') . '/' . $device['os'])) {
-        $extra[] = Config::get('mib_dir') . '/' . $device['os'];
+        $dirs[] = Config::get('mib_dir') . '/' . $device['os'];
     }
 
     if (isset($device['os_group'])) {
         if (file_exists(Config::get('mib_dir') . '/' . $device['os_group'])) {
-            $extra[] = Config::get('mib_dir') . '/' . $device['os_group'];
+            $dirs[] = Config::get('mib_dir') . '/' . $device['os_group'];
         }
 
         if ($group_mibdir = Config::get("os_groups.{$device['os_group']}.mib_dir")) {
             if (is_array($group_mibdir)) {
                 foreach ($group_mibdir as $k => $dir) {
-                    $extra[] = Config::get('mib_dir') . '/' . $dir;
+                    $dirs[] = Config::get('mib_dir') . '/' . $dir;
                 }
             }
         }
     }
 
     if ($os_mibdir = Config::get("os.{$device['os']}.mib_dir")) {
-        if (is_array($os_mibdir)) {
-            foreach ($os_mibdir as $k => $dir) {
-                $extra[] = Config::get('mib_dir') . '/' . $dir;
-            }
-        }
+        $dirs[] = Config::get('mib_dir') . '/' . $os_mibdir;
     }
 
-    return $extra;
+    return $dirs;
 }
 
 /**

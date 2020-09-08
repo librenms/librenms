@@ -4,8 +4,7 @@ type: appliance
 icon: packetflux
 over:
     - { graph: device_poller_perf, text: 'Poller time' }
-mib_dir:
-    - packetflux
+mib_dir: packetflux
 discovery:
     -
         sysObjectID:

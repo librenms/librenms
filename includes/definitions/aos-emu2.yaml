@@ -5,8 +5,7 @@ icon: apc
 over:
     - { graph: device_temperature, text: Temperature }
     - { graph: device_humidity, text: Humidity }
-mib_dir:
-    - apc
+mib_dir: apc
 discovery:
     -
         sysObjectID:

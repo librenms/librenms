@@ -3,8 +3,7 @@ text: 'EDS'
 type: appliance
 icon: eds
 group: eds
-mib_dir:
-    - eds
+mib_dir: eds
 poller_modules:
     bgp-peers: false
     stp: false

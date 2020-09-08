@@ -3,8 +3,7 @@ text: 'ICT Modular Power System'
 type: power
 icon: ict
 nobulk: true
-mib_dir:
-    - ict
+mib_dir: ict
 over:
     - { graph: device_voltage, text: 'Input Voltage' }
     - { graph: device_voltage, text: 'Output Voltage' }

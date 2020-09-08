@@ -7,8 +7,7 @@ over:
     - { graph: device_temperature, text: 'Temperature' }
     - { graph: device_power, text: 'Power' }
     - { graph: device_fanspeed, text: 'Fans' }
-mib_dir:
-    - huawei
+mib_dir: huawei
 poller_modules:
     bgp-peers: false
     stp: false

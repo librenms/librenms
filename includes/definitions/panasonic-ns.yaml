@@ -2,8 +2,7 @@ os: panasonic-ns
 text: 'Panasonic KX-NS Series'
 type: server
 icon: panasonic
-mib_dir:
-    - panasonic
+mib_dir: panasonic
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

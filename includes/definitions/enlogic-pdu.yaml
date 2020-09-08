@@ -7,8 +7,7 @@ over:
     - { graph: device_current, text: Current }
     - { graph: device_power, text: Power }
     - { graph: device_state, text: State }
-mib_dir:
-    - enlogic
+mib_dir: enlogic
 discovery:
     -
         sysObjectID:

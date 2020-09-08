@@ -3,8 +3,7 @@ text: 'PBI Digital Decoder'
 type: network
 icon: pbi
 group: pbi
-mib_dir:
-    - pbi
+mib_dir: pbi
 over:
     - { graph: device_signal, text: 'Signal Strength' }
     - { graph: device_dbm, text: 'dBm' }

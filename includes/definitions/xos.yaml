@@ -3,8 +3,7 @@ text: 'Extreme XOS'
 type: network
 ifname: true
 icon: extreme
-mib_dir:
-    - extreme
+mib_dir: extreme
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

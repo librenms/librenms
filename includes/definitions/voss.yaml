@@ -2,8 +2,7 @@ os: voss
 text: 'Extreme VOSS'
 type: network
 icon: extremevoss
-mib_dir:
-    - nortel
+mib_dir: nortel
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
