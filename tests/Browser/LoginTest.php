@@ -26,7 +26,7 @@ class LoginTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $password = 'some_password';
-            $user = factory(User::class)->create([
+            $user = User::factory()->create([
                 'password' => password_hash($password, PASSWORD_DEFAULT),
             ]);
 
@@ -52,7 +52,7 @@ class LoginTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $password = 'another_password';
-            $user = factory(User::class)->create([
+            $user = User::factory()->create([
                 'password' => password_hash($password, PASSWORD_DEFAULT),
             ]);
             Config::persist('twofactor', true); // set to db

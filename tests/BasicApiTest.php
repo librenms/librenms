@@ -35,9 +35,9 @@ class BasicApiTest extends DBTestCase
 
     public function testListDevices()
     {
-        $user = factory(User::class)->state('admin')->create();
+        $user = User::factory()->admin()->create();
         $token = ApiToken::generateToken($user);
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->token_hash])
             ->assertStatus(200)

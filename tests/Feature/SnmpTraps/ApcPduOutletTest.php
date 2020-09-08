@@ -33,7 +33,7 @@ class ApcPduOutletTest extends SnmpTrapTestCase
 {
     public function testOutletOff()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -52,7 +52,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
 
     public function testOutletOn()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -71,7 +71,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
 
     public function testOutletReboot()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162

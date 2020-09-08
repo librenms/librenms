@@ -34,7 +34,7 @@ class RuckusSzEventTest extends SnmpTrapTestCase
 {
     public function testSzApConf()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -60,7 +60,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfigID.0 \"2f860f70-6b88-11e9-a3c5-000000937916
 
     public function testSzApConnect()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -86,7 +86,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 \"AP connected after rebooting\"";
 
     public function testSzApMiscEvent()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -112,7 +112,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription.0 \"Test AP event has occured\"";
 
     public function testSzApRebooted()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

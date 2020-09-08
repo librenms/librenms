@@ -32,7 +32,7 @@ class AdvaObjectDeletionTest extends SnmpTrapTestCase
 {
     public function testUserDeletion()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -53,7 +53,7 @@ ADVA-MIB::neEventLogTimeStamp.92 2018-12-10,8:56:27.5,-6:0";
 
     public function testFLowDeletion()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -74,7 +74,7 @@ ADVA-MIB::neEventLogTimeStamp.148 2018-12-10,9:7:28.1,-6:0";
 
     public function testLagPortDeletion()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -95,7 +95,7 @@ ADVA-MIB::neEventLogTimeStamp.136 2018-12-10,9:3:51.3,-6:0";
 
     public function testLagDeletion()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

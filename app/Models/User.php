@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\UserCreated;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,6 +12,8 @@ use Permissions;
 
 class User extends Authenticatable
 {
+    use HasFactory;
+
     use Notifiable;
 
     protected $primaryKey = 'user_id';

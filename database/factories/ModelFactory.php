@@ -13,165 +13,264 @@
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 
+namespace Database\Factories;
+
+use App\Models\Ipv4Network;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
 use LibreNMS\Util\IPv4;
 
-$factory->define(App\Models\User::class, function (Faker\Generator $faker) {
-    static $password;
+class ModelFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = \App\Models\User::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        static $password;
 
     return [
         'auth_type' => 'mysql',
-        'username' => $faker->unique()->userName,
-        'realname' => $faker->name,
-        'email' => $faker->safeEmail,
+        'username' => $this->faker->unique()->userName,
+        'realname' => $this->faker->name,
+        'email' => $this->faker->safeEmail,
         'password' => $password ?: $password = bcrypt('secret'),
         'level' => 1,
     ];
-});
+    }
 
-$factory->state(App\Models\User::class, 'admin', function ($faker) {
-    return [
+    public function admin()
+    {
+        return $this->state(function () {
+            return [
         'level' => '10',
     ];
-});
+        });
+    }
 
-$factory->state(App\Models\User::class, 'read', function ($faker) {
-    return [
+    public function read()
+    {
+        return $this->state(function () {
+            return [
         'level' => '5',
     ];
-});
+        });
+    }
 
-$factory->define(\App\Models\Bill::class, function (Faker\Generator $faker) {
-    return [
-        'bill_name' => $faker->text,
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'bill_name' => $this->faker->text,
     ];
-});
+    }
 
-$factory->define(\App\Models\Device::class, function (Faker\Generator $faker) {
-    return [
-        'hostname' => $faker->domainWord.'.'.$faker->domainName,
-        'ip' => $faker->randomElement([$faker->ipv4, $faker->ipv6]),
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'hostname' => $this->faker->domainWord.'.'.$this->faker->domainName,
+        'ip' => $this->faker->randomElement([$this->faker->ipv4, $this->faker->ipv6]),
         'status' => $status = random_int(0, 1),
-        'status_reason' => $status == 0 ? $faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
+        'status_reason' => $status == 0 ? $this->faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
     ];
-});
+    }
 
-$factory->define(\App\Models\Port::class, function (Faker\Generator $faker) {
-    return [
-        'ifIndex' => $faker->unique()->numberBetween(),
-        'ifName' => $faker->text(20),
-        'ifDescr' => $faker->text(255),
-        'ifLastChange' => $faker->unixTime(),
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'ifIndex' => $this->faker->unique()->numberBetween(),
+        'ifName' => $this->faker->text(20),
+        'ifDescr' => $this->faker->text(255),
+        'ifLastChange' => $this->faker->unixTime(),
     ];
-});
+    }
 
-$factory->define(\App\Models\BgpPeer::class, function (Faker\Generator $faker) {
-    return [
-        'bgpPeerIdentifier' => $faker->ipv4,
-        'bgpLocalAddr' => $faker->ipv4,
-        'bgpPeerRemoteAddr' => $faker->ipv4,
-        'bgpPeerRemoteAs' => $faker->numberBetween(1, 65535),
-        'bgpPeerState' => $faker->randomElement(['established', 'idle']),
-        'astext' => $faker->sentence(),
-        'bgpPeerAdminStatus' => $faker->randomElement(['start', 'stop']),
-        'bgpPeerInUpdates' => $faker->randomDigit,
-        'bgpPeerOutUpdates' => $faker->randomDigit,
-        'bgpPeerInTotalMessages' => $faker->randomDigit,
-        'bgpPeerOutTotalMessages' => $faker->randomDigit,
-        'bgpPeerFsmEstablishedTime' => $faker->unixTime,
-        'bgpPeerInUpdateElapsedTime' => $faker->unixTime,
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'bgpPeerIdentifier' => $this->faker->ipv4,
+        'bgpLocalAddr' => $this->faker->ipv4,
+        'bgpPeerRemoteAddr' => $this->faker->ipv4,
+        'bgpPeerRemoteAs' => $this->faker->numberBetween(1, 65535),
+        'bgpPeerState' => $this->faker->randomElement(['established', 'idle']),
+        'astext' => $this->faker->sentence(),
+        'bgpPeerAdminStatus' => $this->faker->randomElement(['start', 'stop']),
+        'bgpPeerInUpdates' => $this->faker->randomDigit,
+        'bgpPeerOutUpdates' => $this->faker->randomDigit,
+        'bgpPeerInTotalMessages' => $this->faker->randomDigit,
+        'bgpPeerOutTotalMessages' => $this->faker->randomDigit,
+        'bgpPeerFsmEstablishedTime' => $this->faker->unixTime,
+        'bgpPeerInUpdateElapsedTime' => $this->faker->unixTime,
     ];
-});
+    }
 
-$factory->define(\App\Models\Ipv4Address::class, function (Faker\Generator $faker) {
-    $prefix = $faker->numberBetween(0, 32);
-    $ip = new IPv4($faker->ipv4.'/'.$prefix);
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        $prefix = $this->faker->numberBetween(0, 32);
+    $ip = new IPv4($this->faker->ipv4.'/'.$prefix);
 
     return [
         'ipv4_address' => $ip->uncompressed(),
         'ipv4_prefixlen' => $prefix,
         'port_id' => function () {
-            return factory(\App\Models\Port::class)->create()->port_id;
+            return Port::factory()->create()->port_id;
         },
         'ipv4_network_id' => function () use ($ip) {
-            return factory(\App\Models\Ipv4Network::class)->create(['ipv4_network' => $ip->getNetworkAddress().'/'.$ip->cidr])->ipv4_network_id;
+            return Ipv4Network::factory()->create(['ipv4_network' => $ip->getNetworkAddress().'/'.$ip->cidr])->ipv4_network_id;
         },
     ];
-});
+    }
 
-$factory->define(\App\Models\Ipv4Network::class, function (Faker\Generator $faker) {
-    return [
-        'ipv4_network' => $faker->ipv4.'/'.$faker->numberBetween(0, 32),
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'ipv4_network' => $this->faker->ipv4.'/'.$this->faker->numberBetween(0, 32),
     ];
-});
+    }
 
-$factory->define(\App\Models\Syslog::class, function (Faker\Generator $faker) {
-    $facilities = ['kern', 'user', 'mail', 'daemon', 'auth', 'syslog', 'lpr', 'news', 'uucp', 'cron', 'authpriv', 'ftp', 'ntp', 'security', 'console', 'solaris-cron', 'local0', 'local1', 'local2', 'local3', 'local4', 'local5', 'local6', 'local7'];
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        $facilities = ['kern', 'user', 'mail', 'daemon', 'auth', 'syslog', 'lpr', 'news', 'uucp', 'cron', 'authpriv', 'ftp', 'ntp', 'security', 'console', 'solaris-cron', 'local0', 'local1', 'local2', 'local3', 'local4', 'local5', 'local6', 'local7'];
     $levels = ['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug'];
 
     return [
-        'facility' => $faker->randomElement($facilities),
-        'priority' => $faker->randomElement($levels),
-        'level' => $faker->randomElement($levels),
-        'tag' => $faker->asciify(str_repeat('*', $faker->numberBetween(0, 10))),
+        'facility' => $this->faker->randomElement($facilities),
+        'priority' => $this->faker->randomElement($levels),
+        'level' => $this->faker->randomElement($levels),
+        'tag' => $this->faker->asciify(str_repeat('*', $this->faker->numberBetween(0, 10))),
         'timestamp' => Carbon::now(),
-        'program' => $faker->asciify(str_repeat('*', $faker->numberBetween(0, 32))),
-        'msg' => $faker->text(),
+        'program' => $this->faker->asciify(str_repeat('*', $this->faker->numberBetween(0, 32))),
+        'msg' => $this->faker->text(),
     ];
-});
+    }
 
-$factory->define(\App\Models\Vminfo::class, function (Faker\Generator $faker) {
-    return [
-        'vm_type' => $faker->text(16),
-        'vmwVmVMID' => $faker->randomDigit,
-        'vmwVmDisplayName' => $faker->domainWord.'.'.$faker->domainName,
-        'vmwVmGuestOS' => $faker->text(128),
-        'vmwVmMemSize' => $faker->randomDigit,
-        'vmwVmCpus' => $faker->randomDigit,
-        'vmwVmState' => $faker->randomElement(['powered on', 'powered off', 'suspended']),
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'vm_type' => $this->faker->text(16),
+        'vmwVmVMID' => $this->faker->randomDigit,
+        'vmwVmDisplayName' => $this->faker->domainWord.'.'.$this->faker->domainName,
+        'vmwVmGuestOS' => $this->faker->text(128),
+        'vmwVmMemSize' => $this->faker->randomDigit,
+        'vmwVmCpus' => $this->faker->randomDigit,
+        'vmwVmState' => $this->faker->randomElement(['powered on', 'powered off', 'suspended']),
     ];
-});
+    }
 
-$factory->define(\App\Models\OspfNbr::class, function (Faker\Generator $faker) {
-    return [
-        'id' => $faker->randomDigit,
-        'ospfNbrIpAddr' => $faker->ipv4,
-        'ospfNbrAddressLessIndex' => $faker->randomDigit,
-        'ospfNbrRtrId' => $faker->ipv4,
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'id' => $this->faker->randomDigit,
+        'ospfNbrIpAddr' => $this->faker->ipv4,
+        'ospfNbrAddressLessIndex' => $this->faker->randomDigit,
+        'ospfNbrRtrId' => $this->faker->ipv4,
         'ospfNbrOptions' => 0,
         'ospfNbrPriority' => 1,
-        'ospfNbrEvents' => $faker->randomDigit,
+        'ospfNbrEvents' => $this->faker->randomDigit,
         'ospfNbrLsRetransQLen' => 0,
         'ospfNbmaNbrStatus' => 'active',
         'ospfNbmaNbrPermanence' => 'dynamic',
         'ospfNbrHelloSuppressed' => 'false',
     ];
-});
+    }
 
-$factory->define(\App\Models\OspfPort::class, function (Faker\Generator $faker) {
-    return [
-        'id' => $faker->randomDigit,
-        'ospf_port_id' => $faker->randomDigit,
-        'ospfIfIpAddress' => $faker->ipv4,
-        'ospfAddressLessIf' => $faker->randomDigit,
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'id' => $this->faker->randomDigit,
+        'ospf_port_id' => $this->faker->randomDigit,
+        'ospfIfIpAddress' => $this->faker->ipv4,
+        'ospfAddressLessIf' => $this->faker->randomDigit,
         'ospfIfAreaId' => '0.0.0.0',
     ];
-});
+    }
 
-$factory->define(\App\Models\Component::class, function (Faker\Generator $faker) {
-    return [
-        'device_id' => $faker->randomDigit,
-        'type' => $faker->regexify('[A-Za-z0-9]{4,20}'),
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'device_id' => $this->faker->randomDigit,
+        'type' => $this->faker->regexify('[A-Za-z0-9]{4,20}'),
     ];
-});
-$factory->define(\App\Models\Sensor::class, function (Faker\Generator $faker) {
-    $sensor_class = ['airflow', 'ber', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dbm', 'delay', 'eer', 'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'power', 'power_consumed', 'power_factor', 'pressure', 'quality_factor', 'runtime', 'signal', 'snr', 'state', 'temperature', 'voltage', 'waterflow'];
-    $sensor_oid = '.1.3.6.1.4.1.4115.1.4.3.3.'.$faker->numberBetween(0, 10).'.'.$faker->numberBetween(0, 10).'.'.$faker->numberBetween(0, 10);
+    }
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        $sensor_class = ['airflow', 'ber', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dbm', 'delay', 'eer', 'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'power', 'power_consumed', 'power_factor', 'pressure', 'quality_factor', 'runtime', 'signal', 'snr', 'state', 'temperature', 'voltage', 'waterflow'];
+    $sensor_oid = '.1.3.6.1.4.1.4115.1.4.3.3.'.$this->faker->numberBetween(0, 10).'.'.$this->faker->numberBetween(0, 10).'.'.$this->faker->numberBetween(0, 10);
 
     return [
-        'sensor_index' => $faker->randomDigit,
-        'sensor_class' => $faker->randomElement($sensor_class),
-        'sensor_current' => $faker->randomDigit,
+        'sensor_index' => $this->faker->randomDigit,
+        'sensor_class' => $this->faker->randomElement($sensor_class),
+        'sensor_current' => $this->faker->randomDigit,
         'sensor_oid' => $sensor_oid,
     ];
-});
+    }
+}

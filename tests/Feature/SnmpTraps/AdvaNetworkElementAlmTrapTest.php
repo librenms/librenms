@@ -32,7 +32,7 @@ class AdvaNetworkElementAlmTrapTest extends SnmpTrapTestCase
 {
     public function testElementAlarmCleared()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -64,7 +64,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0";
 
     public function testElementAlarmMinor()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -96,7 +96,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0";
 
     public function testElementAlarmMajor()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -128,7 +128,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0";
 
     public function testElementAlarmCritical()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
