@@ -2,8 +2,7 @@ os: omnitron-iconverter
 text: 'Omnitron iConverter'
 type: management
 icon: omnitron
-mib_dir:
-    - omnitron
+mib_dir: omnitron
 discovery:
     -
         sysObjectID:

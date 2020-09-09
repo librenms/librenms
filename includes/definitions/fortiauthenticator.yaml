@@ -2,8 +2,7 @@ os: fortiauthenticator
 text: 'Fortinet FortiAuthenticator'
 type: firewall
 icon: fortinet
-mib_dir:
-    - fortinet
+mib_dir: fortinet
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

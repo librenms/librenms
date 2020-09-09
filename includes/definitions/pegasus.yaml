@@ -5,8 +5,7 @@ type: network
 icon: pegasus
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-mib_dir:
-    - pegasus
+mib_dir: pegasus
 discovery:
     -
         sysObjectID:

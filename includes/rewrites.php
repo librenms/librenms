@@ -36,6 +36,7 @@ function rewrite_entity_descr($descr)
     $descr = str_replace('PMOD', 'PSU', $descr);
     $descr = preg_replace('/^temperatures /', '', $descr);
     $descr = preg_replace('/^voltages /', '', $descr);
+    $descr = str_replace('PowerSupply', 'PSU ', $descr);
 
     return $descr;
 }

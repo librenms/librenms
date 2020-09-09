@@ -2,8 +2,7 @@ os: ftos
 text: 'Force10 FTOS'
 type: network
 icon: force10
-mib_dir:
-    - f10
+mib_dir: dell
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

@@ -16,6 +16,14 @@ markdown_extensions:
     - pymdownx.tilde
     - pymdownx.superfences
     - pymdownx.tabbed
+    - pymdownx.details
+    - pymdownx.highlight:
+        extend_pygments_lang:
+          - name: php
+            lang: php
+            options:
+              startinline: true
+
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
@@ -169,4 +177,5 @@ nav:
       - Device Notes:
           - Intro: Support/Device-Notes/index.md
           - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
+          - Asuswrt-Merlin: Support/Device-Notes/AsuswrtMerlin.md
           - OpenWRT: Support/Device-Notes/Openwrt.md

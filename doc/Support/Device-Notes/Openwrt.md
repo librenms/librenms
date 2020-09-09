@@ -1,4 +1,4 @@
-source: Extensions/Openwrt.md
+source: doc/Support/Device-Notes/Openwrt.md
 path: blob/master/doc/
 
 To use Wireless Sensors on Openwrt, an agent of sorts is required. The
@@ -27,7 +27,7 @@ wlan1,wl-5.0G
 
 2: Update the Openwrt SNMP configuration, adding extend support for the Wireless Sensor queries:
 
-`vi /etc/config/snmpd`, adding the following entries (assuming the scripts are installed in /etc/librenms),
+`vi /etc/config/snmpd`, adding the following entries (assuming the scripts are installed in /etc/librenms, and are executable),
 and update the network interfaces as needed to match the hardware,
 
 ```
@@ -116,6 +116,10 @@ NOTE, any of the scripts above can be tested simply by running the corresponding
 NOTE, to check the output data from any of these extensions, on the LibreNMS machine, run (for example),
 
 `snmpwalk -v 2c -c public -Osqnv <openwrt-host> 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."frequency-wlan0"'`
+
+NOTE, on the LibreNMS machine, ensure that snmp-mibs-downloader is installed.
+
+NOTE, on the AsuswrtMerlin machine, ensure that distro is installed (i.e. that the OS is correctly detected!).
 
 3: Restart the snmp service on Openwrt:
 

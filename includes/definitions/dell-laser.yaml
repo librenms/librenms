@@ -6,8 +6,7 @@ type: printer
 icon: dell
 over:
     - { graph: device_toner, text: Toner }
-mib_dir:
-    - dell
+mib_dir: dell
 discovery:
     -
         sysDescr:

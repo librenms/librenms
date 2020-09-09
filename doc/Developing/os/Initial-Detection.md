@@ -148,24 +148,26 @@ Within the discovery code base if you are using php then the following helpers a
   sysObjectID for this device.
 - `$device['sysDescr']`: This will contain the full sysDescr for this device.
 
-### Poller
+#### OS discovery
 
-OS polling is done within `includes/polling/os/$os.inc.php` and is where we detect certain values.
+OS discovery is done within `LibreNMS/OS/$os.php` and is where we detect certain values.
 
 ```php
-$version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
-$hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
+public function discoverOS(): void
+{
+    $device = $this->getDeviceModel();
+    $info = snmp_getnext_multi($this->getDevice(), 'enclosureModel enclosureSerialNum entPhysicalFirmwareRev', '-OQUs', 'NAS-MIB:ENTITY-MIB');
+    $device->version = Str::replaceFirst('\"', '', $info['entPhysicalFirmwareRev']);
+    $device->hardware = $info['enclosureModel'];
+    $device->serial = $info['enclosureSerialNum'];
+}
 ```
 
-`$version`: The version of the OS running on the device.
-
-`$hardware`: The hardware version for the device. For example: 'WS-C3560X-24T-S'
-
-`$features`: Features for the device, for example a list of cards in the slots of a modular chassis.
-
-`$serial`: The main serial number of the device.
-
-`$location`: Overrides sysLocation of the device.
+- `$device->version` The version of the OS running on the device.
+- `$device->hardware` The hardware version for the device. For example: 'WS-C3560X-24T-S'
+- `$device->features` Features for the device, for example a list of cards in the slots of a modular chassis.
+- `$device->serial` The main serial number of the device.
+- `$device->icon` The icon of the device.
 
 ### MIBs
 

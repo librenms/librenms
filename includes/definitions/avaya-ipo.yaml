@@ -2,8 +2,7 @@ os: avaya-ipo
 text: 'IP Office Firmware'
 type: network
 icon: avaya
-mib_dir:
-    - nortel
+mib_dir: nortel
 discovery:
     -
         sysObjectID:

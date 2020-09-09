@@ -2,8 +2,7 @@ os: arris-c3
 text: 'Arris CMTS'
 type: network
 icon: arris
-mib_dir:
-    - arris
+mib_dir: arris
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

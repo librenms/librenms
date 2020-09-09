@@ -1,8 +1,8 @@
 <?php
 /**
- * asuswrt-merlin.inc.php
+ * smartax.inc.php
  *
- * LibreNMS os polling module for AsusWRT-Merlin
+ * LibreNMS mempool poller module for Huawei SmartAX
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,15 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2018 TheGreatDoc
+ * @author     TheGreatDoc <doctoruve@gmail.com>
  */
-
-list($ignore, $hardware, $version) = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
-
-unset($ignore);
+$oid = '.1.3.6.1.4.1.2011.2.6.7.1.1.2.1.6.' . $mempool['mempool_index'];
+$used = snmp_get($device, $oid, '-OvQ');
+$mempool['total'] = 100;
+$mempool['free']  = ($mempool['total'] - $used);
+$mempool['used']  = $used;
+unset(
+    $oid,
+    $used
+);

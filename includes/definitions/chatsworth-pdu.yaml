@@ -3,8 +3,7 @@ text: 'Chatsworth PDU'
 type: power
 icon: chatsworth
 nobulk: true
-mib_dir:
-    - chatsworth
+mib_dir: chatsworth
 discovery:
     -
         sysObjectID:

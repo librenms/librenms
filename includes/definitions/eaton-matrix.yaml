@@ -2,8 +2,7 @@ os: eaton-matrix
 text: 'Eaton Matrix'
 type: power
 icon: eaton
-mib_dir:
-    - eaton
+mib_dir: eaton
 discovery:
     -
         sysObjectID:
