@@ -4,8 +4,7 @@ text: 'Huawei SmartAX'
 type: network
 icon: huawei
 ifname: true
-mib_dir:
-    - huawei
+mib_dir: huawei
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
