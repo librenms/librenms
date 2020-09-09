@@ -95,8 +95,8 @@ if (empty($name)) {
         } else {
             $timerange_day = null;
         }
-        $details['start_hr'] = $start_hr;
-        $details['end_hr'] = $end_hr;
+        $details['start_hr'] = gmdate('H:i', strtotime($start_hr));
+        $details['end_hr'] = gmdate('H:i', strtotime($end_hr));
         $details['day'] = $timerange_day;
     }
     if (!is_array($vars['maps']) && $invert_map) {

@@ -110,14 +110,20 @@ class AlertUtil
                 OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
             )";
 
-        $now = CarbonImmutable::now(config('app.timezone'));
-        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= ? AND at.end_hr >= ? AND at.day LIKE ?))";
+        $local_now = CarbonImmutable::now(config('app.timezone'));
+        $now = CarbonImmutable::now('UTC');
+        $where_time = "(at.timerange = 0 OR
+            (at.timerange = 1 AND ((at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
+            OR (at.start_hr > at.end_hr AND at.start_hr >= ? AND at.end_hr <= ?))
+            AND at.day LIKE ?))";
+
 
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports as at
             WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
-                   $now->toTimeString(), $now->toTimeString(), $now->format('%N%')];
+                   $now->toTimeString(), $now->toTimeString(), $now->toTimeString(), $now->toTimeString(),
+                   $local_now->format('%N%')];
         return dbFetchRows($query, $params);
     }
 
