@@ -592,7 +592,7 @@
                     "type": "network",
                     "serial": "G0290",
                     "icon": "junos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

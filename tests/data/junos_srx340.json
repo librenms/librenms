@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "<private>",
                     "icon": "junos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

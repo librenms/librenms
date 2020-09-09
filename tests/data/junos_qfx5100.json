@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "TA3716123456",
                     "icon": "junos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

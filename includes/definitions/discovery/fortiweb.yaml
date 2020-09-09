@@ -7,7 +7,7 @@ modules:
         version: FORTINET-FORTIWEB-MIB::fwSysVersion.0
         version_regex: '/ (?<version>[\d.]+)/'
         hardware: FORTINET-FORTIWEB-MIB::fwSysVersion.0
-        hardware_regex: '/^(?<hardware>[^ ]+)/'
+        hardware_regex: '/^(?<hardware>\S+)/'
     processors:
         data:
             -
