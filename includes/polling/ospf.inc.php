@@ -178,14 +178,12 @@ if ($instance_count) {
         ->addDataset('instances', 'GAUGE', 0, 1000000)
         ->addDataset('areas', 'GAUGE', 0, 1000000)
         ->addDataset('ports', 'GAUGE', 0, 1000000)
-        ->addDataset('metrics', 'GAUGE', 0, 1000000)
         ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
     $fields = [
         'instances'   => $instance_count,
         'areas'       => $ospf_areas->count(),
         'ports'       => $ospf_ports->count(),
-        'metrics'     => $ospf_tos_metrics->count(),
         'neighbours'  => $ospf_neighbours->count(),
     ];
 
