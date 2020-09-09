@@ -580,6 +580,14 @@ device_group_device:
   Constraints:
     device_group_device_device_group_id_foreign: { name: device_group_device_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
     device_group_device_device_id_foreign: { name: device_group_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+device_outages:
+  Columns:
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
+  Indexes:
+    device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
+    device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 device_perf:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1224,20 +1232,6 @@ ospf_ports:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospf_ports_device_id_ospf_port_id_context_name_unique: { Name: ospf_ports_device_id_ospf_port_id_context_name_unique, Columns: [device_id, ospf_port_id, context_name], Unique: true, Type: BTREE }
-ospf_tos:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospf_port_id, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricIpAddress, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricAddressLessIf, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricTOS, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricValue, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricStatus, Type: int, 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospf_tos_device_id_ospf_port_id_context_name_unique: { Name: ospf_tos_device_id_ospf_port_id_context_name_unique, Columns: [device_id, ospf_port_id, context_name], Unique: true, Type: BTREE }
 packages:
   Columns:
     - { Field: pkg_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
