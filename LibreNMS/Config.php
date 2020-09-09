@@ -408,7 +408,7 @@ class Config
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 
-        self::set('base_url', Str::finish('/', self::get('base_url')));
+        self::set('base_url', Str::finish(self::get('base_url'), '/'));
 
         if (!self::get('email_from')) {
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');

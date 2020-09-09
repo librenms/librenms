@@ -282,8 +282,3 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
         return $output;
     }
 }
-
-function register_mibs()
-{
-    // stub
-}

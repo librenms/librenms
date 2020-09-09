@@ -25,7 +25,7 @@ if (is_numeric($sessions)) {
     $tags = compact('rrd_def');
     data_update($device, 'panos-sessions', $tags, $fields);
 
-    $graphs['panos_sessions'] = true;
+    $os->enableGraph('panos_sessions');
 }
 
 if (is_numeric($sessions_tcp)) {
@@ -38,7 +38,7 @@ if (is_numeric($sessions_tcp)) {
     $tags = compact('rrd_def');
     data_update($device, 'panos-sessions-tcp', $tags, $fields);
 
-    $graphs['panos_sessions_tcp'] = true;
+    $os->enableGraph('panos_sessions_tcp');
 }
 
 if (is_numeric($sessions_udp)) {
@@ -51,7 +51,7 @@ if (is_numeric($sessions_udp)) {
     $tags = compact('rrd_def');
     data_update($device, 'panos-sessions-udp', $tags, $fields);
 
-    $graphs['panos_sessions_udp'] = true;
+    $os->enableGraph('panos_sessions_udp');
 }
 
 if (is_numeric($sessions_icmp)) {
@@ -64,7 +64,7 @@ if (is_numeric($sessions_icmp)) {
     $tags = compact('rrd_def');
     data_update($device, 'panos-sessions-icmp', $tags, $fields);
 
-    $graphs['panos_sessions_icmp'] = true;
+    $os->enableGraph('panos_sessions_icmp');
 }
 
 if (is_numeric($sessions_ssl)) {
@@ -77,7 +77,7 @@ if (is_numeric($sessions_ssl)) {
     $tags = compact('rrd_def');
     data_update($device, 'panos-sessions-ssl', $tags, $fields);
 
-    $graphs['panos_sessions_ssl'] = true;
+    $os->enableGraph('panos_sessions_ssl');
 }
 
 if (is_numeric($sessions_sslutil)) {
@@ -90,7 +90,7 @@ if (is_numeric($sessions_sslutil)) {
     $tags = compact('rrd_def');
     data_update($device, 'panos-sessions-sslutil', $tags, $fields);
 
-    $graphs['panos_sessions_sslutil'] = true;
+    $os->enableGraph('panos_sessions_sslutil');
 }
 
 if (is_numeric($activetunnels)) {
@@ -103,5 +103,5 @@ if (is_numeric($activetunnels)) {
     $tags = compact('rrd_def');
     data_update($device, 'panos-activetunnels', $tags, $fields);
 
-    $graphs['panos_activetunnels'] = true;
+    $os->enableGraph('panos_activetunnels');
 }

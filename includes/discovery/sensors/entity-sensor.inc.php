@@ -71,7 +71,17 @@ if (!empty($entity_oids)) {
             if ($descr) {
                 $descr = rewrite_entity_descr($descr);
             } else {
-                $descr = $entity_array[$index]['entPhysicalDescr'];
+                // Better sensor names for Arista EOS. Remove some redundancy and improve them so they reflect to which unit they belong.
+                if ($device['os'] === 'arista_eos') {
+                    $descr = $entity_array[$index]['entPhysicalDescr'];
+                    if (preg_match("/(Input|Output) (voltage|current) sensor/i", $descr) || Str::startsWith($descr, 'Power supply') || preg_match('/^(Power Supply|Hotspot|Inlet|Board)/i', $descr)) {
+                        $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . " " . preg_replace('/(Voltage|Current|Power Supply) Sensor$/i', '', ucwords($entity_array[$index]['entPhysicalDescr']));
+                    }
+                    if (preg_match('/(temp|temperature) sensor$/i', $descr)) {
+                        $descr = preg_replace('/(temp|temperature) sensor$/i', '', $descr);
+                    }
+                }
+                // End better sensor names for Arista EOS.
                 $descr = rewrite_entity_descr($descr);
             }
             $valid_sensor = check_entity_sensor($descr, $device);
@@ -183,8 +193,30 @@ if (!empty($entity_oids)) {
                             $high_limit = $entry['aristaEntSensorThresholdHighCritical'] / $divisor;
                         }
                     }
+                    // Grouping sensors
+                    $group = null;
+                    if (preg_match("/DOM /i", $descr)) {
+                            $group = "SFPs";
+                    } elseif (preg_match('/PwrCon/', $descr)) {
+                        $string = explode(' ', $descr);
+                        if (preg_match('/PwrCon[0-9]/', $string[0])) {
+                            $group = $string[0];
+                        } else {
+                            $group = preg_replace('/PwrCon/i', '', $string[0]);
+                        }
+                        $descr = preg_replace('/^.*?(PwrCon)[0-9]*/i', '', $descr);
+                    } elseif (preg_match("/^(Trident.*|Jericho[0-9]|FM6000)/i", $descr)) {
+                        // I only know replies for Trident|Jericho|FM6000 platform. If you have another please add to the preg_match
+                        $group = "Platform";
+                    } elseif (preg_match("/^(Power|PSU)/i", $descr)) {
+                        $group = "PSUs";
+                    } else {
+                        $group = "System";
+                        $descr = Str::replaceLast('temp sensor', '', $descr);
+                    }
+                    // End grouping sensors
                 }
-                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
+                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $group);
             }
         }//end if
     }//end foreach

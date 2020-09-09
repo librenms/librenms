@@ -2,8 +2,7 @@ os: atenpdu
 text: Aten PDU
 type: power
 icon: aten
-mib_dir:
-    - aten
+mib_dir: aten
 nobulk: true
 over:
     - { graph: device_current, text: Current }

@@ -3,17 +3,11 @@ type: storage
 group: storage
 text: LenovoEMC
 icon: lenovo
-mib_dir:
-    - lenovo
+mib_dir: lenovo
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-register_mibs:
-    fanValue: IOMEGANAS-MIB
-    tempValue: IOMEGANAS-MIB
-    raidStatus: IOMEGANAS-MIB
-    diskStatus: IOMEGANAS-MIB
 discovery:
     -
         sysDescr:

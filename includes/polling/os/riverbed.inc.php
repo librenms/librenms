@@ -62,7 +62,7 @@ if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && 
     $tags = compact('rrd_def');
 
     data_update($device, 'riverbed_connections', $tags, $fields);
-    $graphs['riverbed_connections'] = true;
+    $os->enableGraph('riverbed_connections');
 }
 
 /* datastore oids
@@ -93,7 +93,7 @@ if ($datastore_hits >= 0 && $datastore_miss >= 0) {
     $tags = compact('rrd_def');
 
     data_update($device, 'riverbed_datastore', $tags, $fields);
-    $graphs['riverbed_datastore'] = true;
+    $os->enableGraph('riverbed_datastore');
 }
 
 /* optimization oids
@@ -125,7 +125,7 @@ if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
     $tags = compact('rrd_def');
 
     data_update($device, 'riverbed_optimization', $tags, $fields);
-    $graphs['riverbed_optimization'] = true;
+    $os->enableGraph('riverbed_optimization');
 }
 
 /* bandwidth passthrough
@@ -163,5 +163,5 @@ if ($bw_in >= 0 && $bw_out >= 0 && $bw_total >= 0) {
     $tags = compact('rrd_def');
 
     data_update($device, 'riverbed_passthrough', $tags, $fields);
-    $graphs['riverbed_passthrough'] = true;
+    $os->enableGraph('riverbed_passthrough');
 }

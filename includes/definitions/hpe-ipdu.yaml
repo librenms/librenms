@@ -4,8 +4,7 @@ type: power
 icon: hpe
 over:
     - { graph: device_bits, text: Traffic }
-mib_dir:
-    - hp
+mib_dir: hp
 discovery:
     -
         sysObjectID:

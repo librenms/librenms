@@ -87,7 +87,9 @@
                                     "dashboard-select",
                                     "snmp3auth",
                                     "ldap-groups",
-                                    "ad-groups"
+                                    "ad-groups",
+                                    "executable",
+                                    "directory"
                                 ]
                             }
                         },

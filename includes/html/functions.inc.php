@@ -1104,6 +1104,10 @@ function get_rules_from_json()
 
 function search_oxidized_config($search_in_conf_textbox)
 {
+    if (!Auth::user()->hasGlobalRead()) {
+        return false;
+    }
+
     $oxidized_search_url = Config::get('oxidized.url') . '/nodes/conf_search?format=json';
     $postdata = http_build_query(
         array(
@@ -1125,6 +1129,14 @@ function search_oxidized_config($search_in_conf_textbox)
         $dev = device_by_name($n['node']);
         $n['dev_id'] = $dev ? $dev['device_id'] : false;
     }
+
+    /*
+    // Filter nodes we don't have access too
+    $nodes = array_filter($nodes, function($device) {
+        return \Permissions::canAccessDevice($device['dev_id'], Auth::id());
+    });
+    */
+
     return $nodes;
 }
 
@@ -1301,29 +1313,6 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
     }
 
     return $entries;
-}
-
-/**
- * Gets all dashboards the user can access
- * adds in the keys:
- *   username - the username of the owner of each dashboard
- *   default - the default dashboard for the logged in user
- *
- * @param int $user_id optionally get list for another user
- * @return array list of dashboards
- */
-function get_dashboards($user_id = null)
-{
-    $user = is_null($user_id) ? Auth::user() : \App\Models\User::find($user_id);
-    $default = get_user_pref('dashboard');
-
-    return \App\Models\Dashboard::allAvailable($user)->with('user')->get()->map(function ($dashboard) use ($default) {
-        $dash = $dashboard->toArray();
-        $dash['username'] = $dashboard->user ? $dashboard->user->username : '';
-        $dash['default'] = $default == $dashboard->dashboard_id;
-
-        return $dash;
-    })->keyBy('dashboard_id')->all();
 }
 
 /**

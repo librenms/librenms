@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
-import os
-import sys
 import pkg_resources
+import sys
 from pkg_resources import DistributionNotFound, VersionConflict
 
 args = sys.argv
@@ -18,9 +17,9 @@ try:
 except DistributionNotFound as req:
     if verbose:
         print(req)
-    exit(1)
+    sys.exit(1)
 except VersionConflict as req:
     if verbose:
         print(req)
-    exit(2)
-exit(0)
+    sys.exit(2)
+sys.exit(0)

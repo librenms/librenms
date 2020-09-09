@@ -680,6 +680,24 @@ return [
             'description' => '連接埠大於 (天)',
             'help' => 'Cleanup done by daily.sh'
         ],
+        'prometheus' => [
+            'enable' => [
+                'description' => '啟用',
+                'help' => '匯出指標數據至 Prometheus Push Gateway'
+            ],
+            'url' => [
+                'description' => '網址',
+                'help' => '要傳送資料至 Prometheus Push Gateway 的主機網址。'
+            ],
+            'job' => [
+                'description' => 'Job',
+                'help' => '指定匯出指標數據的 Job 標籤'
+            ],
+            'attach_sysname' => [
+                'description' => '附加 sysName',
+                'help' => '附加裝置的 sysName 資訊至 Prometheus Push Gateway。'
+            ]
+        ],
         'public_status' => [
             'description' => '公開狀態顯示',
             'help' => '允許不登入的情況下，顯示裝置的狀態資訊。'

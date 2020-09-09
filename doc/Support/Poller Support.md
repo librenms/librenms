@@ -100,7 +100,6 @@ $config['poller_modules']['entity-physical']             = true;
 $config['poller_modules']['entity-state']                = false;
 $config['poller_modules']['applications']                = true;
 $config['poller_modules']['availability']                = true;
-$config['poller_modules']['mib']                         = false;
 $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['services']                    = true;

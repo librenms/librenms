@@ -4,8 +4,7 @@ group: ups
 type: power
 icon: hpe
 rfc1628_compat: true
-mib_dir:
-    - hp
+mib_dir: hp
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }

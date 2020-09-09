@@ -34,6 +34,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
+
+    // Device Tabs
+    Route::group(['prefix' => 'device/{device}', 'namespace' => 'Device\Tabs', 'as' => 'device.'], function () {
+        Route::put('notes', 'NotesController@update')->name('notes.update');
+    });
+
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
         ->name('device')->where(['vars' => '.*']);
 
@@ -112,6 +118,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('customers', 'CustomersController');
             Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
+            Route::post('outages', 'OutagesController');
             Route::post('fdb-tables', 'FdbTablesController');
             Route::post('routes', 'RoutesTablesController');
             Route::post('graylog', 'GraylogController');

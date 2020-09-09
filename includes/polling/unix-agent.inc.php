@@ -47,7 +47,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         );
         data_update($device, 'agent', $tags, $fields);
 
-        $graphs['agent'] = true;
+        $os->enableGraph('agent');
 
         $agentapps = array(
             "apache",

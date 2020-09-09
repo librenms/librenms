@@ -67,7 +67,7 @@ foreach ($menu_options as $option => $text) {
 $headeroptions = '<select name="type" id="type" onchange="window.open(this.options[this.selectedIndex].value,\'_top\')" class="devices-graphs-select">';
 $type = 'device';
 foreach (get_graph_subtypes($type) as $avail_type) {
-    $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+    $display_type = nicecase($avail_type);
     if ('graph_' . $avail_type == $vars['format']) {
         $is_selected = 'selected';
     } else {

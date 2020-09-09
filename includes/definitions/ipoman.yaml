@@ -2,8 +2,7 @@ os: ipoman
 text: 'Ingrasys iPoMan'
 type: power
 icon: ingrasys
-mib_dir:
-    - ingrasys
+mib_dir: ingrasys
 over:
     - { graph: device_current, text: Current }
     - { graph: device_power, text: Power }

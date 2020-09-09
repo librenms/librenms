@@ -2,17 +2,11 @@ os: ruckuswireless
 text: 'Ruckus Wireless ZoneDirector'
 type: wireless
 icon: ruckus
-mib_dir:
-    - ruckus
+mib_dir: ruckus
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_wireless_ap-count, text: 'Number of APs' }
     - { graph: device_wireless_clients, text: 'Number of Clients' }
-register_mibs:
-    ruckusZDSystemStats: RUCKUS-ZD-SYSTEM-MIB
-    ruckusZDWLANTable: RUCKUS-ZD-WLAN-MIB
-    ruckusZDWLANAPTable: RUCKUS-ZD-WLAN-MIB
-    ruckusZDWLANAPRadioStatsTable: RUCKUS-ZD-WLAN-MIB
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.25053.3.1.5

@@ -7,8 +7,7 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
-mib_dir:
-    - exagrid
+mib_dir: exagrid
 discovery:
     -
         sysDescr:

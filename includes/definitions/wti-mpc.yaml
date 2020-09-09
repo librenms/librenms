@@ -2,8 +2,7 @@ os: wti-mpc
 text: 'WTI MPC'
 type: power
 icon: wti
-mib_dir:
-    - wti
+mib_dir: wti
 poller_modules:
     wireless: false
     ntp: false

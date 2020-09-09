@@ -2,8 +2,7 @@ os: benuos
 text: Benu
 type: network
 icon: benuos
-mib_dir:
-    - benuos
+mib_dir: benuos
 discovery:
     -
         sysObjectID:
@@ -12,8 +11,3 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-poller_modules:
-    mib: true
-register_mibs:
-    bTWagNumGrePmip6Tunnels: BENU-TWAG-STATS-MIB
-    bWagNumCurrentL2tpv3TunnelsIPv4: BENU-WAG-STATS-MIB

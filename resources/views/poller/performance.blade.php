@@ -6,23 +6,14 @@
 
 @parent
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Total Poller Time</h3>
-    </div>
-    <div class="panel-body">
-        <?php \LibreNMS\Util\Html::graphRow(['type' => 'global_poller_perf',
-                                           'legend' => 'yes', 'height' => 100], true); ?>
-    </div>
-</div>
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Total Poller Time Per Module</h3>
-    </div>
-    <div class="panel-body">
-        <?php \LibreNMS\Util\Html::graphRow(['type' => 'global_poller_modules_perf',
-                                           'legend' => 'yes', 'height' => 100], true); ?>
-    </div>
-</div>
+<x-panel title="{{ __('Total Poller Time') }}">
+    <?php \LibreNMS\Util\Html::graphRow(['type' => 'global_poller_perf',
+                                       'legend' => 'yes', 'height' => 100], true); ?>
+</x-panel>
+
+<x-panel title="{{ __('Total Poller Time Per Module') }}">
+    <?php \LibreNMS\Util\Html::graphRow(['type' => 'global_poller_modules_perf',
+                                        'legend' => 'yes', 'height' => 100], true); ?>
+</x-panel>
 
 @endsection

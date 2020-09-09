@@ -1,8 +1,7 @@
 os: pcoweb
 text: 'Carel pCOWeb'
 type: environment
-mib_dir:
-    - carel
+mib_dir: carel
 over:
     - { graph: device_temperature, text: Temperature }
     - { graph: device_humidity, text: Humidity }
