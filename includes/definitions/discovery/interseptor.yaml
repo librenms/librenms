@@ -1,7 +1,7 @@
 mib: InterSeptor-MIB
 modules:
     sensors:
-        temperature:   
+        temperature:
             data:
                 -
                     oid: inSeptsensorMonitorDeviceTemperature
@@ -10,10 +10,10 @@ modules:
                     descr: Temperature {{ $index }}
                     group: Temperature
                     divisor: 10
-         
+
         humidity:
-           data:             
-               -
+            data:
+                -
                     oid: inSeptsensorMonitorDeviceHumidity
                     num_oid: '.1.3.6.1.4.1.19011.1.3.1.1.3.2.1.5.{{ $index }}'
                     index: '{{ $index }}'

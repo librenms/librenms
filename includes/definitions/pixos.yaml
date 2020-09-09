@@ -41,6 +41,7 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysDescr:
-        - 'Cisco PIX'
-        - 'Cisco Firewall Services Module'
+    -
+        sysDescr:
+            - 'Cisco PIX'
+            - 'Cisco Firewall Services Module'

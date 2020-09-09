@@ -65,7 +65,12 @@ if (Config::get('enable_sla') && $device['os_group'] == 'cisco') {
                     break;
 
                 case 'jitter':
-                    $data['tag'] = $sla_config['rttMonEchoAdminCodecType'] ." (". preg_replace('/milliseconds/', 'ms', $sla_config['rttMonEchoAdminCodecInterval']) .")";
+                    if ($sla_config['rttMonEchoAdminCodecType'] != 'notApplicable') {
+                        $codec_info = " (" . $sla_config['rttMonEchoAdminCodecType'] . " @ " . preg_replace('/milliseconds/', 'ms', $sla_config['rttMonEchoAdminCodecInterval']) . ")";
+                    } else {
+                        $codec_info = '';
+                    }
+                    $data['tag'] = IP::fromHexString($sla_config['rttMonEchoAdminTargetAddress'], true) . ":" . $sla_config['rttMonEchoAdminTargetPort'] . $codec_info;
                     break;
             }//end switch
         }//end if

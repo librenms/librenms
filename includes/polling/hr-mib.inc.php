@@ -17,7 +17,7 @@ if (is_numeric($hrSystem[0]['hrSystemProcesses'])) {
 
     data_update($device, 'hr_processes', $tags, $fields);
 
-    $graphs['hr_processes'] = true;
+    $os->enableGraph('hr_processes');
     echo ' Processes';
 }
 
@@ -31,7 +31,7 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
 
     data_update($device, 'hr_users', $tags, $fields);
 
-    $graphs['hr_users'] = true;
+    $os->enableGraph('hr_users');
     echo ' Users';
 }
 

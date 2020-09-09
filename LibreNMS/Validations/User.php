@@ -27,7 +27,7 @@ namespace LibreNMS\Validations;
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Util\Env;
+use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
@@ -44,13 +44,12 @@ class User extends BaseValidation
     {
         // Check we are running this as the root user
         $username = $validator->getUsername();
-        $lnms_username = Config::get('user');
-        $lnms_groupname = Config::get('group', $lnms_username); // if group isn't set, fall back to user
+        $lnms_username = \config('librenms.user');
+        $lnms_groupname = \config('librenms.group');
 
         if (!($username === 'root' || $username === $lnms_username)) {
             if (isCli()) {
-                $validator->fail('You need to run this script as root' .
-                    (Config::has('user') ? ' or ' . $lnms_username : ''));
+                $validator->fail("You need to run this script as $lnms_username or root");
             } elseif (function_exists('posix_getgrnam')) {
                 $lnms_group = posix_getgrnam($lnms_groupname);
                 if (!in_array($username, $lnms_group['members'])) {
@@ -63,7 +62,7 @@ class User extends BaseValidation
         }
 
         // skip if docker image
-        if (Env::librenmsDocker()) {
+        if (EnvHelper::librenmsDocker()) {
             return;
         }
 
@@ -73,7 +72,7 @@ class User extends BaseValidation
         }
 
         // Let's test the user configured if we have it
-        if (Config::has('user')) {
+        if ($lnms_username) {
             $dir = Config::get('install_dir');
             $log_dir = Config::get('log_dir', "$dir/logs");
             $rrd_dir = Config::get('rrd_dir', "$dir/rrd");
@@ -119,27 +118,8 @@ class User extends BaseValidation
                     return;
                 }
             }
-
-            // check folder permissions
-            $folders = [
-                'rrd' => $rrd_dir,
-                'log' => $log_dir,
-                'bootstrap' => "$dir/bootstrap/cache/",
-                'storage' => "$dir/storage/",
-                'cache' => "$dir/storage/framework/cache/",
-                'sessions' => "$dir/storage/framework/sessions/",
-                'views' => "$dir/storage/framework/views/",
-            ];
-
-            $folders_string = implode(' ', $folders);
-            $incorrect = exec("find $folders_string -group $lnms_groupname ! -perm -g=w");
-            if (!empty($incorrect)) {
-                $validator->result(ValidationResult::fail(
-                    'Some folders have incorrect file permissions, this may cause issues.'
-                )->setFix($fix)->setList('Files', explode(PHP_EOL, $incorrect)));
-            }
         } else {
-            $validator->warn("You don't have \$config['user'] set, this most likely needs to be set to librenms");
+            $validator->warn("You don't have LIBRENMS_USER set, this most likely needs to be set to librenms");
         }
     }
 }

@@ -17,10 +17,12 @@ $start = microtime(true);
 $init_modules = array('web', 'graphs', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-$auth = Auth::check() || is_client_authorized($_SERVER['REMOTE_ADDR']);
-
-if (!$auth) {
-    die('Unauthorized');
+if (!Auth::check()) {
+    // check for unauthenticated graphs and set auth
+    $auth = is_client_authorized($_SERVER['REMOTE_ADDR']);
+    if (!$auth) {
+        die('Unauthorized');
+    }
 }
 
 set_debug(isset($_GET['debug']));

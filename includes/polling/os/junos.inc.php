@@ -15,7 +15,7 @@ if (is_numeric($srx_sess_data[0]['jnxJsSPUMonitoringCurrentFlowSession'])) {
 
     data_update($device, 'junos_jsrx_spu_sessions', $tags, $fields);
 
-    $graphs['junos_jsrx_spu_sessions'] = true;
+    $os->enableGraph('junos_jsrx_spu_sessions');
     echo ' Flow Sessions';
     unset($srx_sess_data);
 }

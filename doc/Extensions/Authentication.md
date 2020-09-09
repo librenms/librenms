@@ -76,14 +76,14 @@ Enable debug output to troubleshoot issues
 
 Config option: `mysql`
 
-This is default option with LibreNMS so you should have already have
-the configuration setup.
+This is default option with LibreNMS so you should have already have the configuration setup in your
+environment file (.env).
 
-```php
-$config['db_host'] = "HOSTNAME";
-$config['db_user'] = "DBUSER";
-$config['db_pass'] = "DBPASS";
-$config['db_name'] = "DBNAME";
+```dotenv
+DB_HOST=HOSTNAME
+DB_DATABASE=DBNAME
+DB_USERNAME=DBUSER
+DB_PASSWORD="DBPASS"
 ```
 
 # Active Directory Authentication

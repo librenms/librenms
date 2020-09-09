@@ -92,7 +92,7 @@ if (is_numeric($fecInErrorsCount) && is_numeric($fecOutErrorsCount)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-errorCount', $tags, $fields);
-    $graphs['canopy_generic_errorCount'] = true;
+    $os->enableGraph('canopy_generic_errorCount');
     unset($rrd_filename, $fecInErrorsCount, $fecOutErrorsCount);
 }
 
@@ -105,7 +105,7 @@ if (is_numeric($crcErrors)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-crcErrors', $tags, $fields);
-    $graphs['canopy_generic_crcErrors'] = true;
+    $os->enableGraph('canopy_generic_crcErrors');
     unset($crcErrors);
 }
 
@@ -117,7 +117,7 @@ if (is_numeric($jitter)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-jitter', $tags, $fields);
-    $graphs['canopy_generic_jitter'] = true;
+    $os->enableGraph('canopy_generic_jitter');
     unset($rrd_filename, $jitter);
 }
 
@@ -136,7 +136,7 @@ if (is_numeric($registered) && is_numeric($failed)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-regCount', $tags, $fields);
-    $graphs['canopy_generic_regCount'] = true;
+    $os->enableGraph('canopy_generic_regCount');
     unset($rrd_filename, $registered, $failed);
 }
 
@@ -152,7 +152,7 @@ if (is_numeric($visible) && is_numeric($tracked)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-gpsStats', $tags, $fields);
-    $graphs['canopy_generic_gpsStats'] = true;
+    $os->enableGraph('canopy_generic_gpsStats');
     unset($rrd_filename, $visible, $tracked);
 }
 
@@ -176,7 +176,7 @@ if (is_numeric($dbmRadio) && is_numeric($minRadio) && is_numeric($maxRadio) && i
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-radioDbm', $tags, $fields);
-    $graphs['canopy_generic_radioDbm'] = true;
+    $os->enableGraph('canopy_generic_radioDbm');
     unset($rrd_filename, $dbmRadio, $minRadio, $maxRadio, $avgRadio);
 }
 
@@ -192,7 +192,7 @@ if (is_numeric($horizontal) && is_numeric($vertical)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-450-linkRadioDbm', $tags, $fields);
-    $graphs['canopy_generic_450_linkRadioDbm'] = true;
+    $os->enableGraph('canopy_generic_450_linkRadioDbm');
     unset($rrd_filename, $horizontal, $horizontal);
 }
 
@@ -204,7 +204,7 @@ if (is_numeric($lastLevel)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-450-powerlevel', $tags, $fields);
-    $graphs['canopy_generic_450_powerlevel'] = true;
+    $os->enableGraph('canopy_generic_450_powerlevel');
     unset($lastLevel);
 }
 
@@ -223,7 +223,7 @@ if (is_numeric($vertical) && is_numeric($horizontal) && is_numeric($combined)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-signalHV', $tags, $fields);
-    $graphs['canopy_generic_signalHV'] = true;
+    $os->enableGraph('canopy_generic_signalHV');
     unset($rrd_filename, $vertical, $horizontal, $combined);
 }
 
@@ -240,6 +240,6 @@ if (is_numeric($horizontal) && is_numeric($vertical)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'canopy-generic-450-slaveHV', $tags, $fields);
-    $graphs['canopy_generic_450_slaveHV'] = true;
+    $os->enableGraph('canopy_generic_450_slaveHV');
     unset($rrd_filename, $horizontal, $vertical);
 }

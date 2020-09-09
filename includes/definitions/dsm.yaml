@@ -7,22 +7,21 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
-mib_dir:
-    - synology
+mib_dir: synology
 processor_stacked: true
 discovery:
     -
-      sysDescr_regex: '/^Linux /'
-      snmpget:
-          oid: systemStatus.0
-          mib: SYNOLOGY-SYSTEM-MIB
-          mib_dir: synology
-          op: '!='
-          value: false
+        sysDescr_regex: '/^Linux /'
+        snmpget:
+            oid: systemStatus.0
+            mib: SYNOLOGY-SYSTEM-MIB
+            mib_dir: synology
+            op: '!='
+            value: false
     -
-      sysDescr_regex: '/^Linux /'
-      snmpget:
-          oid: HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0
-          value:
-              - 'syno_hw_version'
-              - 'syno_dyn_module'
+        sysDescr_regex: '/^Linux /'
+        snmpget:
+            oid: HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0
+            value:
+                - 'syno_hw_version'
+                - 'syno_dyn_module'

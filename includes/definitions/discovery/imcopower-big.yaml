@@ -74,9 +74,9 @@ modules:
         state:
             data:
                 -
-                    oid: imPM1BatLeg1Fuse
-                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.16.{{ $index }}'
-                    index: 'imPM1BatLeg1Fuse.{{ $index }}'
+                    oid: imPM1Power1Running1
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.32.{{ $index }}'
+                    index: 'imPM1Power1Running1.{{ $index }}'
                     descr: 'Power State'
                     states:
                         - { descr: Battery, graph: 0, value: 1, generic: 2 }

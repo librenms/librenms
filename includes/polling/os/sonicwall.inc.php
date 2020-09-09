@@ -29,5 +29,5 @@ if (is_numeric($data)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'sonicwall_sessions', $tags, $fields);
-    $graphs['sonicwall_sessions'] = true;
+    $os->enableGraph('sonicwall_sessions');
 }

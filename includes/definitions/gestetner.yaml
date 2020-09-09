@@ -6,8 +6,9 @@ icon: ricoh
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - Gestetner Network Printer
+    -
+        sysDescr:
+            - Gestetner Network Printer
 discovery_modules:
     toner: true
     mempools: false

@@ -21,6 +21,6 @@ if ($temp_data['fmDeviceEntMode.1'] == 'fmg-faz') {
     );
     $tags = compact('rrd_def');
     data_update($device, 'fortios_lograte', $tags, $fields);
-    $graphs['fortios_lograte'] = true;
+    $os->enableGraph('fortios_lograte');
 }
 unset($temp_data);

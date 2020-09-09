@@ -154,10 +154,6 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
     list(,,$version,$hardware,$freebsda, $freebsdb, $arch) = explode(" ", $device['sysDescr']);
     $features = $freebsda . " " . $freebsdb;
     $hardware = "$hardware ($arch)";
-} elseif ($device['os'] == "qnap") {
-    $hardware = snmp_get($device, "ENTITY-MIB::entPhysicalName.1", "-Osqnv");
-    $version  = snmp_get($device, "ENTITY-MIB::entPhysicalFirmwareRev.1", "-Osqnv");
-    $serial   = snmp_get($device, "ENTITY-MIB::entPhysicalSerial.1", "-Osqnv");
 } elseif ($device['os'] == "dsm") {
     #  This only gets us the build, not the actual version number, so won't use this.. yet.
     #  list(,,,$version,) = explode(" ",$device['sysDescr'],5);

@@ -51,8 +51,8 @@ if ($device['os'] != 'Snom') {
         $tags = compact('rrd_def');
         data_update($device, 'netstats-snmp', $tags, $fields);
 
-        $graphs['netstat_snmp']     = true;
-        $graphs['netstat_snmp_pkt'] = true;
+        $os->enableGraph('netstat_snmp');
+        $os->enableGraph('netstat_snmp_pkt');
     }
 
     unset($oids, $data, $rrd_def, $fields, $tags);

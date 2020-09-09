@@ -39,7 +39,7 @@ if ($device['os_group'] == 'cisco' && ( $device['os'] == 'asa' || $device['os'] 
         $tags = compact('rrd_def');
         data_update($device, 'asa_conns', $tags, $fields);
 
-        $graphs['asa_conns'] = true;
+        $os->enableGraph('asa_conns');
         echo ' ASA Connections';
     }
 

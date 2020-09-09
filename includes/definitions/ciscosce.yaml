@@ -29,8 +29,8 @@ discovery_modules:
     cisco-pw: false
     vrf: false
     cisco-vrf-lite: false
-mib_dir:
-    - cisco
+mib_dir: cisco
 discovery:
-    - sysDescr:
-        - 'Cisco Service Control'
+    -
+        sysDescr:
+            - 'Cisco Service Control'

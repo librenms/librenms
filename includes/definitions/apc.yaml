@@ -6,10 +6,13 @@ over:
     - { graph: device_voltage, text: Voltage }
     - { graph: device_runtime, text: Runtime }
 discovery:
-    - sysDescr:
-        - APC Web/SNMP Management Card
-        - APC Switched Rack PDU
-        - APC MasterSwitch PDU
-        - APC Metered Rack PDU
-        - APC Embedded PowerNet
-        - APC Environmental Manager
+    -
+        sysDescr:
+            - APC Web/SNMP Management Card
+            - APC Switched Rack PDU
+            - APC MasterSwitch PDU
+            - APC Metered Rack PDU
+            - APC Embedded PowerNet
+            - APC Environmental Manager
+            - APC InRow DX
+            - APC Uniflair SP

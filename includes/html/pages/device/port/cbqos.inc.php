@@ -105,12 +105,29 @@ foreach ($components as $id => $array) {
 
         // Display each graph row.
         echo "<div class='col-md-12'>";
-        echo "<div class='graphhead'>Traffic by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
+
+        echo "<div class='graphhead'>Traffic by CBQoS Class (pre policy) - ".$components[$vars['policy']]['label']."</div>";
+        $graph_array['policy'] = $vars['policy'];
+        if (isset($vars['class'])) {
+            $graph_array['class'] = $vars['class'];
+        }
+        $graph_type = 'port_cbqos_prebits';
+        include 'includes/html/print-interface-graphs.inc.php';
+
+        echo "<div class='graphhead'>Traffic by CBQoS Class (post policy) - ".$components[$vars['policy']]['label']."</div>";
         $graph_array['policy'] = $vars['policy'];
         if (isset($vars['class'])) {
             $graph_array['class'] = $vars['class'];
         }
         $graph_type = 'port_cbqos_traffic';
+        include 'includes/html/print-interface-graphs.inc.php';
+
+        echo "<div class='graphhead'>Packets by CBQoS Class (pre policy) - ".$components[$vars['policy']]['label']."</div>";
+        $graph_array['policy'] = $vars['policy'];
+        if (isset($vars['class'])) {
+            $graph_array['class'] = $vars['class'];
+        }
+        $graph_type = 'port_cbqos_prepkts';
         include 'includes/html/print-interface-graphs.inc.php';
 
         echo "<div class='graphhead'>QoS Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
@@ -119,6 +136,14 @@ foreach ($components as $id => $array) {
             $graph_array['class'] = $vars['class'];
         }
         $graph_type = 'port_cbqos_bufferdrops';
+        include 'includes/html/print-interface-graphs.inc.php';
+
+        echo "<div class='graphhead'>Packet Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
+        $graph_array['policy'] = $vars['policy'];
+        if (isset($vars['class'])) {
+            $graph_array['class'] = $vars['class'];
+        }
+        $graph_type = 'port_cbqos_droppkts';
         include 'includes/html/print-interface-graphs.inc.php';
 
         echo "<div class='graphhead'>Buffer Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";

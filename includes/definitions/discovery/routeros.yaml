@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - mtxrInterfaceStatsName
+                -
+                    oid:
+                        - mtxrInterfaceStatsName
         temperature:
             data:
                 -

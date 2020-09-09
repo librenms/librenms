@@ -60,7 +60,12 @@ if (!$show_recovered) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $where .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%' OR `sysName` LIKE '%$searchPhrase%')";
+    $where .= " AND (`timestamp` LIKE ? OR `rule` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';

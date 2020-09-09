@@ -3,7 +3,7 @@ modules:
     sensors:
         voltage:
             options:
-              divisor: 10
+                divisor: 10
             data:
                 -
                     oid: upsOutputTable
@@ -38,7 +38,7 @@ modules:
                     divisor: 10
         current:
             options:
-              divisor: 10
+                divisor: 10
             data:
                 -
                     oid: upsOutputTable
@@ -76,7 +76,7 @@ modules:
                     descr: Battery
         runtime:
             options:
-              divisor: 60
+                divisor: 60
             data:
                 -
                     oid: upsMinutesOnBattery

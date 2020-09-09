@@ -6,7 +6,11 @@ $sql = " FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `
 $param[] = $device_id;
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `S`.`storage_descr` LIKE '%$searchPhrase%' OR `S`.`storage_perc` LIKE '%$searchPhrase%' OR `S`.`storage_perc_warn` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE ? OR `S`.`storage_descr` LIKE ? OR `S`.`storage_perc` LIKE ? OR `S`.`storage_perc_warn` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`storage_id`) $sql";

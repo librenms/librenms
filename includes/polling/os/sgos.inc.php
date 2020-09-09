@@ -19,7 +19,7 @@ if (is_numeric($sgos[0]['sgProxyHttpClientRequestRate'])) {
 
     data_update($device, 'sgos_average_requests', $tags, $fields);
 
-    $graphs['sgos_average_requests'] = true;
+    $os->enableGraph('sgos_average_requests');
     echo ' HTTP Req Rate';
 }
 
@@ -33,7 +33,7 @@ if (is_numeric($sgos[0]['sgProxyHttpClientConnections'])) {
 
     data_update($device, 'sgos_client_connections', $tags, $fields);
 
-    $graphs['sgos_client_connections'] = true;
+    $os->enableGraph('sgos_client_connections');
     echo ' Client Conn';
 }
 
@@ -47,7 +47,7 @@ if (is_numeric($sgos[0]['sgProxyHttpServerConnections'])) {
 
     data_update($device, 'sgos_server_connections', $tags, $fields);
 
-    $graphs['sgos_server_connections'] = true;
+    $os->enableGraph('sgos_server_connections');
     echo ' Server Conn';
 }
 
@@ -61,7 +61,7 @@ if (is_numeric($sgos[0]['sgProxyHttpClientConnectionsActive'])) {
 
     data_update($device, 'sgos_client_connections_active', $tags, $fields);
 
-    $graphs['sgos_client_connections_active'] = true;
+    $os->enableGraph('sgos_client_connections_active');
     echo ' Client Conn Active';
 }
 
@@ -75,7 +75,7 @@ if (is_numeric($sgos[0]['sgProxyHttpServerConnectionsActive'])) {
 
     data_update($device, 'sgos_server_connections_active', $tags, $fields);
 
-    $graphs['sgos_server_connections_active'] = true;
+    $os->enableGraph('sgos_server_connections_active');
     echo ' Server Conn Active';
 }
 
@@ -89,7 +89,7 @@ if (is_numeric($sgos[0]['sgProxyHttpClientConnectionsIdle'])) {
 
     data_update($device, 'sgos_client_connections_idle', $tags, $fields);
 
-    $graphs['sgos_client_connections_idle'] = true;
+    $os->enableGraph('sgos_client_connections_idle');
     echo ' Client Conne Idle';
 }
 
@@ -103,6 +103,6 @@ if (is_numeric($sgos[0]['sgProxyHttpServerConnectionsIdle'])) {
 
     data_update($device, 'sgos_server_connections_idle', $tags, $fields);
 
-    $graphs['sgos_server_connections_idle'] = true;
+    $os->enableGraph('sgos_server_connections_idle');
     echo ' Server Conn Idle';
 }

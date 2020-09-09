@@ -71,10 +71,10 @@ var grid = $("#alert-schedule").bootgrid({
     },
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
-                "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
+                "<div class=\"col-sm-4 actionBar\"><span class=\"pull-left\">"+
                 "<button type=\"button\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#schedule-maintenance\">Schedule maintenance</button>"+
                 "</span></div>"+
-                "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
+                "<div class=\"col-sm-8 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
     },
     rowCount: [50, 100, 250, -1],
     url: "ajax/table/alert-schedule"

@@ -3,8 +3,7 @@ text: 'EDFA'
 type: network
 icon: edfa
 group: edfa
-mib_dir:
-    - edfa
+mib_dir: edfa
 over:
     - { graph: device_dbm, text: 'dBm' }
 discovery:

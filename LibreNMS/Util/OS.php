@@ -100,7 +100,7 @@ class OS
 
             // remove previously cached os settings and replace with user settings
             $config = ['os' => []]; // local $config variable, not global
-            include "$install_dir/config.php"; // FIXME load db settings too or don't load config.php
+            @include "$install_dir/config.php"; // FIXME load db settings too or don't load config.php
             Config::set('os', $config['os']);
 
             // load the os defs fresh from cache (merges with existing OS settings)

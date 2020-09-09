@@ -6,11 +6,12 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 15;
+$scale_min     = 0;
 
 if (isset($vars['array'])) {
     $arrays=array($vars['array']);
 } else {
-    $arrays=get_arrays_with_mdadm($device, $app['app_id']);
+    $arrays = get_arrays_with_application($device, $app_id, $name);
 }
 
 $int=0;

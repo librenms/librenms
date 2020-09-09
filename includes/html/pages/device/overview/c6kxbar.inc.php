@@ -10,6 +10,7 @@ echo '<i class="fa fa-arrows fa-lg icon-theme" aria-hidden="true"></i> <strong>C
 echo '          </div>
     <table class="table table-hover table-condensed table-striped">';
 
+$entity_state = get_dev_entity_state($device['device_id']);
 foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
     // FIXME i'm not sure if this is the correct way to decide what entphysical index it is. slotnum+1? :>
     $entity = dbFetchRow('SELECT * FROM entPhysical WHERE device_id = ? AND entPhysicalIndex = ?', array($device['device_id'], $index + 1));

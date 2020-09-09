@@ -4,11 +4,11 @@ type: power
 over:
     - { graph: device_current, text: Current }
 icon: servertech
-mib_dir:
-    - sentry
+mib_dir: sentry
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.1718.3
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1718.3
 poller_modules:
     bgp-peers: false
     wireless: false

@@ -6,11 +6,12 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 15;
+$scale_min     = 0;
 
 if (isset($vars['cert_name'])) {
     $cert_name_list=array($vars['cert_name']);
 } else {
-    $cert_name_list=get_domains_with_certificates($device, $app['app_id']);
+    $cert_name_list = get_arrays_with_application($device, $app_id, $name);
 }
 
 $int=0;

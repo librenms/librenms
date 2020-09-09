@@ -273,7 +273,17 @@
                 "Accept",
                 "X-Auth-Token"
             ],
+            "group": "api",
+            "section": "cors",
+            "order": 4,
             "type": "array"
+        },
+        "api.cors.allowcredentials": {
+            "default": false,
+            "group": "api",
+            "section": "cors",
+            "order": 7,
+            "type": "boolean"
         },
         "api.cors.allowmethods": {
             "default": [
@@ -283,14 +293,37 @@
                 "DELETE",
                 "PATCH"
             ],
+            "group": "api",
+            "section": "cors",
+            "order": 2,
             "type": "array"
         },
         "api.cors.enabled": {
             "default": false,
+            "group": "api",
+            "section": "cors",
+            "order": 1,
             "type": "boolean"
+        },
+        "api.cors.exposeheaders": {
+            "default": [
+                "Cache-Control",
+                "Content-Language",
+                "Content-Type",
+                "Expires",
+                "Last-Modified",
+                "Pragma"
+            ],
+            "group": "api",
+            "section": "cors",
+            "order": 5,
+            "type": "array"
         },
         "api.cors.maxage": {
             "default": 86400,
+            "group": "api",
+            "section": "cors",
+            "order": 6,
             "type": "integer",
             "units": "seconds",
             "validate": {
@@ -298,8 +331,11 @@
             }
         },
         "api.cors.origin": {
-            "default": "*",
-            "type": "text"
+            "default": ["*"],
+            "group": "api",
+            "section": "cors",
+            "order": 3,
+            "type": "array"
         },
         "api_demo": {
             "default": false,
@@ -373,6 +409,12 @@
             "group": "auth",
             "section": "ad",
             "order": 10,
+            "type": "text"
+        },
+        "auth_ad_url": {
+            "group": "auth",
+            "section": "ad",
+            "order": 11,
             "type": "text"
         },
         "auth_ldap_attr.uid": {
@@ -1216,9 +1258,21 @@
             "order": 2,
             "type": "integer"
         },
+        "graphing.availability": {
+            "group": "poller",
+            "section": "availability",
+            "order": 10,
+            "default": [
+                "86400",
+                "604800",
+                "2592000",
+                "31536000"
+            ],
+            "type": "array"
+        },
         "dot": {
             "default": "/usr/bin/dot",
-            "type": "text"
+            "type": "executable"
         },
         "email_auto_tls": {
             "default": true,
@@ -1263,7 +1317,7 @@
             "group": "alerting",
             "section": "email",
             "order": 5,
-            "type": "text",
+            "type": "executable",
             "when": {
                 "setting": "email_backend",
                 "operator": "equals",
@@ -1488,14 +1542,14 @@
             "group": "external",
             "section": "binaries",
             "order": 0,
-            "type": "text"
+            "type": "executable"
         },
         "fping6": {
             "default": "fping6",
             "group": "external",
             "section": "binaries",
             "order": 1,
-            "type": "text"
+            "type": "executable"
         },
         "fping_options.count": {
             "default": 3,
@@ -1563,6 +1617,22 @@
                 "openstreetmap": "OpenStreetMap",
                 "mapquest": "MapQuest",
                 "bing": "Bing Maps"
+            }
+        },
+        "geoloc.latlng": {
+            "default": false,
+            "group": "external",
+            "section": "location",
+            "order": 2,
+            "type": "boolean",
+            "when": {
+                "setting": "geoloc.engine",
+                "operator": "in",
+                "value": [
+                    "google",
+                    "mapquest",
+                    "bing"
+                ]
             }
         },
         "github_api": {
@@ -2783,6 +2853,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.availability": {
+            "default": {
+                "section": "availability",
+                "order": 0,
+                "descr": "Device Availability"
+            },
+            "type": "graph"
+        },
         "graph_types.device.sub10_sub10RadioLclAFER": {
             "default": {
                 "section": "wireless",
@@ -3248,7 +3326,7 @@
             }
         },
         "html_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "http_proxy": {
             "group": "system",
@@ -3406,7 +3484,7 @@
             "order": 8
         },
         "install_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "int_core": {
             "default": true,
@@ -3454,7 +3532,7 @@
             "group": "external",
             "section": "binaries",
             "order": 3,
-            "type": "text"
+            "type": "executable"
         },
         "irc_alert": {
             "default": false,
@@ -3566,7 +3644,7 @@
             "type": "color"
         },
         "log_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "log_file": {
             "type": "text"
@@ -3591,7 +3669,7 @@
             "type": "text"
         },
         "mib_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "mono_font": {
             "default": "DejaVuSansMono",
@@ -3602,7 +3680,7 @@
             "group": "external",
             "section": "binaries",
             "order": 4,
-            "type": "text"
+            "type": "executable"
         },
         "mydomain": {
             "type": "text",
@@ -3617,7 +3695,10 @@
         },
         "nagios_plugins": {
             "default": "/usr/lib/nagios/plugins",
-            "type": "text"
+            "type": "directory"
+        },
+        "nets": {
+            "type": "array"
         },
         "network_map_items": {
             "default": [
@@ -3682,7 +3763,7 @@
             "group": "external",
             "section": "binaries",
             "order": 8,
-            "type": "text"
+            "type": "executable"
         },
         "nfsen_enable": {
             "default": false,
@@ -3808,7 +3889,7 @@
             "group": "external",
             "section": "binaries",
             "order": 5,
-            "type": "text"
+            "type": "executable"
         },
         "notifications.LibreNMS": {
             "default": "http://www.librenms.org/notifications.rss",
@@ -4001,10 +4082,10 @@
             "group": "external",
             "section": "binaries",
             "order": 6,
-            "type": "text"
+            "type": "executable"
         },
         "plugin_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "poller_modules.unix-agent": {
             "order": 420,
@@ -4395,6 +4476,13 @@
             "section": "prometheus",
             "order": 2
         },
+        "prometheus.attach_sysname": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 3
+        },
         "public_status": {
             "default": false,
             "group": "auth",
@@ -4455,7 +4543,7 @@
             "group": "poller",
             "section": "rrdtool",
             "order": 6,
-            "type": "text"
+            "type": "directory"
         },
         "rrd_purge": {
             "group": "system",
@@ -4465,7 +4553,7 @@
             "type": "integer"
         },
         "rrd_rra": {
-            "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 ",
+            "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440 RRA:MIN:0.5:24:1440 RRA:MIN:0.5:288:1440 RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440 RRA:MAX:0.5:24:1440 RRA:MAX:0.5:288:1440 RRA:LAST:0.5:1:2016 ",
             "group": "poller",
             "section": "rrdtool",
             "order": 4,
@@ -4502,7 +4590,7 @@
             "group": "external",
             "section": "binaries",
             "order": -1,
-            "type": "text"
+            "type": "executable"
         },
         "rrdtool_tune": {
             "default": false,
@@ -4686,7 +4774,7 @@
             "group": "external",
             "section": "binaries",
             "order": 7,
-            "type": "text"
+            "type": "executable"
         },
         "shorthost_target_length": {
             "group": "webui",
@@ -4885,28 +4973,28 @@
             "group": "external",
             "section": "binaries",
             "order": 8,
-            "type": "text"
+            "type": "executable"
         },
         "snmpget": {
             "default": "/usr/bin/snmpget",
             "group": "external",
             "section": "binaries",
             "order": 9,
-            "type": "text"
+            "type": "executable"
         },
         "snmpgetnext": {
             "default": "snmpgetnext",
             "group": "external",
             "section": "binaries",
             "order": 10,
-            "type": "text"
+            "type": "executable"
         },
         "snmptranslate": {
             "default": "/usr/bin/snmptranslate",
             "group": "external",
             "section": "binaries",
             "order": 11,
-            "type": "text"
+            "type": "executable"
         },
         "snmptraps.eventlog": {
             "default": "unhandled",
@@ -4921,7 +5009,7 @@
             "group": "external",
             "section": "binaries",
             "order": 12,
-            "type": "text"
+            "type": "executable"
         },
         "sso.create_users": {
             "default": true,
@@ -4967,7 +5055,7 @@
             "type": "integer"
         },
         "temp_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "title_image": {
             "group": "webui",
@@ -4988,14 +5076,14 @@
             "group": "external",
             "section": "binaries",
             "order": 13,
-            "type": "text"
+            "type": "executable"
         },
         "traceroute6": {
             "default": "traceroute6",
             "group": "external",
             "section": "binaries",
             "order": 14,
-            "type": "text"
+            "type": "executable"
         },
         "transit_descr": {
             "default": ["transit"],
@@ -5073,7 +5161,7 @@
             "group": "external",
             "section": "binaries",
             "order": 15,
-            "type": "text"
+            "type": "executable"
         },
         "warn.ifdown": {
             "default": true,
@@ -5173,7 +5261,7 @@
             "group": "external",
             "section": "binaries",
             "order": 16,
-            "type": "text"
+            "type": "executable"
         },
         "xirrus_disable_stations": {
             "default": false,
@@ -5191,7 +5279,7 @@
             "group": "external",
             "section": "smokeping",
             "order": 1,
-            "type": "text"
+            "type": "directory"
         },
         "smokeping.url": {
             "group": "external",
