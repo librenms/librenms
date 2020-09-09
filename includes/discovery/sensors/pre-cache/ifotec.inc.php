@@ -24,7 +24,7 @@
  */
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
-    $pre_cache['ifoSysProductIndex'] = snmp_get($device, '.1.3.6.1.4.1.21362.101.1.1.0', '-Oqv'); // .ifotecSystem.ifoSysProductIndex
+    $pre_cache['ifoSysProductIndex'] = snmp_get($device, 'ifoSysProductIndex.0', '-Oqv', 'IFOTEC-SMI');
     
     if ($pre_cache['ifoSysProductIndex'] != null) {
         $virtual_tables = [
@@ -39,7 +39,8 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
         ];
 
         // .ifoTemperatureTable.ifoTemperatureEntry.<ifoSysProductIndex>
-        $data = snmp_walk($device, '.1.3.6.1.4.1.21362.101.2.1.1', '-OQn');
+        $data = snmp_walk($device, 'ifoTemperatureEntry', '-OQn', 'IFOTEC-SMI');
+        var_dump($data);
         foreach (explode(PHP_EOL, $data) as $line) {
             list($oid, $value) = explode(' = ', $line);
 
@@ -59,6 +60,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
                 $pre_cache[$oid] = [[$oid => $value]];
             }
         }
+        var_dump($pre_cache['ifoTemperatureTable']);
     }
 }
 unset($data);
