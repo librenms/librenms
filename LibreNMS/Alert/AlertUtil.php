@@ -70,7 +70,10 @@ class AlertUtil
 
         $local_now = CarbonImmutable::now(config('app.timezone'));
         $now = CarbonImmutable::now('UTC');
-        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= ? AND at.end_hr >= ? AND at.day LIKE ?))";
+        $where_time = "(at.timerange = 0 OR
+            (at.timerange = 1 AND ((at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
+            OR (at.start_hr > at.end_hr AND at.start_hr >= ? AND at.end_hr <= ?))
+            AND at.day LIKE ?))";
 
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
             FROM alert_transport_map AS atm
