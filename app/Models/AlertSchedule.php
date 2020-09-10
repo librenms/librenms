@@ -168,7 +168,7 @@ class AlertSchedule extends Model
     {
         return $query->where(function ($query) {
             $now = CarbonImmutable::now('UTC');
-            $local_now = CarbonImmutable::now(config('app.timezone'));
+            $local_now = CarbonImmutable::now();
             $query->where('start', '<=', $now)
                 ->where('end', '>=', $now)
                 ->where(function ($query) use ($now) {
@@ -195,8 +195,8 @@ class AlertSchedule extends Model
                                 });
                             })
                             // Check we are on the correct day of the week
-                            ->where(function ($query) use ($now) {
-                                $query->where('recurring_day', 'like', $local_now->format('%N%'))
+                            ->where(function ($query) use ($local_now) {
+                                $query->where('recurring_day', 'like', $local_nownow->format('%N%'))
                                     ->orWhereNull('recurring_day');
                             });
                     });
