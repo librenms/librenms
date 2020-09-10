@@ -93,11 +93,11 @@ class AlertUtil
         $rule_id = self::getRuleId($alert_id);
         $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
                    $now->toTimeString(), $now->toTimeString(), $now->toTimeString(), $now->toTimeString(),
-                   $now)->toTimeString(), $now)->toTimeString(),
+                   $now->toTimeString(), $now->toTimeString(),
                    $local_now->format('%N%'),
                    $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
                    $now->toTimeString(), $now->toTimeString(), $now->toTimeString(), $now->toTimeString(),
-                   $now)->toTimeString(), $now)->toTimeString(),
+                   $now->toTimeString(), $now->toTimeString(),
                    $local_now->format('%N%')];
         return dbFetchRows($query, $params);
     }
@@ -137,7 +137,7 @@ class AlertUtil
             WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
                    $now->toTimeString(), $now->toTimeString(), $now->toTimeString(), $now->toTimeString(),
-                   $now)->toTimeString(), $now)->toTimeString(),
+                   $now->toTimeString(), $now->toTimeString(),
                    $local_now->format('%N%')];
         return dbFetchRows($query, $params);
     }
