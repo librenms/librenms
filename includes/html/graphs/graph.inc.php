@@ -30,6 +30,12 @@ $period = ($to - $from);
 $base64_output = '';
 $prev_from = ($from - $period);
 
+if ($output === 'json') {
+    $step = Config::get('rrd.step');
+    $width = (!empty($width) ? $width : ceil($period/$step) );
+    $rrd_options .= " --step $step";
+}
+
 $graphfile = Config::get('temp_dir') . '/' . strgen();
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
@@ -96,10 +102,14 @@ if ($error_msg) {
     }
 } else {
     // $rrd_options .= " HRULE:0#999999";
-    if ($graph_type === 'svg') {
-        $rrd_options .= " --imgformat=SVG";
-        if ($width < 350) {
-            $rrd_options .= " -m 0.75 -R light";
+    if ($output === 'json' && $json_enabled) {
+        $rrd_options .= " --imgformat=JSONTIME";
+    } else {
+        if ($graph_type === 'svg') {
+            $rrd_options .= " --imgformat=SVG";
+            if ($width < 350) {
+                $rrd_options .= " -m 0.75 -R light";
+            }
         }
     }
 

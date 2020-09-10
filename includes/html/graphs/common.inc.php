@@ -86,36 +86,41 @@ if (!isset($float_precision)) {
     $float_precision = 2;
 }
 
-$rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';
-
-if (Config::get('applied_site_style') == 'dark') {
-    $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text_dark') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color_dark'), '#');
+if ($output === 'json') {
+    $rrd_options .= ' --start '.$from.' --end '.$to.' --width '.$width.' ';
 } else {
-    $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
-}
+    $rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';
+
+    if (Config::get('applied_site_style') == 'dark') {
+        $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text_dark') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color_dark'), '#');
+    } else {
+        $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
+    }
 
 
-if ($_GET['bg']) {
-    $rrd_options .= ' -c CANVAS#' . Clean::alphaDash($_GET['bg']) . ' ';
-}
+    if ($_GET['bg']) {
+        $rrd_options .= ' -c CANVAS#' . Clean::alphaDash($_GET['bg']) . ' ';
+    }
 
-if ($_GET['font']) {
-    $rrd_options .= ' -c FONT#' . Clean::alphaDash($_GET['font']) . ' ';
-}
+    if ($_GET['font']) {
+        $rrd_options .= ' -c FONT#' . Clean::alphaDash($_GET['font']) . ' ';
+    }
 
-// $rrd_options .= " -c BACK#FFFFFF";
-if ($height < '99') {
-    $rrd_options .= ' --only-graph';
-}
+    // $rrd_options .= " -c BACK#FFFFFF";
+    if ($height < '99') {
+        $rrd_options .= ' --only-graph';
+    }
 
-if ($width <= '300') {
-    $rrd_options .= ' --font LEGEND:7:' . \LibreNMS\Config::get('mono_font') . ' --font AXIS:6:' . \LibreNMS\Config::get('mono_font');
-} else {
-    $rrd_options .= ' --font LEGEND:8:' . \LibreNMS\Config::get('mono_font') . ' --font AXIS:7:' . \LibreNMS\Config::get('mono_font');
-}
+    if ($width <= '300') {
+        $rrd_options .= ' --font LEGEND:7:' . \LibreNMS\Config::get('mono_font') . ' --font AXIS:6:' . \LibreNMS\Config::get('mono_font');
+    } else {
+        $rrd_options .= ' --font LEGEND:8:' . \LibreNMS\Config::get('mono_font') . ' --font AXIS:7:' . \LibreNMS\Config::get('mono_font');
+    }
 
-$rrd_options .= ' --font-render-mode normal';
+    $rrd_options .= ' --font-render-mode normal';
 
-if (isset($_GET['absolute']) && $_GET['absolute'] == "1") {
-    $rrd_options .= ' --full-size-mode';
+    if (isset($_GET['absolute']) && $_GET['absolute'] == "1") {
+        $rrd_options .= ' --full-size-mode';
+    }
+
 }

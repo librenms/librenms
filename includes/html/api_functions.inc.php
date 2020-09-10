@@ -97,6 +97,19 @@ function api_get_graph(array $vars)
         return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
     }
 
+    if ($vars['output'] === 'json') {
+        $json = json_decode($image);
+        if ($json !== null) {
+            return api_success($json, 'dataset', null, 200, count($json->data));
+        } else {
+            if ($json_enabled) {
+                return api_error(500, 'Could not load data');
+            } else {
+                return api_error(501, 'JSON output not available for this graph');
+            }
+        }
+    }
+
     return response($image, 200, ['Content-Type' => get_image_type()]);
 }
 
