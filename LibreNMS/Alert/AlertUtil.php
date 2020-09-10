@@ -73,7 +73,7 @@ class AlertUtil
         $where_time = "(at.timerange = 0 OR
             (at.timerange = 1 AND ((at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
             OR (at.start_hr > at.end_hr AND at.start_hr >= ? AND at.end_hr <= ?))
-            AND at.day LIKE ?))";
+            AND (at.day LIKE ? OR at.day IS NULL)))";
 
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
             FROM alert_transport_map AS atm
@@ -121,7 +121,7 @@ class AlertUtil
         $where_time = "(at.timerange = 0 OR
             (at.timerange = 1 AND ((at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
             OR (at.start_hr > at.end_hr AND at.start_hr >= ? AND at.end_hr <= ?))
-            AND at.day LIKE ?))";
+            AND (at.day LIKE ? OR at.day IS NULL)))";
 
 
         $query = "SELECT transport_id, transport_type, transport_name
