@@ -14,7 +14,7 @@
                     "type": "power",
                     "serial": "IN1A234B5678912CD345E67",
                     "icon": "dell.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

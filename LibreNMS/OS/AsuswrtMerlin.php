@@ -23,6 +23,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -40,9 +41,8 @@ class AsuswrtMerlin extends OS implements
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $info = explode(' ', snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'));
         $device->hardware = $info[1] ?? null;
         $device->version = $info[2] ?? null;
@@ -60,7 +60,7 @@ class AsuswrtMerlin extends OS implements
         $interfaces = explode(PHP_EOL, snmp_get($this->getDevice(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
         $arrIfaces = array();
         foreach ($interfaces as $interface) {
-            list($k, $v) = explode(',', $interface);
+            [$k, $v] = explode(',', $interface);
             $arrIfaces[$k] = $v;
         }
         return $arrIfaces;

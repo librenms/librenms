@@ -28,10 +28,10 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class AviatWtm extends OS implements
@@ -42,25 +42,12 @@ class AviatWtm extends OS implements
     WirelessSnrDiscovery,
     WirelessPowerDiscovery
 {
-    public function discoverOS(): void
-    {
-        $device = $this->getDeviceModel();
-
-        $oids = ['entPhysicalModelName.2', 'entPhysicalSerialNum.2', 'entPhysicalSoftwareRev.2'];
-        $data = snmp_get_multi($this->getDevice(), $oids, '-OQUs', 'ENTITY-MIB');
-
-        $device->hardware = $data[2]['entPhysicalModelName'] ?? null;
-        $device->serial = $data[2]['entPhysicalSerialNum'] ?? null;
-        $device->version = $data[2]['entPhysicalSoftwareRev'] ?? null;
-    }
-
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array
      */
-
     public function discoverWirelessFrequency()
     {
         $sensors = [];

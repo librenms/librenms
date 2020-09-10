@@ -27,17 +27,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Apsoluteos extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
         $oids = ['genGroupHWVersion.0', 'rndSerialNumber.0', 'rndApsoluteOSVersion.0', 'rdwrDevicePortsConfig.0'];
         $data = snmp_get_multi($this->getDevice(), $oids, '-OQs', 'RADWARE-MIB');
 
-        $device = $this->getDeviceModel();
         $device->serial = $data[0]['rndSerialNumber'] ?? null;
         $device->version = $data[0]['rndApsoluteOSVersion'] ?? null;
         $device->hardware = $data[0]['genGroupHWVersion'] ?? null;

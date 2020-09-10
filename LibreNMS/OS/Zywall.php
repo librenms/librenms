@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Zyxel;
@@ -32,11 +33,10 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Zywall extends Zyxel implements OSDiscovery, OSPolling
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS();
+        parent::discoverOS($device);
 
-        $device = $this->getDeviceModel();
         $device->hardware = $device->hardware ?: $device->sysDescr;
         // ZYXEL-ES-COMMON::sysSwVersionString.0
         $pos = strpos($device->version, 'ITS');

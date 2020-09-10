@@ -14,7 +14,7 @@
                     "type": "wireless",
                     "serial": "<private>",
                     "icon": "ruckus.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -24,12 +24,13 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+
 class Dlink extends \LibreNMS\OS
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
-        $device = $this->getDeviceModel();
+        parent::discoverOS($device); // yaml
 
         if (!empty($device->hardware) && $rev = snmp_get($this->getDevice(), '.1.3.6.1.2.1.16.19.3.0', '-Oqv')) {
             $device->hardware .= ' Rev. ' . $rev;

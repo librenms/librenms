@@ -25,14 +25,14 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Apc extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $apc_serial = snmp_get_multi_oid($this->getDevice(), ['rPDUIdentSerialNumber.0', 'atsIdentSerialNumber.0', 'upsAdvIdentSerialNumber.0', 'sPDUIdentSerialNumber.0', 'airIRRCUnitIdentSerialNumber.0', 'isxModularPduIdentSerialNumber.0', 'airIRRP100UnitIdentSerialNumber.0', 'airIRRP500UnitIdentSerialNumber.0'], '-OUQs', 'PowerNet-MIB');
         $device->serial = array_pop($apc_serial);
 

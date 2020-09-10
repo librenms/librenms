@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "huawei.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

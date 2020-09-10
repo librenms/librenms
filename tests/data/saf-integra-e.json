@@ -14,7 +14,7 @@
                     "type": "wireless",
                     "serial": null,
                     "icon": "saf.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

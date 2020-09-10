@@ -25,17 +25,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Fortinet;
 use LibreNMS\RRD\RrdDefinition;
 
 class Fortigate extends Fortinet implements OSPolling
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
+        parent::discoverOS($device); // yaml
 
-        $device = $this->getDeviceModel();
         $device->hardware = $device->hardware ?: $this->getHardwareName();
     }
 

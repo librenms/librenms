@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "HK01421528",
                     "icon": "teleste.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -32,7 +32,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "zyxel.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

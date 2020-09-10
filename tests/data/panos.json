@@ -295,7 +295,7 @@
                     "type": "firewall",
                     "serial": "015351000009999",
                     "icon": "panos.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

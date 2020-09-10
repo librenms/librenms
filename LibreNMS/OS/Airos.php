@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
@@ -54,10 +55,8 @@ class Airos extends OS implements
     WirelessRssiDiscovery,
     WirelessUtilizationDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-
         $oids = ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'];
         $data = snmp_getnext_multi($this->getDevice(), $oids, '-OQUs', 'IEEE802dot11-MIB');
 

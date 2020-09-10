@@ -26,11 +26,13 @@
 namespace LibreNMS\OS;
 
 
+use App\Models\Device;
+
 class DellLaser extends \LibreNMS\OS
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
+        parent::discoverOS($device); // yaml
 
         // SNMPv2-SMI::enterprises.253.8.51.10.2.1.7.2.28110202 = STRING: "MFG:Dell;CMD:PJL,RASTER,DOWNLOAD,PCLXL,PCL,POSTSCRIPT;MDL:Laser Printer
         // 3100cn;DES:Dell Laser Printer 3100cn;CLS:PRINTER;STS:AAAMAwAAAAAAAgJ/HgMKBigDCgY8AwAzcJqwggAAwAAACAAAAAAA/w==;"
@@ -48,6 +50,6 @@ class DellLaser extends \LibreNMS\OS
             $dell_laser[$key] = $value;
         }
 
-        $this->getDeviceModel()->hardware = $dell_laser['MDL'] ?: $dell_laser['MODEL'];
+        $device->hardware = $dell_laser['MDL'] ?: $dell_laser['MODEL'];
     }
 }

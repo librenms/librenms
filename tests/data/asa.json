@@ -14,7 +14,7 @@
                     "type": "firewall",
                     "serial": "FGL1641413L",
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

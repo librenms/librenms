@@ -25,15 +25,16 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\OS\Shared\Foundry;
 
 class Ironware extends Foundry
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
+        parent::discoverOS($device); // yaml
 
-        $this->getDeviceModel()->hardware = $this->getHardware();
+        $device->hardware = $this->getHardware();
     }
 
     private function getHardware()

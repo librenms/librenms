@@ -14,7 +14,7 @@
                     "type": "appliance",
                     "serial": "FXPA6CSPG9",
                     "icon": "citrix.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

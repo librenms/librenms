@@ -10950,7 +10950,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "alliedtelesis.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

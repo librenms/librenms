@@ -14,7 +14,7 @@
                     "type": "printer",
                     "serial": "MKRA012345",
                     "icon": "canon.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

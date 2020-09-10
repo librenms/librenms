@@ -14,7 +14,7 @@
                     "type": "loadbalancer",
                     "serial": "7FK7FCV4FH",
                     "icon": "citrix.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

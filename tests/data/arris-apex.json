@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "<private>",
                     "icon": "arris.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

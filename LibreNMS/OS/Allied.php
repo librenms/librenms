@@ -25,12 +25,13 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Allied extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
         //OS: AT-S39
         //Legacy products: at8024, at8024GB, at8024M, at8016F, at8026FC
@@ -100,7 +101,6 @@ class Allied extends OS implements OSDiscovery
             $hardware = $e;
         }
 
-        $device = $this->getDeviceModel();
         $device->version = str_replace(['"', ','], '', $version);
         $device->features = str_replace('"', '', $features);
         $device->hardware = str_replace('"', '', $hardware);

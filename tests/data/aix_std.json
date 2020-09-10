@@ -14,7 +14,7 @@
                     "type": "server",
                     "serial": "000000000000",
                     "icon": "aix.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

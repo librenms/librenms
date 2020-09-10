@@ -73,7 +73,7 @@
                     "type": "server",
                     "serial": null,
                     "icon": "linux.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

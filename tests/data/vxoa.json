@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "00-1B-BC-AA-AA-AA",
                     "icon": "silverpeak.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

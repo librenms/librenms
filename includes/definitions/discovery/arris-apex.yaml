@@ -1,5 +1,9 @@
 mib: APEX-MIB
 modules:
+    os:
+        hardware: BCS-IDENT-MIB::identUnitModel.0
+        serial: BCS-IDENT-MIB::identSerialNumber.0
+        version: BCS-IDENT-MIB::identSoftwareVersion.0
     sensors:
         fanspeed:
             data:

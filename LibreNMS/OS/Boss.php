@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -32,10 +33,8 @@ use LibreNMS\OS;
 
 class Boss extends OS implements OSDiscovery, ProcessorDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-
         // Try multiple ways of getting firmware version
         $version = null;
         preg_match('/SW:v?([^ ]+) /', $device->sysDescr, $version_matches);

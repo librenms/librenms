@@ -19,14 +19,6 @@ class AirosAfLtu extends OS implements
     WirelessQualityDiscovery,
     WirelessRateDiscovery
 {
-    public function discoverOS(): void
-    {
-        $device = $this->getDeviceModel();
-        $osdata = snmp_get_multi_oid($this->getDevice(), ['afLTUDevModel.0', 'afLTUFirmwareVersion.0'], '-OQUs', 'UBNT-AFLTU-MIB');
-        $device->hardware = $osdata['afLTUDevModel.0'] ?? null;
-        $device->version = $osdata['afLTUFirmwareVersion.0'] ?? null;
-    }
-
     /**
      * Discover wireless frequency.  This is in Hz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered

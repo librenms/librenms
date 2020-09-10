@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "3303302",
                     "icon": "protelevision.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

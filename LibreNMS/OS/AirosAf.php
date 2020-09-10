@@ -40,13 +40,6 @@ class AirosAf extends OS implements
     WirelessDistanceDiscovery,
     WirelessRateDiscovery
 {
-    public function discoverOS(): void
-    {
-        $device = $this->getDeviceModel();
-        $device->hardware = 'Ubiquiti AF '.trim(snmp_get($this->getDevice(), 'dot11manufacturerProductName.5', '-Ovq', 'IEEE802dot11-MIB'));
-        $device->version  = snmp_get($this->getDevice(), 'fwVersion.1', '-Ovq', 'UBNT-AirFIBER-MIB');
-    }
-
     /**
      * Discover wireless distance.  This is in Kilometers. Type is distance.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered

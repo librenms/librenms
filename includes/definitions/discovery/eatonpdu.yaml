@@ -1,5 +1,12 @@
 mib: PDU-MIB
 modules:
+    os:
+        hardware:
+            - EATON-EPDU-MIB::partNumber.0
+            - PDU-MIB::objectName.0
+        hardware_template: '{{ EATON-EPDU-MIB::partNumber.0 }} {{ PDU-MIB::objectName.0 }}'
+        serial: EATON-EPDU-MIB::serialNumber.0
+        version: EATON-EPDU-MIB::firmwareVersion.0
     sensors:
         power:
             data:

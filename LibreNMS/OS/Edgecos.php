@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -32,9 +33,8 @@ use LibreNMS\OS;
 
 class Edgecos extends OS implements ProcessorDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.6.')) {              //ES3528M0
             $tmp_mib = 'ES3528MO-MIB';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.22.')) {  //ES3528MV2

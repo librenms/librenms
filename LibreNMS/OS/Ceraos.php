@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -38,19 +39,18 @@ use LibreNMS\OS;
 
 class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFrequencyDiscovery, WirelessErrorsDiscovery, WirelessMseDiscovery, WirelessPowerDiscovery, WirelessRateDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $device->hardware = $this->fetchHardware();
 
         $sn_oid = Str::contains($device->hardware, 'IP10') ? 'genEquipUnitIDUSerialNumber.0' : 'genEquipInventorySerialNumber.127';
         $device->serial = snmp_get($this->getDevice(), $sn_oid, '-Oqv', 'MWRM-UNIT-MIB');
 
-        $multi_get_array = snmp_get_multi($this->getDevice(), ['genEquipMngSwIDUVersionsRunningVersion.1', 'genEquipUnitLatitude.0', 'genEquipUnitLongitude.0'], '-OQU', 'MWRM-RADIO-MIB');
-        $device->version = $multi_get_array[1]['MWRM-UNIT-MIB::genEquipMngSwIDUVersionsRunningVersion'] ?? null;
+        $data = snmp_get_multi($this->getDevice(), ['genEquipMngSwIDUVersionsRunningVersion.1', 'genEquipUnitLatitude.0', 'genEquipUnitLongitude.0'], '-OQU', 'MWRM-RADIO-MIB');
+        $device->version = $data[1]['MWRM-UNIT-MIB::genEquipMngSwIDUVersionsRunningVersion'] ?? null;
 
-        // update location lat/lng TODO a system way to do this
-        if ($device->location) {
+        // update location lat/lng
+        if ($device->location && (!empty($multi_get_array[0]['MWRM-UNIT-MIB::genEquipUnitLatitude']) || !empty($multi_get_array[0]['MWRM-UNIT-MIB::genEquipUnitLongitude']))) {
             $device->location->lat = $multi_get_array[0]['MWRM-UNIT-MIB::genEquipUnitLatitude'] ?? $device->location->lat;
             $device->location->lng = $multi_get_array[0]['MWRM-UNIT-MIB::genEquipUnitLongitude'] ?? $device->location->lng;
             $device->location->save();

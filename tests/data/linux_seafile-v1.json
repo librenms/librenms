@@ -14,7 +14,7 @@
                     "type": "server",
                     "serial": null,
                     "icon": "linux.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -119,7 +119,7 @@
                 },
                 {
                     "metric": "test_user_1_acc_trashed_libraries",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "seafile"
                 },
@@ -143,7 +143,7 @@
                 },
                 {
                     "metric": "test_user_2_acc_trashed_libraries",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "seafile"
                 },
@@ -167,7 +167,7 @@
                 },
                 {
                     "metric": "test_user_3_acc_trashed_libraries",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "seafile"
                 }

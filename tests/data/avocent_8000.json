@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "0530050907",
                     "icon": "avocent.svg",
-                    "location": null
+                    "location": "snmp-location-blanked-out"
                 }
             ]
         },

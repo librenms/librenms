@@ -14,7 +14,7 @@
                     "type": "power",
                     "serial": "<private>",
                     "icon": "apc.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

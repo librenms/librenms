@@ -64,8 +64,8 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
           );
 
         foreach (explode('<<<', $agent_raw) as $section) {
-            list($section, $data) = explode('>>>', $section);
-            list($sa, $sb)    = explode('-', $section, 2);
+            [$section, $data] = explode('>>>', $section);
+            [$sa, $sb]    = explode('-', $section, 2);
 
             if (in_array($section, $agentapps)) {
                 $agent_data['app'][$section] = trim($data);
@@ -98,7 +98,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             $data=array();
             foreach (explode("\n", $agent_data['ps']) as $process) {
                 $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9\:\.\-]*),([0-9]*)\)\ (.*)/', '\\1|\\2|\\3|\\4|\\5|\\6', $process);
-                list($user, $vsz, $rss, $cputime, $pid, $command) = explode('|', $process, 6);
+                [$user, $vsz, $rss, $cputime, $pid, $command] = explode('|', $process, 6);
                 if (!empty($command)) {
                     $data[]=array('device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'cputime' => $cputime, 'command' => $command);
                 }
@@ -116,7 +116,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             $data=array();
             foreach (explode("\n", $agent_data['ps:sep(9)']) as $process) {
                 $process = preg_replace('/\(([^,;]+),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)?,?([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11|\\12', $process);
-                list($user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $uptime, $process_name) = explode('|', $process, 12);
+                [$user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $uptime, $process_name] = explode('|', $process, 12);
                 if (!empty($process_name)) {
                     $cputime = ($UserModeTime + $KernelModeTime) / 10000000;
                     $days = floor($cputime / 86400);
@@ -161,7 +161,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         if (!empty($agent_data['drbd'])) {
             $agent_data['app']['drbd'] = array();
             foreach (explode("\n", $agent_data['drbd']) as $drbd_entry) {
-                list($drbd_dev, $drbd_data) = explode(':', $drbd_entry);
+                [$drbd_dev, $drbd_data] = explode(':', $drbd_entry);
                 if (preg_match('/^drbd/', $drbd_dev)) {
                     $agent_data['app']['drbd'][$drbd_dev] = $drbd_data;
                     if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', array($device['device_id'], 'drbd', $drbd_dev)) == '0') {
@@ -172,6 +172,22 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             }
         }
     }//end if
+
+    # Use agent DMI data if available
+    if (isset($agent_data['dmi'])) {
+        if ($agent_data['dmi']['system-product-name']) {
+            $hardware = ($agent_data['dmi']['system-manufacturer'] ? $agent_data['dmi']['system-manufacturer'] . ' ' : '') . $agent_data['dmi']['system-product-name'];
+
+            # Clean up Generic hardware descriptions
+            DeviceCache::getPrimary()->hardware = rewrite_generic_hardware($hardware);
+            unset($hardware);
+        }
+
+        if ($agent_data['dmi']['system-serial-number']) {
+            DeviceCache::getPrimary()->serial = $agent_data['dmi']['system-serial-number'];
+        }
+        DeviceCache::getPrimary()->save();
+    }
 
     if (!empty($agent_sensors)) {
         echo 'Sensors: ';

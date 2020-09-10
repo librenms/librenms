@@ -354,13 +354,13 @@
                     "sysDescr": "Linux 2.6.33 #1 Fri Jan 26 16:39:18 CST 2018 armv5tejl",
                     "sysContact": null,
                     "version": "v4.0.3",
-                    "hardware": "Ubiquiti AF ",
+                    "hardware": null,
                     "features": null,
                     "os": "airos-af",
                     "type": "wireless",
                     "serial": null,
                     "icon": "ubiquiti.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -372,7 +372,7 @@
                     "sysDescr": "Linux 2.6.33 #1 Fri Jan 26 16:39:18 CST 2018 armv5tejl",
                     "sysContact": "<private>",
                     "version": "v4.0.3",
-                    "hardware": "Ubiquiti AF ",
+                    "hardware": null,
                     "features": null,
                     "os": "airos-af",
                     "type": "wireless",

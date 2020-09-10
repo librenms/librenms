@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "dkt.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

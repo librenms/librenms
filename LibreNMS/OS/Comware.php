@@ -25,15 +25,16 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
 class Comware extends OS implements ProcessorDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
+        parent::discoverOS($device); // yaml
 
         // serial
         $serial_nums = explode("\n", snmp_walk($this->getDevice(), 'hh3cEntityExtManuSerialNum', '-Osqv', 'HH3C-ENTITY-EXT-MIB'));

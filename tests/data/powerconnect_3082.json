@@ -32,7 +32,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "dell.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

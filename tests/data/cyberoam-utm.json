@@ -32,7 +32,7 @@
                     "type": "appliance",
                     "serial": "C01001GF24TPDE1",
                     "icon": "sophos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

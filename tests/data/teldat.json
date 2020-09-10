@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "1144",
                     "icon": "teldat.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "30BZ32000",
                     "icon": "alliedtelesis.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

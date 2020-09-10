@@ -25,16 +25,15 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class ThreeCom extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-
         if (Str::contains($device->sysDescr, 'Software')) {
             $device->hardware = str_replace("3Com ", '', substr($device->sysDescr, 0, strpos($device->sysDescr, 'Software')));
             // Version is the last word in the sysDescr's first line

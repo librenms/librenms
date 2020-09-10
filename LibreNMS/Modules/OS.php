@@ -46,7 +46,7 @@ class OS implements Module
                 'icon' => null,
             ]);
 
-            $os->discoverOS();
+            $os->discoverOS($os->getDeviceModel());
         }
         $this->handleChanges($os);
     }

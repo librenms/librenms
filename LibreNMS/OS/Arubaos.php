@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
@@ -46,16 +47,9 @@ class Arubaos extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-
-        // ArubaOS (MODEL: Aruba3600), Version 6.1.2.2 (29541)
-        preg_match('/MODEL: ([^)]+)/', $device->sysDescr, $model_match);
-        preg_match('/Version ([^ ]+)/', $device->sysDescr, $version_match);
-        $device->hardware = $model_match[1] ?? null;
-        $device->version = $version_match[1] ?? null;
-
+        parent::discoverOS($device); // yaml
         $aruba_info = snmp_get_multi($this->getDevice(), [
             'wlsxSwitchRole.0',
             'wlsxSwitchMasterIp.0',

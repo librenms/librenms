@@ -49772,7 +49772,7 @@
                     "type": "network",
                     "serial": "DM20F3000F",
                     "icon": "hpe.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

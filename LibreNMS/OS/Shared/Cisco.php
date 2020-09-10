@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Models\Device;
 use App\Models\PortsNac;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -40,15 +41,15 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
     }
-    public function discoverOS(): void
+
+    public function discoverOS(Device $device): void
     {
         // yaml discovery overrides this
         if ($this->hasYamlDiscovery('os')) {
-            $this->discoverYamlOS();
+            $this->discoverYamlOS($device);
             return;
         }
 
-        $device = $this->getDeviceModel();
         $device->serial = $this->getMainSerial();
         $hardware = null;
 

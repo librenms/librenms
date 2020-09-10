@@ -25,25 +25,12 @@
 
 namespace LibreNMS\OS;
 
-use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
-class Aos extends OS implements OSDiscovery, ProcessorDiscovery
+class Aos extends OS implements ProcessorDiscovery
 {
-    public function discoverOS(): void
-    {
-        $device = $this->getDeviceModel();
-        if (Str::contains($device->sysObjectID, '1.3.6.1.4.1.6486.800.1.1.2.2.4')) {
-            $device->hardware = snmp_get($this->getDevice(), '.1.3.6.1.4.1.89.53.4.1.6.1', '-Osqv', 'RADLAN-Physicaldescription-MIB'); //RADLAN-Physicaldescription-MIB::rlPhdStackProductID
-            $device->version = snmp_get($this->getDevice(), '.1.3.6.1.4.1.89.53.14.1.2.1', '-Osqv', 'RADLAN-Physicaldescription-MIB'); //RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion
-        } else {
-            [, $device->hardware, $device->version] = explode(' ', $device->sysDescr);
-        }
-    }
-
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered

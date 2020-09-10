@@ -264,7 +264,7 @@
                     "type": "power",
                     "serial": null,
                     "icon": "apc.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

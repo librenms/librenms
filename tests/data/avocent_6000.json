@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "0530068451",
                     "icon": "avocent.svg",
-                    "location": null
+                    "location": "sys-location-here-blanked-out"
                 }
             ]
         },

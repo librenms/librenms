@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -55,15 +56,9 @@ class ArubaInstant extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-
-        // ArubaOS (MODEL: 225), Version 8.4.0.0-8.4.0.0
-        // ArubaOS (MODEL: 105), Version 6.4.4.8-4.2.4.12
-        $badchars = ['(', ')', ',',];
-        [, , $device->hardware, , $device->version,] = str_replace($badchars, '', explode(' ', $device->sysDescr));
-
+        parent::discoverOS($device); // yaml
         $device->serial = snmp_getnext($this->getDevice(), 'aiAPSerialNum', '-Oqv', 'AI-AP-MIB');
     }
 

@@ -25,24 +25,24 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Avocent extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $avocent_tmp = snmp_get_multi_oid($this->getDevice(), [
             'pmProductModel.0',
             'pmSerialNumber.0',
             'pmFirmwareVersion.0'
         ], '-OUQs', 'PM-MIB');
 
-        $device->hardware = $avocent_tmp['pmProductModel.0'] ?? null;
-        $device->serial   = $avocent_tmp['pmSerialNumber.0'] ?? null;
-        $device->version  = $avocent_tmp['pmFirmwareVersion.0'] ?? null;
+        $hardware = $avocent_tmp['pmProductModel.0'] ?? null;
+        $serial   = $avocent_tmp['pmSerialNumber.0'] ?? null;
+        $version  = $avocent_tmp['pmFirmwareVersion.0'] ?? null;
 
         if (empty($hardware)) {
             if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.10418.16')) {
@@ -52,10 +52,14 @@ class Avocent extends OS implements OSDiscovery
             }
             if ($avocent_oid) {
                 $avocent_tmp = snmp_get_multi_oid($this->getDevice(), "$avocent_oid.2.0 $avocent_oid.4.0 $avocent_oid.7.0");
-                $device->hardware = explode(' ', $avocent_tmp["$avocent_oid.2.0"] ?? '', 2)[0] ?: null;
-                $device->serial   = $avocent_tmp["$avocent_oid.4.0"] ?? null;
-                $device->version  = $avocent_tmp["$avocent_oid.7.0"] ?? null;
+                $hardware = explode(' ', $avocent_tmp["$avocent_oid.2.0"] ?? '', 2)[0] ?: null;
+                $serial   = $avocent_tmp["$avocent_oid.4.0"] ?? null;
+                $version  = $avocent_tmp["$avocent_oid.7.0"] ?? null;
             }
         }
+
+        $device->hardware = $hardware ?? null;
+        $device->serial = $serial ?? null;
+        $device->version = $version ?? null;
     }
 }

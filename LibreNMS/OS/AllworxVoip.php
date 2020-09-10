@@ -25,14 +25,14 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class AllworxVoip extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $device->hardware = $device->sysDescr;
         $device->serial = $device->sysName;
         $device->version = snmp_get($this->getDevice(), 'applVersion.1', '-OQv', 'NETWORK-SERVICES-MIB');

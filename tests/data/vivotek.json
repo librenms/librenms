@@ -452,7 +452,7 @@
                     "type": "camera",
                     "serial": null,
                     "icon": "vivotek.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -25,11 +25,12 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+
 class Cumulus extends \LibreNMS\OS
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $data = snmp_getnext_multi($this->getDevice(), ['entPhysicalDescr', 'entPhysicalSoftwareRev', 'entPhysicalSerialNum'], '-OQUs', 'ENTITY-MIB');
         $device->hardware = $data['entPhysicalDescr'];
         $device->serial = $data['entPhysicalSerialNum'];

@@ -25,15 +25,15 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
 class Dlinkap extends OS implements ProcessorDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $firmware_oid = $device->sysObjectID . '.5.1.1.0';
         $hardware_oid = $device->sysObjectID . '.5.1.5.0';
 

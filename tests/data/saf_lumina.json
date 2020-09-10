@@ -318,7 +318,7 @@
                     "type": "wireless",
                     "serial": "000000000000",
                     "icon": "saf.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

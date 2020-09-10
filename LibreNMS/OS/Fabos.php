@@ -25,21 +25,18 @@
 
 namespace LibreNMS\OS;
 
-use Illuminate\Support\Str;
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Fabos extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-
         $device->version = snmp_get($this->getDevice(), 'swFirmwareVersion.0', '-Ovq', 'SYSTEM-MIB');
 
         $module = snmp_get($this->getDevice(), 'fcFeModuleObjectID.1', '-Ovqn', 'FIBRE-CHANNEL-FE-MIB');
         $revboard = str_replace('.1.3.6.1.4.1.1588.2.1.1.', '', $module);
-//        $revboard = Str::contains($revboard, '.') ? strstr(str_replace($revboard, '', $module), '.', true) : $revboard;
         $device->hardware = $this->fcSwitchModelToName($revboard);
     }
 

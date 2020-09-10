@@ -14,7 +14,7 @@
                     "type": "power",
                     "serial": "ABCFT1000001",
                     "icon": "cyberpower.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -14,7 +14,7 @@
                     "type": "appliance",
                     "serial": "1234ABC",
                     "icon": "dell.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

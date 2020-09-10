@@ -20,21 +20,10 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\OS;
 use LibreNMS\OS\Shared\Zyxel;
 
 class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery
 {
-    public function discoverOS(): void
-    {
-        $device = $this->getDeviceModel();
-        $device->hardware = $device->sysDescr;
-        $data = snmp_get_multi($this->getDevice(), ['sysSwVersionString.0', 'sysProductSerialNumber.0'], '-OQU', 'ZYXEL-ES-COMMON');
-        $device->version = $data[0]['ZYXEL-ES-COMMON::sysSwVersionString'];
-        $device->serial = $data[0]['ZYXEL-ES-COMMON::sysProductSerialNumber'];
-        $device->features = snmp_get($device, 'operationMode.0', '-Ovq', 'ZYXEL-ES-ZyxelAPMgmt');
-    }
-
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.890.1.15.3.5.1.1.2.1'; //ZYXEL-ES-SMI::esMgmt.5.1.1.2.1

@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "90C709063CC4",
                     "icon": "mikrotik.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

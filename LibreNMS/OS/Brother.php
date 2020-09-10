@@ -25,21 +25,20 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Brother extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-        $oids = [
+        $data = snmp_get_multi($this->getDevice(), [
             'brmDNSPrinterName.0', // Brother HL-2070N series
             'brInfoSerialNumber.0', // 000A5J431816
             'brpsFirmwareDescription.0', // Firmware Ver.1.33 (06.07.21)
             'brieee1284id.0', // MFG:Brother;CMD:HBP,PJL,PCL,PCLXL,POSTSCRIPT;MDL:MFC-8440;CLS:PRINTER;
-        ];
-        $data = snmp_get_multi($this->getDevice(), $oids, '-OQUs', 'BROTHER-MIB');
+        ], '-OQUs', 'BROTHER-MIB');
 
         $device->serial = $data[0]['brInfoSerialNumber'] ?? null;
 

@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "DNI1446B72Z",
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

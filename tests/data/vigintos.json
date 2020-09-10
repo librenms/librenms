@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "vigintos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -25,16 +25,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+use App\Models\PortsNac;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
-use LibreNMS\Interfaces\Polling\NacPolling;
-use LibreNMS\OS;
-use App\Models\PortsNac;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
+use LibreNMS\OS;
 
 class Vrp extends OS implements
     ProcessorDiscovery,
@@ -43,14 +44,8 @@ class Vrp extends OS implements
     WirelessClientsDiscovery,
     OSDiscovery
 {
-
-    /**
-     * Discover OS Vrp
-     *
-     */
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         //Huawei VRP devices are not providing the HW description in a unified way
         preg_match("/Version [^\s]*/m", $device->sysDescr, $matches);
         $device->version = trim(str_replace('Version ', '', $matches[0]));
@@ -216,7 +211,7 @@ class Vrp extends OS implements
         $total_oids = array();
 
         $vapInfoTable = $this->getCacheTable('hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB', 3);
-        
+
         foreach ($vapInfoTable as $a_index => $ap) {
             //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
             $a_index_oid = implode(".", array_map("hexdec", explode(":", $a_index)));

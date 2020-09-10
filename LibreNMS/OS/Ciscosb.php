@@ -25,16 +25,16 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Ciscosb extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
+        parent::discoverOS($device); // yaml
 
-        $device = $this->getDeviceModel();
         $data = snmp_get_multi($this->getDevice(), ['rlPhdUnitGenParamModelName.1', 'genGroupHWVersion.0', 'rlPhdUnitGenParamHardwareVersion.1', 'rlPhdUnitGenParamSoftwareVersion.1', 'rlPhdUnitGenParamFirmwareVersion.1', 'rndBaseBootVersion.0'], '-OQUs', 'CISCOSB-DEVICEPARAMS-MIB:CISCOSB-Physicaldescription-MIB');
 
         if (empty($device->hardware)) {

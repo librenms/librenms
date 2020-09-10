@@ -14,7 +14,7 @@
                     "type": "firewall",
                     "serial": "0000000000000000",
                     "icon": "screenos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -25,15 +25,15 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS\Shared\Zyxel;
 
 class Zynos extends Zyxel implements OSDiscovery
 {
-public function discoverOS(): void
+public function discoverOS(Device $device): void
 {
-    parent::discoverOS();
-    $device = $this->getDeviceModel();
+    parent::discoverOS($device);
 
     // if not already set, let's fill the gaps
     if (empty($device->hardware)) {

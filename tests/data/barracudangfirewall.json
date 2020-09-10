@@ -14,7 +14,7 @@
                     "type": "firewall",
                     "serial": null,
                     "icon": "barracuda.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

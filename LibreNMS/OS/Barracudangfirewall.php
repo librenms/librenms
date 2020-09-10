@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
@@ -33,9 +34,8 @@ use LibreNMS\RRD\RrdDefinition;
 class Barracudangfirewall extends OS implements OSDiscovery, OSPolling
 {
 
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         if ($device->sysObjectID == '.1.3.6.1.4.1.10704.1.10') {
             $device->hardware = $device->sysName;
         }

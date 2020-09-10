@@ -27,16 +27,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class ArrisC4 extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
         $device = $this->getDeviceModel();
 
-        preg_match("/CMTS_V([0-9\.]+),/", $device->sysDescr, $match);
+        preg_match("/CMTS_V([\d.]+),/", $device->sysDescr, $match);
         $device->version = $match[1];
 
         $data = explode(".", $device->sysObjectID);

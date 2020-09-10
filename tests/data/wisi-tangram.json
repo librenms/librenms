@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "<private>",
                     "icon": "wisi.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -14,7 +14,7 @@
                     "type": "wireless",
                     "serial": "0000000000",
                     "icon": "mimosa.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

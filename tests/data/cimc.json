@@ -358,7 +358,7 @@
                     "type": "server",
                     "serial": "FCH2126720R",
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

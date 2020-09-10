@@ -25,14 +25,14 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
 class Junos extends \LibreNMS\OS implements OSPolling
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $data = snmp_get_multi($this->getDevice(), [
             'JUNIPER-MIB::jnxBoxDescr.0',
             'JUNIPER-MIB::jnxBoxSerialNo.0',

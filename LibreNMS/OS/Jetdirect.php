@@ -25,11 +25,13 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+
 class Jetdirect extends \LibreNMS\OS
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
+        parent::discoverOS($device); // yaml
         $device = $this->getDeviceModel();
 
         $info = $this->parseJetdirect(snmp_get($this->getDevice(), '1.3.6.1.4.1.11.2.3.9.1.1.7.0', '-OQv'));

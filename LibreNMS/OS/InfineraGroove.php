@@ -25,11 +25,12 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+
 class InfineraGroove extends \LibreNMS\OS
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $oid_list = [
             'neType.0',
             'softwareloadSwloadState.1',

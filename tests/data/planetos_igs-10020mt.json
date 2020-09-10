@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "planet.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -715,7 +715,7 @@
                     "type": "wireless",
                     "serial": null,
                     "icon": "ubiquiti.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

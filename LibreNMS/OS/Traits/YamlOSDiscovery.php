@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Models\Device;
 use Illuminate\Support\Arr;
 use Log;
 
@@ -45,9 +46,8 @@ trait YamlOSDiscovery
         'location',
     ];
 
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $yaml = $this->getDiscovery();
         $os_yaml = $yaml['modules']['os'] ?? [];
 
@@ -114,9 +114,9 @@ trait YamlOSDiscovery
 
     private function parseTemplate($template, $data)
     {
-        return preg_replace_callback('/{{ ([^ ]+) }}/', function ($matches) use ($data) {
+        return trim(preg_replace_callback('/{{ ([^ ]+) }}/', function ($matches) use ($data) {
             return $data[$matches[1]] ?? '';
-        }, $template);
+        }, $template));
     }
 
     private function isNumeric($oids)

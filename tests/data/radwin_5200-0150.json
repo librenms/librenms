@@ -192,7 +192,7 @@
                     "type": "wireless",
                     "serial": "P10700I500F00005",
                     "icon": "radwin.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

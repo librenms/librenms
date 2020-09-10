@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "EC1713000000",
                     "icon": "cumulus.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

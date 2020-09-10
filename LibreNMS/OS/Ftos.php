@@ -25,11 +25,13 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+
 class Ftos extends Dnos
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
+        parent::discoverOS($device); // yaml
 
         $device = $this->getDeviceModel();
         $device->hardware = $this->getHardware();

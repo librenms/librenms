@@ -25,23 +25,24 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Aix extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $aix_descr = explode("\n", $device->sysDescr);
         # AIX standard snmp deamon
         if ($aix_descr[1]) {
             $device->serial = explode("Processor id: ", $aix_descr[1])[1];
             $aix_long_version = explode(" version: ", $aix_descr[2])[1];
-            list($device->version,$aix_version_min) = array_map('intval', explode(".", $aix_long_version));
+            [$device->version, $aix_version_min] = array_map('intval', explode(".", $aix_long_version));
             # AIX net-snmp
         } else {
-            list(,,$aix_version_min,$device->version,$device->serial) = explode(" ", $aix_descr[0]);
+            [, , $aix_version_min, $device->version, $device->serial] = explode(" ", $aix_descr[0]);
         }
-        $device->version .= "." . $aix_version_min;    }
+        $device->version .= "." . $aix_version_min;
+    }
 }

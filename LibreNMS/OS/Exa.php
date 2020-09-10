@@ -25,15 +25,15 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Exa extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-        $info = snmp_getnext_multi($this->getDevice(), 'e7CardSoftwareVersion e7CardSerialNumber', '-OQUs', 'E7-Calix-MIB');
+        $info = snmp_getnext_multi($this->getDevice(), ['e7CardSoftwareVersion', 'e7CardSerialNumber'], '-OQUs', 'E7-Calix-MIB');
         $device->version = $info['e7CardSoftwareVersion'];
         $device->serial = $info['e7CardSerialNumber'];
         $device->hardware = "Calix " . $device->sysDescr;

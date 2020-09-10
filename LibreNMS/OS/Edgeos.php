@@ -25,11 +25,13 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+
 class Edgeos extends \LibreNMS\OS
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        parent::discoverOS(); // yaml
+        parent::discoverOS($device); // yaml
 
         $hw = snmp_get($this->getDevice(), ['.1.3.6.1.2.1.25.4.2.1.5.3818', '.1.3.6.1.2.1.25.4.2.1.5.3819'], '-Ovq');
         if (preg_match('/(?<=UBNT )(.*)(?= running on)/', $hw, $matches)) {

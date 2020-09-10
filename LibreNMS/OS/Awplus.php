@@ -25,17 +25,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Awplus extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
         //$hardware and $serial use snmp_getnext as the OID for these is not always fixed.
         //However, the first OID is the device baseboard.
-        $device = $this->getDeviceModel();
 
         $data = snmp_getnext_multi($this->getDevice(), ['rscBoardName', 'rscBoardSerialNumber'], '-OQs', 'AT-RESOURCE-MIB');
         $hardware = $data['rscBoardName'];
@@ -65,6 +65,6 @@ class Awplus extends OS implements OSDiscovery
         $device->version = snmp_get($this->getDevice(), "currSoftVersion.0", "-OQv", "AT-SETUP-MIB");
         $device->serial = $serial;
         $device->hardware = $hardware;
-        $device->features = $features;
+        $device->features = $features ?? null;
     }
 }

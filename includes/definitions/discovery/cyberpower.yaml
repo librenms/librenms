@@ -1,5 +1,15 @@
 mib: CPS-MIB
 modules:
+    os:
+        hardware:
+            - CPS-MIB::upsBaseIdentModel.0
+            - CPS-MIB::ePDUIdentModelNumber.0
+        serial:
+            - CPS-MIB::upsAdvanceIdentSerialNumber.0
+            - CPS-MIB::ePDUIdentSerialNumber.0
+        version:
+            - CPS-MIB::upsAdvanceIdentFirmwareRevision.0
+            - CPS-MIB::ePDUIdentFirmwareRev.0
     sensors:
         state:
             data:

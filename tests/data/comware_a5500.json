@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "CN50A1Z4BN",
                     "icon": "hpe.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

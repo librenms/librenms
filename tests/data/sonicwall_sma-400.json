@@ -14,7 +14,7 @@
                     "type": "firewall",
                     "serial": "18B1697FEE2C",
                     "icon": "sonicwall.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

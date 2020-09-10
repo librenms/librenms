@@ -32,7 +32,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "telco-systems.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

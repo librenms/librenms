@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "SY331IC000040",
                     "icon": "dlink.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

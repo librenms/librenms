@@ -27,6 +27,7 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Models\Device;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 
@@ -36,11 +37,11 @@ class Zyxel extends OS
         YamlOSDiscovery::discoverOS as discoverYamlOS;
     }
 
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
         // yaml discovery overrides this
         if ($this->hasYamlDiscovery('os')) {
-            $this->discoverYamlOS();
+            $this->discoverYamlOS($device);
             return;
         };
 
@@ -48,10 +49,10 @@ class Zyxel extends OS
             '.1.3.6.1.4.1.890.1.15.3.1.11.0', // ZYXEL-ES-COMMON::sysProductModel.0
             '.1.3.6.1.4.1.890.1.15.3.1.6.0', // ZYXEL-ES-COMMON::sysSwVersionString.0
             '.1.3.6.1.4.1.890.1.15.3.1.12.0', // ZYXEL-ES-COMMON::sysProductSerialNumber.0
+            // ZYXEL-ES-ZyxelAPMgmt::operationMode.0
         ];
         $data = snmp_get_multi_oid($this->getDevice(), $oids, '-OUQnt');
 
-        $device = $this->getDeviceModel();
         $device->hardware = $data['.1.3.6.1.4.1.890.1.15.3.1.11.0'];
         [$device->version,] = explode(' | ', $data['.1.3.6.1.4.1.890.1.15.3.1.6.0']);
         $device->serial = $data['.1.3.6.1.4.1.890.1.15.3.1.12.0'];

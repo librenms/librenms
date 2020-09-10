@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -33,7 +34,7 @@ use LibreNMS\OS;
 
 class Terra extends OS implements ProcessorDiscovery, OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
         $models = [
             "sda410C" => "5",
@@ -48,8 +49,6 @@ class Terra extends OS implements ProcessorDiscovery, OSDiscovery
             "sdi480" => "17",
             "sti440" => "18"
         ];
-
-        $device = $this->getDeviceModel();
 
         foreach ($models as $model => $index) {
             if (Str::contains($device->sysDescr, $model)) {
