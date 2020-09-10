@@ -122,5 +122,4 @@ if ($output === 'json') {
     if (isset($_GET['absolute']) && $_GET['absolute'] == "1") {
         $rrd_options .= ' --full-size-mode';
     }
-
 }
