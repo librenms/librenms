@@ -207,7 +207,7 @@ if (!empty($argv[1])) {
     }//end if
 
     try {
-        $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
+        $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional, $within_poller_groups);
         $device = device_by_id_cache($device_id);
         echo "Added device {$device['hostname']} ($device_id)\n";
         exit(0);
