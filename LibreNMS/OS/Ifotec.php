@@ -53,7 +53,5 @@ class Ifotec extends OS implements OSDiscovery
 
         // sysDecr struct = (<product_reference> . ' : ' . <product_description>) OR (<product_reference>)
         list($device->hardware) = explode(' : ', $device->sysDescr, 2);
-
-        unset($ifoSysProductIndex, $data, $oids, $device);
     }
 }
