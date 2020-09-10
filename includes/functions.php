@@ -518,7 +518,7 @@ function delete_device($id)
  * @param boolean $force_add add even if the device isn't reachable
  * @param string $port_assoc_mode snmp field to use to determine unique ports
  * @param array $additional an array with additional parameters to take into consideration when adding devices
- * @param array $within_poller_groups if set, will only check for devices within specified pollerg groups
+ * @param array $within_poller_groups if set, will only check for devices within specified poller groups
  *
  * @return int returns the device_id of the added device
  *
@@ -1541,7 +1541,7 @@ function host_exists($hostname, $sysName = null, $within_poller_groups = array()
         }
     }
     if (!empty($within_poller_groups)) {
-        $placeholders = implode(",", array_fill(1, count($within_poller_groups), '?'))
+        $placeholders = implode(",", array_fill(1, count($within_poller_groups), '?'));
         $query .= " AND `poller_group` IN ($placeholders)";
         $params = array_merge($params, $within_poller_groups);
     }
