@@ -77,7 +77,7 @@ class AlertUtil
             (at.start_hr <= ? AND time((time(at.end_hr)+time(240000))) >= ?))
             OR (at.start_hr <= time((time(?)+time(240000))) AND
             time((time(at.end_hr)+time(240000))) >= time((time(?)+time(240000)))))
-            AND (at.day LIKE ? OR at.day IS NULL)))";
+            AND (at.day LIKE ? OR at.day IS NULL))))";
 
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
             FROM alert_transport_map AS atm
@@ -131,7 +131,7 @@ class AlertUtil
             (at.start_hr <= ? AND time((time(at.end_hr)+time(240000))) >= ?))
             OR (at.start_hr <= time((time(?)+time(240000))) AND
             time((time(at.end_hr)+time(240000))) >= time((time(?)+time(240000)))))
-            AND (at.day LIKE ? OR at.day IS NULL)))";
+            AND (at.day LIKE ? OR at.day IS NULL))))";
 
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports as at
