@@ -1482,7 +1482,7 @@ function device_has_ip($ip, $within_poller_groups = array())
 
     if (isset($ip_address) && $ip_address->port) {
         $device = $ip_address->port->device;
-        if ($within_poller_groups.empty()) {
+        if (empty($within_poller_groups)) {
             return $device;
         }
         if (in_array($device->poller_group, $within_poller_groups)) {
@@ -1521,7 +1521,7 @@ function snmpTransportToAddressFamily($transport)
  *
  * @param string $hostname The hostname to check for
  * @param string $sysName The sysName to check
- * @param string $within_poller_groups If non-empty, will only check for dupe hosts within poller groups
+ * @param string $within_poller_groups If non-empty, will only check for dupe hosts within specified poller groups
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
  */
@@ -1540,7 +1540,7 @@ function host_exists($hostname, $sysName = null, $within_poller_groups = array()
             $params[] = $full_sysname;
         }
     }
-    if (!$within_poller_groups.empty()) {
+    if (!empty($within_poller_groups)) {
         $query .= " AND `poller_group` IN ?";
         $params[] = $within_poller_groups;
     }
