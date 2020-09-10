@@ -31,6 +31,7 @@ use Date;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 
 class AlertSchedule extends Model
 {
@@ -167,6 +168,7 @@ class AlertSchedule extends Model
     {
         return $query->where(function ($query) {
             $now = CarbonImmutable::now('UTC');
+            $local_now = CarbonImmutable::now(config('app.timezone'));
             $query->where('start', '<=', $now)
                 ->where('end', '>=', $now)
                 ->where(function ($query) use ($now) {
@@ -184,14 +186,17 @@ class AlertSchedule extends Model
                                     // outside, spans days
                                     $query->whereTime('start', '>', DB::raw("time(`end`)"))
                                         ->where(function ($query) use ($now) {
-                                            $query->whereTime('end', '<=', $now->toTimeString())
-                                                ->orWhereTime('start', '>', $now->toTimeString());
+                                            $query->whereTime('start', '<=', $now->toTimeString())
+                                                ->whereTime(DB::raw("time(`end` + 2400000)"), '>', $now->toTimeString());
+                                        })->orWhere(function ($query) use ($now) {
+                                            $query->whereTime('start', '<=', $now->toTimeString())
+                                                ->whereTime(DB::raw("time(`end` + 2400000)"), '>', $now->toTimeString());
                                         });
                                 });
                             })
                             // Check we are on the correct day of the week
                             ->where(function ($query) use ($now) {
-                                $query->where('recurring_day', 'like', $now->format('%N%'))
+                                $query->where('recurring_day', 'like', $local_now->format('%N%'))
                                     ->orWhereNull('recurring_day');
                             });
                     });
