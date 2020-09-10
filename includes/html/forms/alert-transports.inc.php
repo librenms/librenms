@@ -86,8 +86,8 @@ if (empty($name)) {
             $message .= 'Missing end timerange hour<br />';
         }
 
-        if (strtotime($start_hr) >= strtotime($end_hr)) {
-            $message .= 'Start timerange hour should be stricly inferior to end timerange<br />';
+        if (strtotime($start_hr) >= strtotime($end_hr) && !empty($vars['timerange_day'])) {
+            $message .= 'Start time \< end time means timerange running overnight. Overnight not supported with day of week constraint<br />';
         }
 
         if (isset($vars['timerange_day']) && is_array($vars['timerange_day']) && !empty($vars['timerange_day'])) {
