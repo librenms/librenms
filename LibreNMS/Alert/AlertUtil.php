@@ -71,8 +71,11 @@ class AlertUtil
         $local_now = CarbonImmutable::now(config('app.timezone'));
         $now = CarbonImmutable::now('UTC');
         $where_time = "(at.timerange = 0 OR
-            (at.timerange = 1 AND ((at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
-            OR (at.start_hr > at.end_hr AND at.start_hr >= ? AND at.end_hr <= ?))
+            (at.timerange = 1 AND (
+            (at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
+            OR (at.start_hr > at.end_hr AND (
+            (at.start_hr <= ? AND time((time(at.end_hr)+time("24:00"))) >= ?))
+            OR (at.start_hr <= ? AND time((time(at.end_hr)+time("24:00"))) >= ?))
             AND (at.day LIKE ? OR at.day IS NULL)))";
 
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
@@ -90,9 +93,11 @@ class AlertUtil
         $rule_id = self::getRuleId($alert_id);
         $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
                    $now->toTimeString(), $now->toTimeString(), $now->toTimeString(), $now->toTimeString(),
+                   $now->add(1, 'day')->toTimeString(), $now->add(1, 'day')->toTimeString(),
                    $local_now->format('%N%'),
                    $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
                    $now->toTimeString(), $now->toTimeString(), $now->toTimeString(), $now->toTimeString(),
+                   $now->add(1, 'day')->toTimeString(), $now->add(1, 'day')->toTimeString(),
                    $local_now->format('%N%')];
         return dbFetchRows($query, $params);
     }
@@ -119,8 +124,11 @@ class AlertUtil
         $local_now = CarbonImmutable::now(config('app.timezone'));
         $now = CarbonImmutable::now('UTC');
         $where_time = "(at.timerange = 0 OR
-            (at.timerange = 1 AND ((at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
-            OR (at.start_hr > at.end_hr AND at.start_hr >= ? AND at.end_hr <= ?))
+            (at.timerange = 1 AND (
+            (at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
+            OR (at.start_hr > at.end_hr AND (
+            (at.start_hr <= ? AND time((time(at.end_hr)+time("24:00"))) >= ?))
+            OR (at.start_hr <= ? AND time((time(at.end_hr)+time("24:00"))) >= ?))
             AND (at.day LIKE ? OR at.day IS NULL)))";
 
 
@@ -129,6 +137,7 @@ class AlertUtil
             WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
                    $now->toTimeString(), $now->toTimeString(), $now->toTimeString(), $now->toTimeString(),
+                   $now->add(1, 'day')->toTimeString(), $now->add(1, 'day')->toTimeString(),
                    $local_now->format('%N%')];
         return dbFetchRows($query, $params);
     }
