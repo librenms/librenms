@@ -74,8 +74,9 @@ class AlertUtil
             (at.timerange = 1 AND (
             (at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
             OR (at.start_hr > at.end_hr AND (
-            (at.start_hr <= ? AND time((time(at.end_hr)+time(\"24:00\"))) >= ?))
-            OR (at.start_hr <= ? AND time((time(?)+time(\"24:00\"))) >= time((time(?)+time(\"24:00\")))))
+            (at.start_hr <= ? AND time((time(at.end_hr)+time(240000))) >= ?))
+            OR (at.start_hr <= time((time(?)+time(240000))) AND
+            time((time(at.end_hr)+time(240000))) >= time((time(?)+time(240000)))))
             AND (at.day LIKE ? OR at.day IS NULL)))";
 
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
@@ -127,10 +128,10 @@ class AlertUtil
             (at.timerange = 1 AND (
             (at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
             OR (at.start_hr > at.end_hr AND (
-            (at.start_hr <= ? AND time((time(at.end_hr)+time(\"24:00\"))) >= ?))
-            OR (at.start_hr <= ? AND time((time(?)+time(\"24:00\"))) >= time((time(?)+time(\"24:00\")))))
+            (at.start_hr <= ? AND time((time(at.end_hr)+time(240000))) >= ?))
+            OR (at.start_hr <= time((time(?)+time(240000))) AND
+            time((time(at.end_hr)+time(240000))) >= time((time(?)+time(240000)))))
             AND (at.day LIKE ? OR at.day IS NULL)))";
-
 
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports as at
