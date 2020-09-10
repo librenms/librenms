@@ -1541,8 +1541,8 @@ function host_exists($hostname, $sysName = null, $within_poller_groups = array()
         }
     }
     if (!empty($within_poller_groups)) {
-        $query .= " AND `poller_group` IN ?";
-        $params[] = $within_poller_groups;
+        $query .= " AND `poller_group` IN (?)";
+        $params[] = implode(",", $within_poller_groups);
     }
     return dbFetchCell($query, $params) > 0;
 }
