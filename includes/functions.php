@@ -518,6 +518,7 @@ function delete_device($id)
  * @param boolean $force_add add even if the device isn't reachable
  * @param string $port_assoc_mode snmp field to use to determine unique ports
  * @param array $additional an array with additional parameters to take into consideration when adding devices
+ * @param array $within_poller_groups if set, will only check for devices within specified pollerg groups
  *
  * @return int returns the device_id of the added device
  *
@@ -528,10 +529,10 @@ function delete_device($id)
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = array())
+function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = array(), $within_poller_groups = array())
 {
     // Test Database Exists
-    if (host_exists($host, null, $poller_group)) {
+    if (host_exists($host, null, $within_poller_groups)) {
         throw new HostExistsException("Already have host $host");
     }
 
@@ -551,7 +552,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $ip = $host;
     }
 
-    if ($force_add !== true && $device = device_has_ip($ip, $poller_group)) {
+    if ($force_add !== true && $device = device_has_ip($ip, $within_poller_groups)) {
         $message = "Cannot add $host, already have device with this IP $ip";
         if ($ip != $device->hostname) {
             $message .= " ($device->hostname)";
@@ -756,7 +757,8 @@ function createHost(
     $port_assoc_mode = 'ifIndex',
     $force_add = false,
     $overwrite_ip = null,
-    $additional = array()
+    $additional = array(),
+    $within_poller_groups = array()
 ) {
     $host = trim(strtolower($host));
 
@@ -791,7 +793,7 @@ function createHost(
         $device['os'] = getHostOS($device);
 
         $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-        if (host_exists($host, $snmphost, $poller_group)) {
+        if (host_exists($host, $snmphost, $within_poller_groups)) {
             throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
         }
     }
@@ -1461,10 +1463,10 @@ function fix_integer_value($value)
  * Find a device that has this IP. Checks ipv4_addresses and ipv6_addresses tables.
  *
  * @param string $ip
- * @param string $poller_group
+ * @param array $within_poller_groups
  * @return \App\Models\Device|false
  */
-function device_has_ip($ip, $poller_group = '0')
+function device_has_ip($ip, $within_poller_groups = array())
 {
     if (IPv6::isValid($ip)) {
         $ip_address = \App\Models\Ipv6Address::query()
@@ -1480,10 +1482,10 @@ function device_has_ip($ip, $poller_group = '0')
 
     if (isset($ip_address) && $ip_address->port) {
         $device = $ip_address->port->device;
-        if (!Config::get('remote_poller')) {
+        if ($within_poller_groups.empty()) {
             return $device;
         }
-        if ($device->poller_group == $poller_group) {
+        if (in_array($device->poller_group, $within_poller_groups)) {
             return $device;
         }
     }
@@ -1519,11 +1521,11 @@ function snmpTransportToAddressFamily($transport)
  *
  * @param string $hostname The hostname to check for
  * @param string $sysName The sysName to check
- * @param string $poller_group The poller group to check against if remote polling enabled
+ * @param string $within_poller_groups If non-empty, will only check for dupe hosts within poller groups
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
  */
-function host_exists($hostname, $sysName = null, $poller_group = '0')
+function host_exists($hostname, $sysName = null, $within_poller_groups = array())
 {
     $query = "SELECT COUNT(*) FROM `devices` WHERE (`hostname`=? OR `overwrite_ip`=?)";
     $params = array($hostname, $hostname);
@@ -1538,9 +1540,9 @@ function host_exists($hostname, $sysName = null, $poller_group = '0')
             $params[] = $full_sysname;
         }
     }
-    if (Config::get('remote_poller')) {
-        $query .= " AND `poller_group`=?";
-        $params[] = $poller_group;
+    if (!$within_poller_groups.empty()) {
+        $query .= " AND `poller_group` IN ?";
+        $params[] = $within_poller_groups;
     }
     return dbFetchCell($query, $params) > 0;
 }

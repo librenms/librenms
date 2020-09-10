@@ -4502,10 +4502,6 @@
                 "git": "Git"
             }
         },
-        "remote_poller": {
-            "default": false,
-            "type": "boolean"
-        },
         "rewrite_if": {
             "type": "array"
         },

@@ -45,6 +45,7 @@ class Outcome:
     TERMINATED = 6
 
 
+WITHIN_POLLER_GROUPS = ''
 POLLER_GROUP = '0'
 VERBOSE_LEVEL = 0
 THREADS = 32
@@ -113,7 +114,7 @@ def scan_host(scan_ip):
 
         try:
 
-            arguments = ['/usr/bin/env', 'php', 'addhost.php', '-g', POLLER_GROUP, hostname or scan_ip]
+            arguments = ['/usr/bin/env', 'php', 'addhost.php', '-g', POLLER_GROUP, '-G', WITHIN_POLLER_GROUPS, hostname or scan_ip]
             if args.ping:
                 arguments.insert(5, args.ping)
             add_output = check_output(arguments)
@@ -151,6 +152,8 @@ Example: """ + __file__ + """ -P 192.168.0.0/24""")
     parser.add_argument('-g', dest='group', type=str,
                         help="The poller group all scanned devices will be added to."
                              " Default: The first group listed in 'distributed_poller_group', or {} if not specificed".format(POLLER_GROUP))
+    parser.add_argument('-G', dest='within_poller_groups', type=str,
+                        help="A list of poller groups to restrict duplicate IP checking within")
     parser.add_argument('-l', '--legend', action='store_true', help="Print the legend.")
     parser.add_argument('-v', '--verbose', action='count',
                         help="Show debug output. Specifying multiple times increases the verbosity.")
@@ -165,7 +168,7 @@ Example: """ + __file__ + """ -P 192.168.0.0/24""")
 
     VERBOSE_LEVEL = args.verbose or VERBOSE_LEVEL
     THREADS = args.threads or THREADS
-
+    WITHIN_POLLER_GROUPS = args.within_poller_groups or WITHIN_POLLER_GROUPS
     # Import LibreNMS config
     install_dir = path.dirname(path.realpath(__file__))
     chdir(install_dir)
