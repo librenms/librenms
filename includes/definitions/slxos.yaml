@@ -3,9 +3,7 @@ text: 'Extreme SLX-OS'
 type: network
 group: slxos
 icon: extreme
-mib_dir:
-    - extreme
-    - brocade
+mib_dir: extreme
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
