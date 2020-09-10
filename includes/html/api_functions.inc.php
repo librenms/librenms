@@ -101,13 +101,11 @@ function api_get_graph(array $vars)
         $json = json_decode($image);
         if ($json !== null) {
             return api_success($json, 'dataset', null, 200, count($json->data));
-        } else {
-            if ($json_enabled) {
-                return api_error(500, 'Could not load data');
-            } else {
-                return api_error(501, 'JSON output not available for this graph');
-            }
         }
+        if ($json_enabled) {
+            return api_error(500, 'Could not load data');
+        }
+        return api_error(501, 'JSON output not available for this graph');
     }
 
     return response($image, 200, ['Content-Type' => get_image_type()]);
