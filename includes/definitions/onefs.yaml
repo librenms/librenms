@@ -2,8 +2,7 @@ os: onefs
 text: 'EMC Isilon OneFS'
 type: storage
 icon: emc
-mib_dir:
-    - emc
+mib_dir: emc
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

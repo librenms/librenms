@@ -3,8 +3,7 @@ text: 'ICT Sine Wave Inverter'
 type: power
 icon: ict
 nobulk: true
-mib_dir:
-    - ict
+mib_dir: ict
 over:
     - { graph: device_voltage, text: 'Battery Voltage (VDC)' }
     - { graph: device_voltage, text: 'Inverter Voltage (VAC)' }

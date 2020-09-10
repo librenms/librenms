@@ -2,8 +2,7 @@ os: hikvision-cam
 text: 'Hikvision Camera'
 type: network
 icon: hikvision
-mib_dir:
-    - hikvision
+mib_dir: hikvision
 over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }

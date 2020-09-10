@@ -2,8 +2,7 @@ os: innovaphone
 text: 'Innovaphone ISDN'
 type: environment
 icon: innovaphone
-mib_dir:
-    - innovaphone
+mib_dir: innovaphone
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.6666

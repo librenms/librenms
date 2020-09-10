@@ -11,5 +11,4 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.23867.1.2.
-mib_dir:
-    - silverpeak
+mib_dir: silverpeak

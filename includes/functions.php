@@ -186,7 +186,7 @@ function getHostOS($device, $fetch = true)
     foreach ($os_defs as $os => $def) {
         if (isset($def['discovery']) && !in_array($os, $deferred_os)) {
             foreach ($def['discovery'] as $item) {
-                if (checkDiscovery($device, $item)) {
+                if (checkDiscovery($device, $item, $def['mib_dir'] ?? null)) {
                     return $os;
                 }
             }
@@ -207,7 +207,7 @@ function getHostOS($device, $fetch = true)
     foreach ($deferred_os as $os) {
         if (isset($os_defs[$os]['discovery'])) {
             foreach ($os_defs[$os]['discovery'] as $item) {
-                if (checkDiscovery($device, $item)) {
+                if (checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null)) {
                     return $os;
                 }
             }
@@ -228,9 +228,10 @@ function getHostOS($device, $fetch = true)
  *
  * @param array $device
  * @param array $array Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
+ * @param string|array $mibdir MIB directory for evaluated OS
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($device, $array)
+function checkDiscovery($device, $array, $mibdir)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -255,13 +256,14 @@ function checkDiscovery($device, $array)
                 return false;
             }
         } elseif ($key == 'snmpget') {
-            $options = isset($value['options']) ? $value['options'] : '-Oqv';
-            $mib = isset($value['mib']) ? $value['mib'] : null;
-            $mib_dir = isset($value['mib_dir']) ? $value['mib_dir'] : null;
-            $op = isset($value['op']) ? $value['op'] : 'contains';
-
-            $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
-            if (compare_var($get_value, $value['value'], $op) == $check) {
+            $get_value = snmp_get(
+                $device,
+                $value['oid'],
+                $value['options'] ?? '-Oqv',
+                $value['mib'] ?? null,
+                $value['mib_dir'] ?? $mibdir
+            );
+            if (compare_var($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                 return false;
             }
         }

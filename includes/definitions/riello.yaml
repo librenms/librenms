@@ -5,8 +5,7 @@ icon: riello
 rfc1628_compat: true
 over:
     - { graph: device_current, text: Current }
-mib_dir:
-    - riello
+mib_dir: riello
 discovery:
     -
         sysObjectID:

@@ -4,8 +4,7 @@ group: unix
 text: MobileIron
 ifXmcbc: true
 ifname: true
-mib_dir:
-    - supermicro
+mib_dir: supermicro
     - dell
 over:
     - { graph: device_processor, text: 'Processor Usage' }

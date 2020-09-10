@@ -2,8 +2,7 @@ os: wipipe
 text: 'CradlePoint WiPipe'
 type: network
 icon: cradlepoint
-mib_dir:
-    - cradlepoint
+mib_dir: cradlepoint
 discovery:
     -
         sysObjectID:

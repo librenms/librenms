@@ -1202,6 +1202,16 @@ function uw_to_dbm($value)
 }
 
 /**
+* Converts mW to dBm
+* $value must be positive
+*
+*/
+function mw_to_dbm($value)
+{
+      return 10 * log10($value);
+}
+
+/**
  * @param $value
  * @param null $default
  * @param int $min

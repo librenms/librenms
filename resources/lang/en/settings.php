@@ -1097,13 +1097,17 @@ return [
                 'description' => 'Enable',
                 'help' => 'Exports metrics to Prometheus Push Gateway'
             ],
-            'host' => [
-                'description' => 'Server',
-                'help' => 'The IP or hostname of the Prometheus Push Gateway to send data to'
+            'url' => [
+                'description' => 'URL',
+                'help' => 'The URL of the Prometheus Push Gateway to send data to'
             ],
-            'port' => [
+            'Job' => [
                 'description' => 'Job',
                 'help' => 'Job label for exported metrics'
+            ],
+            'attach_sysname' => [
+                'description' => 'Attach Device sysName',
+                'help' => 'Attach sysName information put to Prometheus.'
             ]
         ],
         'public_status' => [

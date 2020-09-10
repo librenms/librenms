@@ -95,6 +95,9 @@ class Prometheus extends BaseDatastore
             $options['body'] = $vals;
 
             $promurl = $this->base_uri . $device['hostname'] . $promtags;
+            if (Config::get('prometheus.attach_sysname', false)) {
+                $promurl .= '/sysName/' . $device['sysName'];
+            }
             $promurl = str_replace(" ", "-", $promurl); // Prometheus doesn't handle tags with spaces in url
 
             Log::debug("Prometheus put $promurl: ", [

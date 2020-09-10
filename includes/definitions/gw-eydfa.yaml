@@ -5,8 +5,7 @@ icon: glassway
 over:
     - { graph: device_temperature, text: 'Temperatures' }
     - { graph: device_dbm, text: 'Optics' }
-mib_dir:
-    - glassway
+mib_dir: glassway
 discovery:
     -
         sysObjectID:

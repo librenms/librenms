@@ -2,8 +2,7 @@ os: adtran-aos
 text: 'Adtran AOS'
 type: network
 icon: adtran
-mib_dir:
-    - adtran
+mib_dir: adtran
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
