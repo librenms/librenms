@@ -13,7 +13,7 @@
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "linux.svg",
+                    "icon": "centos.svg",
                     "location": "<private>"
                 }
             ]
