@@ -1,5 +1,5 @@
 os: slxos
-text: 'Brocade/Extreme SLX-OS'
+text: 'Extreme SLX-OS'
 type: network
 group: slxos
 icon: extreme
