@@ -328,12 +328,12 @@ function accesspoint_by_id($ap_id, $refresh = '0')
 
 function device_by_id_cache($device_id, $refresh = false)
 {
-    $model = $refresh ? DeviceCache::refresh($device_id) : DeviceCache::get($device_id);
+    $model = $refresh ? DeviceCache::refresh((int)$device_id) : DeviceCache::get((int)$device_id);
 
     $device = $model->toArray();
-    $device['location'] = $model->location->location;
-    $device['lat'] = $model->location->lat;
-    $device['lng'] = $model->location->lng;
+    $device['location'] = $model->location->location ?? null;
+    $device['lat'] = $model->location->lat ?? null;
+    $device['lng'] = $model->location->lng ?? null;
     $device['attribs'] = $model->getAttribs();
     $device['vrf_lite_cisco'] = $model->vrfLites->keyBy('context_name')->toArray();
 
@@ -370,7 +370,7 @@ function getifhost($id)
 
 function gethostbyid($device_id)
 {
-    return DeviceCache::get($device_id)->hostname;
+    return DeviceCache::get((int)$device_id)->hostname;
 }
 
 function strgen($length = 16)
@@ -436,12 +436,12 @@ function zeropad($num, $length = 2)
 
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
-    return DeviceCache::get($device['device_id'])->setAttrib($attrib_type, $attrib_value);
+    return DeviceCache::get((int)$device['device_id'])->setAttrib($attrib_type, $attrib_value);
 }
 
 function get_dev_attribs($device_id)
 {
-    return DeviceCache::get($device_id)->getAttribs();
+    return DeviceCache::get((int)$device_id)->getAttribs();
 }
 
 function get_dev_entity_state($device)
@@ -456,12 +456,12 @@ function get_dev_entity_state($device)
 
 function get_dev_attrib($device, $attrib_type)
 {
-    return DeviceCache::get($device['device_id'])->getAttrib($attrib_type);
+    return DeviceCache::get((int)$device['device_id'])->getAttrib($attrib_type);
 }
 
 function del_dev_attrib($device, $attrib_type)
 {
-    return DeviceCache::get($device['device_id'])->forgetAttrib($attrib_type);
+    return DeviceCache::get((int)$device['device_id'])->forgetAttrib($attrib_type);
 }
 
 function formatRates($value, $round = '2', $sf = '3')
@@ -652,14 +652,14 @@ function get_graph_subtypes($type, $device = null)
 
 function get_smokeping_files($device)
 {
-    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get($device['device_id']));
+    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int)$device['device_id']));
     return $smokeping->findFiles();
 }
 
 
 function generate_smokeping_file($device, $file = '')
 {
-    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get($device['device_id']));
+    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int)$device['device_id']));
     return $smokeping->generateFileName($file);
 }
 
