@@ -30,7 +30,9 @@ $period = ($to - $from);
 $base64_output = '';
 $prev_from = ($from - $period);
 
-if ($output === 'json') {
+$json_output = false;
+if ($output === 'json' && graph_type_supports_json($vars['type'])) {
+    $json_output = true;
     $step = Config::get('rrd.step');
     $width = (!empty($width) ? $width : ceil($period/$step) );
     $rrd_options .= " --step $step";
@@ -102,7 +104,7 @@ if ($error_msg) {
     }
 } else {
     // $rrd_options .= " HRULE:0#999999";
-    if ($output === 'json' && $json_enabled) {
+    if ($json_output) {
         $rrd_options .= " --imgformat=JSONTIME";
     } else {
         if ($graph_type === 'svg') {
@@ -138,7 +140,11 @@ if ($error_msg) {
             d_echo($rrd_cmd);
             if (is_file($graphfile)) {
                 if (!$debug) {
-                    set_image_type();
+                    if ($json_output) {
+                        set_image_type('json');
+                    } else {
+                        set_image_type();
+                    }
                     if (Config::get('trim_tobias') && $graph_type !== 'svg') {
                         list($w, $h, $type, $attr) = getimagesize($graphfile);
                         $src_im                    = imagecreatefrompng($graphfile);

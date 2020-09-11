@@ -85,6 +85,11 @@ function api_get_graph(array $vars)
         return api_error(400, 'Invalid graph type');
     }
 
+    // if json output, check if graph_type is supported
+    if ($vars['output'] === 'json' && ! graph_type_supports_json($vars['type'])) {
+        return api_error(501, 'JSON output not available for this graph');
+    }
+
     ob_start();
 
     include 'includes/html/graphs/graph.inc.php';
@@ -102,10 +107,7 @@ function api_get_graph(array $vars)
         if ($json !== null) {
             return api_success($json, 'dataset', null, 200, count($json->data));
         }
-        if ($json_enabled) {
-            return api_error(500, 'Could not load data');
-        }
-        return api_error(501, 'JSON output not available for this graph');
+        return api_error(500, 'Could not load data');
     }
 
     return response($image, 200, ['Content-Type' => get_image_type()]);

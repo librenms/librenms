@@ -86,7 +86,7 @@ if (!isset($float_precision)) {
     $float_precision = 2;
 }
 
-if ($output === 'json') {
+if ($json_output) {
     $rrd_options .= ' --start '.$from.' --end '.$to.' --width '.$width.' ';
 } else {
     $rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';

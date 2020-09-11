@@ -1179,9 +1179,13 @@ function eventlog_severity($eventlog_severity)
 /**
  *
  */
-function set_image_type()
+function set_image_type($output = '')
 {
-    return header('Content-type: ' . get_image_type());
+    if (!empty($output) && $output === 'json') {
+        return header('Content-type: ' . 'application/json');
+    } else {
+        return header('Content-type: ' . get_image_type());
+    }
 }
 
 function get_image_type()
@@ -1592,5 +1596,20 @@ function nfsen_live_dir($hostname)
         if (file_exists($base_dir) && is_dir($base_dir)) {
             return $base_dir.'/profiles-data/live/'.$hostname;
         }
+    }
+}
+
+/**
+ * @param string $type
+ * @return bool
+ * Takes $type and returns if JSON output is supported
+ */
+function graph_type_supports_json(string $type)
+{
+    switch($type) {
+        case 'device_uptime':
+            return true;
+        default:
+            return false;
     }
 }
