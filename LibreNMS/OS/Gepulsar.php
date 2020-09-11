@@ -1,8 +1,8 @@
 <?php
 /**
- * gepulsar.inc.php
+ * Gepulsar.php
  *
- * LibreNMS os polling module for GE Power systems
+ * GE Pulsar Controllers
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,28 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @author     Craig Harris
  */
 
-$tmp_gepulsar = snmp_get_multi($device, ['ne843Ps1Verw.0', 'ne843Ps1Sn.0', 'ne843Ps1Brc.0'], '-OQUs', 'NE843-MIB');
-$version = $tmp_gepulsar[0]['ne843Ps1Verw'];
-$serial  = $tmp_gepulsar[0]['ne843Ps1Sn'];
-$hardware = $tmp_gepulsar[0]['ne843Ps1Brc'];
+namespace LibreNMS\OS;
 
-unset($tmp_gepulsar);
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\OS;
+
+class Gepulsar extends OS implements OSDiscovery
+{
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+
+        $oids = [
+            'serial' => '.1.3.6.1.4.1.10520.2.1.3.2.12.0',
+            'version' => '.1.3.6.1.4.1.10520.2.1.3.2.7.0',
+            'hardware' => '.1.3.6.1.4.1.10520.2.1.3.2.11.0',
+        ];
+        $os_data = snmp_get_multi_oid($this->getDevice(), $oids);
+        foreach ($oids as $var => $oid) {
+            $device->$var = $os_data[$oid];
+        }
+    }
+}
