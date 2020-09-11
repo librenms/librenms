@@ -1,5 +1,7 @@
 mib: MPIOS-MIB
 modules:
+    os:
+        sysDescr_regex: '/MyPower (?<hardware>.*) version (?<version>[\d.]+)/'
     processors:
         data:
             -

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -42,6 +43,13 @@ class Mimosa extends OS implements
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml
+
+        $device->hardware = snmp_translate($device->sysObjectID, 'MIMOSA-NETWORKS-BASE-MIB', null, null, $this->getDevice());
+    }
+
     /**
      * Discover wireless bit/packet error ratio.  This is in percent. Type is error-ratio.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
