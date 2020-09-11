@@ -5,7 +5,7 @@
  * -Description-
  *
  * Tests NMS Alarm Traps sent by Ekinops Optical Networking products.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -34,15 +34,15 @@ use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
-use Faker\Generator;
 
 class MgmtTrapNmsAlarmTest extends SnmpTrapTestCase
 {
 
-    public function testAlarmClear() {
+    public function testAlarmClear()
+    {
 
         $device = factory(Device::class)->create();
-        $alarm = Self::genEkiAlarm();
+        $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
         $specific = $alarm['specific'];
@@ -76,10 +76,11 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
     }
 
     //Test alarm with addtional text supplied.
-    public function testAlarmAddText() {
+    public function testAlarmAddText()
+    {
 
         $device = factory(Device::class)->create();
-        $alarm = Self::genEkiAlarm();
+        $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
         $specific = $alarm['specific'];
@@ -114,10 +115,11 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
     }
 
     //Alarm is on a specific port
-    public function testAlarmPort() {
+    public function testAlarmPort()
+    {
 
         $device = factory(Device::class)->create();
-        $alarm = Self::genEkiAlarm();
+        $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
         $specific = $alarm['specific'];
@@ -154,13 +156,14 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle mgnt2TrapNMSAlarm trap with additional text');
     }
 
-    public static function genEkiAlarm() {
-        $alarm['slotNum'] = rand(1,32);
+    public static function genEkiAlarm()
+    {
+        $alarm['slotNum'] = rand(1, 32);
         $alarm['srcPm'] = str_shuffle('0123456789abcdefg');
         $alarm['specific'] = str_shuffle('0123456789abcdefg');
         $alarm['portType'] = str_shuffle('0123456789abcdefg');
         $alarm['probCause'] = str_shuffle('0123456789abcdefg');
-        $alarm['portNum'] = rand(1,32);
+        $alarm['portNum'] = rand(1, 32);
         $alarm['addText'] = str_shuffle('0123456789abcdefg');
 
         return $alarm;

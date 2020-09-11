@@ -38,7 +38,6 @@
  */
 
 foreach ($port_stats as $index => $port) {
-
     /*
      * Split up ifName and drop the EKIPS/Chassis
      */
@@ -54,5 +53,4 @@ foreach ($port_stats as $index => $port) {
 
     $port_stats[$index]['ifAlias'] = $ifAlias;
     $port_stats[$index]['ifDescr'] = $ifDescr;
-
 }

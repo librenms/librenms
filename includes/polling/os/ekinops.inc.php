@@ -34,14 +34,14 @@ $hardware = trim(snmp_get($device, "mgnt4nodeChassisType.1", "-OQv", "EKINOPS-MG
 $mgmtCard = trim(snmp_get($device, "mgnt2RinvHwPlatform.0", "-OQv", "EKINOPS-MGNT2-MIB"), '"');
 $softInv = trim(snmp_get($device, "mgnt2RinvSoftwarePackage.0", "-OQv", "EKINOPS-MGNT2-MIB"), '"');
 
-
 $mgmtInfo = ekiParser($mgmtCard);
 $serial = $mgmtInfo['Serial Number'];
 
 $softInfo = ekiParser($softInv);
 $version = $softInfo['Active Release Name'];
 
-function ekiParser($ekiInfo) {
+function ekiParser($ekiInfo)
+{
     $info = explode("\n", $ekiInfo);
     unset($info[0]);
 
