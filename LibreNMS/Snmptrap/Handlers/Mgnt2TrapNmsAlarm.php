@@ -55,7 +55,7 @@ class Mgnt2TrapNmsAlarm implements SnmptrapHandler
         $alarmSeverity = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSeverity'));
 
         // Adding additional info if it exists.
-        if ($probAdd == " ") {
+        if (!empty($probAdd)) {
             $probSpecific = "$probSpecific Additional info: $probAdd";
         }
 

@@ -53,14 +53,14 @@ class Mgnt2TrapNmsEvent implements SnmptrapHandler
         $logAdd = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText'));
 
         // Adding additional info if it exists.
-        if (!is_null($probAdd)) {
+        if (!empty($logAdd)) {
             $logReason = "$logReason Additional info: $logAdd";
         }
 
-        if ($alarmObj == 'port') {
-            $msg = "Alarm on slot $slot, $sourcePm, Port: $portType $portNum. Issue: $logReason.";
+        if ($eventObj == 'port') {
+            $msg = "Event on slot $slot, $sourcePm Port: $portType $portNum. Reason: $logReason";
         } else {
-            $msg = "Event on slot $slot, $sourcePm. Issue: $logReason.";
+            $msg = "Event on slot $slot, $sourcePm Reason: $logReason";
         }
         Log::event($msg, $device->device_id, 'trap', 2);
     }
