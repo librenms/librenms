@@ -1609,6 +1609,9 @@ function graph_type_supports_json(string $type)
     switch ($type) {
         case 'device_uptime':
         case 'device_bits':
+        case 'port_bits':
+        case 'multiport_bits':
+        case 'multiport_bits_separate':
             return true;
         default:
             return false;

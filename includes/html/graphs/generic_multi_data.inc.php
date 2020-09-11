@@ -100,34 +100,44 @@ if ($i) {
         $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
     }
 
-    if ($legend == 'no' || $legend == '1') {
-        $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':';
-        $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':';
+    if ($json_output) {
+        $rrd_options .= ' XPORT:in' . $format . ":'In'";
+        $rrd_options .= ' XPORT:dout' . $format . ":'Out'";
     } else {
-        $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . \LibreNMS\Config::get('percentile_value') . "th %\\n'";
-        $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':In ';
-        $rrd_options .= ' GPRINT:in' . $format . ':LAST:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:in' . $format . ':AVERAGE:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:in' . $format . ':MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:percentile_in:%6.".$float_precision."lf%s\\n";
-        $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':Out';
-        $rrd_options .= ' GPRINT:out' . $format . ':LAST:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:out' . $format . ':MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:percentile_out:%6.".$float_precision."lf%s\\n";
-        $rrd_options .= " GPRINT:tot:'Total %6.".$float_precision."lf%sB'";
-        $rrd_options .= " GPRINT:totin:'(In %6.".$float_precision."lf%sB'";
-        $rrd_options .= " GPRINT:totout:'Out %6.".$float_precision."lf%sB)\\l'";
-    }
+        if ($legend == 'no' || $legend == '1') {
+            $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':';
+            $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':';
+        } else {
+            $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . \LibreNMS\Config::get('percentile_value') . "th %\\n'";
+            $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':In ';
+            $rrd_options .= ' GPRINT:in' . $format . ':LAST:%6.'.$float_precision.'lf%s';
+            $rrd_options .= ' GPRINT:in' . $format . ':AVERAGE:%6.'.$float_precision.'lf%s';
+            $rrd_options .= ' GPRINT:in' . $format . ':MAX:%6.'.$float_precision.'lf%s';
+            $rrd_options .= " GPRINT:percentile_in:%6.".$float_precision."lf%s\\n";
+            $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':Out';
+            $rrd_options .= ' GPRINT:out' . $format . ':LAST:%6.'.$float_precision.'lf%s';
+            $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.'.$float_precision.'lf%s';
+            $rrd_options .= ' GPRINT:out' . $format . ':MAX:%6.'.$float_precision.'lf%s';
+            $rrd_options .= " GPRINT:percentile_out:%6.".$float_precision."lf%s\\n";
+            $rrd_options .= " GPRINT:tot:'Total %6.".$float_precision."lf%sB'";
+            $rrd_options .= " GPRINT:totin:'(In %6.".$float_precision."lf%sB'";
+            $rrd_options .= " GPRINT:totout:'Out %6.".$float_precision."lf%sB)\\l'";
+        }
 
-    $rrd_options .= ' LINE1:percentile_in#aa0000';
-    $rrd_options .= ' LINE1:dpercentile_out#aa0000';
+        $rrd_options .= ' LINE1:percentile_in#aa0000';
+        $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
-    if ($_GET['previous'] == 'yes') {
-        $rrd_options .= ' AREA:in' . $format . 'X#99999999' . $stacked['transparency'] . ':';
-        $rrd_options .= ' AREA:dout' . $format . 'X#99999999' . $stacked['transparency'] . ':';
-        $rrd_options .= ' LINE1:in' . $format . 'X#666666:';
-        $rrd_options .= ' LINE1:dout' . $format . 'X#666666:';
+        if ($_GET['previous'] == 'yes') {
+            if ($json_output) {
+                $rrd_options .= ' XPORT:in' . $format . 'X' . ":'Prev In'";
+                $rrd_options .= ' XPORT:dout' . $format . 'X' . ":'Prev Out'";
+            } else {
+                $rrd_options .= ' AREA:in' . $format . 'X#99999999' . $stacked['transparency'] . ':';
+                $rrd_options .= ' AREA:dout' . $format . 'X#99999999' . $stacked['transparency'] . ':';
+                $rrd_options .= ' LINE1:in' . $format . 'X#666666:';
+                $rrd_options .= ' LINE1:dout' . $format . 'X#666666:';
+            }
+        }
     }
 }
 
