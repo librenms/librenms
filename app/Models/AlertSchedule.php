@@ -189,10 +189,10 @@ class AlertSchedule extends Model
                                         ->where(function ($query) use ($time_now) {
                                             $query->where(function ($query) use ($time_now) {
                                                 $query->whereTime('start', '<=', $time_now[0]->toTimeString())
-                                                    ->whereTime(DB::raw("time(`end` + 240000)"), '>', $time_now[0]->toTimeString());
+                                                    ->whereTime(DB::raw("time(time(`end`) + 240000)"), '>', $time_now[0]->toTimeString());
                                             })->orWhere(function ($query) use ($time_now) {
-                                                $query->whereTime('start', '<=', DB::raw("time(time(" . str_replace(":","",$time_now[0]->toTimeString()). ") + 240000)"))
-                                                    ->whereTime(DB::raw("time(`end` + 240000)"), '>', DB::raw("time(time(" . str_replace(":","",$time_now[0]->toTimeString()) . ") + 240000)"));
+                                                $query->whereTime('start', '<=', DB::raw("time(time(\"" . $time_now[0]->toTimeString(). "\") + 240000)"))
+                                                    ->whereTime(DB::raw("time(time(`end`) + 240000)"), '>', DB::raw("time(time(\"" . $time_now[0]->toTimeString() . "\") + 240000)"));
                                             });
                                         });
                                 });
