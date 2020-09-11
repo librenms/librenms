@@ -1606,8 +1606,9 @@ function nfsen_live_dir($hostname)
  */
 function graph_type_supports_json(string $type)
 {
-    switch($type) {
+    switch ($type) {
         case 'device_uptime':
+        case 'device_bits':
             return true;
         default:
             return false;
