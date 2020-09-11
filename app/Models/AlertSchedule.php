@@ -187,7 +187,7 @@ class AlertSchedule extends Model
                                     // outside, spans days
                                     $query->whereTime('start', '>', DB::raw("time(`end`)"))
                                         ->where(function ($query) use ($time_now) {
-                                            ->where(function ($query) use ($time_now) {
+                                            $query->where(function ($query) use ($time_now) {
                                                 $query->whereTime('start', '<=', $time_now[0]->toTimeString())
                                                     ->whereTime(DB::raw("time(`end` + 240000)"), '>', $time_now[0]->toTimeString());
                                             })->orWhere(function ($query) use ($time_now) {
