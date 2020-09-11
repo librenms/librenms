@@ -32,15 +32,9 @@ class Gepulsar extends OS implements OSDiscovery
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-
-        $oids = [
-            'serial' => '.1.3.6.1.4.1.10520.2.1.3.2.12.0',
-            'version' => '.1.3.6.1.4.1.10520.2.1.3.2.7.0',
-            'hardware' => '.1.3.6.1.4.1.10520.2.1.3.2.11.0',
-        ];
-        $os_data = snmp_get_multi_oid($this->getDevice(), $oids);
-        foreach ($oids as $var => $oid) {
-            $device->$var = $os_data[$oid];
-        }
+        $info = snmp_getnext_multi($this->getDevice(), 'ne843Ps1Sn ne843Ps1Verw ne843Ps1Brc', '-OQUs', 'NE843-MIB');
+        $device->version = $info['ne843Ps1Verw'];
+        $device->hardware = $info['ne843Ps1Brc'];
+        $device->serial = $info['ne843Ps1Sn'];
     }
 }
