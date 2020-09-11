@@ -83,14 +83,14 @@ class AlertUtil
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
             FROM alert_transport_map AS atm
             LEFT JOIN alert_transports AS at ON at.transport_id=atm.transport_or_group_id
-            WHERE atm.target_type='single' AND atm.rule_id=? AND at.transport_id IN (" . $query_mapto . ") AND " . $this->where_time . "
+            WHERE atm.target_type='single' AND atm.rule_id=? AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time . "
             UNION DISTINCT
             SELECT at.transport_id, at.transport_type, at.transport_name
             FROM alert_transport_map AS atm
             LEFT JOIN alert_transport_groups AS atg ON atm.transport_or_group_id=atg.transport_group_id
             LEFT JOIN transport_group_transport AS tgt ON atg.transport_group_id=tgt.transport_group_id
             LEFT JOIN alert_transports AS at ON tgt.transport_id=at.transport_id
-            WHERE atm.target_type='group' AND atm.rule_id=? AND at.transport_id IN (" . $query_mapto . ") AND " . $this->where_time;
+            WHERE atm.target_type='group' AND atm.rule_id=? AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
 
         $rule_id = self::getRuleId($alert_id);
         $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
@@ -136,7 +136,7 @@ class AlertUtil
 
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports as at
-            WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $this->where_time;
+            WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
                    $now->toTimeString(), $now->toTimeString(), $now->toTimeString(), $now->toTimeString(),
                    $now->toTimeString(), $now->toTimeString(),
