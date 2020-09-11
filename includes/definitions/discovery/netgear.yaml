@@ -1,5 +1,9 @@
 mib: NETGEAR-BOXSERVICES-PRIVATE-MIB
 modules:
+    os:
+        sysDescr_regex: '/^(?<hardware>\S+) .*, (?<version>[\d.]+),/'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        version: ENTITY-MIB::entPhysicalSoftwareRev.1
     sensors:
         pre-cache:
             data:

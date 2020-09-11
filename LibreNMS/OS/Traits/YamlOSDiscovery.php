@@ -72,11 +72,8 @@ trait YamlOSDiscovery
 
                 // extract via regex if requested
                 if (isset($os_yaml["{$field}_regex"])) {
-                    unset($extracted_match);
-                    preg_match($os_yaml["{$field}_regex"], $value, $extracted_match);
-                    if (isset($extracted_match[$field])) {
-                        $value = $extracted_match[$field];
-                    }
+                    $this->parseRegex($os_yaml["{$field}_regex"], $value);
+                    $value = $device->$field;
                 }
 
                 $device->$field = isset($os_yaml["{$field}_template"])
