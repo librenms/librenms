@@ -39,11 +39,4 @@ class Siteboss550 extends OS implements
         $deviceModel->hardware = trim($matches[0]);
         $deviceModel->sysName = snmp_get($this->getDevice(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
     }
-
-    public function pollOS(): void
-    {
-        $deviceModel = $this->getDeviceModel();
-        $deviceModel->sysName = snmp_get($this->getDevice(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
-        $deviceModel->save();
-    }
 }
