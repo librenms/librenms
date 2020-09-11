@@ -43,25 +43,6 @@ class AlertUtil
      * @return mixed|null
      */
 
-    private $where_time = "(at.timerange = 0
-            OR(
-                at.timerange = 1
-                AND (
-                    (at.start_hr < at.end_hr AND at.start_hr <= ? AND at.end_hr >= ?)
-                    OR (
-                        at.start_hr > at.end_hr
-                        AND (
-                            (at.start_hr <= ? AND time((time(at.end_hr)+time(240000))) >= ?)
-                            OR (
-                                at.start_hr <= time((time(?)+time(240000))) AND time((time(at.end_hr)+time(240000))) >= time((time(?)+time(240000)))
-                            )
-                        )
-                    )
-                    AND (at.day LIKE ? OR at.day IS NULL)
-                )
-            )
-        )";  # time(240000) : "24:00:00"
-    
     private static function getRuleId($alert_id)
     {
         $query = "SELECT `rule_id` FROM `alerts` WHERE `id`=?";
@@ -90,6 +71,15 @@ class AlertUtil
 
         $local_now = CarbonImmutable::now(config('app.timezone'));
         $now = CarbonImmutable::now('UTC');
+
+        $where_time = "(at.timerange = 0
+        OR(at.timerange = 1 AND ((at.start_hr < at.end_hr AND at.start_hr <= ?
+        AND at.end_hr >= ?) OR (at.start_hr > at.end_hr AND ((at.start_hr <= ?
+        AND time((time(at.end_hr)+time(240000))) >= ?)
+        OR (at.start_hr <= time((time(?)+time(240000)))
+        AND time((time(at.end_hr)+time(240000))) >= time((time(?)+time(240000))))))
+        AND (at.day LIKE ? OR at.day IS NULL)))";  # time(240000) : "24:00:00"
+
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
             FROM alert_transport_map AS atm
             LEFT JOIN alert_transports AS at ON at.transport_id=atm.transport_or_group_id
@@ -135,7 +125,15 @@ class AlertUtil
 
         $local_now = CarbonImmutable::now(config('app.timezone'));
         $now = CarbonImmutable::now('UTC');
-        
+
+        $where_time = "(at.timerange = 0
+        OR(at.timerange = 1 AND ((at.start_hr < at.end_hr AND at.start_hr <= ?
+        AND at.end_hr >= ?) OR (at.start_hr > at.end_hr AND ((at.start_hr <= ?
+        AND time((time(at.end_hr)+time(240000))) >= ?)
+        OR (at.start_hr <= time((time(?)+time(240000)))
+        AND time((time(at.end_hr)+time(240000))) >= time((time(?)+time(240000))))))
+        AND (at.day LIKE ? OR at.day IS NULL)))";  # time(240000) : "24:00:00"
+
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports as at
             WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $this->where_time;
