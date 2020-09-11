@@ -11,5 +11,4 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.9694.1
-mib_dir:
-    - arbornet
+mib_dir: arbornet

@@ -1,3 +1,117 @@
+## 1.67
+*(2020-09-03)*
+
+A big thank you to the following 23 contributors this last month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (10)
+  - [TheGreatDoc](https://github.com/TheGreatDoc) (5)
+  - [hanserasmus](https://github.com/hanserasmus) (5)
+  - [SourceDoctor](https://github.com/SourceDoctor) (5)
+  - [murrant](https://github.com/murrant) (4)
+  - [Negatifff](https://github.com/Negatifff) (2)
+  - [bofh80](https://github.com/bofh80) (2)
+  - [pobradovic08](https://github.com/pobradovic08) (2)
+  - [arrmo](https://github.com/arrmo) (2)
+  - [dependabot](https://github.com/apps/dependabot) (2)
+  - [jozefrebjak](https://github.com/jozefrebjak) (1)
+  - [Jarod2801](https://github.com/Jarod2801) (1)
+  - [Zmegolaz](https://github.com/Zmegolaz) (1)
+  - [Najihel](https://github.com/Najihel) (1)
+  - [TheMysteriousX](https://github.com/TheMysteriousX) (1)
+  - [craig-nokia](https://github.com/craig-nokia) (1)
+  - [sprich96](https://github.com/sprich96) (1)
+  - [raphael247](https://github.com/raphael247) (1)
+  - [nathanshiaulam](https://github.com/nathanshiaulam) (1)
+  - [m4rcu5](https://github.com/m4rcu5) (1)
+  - [nbyers](https://github.com/nbyers) (1)
+  - [rjmidau](https://github.com/rjmidau) (1)
+  - [nightcore500](https://github.com/nightcore500) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (27)
+  - [murrant](https://github.com/murrant) (14)
+  - [TheGreatDoc](https://github.com/TheGreatDoc) (5)
+  - [SourceDoctor](https://github.com/SourceDoctor) (4)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+  - [rigocalin](https://github.com/rigocalin) (1)
+  - [Cormoran96](https://github.com/Cormoran96) (1)
+
+#### Feature
+* Show Device Outages as Log List ([#12011](https://github.com/librenms/librenms/pull/12011)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Availability Calculation for all Devices ([#12004](https://github.com/librenms/librenms/pull/12004)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Device
+* Detect additional TrueNAS hardware types ([#12052](https://github.com/librenms/librenms/pull/12052)) - [TheMysteriousX](https://github.com/TheMysteriousX)
+* Fix 'unused data sent totalconns' in BigIP LTM Pool Members ([#12041](https://github.com/librenms/librenms/pull/12041)) - [rjmidau](https://github.com/rjmidau)
+* Expand endrun os support ([#12008](https://github.com/librenms/librenms/pull/12008)) - [hanserasmus](https://github.com/hanserasmus)
+* Nokia 7705 packet microwave ([#12007](https://github.com/librenms/librenms/pull/12007)) - [craig-nokia](https://github.com/craig-nokia)
+* Add Cisco Firepower 1140 ([#12006](https://github.com/librenms/librenms/pull/12006)) - [Najihel](https://github.com/Najihel)
+* Updated documentation and Discovery, to match Asuswrt-Merlin PR ([#11999](https://github.com/librenms/librenms/pull/11999)) - [arrmo](https://github.com/arrmo)
+* Arista EOS: Added groups and better sensor names ([#11990](https://github.com/librenms/librenms/pull/11990)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Cisco SLA jitter tag ([#11983](https://github.com/librenms/librenms/pull/11983)) - [pobradovic08](https://github.com/pobradovic08)
+* Fix qnap state graphs ([#11976](https://github.com/librenms/librenms/pull/11976)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Added support for FS NMU ([#11965](https://github.com/librenms/librenms/pull/11965)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Wireless support for Asuswrt-Merlin (the same as Openwrt) ([#11964](https://github.com/librenms/librenms/pull/11964)) - [arrmo](https://github.com/arrmo)
+* Fixed Ubiquiti Airfiber LTU retrieval ([#11844](https://github.com/librenms/librenms/pull/11844)) - [nightcore500](https://github.com/nightcore500)
+
+#### Webui
+* Only show smokeping in menu if enabled ([#12019](https://github.com/librenms/librenms/pull/12019)) - [Negatifff](https://github.com/Negatifff)
+* Small update to installation steps ([#12016](https://github.com/librenms/librenms/pull/12016)) - [hanserasmus](https://github.com/hanserasmus)
+* Add crossorigin policy to link rel manifest ([#12005](https://github.com/librenms/librenms/pull/12005)) - [Zmegolaz](https://github.com/Zmegolaz)
+* Only show smokeping link if the url is configured ([#11992](https://github.com/librenms/librenms/pull/11992)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Convert LastSync date for oxidized config info ([#11779](https://github.com/librenms/librenms/pull/11779)) - [Negatifff](https://github.com/Negatifff)
+
+#### Graphs
+* Set RRD minimum to 0 to see the real change relation in app Smart, Mdadm and Certificate ([#11986](https://github.com/librenms/librenms/pull/11986)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Alerting
+* Matrix alert transport ([#12018](https://github.com/librenms/librenms/pull/12018)) - [raphael247](https://github.com/raphael247)
+* Clean up default alert rules ([#12014](https://github.com/librenms/librenms/pull/12014)) - [murrant](https://github.com/murrant)
+
+#### Polling
+* Use overwrite_ip when set on devices for ping checks ([#12022](https://github.com/librenms/librenms/pull/12022)) - [nathanshiaulam](https://github.com/nathanshiaulam)
+* Increase default RRD data retention of MIN, MAX, and LAST to match AVERAGE ([#11995](https://github.com/librenms/librenms/pull/11995)) - [pobradovic08](https://github.com/pobradovic08)
+
+#### Bug
+* Corrected alert_rules.json file to container proper JSON. ([#12033](https://github.com/librenms/librenms/pull/12033)) - [nbyers](https://github.com/nbyers)
+* Fix fping6 config definition ([#12003](https://github.com/librenms/librenms/pull/12003)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Restore device inventory logic after 055abcf ([#11993](https://github.com/librenms/librenms/pull/11993)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Hide pip3 missing validate error ([#11987](https://github.com/librenms/librenms/pull/11987)) - [murrant](https://github.com/murrant)
+* Full path to python requirements check ([#11982](https://github.com/librenms/librenms/pull/11982)) - [murrant](https://github.com/murrant)
+* Python requirements check, use sys.exit ([#11981](https://github.com/librenms/librenms/pull/11981)) - [murrant](https://github.com/murrant)
+* Add default values to cast ([#11977](https://github.com/librenms/librenms/pull/11977)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Add type hinting to devicecache ([#11975](https://github.com/librenms/librenms/pull/11975)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix automatic service discovery ([#11963](https://github.com/librenms/librenms/pull/11963)) - [bofh80](https://github.com/bofh80)
+
+#### Documentation
+* Update Smokeping.md ([#12048](https://github.com/librenms/librenms/pull/12048)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Rewrite the docs for OS discovery ([#12047](https://github.com/librenms/librenms/pull/12047)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Rewrite the test data capture section ([#12046](https://github.com/librenms/librenms/pull/12046)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Update Fast Ping Check docs ([#12024](https://github.com/librenms/librenms/pull/12024)) - [hanserasmus](https://github.com/hanserasmus)
+* Update PortGroups.md ([#12015](https://github.com/librenms/librenms/pull/12015)) - [sprich96](https://github.com/sprich96)
+* Update Applications Docs for Apache Agent ([#12009](https://github.com/librenms/librenms/pull/12009)) - [hanserasmus](https://github.com/hanserasmus)
+* Fixed header anchors in RRDCached Documentation ([#12002](https://github.com/librenms/librenms/pull/12002)) - [hanserasmus](https://github.com/hanserasmus)
+* Update Install-LibreNMS.md ([#12001](https://github.com/librenms/librenms/pull/12001)) - [Jarod2801](https://github.com/Jarod2801)
+
+#### Misc
+* Update travis to Ubuntu 18.04 ([#12043](https://github.com/librenms/librenms/pull/12043)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix missing 'nets' for autodiscovery ([#12039](https://github.com/librenms/librenms/pull/12039)) - [bofh80](https://github.com/bofh80)
+* Handle unknown device_type's. ([#12031](https://github.com/librenms/librenms/pull/12031)) - [m4rcu5](https://github.com/m4rcu5)
+* Move Availability Setting to Poller ([#12021](https://github.com/librenms/librenms/pull/12021)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Cleanup Database Tables on Host Deletion ([#12012](https://github.com/librenms/librenms/pull/12012)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add missing index for device_perf ([#11974](https://github.com/librenms/librenms/pull/11974)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Dependencies
+* Bump symfony/http-kernel from 5.1.2 to 5.1.5 ([#12049](https://github.com/librenms/librenms/pull/12049)) - [dependabot](https://github.com/apps/dependabot)
+* Bump elliptic from 6.5.2 to 6.5.3 ([#11988](https://github.com/librenms/librenms/pull/11988)) - [dependabot](https://github.com/apps/dependabot)
+
+
+## 1.66
+*(2020-09-03)*
+
+
+
 ## 1.66
 *(2020-07-30)*
 

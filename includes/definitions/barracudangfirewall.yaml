@@ -14,5 +14,4 @@ discovery:
         sysDescr:
             - Barracuda Firewall
             - Barracuda NG Firewall
-mib_dir:
-    - barracuda
+mib_dir: barracuda

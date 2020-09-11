@@ -2,8 +2,7 @@ os: aruba-instant
 text: 'Aruba Instant'
 type: wireless
 icon: aruba
-mib_dir:
-    - arubaos
+mib_dir: arubaos
 over:
     - { graph: device_wireless_ap-count, text: 'AP Count' }
     - { graph: device_wireless_clients, text: 'Client Count' }

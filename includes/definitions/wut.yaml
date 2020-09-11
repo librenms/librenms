@@ -2,8 +2,7 @@ os: wut
 text: 'Web-Thermo-Hygrometer'
 type: environment
 icon: wut
-mib_dir:
-    - wut
+mib_dir: wut
 over:
     - { graph: device_temperature, text: Temperature }
     - { graph: device_humidity, text: Humidity }

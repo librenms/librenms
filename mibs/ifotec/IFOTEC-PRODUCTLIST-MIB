@@ -1,0 +1,42 @@
+-- *****************************************************************
+-- IFOTEC-PRODUCTLIST-MIB.mib:  IFOTEC Product Object Identifier Assignments
+--   
+-- Jully 2020, MARMONIER Cedric
+--   
+-- Copyright (c) 1998-2020 by IFOTEC.
+-- All rights reserved.
+--   
+-- ****************************************************************
+
+IFOTEC-PRODUCTLIST-MIB DEFINITIONS ::= BEGIN
+		
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY FROM SNMPv2-SMI
+	ifotec FROM IFOTEC-SMI;
+
+ifotecProductList MODULE-IDENTITY
+    LAST-UPDATED    "202007290000Z"
+    ORGANIZATION    "IFOTEC"
+    CONTACT-INFO    "contact@ifotec.com"
+    DESCRIPTION     "Product list of IFOTEC enterprise."
+     ::= { ifotec 100 }
+
+
+ifotecEthernetProducts OBJECT IDENTIFIER        ::= { ifotecProductList 1 }	
+	-- ifotecMediaConverters OBJECT IDENTIFIER           ::= { ifotecEthernetProducts 1 }
+	-- ifotecManagedMediaConverters OBJECT IDENTIFIER    ::= { ifotecEthernetProducts 2 }
+	-- ifotecL2Switches OBJECT IDENTIFIER         		  ::= { ifotecEthernetProducts 3 }
+	ifotecL2ManagedSwitches OBJECT IDENTIFIER         ::= { ifotecEthernetProducts 4 }
+		-- ifotecHxDFFamilly OBJECT IDENTIFIER     ::= { ifotecL2ManagedSwitches 1 }
+		-- ifotecHNDFFamilly OBJECT IDENTIFIER     ::= { ifotecL2ManagedSwitches 2 }			
+		ifotecINETFamilly OBJECT IDENTIFIER     ::= { ifotecL2ManagedSwitches 3 }
+			INET-2GE2GF-AS-101 OBJECT IDENTIFIER     ::= { ifotecINETFamilly 1 }
+			INET-2GP2GF-AS-101 OBJECT IDENTIFIER     ::= { ifotecINETFamilly 2 }
+			INET-4GE2GF-KS-001 OBJECT IDENTIFIER     ::= { ifotecINETFamilly 3 }
+			INET-4GP2GF-AS-001 OBJECT IDENTIFIER     ::= { ifotecINETFamilly 4 }
+			INET-4GE2GF2XF-R1-001 OBJECT IDENTIFIER  ::= { ifotecINETFamilly 5 }
+			
+	-- ifotecRouters OBJECT IDENTIFIER             ::= { ifotecEthernetProducts 5 }
+
+
+END

@@ -2,8 +2,7 @@ os: eatonpdu
 text: 'Eaton PDU'
 type: power
 icon: eaton
-mib_dir:
-    - eaton
+mib_dir: eaton
 over:
     - { graph: device_power, text: Power }
     - { graph: device_current, text: Current }

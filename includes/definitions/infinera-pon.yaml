@@ -2,8 +2,7 @@ os: infinera-pon
 text: 'Infinera PON'
 type: network
 icon: infinera
-mib_dir:
-    - infinera
+mib_dir: infinera
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
