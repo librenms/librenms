@@ -8,8 +8,6 @@ modules:
                         - boxServicesNormalTempRangeMin
                         - boxServicesNormalTempRangeMax
         temperature:
-            options:
-                skip_values_lt: 0
             data:
                 -
                     oid: boxServicesTempSensorsTable

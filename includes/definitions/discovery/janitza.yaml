@@ -9,7 +9,7 @@ modules:
         voltage:
             options:
                 divisor: 10
-                skip_values_lt: 40
+                skip_value_lt: 40
             data:
                 -
                     oid: uLN1

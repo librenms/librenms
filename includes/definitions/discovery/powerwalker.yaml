@@ -10,7 +10,6 @@ modules:
                     descr: Battery time remaining
         voltage:
             options:
-                skip_values_lt: 0
                 divisor: 10
             data:
                 -
@@ -67,7 +66,6 @@ modules:
                     descr: Module Negative Charge
         frequency:
             options:
-                skip_values_lt: 0
                 divisor: 10
             data:
                 -
@@ -97,7 +95,6 @@ modules:
                     descr: Battery charge remaining
         temperature:
             options:
-                skip_values_lt: 0
                 divisor: 10
             data:
                 -
@@ -132,7 +129,7 @@ modules:
                     high_limit: upsEEnvironmentTemperatureHighSetPoint
         current:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
                 divisor: 10
             data:
                 -
@@ -167,7 +164,7 @@ modules:
                     descr: Negative Charge
         humidity:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: upsEEnvironmentHumidity
@@ -177,7 +174,7 @@ modules:
                     descr: Environment Current
         power:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: upsESystemInputTable

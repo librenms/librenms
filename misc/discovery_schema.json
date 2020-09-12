@@ -442,7 +442,10 @@
                         }
                     ]
                 },
-                "skip_values_lt": {
+                "skip_value_gt": {
+                    "type": "integer"
+                },
+                "skip_value_lt": {
                     "type": "integer"
                 }
             },
