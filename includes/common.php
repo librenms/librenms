@@ -1183,11 +1183,21 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
  * @param string $scale fahrenheit or celsius
  * @return string (containing a float)
  */
+
 function celsius_to_fahrenheit($value, $scale = 'celsius')
 {
     if ($scale === 'celsius') {
         $value = ($value * 1.8) + 32;
     }
+    return sprintf('%.02f', $value);
+}
+
+/**
+ * Converts string to float
+ *
+ */
+function string_to_float($value)
+{
     return sprintf('%.02f', $value);
 }
 
