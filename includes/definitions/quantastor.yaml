@@ -1,0 +1,24 @@
+os: quantastor
+text: 'QuantaStor'
+type: storage
+icon: quantastor
+ifXmcbc: true
+ifname: true
+mib_dir: osnexus
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    bgp-peers: false
+    wireless: false
+    ospf: false
+    stp: false
+processor_stacked: true
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: QUANTASTOR-SYS-STATS::storageSystem-ProductId.0
+            op: starts
+            value: 'QUANTASTOR'
