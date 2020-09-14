@@ -81,11 +81,11 @@ require_once 'includes/html/modal/delete_service_template.inc.php';
                     $host_par = $device_group_ids;
                 }
 
-                $host_sql = 'SELECT `D`.`device_group_id`,`D`.`name` FROM device_groups AS D, services_template AS S WHERE D.device_group_id = S.device_group_id ' . $perms_sql . ' GROUP BY `D`.`name`, `D`.`device_group_id`, `D`.`name` ORDER BY D.`name`';
+                $host_sql = 'SELECT `D`.`id`,`D`.`name` FROM device_groups AS D, services_template AS S WHERE D.id = S.device_group_id ' . $perms_sql . ' GROUP BY `D`.`name`, `D`.`id`, `D`.`name` ORDER BY D.`name`';
 
                 $shift = 1;
                 foreach (dbFetchRows($host_sql, $host_par) as $device_group) {
-                    $device_group_id = $device_group['device_group_id'];
+                    $device_group_id = $device_group['id'];
                     $device_group_name = $device_group['name'];
                     #$device_sysName = $device_group['name'];
                     $devlink = generate_device_link($device_group, null, array('tab' => 'services'));
