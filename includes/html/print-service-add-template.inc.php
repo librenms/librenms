@@ -10,7 +10,7 @@ echo "
       <label for='device_group' class='col-sm-2 control-label'>Device Group</label>
       <div class='col-sm-5'>
         <select name='device_group' class='form-control input-sm'>
-          $devicesform
+          $devicegroupsform
         </select>
       </div>
       <div class='col-sm-5'>

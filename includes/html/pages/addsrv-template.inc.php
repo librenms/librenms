@@ -5,7 +5,7 @@ $no_refresh = true;
 if (!Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
-    if ($vars['addsrvtp']) {
+    if ($vars['addsrv-template']) {
         if (Auth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
