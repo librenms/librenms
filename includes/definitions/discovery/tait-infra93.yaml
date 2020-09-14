@@ -1122,5 +1122,3 @@ modules:
                     descr: 'Reciter Temperature (C)'
                     index: 'rctTemperatureBoard.{{ $index }}'
                     group: Reciter
-
-
