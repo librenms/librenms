@@ -105,6 +105,71 @@ function delete_service($service = null)
     return dbDelete('services', '`service_id` =  ?', array($service));
 }
 
+function add_service_template($device_group, $type, $desc, $param = "", $ignore = 0, $disabled = 0)
+{
+
+    if (!is_array($device_group)) {
+        $device_group = device_group_by_id_cache($device_group);
+    }
+
+    $insert = array('device_group_id' => $device_group['device_group_id'], 'service_template_type' => $type, 'service_template_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled);
+    return dbInsert($insert, 'services_template');
+}
+
+function service_template_get($device_group = null, $service = null)
+{
+    $sql_query = "SELECT `service_template_id`,`device_group_id`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE";
+    $sql_param = array();
+    $add = 0;
+
+    d_echo("SQL Query: ".$sql_query);
+    if (!is_null($service)) {
+        // Add a service filter to the SQL query.
+        $sql_query .= " `service_template_id` = ? AND";
+        $sql_param[] = $service;
+        $add++;
+    }
+    if (!is_null($device)) {
+        // Add a device filter to the SQL query.
+        $sql_query .= " `device_group_id` = ? AND";
+        $sql_param[] = $device_group;
+        $add++;
+    }
+
+    if ($add == 0) {
+        // No filters, remove " WHERE" -6
+        $sql_query = substr($sql_query, 0, strlen($sql_query)-6);
+    } else {
+        // We have filters, remove " AND" -4
+        $sql_query = substr($sql_query, 0, strlen($sql_query)-4);
+    }
+    d_echo("SQL Query: ".$sql_query);
+
+    // $service is not null, get only what we want.
+    $services = dbFetchRows($sql_query, $sql_param);
+    d_echo("Service Array: ".print_r($services, true)."\n");
+
+    return $services;
+}
+
+function edit_service_template($update = array(), $service = null)
+{
+    if (!is_numeric($service)) {
+        return false;
+    }
+
+    return dbUpdate($update, 'services_template', '`service_template_id`=?', array($service));
+}
+
+function delete_service_template($service = null)
+{
+    if (!is_numeric($service)) {
+        return false;
+    }
+
+    return dbDelete('services_template', '`service_template_id` =  ?', array($service));
+}
+
 function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service, $device['device_id']))) {
