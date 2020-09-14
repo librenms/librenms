@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = 'Services';
+$pagetitle[] = 'Services Templates';
 
 require_once 'includes/html/modal/new_service_template.inc.php';
 require_once 'includes/html/modal/delete_service_template.inc.php';
@@ -81,7 +81,7 @@ require_once 'includes/html/modal/delete_service_template.inc.php';
                     $host_par = $device_group_ids;
                 }
 
-                $host_sql = 'SELECT `D`.`device_group_id`,`D`.`name` FROM device_groups AS D, services_template AS S WHERE D.device_group_id = S.device_group_id ' . $perms_sql . ' GROUP BY `D`.`name`, `D`.`device_group_id`, `D`.`sysName` ORDER BY D.name';
+                $host_sql = 'SELECT `D`.`device_group_id`,`D`.`name` FROM device_groups AS D, services_template AS S WHERE D.device_group_id = S.device_group_id ' . $perms_sql . ' GROUP BY `D`.`name`, `D`.`device_group_id`, `D`.`name` ORDER BY D.`name`';
 
                 $shift = 1;
                 foreach (dbFetchRows($host_sql, $host_par) as $device_group) {
