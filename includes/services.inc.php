@@ -152,18 +152,18 @@ function service_template_get($device_group = null, $service_template = null)
     return $services_template;
 }
 
-function edit_service_template($update = array(), $service = null)
+function edit_service_template($update = array(), $service_template = null)
 {
-    if (!is_numeric($service)) {
+    if (!is_numeric($service_template)) {
         return false;
     }
 
     return dbUpdate($update, 'services_template', '`service_template_id`=?', array($service));
 }
 
-function delete_service_template($service = null)
+function delete_service_template($service_template = null)
 {
-    if (!is_numeric($service)) {
+    if (!is_numeric($service_template)) {
         return false;
     }
 
