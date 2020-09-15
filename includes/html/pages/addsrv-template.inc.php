@@ -21,7 +21,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
     }
 
     foreach (dbFetchRows('SELECT * FROM `device_groups` ORDER BY `name`') as $device_group) {
-        $devicegroupsform .= "<option value='".$device_group['id']."'>".format_hostname($device_group).'</option>';
+        $devicegroupsform .= "<option value='".$device_group['id']."'>".$device_group['name'].'</option>';
     }
 
     if ($updated) {
