@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -38,6 +39,20 @@ class Siklu extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
+    public function discoverOS(Device $device): void
+    {
+        $data = snmp_get_multi_oid($this->getDevice(), [
+            'rbSwBank1Running.0',
+            'rbSwBank1Version.0',
+            'rbSwBank2Version.0',
+            'entPhysicalSerialNum.1',
+        ], '-OQUs', 'RADIO-BRIDGE-MIB:ENTITY-MIB');
+
+        $device->version = $data['rbSwBank1Running.0'] == 'running' ? $data['rbSwBank1Version.0'] : $data['rbSwBank2Version.0'];
+        $device->hardware = $device->sysDescr;
+        $device->serial = $data['entPhysicalSerialNum.1'];
+
+    }
 
     /**
      * Discover wireless frequency.  This is in GHz. Type is frequency.

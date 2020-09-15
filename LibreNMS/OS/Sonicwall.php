@@ -20,10 +20,33 @@ namespace LibreNMS\OS;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 
-class Sonicwall extends OS implements ProcessorDiscovery
+class Sonicwall extends OS implements OSPolling, ProcessorDiscovery
 {
+    public function pollOS()
+    {
+        $data = snmp_get_multi($this->getDevice(), [
+            'sonicCurrentConnCacheEntries.0',
+            'sonicMaxConnCacheEntries.0',
+        ], '-OQUs', 'SONICWALL-FIREWALL-IP-STATISTICS-MIB');
+
+        if (is_numeric($data)) {
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('activesessions', 'GAUGE', 0)
+                ->addDataset('maxsessions', 'GAUGE', 0);
+            $fields = [
+                'activesessions' => $data[0]['sonicCurrentConnCacheEntries'],
+                'maxsessions' => $data[0]['sonicMaxConnCacheEntries'],
+            ];
+            $tags = compact('rrd_def');
+            data_update($this->getDevice(), 'sonicwall_sessions', $tags, $fields);
+            $this->enableGraph('sonicwall_sessions');
+        }
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered

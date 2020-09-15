@@ -1,0 +1,8 @@
+modules:
+    os:
+        hardware: SNWL-COMMON-MIB::snwlSysModel.0
+        serial: SNWL-COMMON-MIB::snwlSysSerialNumber.0
+        version:
+            - SNWL-COMMON-MIB::snwlSysFirmwareVersion.0
+            - SNWL-COMMON-MIB::snwlSysROMVersion.0
+        version_template: '(Firmware {{ SNWL-COMMON-MIB::snwlSysFirmwareVersion.0 }} / ROM {{ SNWL-COMMON-MIB::snwlSysROMVersion.0 }})'
