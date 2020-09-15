@@ -28,7 +28,7 @@ $device_group_id = $vars['device_group_id'];
 if (is_numeric($service_template_id) && $service_template_id > 0) {
     // Need to edit.
     $update = array('service_template_desc' => $desc, 'service_template_ip' => $ip, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled);
-    if (is_numeric(edit_service($update, $service_template_id))) {
+    if (is_numeric(edit_service_template($update, $service_template_id))) {
         $status = array('status' =>0, 'message' => 'Modified Service Template: <i>'.$service_template_id.': '.$type.'</i>');
     } else {
         $status = array('status' =>1, 'message' => 'ERROR: Failed to modify Service Template: <i>'.$service_template_id.'</i>');

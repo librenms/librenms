@@ -31,7 +31,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="Create">Services</h5>
+                <h5 class="modal-title" id="Create">Services Template</h5>
             </div>
             <div class="modal-body">
                 <form method="post" role="form" id="service-template" class="form-horizontal service-template-form">
@@ -61,7 +61,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <div class="form-service-template row">
                         <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
                         <div class="col-sm-9">
-                            <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device_group['name']?>'/>
+                            <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder=''/>
                         </div>
                     </div>
                     <div class="form-service-template row">

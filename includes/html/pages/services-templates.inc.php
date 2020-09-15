@@ -88,7 +88,7 @@ require_once 'includes/html/modal/delete_service_template.inc.php';
                     $device_group_id = $device_group['id'];
                     $device_group_name = $device_group['name'];
                     #$device_sysName = $device_group['name'];
-                    $devlink = generate_device_link($device_group, null, array('tab' => 'services'));
+                    #$devlink = generate_device_link($device_group, null, array('tab' => 'services'));
                     if ($shift == 1) {
                         array_unshift($sql_param, $device_group_id);
                         $shift = 0;
@@ -107,7 +107,7 @@ require_once 'includes/html/modal/delete_service_template.inc.php';
 
                         if ($service_template_iteration < 2 && $header) {
                             echo '<div class="panel panel-default">';
-                            echo '<div class="panel-heading"><h3 class="panel-title">' . $devlink . '</h3>' . $device_group_name . '</div>';
+                            echo '<div class="panel-heading"><h3 class="panel-title">' . $device_group_id . '</h3>' . $device_group_name . '</div>';
                             echo '<div class="panel-body">';
                             echo '<table class="table table-hover table-condensed">';
                             echo '<thead>';
