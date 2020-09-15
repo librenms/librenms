@@ -41,7 +41,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     <script>
         $('#confirm-delete').on('show.bs.modal', function (e) {
-            service_id = $(e.relatedTarget).data('service_template_id');
+            service_template_id = $(e.relatedTarget).data('service_template_id');
             $("#service_template_id").val(service_template_id);
         });
 
