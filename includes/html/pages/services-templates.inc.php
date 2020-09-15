@@ -24,7 +24,7 @@ require_once 'includes/html/modal/delete_service_template.inc.php';
     <div class="row">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <span style="font-weight: bold;">Services</span> &#187;
+                <span style="font-weight: bold;">Services Templates</span> &#187;
 
                 <?php
                 $menu_options = array(

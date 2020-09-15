@@ -112,13 +112,13 @@ function add_service_template($device_group, $type, $desc, $param = "", $ignore 
 #        $device_group = device_group_by_id_cache($device_group);
 #    }
 
-    $insert = array('device_group_id' => $device_group['device_group_id'], 'service_template_type' => $type, 'service_template_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled);
+    $insert = array('device_group_id' => $device_group['device_group_id'], 'service_template_ip' => $ip, 'service_template_type' => $type, 'service_template_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled);
     return dbInsert($insert, 'services_template');
 }
 
 function service_template_get($device_group = null, $service_template = null)
 {
-    $sql_query = "SELECT `service_template_id`,`device_group_id`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE";
+    $sql_query = "SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE";
     $sql_param = array();
     $add = 0;
 
@@ -158,7 +158,7 @@ function edit_service_template($update = array(), $service_template = null)
         return false;
     }
 
-    return dbUpdate($update, 'services_template', '`service_template_id`=?', array($service));
+    return dbUpdate($update, 'services_template', '`service_template_id`=?', array($service_template));
 }
 
 function delete_service_template($service_template = null)
@@ -167,7 +167,7 @@ function delete_service_template($service_template = null)
         return false;
     }
 
-    return dbDelete('services_template', '`service_template_id` =  ?', array($service));
+    return dbDelete('services_template', '`service_template_id` =  ?', array($service_template));
 }
 
 function discover_service($device, $service)

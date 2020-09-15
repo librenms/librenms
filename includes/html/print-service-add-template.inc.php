@@ -35,6 +35,14 @@ echo "
       </div>
     </div>
     <div class='form-group'>
+      <label for='ip' class='col-sm-2 control-label'>IP Address</label>
+      <div class='col-sm-5'>
+        <input name='ip' id='ip' class='form-control input-sm' placeholder='IP Address'>
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <div class='form-group'>
       <label for='params' class='col-sm-2 control-label'>Parameters</label>
       <div class='col-sm-5'>
         <input name='params' id='params' class='form-control input-sm'>

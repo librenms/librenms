@@ -34,17 +34,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <h5 class="modal-title" id="Create">Services</h5>
             </div>
             <div class="modal-body">
-                <form method="post" role="form" id="service" class="form-horizontal service-form">
+                <form method="post" role="form" id="service-template" class="form-horizontal service-template-form">
                     <?php echo csrf_field() ?>
                     <input type="hidden" name="service_template_id" id="service_template_id" value="">
-                    <input type="hidden" name="device_group_id" id="device_group_id" value="<?php echo $device_group['device_group_id']?>">
+                    <input type="hidden" name="device_group_id" id="device_group_id" value="<?php echo $device_group['id']?>">
                     <input type="hidden" name="type" id="type" value="create-service-template">
-                    <div class="form-service">
+                    <div class="form-service-template">
                         <div class="col-sm-12">
                             <span id="ajax_response">&nbsp;</span>
                         </div>
                     </div>
-                    <div class="form-service row">
+                    <div class="form-service-template row">
                         <label for='stype' class='col-sm-3 control-label'>Type: </label>
                         <div class="col-sm-9">
                             <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
@@ -52,39 +52,39 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </select>
                         </div>
                     </div>
-                    <div class='form-service row'>
+                    <div class='form-service-template row'>
                         <label for='desc' class='col-sm-3 control-label'>Description: </label>
                         <div class='col-sm-9'>
                             <textarea id='desc' name='desc' class='form-control'></textarea>
                         </div>
                     </div>
-                    <div class="form-service row">
+                    <div class="form-service-template row">
                         <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
                         <div class="col-sm-9">
                             <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device_group['name']?>'/>
                         </div>
                     </div>
-                    <div class="form-service row">
+                    <div class="form-service-template row">
                         <label for='param' class='col-sm-3 control-label'>Parameters: </label>
                         <div class="col-sm-9">
                            <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
                         </div>
                     </div>
-                    <div class="form-service row">
+                    <div class="form-service-template row">
                         <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
                         <div class="col-sm-9">
                             <input type='checkbox' id='ignore' name='ignore'>
                         </div>
                     </div>
-                    <div class="form-service row">
+                    <div class="form-service-template row">
                         <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
                         <div class="col-sm-9">
                             <input type='checkbox' id='disabled' name='disabled'>
                         </div>
                     </div>
-                    <div class="form-service row">
+                    <div class="form-service-template row">
                         <div class="col-sm-offset-3 col-sm-9">
-                            <button class="btn btn-success btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button>
+                            <button class="btn btn-success btn-sm" type="submit" name="service-template-submit" id="service-template-submit" value="save">Save Service Template</button>
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -116,7 +116,7 @@ $('#create-service-template').on('show.bs.modal', function (e) {
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "parse-service", service_template_id: service_template_id },
+        data: { type: "parse-service-template", service_template_id: service_template_id },
         dataType: "json",
         success: function(output) {
             $('#stype').val(output['stype']);
@@ -143,7 +143,7 @@ $('#service-template-submit').click('', function(e) {
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: $('form.service-form').serialize(),
+        data: $('form.service-template-form').serialize(),
         success: function(result){
             if (result.status == 0) {
                 // Yay.
