@@ -129,7 +129,7 @@ function service_template_get($device_group = null, $service_template = null)
         $sql_param[] = $service_template;
         $add++;
     }
-    if (!is_null($device)) {
+    if (!is_null($device_group)) {
         // Add a device filter to the SQL query.
         $sql_query .= " `device_group_id` = ? AND";
         $sql_param[] = $device_group;
