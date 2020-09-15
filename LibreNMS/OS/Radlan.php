@@ -1,8 +1,8 @@
 <?php
-/**
- * rittal-cmc.inc.php
+/*
+ * Radlan.php
  *
- * LibreNMS os poller module for Rittal CMC-TC/LCP-InlineEC  devices
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,24 +19,20 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2020 Kevin Zink
- * @author     Kevin Zink <kevin.zink@mpi-hd.mpg.de>
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$descr = snmp_get($device, '1.3.6.1.2.1.1.1.0', '-OUQnt');
-if (is_string($descr)) {
-    $match=[];
-    if (preg_match('/ SN ([0-9]*)/', $descr, $match) == 1) {
-        $serial   = $match[1];
-    }
-    if (preg_match('/ HW V([0-9\.]*)/', $descr, $match) == 1) {
-        $hardware = $match[1];
-    }
-    if (preg_match('/ SW V([0-9\.]*)/', $descr, $match) == 1) {
-        $version = '[' . $match[1] . ']';
+namespace LibreNMS\OS;
+
+use App\Models\Device;
+
+class Radlan extends \LibreNMS\OS
+{
+    public function discoverOS(Device $device): void
+    {
+        $device->hardware = snmp_getnext($this->getDevice(), 'entPhysicalDescr.64', '-OsvQU', 'ENTITY-MIB');
+        $device->version  = snmp_get($this->getDevice(), 'rndBrgVersion.0', '-OsvQU', 'RADLAN-MIB');
+        $device->serial   = snmp_getnext($this->getDevice(), 'entPhysicalSerialNum.64', '-OsvQU', 'ENTITY-MIB') ?: null;
     }
 }
-
-unset(
-    $descr
-);
