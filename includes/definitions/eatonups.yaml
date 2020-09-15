@@ -3,8 +3,7 @@ text: 'Eaton UPS'
 type: power
 icon: eaton
 rfc1628_compat: true
-mib_dir:
-    - ups
+mib_dir: ups
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
