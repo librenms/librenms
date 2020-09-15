@@ -108,25 +108,25 @@ function delete_service($service = null)
 function add_service_template($device_group, $type, $desc, $param = "", $ignore = 0, $disabled = 0)
 {
 
-    if (!is_array($device_group)) {
-        $device_group = device_group_by_id_cache($device_group);
-    }
+#    if (!is_array($device_group)) {
+#        $device_group = device_group_by_id_cache($device_group);
+#    }
 
     $insert = array('device_group_id' => $device_group['device_group_id'], 'service_template_type' => $type, 'service_template_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled);
     return dbInsert($insert, 'services_template');
 }
 
-function service_template_get($device_group = null, $service = null)
+function service_template_get($device_group = null, $service_template = null)
 {
     $sql_query = "SELECT `service_template_id`,`device_group_id`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE";
     $sql_param = array();
     $add = 0;
 
     d_echo("SQL Query: ".$sql_query);
-    if (!is_null($service)) {
+    if (!is_null($service_template)) {
         // Add a service filter to the SQL query.
         $sql_query .= " `service_template_id` = ? AND";
-        $sql_param[] = $service;
+        $sql_param[] = $service_template;
         $add++;
     }
     if (!is_null($device)) {
@@ -146,10 +146,10 @@ function service_template_get($device_group = null, $service = null)
     d_echo("SQL Query: ".$sql_query);
 
     // $service is not null, get only what we want.
-    $services = dbFetchRows($sql_query, $sql_param);
-    d_echo("Service Array: ".print_r($services, true)."\n");
+    $services_template = dbFetchRows($sql_query, $sql_param);
+    d_echo("Service Template Array: ".print_r($services_template, true)."\n");
 
-    return $services;
+    return $services_template;
 }
 
 function edit_service_template($update = array(), $service = null)
