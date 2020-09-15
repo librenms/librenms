@@ -1,0 +1,6 @@
+mib: PACKETLOGIC-MIB
+modules:
+    os:
+        hardware: PACKETLOGIC-OVERVIEW-MIB::model.1.0
+        serial: PACKETLOGIC-OVERVIEW-MIB::machineId.1.0
+        version: PACKETLOGIC-OVERVIEW-MIB::firmwareVersion.1.0

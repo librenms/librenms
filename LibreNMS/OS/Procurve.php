@@ -1,6 +1,6 @@
 <?php
 /*
- * Freebsd.php
+ * Procurve.php
  *
  * -Description-
  *
@@ -25,13 +25,27 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
+use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\RRD\RrdDefinition;
 
-class Freebsd extends \LibreNMS\OS\Shared\Unix
+class Procurve extends \LibreNMS\OS implements OSPolling
 {
-    public function discoverOS(Device $device): void
+    public function pollOS()
     {
-        parent::discoverOS($device); // yaml
-        $this->discoverExtends($device);
+        $FdbAddressCount = snmp_get($this->getDevice(), 'hpSwitchFdbAddressCount.0', '-Ovqn', 'STATISTICS-MIB');
+
+        if (is_numeric($FdbAddressCount)) {
+            $rrd_def = RrdDefinition::make()->addDataset('value', 'GAUGE', -1, 100000);
+
+            $fields = [
+                'value' => $FdbAddressCount,
+            ];
+
+            $tags = compact('rrd_def');
+            data_update($this->getDevice(), 'fdb_count', $tags, $fields);
+
+            $this->enableGraph('fdb_count');
+        }
+
     }
 }

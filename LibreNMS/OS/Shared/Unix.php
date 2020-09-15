@@ -46,7 +46,7 @@ class Unix extends \LibreNMS\OS
             return;
         }
 
-        preg_match('/ ([\d.]{3,}\S*) /', $device->sysDescr, $matches);
+        preg_match('/ (\d+\.\d\S*) /', $device->sysDescr, $matches);
         $device->version = $matches[1] ?? $device->version;
         if (preg_match('/i[3-6]86/', $device->sysDescr)) {
             $device->hardware = "Generic x86";

@@ -7,12 +7,12 @@
                     "sysObjectID": ".1.3.6.1.4.1.4515.100.1.2500.1",
                     "sysDescr": "PL-2000M",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "2.0.12-B2A2-A01C",
+                    "hardware": "PL-2000M rev 02-28",
                     "features": null,
                     "os": "packetlight",
                     "type": "network",
-                    "serial": null,
+                    "serial": "190400431",
                     "icon": "packetlight.png",
                     "location": "<private>"
                 }

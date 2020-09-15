@@ -1,5 +1,8 @@
 mib: PULSESECURE-PSG-MIB
 modules:
+    os:
+        hardware: PULSESECURE-PSG-MIB::productName.0
+        version: PULSESECURE-PSG-MIB::productVersion.0
     processors:
         data:
             -
