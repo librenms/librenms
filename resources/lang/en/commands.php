@@ -27,6 +27,22 @@ return [
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ]
     ],
+    'dev:check' => [
+        'description' => 'LibreNMS code checks. Running with no options runs all checks',
+        'arguments' => [
+            'check' => 'Run the specified check :checks',
+        ],
+        'options' => [
+            'commands' => 'Print commands that would be run only, no checks',
+            'db' => 'Run unit tests that require a database connection',
+            'fail-fast' => 'Stop checks when any failure is encountered',
+            'full' => 'Run full checks ignoring changed file filtering',
+            'module' => 'Specific Module to run tests on. Implies unit, --db, --snmpsim',
+            'os' => 'Specific OS to run tests on. Implies unit, --db, --snmpsim',
+            'quiet' => 'Hide output unless there is an error',
+            'snmpsim' => 'Use snmpsim for unit tests',
+        ]
+    ],
     'user:add' => [
         'description' => 'Add a local user, you can only log in with this user if auth is set to mysql',
         'arguments' => [

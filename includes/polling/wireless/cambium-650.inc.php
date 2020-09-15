@@ -19,7 +19,7 @@ use LibreNMS\RRD\RrdDefinition;
 //     );
 //     $tags = compact('rrd_def');
 //     data_update($device, 'cambium-650-transmitPower', $tags, $fields);
-//     $graphs['cambium_650_transmitPower'] = true;
+//     $os->enableGraph('cambium_650_transmitPower');
 // }
 
 // $rawReceivePower = snmp_get($device, "rawReceivePower.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 //     );
 //     $tags = compact('rrd_def');
 //     data_update($device, 'cambium-650-rawReceivePower', $tags, $fields);
-//     $graphs['cambium_650_rawReceivePower'] = true;
+//     $os->enableGraph('cambium_650_rawReceivePower');
 // }
 
 
@@ -46,7 +46,7 @@ if (is_numeric($txModulation) && is_numeric($rxModulation)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-650-modulationMode', $tags, $fields);
-    $graphs['cambium_650_modulationMode'] = true;
+    $os->enableGraph('cambium_650_modulationMode');
 }
 
 // $receiveDataRate = snmp_get($device, "receiveDataRate.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
@@ -64,7 +64,7 @@ if (is_numeric($txModulation) && is_numeric($rxModulation)) {
 //     );
 //     $tags = compact('rrd_def');
 //     data_update($device, 'cambium-650-dataRate', $tags, $fields);
-//     $graphs['cambium_650_dataRate'] = true;
+//     $os->enableGraph('cambium_650_dataRate');
 // }
 
 $ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
@@ -75,7 +75,7 @@ if (is_numeric($ssr)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-650-ssr', $tags, $fields);
-    $graphs['cambium_650_ssr'] = true;
+    $os->enableGraph('cambium_650_ssr');
 }
 
 // $gps = snmp_get($device, "tDDSynchronizationStatus.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
@@ -107,5 +107,5 @@ if (is_numeric($ssr)) {
 //         );
 //         $tags = compact('rrd_def');
 //         data_update($device, 'cambium-650-gps', $tags, $fields);
-//             $graphs['cambium_650_gps'] = true;
+//             $os->enableGraph('cambium_650_gps');
 // }

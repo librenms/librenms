@@ -28,11 +28,11 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
-use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Util\Url;
 
 class DeviceController extends TableController
 {
@@ -65,6 +65,19 @@ class DeviceController extends TableController
     protected function searchFields($request)
     {
         return ['sysName', 'hostname', 'hardware', 'os', 'locations.location'];
+    }
+
+    protected function sortFields($request)
+    {
+        return [
+            'status' => 'status',
+            'icon' => 'icon',
+            'hostname' => 'hostname',
+            'hardware' => 'hardware',
+            'os' => 'os',
+            'uptime' => \DB::raw("IF(`status` = 1, `uptime`, `last_polled` - NOW())"),
+            'location' => 'location'
+        ];
     }
 
     /**
@@ -202,7 +215,6 @@ class DeviceController extends TableController
      */
     private function getOsText($device)
     {
-        $device->loadOs();
         $os_text = Config::getOsSetting($device->os, 'text');
 
         if ($this->isDetailed()) {

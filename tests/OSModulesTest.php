@@ -26,17 +26,21 @@
 namespace LibreNMS\Tests;
 
 use DeviceCache;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Fping;
 use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     private $discoveryModules;
     private $pollerModules;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +49,7 @@ class OSModulesTest extends DBTestCase
         $this->pollerModules = Config::get('poller_modules');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         // restore modules
         Config::set('discovery_modules', $this->discoveryModules);
@@ -82,12 +86,8 @@ class OSModulesTest extends DBTestCase
     public function testOS($os, $variant, $modules)
     {
         $this->requireSnmpsim();  // require snmpsim for tests
-
-        // stub out Log::event, we don't need to store them for these tests
-        $this->app->bind('log', function ($app) {
-            return \Mockery::mock('\App\Facades\LogManager[event]', [$app])
-                ->shouldReceive('event');
-        });
+        // stub out Log::event and Fping->ping, we don't need to store them for these tests
+        $this->stubClasses();
 
         try {
             set_debug(false); // avoid all undefined index errors in the legacy code
@@ -124,6 +124,11 @@ class OSModulesTest extends DBTestCase
                 . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
 
+            if ($module === 'route') {
+                // no route poller module
+                continue;
+            }
+
             if ($expected_data[$module]['poller'] == 'matches discovery') {
                 $expected = $expected_data[$module]['discovery'];
             } else {
@@ -157,5 +162,29 @@ class OSModulesTest extends DBTestCase
             // special case for exception
             return [[false, false, $e->getMessage()]];
         }
+    }
+
+    private function stubClasses(): void
+    {
+        $this->app->bind('log', function ($app) {
+            return \Mockery::mock('\App\Facades\LogManager[event]', [$app])
+                ->shouldReceive('event');
+        });
+
+        $this->app->bind(Fping::class, function ($app) {
+            $mock = \Mockery::mock('\LibreNMS\Fping');
+            $mock->shouldReceive('ping')->andReturn([
+                "xmt" => 3,
+                "rcv" => 3,
+                "loss" => 0,
+                "min" => 0.62,
+                "max" => 0.93,
+                "avg" => 0.71,
+                "dup" => 0,
+                "exitcode" => 0,
+            ]);
+
+            return $mock;
+        });
     }
 }

@@ -2,12 +2,12 @@ os: binox
 text: 'Telco Systems BiNOX'
 type: network
 icon: telco-systems
-mib_dir:
-    - telco-systems/binox
+mib_dir: telco-systems/binox
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.738.10.5.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.738.10.5.

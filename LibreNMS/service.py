@@ -59,7 +59,7 @@ class ServiceConfig:
     services = PollerConfig(8, 300)
     discovery = PollerConfig(16, 21600)
     billing = PollerConfig(2, 300, 60)
-    ping = PollerConfig(1, 120)
+    ping = PollerConfig(1, 60)
     down_retry = 60
     update_enabled = True
     update_frequency = 86400
@@ -118,7 +118,7 @@ class ServiceConfig:
         self.alerting.enabled = config.get('service_alerting_enabled', True)
         self.alerting.frequency = config.get('service_alerting_frequency', ServiceConfig.alerting.frequency)
         self.ping.enabled = config.get('service_ping_enabled', False)
-        self.ping.frequency = config.get('ping_rrd_step', ServiceConfig.billing.calculate)
+        self.ping.frequency = config.get('ping_rrd_step', ServiceConfig.ping.frequency)
         self.down_retry = config.get('service_poller_down_retry', ServiceConfig.down_retry)
         self.log_level = config.get('service_loglevel', ServiceConfig.log_level)
         self.update_enabled = config.get('service_update_enabled', ServiceConfig.update_enabled)
@@ -154,6 +154,68 @@ class ServiceConfig:
             except ValueError:
                 error("Unknown log level {}, must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'".format(self.log_level))
                 logging.getLogger().setLevel(logging.INFO)
+
+    def load_poller_config(self, db):
+        try:
+            settings = {}
+            cursor = db.query('SELECT * FROM `poller_cluster` WHERE `node_id`=%s', self.node_id)
+            if cursor.rowcount == 0:
+                return
+
+            for index, setting in enumerate(cursor.fetchone()):
+                name = cursor.description[index][0]
+                settings[name] = setting
+
+            if settings['poller_name'] is not None:
+                self.set_name(settings['poller_name'])
+            if settings['poller_groups'] is not None:
+                self.group = ServiceConfig.parse_group(settings['poller_groups'])
+            if settings['poller_enabled'] is not None:
+                self.poller.enabled = settings['poller_enabled']
+            if settings['poller_frequency'] is not None:
+                self.poller.frequency = settings['poller_frequency']
+            if settings['poller_workers'] is not None:
+                self.poller.workers = settings['poller_workers']
+            if settings['poller_down_retry'] is not None:
+                self.down_retry = settings['poller_down_retry']
+            if settings['discovery_enabled'] is not None:
+                self.discovery.enabled = settings['discovery_enabled']
+            if settings['discovery_frequency'] is not None:
+                self.discovery.frequency = settings['discovery_frequency']
+            if settings['discovery_workers'] is not None:
+                self.discovery.workers = settings['discovery_workers']
+            if settings['services_enabled'] is not None:
+                self.services.enabled = settings['services_enabled']
+            if settings['services_frequency'] is not None:
+                self.services.frequency = settings['services_frequency']
+            if settings['services_workers'] is not None:
+                self.services.workers = settings['services_workers']
+            if settings['billing_enabled'] is not None:
+                self.billing.enabled = settings['billing_enabled']
+            if settings['billing_frequency'] is not None:
+                self.billing.frequency = settings['billing_frequency']
+            if settings['billing_calculate_frequency'] is not None:
+                self.billing.calculate = settings['billing_calculate_frequency']
+            if settings['alerting_enabled'] is not None:
+                self.alerting.enabled = settings['alerting_enabled']
+            if settings['alerting_frequency'] is not None:
+                self.alerting.frequency = settings['alerting_frequency']
+            if settings['ping_enabled'] is not None:
+                self.ping.enabled = settings['ping_enabled']
+            if settings['ping_frequency'] is not None:
+                self.ping.frequency = settings['ping_frequency']
+            if settings['update_enabled'] is not None:
+                self.update_enabled = settings['update_enabled']
+            if settings['update_frequency'] is not None:
+                self.update_frequency = settings['update_frequency']
+            if settings['loglevel'] is not None:
+                self.log_level = settings['loglevel']
+            if settings['watchdog_enabled'] is not None:
+                self.watchdog_enabled = settings['watchdog_enabled']
+            if settings['watchdog_log'] is not None:
+                self.watchdog_logfile = settings['watchdog_log']
+        except pymysql.err.Error:
+            warning('Unable to load poller (%s) config', self.node_id)
 
     def _get_config_data(self):
         try:
@@ -205,11 +267,11 @@ class Service:
 
     def __init__(self):
         self.config.populate()
-        threading.current_thread().name = self.config.name  # rename main thread
-
-        self.attach_signals()
-
         self._db = LibreNMS.DB(self.config)
+        self.config.load_poller_config(self._db)
+
+        threading.current_thread().name = self.config.name  # rename main thread
+        self.attach_signals()
 
         self._lm = self.create_lock_manager()
         self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance, 'maintenance')
@@ -367,8 +429,13 @@ class Service:
             sleep(wait)
 
         info("Running maintenance tasks")
-        output = LibreNMS.call_script('daily.sh')
-        info("Maintenance tasks complete\n{}".format(output))
+        try:
+            output = LibreNMS.call_script('daily.sh')
+            info("Maintenance tasks complete\n{}".format(output))
+        except subprocess.CalledProcessError as e:
+            error("Error in daily.sh:\n" + (e.output.decode() if e.output is not None else 'No output'))
+
+        self._lm.unlock('schema-update', self.config.unique_name)
 
         self.restart()
 
@@ -530,7 +597,7 @@ class Service:
             exception("Unable to log performance statistics - is the database still online?")
 
     def logfile_watchdog(self):
-        
+
         try:
             # check that lofgile has been written to within last poll period
             logfile_mdiff = datetime.now().timestamp() - os.path.getmtime(self.config.watchdog_logfile)

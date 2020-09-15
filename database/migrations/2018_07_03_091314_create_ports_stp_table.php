@@ -26,7 +26,7 @@ class CreatePortsStpTable extends Migration
             $table->string('designatedBridge', 32);
             $table->mediumInteger('designatedPort');
             $table->integer('forwardTransitions')->unsigned();
-            $table->unique(['device_id','port_id'], 'device_id');
+            $table->unique(['device_id','port_id']);
         });
     }
 

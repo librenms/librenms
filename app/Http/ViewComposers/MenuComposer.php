@@ -62,7 +62,7 @@ class MenuComposer
         // end global Settings
 
         //TODO: should be handled via CSS Themes
-        $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
+        $vars['navbar'] = in_array($site_style, ['mono']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
@@ -221,6 +221,9 @@ class MenuComposer
             ->orWhere(function ($query) use ($user) {
                 $query->isUnread($user);
             })->count();
+
+        // Poller Settings
+        $vars['poller_clusters'] = \App\Models\PollerCluster::exists();
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');

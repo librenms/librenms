@@ -170,7 +170,6 @@ class Config
 
     /**
      * Get a setting from the $config['os'] array using the os of the given device
-     * If that is not set, fallback to the same global config key
      *
      * @param string $os The os name
      * @param string $key period separated config variable name
@@ -180,12 +179,10 @@ class Config
     public static function getOsSetting($os, $key, $default = null)
     {
         if ($os) {
+            \LibreNMS\Util\OS::loadDefinition($os);
+
             if (isset(self::$config['os'][$os][$key])) {
                 return self::$config['os'][$os][$key];
-            }
-
-            if (!Str::contains($key, '.')) {
-                return self::get($key, $default);
             }
 
             $os_key = "os.$os.$key";
@@ -194,7 +191,7 @@ class Config
             }
         }
 
-        return self::get($key, $default);
+        return $default;
     }
 
     /**
@@ -210,7 +207,7 @@ class Config
     public static function getCombined($os, $key, $default = array())
     {
         if (!self::has($key)) {
-            return self::get("os.$os.$key", $default);
+            return self::getOsSetting($os, $key, $default);
         }
 
         if (!isset(self::$config['os'][$os][$key])) {
@@ -411,10 +408,7 @@ class Config
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 
-        // If we're on SSL, let's properly detect it
-        if (isset($_SERVER['HTTPS'])) {
-            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
-        }
+        self::set('base_url', Str::finish(self::get('base_url'), '/'));
 
         if (!self::get('email_from')) {
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
@@ -453,6 +447,9 @@ class Config
         }
 
         self::populateTime();
+
+        // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
+        self::populateLegacyDbCredentials();
     }
 
     /**
@@ -489,42 +486,6 @@ class Config
             }
             self::set($new, self::get($old));
         }
-    }
-
-    /**
-     * Get just the database connection settings from config.php
-     *
-     * @return array (keys: db_host, db_port, db_name, db_user, db_pass, db_socket)
-     */
-    public static function getDatabaseSettings()
-    {
-        // Do not access global $config in this function!
-
-        $keys = $config = [
-            'db_host' => '',
-            'db_port' => '',
-            'db_name' => '',
-            'db_user' => '',
-            'db_pass' => '',
-            'db_socket' => '',
-        ];
-
-        if (is_file(__DIR__ . '/../config.php')) {
-            include __DIR__ . '/../config.php';
-        }
-
-        // Check for testing database
-        if (isset($config['test_db_name'])) {
-            putenv('DB_TEST_DATABASE=' . $config['test_db_name']);
-        }
-        if (isset($config['test_db_user'])) {
-            putenv('DB_TEST_USERNAME=' . $config['test_db_user']);
-        }
-        if (isset($config['test_db_pass'])) {
-            putenv('DB_TEST_PASSWORD=' . $config['test_db_pass']);
-        }
-
-        return array_intersect_key($config, $keys); // return only the db settings
     }
 
     /**
@@ -567,5 +528,17 @@ class Config
         self::set('time.sixmonth', $now - 16070400); // time() - (6 * 31 * 24 * 60 * 60);
         self::set('time.year', $now - 31536000); // time() - (365 * 24 * 60 * 60);
         self::set('time.twoyear', $now - 63072000); // time() - (2 * 365 * 24 * 60 * 60);
+    }
+
+    public static function populateLegacyDbCredentials()
+    {
+        $db = config('database.default');
+
+        self::set('db_host', config("database.connections.$db.host", 'localhost'));
+        self::set('db_name', config("database.connections.$db.database", 'librenms'));
+        self::set('db_user', config("database.connections.$db.username", 'librenms'));
+        self::set('db_pass', config("database.connections.$db.password"));
+        self::set('db_port', config("database.connections.$db.port", 3306));
+        self::set('db_socket', config("database.connections.$db.unix_socket"));
     }
 }

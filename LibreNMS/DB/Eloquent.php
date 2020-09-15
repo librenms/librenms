@@ -29,6 +29,7 @@ use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Events\Dispatcher;
+use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Laravel;
 
 class Eloquent
@@ -77,7 +78,7 @@ class Eloquent
      */
     public static function setStrictMode($strict = true)
     {
-        if (self::isConnected()) {
+        if (self::isConnected() && self::getDriver() == 'mysql') {
             if ($strict) {
                 self::DB()->getPdo()->exec("SET sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
             } else {
@@ -86,10 +87,10 @@ class Eloquent
         }
     }
 
-    public static function isConnected()
+    public static function isConnected($name = null)
     {
         try {
-            $conn = self::DB();
+            $conn = self::DB($name);
             if ($conn) {
                 return !is_null($conn->getPdo());
             }
@@ -103,19 +104,45 @@ class Eloquent
     /**
      * Access the Database Manager for Fluent style queries. Like the Laravel DB facade.
      *
+     * @param string $name
      * @return \Illuminate\Database\Connection
      */
-    public static function DB()
+    public static function DB($name = null)
     {
         // check if Laravel is booted
         if (Laravel::isBooted()) {
-            return \DB::connection();
+            return \DB::connection($name);
         }
 
         if (is_null(self::$capsule)) {
             return null;
         }
 
-        return self::$capsule->getDatabaseManager()->connection();
+        return self::$capsule->getDatabaseManager()->connection($name);
+    }
+
+    public static function getDriver()
+    {
+        $connection = config('database.default');
+        return config("database.connections.{$connection}.driver");
+    }
+
+    public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
+    {
+        \Config::set("database.connections.$name", [
+            "driver" => "mysql",
+            "host" => $db_host,
+            "port" => $db_port,
+            "database" => $db_name,
+            "username" => $db_user,
+            "password" => $db_pass,
+            "unix_socket" => $db_socket,
+            "charset" => "utf8",
+            "collation" => "utf8_unicode_ci",
+            "prefix" => "",
+            "strict" => true,
+            "engine" => null
+        ]);
+        \Config::set('database.default', $name);
     }
 }

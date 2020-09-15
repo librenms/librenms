@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
 
 class DeviceController extends Controller
@@ -23,6 +24,7 @@ class DeviceController extends Controller
         'apps' => \App\Http\Controllers\Device\Tabs\AppsController::class,
         'processes' => \App\Http\Controllers\Device\Tabs\ProcessesController::class,
         'collectd' => \App\Http\Controllers\Device\Tabs\CollectdController::class,
+        'munin' => \App\Http\Controllers\Device\Tabs\MuninController::class,
         'ports' => \App\Http\Controllers\Device\Tabs\PortsController::class,
         'port' => \App\Http\Controllers\Device\Tabs\PortController::class,
         'slas' => \App\Http\Controllers\Device\Tabs\SlasController::class,
@@ -54,17 +56,23 @@ class DeviceController extends Controller
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
 
-    public function index(Request $request, $device_id, $current_tab = 'overview', $vars = '')
+    public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
+        $device = str_replace('device=', '', $device);
+        $device = is_numeric($device) ? DeviceCache::get($device) : DeviceCache::getByHostname($device);
+        $device_id = $device->device_id;
+        DeviceCache::setPrimary($device_id);
 
-        $device_id = (int)str_replace('device=', '', $device_id);
+        if (!$device->exists) {
+            abort(404);
+        }
+
         $current_tab = str_replace('tab=', '', $current_tab);
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
-        DeviceCache::setPrimary($device_id);
-        $device = DeviceCache::getPrimary();
+
         if ($current_tab == 'port') {
             $vars = Url::parseLegacyPath($request->path());
-            $port = Port::findOrFail($vars->get('port'));
+            $port = $device->ports()->findOrFail($vars->get('port'));
             $this->authorize('view', $port);
         } else {
             $this->authorize('view', $device);
@@ -130,25 +138,13 @@ class DeviceController extends Controller
         ];
 
         $graphs = [];
-        foreach ($this->getDeviceGraphs($device) as $graph) {
+        foreach (Graph::getOverviewGraphsForDevice($device) as $graph) {
             $graph_array['type'] = $graph['graph'];
             $graph_array['popup_title'] = __($graph['text']);
             $graphs[] = $graph_array;
         }
 
         return $graphs;
-    }
-
-    private function getDeviceGraphs(Device $device)
-    {
-        if ($device->snmp_disable) {
-            return Config::get('os.ping.over');
-        } elseif (Config::has("os.$device->os.over")) {
-            return Config::get("os.$device->os.over");
-        }
-
-        $os_group = Config::getOsSetting($device->os, 'group');
-        return Config::get("os.$os_group.over", Config::get('os.default.over'));
     }
 
     private function deviceLinkMenu(Device $device)

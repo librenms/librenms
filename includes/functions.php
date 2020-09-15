@@ -21,6 +21,7 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Fping;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
@@ -126,7 +127,7 @@ function parse_modules($type, $options)
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
-                list($module, $submodule) = explode('/', $module, 2);
+                [$module, $submodule] = explode('/', $module, 2);
                 $existing_submodules = Config::get("{$type}_submodules.$module", []);
                 $existing_submodules[] = $submodule;
                 Config::set("{$type}_submodules.$module", $existing_submodules);
@@ -162,12 +163,16 @@ function logfile($string)
  * Detect the os of the given device.
  *
  * @param array $device device to check
+ * @param bool $fetch fetch sysDescr and sysObjectID fresh from the device
  * @return string the name of the os
+ * @throws Exception
  */
-function getHostOS($device)
+function getHostOS($device, $fetch = true)
 {
-    $device['sysDescr']    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
-    $device['sysObjectID'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    if ($fetch) {
+        $device['sysDescr']    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+        $device['sysObjectID'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    }
 
     d_echo("| {$device['sysDescr']} | {$device['sysObjectID']} | \n");
 
@@ -181,7 +186,7 @@ function getHostOS($device)
     foreach ($os_defs as $os => $def) {
         if (isset($def['discovery']) && !in_array($os, $deferred_os)) {
             foreach ($def['discovery'] as $item) {
-                if (checkDiscovery($device, $item)) {
+                if (checkDiscovery($device, $item, $def['mib_dir'] ?? null)) {
                     return $os;
                 }
             }
@@ -202,7 +207,7 @@ function getHostOS($device)
     foreach ($deferred_os as $os) {
         if (isset($os_defs[$os]['discovery'])) {
             foreach ($os_defs[$os]['discovery'] as $item) {
-                if (checkDiscovery($device, $item)) {
+                if (checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null)) {
                     return $os;
                 }
             }
@@ -223,9 +228,10 @@ function getHostOS($device)
  *
  * @param array $device
  * @param array $array Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
+ * @param string|array $mibdir MIB directory for evaluated OS
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($device, $array)
+function checkDiscovery($device, $array, $mibdir)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -250,13 +256,14 @@ function checkDiscovery($device, $array)
                 return false;
             }
         } elseif ($key == 'snmpget') {
-            $options = isset($value['options']) ? $value['options'] : '-Oqv';
-            $mib = isset($value['mib']) ? $value['mib'] : null;
-            $mib_dir = isset($value['mib_dir']) ? $value['mib_dir'] : null;
-            $op = isset($value['op']) ? $value['op'] : 'contains';
-
-            $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
-            if (compare_var($get_value, $value['value'], $op) == $check) {
+            $get_value = snmp_get(
+                $device,
+                $value['oid'],
+                $value['options'] ?? '-Oqv',
+                $value['mib'] ?? null,
+                $value['mib_dir'] ?? $mibdir
+            );
+            if (compare_var($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                 return false;
             }
         }
@@ -332,6 +339,8 @@ function compare_var($a, $b, $comparison = '=')
             return in_array($a, $b);
         case "not_in_array":
             return !in_array($a, $b);
+        case "exists":
+            return isset($a) == $b;
         default:
             return false;
     }
@@ -454,6 +463,9 @@ function delete_device($id)
     dbQuery("DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?", array($id));
     dbQuery("DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?", array($id));
 
+    //Remove Outages
+    \App\Models\Availability::where('device_id', $id)->delete();
+    \App\Models\DeviceOutage::where('device_id', $id)->delete();
 
     \App\Models\Port::where('device_id', $id)
         ->with('device')
@@ -672,7 +684,7 @@ function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
         ];
     }
 
-    $status = fping(
+    $status = app()->make(Fping::class)->ping(
         $hostname,
         Config::get('fping_options.count', 3),
         Config::get('fping_options.interval', 500),
@@ -1045,7 +1057,7 @@ function is_port_valid($port, $device)
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
-        if (!Config::getOsSetting($device['os'], 'empty_ifdescr', false)) {
+        if (!Config::getOsSetting($device['os'], 'empty_ifdescr', Config::get('empty_ifdescr', false))) {
             d_echo("ignored: empty ifDescr\n");
             return false;
         }
@@ -1057,7 +1069,7 @@ function is_port_valid($port, $device)
     $ifType  = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'];
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
+    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
     }
 
@@ -1369,6 +1381,22 @@ function set_curl_proxy($curl)
 }
 
 /**
+ * Return the proxy url in guzzle format
+ *
+ * @return 'tcp://' + $proxy
+ */
+function get_guzzle_proxy()
+{
+    $proxy = get_proxy();
+
+    $tmp = rtrim($proxy, "/");
+    $proxy = str_replace(array("http://", "https://"), "", $tmp);
+    if (!empty($proxy)) {
+        return 'tcp://' . $proxy;
+    }
+}
+
+/**
  * Return the proxy url
  *
  * @return array|bool|false|string
@@ -1453,70 +1481,6 @@ function device_has_ip($ip)
     }
 
     return false; // not an ipv4 or ipv6 address...
-}
-
-/**
- * Run fping against a hostname/ip in count mode and collect stats.
- *
- * @param string $host
- * @param int $count (min 1)
- * @param int $interval (min 20)
- * @param int $timeout (not more than $interval)
- * @param string $address_family ipv4 or ipv6
- * @return array
- */
-function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4')
-{
-    // Default to ipv4
-    $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
-    $interval = max($interval, 20);
-
-    // build the command
-    $cmd = [
-        Config::get($fping_name, $fping_name),
-        '-e',
-        '-q',
-        '-c',
-        max($count, 1),
-        '-p',
-        $interval,
-        '-t',
-        max($timeout, $interval),
-        $host
-    ];
-
-    $process = app()->make(Process::class, ['command' => $cmd]);
-    d_echo('[FPING] ' . $process->getCommandLine() . PHP_EOL);
-    $process->run();
-    $output = $process->getErrorOutput();
-
-    preg_match('#= (\d+)/(\d+)/(\d+)%(, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))?$#', $output, $parsed);
-    list(, $xmt, $rcv, $loss, , $min, $avg, $max) = array_pad($parsed, 8, 0);
-
-    if ($loss < 0) {
-        $xmt = 1;
-        $rcv = 1;
-        $loss = 100;
-    }
-
-    $response = [
-        'xmt'  => (int)$xmt,
-        'rcv'  => (int)$rcv,
-        'loss' => (int)$loss,
-        'min'  => (float)$min,
-        'max'  => (float)$max,
-        'avg'  => (float)$avg,
-        'dup'  => substr_count($output, 'duplicate'),
-        'exitcode' => $process->getExitCode(),
-    ];
-    d_echo($response);
-
-    return $response;
-}
-
-function function_check($function)
-{
-    return function_exists($function);
 }
 
 /**
@@ -2163,12 +2127,33 @@ function device_is_up($device, $record_perf = false)
             array($device['device_id'])
         );
 
+        $uptime = $device['uptime'] ?: 0;
+
         if ($response['status']) {
             $type = 'up';
             $reason = $device['status_reason'];
+
+            $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL', array($device['device_id']));
+            if (!empty($going_down)) {
+                $up_again = time() - $uptime;
+                if ($up_again <= $going_down) {
+                    # network connection loss, not device down
+                    $up_again = time();
+                }
+                dbUpdate(
+                    array('device_id' => $device['device_id'], 'up_again' => $up_again),
+                    'device_outages',
+                    'device_id=? and up_again is NULL',
+                    array($device['device_id'])
+                );
+            }
         } else {
             $type = 'down';
             $reason = $response['status_reason'];
+
+            $data = ['device_id' => $device['device_id'],
+                     'going_down' => strtotime($device['last_polled'])];
+            dbInsert($data, 'device_outages');
         }
 
         log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
@@ -2284,49 +2269,59 @@ function cache_peeringdb()
  * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
  * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
  *
+ * @param string $connection use a specific connection
  * @return array
  */
-function dump_db_schema()
+function dump_db_schema($connection = null)
 {
     $output = [];
-    $db_name = dbFetchCell('SELECT DATABASE()');
+    $db_name = DB::connection($connection)->getDatabaseName();
 
-    foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;") as $table) {
-        $table = $table['TABLE_NAME'];
-        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'") as $data) {
+    foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;")) as $table) {
+        $table = $table->TABLE_NAME;
+        foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'")) as $data) {
             $def = [
-                'Field'   => $data['COLUMN_NAME'],
-                'Type'    => $data['COLUMN_TYPE'],
-                'Null'    => $data['IS_NULLABLE'] === 'YES',
-                'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data['EXTRA']),
+                'Field'   => $data->COLUMN_NAME,
+                'Type'    => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),
+                'Null'    => $data->IS_NULLABLE === 'YES',
+                'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data->EXTRA),
             ];
 
-            if (isset($data['COLUMN_DEFAULT']) && $data['COLUMN_DEFAULT'] != 'NULL') {
-                $default = trim($data['COLUMN_DEFAULT'], "'");
+            if (isset($data->COLUMN_DEFAULT) && $data->COLUMN_DEFAULT != 'NULL') {
+                $default = trim($data->COLUMN_DEFAULT, "'");
                 $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
+            }
+            // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
+            if ($def['Type'] == 'timestamp') {
+                 $def['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $def['Extra']);
             }
 
             $output[$table]['Columns'][] = $def;
         }
 
-        foreach (array_sort_by_column(dbFetchRows("SHOW INDEX FROM `$table`"), 'Key_name') as $key) {
-            $key_name = $key['Key_name'];
+        $keys = DB::connection($connection)->select(DB::raw("SHOW INDEX FROM `$table`"));
+        usort($keys, function ($a, $b) {
+            return $a->Key_name <=> $b->Key_name;
+        });
+        foreach ($keys as $key) {
+            $key_name = $key->Key_name;
             if (isset($output[$table]['Indexes'][$key_name])) {
-                $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
+                $output[$table]['Indexes'][$key_name]['Columns'][] = $key->Column_name;
             } else {
                 $output[$table]['Indexes'][$key_name] = [
-                    'Name'    => $key['Key_name'],
-                    'Columns' => [$key['Column_name']],
-                    'Unique'  => !$key['Non_unique'],
-                    'Type'    => $key['Index_type'],
+                    'Name'    => $key->Key_name,
+                    'Columns' => [$key->Column_name],
+                    'Unique'  => !$key->Non_unique,
+                    'Type'    => $key->Index_type,
                 ];
             }
         }
 
-        $create = dbFetchRow("SHOW CREATE TABLE `$table`");
-        if (isset($create['Create Table'])) {
+        $create = DB::connection($connection)->select(DB::raw("SHOW CREATE TABLE `$table`"))[0];
+
+        if (isset($create->{'Create Table'})) {
             $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';
-            $constraint_count = preg_match_all($constraint_regex, $create['Create Table'], $constraints);
+            $constraint_count = preg_match_all($constraint_regex, $create->{'Create Table'}, $constraints);
             for ($i = 0; $i < $constraint_count; $i++) {
                 $constraint_name = $constraints['name'][$i];
                 $output[$table]['Constraints'][$constraint_name] = [
@@ -2342,10 +2337,6 @@ function dump_db_schema()
 
     return $output;
 }
-
-
-
-
 
 
 /**

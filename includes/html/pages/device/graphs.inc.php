@@ -22,8 +22,6 @@ foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY g
     }
 }
 
-enable_graphs($device, $graph_enable);
-
 $sep = '';
 foreach ($graph_enable as $section => $nothing) {
     if (isset($graph_enable) && is_array($graph_enable[$section])) {
@@ -54,28 +52,33 @@ unset($sep);
 
 print_optionbar_end();
 
-$graph_enable = $graph_enable[$vars['group']];
+$group = $vars['group'];
+$graph_enable = $graph_enable[$group];
 
-foreach ($graph_enable as $graph => $entry) {
-    $graph_array = array();
-    if ($graph_enable[$graph]) {
-        if ($graph == 'customoid') {
-            foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY `customoid_descr`', array($device['device_id'])) as $graph_entry) {
-                $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr").": ".$graph_entry['customoid_descr'];
-                $graph_array['type'] = 'customoid_' . $graph_entry['customoid_descr'];
-                if (!empty($graph_entry['customoid_unit'])) {
-                    $graph_array['unit'] = $graph_entry['customoid_unit'];
-                } else {
-                    $graph_array['unit'] = 'value';
+$metric = basename($vars['metric']);
+if (($group != 'customoid') && (is_file("includes/html/pages/device/graphs/$group.inc.php"))) {
+    include "includes/html/pages/device/graphs/$group.inc.php";
+} else {
+    foreach ($graph_enable as $graph => $entry) {
+        $graph_array = array();
+        if ($graph_enable[$graph]) {
+            if ($graph == 'customoid') {
+                foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY `customoid_descr`', array($device['device_id'])) as $graph_entry) {
+                    $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr").": ".$graph_entry['customoid_descr'];
+                    $graph_array['type'] = 'customoid_' . $graph_entry['customoid_descr'];
+                    if (!empty($graph_entry['customoid_unit'])) {
+                        $graph_array['unit'] = $graph_entry['customoid_unit'];
+                    } else {
+                        $graph_array['unit'] = 'value';
+                    }
+                    include 'includes/html/print-device-graph.php';
                 }
+            } else {
+                $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr");
+                $graph_array['type'] = 'device_'.$graph;
                 include 'includes/html/print-device-graph.php';
             }
-        } else {
-            $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr");
-            $graph_array['type'] = 'device_'.$graph;
-            include 'includes/html/print-device-graph.php';
         }
     }
 }
-
 $pagetitle[] = 'Graphs';

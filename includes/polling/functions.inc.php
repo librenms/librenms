@@ -1,16 +1,16 @@
 <?php
 
+use App\Models\DeviceGraph;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Exceptions\JsonAppException;
-use LibreNMS\Exceptions\JsonAppPollingFailedException;
-use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
-use LibreNMS\Exceptions\JsonAppMissingKeysException;
-use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
-use App\Models\Location;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppPollingFailedException;
+use LibreNMS\Exceptions\JsonAppWrongVersionException;
+use LibreNMS\RRD\RrdDefinition;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -160,8 +160,8 @@ function record_sensor_data($device, $all_sensors)
         $sensor_value      = $sensor['new_value'];
         $prev_sensor_value = $sensor['sensor_current'];
 
-        if ($sensor_value == -32768) {
-            echo 'Invalid (-32768) ';
+        if ($sensor_value == -32768 || is_nan($sensor_value)) {
+            echo 'Invalid (-32768 or NaN)';
             $sensor_value = 0;
         }
 
@@ -238,6 +238,7 @@ function poll_device($device, $force_module = false)
     $device['attribs'] = $attribs;
 
     load_os($device);
+    $os = \LibreNMS\OS::make($device);
 
     unset($array);
 
@@ -289,14 +290,11 @@ function poll_device($device, $force_module = false)
     $response = device_is_up($device, true);
 
     if ($response['status'] == '1') {
-        $graphs    = array();
-        $oldgraphs = array();
-
         if ($device['snmp_disable']) {
-            Config::set('poller_modules', []);
+            Config::set('poller_modules', ['availability' => true]);
         } else {
             // we always want the core module to be included, prepend it
-            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
+            Config::set('poller_modules', ['core' => true, 'availability' => true] + Config::get('poller_modules'));
         }
 
         printChangedStats(true); // don't count previous stats
@@ -338,6 +336,7 @@ function poll_device($device, $force_module = false)
                     'poller' => $module_time,
                 );
                 data_update($device, 'poller-perf', $tags, $fields);
+                $os->enableGraph('poller_perf');
 
                 // remove old rrd
                 $oldrrd = rrd_name($device['hostname'], array('poller', $module, 'perf'));
@@ -354,41 +353,6 @@ function poll_device($device, $force_module = false)
             }
         }
 
-        // Update device_groups
-        echo "### Start Device Groups ###\n";
-        $dg_start = microtime(true);
-
-        $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
-        d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
-        d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
-
-        echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
-
-        if (!$force_module && !empty($graphs)) {
-            echo "Enabling graphs: ";
-            // FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
-            // This code cycles through the graphs already known in the database and the ones we've defined as being polled here
-            // If there any don't match, they're added/deleted from the database.
-            // Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
-            foreach (dbFetch('SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?', array($device['device_id'])) as $graph) {
-                if (isset($graphs[$graph['graph']])) {
-                    $oldgraphs[$graph['graph']] = true;
-                } else {
-                    dbDelete('device_graphs', '`device_id` = ? AND `graph` = ?', array($device['device_id'], $graph['graph']));
-                }
-            }
-
-            foreach ($graphs as $graph => $value) {
-                if (!isset($oldgraphs[$graph])) {
-                    echo '+';
-                    dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph), 'device_graphs');
-                }
-
-                echo $graph.' ';
-            }
-            echo PHP_EOL;
-        }//end if
-
         // Ping response
         if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
@@ -402,6 +366,7 @@ function poll_device($device, $force_module = false)
             $update_array['last_ping_timetaken']   = $response['ping_time'];
 
             data_update($device, 'ping-perf', $tags, $fields);
+            $os->enableGraph('ping_perf');
         }
 
         $device_time  = round(microtime(true) - $device_start, 3);
@@ -417,12 +382,24 @@ function poll_device($device, $force_module = false)
             );
 
             data_update($device, 'poller-perf', $tags, $fields);
+            $os->enableGraph('poller_modules_perf');
         }
 
         if (!$force_module) {
             // don't update last_polled time if we are forcing a specific module to be polled
             $update_array['last_polled']           = array('NOW()');
             $update_array['last_polled_timetaken'] = $device_time;
+
+            echo "Enabling graphs: ";
+            DeviceGraph::deleted(function ($graph) {
+                echo '-';
+            });
+            DeviceGraph::created(function ($graph) {
+                echo '+';
+            });
+
+            $os->persistGraphs();
+            echo PHP_EOL;
         }
 
         $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
@@ -449,89 +426,6 @@ function poll_device($device, $force_module = false)
     return false; // device not polled
 }//end poll_device()
 
-/**
- * if no rrd_name parameter is passed, the MIB name is used as the rrd_file_name
- */
-function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs, $rrd_name = null)
-{
-    echo "This is poll_mib_def Processing\n";
-    $mib = null;
-
-    list($mib, $file) = explode(':', $mib_name_table, 2);
-
-    if (is_null($rrd_name)) {
-        if (str_i_contains($mib_name_table, 'UBNT')) {
-            $rrd_name = strtolower($mib);
-        } else {
-            $rrd_name = strtolower($file);
-        }
-    }
-
-    $rrd_def = new RrdDefinition();
-    $oidglist  = array();
-    $oidnamelist = array();
-    foreach ($mib_oids as $oid => $param) {
-        $oidindex  = $param[0];
-        $oiddsname = $param[1];
-        $oiddsdesc = $param[2];
-        $oiddstype = $param[3];
-        $oiddsopts = $param[4];
-
-        if (empty($oiddsopts)) {
-            $rrd_def->addDataset($oiddsname, $oiddstype, null, 100000000000);
-        } else {
-            $min = array_key_exists('min', $oiddsopts) ? $oiddsopts['min'] : null;
-            $max = array_key_exists('max', $oiddsopts) ? $oiddsopts['max'] : null;
-            $heartbeat = array_key_exists('heartbeat', $oiddsopts) ? $oiddsopts['heartbeat'] : null;
-            $rrd_def->addDataset($oiddsname, $oiddstype, $min, $max, $heartbeat);
-        }
-
-        if ($oidindex != '') {
-            $fulloid = $oid.'.'.$oidindex;
-        } else {
-            $fulloid = $oid;
-        }
-
-        // Add to oid GET list
-        $oidglist[] = $fulloid;
-        $oidnamelist[] = $oiddsname;
-    }//end foreach
-
-    // Implde for LibreNMS Version
-    $oidilist = implode(' ', $oidglist);
-
-    $snmpdata = snmp_get_multi($device, $oidilist, '-OQUs', $mib);
-    if (isset($GLOBALS['exec_status']['exitcode']) && $GLOBALS['exec_status']['exitcode'] !== 0) {
-        print_debug('  ERROR, bad snmp response');
-        return false;
-    }
-
-    $oid_count = 0;
-    $fields = array();
-    foreach ($oidglist as $fulloid) {
-        list($splitoid, $splitindex) = explode('.', $fulloid, 2);
-        $val = $snmpdata[$splitindex][$splitoid];
-        if (is_numeric($val)) {
-            $fields[$oidnamelist[$oid_count]] = $val;
-        } elseif (preg_match("/^\"(.*)\"$/", $val, $number) && is_numeric($number[1])) {
-            $fields[$oidnamelist[$oid_count]] = $number[1];
-        } else {
-            $fields[$oidnamelist[$oid_count]] = 'U';
-        }
-        $oid_count++;
-    }
-
-    $tags = compact('rrd_def');
-    data_update($device, $rrd_name, $tags, $fields);
-
-    foreach ($mib_graphs as $graphtoenable) {
-        $graphs[$graphtoenable] = true;
-    }
-
-    return true;
-}//end poll_mib_def()
-
-
 function get_main_serial($device)
 {
     if ($device['os_group'] == 'cisco') {
@@ -555,7 +449,7 @@ function get_main_serial($device)
  * The special group "none" will not be prefixed.
  *
  * @param array $app app from the db, including app_id
- * @param string $response This should be the full output
+ * @param string $response This should be the return state of Application polling
  * @param array $metrics an array of additional metrics to store in the database for alerting
  * @param string $status This is the current value for alerting
  */
@@ -577,13 +471,44 @@ function update_application($app, $response, $metrics = array(), $status = '')
             'Traceback (most recent call last):',
         ))) {
             $data['app_state'] = 'ERROR';
+        } elseif (in_array($response, ['OK', 'ERROR', 'LEGACY', 'UNSUPPORTED'])) {
+            $data['app_state'] = $response;
         } else {
+            # should maybe be 'unknown' as state
             $data['app_state'] = 'OK';
         }
     }
 
     if ($data['app_state'] != $app['app_state']) {
         $data['app_state_prev'] = $app['app_state'];
+
+        $device = dbFetchRow('SELECT * FROM devices LEFT JOIN applications ON devices.device_id=applications.device_id WHERE applications.app_id=?', array($app['app_id']));
+
+        $app_name = \LibreNMS\Util\StringHelpers::nicecase($app['app_type']);
+
+        switch ($data['app_state']) {
+            case 'OK':
+                $severity = Alert::OK;
+                $event_msg = "changed to OK";
+                break;
+            case 'ERROR':
+                $severity = Alert::ERROR;
+                $event_msg = "ends with ERROR";
+                break;
+            case 'LEGACY':
+                $severity = Alert::WARNING;
+                $event_msg = "Client Agent is deprecated";
+                break;
+            case 'UNSUPPORTED':
+                $severity = Alert::ERROR;
+                $event_msg = "Client Agent Version is not supported";
+                break;
+            default:
+                $severity = Alert::UNKNOWN;
+                $event_msg = "has UNKNOWN state";
+                break;
+        }
+        log_event("Application ".$app_name." ".$event_msg, $device, 'application', $severity);
     }
     dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
 
@@ -783,42 +708,4 @@ function data_flatten($array, $prefix = '', $joiner = '_')
     }
 
     return $return;
-}
-
-/**
- * @param string $sysLocation location override (instead of sysLocation.0)
- * @param &$device
- * @param &$update_array
- */
-function set_device_location($sysLocation, &$device, &$update_array)
-{
-    $sysLocation = str_replace('"', '', $sysLocation);
-
-    // Rewrite sysLocation if there is a mapping array (database too?)
-    if (!empty($sysLocation) && (is_array(Config::get('location_map')) || is_array(Config::get('location_map_regex')) || is_array(Config::get('location_map_regex_sub')))) {
-        $sysLocation = rewrite_location($sysLocation);
-    }
-
-    if ($sysLocation == 'not set') {
-        $sysLocation = '';
-    }
-
-    if ($device['override_sysLocation'] == 0 && $sysLocation) {
-        /** @var Location $location */
-        $location = Location::firstOrCreate(['location' => $sysLocation]);
-
-        if ($device['location_id'] != $location->id) {
-            $device['location_id'] = $location->id;
-            $update_array['location_id'] = $location->id;
-            log_event('Location -> ' . $location->location, $device, 'system', 3);
-        }
-    }
-
-    // make sure the location has coordinates
-    if (Config::get('geoloc.latlng', true) && ($location || $location = Location::find($device['location_id']))) {
-        if (!$location->hasCoordinates()) {
-            $location->lookupCoordinates();
-            $location->save();
-        }
-    }
 }

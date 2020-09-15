@@ -71,18 +71,13 @@ var grid = $("#alert-schedule").bootgrid({
     },
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
-                "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
+                "<div class=\"col-sm-4 actionBar\"><span class=\"pull-left\">"+
                 "<button type=\"button\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#schedule-maintenance\">Schedule maintenance</button>"+
                 "</span></div>"+
-                "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
+                "<div class=\"col-sm-8 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
     },
     rowCount: [50, 100, 250, -1],
-    post: function () {
-        return {
-            id: "alert-schedule",
-        };
-    },
-    url: "ajax_table.php"
+    url: "ajax/table/alert-schedule"
 }).on("loaded.rs.jquery.bootgrid", function() {
     /* Executes after data is loaded and rendered */
     grid.find(".command-edit").on("click", function(e) {

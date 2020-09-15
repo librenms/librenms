@@ -34,7 +34,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('routing/vrf/{id}', 'LegacyApiController@get_vrf')->name('get_vrf');
         Route::get('routing/ipsec/data/{hostname}', 'LegacyApiController@list_ipsec')->name('list_ipsec');
         Route::get('services', 'LegacyApiController@list_services')->name('list_services');
-        Route::get('services/{hostname}', 'LegacyApiController@list_services')->name('list_services');
+        Route::get('services/{hostname}', 'LegacyApiController@list_services')->name('list_services_device');
 
         Route::group(['prefix' => 'resources'], function () {
             Route::get('links/{id}', 'LegacyApiController@get_link')->name('get_link');
@@ -92,7 +92,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/graphs/health/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_health_graph');
         Route::get('{hostname}/graphs/wireless/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_wireless_graph');
         Route::get('{hostname}/vlans', 'LegacyApiController@get_vlans')->name('get_vlans');
-        Route::get('{hostname}/links', 'LegacyApiController@list_links')->name('list_links');
+        Route::get('{hostname}/links', 'LegacyApiController@list_links')->name('list_links_device');
         Route::get('{hostname}/graphs', 'LegacyApiController@get_graphs')->name('get_graphs');
         Route::get('{hostname}/fdb', 'LegacyApiController@get_fdb')->name('get_fdb');
         Route::get('{hostname}/health/{type?}/{sensor_id?}', 'LegacyApiController@list_available_health_graphs')->name('list_available_health_graphs');
@@ -101,7 +101,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/ip', 'LegacyApiController@get_device_ip_addresses')->name('get_ip_addresses');
         Route::get('{hostname}/port_stack', 'LegacyApiController@get_port_stack')->name('get_port_stack');
         Route::get('{hostname}/components', 'LegacyApiController@get_components')->name('get_components');
-        Route::get('{hostname}/groups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
+        Route::get('{hostname}/groups', 'LegacyApiController@get_device_groups')->name('get_device_groups_device');
         // consumes the route below, but passes to it when detected
         Route::get('{hostname}/ports/{ifname}', 'LegacyApiController@get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname')->where('ifname', '.*');
         Route::get('{hostname}/ports/{ifname}/{type}', 'LegacyApiController@get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
@@ -113,6 +113,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     Route::group(['prefix' => 'ports'], function () {
         Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
+        Route::get('search/{search}', 'LegacyApiController@search_ports')->name('search_ports');
         Route::get(null, 'LegacyApiController@get_all_ports')->name('get_all_ports');
     });
 

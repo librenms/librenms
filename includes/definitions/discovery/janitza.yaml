@@ -3,12 +3,13 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - janitza
+                -
+                    oid:
+                        - janitza
         voltage:
             options:
-                    divisor: 10
-                    skip_values_lt: 40
+                divisor: 10
+                skip_value_lt: 40
             data:
                 -
                     oid: uLN1
@@ -54,7 +55,7 @@ modules:
                     descr: 'L3 to L1'
         current:
             options:
-                    divisor: 1000
+                divisor: 1000
             data:
                 -
                     oid: iL1
@@ -62,40 +63,40 @@ modules:
                     index: iL1.{{ $index }}
                     descr: 'L1'
                     skip_values:
-                    -
-                      oid: uLN1
-                      op: '<'
-                      value: 40		  
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
                 -
                     oid: iL2
                     num_oid: .1.3.6.1.4.1.34278.1.9.{{ $index }}
                     index: iL2.{{ $index }}
                     descr: 'L2'
                     skip_values:
-                    -
-                      oid: uLN2
-                      op: '<'
-                      value: 40		  
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
                 -
                     oid: iL3
                     num_oid: .1.3.6.1.4.1.34278.1.10.{{ $index }}
                     index: iL3.{{ $index }}
                     descr: 'L3'
                     skip_values:
-                    -
-                      oid: uLN3
-                      op: '<'
-                      value: 40		  
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
                 -
                     oid: iL4
                     num_oid: .1.3.6.1.4.1.34278.1.11.{{ $index }}
                     index: iL4.{{ $index }}
                     descr: 'L4'
                     skip_values:
-                    -
-                      oid: uLN4
-                      op: '<'
-                      value: 40		  
+                        -
+                            oid: uLN4
+                            op: '<'
+                            value: 40
         power:
             data:
                 -
@@ -105,10 +106,10 @@ modules:
                     group: 'Real'
                     descr: 'L1'
                     skip_values:
-                    -
-                      oid: uLN1
-                      op: '<'
-                      value: 40		    
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
                 -
                     oid: pL2
                     num_oid: .1.3.6.1.4.1.34278.1.13.{{ $index }}
@@ -116,10 +117,10 @@ modules:
                     group: 'Real'
                     descr: 'L2'
                     skip_values:
-                    -
-                      oid: uLN2
-                      op: '<'
-                      value: 40		    
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
                 -
                     oid: pL3
                     num_oid: .1.3.6.1.4.1.34278.1.14.{{ $index }}
@@ -127,10 +128,10 @@ modules:
                     group: 'Real'
                     descr: L3
                     skip_values:
-                    -
-                      oid: uLN3
-                      op: '<'
-                      value: 40		    
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
                 -
                     oid: pL4
                     num_oid: .1.3.6.1.4.1.34278.1.15.{{ $index }}
@@ -138,10 +139,10 @@ modules:
                     group: 'Real'
                     descr: 'L4'
                     skip_values:
-                    -
-                      oid: uLN4
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN4
+                            op: '<'
+                            value: 40
                 -
                     oid: p3
                     num_oid: .1.3.6.1.4.1.34278.2.1.{{ $index }}
@@ -155,10 +156,10 @@ modules:
                     group: 'Reactiv'
                     descr: 'L1'
                     skip_values:
-                    -
-                      oid: uLN1
-                      op: '<'
-                      value: 40		    
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
                 -
                     oid: qL2
                     num_oid: .1.3.6.1.4.1.34278.1.17.{{ $index }}
@@ -166,10 +167,10 @@ modules:
                     group: 'Reactiv'
                     descr: 'L2'
                     skip_values:
-                    -
-                      oid: uLN2
-                      op: '<'
-                      value: 40		    
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
                 -
                     oid: qL3
                     num_oid: .1.3.6.1.4.1.34278.1.18.{{ $index }}
@@ -177,10 +178,10 @@ modules:
                     group: 'Reactiv'
                     descr: 'L3'
                     skip_values:
-                    -
-                      oid: uLN3
-                      op: '<'
-                      value: 40		    
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
                 -
                     oid: qL4
                     num_oid: .1.3.6.1.4.1.34278.1.19.{{ $index }}
@@ -188,10 +189,10 @@ modules:
                     group: 'Reactiv'
                     descr: 'L4'
                     skip_values:
-                    -
-                      oid: uLN4
-                      op: '<'
-                      value: 40		    
+                        -
+                            oid: uLN4
+                            op: '<'
+                            value: 40
                 -
                     oid: q3
                     num_oid: .1.3.6.1.4.1.34278.2.2.{{ $index }}
@@ -204,40 +205,40 @@ modules:
                     index: sL1.{{ $index }}
                     descr: 'L1'
                     skip_values:
-                    -
-                      oid: uLN1
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
                 -
                     oid: sL2
                     num_oid: .1.3.6.1.4.1.34278.1.21.{{ $index }}
                     index: sL2.{{ $index }}
                     descr: 'L2'
                     skip_values:
-                    -
-                      oid: uLN2
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
                 -
                     oid: sL3
                     num_oid: .1.3.6.1.4.1.34278.1.22.{{ $index }}
                     index: sL3.{{ $index }}
                     descr: 'L3'
                     skip_values:
-                    -
-                      oid: uLN3
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
                 -
                     oid: sL4
                     num_oid: .1.3.6.1.4.1.34278.1.23.{{ $index }}
                     index: iL4.{{ $index }}
                     descr: 'L4'
                     skip_values:
-                    -
-                      oid: uLN4
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN4
+                            op: '<'
+                            value: 40
                 -
                     oid: s3
                     num_oid: .1.3.6.1.4.1.34278.2.3.{{ $index }}
@@ -254,10 +255,10 @@ modules:
                     descr: 'L1'
                     low_warn_limit: '0.9'
                     skip_values:
-                    -
-                      oid: uLN1
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
                 -
                     oid: cosPL2
                     num_oid: .1.3.6.1.4.1.34278.1.25.{{ $index }}
@@ -267,10 +268,10 @@ modules:
                     descr: 'L2'
                     low_warn_limit:  '0.9'
                     skip_values:
-                    -
-                      oid: uLN2
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
                 -
                     oid: cosPL3
                     num_oid: .1.3.6.1.4.1.34278.1.26.{{ $index }}
@@ -280,10 +281,10 @@ modules:
                     descr: 'L3'
                     low_warn_limit: '0.9'
                     skip_values:
-                    -
-                      oid: uLN3
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
                 -
                     oid: cosP4
                     num_oid: .1.3.6.1.4.1.34278.1.27.{{ $index }}
@@ -293,10 +294,10 @@ modules:
                     descr: 'L4'
                     low_warn_limit: '0.9'
                     skip_values:
-                    -
-                      oid: uLN4
-                      op: '<'
-                      value: 40		      
+                        -
+                            oid: uLN4
+                            op: '<'
+                            value: 40
                 -
                     oid: thdULN1
                     num_oid: .1.3.6.1.4.1.34278.7.1.{{ $index }}
@@ -305,10 +306,10 @@ modules:
                     divisor: 10
                     descr: 'L1'
                     skip_values:
-                    -
-                      oid: uLN1
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
                 -
                     oid: thdULN2
                     num_oid: .1.3.6.1.4.1.34278.7.2.{{ $index }}
@@ -317,10 +318,10 @@ modules:
                     divisor: 10
                     descr: 'L2'
                     skip_values:
-                    -
-                      oid: uLN2
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
                 -
                     oid: thdULN3
                     num_oid: .1.3.6.1.4.1.34278.7.3.{{ $index }}
@@ -329,10 +330,10 @@ modules:
                     divisor: 10
                     descr: 'L3'
                     skip_values:
-                    -
-                      oid: uLN3
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
                 -
                     oid: thdULN4
                     num_oid: .1.3.6.1.4.1.34278.7.4.{{ $index }}
@@ -341,10 +342,10 @@ modules:
                     divisor: 10
                     descr: 'L4'
                     skip_values:
-                    -
-                      oid: uLN4
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN4
+                            op: '<'
+                            value: 40
                 -
                     oid: thdIL1
                     num_oid: .1.3.6.1.4.1.34278.7.5.{{ $index }}
@@ -353,10 +354,10 @@ modules:
                     divisor: 10
                     descr: 'L1'
                     skip_values:
-                    -
-                      oid: uLN1
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN1
+                            op: '<'
+                            value: 40
                 -
                     oid: thdIL2
                     num_oid: .1.3.6.1.4.1.34278.7.6.{{ $index }}
@@ -365,10 +366,10 @@ modules:
                     divisor: 10
                     descr: 'L2'
                     skip_values:
-                    -
-                      oid: uLN2
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN2
+                            op: '<'
+                            value: 40
                 -
                     oid: thdIL3
                     num_oid: .1.3.6.1.4.1.34278.7.7.{{ $index }}
@@ -377,10 +378,10 @@ modules:
                     divisor: 10
                     descr: 'L3'
                     skip_values:
-                    -
-                      oid: uLN3
-                      op: '<'
-                      value: 40
+                        -
+                            oid: uLN3
+                            op: '<'
+                            value: 40
                 -
                     oid: thdIL4
                     num_oid: .1.3.6.1.4.1.34278.7.8.{{ $index }}
@@ -389,13 +390,13 @@ modules:
                     divisor: 10
                     descr: 'L4'
                     skip_values:
-                    -
-                      oid: uLN4
-                      op: '<'
-                      value: 40		    		      
+                        -
+                            oid: uLN4
+                            op: '<'
+                            value: 40
         frequency:
             options:
-                    divisor: 100
+                divisor: 100
             data:
                 -
                     oid: frequenz

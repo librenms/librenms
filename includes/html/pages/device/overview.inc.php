@@ -13,6 +13,7 @@ echo('
     <div class="col-md-6">
 ');
 require 'includes/html/dev-overview-data.inc.php';
+require 'includes/html/dev-groups-overview-data.inc.php';
 require 'overview/puppet_agent.inc.php';
 require 'overview/tracepath.inc.php';
 
@@ -64,6 +65,7 @@ require 'overview/sensors/chromatic_dispersion.inc.php';
 require 'overview/sensors/ber.inc.php';
 require 'overview/sensors/eer.inc.php';
 require 'overview/sensors/waterflow.inc.php';
+require 'overview/sensors/loss.inc.php';
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';

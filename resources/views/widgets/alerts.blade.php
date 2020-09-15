@@ -37,6 +37,7 @@
             }
         },
         url: "ajax_table.php",
+        navigation: ! {{ $hidenavigation }},
         rowCount: [50, 100, 250, -1]
     }).on("loaded.rs.jquery.bootgrid", function() {
         alerts_grid = $(this);

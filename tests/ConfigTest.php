@@ -26,14 +26,12 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
-use LibreNMS\DB\Eloquent;
-use ReflectionClass;
 
 class ConfigTest extends TestCase
 {
     private $config;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->config = new \ReflectionProperty(Config::class, 'config');
@@ -100,7 +98,7 @@ class ConfigTest extends TestCase
         $this->assertNull(Config::getOsSetting('nullos', 'unset'), 'Non-existing settings should return null');
         $this->assertFalse(Config::getOsSetting('nullos', 'unset', false), 'Non-existing settings should return $default');
         $this->assertTrue(Config::getOsSetting('nullos', 'fancy'), 'Failed to get setting');
-        $this->assertTrue(Config::getOsSetting('nullos', 'fallback'), 'Failed to fallback to global setting');
+        $this->assertNull(Config::getOsSetting('nullos', 'fallback'), 'Incorrectly loaded global setting');
     }
 
     public function testGetCombined()

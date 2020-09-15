@@ -3,9 +3,10 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - moduleSlotNo
-                    - moduleHwType
+                -
+                    oid:
+                        - moduleSlotNo
+                        - moduleHwType
         temperature:
             data:
                 -

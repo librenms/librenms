@@ -67,7 +67,7 @@ foreach ($menu_options as $option => $text) {
 $headeroptions = '<select name="type" id="type" onchange="window.open(this.options[this.selectedIndex].value,\'_top\')" class="devices-graphs-select">';
 $type = 'device';
 foreach (get_graph_subtypes($type) as $avail_type) {
-    $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+    $display_type = nicecase($avail_type);
     if ('graph_' . $avail_type == $vars['format']) {
         $is_selected = 'selected';
     } else {
@@ -202,7 +202,7 @@ if ($format == "graph") {
         $where .= " )";
     }
 
-    $query = "SELECT * FROM `devices`,locations WHERE devices.location_id = locations.id ";
+    $query = "SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1";
 
     if (isset($where)) {
         $query .= $where;
@@ -272,8 +272,6 @@ if ($format == "graph") {
 
     $os_selected = '""';
     if (isset($vars['os'])) {
-        $device = ['os' => $vars['os']];
-        load_os($device);
         $os_selected = json_encode(['id' => $vars['os'], 'text' => \LibreNMS\Config::getOsSetting($vars['os'], 'text', $vars['os'])]);
     }
 

@@ -55,12 +55,16 @@ class GitHub
         'billing' => [],
         'discovery' => [],
         'polling' => [],
+        'rancid' => [],
+        'oxidized' => [],
         'bug' => [],
         'refactor' => [],
         'cleanup' => [],
         'documentation' => [],
         'translation' => [],
+        'tests' => [],
         'misc' => [],
+        'dependencies' => [],
     ];
     protected $changelog_users = [];
     protected $changelog_mergers = [];
@@ -230,6 +234,11 @@ GRAPHQL;
                 }
             }
 
+            // If the Gihub profile doesnt exist anymore, the author is null
+            if (empty($pr['author'])) {
+                $pr['author'] = ['login' => 'ghost', 'url' => 'https://github.com/ghost'];
+            }
+
             // only add the changelog if it isn't set to ignore
             if (!in_array('ignore changelog', $pr['labels'])) {
                 $title = addcslashes(ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title']))), '<>');
@@ -237,7 +246,10 @@ GRAPHQL;
             }
 
             $this->recordUserInfo($pr['author']);
-            $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
+            // Let's not count self-merges
+            if ($pr['author']['login'] != $pr['mergedBy']['login']) {
+                $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
+            }
 
             $ignore = [$pr['author']['login'], $pr['mergedBy']['login']];
             foreach (array_unique($pr['reviews']['nodes'], SORT_REGULAR) as $reviewer) {
@@ -286,7 +298,7 @@ GRAPHQL;
         $tmp_markdown .= PHP_EOL;
 
         if (!empty($this->changelog_mergers)) {
-            $tmp_markdown .= "Thanks to maintainers that helped with pull requests this month:" . PHP_EOL . PHP_EOL;
+            $tmp_markdown .= "Thanks to maintainers and others that helped with pull requests this month:" . PHP_EOL . PHP_EOL;
             $tmp_markdown .= $this->formatUserList($this->changelog_mergers) . PHP_EOL;
         }
 

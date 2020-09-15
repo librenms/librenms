@@ -131,7 +131,7 @@ class YamlDiscovery
             $value = str_replace($search, $replace, $data[$name]);
 
             // search discovery data for values
-            $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
+            $value = preg_replace_callback('/{{ \$([a-zA-Z0-9\-.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
                 if (is_null($replace)) {
                     d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
@@ -260,10 +260,10 @@ class YamlDiscovery
         foreach ($skip_values as $skip_value) {
             if (is_array($skip_value) && $pre_cache) {
                 // Dynamic skipping of data
-                $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
+                $op = $skip_value['op'] ?? '!=';
                 $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
                 if (Str::contains($skip_value['oid'], '.')) {
-                    list($skip_value['oid'], $targeted_index) = explode('.', $skip_value['oid'], 2);
+                    [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
                     $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
                 }
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {

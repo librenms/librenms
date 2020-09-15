@@ -232,7 +232,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
       },
       error: function(){
-        $("#thanks").html('<div class="alert alert-info">An error occurred removing the token.</div>');
+        $("#thanks").html('<div class="alert alert-info">An error occurred creating the token.</div>');
         $("#create-token").modal('hide');
       }
     });

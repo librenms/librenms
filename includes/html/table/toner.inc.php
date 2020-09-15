@@ -19,10 +19,13 @@ use LibreNMS\Util\StringHelpers;
 
 $graph_type = 'toner_usage';
 
+$param = [];
 $sql = 'SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id';
 
 if (!empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `toner_descr` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE ? OR `toner_descr` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(*) FROM `toner`";

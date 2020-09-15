@@ -3,8 +3,7 @@ text: 'AIX'
 type: server
 icon: aix
 group: unix
-mib_dir:
-    - ibm
+mib_dir: ibm
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -22,6 +21,7 @@ discovery_modules:
     wireless: false
 processor_stacked: true
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.8072.3.2.15
-        - .1.3.6.1.4.1.2.3.1.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2.15
+            - .1.3.6.1.4.1.2.3.1.

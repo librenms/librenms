@@ -72,8 +72,8 @@ if (!empty(mres($_POST['user_func']))) {
 }
 
 if ($action == "test") {
-    $query = "SELECT * FROM `devices` WHERE `device_id` = $device_id LIMIT 1";
-    $device = dbFetchRow($query);
+    $query = "SELECT * FROM `devices` WHERE `device_id` = ? LIMIT 1";
+    $device = dbFetchRow($query, [$device_id]);
 
     $rawdata = snmp_get($device, $oid, '-Oqv');
 

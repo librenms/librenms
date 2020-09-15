@@ -3,11 +3,11 @@ text: 'Cambium cnPilot'
 type: wireless
 icon: cambium
 group: cambium
-mib_dir:
-    - cambium/cnpilote
+mib_dir: cambium/cnpilote
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_wireless_clients, text: 'Number of Clients' }
 discovery:
-    - sysObjectID:
+    -
+        sysObjectID:
             - .1.3.6.1.4.1.17713.22

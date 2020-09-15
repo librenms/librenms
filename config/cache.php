@@ -22,7 +22,8 @@ return [
     | not explicitly specified when executing a given caching function.
     |
     | Supported: "apc", "array", "database", "file",
-    |            "memcached", "redis", "dynamodb"    |
+    |            "memcached", "redis", "dynamodb"
+    |
     */
 
     'default' => env('CACHE_DRIVER', 'array'),
@@ -46,6 +47,7 @@ return [
 
         'array' => [
             'driver' => 'array',
+            'serialize' => false,
         ],
 
         'database' => [

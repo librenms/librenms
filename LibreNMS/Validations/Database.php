@@ -107,7 +107,7 @@ class Database extends BaseValidation
 
     private function checkMysqlEngine(Validator $validator)
     {
-        $db = Config::get('db_name', 'librenms');
+        $db = \config('database.connections.'.\config('database.default').'.database');
         $query = "SELECT `TABLE_NAME` FROM information_schema.tables WHERE `TABLE_SCHEMA` = '$db' && `ENGINE` != 'InnoDB'";
         $tables = dbFetchRows($query);
         if (!empty($tables)) {

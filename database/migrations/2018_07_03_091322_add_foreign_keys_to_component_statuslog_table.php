@@ -26,8 +26,10 @@ class AddForeignKeysToComponentStatuslogTable extends Migration
      */
     public function down()
     {
-        Schema::table('component_statuslog', function (Blueprint $table) {
-            $table->dropForeign('component_statuslog_ibfk_1');
-        });
+        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('component_statuslog', function (Blueprint $table) {
+                $table->dropForeign('component_statuslog_ibfk_1');
+            });
+        }
     }
 }

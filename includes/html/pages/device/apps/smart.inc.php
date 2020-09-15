@@ -1,6 +1,6 @@
 <?php
 
-$disks=get_disks_with_smart($device, $app['app_id']);
+$disks = get_arrays_with_application($device, $app['app_id'], 'smart');
 
 print_optionbar_start();
 

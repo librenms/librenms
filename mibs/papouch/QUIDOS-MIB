@@ -1,0 +1,312 @@
+--*********************************
+-- Quido.txt: MIB corespording to QUIDOSNMP-10.C
+--
+--
+-- September 2003 Steiger Miroslav
+-- Copyringht (c) 2003 by PaPouch elektronika
+
+--*********************************
+
+QUIDOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS  
+--      MODULE-IDENTITY,
+--      OBJECT-TYPE,
+--      NOTIFICATION-TYPE,
+                enterprises,
+                IpAddress,
+                Counter,
+                TimeTicks
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+                FROM RFC-1212    
+        DisplayString
+                FROM RFC1213-MIB
+        TRAP-TYPE
+                FROM RFC-1215
+    ;
+    
+papouchProjekt     OBJECT IDENTIFIER ::= { enterprises 18248 }
+--OID 1.3.6.1.4.1.18248.16
+quidos                 OBJECT IDENTIFIER ::= { papouchProjekt 16 }
+
+quido-var          OBJECT IDENTIFIER ::= { quidos 1 }
+table-in           OBJECT IDENTIFIER ::= { quidos 2 }   
+table-out          OBJECT IDENTIFIER ::= { quidos 3 } 
+table-term         OBJECT IDENTIFIER ::= { quidos 4 }
+
+--
+-- Type Definitions
+--
+
+PositiveInteger ::= INTEGER (0..65535)
+
+OnOff ::= INTEGER {
+                off (0),
+                on (1)
+        }
+
+StatCit ::= INTEGER {
+    none (0),
+    falling(1),
+    rising(2),
+    both(3)    
+}
+--OID 1.3.6.1.4.1.18248.16.1.1.0
+temperatureReading OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "temperature value / 10"
+::= { quido-var 1 }
+--OID 1.3.6.1.4.1.18248.16.1.2.0
+temperature-S-Reading OBJECT-TYPE
+    SYNTAX DisplayString
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION     "temperature value as string"
+::= { quido-var 2 }
+--OID 1.3.6.1.4.1.18248.16.1.3.0
+user-name OBJECT-TYPE
+    SYNTAX DisplayString
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION     "user name is user string"
+::= { quido-var 3 }
+--OID 1.3.6.1.4.1.18248.16.1.4.0
+device-msg OBJECT-TYPE
+    SYNTAX DisplayString
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION     "msg"
+::= { quido-var 4 }
+          
+temp-msg TRAP-TYPE
+        ENTERPRISE quido-var
+        VARIABLES {user-name,device-msg}
+                DESCRIPTION "tento trap je odesilan pri zmenach vstupu "
+            ::= 1
+   
+ ---
+ --- TABULKA PRO PARAMETRY VSTUPU
+ ---
+ inTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF InEntry
+        ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION     ""
+ ::= { table-in 1 }
+
+ inEntry OBJECT-TYPE
+        SYNTAX  InEntry
+        ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION     ""
+        INDEX   { index }
+ ::= { inTable 1 }
+
+ InEntry ::=
+    SEQUENCE {
+        in
+            OnOff,
+        in-name
+            DisplayString, 
+                citrwS
+                    StatCit,
+                citrw
+                    INTEGER
+    } 
+--
+-- parametry pro cteni vstupu
+--
+--OID 1.3.6.1.4.1.18248.16.2.1.1.1.1- len-in                 
+in  OBJECT-TYPE
+        SYNTAX          OnOff
+        ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "0 = OFF, 1 = ON"
+::= { inEntry 1 }   
+--
+-- parametry pro cteni nastaveni jmena vstupu
+--  
+--OID 1.3.6.1.4.1.18248.16.2.1.1.2.1- len-in 
+in-name OBJECT-TYPE
+    SYNTAX DisplayString
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION     "user name is user string"
+::= { inEntry 2 }
+--
+-- parametry pro cteni nastaveni citacu
+--  
+--OID 1.3.6.1.4.1.18248.16.2.1.1.3.1- len-in; max 60 
+citrwS OBJECT-TYPE
+        SYNTAX          StatCit
+        ACCESS          read-write
+        STATUS          current
+        DESCRIPTION     "0 = none, 1 = rising, 2 = falling, 3 = both"
+::= { inEntry 3 }
+--
+-- parametry pro cteni hodnoty citace popripade odecet od citace
+--                                
+--OID 1.3.6.1.4.1.18248.16.2.1.1.4.1- len-in; max 60
+citrw OBJECT-TYPE
+        SYNTAX          INTEGER (0..65535)
+        ACCESS          read-write
+        STATUS          current
+        DESCRIPTION     "cteni citacu nebo odecet od citace"
+::= { inEntry 4 } 
+---
+--- TABULKA PRO PARAMETRY VYSTUPU
+---               
+
+ outTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF OutEntry
+        ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION     ""
+ ::= { table-out 1 }
+
+ outEntry OBJECT-TYPE
+        SYNTAX  OutEntry
+        ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION     ""
+        INDEX   { index }
+ ::= { outTable 1 }
+
+OutEntry ::=
+    SEQUENCE {
+        out
+            OnOff,
+        out-name
+            DisplayString, 
+                outTwr
+                    INTEGER
+    } 
+ --
+-- parametry pro nastaveni cteni vystupu
+--  
+--OID 1.3.6.1.4.1.18248.16.3.1.1.1.1- len-out
+out OBJECT-TYPE
+        SYNTAX          OnOff
+        ACCESS          read-write
+        STATUS          current
+        DESCRIPTION     "0 = OFF, 1 = ON"
+::= { outEntry 1 }  
+--
+-- parametry pro cteni nastaveni jmena vystupu
+--
+--OID 1.3.6.1.4.1.18248.16.3.1.1.2.1- len-out   
+out-name OBJECT-TYPE
+    SYNTAX DisplayString
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION     "user name is user string"
+::= { outEntry 2 }
+--
+-- parametry pro nastaveni a cteni casu vystupu
+--                                
+--OID 1.3.6.1.4.1.18248.16.3.1.1.3.1- len-out
+outTwr OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          current
+        DESCRIPTION     "0 - 255"
+::= { outEntry 3 }
+---
+--- TABULKA PRO PARAMETRY HLIDANI TEPLOTY
+---
+ termTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF TermEntry
+        ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION     ""
+ ::= { table-term 1 }
+
+ termEntry OBJECT-TYPE
+        SYNTAX  TermEntry
+        ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION     ""
+        INDEX   { index }
+ ::= { termTable 1 }
+
+TermEntry ::=
+    SEQUENCE {
+        modeTerm
+            INTEGER,
+        mezHi
+            INTEGER, 
+        mezLo
+            INTEGER, 
+        time
+            INTEGER, 
+        err
+            INTEGER 
+    } 
+--OID 1.3.6.1.4.1.18248.16.4.1.1.1.1- len-out    
+modeTerm OBJECT-TYPE
+        SYNTAX          INTEGER(0..6)
+        ACCESS          read-write
+        STATUS          current
+        DESCRIPTION     "0 = vypnut,
+                     1 = prekroci li teplota hodnotu mezHi1 sepne rele1, klesne li pod hodnotu mezLo1 rozepne rele1
+                     2 = prekroci li teplota hodnotu mezHi1 rozepne rele1, klesne li pod hodnotu mezLo1 sepne rele1                  
+                     3 = prekroci li teplota hodnotu mezHi1 sepne rele1 na dobu v parametru time1.
+                         pri opetovnem prekroceni se udalost vyvola klesla li teplota od
+                         predchozi udalosti na hodnotu v mezLo1
+                     4 = prekroci li teplota hodnotu mezHi1 rozepne rele1 na dobu v parametru time1.
+                         pri opetovnem prekroceni se udalost vyvola klesla li teplota od
+                         predchozi udalosti na hodnotu v mezLo1   
+                     5 = klesne li teplota pod hodnotu mezLo1 sepne rele1 na dobu v parametru time1.
+                         pri opetovnem poklesu teploty se udalost vyvola stoupla li teplota od 
+                         predchozi udalosti na hodnotu v mezHi1   
+                     6 = klesne li teplota pod hodnotu mezLo1 sepne rele1 na dobu v parametru time1.
+                         pri opetovnem poklesu teploty se udalost vyvola stoupla li teplota od 
+                         predchozi udalosti na hodnotu v mezHi1                                                  
+                    "
+                     
+::= { termEntry 1 }
+--OID 1.3.6.1.4.1.18248.16.4.1.1.2.1- len-out
+ mezHi OBJECT-TYPE
+        SYNTAX          INTEGER(-550..1250)
+        ACCESS          read-write
+        STATUS          current
+        DESCRIPTION     "nastavuji horni mez teploty v intervalu -550 .. +1250
+                     zpusob zapisu: pozadovana hodnota * 10
+                     nesmi byt mensi nez mezLo1    
+                    "
+::= { termEntry 2 }
+--OID 1.3.6.1.4.1.18248.16.4.1.1.3.1- len-out
+mezLo OBJECT-TYPE
+        SYNTAX          INTEGER(-550..1250)
+        ACCESS          read-write
+        STATUS          current
+        DESCRIPTION     "nastavuji dolni mez teploty v intervalu -550 .. +1250
+                     zpusob zapisu: pozadovana hodnota * 10
+                     nesmi byt vetsi nez mezHi1    
+                    "
+::= { termEntry 3 }
+--OID 1.3.6.1.4.1.18248.16.4.1.1.4.1- len-out
+time OBJECT-TYPE
+        SYNTAX          INTEGER(0..255)
+        ACCESS          read-write
+        STATUS          current
+        DESCRIPTION     "zde je uvedena doba po kterou bude rele1 po vyvolani udalosti sepnuto nebo rozepnuto
+                     tato doba je ve vterinach
+                    "
+::= { termEntry 4 }
+--OID 1.3.6.1.4.1.18248.16.4.1.1.5.1- len-out
+err OBJECT-TYPE
+         SYNTAX         INTEGER(0..2)
+         ACCESS         read-write
+         STATUS         current
+         DESCRIPTION    "parametr urcujici v jakem stavu ma byt rele2 dojde li k chybe teplotniho cidla
+                         0 = nechat ve stavu ve kterem se rele nachazi
+                         1 = rozepnout rele2
+                         2 = sepnout rele2
+                        "
+::= { termEntry 5 }    
+    
+END

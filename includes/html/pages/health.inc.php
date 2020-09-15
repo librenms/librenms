@@ -45,6 +45,7 @@ $type_text = [
     'power_factor' => "Power Factor",
     'dbm' => "dBm",
     'load' => "Load",
+    'loss' => 'Loss',
     'state' => "State",
     'count' => "Count",
     'signal' => "Signal",

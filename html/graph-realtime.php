@@ -342,6 +342,7 @@ function handle_error(type) {
     if (real_interval !== 0) {
         SVGDoc.getElementById('cacheinterval').firstChild.data = Math.round(real_interval);
     }
+    return;
   } else {
     SVGDoc.getElementById("error").setAttributeNS(null, 'visibility', 'visible');
   }

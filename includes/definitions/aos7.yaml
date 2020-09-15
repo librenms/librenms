@@ -1,0 +1,16 @@
+os: aos7
+group: nokia
+text: 'Alcatel-Lucent OS'
+type: network
+ifXmcbc: true
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_temperature, text: 'Temperature' }
+icon: alcatellucent
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.6486.801. #aos7
+mib_dir: nokia/aos7

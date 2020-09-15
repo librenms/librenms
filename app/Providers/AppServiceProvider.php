@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use App\Facades\DeviceCache;
+use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-use App\Models\Sensor;
 use LibreNMS\Config;
 use LibreNMS\Permissions;
 use LibreNMS\Util\IP;
@@ -47,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
+        $this->bootObservers();
     }
 
     private function bootCustomBladeDirectives()
@@ -85,6 +85,7 @@ class AppServiceProvider extends ServiceProvider
             'sensor' => \App\Models\Sensor::class,
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
+            'location' => \App\Models\Location::class,
         ], $sensor_types));
     }
 
@@ -118,6 +119,11 @@ class AppServiceProvider extends ServiceProvider
                     return $app->make(\App\ApiClients\GoogleMapsApi::class);
             }
         });
+    }
+
+    private function bootObservers()
+    {
+        \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
     }
 
     private function bootCustomValidators()

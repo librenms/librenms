@@ -7,8 +7,8 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-mib_dir:
-    - cisco
+mib_dir: cisco
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.41916.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.41916.

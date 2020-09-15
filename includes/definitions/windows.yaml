@@ -4,12 +4,13 @@ text: 'Microsoft Windows'
 ifname: true
 processor_stacked: true
 bad_hrSystemUptime: true
-mib_dir:
-    - dell
+mib_dir: dell
 over:
-    - { graph: device_bits, text: Traffic }
-    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
 discovery:
-    - sysObjectID: .1.3.6.1.4.1.311.1.1.3
-    - sysDescr: Windows
+    -
+        sysObjectID: .1.3.6.1.4.1.311.1.1.3
+    -
+        sysDescr: Windows

@@ -4,10 +4,10 @@ text: 'Supermicro Switch'
 type: network
 icon: supermicro
 ifname: true
-mib_dir:
-    - supermicro
+mib_dir: supermicro
 discovery:
-    - sysDescr_regex:
-        - '/^Supermicro Switch/'
-        - '/^SSE-/'
-        - '/^SBM-/'
+    -
+        sysDescr_regex:
+            - '/^Supermicro Switch/'
+            - '/^SSE-/'
+            - '/^SBM-/'

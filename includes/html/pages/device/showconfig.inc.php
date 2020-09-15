@@ -46,7 +46,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if (Config::get('rancid_repo_type') == 'git') {
             $sep     = ' | ';
 
-            $process = new Process(array('git', 'log', '-n 8', '--pretty=format:%h;%ct', $rancid_file), $configs);
+            $process = new Process(array('git', 'log', '-n 8', '--pretty=format:%h;%ct', $rancid_file), $rancid_path);
             $process->run();
             $gitlogs_raw = explode(PHP_EOL, $process->getOutput());
             $gitlogs = array();
@@ -100,7 +100,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         } elseif (Config::get('rancid_repo_type') == 'git') {
             if (in_array($vars['rev'], $revlist)) {
-                $process = new Process(array('git', 'diff', $vars['rev'] . '^', $vars['rev'], $rancid_file), $configs);
+                $process = new Process(array('git', 'diff', $vars['rev'] . '^', $vars['rev'], $rancid_file), $rancid_path);
                 $process->run();
                 $diff = $process->getOutput();
                 if (!$diff) {
@@ -132,6 +132,12 @@ if (Auth::user()->hasGlobalAdmin()) {
         // fetch info about the node and then a list of versions for that node
         $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json'), true);
 
+        if (!empty($node_info['last']['start'])) {
+            $node_info['last']['start']=date(Config::get('dateformat.long'), strtotime($node_info['last']['start']));
+        }
+        if (!empty($node_info['last']['end'])) {
+            $node_info['last']['end']=date(Config::get('dateformat.long'), strtotime($node_info['last']['end']));
+        }
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
             // Adjust hostname based on whether domain was already in it or not

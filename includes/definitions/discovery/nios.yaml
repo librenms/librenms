@@ -3,8 +3,8 @@ modules:
     sensors:
         pre-cache:
             data:
-                - 
-                    oid: 
+                -
+                    oid:
                         - ibServiceName
                     snmp_flags: ['-OQUsb']
 

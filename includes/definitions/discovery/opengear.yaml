@@ -3,9 +3,10 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - ogCellModemTable
-                    - ogEmdTemperatureTable
+                -
+                    oid:
+                        - ogCellModemTable
+                        - ogEmdTemperatureTable
         temperature:
             data:
                 -

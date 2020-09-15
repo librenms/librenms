@@ -1,0 +1,21 @@
+os: endrun
+type: appliance
+group: unix
+mib_dir: endrun
+text: 'EndRun'
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+          oid: .1.3.6.1.4.1.13827.5.0.11.0
+          op: 'contains'
+          value: 'Tempus LX CDMA'
+    -
+      snmpget:
+          oid: .1.3.6.1.4.1.13827.12.1.16.0
+          op: 'contains'
+          value: 'Sonoma_D12'

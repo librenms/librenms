@@ -32,6 +32,45 @@ use LibreNMS\Config;
 class Html
 {
     /**
+     * return icon and color for application state
+     * @param string $app_state
+     * @return array
+     *
+     */
+    public static function appStateIcon($app_state)
+    {
+        switch ($app_state) {
+            case 'OK':
+                $icon = '';
+                $color = '';
+                $hover_text = 'OK';
+                break;
+            case 'ERROR':
+                $icon = 'fa-close';
+                $color = '#cc1122';
+                $hover_text = 'Error';
+                break;
+            case 'LEGACY':
+                $icon = 'fa-warning';
+                $color = '#eebb00';
+                $hover_text = 'legacy Agent Script';
+                break;
+            case 'UNSUPPORTED':
+                $icon = 'fa-flash';
+                $color = '#ff9900';
+                $hover_text = 'Unsupported Agent Script Version';
+                break;
+            default:
+                $icon = 'fa-question';
+                $color = '#777777';
+                $hover_text = 'Unknown State';
+                break;
+        }
+
+        return ['icon' => $icon, 'color' => $color, 'hover_text' => $hover_text];
+    }
+
+    /**
      * Print or return a row of graphs
      *
      * @param array $graph_array

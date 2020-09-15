@@ -177,15 +177,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
     $text = format_hostname($device, $text);
 
-    if ($device['snmp_disable']) {
-        $graphs = Config::get('os.ping.over');
-    } elseif (Config::has("os.{$device['os']}.over")) {
-        $graphs = Config::get("os.{$device['os']}.over");
-    } elseif (isset($device['os_group']) && Config::has("os.{$device['os_group']}.over")) {
-        $graphs = Config::get("os.{$device['os_group']}.over");
-    } else {
-        $graphs = Config::get('os.default.over');
-    }
+    $graphs = \LibreNMS\Util\Graph::getOverviewGraphsForDevice(DeviceCache::get($device['device_id']));
 
     $url = generate_device_url($device, $vars);
 
@@ -196,7 +188,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
     }
 
     if ($device['os']) {
-        $contents .= ' - ' . Config::get("os.{$device['os']}.text");
+        $contents .= ' - ' . Config::getOsSetting($device['os'], 'text');
     }
 
     if ($device['version']) {
@@ -1112,6 +1104,10 @@ function get_rules_from_json()
 
 function search_oxidized_config($search_in_conf_textbox)
 {
+    if (!Auth::user()->hasGlobalRead()) {
+        return false;
+    }
+
     $oxidized_search_url = Config::get('oxidized.url') . '/nodes/conf_search?format=json';
     $postdata = http_build_query(
         array(
@@ -1126,13 +1122,21 @@ function search_oxidized_config($search_in_conf_textbox)
         )
     );
     $context = stream_context_create($opts);
-    
+
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
     // Look up Oxidized node names to LibreNMS devices for a link
     foreach ($nodes as &$n) {
         $dev = device_by_name($n['node']);
         $n['dev_id'] = $dev ? $dev['device_id'] : false;
     }
+
+    /*
+    // Filter nodes we don't have access too
+    $nodes = array_filter($nodes, function($device) {
+        return \Permissions::canAccessDevice($device['dev_id'], Auth::id());
+    });
+    */
+
     return $nodes;
 }
 
@@ -1205,7 +1209,7 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
-        
+
         echo "<tr>
         <td>" . $device['device_id'] . "</td>
         <td>" . $object['name'] . "</td>
@@ -1281,12 +1285,13 @@ function get_postgres_databases($device_id)
  *
  * @param array $device device for which we get the rrd's
  * @param int   $app_id application id on the device
- * @param string  $category which category of seafile graphs are searched
+ * @param string  $category which category of graphs are searched
  * @return array list of entry data
  */
 function get_arrays_with_application($device, $app_id, $app_name, $category = null)
 {
     $entries = array();
+    $separator = '-';
 
     if ($category) {
         $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id, $category);
@@ -1294,10 +1299,13 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
         $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id);
     }
 
+    # app_name contains a separator character? consider it
+    $offset = substr_count($app_name, $separator);
+
     foreach (glob($pattern) as $rrd) {
         $filename = basename($rrd, '.rrd');
 
-        list(,,, $entry) = explode("-", $filename, 4);
+        $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
 
         if ($entry) {
             array_push($entries, $entry);
@@ -1305,86 +1313,6 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
     }
 
     return $entries;
-}
-
-/**
- * Get all certificate names from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of certificate names
- */
-function get_domains_with_certificates($device, $app_id)
-{
-    $app_name = 'certificate';
-    return get_arrays_with_application($device, $app_id, $app_name);
-}
-
-/**
- * Get all seafile data from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @param string $category which category of seafile graphs are searched
- * @return array list of seafile data
- */
-function get_arrays_with_seafile($device, $app_id, $category)
-{
-    $app_name = 'seafile';
-    return get_arrays_with_application($device, $app_id, $app_name, $category);
-}
-
-/**
- * Get all mdadm arrays from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of raid-arrays
- */
-function get_arrays_with_mdadm($device, $app_id)
-{
-    $app_name = 'mdadm';
-    return get_arrays_with_application($device, $app_id, $app_name);
-}
-
-/**
- * Get all disks (disk serial numbers) from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of disks
- */
-function get_disks_with_smart($device, $app_id)
-{
-    $app_name = 'smart';
-    return get_arrays_with_application($device, $app_id, $app_name);
-}
-
-/**
- * Gets all dashboards the user can access
- * adds in the keys:
- *   username - the username of the owner of each dashboard
- *   default - the default dashboard for the logged in user
- *
- * @param int $user_id optionally get list for another user
- * @return array list of dashboards
- */
-function get_dashboards($user_id = null)
-{
-    $user = is_null($user_id) ? Auth::user() : \App\Models\User::find($user_id);
-    $default = get_user_pref('dashboard');
-
-    return \App\Models\Dashboard::allAvailable($user)->with('user')->get()->map(function ($dashboard) use ($default) {
-        $dash = $dashboard->toArray();
-        $dash['username'] = $dashboard->user ? $dashboard->user->username : '';
-        $dash['default'] = $default == $dashboard->dashboard_id;
-
-        return $dash;
-    })->keyBy('dashboard_id')->all();
 }
 
 /**
@@ -1558,6 +1486,9 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     if ($sensor['sensor_class'] == 'runtime') {
         $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
         return "<span class='label $label_style'>".trim($sensor['sensor_current'])."</span>";
+    }
+    if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
+        return "<span class='label $label_style'>".trim($sensor['sensor_current'])." ".$unit."</span>";
     }
     return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
 }

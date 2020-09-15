@@ -347,7 +347,9 @@
         "ifname": {
             "type": "boolean"
         },
-        "mib_dir": {"$ref": "#/definitions/string_group"},
+        "mib_dir": {
+            "type":  "string"
+        },
         "good_if": {
             "type": "array",
             "items": {
@@ -368,9 +370,6 @@
         },
         "empty_ifdescr": {
             "type": "boolean"
-        },
-        "register_mibs": {
-            "type": "object"
         },
         "bad_if": {
             "type": "array",
@@ -533,7 +532,8 @@
                 "not_contains",
                 "not_regex",
                 "in_array",
-                "not_in_array"
+                "not_in_array",
+                "exists"
             ]
         }
     }

@@ -3,14 +3,13 @@ text: 'iBoot PDU'
 type: power
 icon: dataprobe
 rfc1628_compat: true
-mib_dir:
-    - dataprobe
+mib_dir: dataprobe
 over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
 discovery:
     -
-      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
-      sysDescr_regex:
-        - '/ibootpdu/'
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        sysDescr_regex:
+            - '/ibootpdu/'
