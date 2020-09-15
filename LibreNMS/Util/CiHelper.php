@@ -491,7 +491,7 @@ class CiHelper
         }
 
         echo "Running pip3 install to install developer dependencies.\n";
-        passthru("pip3 install $exec"); // probably wrong in other cases...
+        passthru("pip3 install --user $exec"); // probably wrong in other cases...
 
         if (is_executable($path)) {
             return $path;
