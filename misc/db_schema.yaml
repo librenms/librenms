@@ -1723,6 +1723,21 @@ services:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     services_device_id_index: { Name: services_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+services_template:
+  Columns:
+    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: service_template_ip, Type: text, 'Null': false, Extra: '' }
+    - { Field: service_template_type, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: service_template_desc, Type: text, 'Null': false, Extra: '' }
+    - { Field: service_template_param, Type: text, 'Null': false, Extra: '' }
+    - { Field: service_template_ignore, Type: tinyint, 'Null': false, Extra: '' }
+    - { Field: service_template_status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: service_template_changed, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: service_disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [service_template_id], Unique: true, Type: BTREE }
+    services_device_group_id_index: { Name: services_device_group_id_index, Columns: [device_template_id], Unique: false, Type: BTREE }
 session:
   Columns:
     - { Field: session_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
