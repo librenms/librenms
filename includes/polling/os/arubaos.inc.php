@@ -9,6 +9,7 @@ list(,,$hardware,,$version,) = str_replace($badchars, '', explode(' ', $device['
 $switch_info_oids = array(
     'wlsxSwitchRole',
     'wlsxSwitchMasterIp',
+    'wlsxSwitchLicenseSerialNumber',
 );
 echo 'Caching Oids: ';
 foreach ($switch_info_oids as $oid) {
@@ -23,3 +24,5 @@ if ($aruba_info[0]['wlsxSwitchRole'] == 'master') {
 } else {
     $features = 'Local Controller for '.$aruba_info[0]['wlsxSwitchMasterIp'];
 }
+
+$serial = $aruba_info[0]['wlsxSwitchLicenseSerialNumber'];
