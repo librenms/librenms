@@ -1,0 +1,50 @@
+os: packetfluxpfr
+text: 'Rack Injector'
+type: timing
+icon: packetflux
+over:
+    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_state, text: 'GPS Fix' }
+nobulk: true
+mib_dir:
+    - pfr
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.32050.1.3
+discovery_modules:
+    ports: false
+    ports-stack: false
+    entity-physical: false
+    processors: false
+    mempools: false
+    cisco-vrf-lite: false
+    ipv4-addresses: false
+    ipv6-addresses: false
+    storage: false
+    hr-device: false
+    discovery-protocols: false
+    bgp-peers: false
+    vlans: false
+    ucd-diskio: false
+    mef: false
+    wireless: false
+    ospf: false
+    applications: false
+    stp: false
+    ntp: false
+poller_modules:
+    storage: false
+    netstats: false
+    processors: false
+    mempools: false
+    hr-mib: false
+    ucd-mib: false
+    ports: false
+    bgp-peers: false
+    ucd-diskio: false
+    wireless: false
+    ospf: false
+    entity-physical: false
+    applications: false
+    stp: false
+    ntp: false
