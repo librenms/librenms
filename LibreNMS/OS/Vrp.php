@@ -243,7 +243,6 @@ class Vrp extends OS implements
                 }
             }
         }
-
     }
 
     /**

@@ -36,7 +36,6 @@ class Zxdsl extends \LibreNMS\OS
         if (preg_match('/^\.1\.3\.6\.1\.4\.1\.3902\.(1004|1015)\.(?<model>[^.]+)\.(?<variant>.*\.)1\.1\.1/', $device->sysObjectID, $matches)) {
             $device->hardware = "ZXDSL " . $matches['model'] . $this->parseVariant($matches['variant']);
         }
-
     }
 
     protected function parseVariant($oid)

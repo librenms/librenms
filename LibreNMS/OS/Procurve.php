@@ -46,6 +46,5 @@ class Procurve extends \LibreNMS\OS implements OSPolling
 
             $this->enableGraph('fdb_count');
         }
-
     }
 }

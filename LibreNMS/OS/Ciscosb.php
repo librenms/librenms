@@ -50,7 +50,7 @@ class Ciscosb extends OS implements OSDiscovery
 
         $hwversion = $data['0']['genGroupHWVersion'] ?? $data['1']['rlPhdUnitGenParamHardwareVersion'] ?? null;
         if ($hwversion) {
-            $device->hardware = trim ("$device->hardware $hwversion");
+            $device->hardware = trim("$device->hardware $hwversion");
         }
 
         $device->version = isset($data['1']['rlPhdUnitGenParamSoftwareVersion']) ? ('Software ' . $data['1']['rlPhdUnitGenParamSoftwareVersion']) : null;
@@ -63,6 +63,5 @@ class Ciscosb extends OS implements OSDiscovery
             $device->version .= ", Firmware $firmware";
         }
         $device->version = trim($device->version, ', ');
-
     }
 }

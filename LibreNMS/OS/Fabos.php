@@ -117,6 +117,4 @@ class Fabos extends OS implements OSDiscovery
 
         return $models[$model] ?? 'Unknown Brocade FC Switch';
     }
-
-
 }

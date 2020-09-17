@@ -45,9 +45,9 @@ class Panos extends \LibreNMS\OS implements OSPolling
         if (is_numeric($data[0]['panSessionActive'])) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
 
-            $fields = array(
+            $fields = [
                 'sessions' => $data[0]['panSessionActive'],
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDevice(), 'panos-sessions', $tags, $fields);
@@ -58,9 +58,9 @@ class Panos extends \LibreNMS\OS implements OSPolling
         if (is_numeric($data[0]['panSessionActiveTcp'])) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions_tcp', 'GAUGE', 0, 3000000);
 
-            $fields = array(
+            $fields = [
                 'sessions_tcp' => $data[0]['panSessionActiveTcp'],
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDevice(), 'panos-sessions-tcp', $tags, $fields);
@@ -71,9 +71,9 @@ class Panos extends \LibreNMS\OS implements OSPolling
         if (is_numeric($data[0]['panSessionActiveUdp'])) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions_udp', 'GAUGE', 0, 3000000);
 
-            $fields = array(
+            $fields = [
                 'sessions_udp' => $data[0]['panSessionActiveUdp'],
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDevice(), 'panos-sessions-udp', $tags, $fields);
@@ -84,9 +84,9 @@ class Panos extends \LibreNMS\OS implements OSPolling
         if (is_numeric($data[0]['panSessionActiveICMP'])) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions_icmp', 'GAUGE', 0, 3000000);
 
-            $fields = array(
+            $fields = [
                 'sessions_icmp' => $data[0]['panSessionActiveICMP'],
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDevice(), 'panos-sessions-icmp', $tags, $fields);
@@ -97,9 +97,9 @@ class Panos extends \LibreNMS\OS implements OSPolling
         if (is_numeric($data[0]['panSessionActiveSslProxy'])) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions_ssl', 'GAUGE', 0, 3000000);
 
-            $fields = array(
+            $fields = [
                 'sessions_ssl' => $data[0]['panSessionActiveSslProxy'],
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDevice(), 'panos-sessions-ssl', $tags, $fields);
@@ -110,9 +110,9 @@ class Panos extends \LibreNMS\OS implements OSPolling
         if (is_numeric($data[0]['panSessionSslProxyUtilization'])) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions_sslutil', 'GAUGE', 0, 3000000);
 
-            $fields = array(
+            $fields = [
                 'sessions_sslutil' => $data[0]['panSessionSslProxyUtilization'],
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDevice(), 'panos-sessions-sslutil', $tags, $fields);
@@ -123,15 +123,14 @@ class Panos extends \LibreNMS\OS implements OSPolling
         if (is_numeric($data[0]['panGPGWUtilizationActiveTunnels'])) {
             $rrd_def = RrdDefinition::make()->addDataset('activetunnels', 'GAUGE', 0, 3000000);
 
-            $fields = array(
+            $fields = [
                 'activetunnels' => $data[0]['panGPGWUtilizationActiveTunnels'],
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDevice(), 'panos-activetunnels', $tags, $fields);
 
             $this->enableGraph('panos_activetunnels');
         }
-
     }
 }

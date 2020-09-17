@@ -51,7 +51,6 @@ class Siklu extends OS implements
         $device->version = $data['rbSwBank1Running.0'] == 'running' ? $data['rbSwBank1Version.0'] : $data['rbSwBank2Version.0'];
         $device->hardware = $device->sysDescr;
         $device->serial = $data['entPhysicalSerialNum.1'];
-
     }
 
     /**

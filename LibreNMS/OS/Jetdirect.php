@@ -45,5 +45,4 @@ class Jetdirect extends \LibreNMS\OS\Shared\Printer
             $device->hardware = ucfirst($hardware);
         }
     }
-
 }

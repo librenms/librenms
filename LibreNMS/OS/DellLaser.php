@@ -25,7 +25,6 @@
 
 namespace LibreNMS\OS;
 
-
 use App\Models\Device;
 
 class DellLaser extends \LibreNMS\OS

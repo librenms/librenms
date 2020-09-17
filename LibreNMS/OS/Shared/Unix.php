@@ -25,7 +25,6 @@
 
 namespace LibreNMS\OS\Shared;
 
-
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
