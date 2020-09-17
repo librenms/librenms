@@ -14,7 +14,7 @@
                     "type": "server",
                     "serial": null,
                     "icon": "beagleboard.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

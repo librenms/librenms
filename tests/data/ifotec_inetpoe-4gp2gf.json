@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "0051",
                     "icon": "ifotec.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
