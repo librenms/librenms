@@ -105,6 +105,16 @@ function delete_service($service = null)
     return dbDelete('services', '`service_id` =  ?', array($service));
 }
 
+function discover_service($device, $service)
+{
+    if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service, $device['device_id']))) {
+        add_service($device, $service, "(Auto discovered) $service");
+        log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
+        echo '+';
+    }
+    echo "$service ";
+}
+
 function add_service_template($device_group, $type, $desc, $param = "", $ignore = 0, $disabled = 0)
 {
 
@@ -170,13 +180,18 @@ function delete_service_template($service_template = null)
     return dbDelete('services_template', '`service_template_id` =  ?', array($service_template));
 }
 
-function discover_service($device, $service)
+function discover_service_template($device_group_id, $service_template_id)
 {
-    if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service, $device['device_id']))) {
-        add_service($device, $service, "(Auto discovered) $service");
+    if (! dbFetchCell('SELECT COUNT(service_template_id) FROM `services_template` WHERE `service_template_type`= ? AND `device_group_id` = ?', array($service_template_id, $device_group['device_group_id']))) {
+        $service=service_template_get($device_group_id, $service_template_id);
+        $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
+        foreach ($device_ids as $device) {
+            add_service($device, $service);
+        }    
         log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
         echo '+';
     }
+
     echo "$service ";
 }
 
