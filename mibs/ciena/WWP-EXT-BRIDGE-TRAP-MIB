@@ -1,0 +1,115 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-EXT-BRIDGE-TRAP-MIB.my
+ --
+ --
+
+ WWP-EXT-BRIDGE-TRAP-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   TimeTicks, Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY			
+	FROM SNMPv2-SMI			
+   DisplayString, MacAddress, TEXTUAL-CONVENTION, RowStatus, TruthValue			
+	FROM SNMPv2-TC
+   sysName, sysLocation
+        FROM RFC1213-MIB
+   wwpPortId, wwpPortType, wwpPortName, wwpPortAdminStatus, 
+   wwpPortOperStatus
+        FROM WWP-EXT-BRIDGE-MIB 						
+   wwpModules			
+	FROM WWP-SMI;
+
+	
+ wwpExtBridgeTrapMIB MODULE-IDENTITY
+	    LAST-UPDATED "200210271700Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "This MIB module defines Traps for the wwp-ext-bridge mib."
+	    REVISION    "200210271700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModules 41 }
+
+ --
+ -- Node definitions
+ --
+	
+ wwpExtBridgeTrapMIBObjects OBJECT IDENTIFIER ::= { wwpExtBridgeTrapMIB 1 }
+ 
+ -- Notifications 
+ 
+ wwpExtBridgeTrapMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpExtBridgeTrapMIB 2 } 
+ wwpExtBridgeTrapMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpExtBridgeTrapMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpExtBridgeTrapMIBConformance OBJECT IDENTIFIER ::= { wwpExtBridgeTrapMIB 3 } 
+ wwpExtBridgeTrapMIBCompliances OBJECT IDENTIFIER ::= { wwpExtBridgeTrapMIBConformance 1 } 		
+ wwpExtBridgeTrapMIBGroups      OBJECT IDENTIFIER ::= { wwpExtBridgeTrapMIBConformance 2 }
+
+ wwpStndLinkUpDownTrapsEnable OBJECT-TYPE
+     SYNTAX       TruthValue       
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Setting this object to 'false(2)' will cause
+	      standard Link Up Down Traps to be suppressed." 
+     DEFVAL { true }
+     ::= { wwpExtBridgeTrapMIBObjects 1 }
+     
+ wwpLinkUpDownTrapsEnable OBJECT-TYPE
+     SYNTAX       TruthValue       
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Setting this object to 'true(1)' will cause
+	      wwp specific port up down trap to be generated." 
+     DEFVAL { false }
+     ::= { wwpExtBridgeTrapMIBObjects 2 }
+                
+ wwpLinkUp  NOTIFICATION-TYPE
+	OBJECTS	   {  sysName,
+	              sysLocation, 
+	              wwpPortId,
+		      wwpPortName,  
+		      wwpPortType,
+		      wwpPortAdminStatus,
+		      wwpPortOperStatus   
+		   }
+	STATUS	   current
+	DESCRIPTION  
+		"A wwpLinkUp trap signifies that the SNMP entity, acting in
+                 an agent role, has detected that the ifOperStatus object for
+                 one of its communication links has entered the up state."
+	::= { wwpExtBridgeTrapMIBNotifications 1 } 
+	
+
+ wwpLinkDown  NOTIFICATION-TYPE
+	OBJECTS	   { sysName,
+	             sysLocation,
+		     wwpPortId,
+		     wwpPortType,
+		     wwpPortName,
+		     wwpPortAdminStatus,
+		     wwpPortOperStatus   
+		   }
+	STATUS	   current
+	DESCRIPTION  
+		"A wwpLinkDown trap signifies that the SNMP entity, acting in
+                 an agent role, has detected that the ifOperStatus object for
+                 one of its communication links has entered the down state."
+	::= { wwpExtBridgeTrapMIBNotifications 2 } 
+ 
+ END
+ 
+ --
+ -- WWP-EXT-BRIDGE-TRAP-MIB
+ --

@@ -1,0 +1,323 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-DNS-CLIENT-MIB.my
+ --
+
+ WWP-LEOS-DNS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 
+    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY			
+	FROM SNMPv2-SMI			
+    DisplayString, RowStatus
+	FROM SNMPv2-TC
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    wwpModulesLeos			
+	FROM WWP-SMI;
+	 
+ wwpLeosDnsClientMIB MODULE-IDENTITY
+    LAST-UPDATED "201203200700Z"
+    ORGANIZATION
+	     "   Ciena Inc"
+    CONTACT-INFO
+	     "   Mib Meister
+	 	 115 North Sullivan Road
+		 Spokane Valley, WA 99037
+		     	USA		 		
+		      	Phone:  +1 509 242 9000
+			Email:  support@ciena.com"
+
+     DESCRIPTION
+	     "A MIB module to manage dns client on the
+	     WWP products."
+     REVISION    "201203200700Z"
+     DESCRIPTION
+             "Add new MIB OIDs to support IP protocol version 
+              independent Inet addressing.
+              New attributes include: wwpLeosDnsServerInetAddr,
+              wwpLeosDnsServerInetAddrType."
+     REVISION    "200303191012Z"
+     DESCRIPTION
+	     "Initial Creation"
+     ::= { wwpModulesLeos 16 }
+
+
+ --
+ -- Node definitions
+ --	
+ 
+ wwpLeosDnsClientMIBObjects OBJECT IDENTIFIER ::= { wwpLeosDnsClientMIB 1 }
+ 
+ wwpLeosDnsClient  OBJECT IDENTIFIER ::= { wwpLeosDnsClientMIBObjects 1 }
+ 
+ -- Notifications 
+
+ wwpLeosDnsClientMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosDnsClientMIB 2 } 
+ wwpLeosDnsClientMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosDnsClientMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosDnsClientMIBConformance OBJECT IDENTIFIER ::= { wwpLeosDnsClientMIB 3 } 
+ wwpLeosDnsClientMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosDnsClientMIBConformance 1 } 		
+ wwpLeosDnsClientMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosDnsClientMIBConformance 2 }
+ 
+ -- The system wide parameters
+
+ wwpLeosDnsClientStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+			enabled(1),
+			disabled(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Specifies whether or not the DNS client resolver is enabled or disabled."     
+     ::= { wwpLeosDnsClient 1 }    
+
+ wwpLeosDnsClientDhcpDomainName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Specifies the admin domain name configured by dhcp for this device."     
+     ::= { wwpLeosDnsClient 2 }
+
+  wwpLeosDnsClientDhcpDomainNameState OBJECT-TYPE
+     SYNTAX      INTEGER {
+			enabled(1),
+			disabled(2)
+		 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Specifies if wwpLeosDnsClientDhcpDomainName is enabled or disabled."     
+     ::= { wwpLeosDnsClient 3 }
+ 
+ wwpLeosDnsClientUserDomainName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Specifies the admin domain name configured by user for this device."     
+     ::= { wwpLeosDnsClient 4 }
+
+  wwpLeosDnsClientUserDomainNameState OBJECT-TYPE
+     SYNTAX      INTEGER {
+			enabled(1),
+			disabled(2)
+		 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Specifies if wwpLeosDnsClientUserDomainName is enabled or disabled."     
+     ::= { wwpLeosDnsClient 5 }
+      
+ -- -------------------------------------------------------------
+ -- The DNS Server Table
+ -- -------------------------------------------------------------
+ -- Each row in this table defines a dns name server 
+ --
+
+ wwpLeosDnsServerTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosDnsServerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A table containing configured DNS Servers information.
+	      To create entry in this table use SNMP multiple set
+	      operation.
+	      Following mib objects must be set to create valid entry
+	      wwpLeosDnsServerAddr, wwpLeosDnsServerStatus"
+     ::= { wwpLeosDnsClient 6}
+
+ wwpLeosDnsServerEntry OBJECT-TYPE
+     SYNTAX      WwpLeosDnsServerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "Defines the information pertaining to a configured DNS Server."
+     INDEX  { wwpLeosDnsServerIndex }
+     ::= { wwpLeosDnsServerTable 1 }
+
+ WwpLeosDnsServerEntry ::= SEQUENCE {
+        wwpLeosDnsServerIndex          Integer32,
+	wwpLeosDnsServerAddr           IpAddress,
+	wwpLeosDnsServerUserPriority   Integer32,
+	wwpLeosDnsServerDhcpPriority   Integer32,
+	wwpLeosDnsServerScope          INTEGER,
+	wwpLeosDnsServerStatus         RowStatus,
+        wwpLeosDnsServerInetAddrType   InetAddressType,
+	wwpLeosDnsServerInetAddr       InetAddress
+     } 
+ 
+ wwpLeosDnsServerIndex OBJECT-TYPE
+     SYNTAX      Integer32 (1..10)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "The unique index in DNS server table."
+     ::= { wwpLeosDnsServerEntry 1 }
+
+ wwpLeosDnsServerAddr OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The IP address for the configured DNS Server.
+              wwpLeosDnsServerInetAddr cannot be set at the same time.
+              This OID will be set to 0.0.0.0 when the server has an IPv6 address,
+              which is shown in the wwpLeosDnsServerInetAddr and the 
+              wwpLeosDnsServerInetAddrType is set to ipv6.  For a server with an
+              IPv4 address, the ip address will be shown in this OID and the
+              wwpLeosDnsServerInetAddr with the wwpLeosDnsServerInetAddrType
+              set to ipv4."
+     ::= { wwpLeosDnsServerEntry 2 }
+ 
+ wwpLeosDnsServerUserPriority OBJECT-TYPE
+     SYNTAX      Integer32 (1..10)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The priority of the dns server configured by user."
+     ::= { wwpLeosDnsServerEntry 3 } 
+
+ wwpLeosDnsServerDhcpPriority OBJECT-TYPE
+     SYNTAX      Integer32 (1..10)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The priority of the dns server configured by DHCP."
+     ::= { wwpLeosDnsServerEntry 4 }
+
+ wwpLeosDnsServerScope OBJECT-TYPE
+     SYNTAX      INTEGER {
+			user(1),
+			dhcp(2),
+			both(3)
+		  }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The object specifies the scope of this entry.
+	      Scope of the entry means who configured this entry.
+	      dhcp or user or both"
+     ::= { wwpLeosDnsServerEntry 5 }
+ 
+ wwpLeosDnsServerStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "This object is used to create and delete rows in the
+	      wwpLeosDnsServerTable. To create a new row the 
+	      management station must set the object to 
+	      'CreateAndGo'."
+     ::= { wwpLeosDnsServerEntry 6 }
+ 
+ wwpLeosDnsServerInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The Inet address type for the configured DNS Server.
+              Used in conjunction with wwpLeosDnsServerInetAddr. When set to:
+                ipv4 : wwpLeosDnsServerInetAddr should be compliant with 
+                       InetAddressIPv4 from RFC 4001
+                ipv6 : wwpLeosDnsServerInetAddr should be compliant with
+                       InetAddressIPv6 from RFC 4001"
+     ::= { wwpLeosDnsServerEntry 7 }
+ 
+ wwpLeosDnsServerInetAddr OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The Inet address for the configured DNS Server. This OID must
+              be used in conjunction with wwpLeosDnsServerInetAddrType.
+              The InetAddress specified here will be compliant with RFC 4001."
+     ::= { wwpLeosDnsServerEntry 8 }
+ 
+ -- 
+ -- Added extension to wwpLeosDnsServerTable table
+ --
+ wwpLeosDnsServerExtTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosDnsServerExtEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "This table is an extension for wwpLeosDnsServerTable table.
+	      This table allows to set more attributes for DNS wwpLeosDnsServerTable
+	      table"
+     ::= { wwpLeosDnsClient 7}
+
+ wwpLeosDnsServerExtEntry OBJECT-TYPE
+     SYNTAX      WwpLeosDnsServerExtEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "Defines the information pertaining to a configured DNS Server."
+     INDEX  { wwpLeosDnsServerIndex }
+     ::= { wwpLeosDnsServerExtTable 1 }
+
+ WwpLeosDnsServerExtEntry ::= SEQUENCE {        
+	wwpLeosDnsServerAdminState	INTEGER,
+	wwpLeosDnsServerOperState	INTEGER	
+     } 
+
+ wwpLeosDnsServerAdminState OBJECT-TYPE
+     SYNTAX      INTEGER {
+			disabled(1),
+			enabled(2)			
+		  }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The object specifies the user admin state of this entry. User
+	      can configure this to enable | disable."
+     ::= { wwpLeosDnsServerExtEntry 1 }
+
+ wwpLeosDnsServerOperState OBJECT-TYPE
+     SYNTAX      INTEGER {
+			disabled(1),
+			enabled(2)
+		  }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The object specifies the operational state of this entry."
+     ::= { wwpLeosDnsServerExtEntry 2 } 
+
+ --
+ -- module compliance  
+ --
+ wwpLeosDnsServerEntryCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION
+           "The compliance statement of the wwpLeosDnsClient MIB."
+       MODULE
+
+       GROUP    wwpLeosDnsServerEntryIpv6Group
+       DESCRIPTION
+           "This group is mandatory when IPv6 addresses are supported."
+
+       OBJECT  wwpLeosDnsServerInetAddrType
+       SYNTAX  InetAddressType { ipv4(1), ipv6(2) }
+       DESCRIPTION
+           "An implementation is only required to support IPv4
+            and IPv6 addresses without zone indices."
+       ::= { wwpLeosDnsClientMIBCompliances 1 }
+
+ wwpLeosDnsServerEntryIpv6Group OBJECT-GROUP
+       OBJECTS { wwpLeosDnsServerInetAddrType, wwpLeosDnsServerInetAddr }
+       STATUS  current
+       DESCRIPTION "DNS server entry objects for IPv6 address."
+       ::= { wwpLeosDnsClientMIBGroups 1 }
+END
+
+ --
+ -- WWP-LEOS-DNS-CLIENT-MIB.my
+ --
+ 

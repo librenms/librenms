@@ -1,0 +1,1864 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+WWP-LEOS-LLDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Integer32, Unsigned32, Counter32, TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeStamp, TruthValue
+        FROM SNMPv2-TC
+    --SnmpAdminString
+      --  FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+  --  TimeFilter
+    --    FROM RMON2-MIB
+    wwpModules, wwpModulesLeos			
+	    FROM WWP-SMI
+    AddressFamilyNumbers
+         FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB;
+
+wwpLeosLldpMIB MODULE-IDENTITY
+    LAST-UPDATED "200404180000Z"
+    ORGANIZATION "IEEE 802.1AB Workgroup"
+    CONTACT-INFO "The Institute of Electrical and Electronics Engineers, Inc.
+                  3 Park Avenue, 
+                  New York, NY 10016-5997, USA
+
+                  http://grouper.ieee.org/groups/802/1/index.html"
+    DESCRIPTION
+            "The MIB module for LLDP configuration, statistics, local
+            system data and remote systems data components."
+
+    REVISION        "200404180000Z"
+    DESCRIPTION
+            "Whole MIB deprecated."
+    REVISION        "200304230000Z"
+    DESCRIPTION
+            "Initial Version."
+   ::= { wwpModulesLeos 26 }
+
+wwpLeosLldpMIBObjects               OBJECT IDENTIFIER ::= { wwpLeosLldpMIB 1 }
+
+-- LLDP MIB groups
+
+wwpLeosLldpConfiguration            OBJECT IDENTIFIER ::= { wwpLeosLldpMIBObjects 1 }
+wwpLeosLldpStatistics               OBJECT IDENTIFIER ::= { wwpLeosLldpMIBObjects 2 }
+wwpLeosLldpLocalSystemData          OBJECT IDENTIFIER ::= { wwpLeosLldpMIBObjects 3 }
+wwpLeosLldpRemoteSystemsData        OBJECT IDENTIFIER ::= { wwpLeosLldpMIBObjects 4 }
+wwpLeosLldpExtentions               OBJECT IDENTIFIER ::= { wwpLeosLldpMIBObjects 5 }
+wwpLeosLldpGlobalAtts               OBJECT IDENTIFIER ::= { wwpLeosLldpMIBObjects 6 }
+ 
+-- Notifications 
+  
+wwpLeosLldpNotifMIBNotificationPrefix OBJECT IDENTIFIER ::= { wwpLeosLldpMIB 3 } 
+wwpLeosLldpNotifMIBNotification       OBJECT IDENTIFIER ::= { wwpLeosLldpNotifMIBNotificationPrefix 0 }
+
+
+-- textual conventions
+TimeFilter ::= TEXTUAL-CONVENTION
+    STATUS        deprecated
+    DESCRIPTION
+
+
+
+
+
+        "To be used for the index to a table.  Allows an application
+        to download only those rows changed since a particular time.
+        A row is considered changed if the value of any object in the
+        row changes or if the row is created or deleted.
+
+        When sysUpTime is equal to zero, this table shall be empty.
+
+        One entry exists for each past value of sysUpTime, except that
+        the whole table is purged should sysUpTime wrap.
+
+        As this basic row is updated new conceptual rows are created
+        (which still share the now updated object values with all
+        other instances).  The number of instances which are created
+        is determined by the value of sysUpTime at which the basic row
+        was last updated.  One instance will exist for each value of
+        sysUpTime at the last update time for the row.  A new
+        timeMark instance is created for each new sysUpTime value.
+        Each new conceptual row will be associated with the timeMark
+        instance which was created at the value of sysUpTime with
+        which the conceptual row is to be associated.
+
+        By definition all conceptual rows were updated at or after
+        time zero and so at least one conceptual row (associated with
+        timeMark.0) must exist for each underlying (basic) row.
+
+        See the appendix for further discussion of this variable.
+
+        Consider the following fooTable:
+
+        fooTable ...
+        INDEX { fooTimeMark, fooIndex }
+
+        FooEntry {
+           fooTimeMark  TimeFilter
+           fooIndex     INTEGER,
+           fooCounts    Counter
+        }
+
+        Should there be two basic rows in this table (fooIndex == 1,
+        fooIndex == 2) and row 1 was updated most recently at time 6,
+        while row 2 was updated most recently at time 8, and both rows
+        had been updated on several earlier occasions such that the
+        deprecated values were 5 and 9 respectively then the following
+        fooCounts instances would exist.
+
+        fooCounts.0.1  5
+        fooCounts.0.2  9
+        fooCounts.1.1  5
+
+
+
+
+
+        fooCounts.1.2  9
+        fooCounts.2.1  5
+        fooCounts.2.2  9
+        fooCounts.3.1  5
+        fooCounts.3.2  9
+        fooCounts.4.1  5
+        fooCounts.4.2  9
+        fooCounts.5.1  5
+        fooCounts.5.2  9
+        fooCounts.6.1  5
+        fooCounts.6.2  9
+        fooCounts.7.2  9    -- note that row 1 doesn't exist for
+        fooCounts.8.2  9    -- times 7 and 8"
+    SYNTAX    TimeTicks
+
+SnmpAdminString ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "255a"
+       STATUS       deprecated
+       DESCRIPTION "An octet string containing administrative
+                    information, preferably in human-readable form.
+
+                    To facilitate internationalization, this
+                    information is represented using the ISO/IEC
+                    IS 10646-1 character set, encoded as an octet
+                    string using the UTF-8 transformation format
+
+                    described in [RFC2279].
+
+                    Since additional code points are added by
+                    amendments to the 10646 standard from time
+                    to time, implementations must be prepared to
+                    encounter any code point from 0x00000000 to
+                    0x7fffffff.  Byte sequences that do not
+                    correspond to the valid UTF-8 encoding of a
+                    code point or are outside this range are
+                    prohibited.
+
+                    The use of control codes should be avoided.
+
+                    When it is necessary to represent a newline,
+                    the control code sequence CR LF should be used.
+
+                    The use of leading or trailing white space should
+                    be avoided.
+
+                    For code points not directly supported by user
+                    interface hardware or software, an alternative
+                    means of entry and display, such as hexadecimal,
+                    may be provided.
+
+                    For information encoded in 7-bit US-ASCII,
+                    the UTF-8 encoding is identical to the
+                    US-ASCII encoding.
+
+                    UTF-8 may require multiple bytes to represent a
+                    single character / code point; thus the length
+                    of this object in octets may be different from
+                    the number of characters encoded.  Similarly,
+                    size constraints refer to the number of encoded
+                    octets, not the number of characters represented
+                    by an encoding.
+
+                    Note that when this TC is used for an object that
+                    is used or envisioned to be used as an index, then
+                    a SIZE restriction MUST be specified so that the
+                    number of sub-identifiers for any object instance
+                    does not exceed the limit of 128, as defined by
+                    [RFC1905].
+
+                    Note that the size of an SnmpAdminString object is
+                    measured in octets, not characters.
+                   "
+       SYNTAX       OCTET STRING (SIZE (0..255))
+
+
+WwpLeosLldpChassisIdType ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+            "This TC describes the source of a chassis identifier.
+
+            The enumeration 'entPhysicalAlias(1)' represents a chassis
+            identifier based on the value of entPhysicalAlias for
+            a chassis component (i.e., an entPhysicalClass value of
+            'chassis(3)').
+
+            The enumeration 'ifAlias(2)' represents a chassis identifier
+            based on the value of ifAlias for an interface on the
+            containing chassis.
+
+            The enumeration 'portEntPhysicalAlias(3)' represents a
+            chassis identifier based on the value of entPhysicalAlias for
+            a port component (i.e., entPhysicalClass value of 'port(10)'),
+            within the containing chassis.
+
+            The enumeration 'backplaneEntPhysicalAlias(4)' represents a
+            chassis identifier based on the value of entPhysicalAlias
+            for backplane component (i.e., entPhysicalClass value of
+            'backplane(4)'), within the containing chassis.
+
+            The enumeration 'macAddress(5)' represents a chassis
+            identifier based on the value of a unicast source MAC address
+            (encoded in network byte order and IEEE 802.3 canonical bit
+            order), of a port on the containing chassis.
+
+            The enumeration 'networkAddress(6)' represents a chassis
+            identifier based on a network address, associated with
+            a particular chassis.  The encoded address is actually
+            composed of two fields.  The first field is a single octet,
+            representing the IANA AddressFamilyNumbers value for the
+            specific address type, and the second field is the network
+            address value.
+
+            The enumeration 'local(7)' represents a chassis identifier
+            based on a locally defined value."
+    SYNTAX  INTEGER {
+            entPhysicalAlias(1),
+            ifAlias(2),
+            portEntPhysicalAlias(3),
+            backplaneEntPhysicalAlias(4),
+            macAddress(5),
+            networkAddress(6),
+            local(7)
+    }
+
+WwpLeosLldpChassisId ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+
+    DESCRIPTION
+            "This TC describes the format of a chassis identifier string.
+            Objects of this type are always used with an associated
+            WwpLeosLldpChassisIdType object, which identifies the format of
+            the particular WwpLeosLldpChassisId object instance.
+
+            If the associated ChassisIdType object has a value of
+            'entPhysicalAlias(1)', then the octet string identifies
+            a particular instance of the entPhysicalAlias object for
+            a chassis component (i.e., an entPhysicalClass value of
+            'chassis(3)').
+
+            If the associated WwpLeosLldpChassisIdType object has a value of
+            'ifAlias(2)', then the octet string identifies a particular
+            instance of the ifAlias object for an interface on the
+            containing chassis.
+
+            If the associated WwpLeosLldpChassisIdType object has a value of
+            'portEntPhysicalAlias(3)', then the octet string identifies
+            a particular instance of the entPhysicalAlias object for a
+            port component within the containing chassis.
+
+            If the associated WwpLeosLldpChassisIdType object has a value
+            of 'backplaneEntPhysicalAlias(4)', then the octet string
+            identifies a particular instance of the entPhysicalAlias
+            object for the backplane component within the containing
+            chassis.
+
+            If the associated ChassisIdType object has a value of
+            'macAddress(5)', then this string identifies a particular
+            unicast source MAC address (encoded in network byte order
+            and IEEE 802.3 canonical bit order), of a port on the
+            containing chassis.
+
+            If the associated ChassisIdType object has a value of
+            'networkAddress(6)', then this string identifies a particular
+            network address, encoded in network byte order, associated
+            with one or more ports on the containing chassis.  The first
+            octet contains the IANA Address Family Numbers enumeration
+            value for the specific address type, and octets 2 through
+            N contain the network address value in network byte order.
+
+            If the associated ChassisIdType object has a value of
+            'local(7)', then this string identifies a locally assigned
+            Chassis ID."
+    SYNTAX      OCTET STRING (SIZE (1..255))
+
+WwpLeosLldpPortIdType ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+            "This TC describes the source of a particular type of port
+            identifier used in the LLDP MIB.
+
+            The enumeration 'ifAlias(1)' represents a port identifier
+            based on the ifAlias MIB object.
+
+            The enumeration 'portEntPhysicalAlias(2)' represents a port
+            identifier based on the value of entPhysicalAlias for a
+            port component (i.e., entPhysicalClass value of 'port(10)'),
+            within the containing chassis.
+
+            The enumeration 'backplaneEntPhysicalAlias(3)' represents
+            a port identifier based on the value of entPhysicalAlias
+            for a backplane component (i.e., entPhysicalClass value of
+            'backplane(4)'), within the containing chassis.
+
+            The enumeration 'macAddress(4)' represents a port identifier
+            based on a unicast source MAC address, which has been detected
+            by the agent and associated with a particular port.
+
+            The enumeration 'networkAddress(5)' represents a port
+            identifier based on a network address, detected by the agent
+            and associated with a particular port.
+
+            The enumeration 'local(6)' represents a port identifier
+            based on a value locally assigned."
+
+    SYNTAX  INTEGER {
+            ifAlias(1),
+            portEntPhysicalAlias(2),
+            backplaneEntPhysicalAlias(3),
+            macAddress(4),
+            networkAddress(5),
+            local(6)
+    }
+
+WwpLeosLldpPortId ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+            "This TC describes the format of a port identifier string.
+            Objects of this type are always used with an associated
+            WwpLeosLldpPortIdType object, which identifies the format of the
+            particular WwpLeosLldpPortId object instance.
+
+            If the associated WwpLeosLldpPortIdType object has a value of
+            'ifAlias(1)', then the octet string identifies a
+            particular instance of the ifAlias object.
+
+            If the associated WwpLeosLldpPortIdType object has a value of
+            'portEntPhysicalAlias(2)', then the octet string
+            identifies a particular instance of the entPhysicalAlias
+            object for a port component (i.e., entPhysicalClass value of
+            'port(10)').
+
+            If the associated LlpdPortIdType object has a value
+            of 'backplaneEntPhysicalAlias(3)', then the
+            octet string identifies a particular instance of the
+            entPhysicalAlias object for a backplane component (i.e.,
+            entPhysicalClass value of 'port(4)').
+
+            If the associated WwpLeosLldpPortIdType object has a value of
+            'macAddr(4)', then this string identifies a
+            particular unicast source MAC address associated with
+            the port.
+
+            If the associated WwpLeosLldpPortIdType object has a value of
+            'networkAddress(5)', then this string identifies a network
+            address associated with the port.  The first octet contains
+            the IANA AddressFamilyNumbers enumeration value for the
+            specific address type, and octets 2 through N contain the
+            networkAddress address value in network byte order.
+
+            If the associated WwpLeosLldpPortIdType object has a value of
+            'local(6)', then this string identifies a locally
+            assigned port ID."
+    SYNTAX      OCTET STRING (SIZE (1..255))
+
+WwpLeosLldpManAddrIfSubtype ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+            "This TC describes the basis of a particular type of
+            management address interface used in the LLDP MIB.
+
+            The enumeration 'unknown(1)' represents the case where the
+            interface is not known.
+
+            The enumeration 'ifIndex(2)' represents interface identifier
+            based on the ifIndex MIB object.
+
+            The enumeration 'systemPortNumber(3)' represents interface
+            identifier based on the system port numbering convention."
+    SYNTAX  INTEGER {
+            unknown(1),
+            ifIndex(2),
+            systemPortNumber(3)
+    }
+
+WwpLeosLldpManAddress ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+            "The value of a management address."
+    SYNTAX      OCTET STRING (SIZE (1..31))
+
+
+WwpLeosLldpSystemCapabilitiesMap ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+            "This TC describes the system capabilities.
+
+            The bit 'repeater(0)' indicates that the system has repeater
+            capability.
+
+            The bit 'bridge(1)' indicates that the system has bridge
+            capability.
+
+            The bit 'accessPoint(2)' indicates that the system has access
+            point capability.
+
+            The bit 'router(3)' indicates that the system has router
+            capability.
+
+            The bit 'telephone(4)' indicates that the system has telephone
+            capability.
+
+            The bit 'wirelessStation(5)' indicates that the system has
+            wireless Station capability.
+
+            The bit 'stationOnly(6)' indicates that the system has only
+            station capability and nothing else."
+    SYNTAX  BITS {
+            repeater(0),
+            bridge(1),
+            accessPoint(2),
+            router(3),
+            telephone(4),
+            wirelessStation(5),
+            stationOnly(6)
+    }
+
+
+WwpLeosLldpPortNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS deprecated 
+    DESCRIPTION
+            "Each port contained in the chassis (that is known to the
+            LLDP agent) is uniquely identified by a port number.
+            A port number has no mandatory relationship to an
+            interface number (of the interfaces MIB.)  However, if
+            interfaces MIB is present, it is strongly recommended that
+            a port number has the same value as the corresponding
+            interface's interface number.
+
+            Port numbers are in the range (1..1024) since a particular 
+            port is also represented by the corresponding port number bit
+            in LldpPortList.  For more information about the LldpPortList, 
+            please refer to 'LldpPortList' TC description."
+    SYNTAX 	Integer32(1..1024)
+
+WwpLeosLldpPortList ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+            "Each octet within this value specifies a set of eight ports,
+            with the first octet specifying ports 1 through 8, the second
+            octet specifying ports 9 through 16, etc.  Within each octet,
+            the most significant bit represents the lowest numbered port,
+            and the least significant bit represents the highest numbered
+            port.  Thus, each port of the system is represented by a
+            single bit within the value of this object.  If that bit has
+            a value of '1' then that port is included in the set of ports;
+            the port is not included if its bit has a value of '0'."
+    REFERENCE 
+            "description is taken from RFC 2674, Section 5"
+    SYNTAX  OCTET STRING
+
+-- 
+-- ***********************************************************
+-- 
+--                  L L D P    C O N F I G 
+-- 
+-- *********************************************************** 
+--
+
+wwpLeosLldpMessageTxInterval OBJECT-TYPE
+    SYNTAX      Integer32(5..32768)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+            "The interval at which LLDP frames are transmitted on
+            behalf of this LLDP agent.
+
+            The default value for lldpMessageTxInterval object is
+            30 seconds.
+
+            If the agent is capable of storing non-volatile
+            configuration, then the value of this object must be restored
+            after a re-initialization of the management system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 10.5.5.3"
+    DEFVAL     { 30 }
+    ::= { wwpLeosLldpConfiguration 1 }
+
+wwpLeosLldpMessageTxHoldMultiplier OBJECT-TYPE
+    SYNTAX      Integer32(2..10)
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+            "The time-to-live value expressed as a multiple of the
+            wwpLeosLldpMessageTxInterval object.  The actual time-to-live value
+            used in LLDP frames, transmitted on behalf of this LLDP agent,
+            can be expressed by the following formula: TTL = min(65535,
+            (wwpLeosLldpMessageTxInterval * wwpLeosLldpMessageTxHoldMultiplier)) For
+            example, if the value of wwpLeosLldpMessageTxInterval is '30', and
+            the value of wwpLeosLldpMessageTxHoldMultiplier is '4', then the
+            value '120' is encoded in the TTL field in the LLDP header.
+
+            The default value for wwpLeosLldpMessageTxHoldMultiplier object is 4.
+
+            If the agent is capable of storing non-volatile configuration,
+            then the value of this object must be restored after a
+            re-initialization of the management system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 10.5.5.3"
+    DEFVAL      { 4 }    
+    ::= { wwpLeosLldpConfiguration 2 }
+
+wwpLeosLldpReinitDelay OBJECT-TYPE
+    SYNTAX      Integer32(1..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+            "The wwpLeosLldpReinitDelay indicates the delay (in units
+            of seconds) from when adminStatus becomes 'disable' until
+            re-initialization will be attempted.
+
+            The default value for wwpLeosLldpReintDelay object is one second.
+
+            If the agent is capable of storing non-volatile configuration,
+            then the value of this object must be restored after a
+            re-initialization of the management system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 10.5.3.3"
+    DEFVAL      { 1 }    
+    ::= { wwpLeosLldpConfiguration 3 }
+
+wwpLeosLldpTxDelay OBJECT-TYPE
+    SYNTAX      Integer32(1..8192)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+            "The wwpLeosLldpTxDelay indicates the delay (in units
+            of seconds) between successive LLDP frame transmissions 
+            initiated by value/status changes in the LLDP local systems
+            MIB.  The recommended value for the wwpLeosLldpTxDelay is set by the
+            following  formula:
+
+               1 <= wwpLeosLldpTxDelay <= (0.25 * wwpLeosLldpMessageTxInterval)
+
+            The default value for wwpLeosLldpTxDelay object is 8 seconds.
+
+            If the agent is capable of storing non-volatile configuration,
+            then the value of this object must be restored after a
+            re-initialization of the management system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 10.5.3.3"
+    DEFVAL      { 8 }    
+    ::= { wwpLeosLldpConfiguration 4 }
+
+--
+-- wwpLeosLldpPortConfigTable: LLDP configuration on a per port basis
+--
+
+wwpLeosLldpPortConfigTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The table that controls LLDP frame transmission on individual
+            ports."
+    ::= { wwpLeosLldpConfiguration 5 }
+
+wwpLeosLldpPortConfigEntry   OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "LLDP configuration information for a particular port.
+            The port must be contained in the same chassis as the LLDP
+            agent. This configuration parameter controls the transmission
+            and the reception of LLDP frames on those ports whose rows
+            are created in this table."
+     INDEX  { wwpLeosLldpPortConfigPortNum }
+    ::= { wwpLeosLldpPortConfigTable 1 }
+
+WwpLeosLldpPortConfigEntry ::= SEQUENCE {
+      wwpLeosLldpPortConfigPortNum          WwpLeosLldpPortNumber,
+      wwpLeosLldpPortConfigAdminStatus      INTEGER,
+      wwpLeosLldpPortConfigTLVsTxEnable     BITS,
+      wwpLeosLldpPortConfigStatsClear       TruthValue,
+      wwpLeosLldpPortConfigOperPortSpeed    Unsigned32,
+      wwpLeosLldpPortConfigReqPortSpeed		Unsigned32
+      }
+
+wwpLeosLldpPortConfigPortNum   OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortNumber 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      deprecated
+    DESCRIPTION
+            "The index value used to identify the port component
+            (contained in the local chassis with the LLDP agent)
+            associated with this entry.
+
+            The value of this object is used as a port index to the
+            wwpLeosLldpPortConfigTable."
+    ::= { wwpLeosLldpPortConfigEntry 1 }
+
+wwpLeosLldpPortConfigAdminStatus  OBJECT-TYPE 
+    SYNTAX INTEGER { 
+       txOnly(1), 
+       rxOnly(2),
+       txAndRx(3),
+       disabled(4)
+    }
+    MAX-ACCESS read-write 
+    STATUS     deprecated 
+    DESCRIPTION 
+            "The administratively desired status of the local LLDP agent.
+
+            If the associated wwpLeosLldpPortConfigAdminStatus object has a
+            value of 'txOnly(1)', then this port will transmit LLDP
+            frames only and it will not store any information about the
+            remote systems connected.
+         
+            If the associated wwpLeosLldpPortConfigAdminStatus object has a value
+            of 'rxOnly(2)', then this port will receive LLDP frames only.
+
+            If the associated wwpLeosLldpPortConfigAdminStatus object has a
+            value of 'txAndRx(3)', then this port will transmit and
+            receive LLDP frames.
+
+            If the associated wwpLeosLldpPortConfigAdminStatus object has a
+            value of 'disabled(4)', then this port will not transmit or
+            receive LLDP frames."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.5.1"
+    DEFVAL      { 3 }    
+   ::= { wwpLeosLldpPortConfigEntry 2 } 
+
+wwpLeosLldpPortConfigTLVsTxEnable OBJECT-TYPE
+    SYNTAX      BITS {
+            portDesc(4),
+            sysName(5),
+            sysDesc(6),
+            sysCap(7)
+    }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+            "The wwpLeosLldpTLVsTxEnable, defined as a bitmap, includes the
+            basic set of LLDP TLVs whose transmission is allowed on the
+            local LLDP agent by the network management.  Each bit in the
+            bitmap corresponds to a TLV type associated with a specific
+            optional TLV.  Some of the bits, such as 0 through 3, are
+            not included in the bitmap since they represent mandatory
+            TLVs that all LLDP agents should transmit.
+
+            It should be noted that the organizationally defined TLVs
+            are excluded from the wwpLeosLldpTLVsTxEnable bitmap.
+            
+            LLDP Organization Specific Information Extension MIBs should
+            have similar configuration object to control transmission
+            of their organizationally defined TLVs.
+
+            The bit 'portDesc(4)' indicates that LLDP agent should
+            transmit 'Port Description TLV'.
+
+            The bit 'sysName(5)' indicates that LLDP agent should transmit
+            'System Name TLV'.
+
+            The bit 'sysDesc(6)' indicates that LLDP agent should transmit
+            'System Description TLV'.
+
+            The bit 'sysCap(7)' indicates that LLDP agent should transmit
+            'System Capabilities TLV'.
+
+            There is no bit reserved for the management address TLV type
+            since transmission of management address TLVs are controlled
+            by another object, wwpLeosLldpConfigManAddrTable.
+
+            If the agent is capable of storing non-volatile configuration,
+            then the value of this object must be restored after a
+            re-initialization of the management system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 10.2.1.1"
+    DEFVAL  { { portDesc, sysName, sysDesc, sysCap } }
+--          the default value is the hexadecimal representation of
+--          the bitmap includes the the following bits: portDesc(4),
+--          sysName(5), sysDesc(6), sysCap(7)
+    ::= { wwpLeosLldpPortConfigEntry 3 } 
+    
+ wwpLeosLldpPortConfigStatsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Setting this object to 'true' will clear the LLDP statistics of given port."
+        ::= { wwpLeosLldpPortConfigEntry 4 }
+        
+ wwpLeosLldpPortConfigOperPortSpeed OBJECT-TYPE
+ 	SYNTAX		Unsigned32
+ 	MAX-ACCESS  read-only
+ 	STATUS      current
+ 	DESCRIPTION "The current egress bandwidth of the port in kbps."
+ 		::= { wwpLeosLldpPortConfigEntry 5 }
+ 		
+ wwpLeosLldpPortConfigReqPortSpeed OBJECT-TYPE
+ 	SYNTAX		Unsigned32
+ 	MAX-ACCESS  read-only
+ 	STATUS      current
+ 	DESCRIPTION "The requested egress bandwidth of the port in kbps.  If no request
+ 	             to change the egress bandwidth has been made, this value will be 0."
+ 		::= { wwpLeosLldpPortConfigEntry 6 }
+ 		
+
+--
+-- wwpLeosLldpManAddrConfigTxPortsTable : selection of management addresses
+--                                 to be transmitted on a specified set
+--                                 of ports.
+-- 
+
+wwpLeosLldpConfigManAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpConfigManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The table that controls selection of LLDP management address
+            TLV instances to be transmitted on individual ports."
+    ::= { wwpLeosLldpConfiguration 6 }
+
+wwpLeosLldpConfigManAddrEntry  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpConfigManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "LLDP configuration information that specifies the set
+            of ports (represented as a PortList) on which the local
+            system management address instance will be transmitted.
+
+            This configuration object augments the wwpLeosLldpLocManAddrEntry,
+            therefore it is only present along with the management
+            address instance contained in the associated
+            wwpLeosLldpLocManAddrEntry entry.
+
+            If the agent is capable of storing non-volatile configuration,
+            then each active wwpLeosLldpManAddrConfigTxPortsEntry must be
+            re-created (along with the corresponding wwpLeosLldpLocManAddrEntry)
+            after a re-initialization of the management system."
+    AUGMENTS { wwpLeosLldpLocManAddrEntry }
+    ::= { wwpLeosLldpConfigManAddrTable 1 }
+
+WwpLeosLldpConfigManAddrEntry  ::= SEQUENCE {
+      wwpLeosLldpManAddrPortsTxEnable  WwpLeosLldpPortList
+}
+
+wwpLeosLldpManAddrPortsTxEnable  OBJECT-TYPE
+    SYNTAX        WwpLeosLldpPortList
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+            "a set of ports that are identified by a PortList, in which
+            each port is represented as a bit.  The corresponding local
+            system management address instance will be transmitted on
+            the member ports of the wwpLeosLldpManAddrPortsTxEnable."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 10.2.1.1"
+    ::= { wwpLeosLldpConfigManAddrEntry 1 }
+
+
+--
+--  *********************************************************** 
+--
+--                   L L D P    S T A T S 
+--
+--  *********************************************************** 
+--
+-- LLDP Stats Group
+
+wwpLeosLldpStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION 
+            "A table containing LLDP statistics for individual ports.
+            Entries are not required to exist in this table while the
+            lldpPortConfigEntry object is equal to 'disabled(4)'."
+::= { wwpLeosLldpStatistics 1 } 
+
+wwpLeosLldpStatsEntry   OBJECT-TYPE
+     SYNTAX      WwpLeosLldpStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      deprecated
+     DESCRIPTION
+             "LLDP frame statistics for a particular port.  The port
+             must be contained in the same chassis as the LLDP agent.
+            
+             All statistical counter values in a particular entry shall
+             be maintained on a continuing basis and shall not be deleted
+             upon expiration of rxInfoTTL timing counters in the LLDP
+             remote systems MIB of the receipt of a shutdown frame from
+             a remote LLDP agent.  
+
+             All statistical counters associated with a particular
+             port on the local LLDP agent become frozen whenever the
+             adminStatus is disabled for the same port."
+     INDEX  { wwpLeosLldpStatsPortNum }
+     ::= { wwpLeosLldpStatsTable 1 } 
+
+WwpLeosLldpStatsEntry ::= SEQUENCE {      
+      wwpLeosLldpStatsPortNum               WwpLeosLldpPortNumber,
+      wwpLeosLldpStatsFramesDiscardedTotal  Counter32,
+      wwpLeosLldpStatsFramesInErrors        Counter32,
+      wwpLeosLldpStatsFramesInTotal         Counter32,
+      wwpLeosLldpStatsFramesOutTotal        Counter32,
+      wwpLeosLldpStatsTLVsInErrors          Counter32,
+      wwpLeosLldpStatsTLVsDiscardedTotal    Counter32,
+      wwpLeosLldpStatsTLVsUnrecognizedTotal Counter32,
+      wwpLeosLldpCounterDiscontinuityTime   TimeStamp
+}
+
+wwpLeosLldpStatsPortNum   OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortNumber 
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The index value used to identify the port component
+            (contained in the local chassis with the LLDP agent)
+            associated with this entry.
+
+            The value of this object is used as a port index to the
+            lldpStatsTable."
+    ::= { wwpLeosLldpStatsEntry 1 } 
+
+wwpLeosLldpStatsFramesDiscardedTotal OBJECT-TYPE 
+    SYNTAX        Counter32
+    MAX-ACCESS read-only
+    STATUS     deprecated 
+    DESCRIPTION 
+            "The number of LLDP frames received by this LLDP agent on
+            the indicated port, and then discarded for any reason.
+            This counter can provide an indication that LLDP header
+            formatting problems may exist with the local LLDP agent in
+            the sending system or that LLDPDU validation problems may
+            exit with the local LLDP agent in the receiving system.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other times
+            as indicated by the value of wwpLeosLldpCounterDiscontinuityTime."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 11.4.2"
+   ::= { wwpLeosLldpStatsEntry 2 } 
+
+wwpLeosLldpStatsFramesInErrors  OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+            "The number of invalid LLDP frames received by this LLDP
+            agent on the indicated port, while this LLDP agent is enabled.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other times
+            as indicated by the value of wwpLeosLldpCounterDiscontinuityTime."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 11.4.2"
+    ::= { wwpLeosLldpStatsEntry 3 }
+
+wwpLeosLldpStatsFramesInTotal OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+            "The number of valid LLDP frames received by this LLDP agent
+            on the indicated port, while this LLDP agent is enabled.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other times
+            as indicated by the value of wwpLeosLldpCounterDiscontinuityTime."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 11.4.2"
+    ::= { wwpLeosLldpStatsEntry 4 }
+
+wwpLeosLldpStatsFramesOutTotal  OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+            "The number of LLDP frames transmitted by this LLDP agent
+            on the indicated port.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other times
+            as indicated by the value of wwpLeosLldpCounterDiscontinuityTime."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 11.4.2"
+    ::= { wwpLeosLldpStatsEntry 5 }
+
+wwpLeosLldpStatsTLVsInErrors  OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+            "The number of erroneous LLDP TLVs received by this LLDP
+            agent on the indicated port.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other times
+            as indicated by the value of wwpLeosLldpCounterDiscontinuityTime."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 11.4.2"
+    ::= { wwpLeosLldpStatsEntry 6 }
+
+wwpLeosLldpStatsTLVsDiscardedTotal OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+            "The number of LLDP TLVs discarded for any reason by this LLDP
+            agent on the indicated port.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other times
+            as indicated by the value of wwpLeosLldpCounterDiscontinuityTime."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 11.4.2"
+    ::= { wwpLeosLldpStatsEntry 7 }
+
+wwpLeosLldpStatsTLVsUnrecognizedTotal  OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+            "The number of LLDP TLVs received on the given port that
+            are not recognized by this LLDP agent on the indicated port.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other times
+            as indicated by the value of wwpLeosLldpCounterDiscontinuityTime."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 11.4.2"
+    ::= { wwpLeosLldpStatsEntry 8 }
+
+wwpLeosLldpCounterDiscontinuityTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "This object is defined to record the time of the last
+            discontinuity in statistics counters of the indicated port.
+            The relevant counters are the specific instances associated
+            with this port of any Counter32 objects contained in the
+            wwpLeosLldpStatsTable.  If no such discontinuities have occurred
+            since the last re-initialization of the local management
+            subsystem, then this object contains a zero value."
+    ::= { wwpLeosLldpStatsEntry 9 }
+
+
+--  ***********************************************************
+--
+--          L O C A L    S Y S T E M    D A T A
+--
+--  ***********************************************************
+
+wwpLeosLldpLocChassisType  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpChassisIdType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The type of encoding used to identify the chassis
+            associated with the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.2.2"
+    ::= { wwpLeosLldpLocalSystemData 1 }
+
+wwpLeosLldpLocChassisId  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpChassisId
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the chassis component
+            associated with the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.2.3"
+    ::= { wwpLeosLldpLocalSystemData 2 }
+
+wwpLeosLldpLocSysName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the system name of the
+            local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.6.2"
+    ::= { wwpLeosLldpLocalSystemData 3 }
+
+wwpLeosLldpLocSysDesc  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the system description
+            of the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.7.2"
+    ::= { wwpLeosLldpLocalSystemData 4 }
+
+wwpLeosLldpLocSysCapSupported OBJECT-TYPE
+    SYNTAX      WwpLeosLldpSystemCapabilitiesMap
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The bitmap value used to identify which system capabilities
+            are supported on the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.8.2"
+    ::= { wwpLeosLldpLocalSystemData 5 }
+
+wwpLeosLldpLocSysCapEnabled  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpSystemCapabilitiesMap
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The bitmap value used to identify which system capabilities
+            are enabled on the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.8.3"
+    ::= { wwpLeosLldpLocalSystemData 6 }
+
+
+--
+-- wwpLeosLldpLocPortTable : Port specific Local system data
+--
+
+wwpLeosLldpLocPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpLocPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This table contains one or more rows per port information
+            associated with the local system known to this agent."
+    ::= { wwpLeosLldpLocalSystemData 7 }
+
+wwpLeosLldpLocPortEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLldpLocPortEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "Information about a particular port component.
+
+            Entries may be created and deleted in this table by the
+            agent."
+    INDEX   { wwpLeosLldpLocPortNum }
+    ::= { wwpLeosLldpLocPortTable 1 }
+
+WwpLeosLldpLocPortEntry ::= SEQUENCE {
+      wwpLeosLldpLocPortNum         WwpLeosLldpPortNumber,
+      wwpLeosLldpLocPortType               WwpLeosLldpPortIdType,
+      wwpLeosLldpLocPortId                 WwpLeosLldpPortId,
+      wwpLeosLldpLocPortDesc               SnmpAdminString
+}
+
+wwpLeosLldpLocPortNum  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The index value used to identify the port component
+            (contained in the local chassis with the LLDP agent)
+            associated with this entry.
+            
+            The value of this object is used as a port index to the
+            wwpLeosLldpLocPortTable."
+    ::= { wwpLeosLldpLocPortEntry 1 }
+
+wwpLeosLldpLocPortType  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortIdType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The type of port identifier encoding used in the associated
+            'wwpLeosLldpLocPortId' object."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.3.2"
+    ::= { wwpLeosLldpLocPortEntry 2 }
+
+wwpLeosLldpLocPortId  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortId
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the port component
+            associated with a given port in the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.3.3"
+    ::= { wwpLeosLldpLocPortEntry 3 }
+
+wwpLeosLldpLocPortDesc  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the 802 LAN station's port
+            description associated with the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.5.2"
+    ::= { wwpLeosLldpLocPortEntry 4 }
+
+
+--
+-- wwpLeosLldpLocManAddrTable : Management addresses of the local system
+--
+
+wwpLeosLldpLocManAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpLocManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This table contains one row per management address
+            information on the local system known to this agent."
+    ::= { wwpLeosLldpLocalSystemData 8 }
+
+wwpLeosLldpLocManAddrEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLldpLocManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "Management address information about a particular chassis
+            component.  There may be multiple management addresses
+            configured on the system identified by a particular
+            wwpLeosLldpLocChassisId.  Each management address should have
+            distinct 'management address type' (wwpLeosLldpLocManAddrType) and
+            'management address' (wwpLeosLldpLocManAddr.)
+
+            Entries may be created and deleted in this table by the
+            agent."
+    INDEX   { wwpLeosLldpLocManAddrType,
+              wwpLeosLldpLocManAddr }
+    ::= { wwpLeosLldpLocManAddrTable 1 }
+
+WwpLeosLldpLocManAddrEntry ::= SEQUENCE {
+      wwpLeosLldpLocManAddrType       AddressFamilyNumbers,
+      wwpLeosLldpLocManAddr           WwpLeosLldpManAddress,
+      wwpLeosLldpLocManAddrLen        Integer32,
+      wwpLeosLldpLocManAddrIfSubtype  WwpLeosLldpManAddrIfSubtype,
+      wwpLeosLldpLocManAddrIfId       Integer32,
+      wwpLeosLldpLocManAddrOID        OBJECT IDENTIFIER
+}
+
+wwpLeosLldpLocManAddrType  OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The type of management address identifier encoding used in
+            the associated 'wwpLeosLldpLocManagmentAddr' object."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.3"
+    ::= { wwpLeosLldpLocManAddrEntry 1 }
+
+wwpLeosLldpLocManAddr  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpManAddress
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the management address
+            component associated with the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.4"
+    ::= { wwpLeosLldpLocManAddrEntry 2 }
+
+wwpLeosLldpLocManAddrLen  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The total length of the management address subtype and the
+            management address fields in LLDPDUs transmitted by the
+            local LLDP agent.
+
+            The management address length field is needed so that the
+            receiving systems that do not implement SNMP will not be
+            required to implement an IANA family numbers/address length
+            equivalency table in order to decode the management address."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.2"
+    ::= { wwpLeosLldpLocManAddrEntry 3 }
+
+
+wwpLeosLldpLocManAddrIfSubtype  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpManAddrIfSubtype
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The enumeration value used to identify the interface numbering 
+            subtype from which the interface number is derived associated with
+            the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.5"
+    ::= { wwpLeosLldpLocManAddrEntry 4 }
+
+wwpLeosLldpLocManAddrIfId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The integer value used to identify the interface number
+            regarding the management address component associated with
+            the local system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.6"
+    ::= { wwpLeosLldpLocManAddrEntry 5 }
+
+wwpLeosLldpLocManAddrOID  OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The OID value used to identify the type of hardware component
+            or protocol entity associated with the management address
+            advertised by the local system agent."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.8"
+    ::= { wwpLeosLldpLocManAddrEntry 6 }
+
+--  ***********************************************************
+--
+--          R E M O T E    S Y S T E M S    D A T A
+--
+--  ***********************************************************
+
+wwpLeosLldpRemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpRemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This table contains one or more rows per physical network
+            connection known to this agent.  The agent may wish to ensure
+            that only one wwpLeosLldpRemEntry is present for each local port,
+            or it may choose to maintain multiple wwpLeosLldpRemEntries for
+            the same local port."
+    ::= { wwpLeosLldpRemoteSystemsData 1 }
+
+wwpLeosLldpRemEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLldpRemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "Information about a particular physical network connection.
+            Entries may be created and deleted in this table by the agent,
+            if a physical topology discovery process is active."
+    INDEX   {
+           wwpLeosLldpRemTimeMark,
+           wwpLeosLldpRemLocalPortNum,
+           wwpLeosLldpRemIndex
+    }
+    ::= { wwpLeosLldpRemTable 1 }
+
+WwpLeosLldpRemEntry ::= SEQUENCE {
+      wwpLeosLldpRemTimeMark           TimeFilter,
+      wwpLeosLldpRemLocalPortNum       WwpLeosLldpPortNumber,
+      wwpLeosLldpRemIndex              Integer32,
+      wwpLeosLldpRemRemoteChassisType  WwpLeosLldpChassisIdType,
+      wwpLeosLldpRemRemoteChassis      WwpLeosLldpChassisId,
+      wwpLeosLldpRemRemotePortType     WwpLeosLldpPortIdType,
+      wwpLeosLldpRemRemotePort         WwpLeosLldpPortId,
+      wwpLeosLldpRemPortDesc           SnmpAdminString,
+      wwpLeosLldpRemSysName            SnmpAdminString,
+      wwpLeosLldpRemSysDesc            SnmpAdminString,
+      wwpLeosLldpRemSysCapSupported    WwpLeosLldpSystemCapabilitiesMap,
+      wwpLeosLldpRemSysCapEnabled      WwpLeosLldpSystemCapabilitiesMap
+}
+
+wwpLeosLldpRemTimeMark  OBJECT-TYPE
+    SYNTAX      TimeFilter
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "A TimeFilter for this entry.  See the TimeFilter textual
+            convention in RFC 2021 to see how this works."
+    REFERENCE 
+            "RFC 2021 section 6"
+    ::= { wwpLeosLldpRemEntry 1 }
+
+wwpLeosLldpRemLocalPortNum  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The index value used to identify the port component
+            (contained in the local chassis with the LLDP agent)
+            associated with this entry.  The wwpLeosLldpRemLocalPortNum
+            identifies the port on which the remote system information
+            is received.
+
+            The value of this object is used as a port index to the
+            wwpLeosLldpRemTable."
+    ::= { wwpLeosLldpRemEntry 2 }
+
+wwpLeosLldpRemIndex  OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This object represents an arbitrary local integer value used
+            by this agent to identify a particular connection instance,
+            unique only for the indicated remote system.
+
+            A particular wwpLeosLldpRemIndex value may be reused in the event
+            an entry is aged out and later re-learned with the same
+            (or different) remote chassis and port identifiers.
+
+            An agent is encouraged to assign monotonically increasing
+            index values to new entries, starting with one, after each
+            reboot.  It is considered unlikely that the wwpLeosLldpRemIndex
+            will wrap between reboots."
+    ::= { wwpLeosLldpRemEntry 3 }
+
+wwpLeosLldpRemRemoteChassisType  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpChassisIdType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The type of encoding used to identify the chassis associated
+            with the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.2.2"
+    ::= { wwpLeosLldpRemEntry 4 }
+
+wwpLeosLldpRemRemoteChassis  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpChassisId
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the chassis component
+            associated with the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.2.3"
+    ::= { wwpLeosLldpRemEntry 5 }
+
+wwpLeosLldpRemRemotePortType  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortIdType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The type of port identifier encoding used in the associated
+            'wwpLeosLldpRemRemotePort' object."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.3.2"
+    ::= { wwpLeosLldpRemEntry 6 }
+
+wwpLeosLldpRemRemotePort  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpPortId
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the port component
+            associated with the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.3.3"
+    ::= { wwpLeosLldpRemEntry 7 }
+
+wwpLeosLldpRemPortDesc  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the description of
+            the given port associated with the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.5.2"
+    ::= { wwpLeosLldpRemEntry 8 }
+
+wwpLeosLldpRemSysName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the system name of the
+            remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.6.2"
+    ::= { wwpLeosLldpRemEntry 9 }
+
+wwpLeosLldpRemSysDesc  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the system description
+            of the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.7.2"
+    ::= { wwpLeosLldpRemEntry 10 }
+
+wwpLeosLldpRemSysCapSupported OBJECT-TYPE
+    SYNTAX      WwpLeosLldpSystemCapabilitiesMap
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The bitmap value used to identify which system capabilities
+            are supported on the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.8.2"
+    ::= { wwpLeosLldpRemEntry 11 }
+
+wwpLeosLldpRemSysCapEnabled  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpSystemCapabilitiesMap
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The bitmap value used to identify which system capabilities
+            are enabled on the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.8.3"
+    ::= { wwpLeosLldpRemEntry 12 }
+
+--
+-- wwpLeosLldpRemManAddrTable : Management addresses of the remote system
+--
+
+wwpLeosLldpRemManAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpRemManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This table contains one or more rows per management address
+            information on the remote system learned on a particular port
+            contained in the local chassis known to this agent."
+    ::= { wwpLeosLldpRemoteSystemsData 2 }
+
+wwpLeosLldpRemManAddrEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLldpRemManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "Management address information about a particular chassis
+            component.  There may be multiple management addresses
+            configured on the remote system identified by a particular
+            wwpLeosLldpRemIndex whose information is received on
+            wwpLeosLldpRemLocalPortNum of the local system.  Each management
+            address should have distinct 'management address
+            type' (wwpLeosLldpRemManAddrType) and 'management address'
+            (wwpLeosLldpRemManAddr.)
+
+            Entries may be created and deleted in this table by the
+            agent."
+    INDEX   { wwpLeosLldpRemTimeMark,
+              wwpLeosLldpRemLocalPortNum,
+              wwpLeosLldpRemIndex,
+              wwpLeosLldpRemManAddrType,
+              wwpLeosLldpRemManAddr
+ }
+    ::= { wwpLeosLldpRemManAddrTable 1 }
+
+WwpLeosLldpRemManAddrEntry ::= SEQUENCE {
+      wwpLeosLldpRemManAddrType        AddressFamilyNumbers,
+      wwpLeosLldpRemManAddr            WwpLeosLldpManAddress,
+      wwpLeosLldpRemManAddrIfSubtype   WwpLeosLldpManAddrIfSubtype,
+      wwpLeosLldpRemManAddrIfId        Integer32,
+      wwpLeosLldpRemManAddrOID         OBJECT IDENTIFIER
+}
+
+wwpLeosLldpRemManAddrType  OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The type of management address identifier encoding used in
+            the associated 'wwpLeosLldpRemManagmentAddr' object."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.3"
+    ::= { wwpLeosLldpRemManAddrEntry 1 }
+
+wwpLeosLldpRemManAddr  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpManAddress
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the management address
+            component associated with the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.4"
+    ::= { wwpLeosLldpRemManAddrEntry 2 }
+
+wwpLeosLldpRemManAddrIfSubtype  OBJECT-TYPE
+    SYNTAX      WwpLeosLldpManAddrIfSubtype
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The enumeration value used to identify the interface numbering 
+            subtype from which the interface number is derived associated with
+            the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.5"
+    ::= { wwpLeosLldpRemManAddrEntry 3 }
+
+wwpLeosLldpRemManAddrIfId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The integer value used to identify the interface number
+            regarding the management address component associated with
+            the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.6"
+    ::= { wwpLeosLldpRemManAddrEntry 4 }
+
+wwpLeosLldpRemManAddrOID  OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The OID value used to identify the type of hardware component
+            or protocol entity associated with the management address
+            advertised by the remote system agent."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.4.9.8"
+    ::= { wwpLeosLldpRemManAddrEntry 5 }
+--
+-- wwpLeosLldpRemUnknownTLVTable : Unrecognized TLV information 
+--
+wwpLeosLldpRemUnknownTLVTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpRemUnknownTLVEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This table contains information about an incoming TLV which
+            is not recognized by the receiving LLDP agent.  The TLV may
+            be from a later version of the basic management set."
+    ::= { wwpLeosLldpRemoteSystemsData 3 }
+
+wwpLeosLldpRemUnknownTLVEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLldpRemUnknownTLVEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "Information about an unrecognized TLV received from a
+            physical network connection.  Entries may be created and
+            deleted in this table by the agent, if a physical topology
+            discovery process is active."
+    INDEX   {
+           wwpLeosLldpRemTimeMark,
+           wwpLeosLldpRemLocalPortNum,
+           wwpLeosLldpRemIndex
+    }
+    ::= { wwpLeosLldpRemUnknownTLVTable 1 }
+
+WwpLeosLldpRemUnknownTLVEntry ::= SEQUENCE {
+      wwpLeosLldpRemUnknownTLVType     Integer32,
+      wwpLeosLldpRemUnknownTLVInfo     OCTET STRING
+}
+
+wwpLeosLldpRemUnknownTLVType OBJECT-TYPE
+    SYNTAX      Integer32(9..126)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This object represents the value extracted from the type
+            field of the TLV."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 10.3.5"
+    ::= { wwpLeosLldpRemUnknownTLVEntry 1 }
+
+wwpLeosLldpRemUnknownTLVInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..511))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "This object represents the value extracted from the value
+            field of the TLV."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 10.3.5"
+    ::= { wwpLeosLldpRemUnknownTLVEntry 2 }
+
+------------------------------------------------------------------------------
+-- Remote Systems Extension Table - Organizationally Defined Information 
+------------------------------------------------------------------------------
+wwpLeosLldpRemOrgDefInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLldpRemOrgDefInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This table contains one or more rows per physical network
+            connection which advertises the organizationally defined
+            information.
+
+            Note that this table contains one or more rows of
+            organizationally defined information that is not recognized
+            by the local agent.  The agent may wish to ensure that only
+            one wwpLeosLldpRemOrgDefInfoEntry is present for each remote system,
+            or it may choose to maintain multiple wwpLeosLldpRemOrgDefInfoEntries
+            for the same remote system.
+
+            If the local system is capable of recognizing any
+            organizationally defined information, appropriate extension
+            MIBs from the organization should be used for information
+            retrieval."
+    ::= { wwpLeosLldpRemoteSystemsData 4 }
+
+wwpLeosLldpRemOrgDefInfoEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLldpRemOrgDefInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "Information about the unrecognized organizationally
+            defined information advertised by the remote system.
+            The wwpLeosLldpRemTimeMark, wwpLeosLldpRemLocalPortNum, wwpLeosLldpRemIndex, 
+            wwpLeosLldpRemOrgDefInfoOUI, wwpLeosLldpRemOrgDefInfoSubtype, and
+            wwpLeosLldpRemOrgDefInfoIndex are indexes to this table.  If there is
+            an wwpLeosLldpRemOrgDefInfoEntry associated with a particular remote
+            system identified by the wwpLeosLldpRemLocalPortNum and wwpLeosLldpRemIndex,
+            there must be an wwpLeosLldpRemEntry associated with the same
+            instance (i.e, using same indexes.)  When the wwpLeosLldpRemEntry
+            for the same index is removed from the wwpLeosLldpRemTable, the
+            associated wwpLeosLldpRemOrgDefInfoEntry should be removed from
+            the wwpLeosLldpRemOrgDefInfoTable.
+
+            Entries may be created and deleted in this table by the
+            agent."
+    INDEX   { wwpLeosLldpRemTimeMark,
+              wwpLeosLldpRemLocalPortNum,
+              wwpLeosLldpRemIndex,
+              wwpLeosLldpRemOrgDefInfoOUI,
+              wwpLeosLldpRemOrgDefInfoSubtype,
+              wwpLeosLldpRemOrgDefInfoIndex }
+    ::= { wwpLeosLldpRemOrgDefInfoTable 1 }
+
+WwpLeosLldpRemOrgDefInfoEntry ::= SEQUENCE {
+      wwpLeosLldpRemOrgDefInfoOUI         OCTET STRING,
+      wwpLeosLldpRemOrgDefInfoSubtype     Integer32,
+      wwpLeosLldpRemOrgDefInfoIndex       Integer32,
+      wwpLeosLldpRemOrgDefInfo            OCTET STRING
+}
+
+wwpLeosLldpRemOrgDefInfoOUI  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(3))  
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The Organizationally Unique Identifier (OUI), as defined
+            in IEEE std. 802-2001, is a 24 bit (three octets) globally
+            unique assigned number referenced by various standards,
+            of the information received from the remote system."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.5.1.3"
+    ::= { wwpLeosLldpRemOrgDefInfoEntry 1 }
+
+wwpLeosLldpRemOrgDefInfoSubtype  OBJECT-TYPE
+    SYNTAX      Integer32(1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "The integer value used to identify the subtype of the
+            organizationally defined information received from the
+            remote system.
+
+            The subtype value is required to identify different instances
+            of organizationally defined information that could not be
+            retrieved without a unique identifier that indicates the
+            particular type of information contained in the information
+            string."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.5.1.4"
+    ::= { wwpLeosLldpRemOrgDefInfoEntry 2 }
+
+wwpLeosLldpRemOrgDefInfoIndex  OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "This object represents an arbitrary local integer value
+            used by this agent to identify a particular unrecognized
+            organizationally defined information instance, unique only
+            for the wwpLeosLldpRemOrgDefInfoOUI and wwpLeosLldpRemOrgDefInfoSubtype
+            from the same remote system.
+
+            A particular wwpLeosLldpRemOrgDefInfoIndex value may be reused
+            in the event an entry is aged out and later re-learned
+            with the same (or different) wwpLeosLldpRemOrgDefInfoOUI and
+            wwpLeosLldpRemOrgDefInfoSubtype.
+
+            An agent is encouraged to assign monotonically increasing
+            index values to new entries, starting with one, after each
+            reboot.  It is considered unlikely that the
+            wwpLeosLldpRemOrgDefInfoIndex will wrap between reboots."
+    ::= { wwpLeosLldpRemOrgDefInfoEntry 3 }
+
+wwpLeosLldpRemOrgDefInfo  OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..507))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The string value used to identify the organizationally
+            defined information of the remote system.  The encoding for
+            this object should be as defined for SnmpAdminString TC."
+    REFERENCE 
+            "IEEE 802.1AB/D8 section 9.5.1.5"
+    ::= { wwpLeosLldpRemOrgDefInfoEntry 4 }
+
+wwpLeosLldpStatsClear  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Setting this mib object to 'true' will clear
+             all statistics of LLDP."
+    ::= { wwpLeosLldpGlobalAtts 1 }
+
+
+-- conformance information
+wwpLeosLldpConformance OBJECT IDENTIFIER ::= { wwpLeosLldpMIB 2 } 
+wwpLeosLldpCompliances OBJECT IDENTIFIER ::= { wwpLeosLldpConformance 1 }
+wwpLeosLldpGroups      OBJECT IDENTIFIER ::= { wwpLeosLldpConformance 2 }
+
+-- compliance statements
+
+wwpLeosLldpCompliance MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+            "The compliance statement for SNMP entities which implement
+            the LLDP MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { wwpLeosLldpConfigGroup, 
+                           wwpLeosLldpStatsGroup, 
+                           wwpLeosLldpLocSysGroup,
+                           wwpLeosLldpRemSysGroup
+        }
+        GROUP wwpLeosLldpOptLocSysGroup 
+            DESCRIPTION
+                "This object represent the information associated with
+                the optional TLVs, therefore the agent may not implement
+                them."
+    ::= { wwpLeosLldpCompliances 1 }
+
+-- MIB groupings
+
+wwpLeosLldpConfigGroup    OBJECT-GROUP
+    OBJECTS {
+        wwpLeosLldpMessageTxInterval,
+        wwpLeosLldpMessageTxHoldMultiplier,
+        wwpLeosLldpReinitDelay,
+        wwpLeosLldpTxDelay,
+        wwpLeosLldpPortConfigAdminStatus,
+        wwpLeosLldpPortConfigTLVsTxEnable,
+        wwpLeosLldpManAddrPortsTxEnable
+    }
+    STATUS  deprecated
+    DESCRIPTION
+            "The collection of objects which are used to configure the
+            LLDP implementation behavior.
+
+            This group is mandatory for agents which implement the LLDP."
+    ::= { wwpLeosLldpGroups 1 }
+
+wwpLeosLldpStatsGroup    OBJECT-GROUP
+    OBJECTS {
+        wwpLeosLldpStatsFramesDiscardedTotal,
+        wwpLeosLldpStatsFramesInErrors,
+        wwpLeosLldpStatsFramesInTotal,
+        wwpLeosLldpStatsFramesOutTotal,
+        wwpLeosLldpStatsTLVsInErrors,
+        wwpLeosLldpStatsTLVsDiscardedTotal,
+        wwpLeosLldpStatsTLVsUnrecognizedTotal,
+        wwpLeosLldpCounterDiscontinuityTime
+    }
+    STATUS  deprecated
+    DESCRIPTION
+            "The collection of objects which are used to represent LLDP
+            statistics.
+
+            This group is mandatory for agents which implement the LLDP."
+    ::= { wwpLeosLldpGroups 2 }
+
+wwpLeosLldpLocSysGroup  OBJECT-GROUP
+    OBJECTS {
+        wwpLeosLldpLocChassisType,
+        wwpLeosLldpLocChassisId,
+        wwpLeosLldpLocPortType,
+        wwpLeosLldpLocPortId
+    }
+    STATUS  deprecated
+    DESCRIPTION
+            "The collection of objects which are used to represent LLDP
+            Local System Information.  The objects represent the 
+            information associated with the mandatory TLVs.
+            
+            This group is mandatory for agents which implement the LLDP."
+    ::= { wwpLeosLldpGroups 3 }
+   
+wwpLeosLldpOptLocSysGroup  OBJECT-GROUP
+    OBJECTS {
+        wwpLeosLldpLocPortDesc,
+        wwpLeosLldpLocSysDesc,
+        wwpLeosLldpLocSysName,
+        wwpLeosLldpLocSysCapSupported,
+        wwpLeosLldpLocSysCapEnabled,
+        wwpLeosLldpLocManAddrIfSubtype,
+        wwpLeosLldpLocManAddrIfId,
+        wwpLeosLldpLocManAddrOID
+    }
+    STATUS  deprecated
+    DESCRIPTION
+            "The collection of objects which are used to represent optional
+            LLDP Local System Information.  The objects represent the 
+            information associated with the optional TLVs.
+            
+            This group is optional for agents which implement the Lldp."
+    ::= { wwpLeosLldpGroups 4 }
+
+wwpLeosLldpRemSysGroup  OBJECT-GROUP
+    OBJECTS {
+        wwpLeosLldpRemRemoteChassisType,
+        wwpLeosLldpRemRemoteChassis,
+        wwpLeosLldpRemRemotePortType,
+        wwpLeosLldpRemRemotePort,
+        wwpLeosLldpRemPortDesc,
+        wwpLeosLldpRemSysName,
+        wwpLeosLldpRemSysDesc,
+        wwpLeosLldpRemSysCapSupported,
+        wwpLeosLldpRemSysCapEnabled,
+        wwpLeosLldpRemManAddrIfSubtype,
+        wwpLeosLldpRemManAddrIfId,
+        wwpLeosLldpRemManAddrOID,
+        wwpLeosLldpRemUnknownTLVInfo,
+        wwpLeosLldpRemOrgDefInfo 
+    }
+    STATUS  deprecated
+    DESCRIPTION
+            "The collection of objects which are used to represent
+            LLDP Remote Systems Information.  The objects represent the
+            information associated with the basic TLV set.  Please note
+            that even the agent doesn't implement some of the optional
+            TLVs, it shall recognize all the optional TLV information
+            that the remote system may advertise.
+            
+            This group is mandatory for agents which implement the Lldp."
+    ::= { wwpLeosLldpGroups 5 }
+    
+ --
+ -- Notifications
+ --  
+ wwpLeosLldpPortSpeedChangeTrap  NOTIFICATION-TYPE
+    OBJECTS {
+    			wwpLeosLldpPortConfigPortNum,
+    			wwpLeosLldpPortConfigOperPortSpeed,
+    			wwpLeosLldpPortConfigReqPortSpeed
+    		}
+    STATUS  current
+    DESCRIPTION "A notification is sent whenever a request is made to change the
+                 egress bandwidth of the port.  OperPortSpeed is the speed of the
+                 port at the time the request is received, ReqPortSpeed is the
+                 new requested speed."
+    ::= { wwpLeosLldpNotifMIBNotification 1 }
+
+END
+

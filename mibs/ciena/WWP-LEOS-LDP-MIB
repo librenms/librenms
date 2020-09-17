@@ -1,0 +1,385 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-LDP-MIB.my
+ --
+
+ WWP-LEOS-LDP-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   TimeTicks, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, IpAddress    		
+	FROM SNMPv2-SMI			
+   DisplayString, MacAddress, TEXTUAL-CONVENTION, RowStatus, TruthValue			
+	FROM SNMPv2-TC							
+   wwpModulesLeos			
+	FROM WWP-SMI
+   MplsLdpIdentifier
+        FROM MPLS-TC-STD-MIB
+   IndexInteger
+        FROM DIFFSERV-MIB;
+
+	
+ wwpLeosLdpMIB MODULE-IDENTITY
+	    LAST-UPDATED "200104031700Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "This MIB module is for the Extension of the BRIDGE MIB for WWP Products"
+	    REVISION    "200104031700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 32 }
+
+
+ --
+ -- TEXTUAL CONVENTIONS
+ --
+
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosLdpMIBObjects   OBJECT IDENTIFIER ::= { wwpLeosLdpMIB 1 }
+ wwpLeosLdpObjects      OBJECT IDENTIFIER ::= { wwpLeosLdpMIBObjects 1 }
+ wwpLeosLdp             OBJECT IDENTIFIER ::= { wwpLeosLdpMIBObjects 2 }
+ 
+
+--
+-- Global objects 
+--
+    
+ wwpLeosLdpAdminStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Globally enable/disable LDP"
+    ::= { wwpLeosLdpObjects 1 }
+
+ wwpLeosLdpOperStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    unknown(1),
+                    up(2),
+                    down(3)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Current operational state of LDP"
+    ::= { wwpLeosLdpObjects 2 }
+
+ wwpLeosLdpHelloHoldTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "The 16-bit integer value which is the proposed
+        global hello hold timer (in seconds) for LDP.
+
+        An LSR maintains a record of Hellos received
+        from potential peers.  This object represents
+        the Hold Time in the Common Hello Parameters TLV of
+        the Hello Message.
+
+        A value of 65535 means infinite (i.e., wait forever).
+
+        All other values represent the amount of time in
+        seconds to wait for a Hello Message.  Setting the
+        hold time to a value smaller than 15 is not
+        recommended, although not forbidden according
+        to RFC3036."
+    ::= { wwpLeosLdpObjects 3 }
+
+ wwpLeosLdpKeepAliveHoldTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "The 16-bit integer value which is the proposed global
+        keep alive hold timer for LDP."
+    ::= { wwpLeosLdpObjects 4 }
+    
+--
+-- The WWP MPLS LDP Sessions Table. It augments MPLS LDP Sessions Table
+--
+
+wwpLeosLdpSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Sessions between the LDP Entities
+        and LDP Peers.  Each row in this table
+        represents a single session."
+    ::= {  wwpLeosLdp 1 }
+
+wwpLeosLdpSessionEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single session between an LDP Entity and LDP Peer.
+        The information contained in a row is read-only.
+
+        Please note:  the Path Vector Limit for the
+        Session is the value which is configured in
+        the corresponding mplsLdpEntityEntry. The
+        Peer's Path Vector Limit is in the
+        mplsLdpPeerPathVectorLimit object in the
+        mplsLdpPeerTable.
+
+        Values which may differ from those configured are
+        noted in the objects of this table, the
+        mplsLdpAtmSessionTable and the
+        mplsLdpFrameRelaySessionTable. A value will
+        differ if it was negotiated between the
+        Entity and the Peer.  Values may or may not
+        be negotiated.  For example, if the values
+        are the same then no negotiation takes place.
+        If they are negotiated, then they may differ."
+    INDEX       { wwpLeosLdpEntityLdpId,
+                  wwpLeosLdpEntityIndex,
+                  wwpLeosLdpPeerLdpId }
+    ::= { wwpLeosLdpSessionTable 1 }
+
+WwpLeosLdpSessionEntry ::= SEQUENCE {
+        wwpLeosLdpEntityLdpId                   MplsLdpIdentifier,
+        wwpLeosLdpEntityIndex                   IndexInteger,
+        wwpLeosLdpPeerLdpId                     MplsLdpIdentifier,
+        wwpLeosLdpSessionConfiguredHoldTime     Unsigned32,
+        wwpLeosLdpSessionPeerHoldTime           Unsigned32,
+        wwpLeosLdpSessionHoldTimeInUse          Unsigned32
+        }
+
+
+ wwpLeosLdpEntityLdpId OBJECT-TYPE
+     SYNTAX      MplsLdpIdentifier
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The LDP identifier.  The first four octets encode an IP
+         address assigned to the LSR, and the last two octets
+         identify a specific label space within the LSR."
+    REFERENCE
+        "RFC3036, LDP Specification, Section on LDP Identifiers."
+    ::= { wwpLeosLdpSessionEntry 1 }
+
+ wwpLeosLdpEntityIndex OBJECT-TYPE
+    SYNTAX      IndexInteger
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is used as a secondary index to uniquely
+        identify this row.  Before creating a row in this table,
+        the 'mplsLdpEntityIndexNext' object should be retrieved.
+        That value should be used for the value of this index
+        when creating a row in this table.  NOTE:  if a value
+        of zero (0) is retrieved, that indicates that no rows
+        can be created in this table at this time.
+
+        A secondary index (this object) is meaningful to some
+        but not all, LDP implementations.  For example
+        an LDP implementation which uses PPP would
+        use this index to differentiate PPP sub-links.
+
+        Another way to use this index is to give this the
+        value of ifIndex.  However, this is dependant
+        on the implementation.
+
+        This field is deprecated in the following tables provided
+        by DC-CR-LDP Session Controller.
+
+        - mplsLdpEntityTable.
+        - mplsLdpPeerTable.
+
+        In these tables the value of the Entity Index will always
+        be filled in to be 1."
+    ::= { wwpLeosLdpSessionEntry 2 }
+
+ wwpLeosLdpPeerLdpId OBJECT-TYPE
+    SYNTAX      MplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The LDP identifier of this LDP Peer."
+    ::= { wwpLeosLdpSessionEntry 3 }
+            
+ wwpLeosLdpSessionConfiguredHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The locally configured keepalive hold time for this
+        session, in seconds.  Note that the value of this field
+        reflects configuration at the time of session
+        initialization; this may differ from the configuration
+        that would apply to a new session, if configuration has
+        changed since this session was initialized."
+    ::= { wwpLeosLdpSessionEntry 4 }
+
+  wwpLeosLdpSessionPeerHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peer's advertised keepalive hold time for this session
+        in seconds.  Note that the value of this field reflects
+        the peer's configuration at the time of session
+        initialization; this may differ from the configuration
+        that would apply to a new session, if the peer's
+        configuration has changed since this session was
+        initialized."
+    ::= { wwpLeosLdpSessionEntry 5 }
+
+  wwpLeosLdpSessionHoldTimeInUse OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The keepalive hold time that is currently in use for this
+        session, in seconds."
+    ::= { wwpLeosLdpSessionEntry 6 }
+
+
+wwpLeosLdpHelloAdjacencyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Hello Adjacencies for Sessions."
+    ::= { wwpLeosLdp 2 }
+
+wwpLeosLdpHelloAdjacencyEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a single LDP Hello Adjacency.
+        An LDP Session can have one or more Hello
+        Adjacencies."
+         INDEX       { wwpLeosLdpEntityLdpId,
+                       wwpLeosLdpEntityIndex,
+                       wwpLeosLdpPeerLdpId,
+                       wwpLeosLdpHelloAdjacencyIndex }
+    ::= { wwpLeosLdpHelloAdjacencyTable 1 }
+
+WwpLeosLdpHelloAdjacencyEntry ::= SEQUENCE {
+    wwpLeosLdpHelloAdjacencyIndex               Unsigned32,
+    wwpLeosLdpHelloAdjacencyConfiguredHoldTime  Unsigned32,
+    wwpLeosLdpHelloAdjacencyPeerHoldTime        Unsigned32
+}
+
+wwpLeosLdpHelloAdjacencyIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An identifier for this specific adjacency."
+    ::= { wwpLeosLdpHelloAdjacencyEntry 1 }
+
+wwpLeosLdpHelloAdjacencyConfiguredHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The locally configured hello hold time for this adjacency,
+        in seconds."
+    ::= { wwpLeosLdpHelloAdjacencyEntry 2 }
+
+wwpLeosLdpHelloAdjacencyPeerHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peer's advertised hello hold time for this adjacency,
+        in seconds."
+    ::= { wwpLeosLdpHelloAdjacencyEntry 3 }
+
+
+wwpLeosLdpIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosLdpIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of interfaces that LDP can be enabled on."
+    ::= { wwpLeosLdp 3 }
+    
+wwpLeosLdpIfEntry OBJECT-TYPE
+    SYNTAX      WwpLeosLdpIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WWP Descr."
+         INDEX       { wwpLeosLdpIfIndex }
+    ::= { wwpLeosLdpIfTable 1 }
+
+WwpLeosLdpIfEntry ::= SEQUENCE {
+    wwpLeosLdpIfIndex           INTEGER,
+    wwpLeosLdpIfName            DisplayString,
+    wwpLeosLdpIfIpAddr          IpAddress,
+    wwpLeosLdpIfAdminStatus     INTEGER,
+    wwpLeosLdpIfOperStatus      INTEGER
+}
+
+ wwpLeosLdpIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface Name"
+    ::= { wwpLeosLdpIfEntry 1 }
+
+ wwpLeosLdpIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..4096)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface Index"
+    ::= { wwpLeosLdpIfEntry 2 }
+
+ wwpLeosLdpIfIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface IP Address"
+    ::= { wwpLeosLdpIfEntry 3 }
+
+ wwpLeosLdpIfAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   enable(1),
+                   disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Desired LDP status on this Interface"
+    ::= { wwpLeosLdpIfEntry 4 }
+
+ wwpLeosLdpIfOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   up(1),
+                   down(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "LDP Operational Status on this Interface"
+    ::= { wwpLeosLdpIfEntry 5 }
+
+  END
+ 
+ --
+ -- WWP-LEOS-LDP-MIB
+ --

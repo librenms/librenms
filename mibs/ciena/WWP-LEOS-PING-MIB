@@ -1,0 +1,224 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+--
+-- WWP-LEOS-PING-MIB.my
+--
+--
+
+	WWP-LEOS-PING-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS 
+			Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			TruthValue, TEXTUAL-CONVENTION, DisplayString	
+				FROM SNMPv2-TC
+			AddressFamilyNumbers
+				FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+                        InetAddressType
+                                FROM INET-ADDRESS-MIB
+			wwpModulesLeos		
+				FROM WWP-SMI;
+	
+		wwpLeosPingMIB MODULE-IDENTITY
+			LAST-UPDATED "201204020000Z"
+			ORGANIZATION "Ciena, Inc"
+			CONTACT-INFO
+				" Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+				Email:  support@ciena.com"
+			DESCRIPTION
+				"The MIB for WWP Ping"
+                        REVISION    "201204020000Z"
+                        DESCRIPTION
+                                "Add wwpLeosPingInetAddrType to support IP protocol 
+                                 version independent Inet addressing."
+			REVISION "200107031257Z"
+			DESCRIPTION
+				"Initial Creation"
+			::= { wwpModulesLeos 19 }
+		
+	
+--
+-- Textual conventions
+--
+	
+		PingFailCause ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION
+				"The cause of the last ping failure."
+			SYNTAX INTEGER
+				{
+				unknownHost(1),
+				socketError(2),
+				bindError(3),
+				connectError(4),
+				missingHost(5),
+				asyncError(6),
+				nonBlockError(7),
+				mcastError(8),
+				ttlError(9),
+				mcastTtlError(10),
+				outputError(11),
+				unreachableError(12),
+				isAlive(13),
+				txRx(14),
+				commandCompleted(15),
+				noStatus(16),
+				sendRecvMismatch(17)
+				}
+			
+		PingState ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION
+				"The state of the last ping request."
+			SYNTAX INTEGER
+				{
+				idle(1),
+				pinging(2),
+				pingComplete(3),
+				failed(4)
+				}
+			
+--
+-- Node definitions
+--
+	
+		wwpLeosPingMIBObjects OBJECT IDENTIFIER ::= { wwpLeosPingMIB 1 }
+		
+		wwpLeosPingDelay OBJECT-TYPE
+			SYNTAX Integer32 (0..100000)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The object specifies the minimum amount of time to wait 
+                                before sending the next packet in a sequence 
+                                after receiving a response or declaring a 
+                                timeout for a previous packet."
+			::= { wwpLeosPingMIBObjects 1 }
+		
+		wwpLeosPingPacketSize OBJECT-TYPE
+			SYNTAX Integer32 (1..1464)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The size of the ping packets to send to the target."
+			DEFVAL { 56 }
+			::= { wwpLeosPingMIBObjects 2 }
+		
+		wwpLeosPingActivate OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Ping can be activated by setting this object to true.
+                                Once the ping operation is completed, the object is 
+                                set to 'false'. This object can be set to 'false'
+                                by the Management Station to stop the ping."
+			::= { wwpLeosPingMIBObjects 3 }
+		
+		wwpLeosPingAddrType OBJECT-TYPE
+			SYNTAX		AddressFamilyNumbers
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"The address type associated with wwpLeosPingAddr.
+                                 With the new wwpLeosPingInetAddrType being introduced
+                                 to support RFC 4001, this OID will only be used when
+                                 wwpLeosPingAddr is a host name or an IPv4 address. 
+                                 Otherwise, it will be set to other(0)."
+			::= { wwpLeosPingMIBObjects 4 }
+		
+		wwpLeosPingAddr OBJECT-TYPE
+			SYNTAX		DisplayString
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+				"The host name or IP address of the device to be pinged.
+				 				wwpLeosPingAddrType determines if address 
+				 				is host name or IP address."
+			::= { wwpLeosPingMIBObjects 5 }
+
+		wwpLeosPingPacketCount OBJECT-TYPE
+			SYNTAX Integer32 (0..100000)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Specifies the number of ICMP requests to send to the target."
+			::= { wwpLeosPingMIBObjects 6 }
+		
+		wwpLeosPingPacketTimeout OBJECT-TYPE
+			SYNTAX Integer32 (0..100000)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Specifies the amount of time to wait for a response to a 
+                                transmitted packet before declaring the packet 'dropped'."
+			::= { wwpLeosPingMIBObjects 7 }
+		
+		wwpLeosPingSentPackets OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of ping packets that have been sent to the target."
+			::= { wwpLeosPingMIBObjects 8 }
+		
+		wwpLeosPingReceivedPackets OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of ping packets that have been received from the target."
+			::= { wwpLeosPingMIBObjects 9 }
+		
+		wwpLeosPingFailCause OBJECT-TYPE
+			SYNTAX PingFailCause
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The result of the ping."
+			::= { wwpLeosPingMIBObjects 10 }
+		
+		wwpLeosPingState OBJECT-TYPE
+			SYNTAX PingState
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The state of the ping process. The possible states include 
+				pinging, idle, complete or failed."
+			DEFVAL { idle }
+			::= { wwpLeosPingMIBObjects 11 }
+		
+		wwpLeosPingUntilStopped OBJECT-TYPE
+			SYNTAX     TruthValue
+			MAX-ACCESS  read-write
+			STATUS     current
+			DESCRIPTION
+				"Setting this object to true prior to wwpLeosPingActivate will
+                                cause the device to ping the specified host until
+                                wwpLeosPingActivate is set to false. The object cannot be
+                                modified once the ping is active. The object returns to 
+                                'false' once the ping is halted."
+                        DEFVAL { false }
+			::= { wwpLeosPingMIBObjects 12 }
+	
+		wwpLeosPingInetAddrType OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"The Inet address type associated with wwpLeosPingAddr.
+                                 When set to:
+                                 ipv4 : wwpLeosPingAddr should be compliant with 
+                                        InetAddressIPv4 from RFC 4001
+                                 ipv6 : wwpLeosPingAddr should be compliant with
+                                        InetAddressIPv6 from RFC 4001."
+			::= { wwpLeosPingMIBObjects 13 }
+		
+	END
+
+--
+-- WWP-PING-MIB.my
+--

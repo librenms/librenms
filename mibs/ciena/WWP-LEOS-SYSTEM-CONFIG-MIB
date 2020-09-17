@@ -1,0 +1,1612 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-SYSTEM-CONFIG-MIB.my
+ --
+
+ WWP-LEOS-SYSTEM-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   IpAddress, Integer32, Unsigned32, Gauge32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY
+	    FROM SNMPv2-SMI			
+   DisplayString, TruthValue, DateAndTime, RowStatus, TEXTUAL-CONVENTION			
+	    FROM SNMPv2-TC						
+   InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB	    				
+   MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+   wwpModulesLeos	
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosSystemConfigMIB MODULE-IDENTITY
+	    LAST-UPDATED "201209190000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "The MIB module for the WWP System Config information."
+	    REVISION    "201209190000Z"
+	    DESCRIPTION
+		    "Added wwpLeosSystemServers for enable/disable of SFTP server."
+	    REVISION    "201207060000Z"
+	    DESCRIPTION
+		    "Added three new tables for XFTP server settings."
+	    REVISION    "201206270000Z"
+	    DESCRIPTION
+		    "Corrected string lengths."
+	    REVISION    "201204160000Z"
+	    DESCRIPTION
+		    "Added a new table for Default Gateway to support IPv6 configuration.
+                     The old OID, wwpLeosSystemConfigDefaultGateway, will continue to
+                     support ipv4 configuration."
+	    REVISION    "201111050000Z"
+            DESCRIPTION
+		    "Added a new table for Guardian configuration"
+	    REVISION    "201107050000Z"
+ 	    DESCRIPTION
+		    "Added a new object wwpLeosTelnetMaxAdminUserSessions."
+	    REVISION    "200203160000Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 12 }
+
+ FileName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+            "Represents the textual convention which defines the 
+	     name string and display hint"
+    SYNTAX       OCTET STRING (SIZE (1..64))
+
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosSystemConfigMIBObjects OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIB 1 }
+
+ --
+ -- SystemCfg Attributes
+ --
+ wwpLeosSystemConfigAttr OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 1 }
+
+ --
+ -- Cfg Group
+ --
+ wwpLeosSystemConfig OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 2 }
+ 
+ --
+ -- system telnet objects
+ --
+ wwpLeosSystemTelnet  OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 3 }
+ 
+ -- Notifications 
+  
+ wwpLeosSystemConfigMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIB 2 } 
+ wwpLeosSystemConfigMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosSystemConfigMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosSystemConfigMIBConformance OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIB 3 } 
+ wwpLeosSystemConfigCompliances OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBConformance 1 } 		
+ wwpLeosSystemConfigMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBConformance 2 }
+ 				 		
+
+ wwpLeosSystemConfigDefaultGateway OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "Default gateway IP address."
+     ::= { wwpLeosSystemConfigAttr 1 }
+
+ wwpLeosSystemConfigBootCmdFile OBJECT-TYPE
+      SYNTAX      FileName
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	      "Name of the last successfully executed command file name 
+	       executed by the device."
+      ::= { wwpLeosSystemConfigAttr 2 }
+      
+ wwpLeosSystemConfigBootCfgFile OBJECT-TYPE
+      SYNTAX      FileName
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	      "This mib object specifies the bootup config file for the system.
+	       Setting is object is similar to setting default load config file name.
+	       When device will reboot it will attempt to load the file specified by 
+	       wwpLeosSystemConfigBootCfgFile."
+      ::= { wwpLeosSystemConfigAttr 3 }
+ 
+ wwpLeosSystemClockDateTime    OBJECT-TYPE
+     SYNTAX                DateAndTime
+     MAX-ACCESS            read-write
+     STATUS                current
+     DESCRIPTION
+	     "The current system date and time of box.  
+				
+	      There are no provisions for local time or
+	      daylight savings. All times use the 24 hr clock
+	      and are UTC.
+				
+	      Because device time is UTC, only first 7 bytes of
+	      DateAndTime data are returned, as per RFC1903."
+      ::= { wwpLeosSystemConfigAttr 4 }
+
+ wwpLeosSystemConfigSavePermFile OBJECT-TYPE
+      SYNTAX      FileName
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	      "Setting this object will set the save file name 
+	       to the value of wwpLeosSystemConfigSavePermFile.
+	       What it means is that whenever wwpLeosSystemConfigControl
+	       is set to value 'save' then if wwpLeosSystemConfigSaveFile is not set
+	       then device will use wwpLeosSystemConfigSavePermFile as the file name
+	       to store config."
+      ::= { wwpLeosSystemConfigAttr 5 }
+
+ wwpLeosSystemConfigLastFileNameReset OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	      "Setting this object will reset the name of the last config
+	       filename that was successfully executed by the device."
+      ::= { wwpLeosSystemConfigAttr 6 }
+ 
+ wwpLeosSystemServiceMode  OBJECT-TYPE
+      SYNTAX      INTEGER {
+      					none(0),
+      					mpls(1),
+      					pbt(2),
+      					aoam(3)
+      				}
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	      "Setting this object will change the service mode of operation.
+	       It will cause device to reboot. If this object is set to 'none' then 
+	       device will reject the request and will return error."
+      ::= { wwpLeosSystemConfigAttr 7 }    
+      
+ wwpLeosSystemConfigBackupGateway OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "Backup gateway IP address."
+     ::= { wwpLeosSystemConfigAttr 8 }
+     
+ wwpLeosSystemConfigCustomerCfgFile OBJECT-TYPE
+      SYNTAX      FileName
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	      "Setting this object will set the name of the default customer configuration
+	       file name, which is the file that will copied to the default configuration
+	       file during a reset-to-customer-default operation.  Setting this object to
+	       an empty string will remove the file name from the system configuration."
+      ::= { wwpLeosSystemConfigAttr 9 }
+
+ --
+ --  The System Default Gateway Table
+ --
+
+ wwpLeosSystemConfigDefaultGatewayTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosSystemConfigDefaultGatewayEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the default gateways"
+     ::= { wwpLeosSystemConfigAttr 10 }
+
+ wwpLeosSystemConfigDefaultGatewayEntry OBJECT-TYPE
+    SYNTAX     WwpLeosSystemConfigDefaultGatewayEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosSystemConfigDefaultGatewayTable."
+    INDEX      { wwpLeosSystemConfigDefaultGatewayIndex }
+    ::= { wwpLeosSystemConfigDefaultGatewayTable 1 }
+
+
+ WwpLeosSystemConfigDefaultGatewayEntry ::= SEQUENCE {
+    wwpLeosSystemConfigDefaultGatewayIndex         Integer32,   
+    wwpLeosSystemConfigDefaultGatewayInetAddrType  InetAddressType,
+    wwpLeosSystemConfigDefaultGatewayInetAddress   InetAddress,
+    wwpLeosSystemConfigDefaultGatewayInterfaceName DisplayString,
+    wwpLeosSystemConfigDefaultGatewayMetric        Integer32,
+    wwpLeosSystemConfigDefaultGatewayStatus        RowStatus
+ }
+ 
+ wwpLeosSystemConfigDefaultGatewayIndex     OBJECT-TYPE
+     SYNTAX             Integer32(1..16)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+    	     "Unique identifier to the table."               
+     ::= { wwpLeosSystemConfigDefaultGatewayEntry 1 }
+ 
+ wwpLeosSystemConfigDefaultGatewayInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "The Inet address type of default gateway. Used in conjunction with 
+              wwpLeosSystemConfigDefaultGatewayInetAddress.
+              When set to :
+              ipv4: wwpLeosSystemConfigDefaultGatewayInetAddress should be compliant with 
+                    InetAddressIPv4 from RFC 4001
+              ipv6: wwpLeosSystemConfigDefaultGatewayInetAddress should be compliant with
+                    InetAddressIPv6 from RFC 4001."
+     ::= { wwpLeosSystemConfigDefaultGatewayEntry 2 }
+
+ wwpLeosSystemConfigDefaultGatewayInetAddress OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "Default gateway IP address. This OID must be used in 
+              conjunction with wwpLeosSystemConfigDefaultGatewayInetAddrType. 
+              The InetAddress set here should be compliant with rfc 4001 InetAddressType.
+              When this OID is set, wwpLeosSystemConfigDefaultGateway is set ot 0.0.0.0."
+     ::= { wwpLeosSystemConfigDefaultGatewayEntry 3 }
+     
+ wwpLeosSystemConfigDefaultGatewayInterfaceName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "Interface Name of the gateway, local or remote."
+     ::= { wwpLeosSystemConfigDefaultGatewayEntry 4 }
+     
+ wwpLeosSystemConfigDefaultGatewayMetric OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "Metric of the gateway."
+     ::= { wwpLeosSystemConfigDefaultGatewayEntry 5 }
+     
+ wwpLeosSystemConfigDefaultGatewayStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the conceptual rows in this table.
+              To create a row in this table, a manager must set this object to 'createAndGo'. 
+              To delete an entry, set this object to 'destroy'."
+     ::= { wwpLeosSystemConfigDefaultGatewayEntry 6 }
+     
+      
+ --
+ --  The System Backup Gateway Table
+ --
+
+ wwpLeosSystemConfigBackupGatewayTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosSystemConfigBackupGatewayEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the default gateways"
+     ::= { wwpLeosSystemConfigAttr 11 }
+
+ wwpLeosSystemConfigBackupGatewayEntry OBJECT-TYPE
+    SYNTAX     WwpLeosSystemConfigBackupGatewayEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosSystemConfigBackupGatewayTable."
+    INDEX      { wwpLeosSystemConfigBackupGatewayIndex }
+    ::= { wwpLeosSystemConfigBackupGatewayTable 1 }
+
+
+ WwpLeosSystemConfigBackupGatewayEntry ::= SEQUENCE {
+    wwpLeosSystemConfigBackupGatewayIndex         Integer32,   
+    wwpLeosSystemConfigBackupGatewayInetAddrType  InetAddressType,
+    wwpLeosSystemConfigBackupGatewayInetAddress   InetAddress,
+    wwpLeosSystemConfigBackupGatewayInterfaceName DisplayString,
+    wwpLeosSystemConfigBackupGatewayMetric        Integer32,
+    wwpLeosSystemConfigBackupGatewayStatus        RowStatus
+ }
+ 
+ wwpLeosSystemConfigBackupGatewayIndex     OBJECT-TYPE
+     SYNTAX             Integer32(1..16)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+    	     "Unique identifier to the table."               
+     ::= { wwpLeosSystemConfigBackupGatewayEntry 1 }
+ 
+ wwpLeosSystemConfigBackupGatewayInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "The Inet address type of backup gateway. Used in conjunction with 
+              wwpLeosSystemConfigBackupGatewayInetAddress.
+              When set to :
+              ipv4: wwpLeosSystemConfigBackupGatewayInetAddress should be compliant with 
+                    InetAddressIPv4 from RFC 4001
+              ipv6: wwpLeosSystemConfigBackupGatewayInetAddress should be compliant with
+                    InetAddressIPv6 from RFC 4001."
+     ::= { wwpLeosSystemConfigBackupGatewayEntry 2 }
+
+ wwpLeosSystemConfigBackupGatewayInetAddress OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "Backup gateway IP address. This OID must be used in 
+              conjunction with wwpLeosSystemConfigBackupGatewayInetAddrType. 
+              The InetAddress set here should be compliant with rfc 4001 InetAddressType.
+              When this OID is set, wwpLeosSystemConfigBackupGateway is set ot 0.0.0.0."
+     ::= { wwpLeosSystemConfigBackupGatewayEntry 3 }
+     
+ wwpLeosSystemConfigBackupGatewayInterfaceName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "Interface Name of the gateway, local or remote."
+     ::= { wwpLeosSystemConfigBackupGatewayEntry 4 }
+     
+ wwpLeosSystemConfigBackupGatewayMetric OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "Metric of the gateway."
+     ::= { wwpLeosSystemConfigBackupGatewayEntry 5 }
+     
+ wwpLeosSystemConfigBackupGatewayStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the conceptual rows in this table.
+              To create a row in this table, a manager must set this object to 'createAndGo'. 
+              To delete an entry, set this object to 'destroy'."
+     ::= { wwpLeosSystemConfigBackupGatewayEntry 6 }
+     
+      
+ wwpLeosSystemConfigSaveFileName OBJECT-TYPE
+      SYNTAX		FileName
+      MAX-ACCESS	read-write
+      STATUS		current   
+      DESCRIPTION
+	      "wwpLeosSystemConfigSaveFileName specifies the name of the config
+	       file to be used when wwpLeosSystemConfigControl has been set 
+	       to 'save'. If this object is not set then device will use 
+	       the file name specified by wwpLeosSystemConfigSavePermFile.
+	       If wwpLeosSystemConfigSavePermFile is also not set then default config 
+	       file name i.e startup-config will be used to save config.
+	       Once 'wwpLeosSystemConfigControl' has been successfully applied,
+	       read on wwpLeosSystemConfigSaveFileName will always return empty
+	       string else it will show what user has configured."
+       ::= { wwpLeosSystemConfig 1 }
+       
+ wwpLeosSystemConfigControl OBJECT-TYPE
+      SYNTAX          INTEGER {
+                           none(0),
+			   save(1),   
+			   mfgDefaultCfg(2)
+		       }
+      MAX-ACCESS       read-write
+      STATUS           current   
+      DESCRIPTION
+	      "Controls configuration options on the device.
+              The current options are:
+	      save:   
+		  to make the configuration changes made
+		  using SNMP persistent across a reboot.
+				 
+	      mfgDefaultCfg:
+		   Set system configuration to factory defaults.
+		   Note: this will wipe out all of the current 
+		   configuration including Password and VLAN 
+		   information.
+              
+             If the system doesn't support any of these control 
+             configuration option, it should return error while 
+             trying to set this object to the specific option.
+              
+             A read on this object should return none(0)."
+       ::= { wwpLeosSystemConfig 2 }
+ 
+ wwpLeosSystemConfigFilepath OBJECT-TYPE
+      SYNTAX        FileName
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "Returns the path for configuration related files."
+      ::= { wwpLeosSystemConfig 3 }
+ 				
+ --
+ --  The System Config File Table
+ --
+
+ wwpLeosSystemConfigFileTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosSystemConfigFileEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the configs"
+     ::= { wwpLeosSystemConfig 4 }
+
+ wwpLeosSystemConfigFileEntry OBJECT-TYPE
+    SYNTAX     WwpLeosSystemConfigFileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosSystemConfigFileTable."
+    INDEX      { wwpLeosSystemConfigFileIndex }
+    ::= { wwpLeosSystemConfigFileTable 1 }
+
+
+ WwpLeosSystemConfigFileEntry ::= SEQUENCE {
+    wwpLeosSystemConfigFileIndex      Integer32,   
+    wwpLeosSystemConfigFileName       FileName,
+    wwpLeosSystemConfigActivateFile   INTEGER
+ }
+ 
+ wwpLeosSystemConfigFileIndex     OBJECT-TYPE
+     SYNTAX             Integer32(1..65535)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+    	     "Unique identifier to the table."               
+     ::= { wwpLeosSystemConfigFileEntry 1 }
+ 
+ wwpLeosSystemConfigFileName     OBJECT-TYPE
+     SYNTAX          FileName
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The name of the Config file."               
+     ::= { wwpLeosSystemConfigFileEntry 2 }
+ 
+ wwpLeosSystemConfigActivateFile  OBJECT-TYPE
+     SYNTAX      INTEGER {
+		     loadCfg(1),
+		     resetToCfg(2),
+		     none(3)
+		 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "Set this object to 'loadCfg to load the 'wwpLeosSystemConfigFileName' config. 
+	      If the operation was successful, this object performs 
+              the CLI equivalent to these commands and will return the status
+	      
+	      Setting this object to 'resetToCfg' will kills the load module and reloads a new load module and 
+	      applies the config file specified by wwpLeosSystemConfigFileName.
+	      
+	      Setting this object to none will do nothing."  
+	  DEFVAL {none}
+     ::= { wwpLeosSystemConfigFileEntry 3 }
+     
+ wwpLeosTelnetMaxBaseUserSessions OBJECT-TYPE
+     SYNTAX           Integer32 (0..10)      
+     MAX-ACCESS       read-write
+     STATUS           current   
+     DESCRIPTION
+             "The max number of base user telnet sessions
+             for the device."
+     ::= { wwpLeosSystemTelnet 1 }
+     
+ wwpLeosTelnetMaxSuperUserSessions OBJECT-TYPE
+     SYNTAX           Integer32 (0..10)
+     MAX-ACCESS       read-write
+     STATUS           current   
+     DESCRIPTION
+             "The max number of super user telnet sessions
+             for the device."
+     ::= { wwpLeosSystemTelnet 2 }
+    
+  wwpLeosTelnetMaxAdminUserSessions OBJECT-TYPE
+     SYNTAX      Integer32 (0..10)
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+     	"The max number of admin users telnet sessions for
+     	the device."
+     ::= { wwpLeosSystemTelnet 3 }   
+
+ --
+ -- System Cpu Load Query
+ --
+ wwpLeosSystemCpuLoadQuery OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 7 }
+
+ wwpLeosSystemCpuLoad1Min OBJECT-TYPE
+     SYNTAX     Integer32(1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "The OID to display CPU load in last 1 min.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 1 }
+
+ wwpLeosSystemCpuLoad10Min OBJECT-TYPE
+     SYNTAX     Integer32(1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "The OID to display CPU load in last 10 min.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 2 }
+ 
+ wwpLeosSystemCpuLoad15Min OBJECT-TYPE
+     SYNTAX     Integer32(1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "The OID to display CPU load in last 15 min.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 3 }
+
+ wwpLeosSystemCpuLoad5Min OBJECT-TYPE
+     SYNTAX     Integer32(1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "The OID to display CPU load in last 5 min.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 4 }
+     
+ wwpLeosSystemCpuLoad1MinMinimum OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The minimum 1 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 5 }
+     
+ wwpLeosSystemCpuLoad1MinMaximum OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The maximum 1 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 6 }
+
+ wwpLeosSystemCpuLoad1MinState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The 1 minute CPU load average state."
+     ::= { wwpLeosSystemCpuLoadQuery 7 }
+
+ wwpLeosSystemCpuLoad15MinMinimum OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The minimum 15 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 8 }
+     
+ wwpLeosSystemCpuLoad15MinMaximum OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The maximum 15 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 9 }
+     
+ wwpLeosSystemCpuLoad15MinState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The 15 minutes CPU load average state."
+     ::= { wwpLeosSystemCpuLoadQuery 10 }
+     
+ wwpLeosSystemCpuLoad5MinMinimum OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The minimum 5 minutes CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 11 }
+     
+ wwpLeosSystemCpuLoad5MinMaximum OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The maximum 5 minutes CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+     ::= { wwpLeosSystemCpuLoadQuery 12 }
+     
+ wwpLeosSystemCpuLoad5MinState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The 5 minutes CPU load average state."
+     ::= { wwpLeosSystemCpuLoadQuery 13 }
+ 
+ --
+ -- String used for notification
+ --
+ wwpLeosSystemConfigNotif OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 8 }
+
+ wwpLeosSystemConfigNotifTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosSystemConfigNotifEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the configuration file line numbers.
+	     This table is only used when sending wwpLeosImproperCmdInConfigFile
+	     notification. No Get, GetNext or Set is allowed on this table."
+     ::= { wwpLeosSystemConfigNotif 1 }
+
+ wwpLeosSystemConfigNotifEntry OBJECT-TYPE
+    SYNTAX     WwpLeosSystemConfigNotifEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosSystemConfigNotifTable.
+	     No Get, GetNext or Set is allowed on this table."
+    INDEX      { wwpLeosSystemConfigFileIndex }
+    ::= { wwpLeosSystemConfigNotifTable 1 }
+
+ WwpLeosSystemConfigNotifEntry ::= SEQUENCE {
+    wwpLeosSystemConfigErrLineNum	Integer32,
+    wwpLeosSystemConfigErrStr		DisplayString,
+    wwpLeosSystemConfigErrLinesTotal	Integer32
+ }
+
+ wwpLeosSystemConfigErrLineNum OBJECT-TYPE
+     SYNTAX     Integer32(0..64)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "The OID is sent in the wwpLeosImproperCmdInConfigFile 
+	     trap to identify the line number which was failed 
+	     when configuration is applied. No Get, GetNext or Set is 
+	     allowed on this table."
+     ::= { wwpLeosSystemConfigNotifEntry 1 }
+     
+     
+ wwpLeosSystemConfigErrStr OBJECT-TYPE
+          SYNTAX      DisplayString
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "The OID is  wwpLeosSystemConfigErrStr
+     	     trap to identify the line  which was failed 
+     	     when configuration is applied. No Get, GetNext or Set is 
+     	     allowed on this table."
+    ::= { wwpLeosSystemConfigNotifEntry 2 }
+    
+    
+ wwpLeosSystemConfigErrLinesTotal OBJECT-TYPE
+         SYNTAX     Integer32 (0..64)
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+                "The OID is sent in the wwpLeosImproperCmdInConfigFile 
+    	     trap to identify the total line numbers which was failed 
+    	     when configuration is applied. No Get, GetNext or Set is 
+    	     allowed on this table."
+     ::= { wwpLeosSystemConfigNotifEntry 3 }
+     
+ --
+ -- System Memory Usage
+ --
+ wwpLeosSystemMemoryUsageQuery OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 9 }
+
+ wwpLeosSystemMemoryUsageTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF WwpLeosSystemMemoryUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of Memory Usage for various Memory Pools."
+        ::= { wwpLeosSystemMemoryUsageQuery 1 }
+        
+ wwpLeosSystemMemoryUsageEntry OBJECT-TYPE
+        SYNTAX          WwpLeosSystemMemoryUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry for each Memory Pool."
+        INDEX { wwpLeosSystemMemoryUsagePoolIndex }
+        ::= { wwpLeosSystemMemoryUsageTable 1 }
+        
+ WwpLeosSystemMemoryUsageEntry ::= SEQUENCE {
+        wwpLeosSystemMemoryUsagePoolIndex       INTEGER,
+        wwpLeosSystemMemoryUsageMemoryTotal     Unsigned32,
+        wwpLeosSystemMemoryUsageMemoryLWM       Unsigned32,
+        wwpLeosSystemMemoryUsageMemoryFree      Unsigned32,
+        wwpLeosSystemMemoryUsageStatus          INTEGER,
+	wwpLeosSystemMemoryUsageMemoryUsed      Unsigned32,
+	wwpLeosSystemMemoryUsageMemoryAvailable Unsigned32
+ }
+ 
+ wwpLeosSystemMemoryUsagePoolIndex OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                ose-pool-1      (1),    -- OSE Pool 1
+                                global-heap     (2),    -- Global Heap
+                                malloc-heap		(3) 	-- Malloc Heap
+                        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The Memory Pool type."
+        ::= { wwpLeosSystemMemoryUsageEntry 1 }
+        
+ wwpLeosSystemMemoryUsageMemoryTotal OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "bytes"
+        MAX-ACCESS      read-only 
+        STATUS          current
+        DESCRIPTION     "Total size of the Memory Pool in bytes."
+        ::= { wwpLeosSystemMemoryUsageEntry 2 }
+        
+ wwpLeosSystemMemoryUsageMemoryLWM OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Lowest free memory in the Memory Pool in bytes.
+			Not supported in SAOS 6.x"
+        ::= { wwpLeosSystemMemoryUsageEntry 3 }
+
+ wwpLeosSystemMemoryUsageMemoryFree OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Amount of free memory in the Memory Pool in bytes.
+			This corresponds to the CLI's memory never used."
+        ::= { wwpLeosSystemMemoryUsageEntry 4 }
+
+ wwpLeosSystemMemoryUsageStatus OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                                 normal(1),
+                                 lowMemory(2),
+                                 notSupported(3)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Denotes if the free memory amount is normal or below limit."
+        ::= { wwpLeosSystemMemoryUsageEntry 5 }
+
+wwpLeosSystemMemoryUsageMemoryUsed OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "bytes"
+        MAX-ACCESS      read-only  
+        STATUS          current
+        DESCRIPTION     "Amount of used memory in the Memory Pool in bytes.."
+        ::= { wwpLeosSystemMemoryUsageEntry 6 }
+
+wwpLeosSystemMemoryUsageMemoryAvailable OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Amount of available memory in the Memory Pool in bytes."
+        ::= { wwpLeosSystemMemoryUsageEntry 7 }
+ --
+ -- xFTP 
+ --
+wwpLeosSystemXFtp OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 10 }
+
+ wwpLeosSystemXFtpMode  OBJECT-TYPE
+      SYNTAX      INTEGER {
+      				tftp(1),
+      				ftp(2),
+      				sftp(3)
+      		          }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	      "Select between modes of file transfer.
+               The default mode is tftp."
+      ::= { wwpLeosSystemXFtp 1 }    
+
+ wwpLeosSystemXFtpServer OBJECT-TYPE
+     SYNTAX      DisplayString 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "IP address or the host name of default server."
+     ::= { wwpLeosSystemXFtp 2 }
+
+
+ wwpLeosSystemXFtpUserName OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..32)) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Name used to login with."
+     ::= { wwpLeosSystemXFtp 3 }
+
+ wwpLeosSystemXFtpPasswd OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..128)) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Password used to login with."
+     ::= { wwpLeosSystemXFtp 4 }
+
+
+ wwpLeosSystemXFtpNumOfRetries OBJECT-TYPE
+     SYNTAX      Integer32(1..10) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Number of times to retry a file transfer request if it fails."
+     ::= { wwpLeosSystemXFtp 5 }
+
+ wwpLeosSystemXFtpRetryInterval OBJECT-TYPE
+     SYNTAX      Integer32(1..300) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Length of time in seconds to wait before retrying a file transfer if it fails."
+     ::= { wwpLeosSystemXFtp 6 }
+
+ wwpLeosSystemXFtpConnectionTimeout OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Length of time in seconds to wait before connection times out."
+     ::= { wwpLeosSystemXFtp 7 }
+
+ wwpLeosSystemXFtpTFtpServerTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosSystemXFtpTFtpServerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The (conceptual) table listing the default TFTP server"
+     ::= { wwpLeosSystemXFtp 8 }
+
+ wwpLeosSystemXFtpTFtpServerEntry OBJECT-TYPE
+     SYNTAX      WwpLeosSystemXFtpTFtpServerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "An entry (conceptual row) in the wwpLeosSystemXFtpTFtpServerTable."
+     INDEX      { wwpLeosSystemXFtpTFtpServerIndex }
+     ::= { wwpLeosSystemXFtpTFtpServerTable 1 }
+
+ WwpLeosSystemXFtpTFtpServerEntry ::= SEQUENCE {
+     wwpLeosSystemXFtpTFtpServerIndex         Integer32,
+     wwpLeosSystemXFtpTFtpServerHostName      DisplayString,
+     wwpLeosSystemXFtpTFtpServerRowStatus     RowStatus
+ }
+
+ wwpLeosSystemXFtpTFtpServerIndex     OBJECT-TYPE
+     SYNTAX      Integer32(1..1)        -- Only one instance currently
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Unique identifier to the table."
+     ::= { wwpLeosSystemXFtpTFtpServerEntry 1 }
+
+ wwpLeosSystemXFtpTFtpServerHostName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Host name or IP address of the default TFTP server."
+     ::= { wwpLeosSystemXFtpTFtpServerEntry 2 }
+
+ wwpLeosSystemXFtpTFtpServerRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Used to manage the creation and deletion of the conceptual rows in this table.
+          To create a row in this table, a manager must set this object to 'createAndGo'.
+          To delete an entry, set this object to 'destroy'.
+          At the current time, there is only one, static row in this table, with index 1."
+     ::= { wwpLeosSystemXFtpTFtpServerEntry 6 }
+
+ wwpLeosSystemXFtpFtpServerTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosSystemXFtpFtpServerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The (conceptual) table listing the default FTP server"
+     ::= { wwpLeosSystemXFtp 9 }
+
+ wwpLeosSystemXFtpFtpServerEntry OBJECT-TYPE
+     SYNTAX      WwpLeosSystemXFtpFtpServerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "An entry (conceptual row) in the wwpLeosSystemXFtpFtpServerTable."
+     INDEX      { wwpLeosSystemXFtpFtpServerIndex }
+     ::= { wwpLeosSystemXFtpFtpServerTable 1 }
+
+ WwpLeosSystemXFtpFtpServerEntry ::= SEQUENCE {
+     wwpLeosSystemXFtpFtpServerIndex         Integer32,
+     wwpLeosSystemXFtpFtpServerHostName      DisplayString,
+     wwpLeosSystemXFtpFtpServerUserName      DisplayString,
+     wwpLeosSystemXFtpFtpServerPassword      DisplayString,
+     wwpLeosSystemXFtpFtpServerSecret        DisplayString,
+     wwpLeosSystemXFtpFtpServerRowStatus     RowStatus
+ }
+
+ wwpLeosSystemXFtpFtpServerIndex     OBJECT-TYPE
+     SYNTAX      Integer32(1..1)        -- Only one instance currently
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Unique identifier to the table."
+     ::= { wwpLeosSystemXFtpFtpServerEntry 1 }
+
+ wwpLeosSystemXFtpFtpServerHostName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Host name or IP address of the default FTP server."
+     ::= { wwpLeosSystemXFtpFtpServerEntry 2 }
+
+ wwpLeosSystemXFtpFtpServerUserName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "User name / login ID to be used with the default FTP server."
+     ::= { wwpLeosSystemXFtpFtpServerEntry 3 }
+
+ wwpLeosSystemXFtpFtpServerPassword OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Password to be used with the default FTP server.
+          Returns an empty string when read.
+          Either the password or the secret may be set, but not both."
+     ::= { wwpLeosSystemXFtpFtpServerEntry 4 }
+
+ wwpLeosSystemXFtpFtpServerSecret OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Password secret to be used with the default FTP server.
+          Returns an empty string when read.
+          Either the password or the secret may be set, but not both."
+     ::= { wwpLeosSystemXFtpFtpServerEntry 5 }
+
+ wwpLeosSystemXFtpFtpServerRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Used to manage the creation and deletion of the conceptual rows in this table.
+          To create a row in this table, a manager must set this object to 'createAndGo'.
+          To delete an entry, set this object to 'destroy'.
+          At the current time, there is only one, static row in this table, with index 1."
+     ::= { wwpLeosSystemXFtpFtpServerEntry 6 }
+
+ wwpLeosSystemXFtpSFtpServerTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosSystemXFtpSFtpServerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The (conceptual) table listing the default SFTP server"
+     ::= { wwpLeosSystemXFtp 10 }
+
+ wwpLeosSystemXFtpSFtpServerEntry OBJECT-TYPE
+     SYNTAX      WwpLeosSystemXFtpSFtpServerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "An entry (conceptual row) in the wwpLeosSystemXFtpSFtpServerTable."
+     INDEX      { wwpLeosSystemXFtpSFtpServerIndex }
+     ::= { wwpLeosSystemXFtpSFtpServerTable 1 }
+
+ WwpLeosSystemXFtpSFtpServerEntry ::= SEQUENCE {
+     wwpLeosSystemXFtpSFtpServerIndex         Integer32,
+     wwpLeosSystemXFtpSFtpServerHostName      DisplayString,
+     wwpLeosSystemXFtpSFtpServerUserName      DisplayString,
+     wwpLeosSystemXFtpSFtpServerPassword      DisplayString,
+     wwpLeosSystemXFtpSFtpServerSecret        DisplayString,
+     wwpLeosSystemXFtpSFtpServerRowStatus     RowStatus
+ }
+
+ wwpLeosSystemXFtpSFtpServerIndex     OBJECT-TYPE
+     SYNTAX      Integer32(1..1)        -- Only one instance currently
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Unique identifier to the table."
+     ::= { wwpLeosSystemXFtpSFtpServerEntry 1 }
+
+ wwpLeosSystemXFtpSFtpServerHostName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Host name or IP address of the default SFTP server."
+     ::= { wwpLeosSystemXFtpSFtpServerEntry 2 }
+
+ wwpLeosSystemXFtpSFtpServerUserName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "User name / login ID to be used with the default SFTP server."
+     ::= { wwpLeosSystemXFtpSFtpServerEntry 3 }
+
+ wwpLeosSystemXFtpSFtpServerPassword OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Password to be used with the default SFTP server.
+          Returns an empty string when read.
+          Either the password or the secret may be set, but not both."
+     ::= { wwpLeosSystemXFtpSFtpServerEntry 4 }
+
+ wwpLeosSystemXFtpSFtpServerSecret OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Password secret to be used with the default SFTP server.
+          Returns an empty string when read.
+          Either the password or the secret may be set, but not both."
+     ::= { wwpLeosSystemXFtpSFtpServerEntry 5 }
+
+ wwpLeosSystemXFtpSFtpServerRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Used to manage the creation and deletion of the conceptual rows in this table.
+          To create a row in this table, a manager must set this object to 'createAndGo'.
+          To delete an entry, set this object to 'destroy'.
+          At the current time, there is only one, static row in this table, with index 1."
+     ::= { wwpLeosSystemXFtpSFtpServerEntry 6 }
+
+wwpLeosSystemCpuUtilization OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 11 }
+
+ wwpLeosSystemCpuUtilizationLast5Seconds OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Average 5 second CPU usage measurement."
+     ::= { wwpLeosSystemCpuUtilization 1 }
+     
+ wwpLeosSystemCpuUtilizationLast5SecondsMinimum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Minimum 5 second CPU usage measurement."
+     ::= { wwpLeosSystemCpuUtilization 2 }
+     
+ wwpLeosSystemCpuUtilizationLast5SecondsMaximum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The maximum 5 seconds CPU usage measurement."
+     ::= { wwpLeosSystemCpuUtilization 3 }
+     
+ wwpLeosSystemCpuUtilizationLast5SecondsState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The 5 seconds CPU usage state."
+     ::= { wwpLeosSystemCpuUtilization 4 }
+     
+ wwpLeosSystemCpuUtilizationLast10Seconds OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The 10 seconds CPU usage measurement."
+     ::= { wwpLeosSystemCpuUtilization 5 }
+     
+ wwpLeosSystemCpuUtilizationLast10SecondsMinimum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Minimum 10 seconds CPU usage measurement."
+     ::= { wwpLeosSystemCpuUtilization 6 }
+     
+ wwpLeosSystemCpuUtilizationLast10SecondsMaximum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Maximum 10 seconds CPU usage measurement."
+     ::= { wwpLeosSystemCpuUtilization 7 }
+     
+ wwpLeosSystemCpuUtilizationLast10SecondsState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The 10 seconds CPU usage state."
+     ::= { wwpLeosSystemCpuUtilization 8 }
+     
+ wwpLeosSystemCpuUtilizationLast60Seconds OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The 60 seconds CPU usage state."
+     ::= { wwpLeosSystemCpuUtilization 9 }
+     
+ wwpLeosSystemCpuUtilizationLast60SecondsMinimum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Minimum 60 seconds CPU usage measurement."
+     ::= { wwpLeosSystemCpuUtilization 10 }
+     
+ wwpLeosSystemCpuUtilizationLast60SecondsMaximum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Maximum 60 seconds CPU usage measurement."
+     ::= { wwpLeosSystemCpuUtilization 11 }
+     
+ wwpLeosSystemCpuUtilizationLast60SecondsState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The 60 seconds CPU state."
+     ::= { wwpLeosSystemCpuUtilization 12 }     
+
+wwpLeosSystemFileSystemUtilization OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 12 }
+
+ wwpLeosSystemFileSystemUtilizationTmpfsCurrent OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Current percentage usage of the /tmp/ directory in the filesystem."
+     ::= { wwpLeosSystemFileSystemUtilization 1 }
+     
+ wwpLeosSystemFileSystemUtilizationTmpfsMinimum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Minimum percentage usage of the /tmp/ directory in the file system."
+     ::= { wwpLeosSystemFileSystemUtilization 2 }
+     
+ wwpLeosSystemFileSystemUtilizationTmpfsMaximum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Maximum percentage usage of the /tmp/ directory in the file system."
+     ::= { wwpLeosSystemFileSystemUtilization 3 }
+     
+ wwpLeosSystemFileSystemUtilizationTmpfsState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Current state of the /tmp/ directory in the file system."
+     ::= { wwpLeosSystemFileSystemUtilization 4 }
+     
+ wwpLeosSystemFileSystemUtilizationSysfsCurrent OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Current percentage usage of the /mnt/sysfs/ directory in the file system."
+     ::= { wwpLeosSystemFileSystemUtilization 5 }
+     
+ wwpLeosSystemFileSystemUtilizationSysfsMinimum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Minimum percentage usage of the /mnt/sysfs/ directory in the file system."
+     ::= { wwpLeosSystemFileSystemUtilization 6 }
+     
+ wwpLeosSystemFileSystemUtilizationSysfsMaximum OBJECT-TYPE
+     SYNTAX      Integer32(1..100) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Maximum percentage usage of the /mnt/sysfs/ directory in the file system."
+     ::= { wwpLeosSystemFileSystemUtilization 7 }
+     
+ wwpLeosSystemFileSystemUtilizationSysfsState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Current state of the /mnt/sysfs/ directory in the file system."
+     ::= { wwpLeosSystemFileSystemUtilization 8 }
+
+wwpLeosSystemMemoryUtilization OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 13 }
+
+ wwpLeosSystemMemoryUtilizationUsedMemoryCurrent OBJECT-TYPE
+     SYNTAX      Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Current number of used memory in bytes."
+     ::= { wwpLeosSystemMemoryUtilization 1 }
+     
+ wwpLeosSystemMemoryUtilizationUsedMemoryMinimum OBJECT-TYPE
+     SYNTAX      Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Minimum number of used memory in bytes."
+     ::= { wwpLeosSystemMemoryUtilization 2 }
+     
+ wwpLeosSystemMemoryUtilizationUsedMemoryMaximum OBJECT-TYPE
+     SYNTAX      Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Maximum number of used memory in bytes."
+     ::= { wwpLeosSystemMemoryUtilization 3 }
+     
+ wwpLeosSystemMemoryUtilizationAvailableMemoryCurrent OBJECT-TYPE
+     SYNTAX      Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Current number of available memory in bytes."
+     ::= { wwpLeosSystemMemoryUtilization 4 }
+     
+ wwpLeosSystemMemoryUtilizationAvailableMemoryMinimum OBJECT-TYPE
+     SYNTAX      Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Minimum number of available memory in bytes."
+     ::= { wwpLeosSystemMemoryUtilization 5 }
+     
+ wwpLeosSystemMemoryUtilizationAvailableMemoryMaximum OBJECT-TYPE
+     SYNTAX      Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Maximum number of available memory in bytes."
+     ::= { wwpLeosSystemMemoryUtilization 6 }
+     
+ wwpLeosSystemMemoryUtilizationAvailableMemoryState OBJECT-TYPE
+     SYNTAX      INTEGER {
+      				normal(1),
+      				warning(2),
+      				degraded(3),
+      				faulted(4)
+      		          }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Current state of the available memory."
+     ::= { wwpLeosSystemMemoryUtilization 7 }
+
+ wwpLeosSystemGuardian OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 14 }
+ 
+ wwpLeosSystemGuardianAdminEnable     OBJECT-TYPE
+     SYNTAX             INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+    	     "Sets the admin state for the system guardian. A reboot is required for 
+           changes to take effect"               
+     ::= { wwpLeosSystemGuardian 1 }
+
+ wwpLeosSystemGuardianOperEnable     OBJECT-TYPE
+     SYNTAX             INTEGER {
+                        enable(1),
+                        disable(2),
+                        suspended(3)
+                        }
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+    	     "Displays the current guardian operational state."               
+     ::= { wwpLeosSystemGuardian 2 }
+
+ wwpLeosSystemGuardianLimitNumReboots     OBJECT-TYPE
+     SYNTAX             INTEGER {
+                        on(1),
+                        off(2)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+    	     "limits the number of consecutive guardian reboots to 3 if set to on."               
+     ::= { wwpLeosSystemGuardian 3 }
+
+ wwpLeosSystemGuardianConsecutiveReboots     OBJECT-TYPE
+     SYNTAX             Integer32(1..65535)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+    	     "The current number of consecutive guardian reboots"               
+     ::= { wwpLeosSystemGuardian 4 }
+
+ wwpLeosSystemGuardianTotalReboots     OBJECT-TYPE
+     SYNTAX             Integer32(1..65535)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+    	     "The total number of guardian reboots."               
+     ::= { wwpLeosSystemGuardian 5 }
+ 
+ wwpLeosSystemServers OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 15 }
+ 
+ wwpLeosSystemSftpServerAdminState     OBJECT-TYPE
+     SYNTAX             INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+    	     "Sets the admin state for the SFTP server"               
+     ::= { wwpLeosSystemServers 1 }
+ 
+ --
+ -- Traps
+ --
+
+ wwpLeosImproperCmdInConfigFile  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	              wwpLeosSystemConfigFileName, 
+		      wwpLeosSystemConfigErrLineNum,
+		      wwpLeosSystemConfigErrLinesTotal
+		      
+		   }
+	STATUS	   current
+	DESCRIPTION  
+		"A wwpLeosImproperCmdInConfigFile notif signifies that the SNMP entity, acting in
+                an agent role, has counted the number of improper commands that  were found in the
+		configuration file while processing the wwpLeosSystemConfigFileName"  
+	::= { wwpLeosSystemConfigMIBNotifications 1 } 
+	
+ wwpLeosSystemServiceModeChange  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	              wwpLeosSystemServiceMode		      
+		   	   }
+	STATUS	   current
+	DESCRIPTION  
+		"A wwpLeosSystemServiceModeChange notification will be sent out whenever someone changes the system service mode 
+		 between mpls and pbt."  
+	::= { wwpLeosSystemConfigMIBNotifications 2 }
+
+ wwpLeosSystemMemoryStatusNotification  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	              wwpLeosSystemMemoryUsageMemoryTotal,
+	              wwpLeosSystemMemoryUsageMemoryFree,
+	              wwpLeosSystemMemoryUsageStatus,
+                      wwpLeosSystemMemoryUsageMemoryAvailable
+		   	   }
+	STATUS	   current
+	DESCRIPTION  
+		"A wwpLeosSystemMemoryStatusNotification notification will be sent out whenever the system memory is
+		 below threshold limit."  
+	::= { wwpLeosSystemConfigMIBNotifications 3 }   
+	
+ wwpLeosImproperCmdInConfigLineString  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemConfigErrStr,
+	                  wwpLeosSystemConfigErrLineNum,
+	                  wwpLeosSystemConfigFileName
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"A wwpLeosImproperCmdInConfigLineString notif signifies that the SNMP entity, acting in
+                an agent role, has detected that improper commands were found in the
+		configuration file while processing the wwpLeosSystemConfigFileName. 
+		wwpLeosSystemConfigErrStr will specify the commands which failed with the line number."  
+	::= { wwpLeosSystemConfigMIBNotifications 4 }
+	
+ wwpLeosSystemCpuUtilization5SecondStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemCpuUtilizationLast5Seconds, 
+	                  wwpLeosSystemCpuUtilizationLast5SecondsState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemCpuUtilizationStatusTrap is sent out when the 5 second CPU utilization changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 5 }
+	
+ wwpLeosSystemCpuUtilization10SecondStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemCpuUtilizationLast10Seconds, 
+	                  wwpLeosSystemCpuUtilizationLast10SecondsState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemCpuUtilization10SecondStatusTrap is sent out when the 10 second CPU utilization changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 6 }
+	
+ wwpLeosSystemCpuUtilization60SecondStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemCpuUtilizationLast60Seconds,
+	                  wwpLeosSystemCpuUtilizationLast60SecondsState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemCpuUtilizationStatusTrap is sent out when the 60 second CPU utilization changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 7 }
+	
+ wwpLeosSystemCpu1MinLoadStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemCpuLoad1Min, 
+	                  wwpLeosSystemCpuLoad1MinState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemCpuLoadStatusTrap is sent out when the CPU load over one minute changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 8 }
+	
+ wwpLeosSystemCpu5MinLoadStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemCpuLoad5Min,
+	                  wwpLeosSystemCpuLoad5MinState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemCpuLoadStatusTrap is sent out when the CPU load over five minutes changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 9 }
+
+ wwpLeosSystemCpu15MinLoadStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemCpuLoad15Min, 
+	                  wwpLeosSystemCpuLoad15MinState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemCpuLoadStatusTrap is sent out when the CPU load over fifteen minutes changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 10 }
+	
+ wwpLeosSystemMemoryUtilizationStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemMemoryUtilizationAvailableMemoryCurrent, 
+	                  wwpLeosSystemMemoryUtilizationAvailableMemoryState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemMemoryUtilizationStatusTrap is sent out when the memory utilization changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 11 }
+	
+ wwpLeosSystemFileSystemUtilizationTmpStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemFileSystemUtilizationTmpfsCurrent, 
+	                  wwpLeosSystemFileSystemUtilizationTmpfsState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemFileSystemUtilizationTmpStatusTrap is sent out when the usage of '/tmp/' changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 12 }
+	
+ wwpLeosSystemFileSystemUtilizationSysfsStatusTrap  NOTIFICATION-TYPE
+	OBJECTS	   {  
+	                  wwpLeosSystemFileSystemUtilizationSysfsCurrent, 
+	                  wwpLeosSystemFileSystemUtilizationSysfsState
+		   }
+		   
+	STATUS	   current
+	DESCRIPTION  
+		"The wwpLeosSystemFileSystemUtilizationSysfsStatusTrap is sent out when the usage of '/mnt/sysfs/' changes states."  
+	::= { wwpLeosSystemConfigMIBNotifications 13 }
+        
+ --
+ -- module compliance  
+ --
+ wwpLeosDefaultGatewayCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+           "The compliance statement of wwpLeosSystemConfigAttr."
+       MODULE
+
+       GROUP   wwpLeosDefaultGatewayIPv6Group
+       DESCRIPTION
+           "This group is mandatory when IPv6 addresses are supported."
+
+       OBJECT  wwpLeosSystemConfigDefaultGatewayInetAddrType
+       SYNTAX  InetAddressType { ipv4(1), ipv6(2) }
+       DESCRIPTION
+           "An implementation is only required to support IPv4
+            and IPv6 addresses without zone indices."
+       ::= { wwpLeosSystemConfigCompliances 1 }                                            
+
+ wwpLeosBackupGatewayCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+           "The compliance statement of wwpLeosSystemConfigAttr."
+       MODULE
+
+       GROUP   wwpLeosBackupGatewayIPv6Group
+       DESCRIPTION
+           "This group is mandatory when IPv6 addresses are supported."
+
+       OBJECT  wwpLeosSystemConfigBackupGatewayInetAddrType
+       SYNTAX  InetAddressType { ipv4(1), ipv6(2) }
+       DESCRIPTION
+           "An implementation is only required to support IPv4
+            and IPv6 addresses without zone indices."
+       ::= { wwpLeosSystemConfigCompliances 2 }                                            
+
+ wwpLeosDefaultGatewayIPv6Group OBJECT-GROUP
+       OBJECTS { wwpLeosSystemConfigDefaultGatewayInetAddrType, wwpLeosSystemConfigDefaultGatewayInetAddress }
+       STATUS current
+       DESCRIPTION "System config default gateway objects for supporting IPv6."
+       ::= { wwpLeosSystemConfigMIBGroups 1 }
+
+ wwpLeosBackupGatewayIPv6Group OBJECT-GROUP
+       OBJECTS { wwpLeosSystemConfigBackupGatewayInetAddrType, wwpLeosSystemConfigBackupGatewayInetAddress }
+       STATUS current
+       DESCRIPTION "System config backup gateway objects for supporting IPv6."
+       ::= { wwpLeosSystemConfigMIBGroups 2 }
+
+ END
+     
+ --
+ -- WWP-SYSTEM-CONFIG-MIB.my
+ --

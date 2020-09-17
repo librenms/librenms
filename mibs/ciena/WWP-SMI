@@ -1,0 +1,73 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+--
+-- WWP-SMI.my
+--
+--
+
+	WWP-SMI DEFINITIONS ::= BEGIN
+
+		IMPORTS 
+			enterprises, MODULE-IDENTITY, OBJECT-IDENTITY			
+				FROM SNMPv2-SMI;
+	
+	
+		wwp MODULE-IDENTITY
+			LAST-UPDATED "201302090136Z"
+			ORGANIZATION
+				"Ciena, Inc."
+			CONTACT-INFO
+				"       Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+			DESCRIPTION
+				"Top-level WWP node definitions."
+
+			REVISION "201302090136Z"
+			DESCRIPTION
+				"MIB Version: 04-10-01-0027"
+			::= { enterprises 6141 }
+		
+	
+--
+-- Node definitions
+--
+	
+		wwpProducts OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION
+				"wwpProducts is the root OBJECT-IDENTIFIER for all WWP
+				products.  sysObjectID values will be assigned the OID
+				representing the product specified in WWP-PRODUCTS-MIB.my."
+			::= { wwp 1 }
+		
+		wwpModules OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION
+				"wwpModules provides a root object identifier that can be
+				used to assign MODULE-IDENTIFY values."
+			::= { wwp 2 }
+  
+  
+		wwpModulesLeos OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION
+				"wwpModulesLeos provides a root object identifier for leos that can be
+				  used to assign MODULE-IDENTIFY values."
+			::= { wwpModules 60 }
+		
+		wwpModulesLeosTce OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION
+				"wwpModulesLeosTce provides a root object identifier for leos TCE that can be
+				  used to assign MODULE-IDENTIFY values."
+			::= { wwpModules 61 }
+		
+	
+	END
+
+--
+-- WWP-SMI.my
+--

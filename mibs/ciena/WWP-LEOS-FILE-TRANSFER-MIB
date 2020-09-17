@@ -1,0 +1,346 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-FILE-TRANSFER-MIB.my
+ --
+
+ --  This module provides authoritative definitions for WWP's
+ --  enterprise-specific SNMP API to transfer the files 
+ --  and system images. This MIB uses TFTP to transfer the
+ --  file.
+ --  This module will be extended, as required.
+ 
+ WWP-LEOS-FILE-TRANSFER-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   IpAddress, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+	    FROM SNMPv2-SMI			
+   TruthValue, TEXTUAL-CONVENTION			
+	    FROM SNMPv2-TC		
+   InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB	    				
+   MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+   wwpModulesLeos
+	    FROM WWP-SMI;
+
+ wwpLeosFileTransferMIB MODULE-IDENTITY
+	    LAST-UPDATED "201203220000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "The MIB module for the WWP TFTP Operation to download a file."
+	    REVISION    "201203220000Z"
+	    DESCRIPTION
+		    "Added new MIB OIDs to support protocol version 
+                    independent of Inet Addressing.
+		    wwpLeosFTransferServerInetAddr and 
+                    wwpLeosFTransferServerInetAddrType are added."
+	    REVISION    "200104031700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 23 }
+						
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosFileTransferMIBObjects OBJECT IDENTIFIER ::= { wwpLeosFileTransferMIB 1 }
+ 
+ --
+ -- System Atributes
+ --
+ wwpLeosFileTransfer OBJECT IDENTIFIER ::= { wwpLeosFileTransferMIBObjects 1 }
+ 
+ 
+ -- Notifications 
+  
+ wwpLeosFileTransferMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosFileTransferMIB 2 } 
+ wwpLeosFiletransferMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosFileTransferMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosFileTransferMIBConformance OBJECT IDENTIFIER ::= { wwpLeosFileTransferMIB 3 } 
+ wwpLeosFileTransferMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosFileTransferMIBConformance 1 } 		
+ wwpLeosFileTransferMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosFileTransferMIBConformance 2 }
+
+ FileTransferState ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"The state of a File transfer operation. 
+		 The description of each state is given below:
+
+		 idle: 	              No file transfer operation is in place.
+
+		 sending:	      this state signifies that the file is being
+				      sent to the TFTP server.
+
+ 		 receiving: 	      this state signifies that the file is being
+				      received from the TFTP server.
+
+		 transferComplete:    the state when a file transfer request is
+				      successfully completed.
+
+		 failed:	      the file transfer request was unsuccesful.
+		"
+	SYNTAX	INTEGER {
+		idle(1),
+		sending(2),
+                receiving(3), 
+		transferComplete(4),
+		failed(5)
+	}
+
+ FileTransferFailCause ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"The reason a File transfer request failed."
+	SYNTAX INTEGER {
+                      noStatus(1),
+                      timeout(2),
+                      networkError(3),
+                      noSpace(4),
+		      invalidFileName(5),
+                      commandCompleted(6),
+	              internalError(7),
+                      commandFileParseError(8)
+                }
+	
+ wwpLeosFTransferOp OBJECT-TYPE
+     SYNTAX       INTEGER {
+		       none(0),
+		       sendFile(1),
+		       getFile(2),
+		       getCmdFile(3)
+		  }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "Used to transfer file(s) between a TFTP server (remote)
+	     and the device(local).  All transfers are binary. 				
+	     There are three types of file transfers:
+		
+	          sendFile sends a file to the host TFTP server.
+				
+		  getFile receives a file from the host server.
+				
+		  getCmdFile gets the specified file from the host
+		  and parses that file for additional operations to be performed.
+                  This is the mechanism used to upgrade the device with new software."
+      DEFVAL { none }
+      ::= { wwpLeosFileTransfer 1 } 
+	
+ wwpLeosFTransferServerAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The IP address of the TFTP server from (or to) which 
+             to transfer the file.Address must be a unicast address that 
+             is reachable from the agent and no firewalls or ACLs preventing 
+             TFTP datagrams from being transferred.
+             wwpLeosFTransferServerInetAddr cannot be set at the same time.
+             This OID will be set to 0.0.0.0 when the server has an IPv6 address,
+             which is shown in the wwpLeosFTransferServerInetAddr and the 
+             wwpLeosDnsServerInetAddrType is set to ipv6.  For a server with an
+             IPv4 address, the ip address will be shown in this OID and the
+             wwpLeosFTransferServerInetAddr with the wwpLeosDnsServerInetAddrType
+             set to ipv4."
+     DEFVAL { '00000000'h }
+     ::= { wwpLeosFileTransfer 2 }
+
+ wwpLeosFTransferRemoteFilename OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (1..64))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The file name (including the path, if applicable) to be retrieved from the 
+             TFTP server. If the switch/device is downloading a file, then this should be 
+             the name of the file on the remote server. Length of filename string must 
+             not exceed 64 alpha-numeric characters, no spaces in filenames."
+     DEFVAL { "" }        
+     ::= { wwpLeosFileTransfer 3 }
+
+ wwpLeosFTransferLocalFilename OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (1..64))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The file name (including the path, if applicable) to be written to.
+             If the switch/device is downloading a file, then this should be 
+             the name of the file on the switch/device. Length of filename string must 
+             not exceed 64 alpha-numeric characters, no spaces in filenames. By default
+             it will have the same value as of wwpLeosFTransferRemoteFilename."
+     ::= { wwpLeosFileTransfer 4 }
+ 
+
+ wwpLeosFTransferActivate  OBJECT-TYPE
+     SYNTAX          TruthValue
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+    	     "Activate the file transfer operation with a value of True(1). 
+             The object will return to 'false' once the file transfer is completed.
+             Poll wwpLeosFTransferStatus for current status. 
+	     Default value is False. wwpLeosFTransferRemoteFileName, wwpLeosFTransferServerAddress
+             and wwpLeosFTransferOp must be valid prior to setting this object to True."
+       DEFVAL { false }                
+       ::= { wwpLeosFileTransfer 5 }		
+
+ wwpLeosFTransferNotifOnCompletion OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Specifies whether or not a wwpLeosFTransferCompletion
+             notification should be issued on completion of the TFTP
+             transfer. If such a notification is desired, it is the
+             responsibility of the management entity to ensure that the
+             SNMP administrative model is configured in such a way as to
+             allow the notification to be delivered."
+     DEFVAL { true }
+     ::= { wwpLeosFileTransfer 6 }
+
+ wwpLeosFTransferStatus OBJECT-TYPE
+     SYNTAX        FileTransferState
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "Specifies the state of this file transfer request. If no file
+             transfer request is being processed, then the wwpLeosFTransferStatus
+             should be 'idle'."
+    ::= { wwpLeosFileTransfer 7 }
+
+ wwpLeosFTransferFailCause OBJECT-TYPE
+     SYNTAX       FileTransferFailCause
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The reason why the file transfer operation failed. If no file
+             transfer request is being processed, then the wwpLeosFTransferFileCause
+             should be 'noStatus'."           
+    ::= { wwpLeosFileTransfer 8 }
+
+ 
+ wwpLeosFTransferNotificationStatus OBJECT-TYPE
+     SYNTAX       INTEGER  {
+                     downloadSuccess(0),
+                     tftpServerNotFound(1),
+                     couldNotGetFile(2),
+                     cmdFileParseError(3),
+                     internalFilesystemError(4),
+                     inValidFileContents(5),
+                     flashOffline(6),
+                     noStatus(7),
+                     putSuccessful(8),
+                     couldNotPutFile(9),                    
+                     badFileCrc(10),
+                     allFilesSkipped(11),    
+                     fileAlreadyExist(12),  
+                     fileGetError(13),
+                     filePutError(14),
+                     fileSystemError(15),
+                     fileContentsInvalid(16),   
+                     serverIpAddrInvalid(18),
+                     filePathInvalid(19),
+                     fileNameInvalid(20),
+                     sourceNotFound(21),
+                     fileNameNeeded(22),
+                     notEnoughSpace(23),
+                     internalError(24)
+                  }
+     --MAX-ACCESS   accessible-for-notify
+     MAX-ACCESS     read-only
+     STATUS       current
+     DESCRIPTION
+             "The status of the file transfer which is to be reported 
+             via the FileTransfer Notification."
+    ::= { wwpLeosFileTransfer 9 }
+
+ wwpLeosFTransferNotificationInfo OBJECT-TYPE
+     SYNTAX         OCTET STRING (SIZE (0..512))
+     MAX-ACCESS     read-only
+     STATUS       current
+     DESCRIPTION
+             "The string explaining the error code in detail or the additional
+             info for the file transfer completion."
+    ::= { wwpLeosFileTransfer 10 }
+
+ wwpLeosFTransferServerInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The Inet address type of the TFTP server from (or to) which 
+              to transfer the file. Used in conjunction with 
+              wwpLeosFTransferServerInetAddr.
+              When set to :
+              ipv4: wwpLeosFTransferServerInetAddr should be compliant with 
+                    InetAddressIPv4 from RFC 4001
+              ipv6: wwpLeosFTransferServerInetAddr should be compliant with
+                    InetAddressIPv6 from RFC 4001"
+     ::= { wwpLeosFileTransfer 11 }
+
+ wwpLeosFTransferServerInetAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The Inet address of the TFTP server from (or to) which 
+              to transfer the file.  Address must be a unicast address that 
+              is reachable from the agent and no firewalls or ACLs preventing 
+              TFTP datagrams from being transferred. This OID must be used in 
+              conjuction with wwpLeosFTransferServerInetAddrType. 
+              The InetAddress set here should be compliant with rfc 4001
+              InetAddressType.
+              When this OID is set, wwpLeosFTransferServerAddr is set ot 0.0.0.0."
+     ::= { wwpLeosFileTransfer 12 }
+ 
+ wwpLeosFTransferCompletion NOTIFICATION-TYPE
+	OBJECTS	   {	wwpLeosFTransferRemoteFilename,
+                    wwpLeosFTransferLocalFilename,
+		    wwpLeosFTransferNotificationStatus,
+  	            wwpLeosFTransferNotificationInfo
+		   }
+	STATUS	   current
+	DESCRIPTION
+                 "A wwpLeosFTransferCompletion notification is sent at the completion 
+                 of a file transfer request."
+	::= { wwpLeosFiletransferMIBNotifications 1 }
+
+ --
+ -- module compliance  
+ --
+ wwpLeosFileTransferCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+           "The compliance statement of the wwpLeosFileTransfer MIB."
+       MODULE
+
+       GROUP   wwpLeosFileTransferIPv6Group
+       DESCRIPTION
+           "This group is mandatory when IPv6 addresses are supported."
+
+       OBJECT  wwpLeosFTransferServerInetAddrType
+       SYNTAX  InetAddressType { ipv4(1), ipv6(2) }
+       DESCRIPTION
+           "An implementation is only required to support IPv4
+            and IPv6 addresses without zone indices."
+       ::= { wwpLeosFileTransferMIBCompliances 1 }
+
+ wwpLeosFileTransferIPv6Group OBJECT-GROUP
+       OBJECTS { wwpLeosFTransferServerInetAddrType, wwpLeosFTransferServerInetAddr }
+       STATUS current
+       DESCRIPTION "File transfer objects for IPv6 address."
+       ::= { wwpLeosFileTransferMIBGroups 1 }
+ END
+ 
+ -- 
+ -- WWP-TFTP-MIB
+ --

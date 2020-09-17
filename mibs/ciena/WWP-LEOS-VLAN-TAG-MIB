@@ -1,0 +1,1088 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-VLAN-TAG-MIB.my
+ --
+
+ WWP-LEOS-VLAN-TAG-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   TimeTicks, Integer32, Unsigned32, Counter32, Counter64, OBJECT-TYPE, MODULE-IDENTITY                       
+        FROM SNMPv2-SMI                 
+   DisplayString, MacAddress, TEXTUAL-CONVENTION, RowStatus, TruthValue, TimeStamp                 
+        FROM SNMPv2-TC                                                  
+   wwpModulesLeos           
+        FROM WWP-SMI;
+
+        
+ wwpLeosVlanMIB MODULE-IDENTITY
+            LAST-UPDATED "200709291700Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+            DESCRIPTION
+                    "This MIB module defines the managed objects for the VLAN,
+                    specific for the WWP products."  
+
+            REVISION     "200709291700Z"
+            DESCRIPTION
+                    "Added VLAN statistics."
+            REVISION     "200301151700Z"
+            DESCRIPTION
+                    "Initial creation."
+            ::= { wwpModulesLeos 5 }
+
+ --
+ -- Textual conventions
+ --
+
+ VlanId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A Vlan ID represents a Broadcast Domain."
+    SYNTAX      INTEGER (1..24576)
+ 
+ VlanTag ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit ID used in the VLAN Tag header."
+    SYNTAX      INTEGER (1..4094)
+ 
+ --
+ -- Node definitions
+ --
+        
+ wwpLeosVlanMIBObjects OBJECT IDENTIFIER ::= { wwpLeosVlanMIB 1 }
+
+ wwpLeosVlan  OBJECT IDENTIFIER ::= { wwpLeosVlanMIBObjects 1 }
+ 
+ wwpLeosVlanEPR OBJECT IDENTIFIER ::= { wwpLeosVlanMIBObjects 2 }
+ 
+ 
+ -- Notifications 
+  
+ wwpLeosVlanMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosVlanMIB 2 } 
+ wwpLeosVlanMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosVlanMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosVlanMIBConformance OBJECT IDENTIFIER ::= { wwpLeosVlanMIB 3 } 
+ wwpLeosVlanMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosVlanMIBConformance 1 }                
+ wwpLeosVlanMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosVlanMIBConformance 2 }
+   
+ wwpLeosMaxVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of VLANs that this device
+        supports."
+    ::= { wwpLeosVlan 1 }
+    
+ wwpLeosMaxSupportedVlanTagId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum value of VLAN Tag ID that this 
+        device supports."
+    ::= { wwpLeosVlan 2 }
+    
+ wwpLeosNumVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of VLANs that are
+        configured in this device."
+    ::= { wwpLeosVlan 3 }
+    
+ wwpLeosVlanTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the config 
+            parameters for the VLAN."  
+     ::= { wwpLeosVlan 4 }
+                
+ wwpLeosVlanEntry OBJECT-TYPE
+     SYNTAX      WwpLeosVlanEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the wwpLeosVlanTable."
+     INDEX { wwpLeosVlanId }
+     ::= { wwpLeosVlanTable 1 }
+                
+ WwpLeosVlanEntry ::=  SEQUENCE { 
+     wwpLeosVlanId                         VlanId,
+     wwpLeosVlanName                       OCTET STRING,
+     wwpLeosVlanStatus                     RowStatus,
+     wwpLeosVlanMacLrnState                INTEGER,
+     wwpLeosVlanMacLrnOperState            INTEGER,
+     wwpLeosVlanTranslationVlan            INTEGER,
+     wwpLeosVlanEgressTpid                 INTEGER
+ }
+
+ wwpLeosVlanId OBJECT-TYPE
+     SYNTAX      VlanId
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "A unique identifier for the VLAN."
+     ::= { wwpLeosVlanEntry 1 }
+                
+ wwpLeosVlanName OBJECT-TYPE
+     SYNTAX       OCTET STRING (SIZE (0..32))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Name associated with this VLAN Entry."
+     ::= { wwpLeosVlanEntry 2 }
+
+ wwpLeosVlanStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, there should not be any port/tag associated with 
+             this VLAN."
+     ::= { wwpLeosVlanEntry 4 }  
+ 
+ wwpLeosVlanMacLrnState OBJECT-TYPE
+     SYNTAX       INTEGER {
+                                enabled(1),
+                                disabled(2)
+                          }
+     MAX-ACCESS   read-write
+     STATUS       current      
+     DESCRIPTION
+             "Setting this object will enable or disable MAC learning for the VLAN."
+     DEFVAL               { enabled }
+     ::= { wwpLeosVlanEntry 5 } 
+
+ wwpLeosVlanMacLrnOperState OBJECT-TYPE
+     SYNTAX       INTEGER {
+                                enabled(1),
+                                disabled(2),
+                                vsOverride(3)
+                          }
+     MAX-ACCESS   read-only
+     STATUS       current      
+     DESCRIPTION
+             "Displays the operational status of MAC learning for the VLAN."
+     DEFVAL               { enabled }
+     ::= { wwpLeosVlanEntry 6 }
+ 
+ wwpLeosVlanTranslationVlan OBJECT-TYPE
+     SYNTAX       INTEGER (0..24576)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "The translated VLAN for the given ingress VLAN specified by 
+             wwpLeosVlanId. Setting this MIB object to 0 will result in 
+             unsetting the translation VLAN for given ingress VLAN wwpLeosVlanId."
+     ::= { wwpLeosVlanEntry 7 }
+          
+ wwpLeosVlanEgressTpid OBJECT-TYPE
+     SYNTAX           INTEGER {
+                           tpid8100(1),
+                           tpid9100(2),
+                           tpid88A8(3)
+                      }
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "This object specifies the tpid used at egress for frames that egress a port on this vlan.
+              This is used in conjunction with port egress tpid policy described in wwpLeosVplsVirtualCircuitEtherTypePolicy."
+         DEFVAL { tpid8100 }
+     ::= { wwpLeosVlanEntry 8 }
+          
+ --
+ --  The VLAN Membership Table
+ --
+
+ wwpLeosVlanTagMemberTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanTagMemberEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the configuration parameters 
+            for the members of the VLANs."
+    ::= { wwpLeosVlan 5 }
+
+ wwpLeosVlanTagMemberEntry OBJECT-TYPE
+    SYNTAX     WwpLeosVlanTagMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosVlanTagMemberTable."
+    INDEX      { wwpLeosVlanId, wwpLeosVlanMemberPortId, wwpLeosVlanMemberTagId }
+    ::= { wwpLeosVlanTagMemberTable 1 }
+
+ WwpLeosVlanTagMemberEntry ::= SEQUENCE {   
+    wwpLeosVlanMemberPortId             INTEGER,
+    wwpLeosVlanMemberTagId              VlanTag,    
+    wwpLeosVlanMemberStatus             RowStatus
+ }
+ 
+ wwpLeosVlanMemberPortId   OBJECT-TYPE
+     SYNTAX           INTEGER(1..65535)
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "The port ID to be associated with this VLAN."               
+     ::= { wwpLeosVlanTagMemberEntry 1 }
+
+ wwpLeosVlanMemberTagId   OBJECT-TYPE
+     SYNTAX      VlanTag
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The VLAN Tag ID used by the port on this
+             VLAN. If the switch is being used as a traditional 
+             Layer 2 device, then the value of 
+             wwpLeosVlanMemberTagId should be same as wwpLeosVlanMemberId."
+     ::= { wwpLeosVlanTagMemberEntry 2 } 
+     
+ wwpLeosVlanMemberStatus OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'."
+     ::= { wwpLeosVlanTagMemberEntry 4 }
+
+ --
+ -- VC Table
+ -- 
+ wwpLeosVlanCircuitTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanCircuitEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the virtual circuit table."
+     ::= { wwpLeosVlan 6 }
+     
+ wwpLeosVlanCircuitEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVlanCircuitEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "The virtual circuit table entry indexed by virtual circuit index.
+              To create an entry, use the SNMP multiple set operation because 
+              wwpLeosCircuitVlanId, wwpLeosCircuitName and wwpLeosCircuitType 
+              are mandatory while creating entry in the table."
+     INDEX { wwpLeosCircuitIndex}
+     ::= { wwpLeosVlanCircuitTable 1 }
+     
+ WwpLeosVlanCircuitEntry ::=  SEQUENCE {
+     wwpLeosCircuitIndex                        INTEGER,
+     wwpLeosCircuitVlanId                       VlanId,
+     wwpLeosCircuitType                         INTEGER,
+     wwpLeosCircuitName                         OCTET STRING,
+     wwpLeosCircuitPriority                     INTEGER,
+     wwpLeosCircuitDataTunnelState              INTEGER,
+     wwpLeosCircuitCtrlProtocolTunnelState      INTEGER,
+     wwpLeosCircuitNumEndPoints                 INTEGER,
+     wwpLeosCircuitStatus                       RowStatus
+ }
+ 
+ wwpLeosCircuitIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the virtual circuit index in the table."
+     ::= { wwpLeosVlanCircuitEntry 1 } 
+  
+ wwpLeosCircuitVlanId OBJECT-TYPE
+     SYNTAX      VlanId
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the VLAN ID associated with virtual circuit index in the table."
+     ::= { wwpLeosVlanCircuitEntry 2 }
+  
+ wwpLeosCircuitType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        ethernet(1),
+                        mpls(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the type of virtual circuit eth or mpls."
+     ::= { wwpLeosVlanCircuitEntry 3 }
+
+ wwpLeosCircuitName OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (0..16))
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the name associated with the virtual circuit."
+     ::= { wwpLeosVlanCircuitEntry 4 }
+ 
+ wwpLeosCircuitPriority OBJECT-TYPE
+     SYNTAX      INTEGER (0..7)
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the 802.1D priority associated with the virtual circuit."
+     ::= { wwpLeosVlanCircuitEntry 5 }
+ 
+ wwpLeosCircuitDataTunnelState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        on(1),
+                        off(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the data tunnel state associated with the virtual circuit.
+         Setting to 'on' enables the tunnel for data frames. Setting to 'off' disables 
+         it."
+     ::= { wwpLeosVlanCircuitEntry 6 }
+ 
+ wwpLeosCircuitCtrlProtocolTunnelState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        on(1),
+                        off(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the control frame tunnel state associated with the virtual 
+        circuit. Setting to 'on' enables the tunnel for control frames. Setting to 
+        'off' disables it."
+     ::= { wwpLeosVlanCircuitEntry 7 }
+ 
+ wwpLeosCircuitNumEndPoints OBJECT-TYPE
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the number of end points associated with this entry."
+     ::= { wwpLeosVlanCircuitEntry 8 }
+
+ wwpLeosCircuitStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      deprecated
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry 
+         and by default will enable control frame and data frame tunnel
+         .       
+         Setting this object to 'destroy' will delete the entry
+         from the table for given VLAN."
+     ::= { wwpLeosVlanCircuitEntry 9 }
+
+ --
+ -- Vc Port Exclusive list
+ --  
+ wwpLeosVlanCircuitPortExclusiveTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanCircuitPortExclusiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the layer 2 control frame tunnel  
+             status on a VLAN."
+     ::= { wwpLeosVlan 7 }
+     
+ wwpLeosVlanCircuitPortExclusiveEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVlanCircuitPortExclusiveEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "The layer 2 control frame protocol tunnel entry for the VLAN."
+     INDEX { wwpLeosCircuitIndex, wwpLeosPortId}
+     ::= { wwpLeosVlanCircuitPortExclusiveTable 1 }
+     
+ WwpLeosVlanCircuitPortExclusiveEntry ::=  SEQUENCE { 
+     wwpLeosPortId                      INTEGER,
+     wwpLeosPortExclusiveStatus         RowStatus
+ }
+ 
+ wwpLeosPortId OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "This specifies the port which is the end point for in this virtual circuit."
+     ::= { wwpLeosVlanCircuitPortExclusiveEntry 1 }
+
+ wwpLeosPortExclusiveStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      deprecated
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry 
+         and designate the port as the end point of the virtual circuit.     
+         Setting this object to 'destroy' will delete the entry
+         from the table for the given virtual circuit."
+     ::= { wwpLeosVlanCircuitPortExclusiveEntry 2 }
+
+--
+-- l2 control frame protocol table
+--
+wwpLeosVlanCircuitCtrlProtocolTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanCircuitCtrlProtocolEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the layer 2 control frame protocol status 
+             tunnel for a given VLAN."
+     ::= { wwpLeosVlan 8 }
+     
+ wwpLeosVlanCircuitCtrlProtocolEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVlanCircuitCtrlProtocolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "The layer 2 control frame protocol tunnel entry for the VLAN."
+     INDEX {wwpLeosCircuitIndex, wwpLeosVlanl2ProtocolNum}
+     ::= { wwpLeosVlanCircuitCtrlProtocolTable 1 }
+     
+ WwpLeosVlanCircuitCtrlProtocolEntry ::=  SEQUENCE { 
+     wwpLeosVlanl2ProtocolNum           INTEGER,
+     wwpLeosVlanl2Type                  INTEGER
+ }
+
+  wwpLeosVlanl2ProtocolNum OBJECT-TYPE
+     SYNTAX      INTEGER {                     
+                     l28021x(1),
+                     rstp(2),
+                     ciscoCdp(3),
+                     ciscoDtp(4),
+                     ciscoPagp(5),
+                     ciscoPvst(6),
+                     ciscoUplinkFast(7),
+                     ciscoUdlp(8),
+                     ciscoVtp(9),
+                     gvrp(10),
+                     lacp(11),
+                     lacpMarker(12),
+                     lldp(13),
+                     oam(14),
+                     vlanBridge(15)                  
+                 }
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "This object represent the list of protocols supported by 
+         the device."
+     ::= { wwpLeosVlanCircuitCtrlProtocolEntry 1 }
+
+  wwpLeosVlanl2Type OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     discard(1),
+                     peer(2),
+                     tunnel(3)               
+                 }
+     MAX-ACCESS  read-create
+     STATUS      deprecated
+     DESCRIPTION
+        "Setting this object to 'discard' will cause wwpLeosProtocolNum
+         frames arriving at the specified UNI to be discarded.  
+         Setting this to 'peer' will cause the wwpLeosProtocolNum frame
+         to be processed by the provider network and cause the provider 
+         network to behave as a peer.  
+         Setting this to 'tunnel' will cause the wwpLeosProtocolNum frame to be 
+         tunneled."
+     ::= { wwpLeosVlanCircuitCtrlProtocolEntry 2 }
+
+--
+-- l2 global stats
+--
+wwpLeosVlanCircuitStats OBJECT IDENTIFIER ::= { wwpLeosVlan 9 }
+
+ wwpLeosVlanl2AllRxPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies total number of packets ingressed on VLAN."
+     ::= { wwpLeosVlanCircuitStats 1 }
+
+ wwpLeosVlanl2AllTunneledPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the total number of packets tunneled on the VLAN."
+     ::= { wwpLeosVlanCircuitStats 2 }
+
+ wwpLeosVlanl2AllPeerPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the total number of packets peered on the VLAN."
+     ::= { wwpLeosVlanCircuitStats 3 }
+
+ wwpLeosVlanl2AllDiscardedPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the total number of discarded packets on the VLAN."
+     ::= { wwpLeosVlanCircuitStats 4 }
+
+ wwpLeosVlanl2AllDecodedPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the total number of packets tunneled and then 
+        restored on the VLAN."
+     ::= { wwpLeosVlanCircuitStats 5 }
+
+ wwpLeosVlanl2AllDecodedFailures OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the total number of packets failed to 'untunnel'
+        on the VLAN."
+     ::= { wwpLeosVlanCircuitStats 6 }
+
+ wwpLeosVlanl2AllTunneledSubcriberPortPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the total number of tunneled packets received 
+         on the subscriber port on the VLAN."
+     ::= { wwpLeosVlanCircuitStats 7 }
+
+--
+-- l2 control frame protocol table stats
+--
+ wwpLeosVlanCircuitProtocolStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanCircuitProtocolStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the layer 2 control frame protocol 
+            statistics for a given VLAN."
+     ::= { wwpLeosVlan 10 }
+     
+ wwpLeosVlanCircuitProtocolStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVlanCircuitProtocolStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "The layer 2 control frame protocol statistics entry for the VLAN."
+     INDEX { wwpLeosCircuitIndex, wwpLeosVlanl2ProtocolNum}
+     ::= { wwpLeosVlanCircuitProtocolStatsTable 1 }
+     
+ WwpLeosVlanCircuitProtocolStatsEntry ::=  SEQUENCE { 
+     wwpLeosVlanl2RxPkts                        Counter32,
+     wwpLeosVlanl2TunneledPkts                  Counter32,
+     wwpLeosVlanl2PeerPkts                      Counter32,
+     wwpLeosVlanl2DiscardedPkts                 Counter32,
+     wwpLeosVlanl2DecodedPkts                   Counter32,
+     wwpLeosVlanl2DecodedFailures               Counter32,
+     wwpLeosVlanl2TunneledSubcriberPortPkts     Counter32
+ }
+
+ wwpLeosVlanl2RxPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the number of packets ingressed matching the protocol."
+     ::= { wwpLeosVlanCircuitProtocolStatsEntry 1 }
+
+ wwpLeosVlanl2TunneledPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the number of packets tunneled."
+     ::= { wwpLeosVlanCircuitProtocolStatsEntry 2 }
+
+ wwpLeosVlanl2PeerPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the number of peered packets."
+     ::= { wwpLeosVlanCircuitProtocolStatsEntry 3 }
+
+ wwpLeosVlanl2DiscardedPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the number of discarded packets."
+     ::= { wwpLeosVlanCircuitProtocolStatsEntry 4 }
+
+ wwpLeosVlanl2DecodedPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the number of packets tunneled and then restored."
+     ::= { wwpLeosVlanCircuitProtocolStatsEntry 5 }
+
+ wwpLeosVlanl2DecodedFailures OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the number of packets failed to 'untunnel'."
+     ::= { wwpLeosVlanCircuitProtocolStatsEntry 6 }
+
+ wwpLeosVlanl2TunneledSubcriberPortPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "Specifies the number of tunneled packets received 
+         on the subscriber port."
+     ::= { wwpLeosVlanCircuitProtocolStatsEntry 7 }
+
+--
+-- VLAN stats
+--       
+ wwpLeosVlanStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "A list of VLAN statistics entries."
+     ::= { wwpLeosVlan 11 }
+                 
+ wwpLeosVlanStatsEntry OBJECT-TYPE
+     SYNTAX       WwpLeosVlanStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+           "An entry in the VLAN stats table."
+     INDEX { wwpLeosVlanStatsVlanId }
+     ::= { wwpLeosVlanStatsTable 1 }
+            
+ WwpLeosVlanStatsEntry ::= SEQUENCE { 
+     wwpLeosVlanStatsVlanId               VlanTag,
+     wwpLeosVlanStatsCreateTime           TimeStamp,
+     wwpLeosVlanStatsUniOctets            Counter64,
+     wwpLeosVlanStatsUniPkts              Counter32,
+     wwpLeosVlanStatsNonUniOctets         Counter64,
+     wwpLeosVlanStatsNonUniPkts           Counter32,
+     wwpLeosVlanStatsStatus               RowStatus,
+     wwpLeosVlanStatsClear                TruthValue,
+     wwpLeosVlanStatsPortId               INTEGER
+}
+
+ wwpLeosVlanStatsVlanId OBJECT-TYPE
+    SYNTAX        VlanTag
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+          "The VLAN ID for this statistics entry."
+    ::= { wwpLeosVlanStatsEntry 1 }
+
+ wwpLeosVlanStatsCreateTime OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The value of sysUpTime when this control entry was last
+            activated. This value can be used by the management station to
+            ensure that the entry has not been deleted and recreated
+            between polls."
+    ::= { wwpLeosVlanStatsEntry 2 }
+
+ wwpLeosVlanStatsUniOctets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of unicast bytes through this VLAN."
+    ::= { wwpLeosVlanStatsEntry 3 }
+
+ wwpLeosVlanStatsUniPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of unicast packets through this VLAN."
+    ::= { wwpLeosVlanStatsEntry 4 }
+
+wwpLeosVlanStatsNonUniOctets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of broadcast or multicast bytes through this VLAN."
+    ::= { wwpLeosVlanStatsEntry 5 }
+
+ wwpLeosVlanStatsNonUniPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of broadcast or multicast packets through this VLAN."
+    ::= { wwpLeosVlanStatsEntry 6 }
+    
+ wwpLeosVlanStatsStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Setting this object to 'createAndGo' will enable the collection 
+         of statistics on the specified VLAN, clear the initial statistics
+         bucket and add the entry to the table.
+         Setting this object to 'destroy' will disable the collection of
+         statistics and remove the entry from the table for given VLAN."
+    ::= { wwpLeosVlanStatsEntry 7 }
+    
+ wwpLeosVlanStatsClear OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+          "Setting this object to True will reset the statistics of the
+          given VLAN. Read on this object will always return False."
+    DEFVAL          { false }
+    ::= { wwpLeosVlanStatsEntry 8 }
+
+ wwpLeosVlanStatsPortId OBJECT-TYPE
+     SYNTAX           INTEGER(0..65535)
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "The port ID to be associated with this VLAN statistics entry.
+              When a portId is specified, VLAN statistics gathering	is restricted
+              to the specified port. A port ID of zero means no port restriction.
+             Support for this object is currently not implemented."
+     DEFVAL		      { 0 }
+     ::= { wwpLeosVlanStatsEntry 9 }          
+--
+-- VLAN Total stats
+--       
+ wwpLeosVlanTotalStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanTotalStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "A list of VLAN statistics entries."
+     ::= { wwpLeosVlan 12 }   
+      
+ wwpLeosVlanTotalStatsEntry OBJECT-TYPE
+     SYNTAX       WwpLeosVlanTotalStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+           "An entry in the VLAN statistics table."
+     INDEX { wwpLeosVlanTotalStatsVlanId }
+     ::= { wwpLeosVlanTotalStatsTable 1 }   
+     
+  WwpLeosVlanTotalStatsEntry ::= SEQUENCE { 
+     wwpLeosVlanTotalStatsVlanId               VlanTag,
+     wwpLeosVlanTotalStatsCreateTime           TimeStamp,
+     wwpLeosVlanTotalStatsUniOctets            Counter64,
+     wwpLeosVlanTotalStatsUniPkts              Counter32,
+     wwpLeosVlanTotalStatsNonUniOctets         Counter64,
+     wwpLeosVlanTotalStatsNonUniPkts           Counter32,
+     wwpLeosVlanTotalStatsStatus               RowStatus,
+     wwpLeosVlanTotalStatsClear                TruthValue,
+     wwpLeosVlanTotalStatsPortId               INTEGER
+}
+
+ wwpLeosVlanTotalStatsVlanId OBJECT-TYPE
+    SYNTAX        VlanTag
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+          "The VLAN ID for this statistics entry."
+    ::= { wwpLeosVlanTotalStatsEntry 1 }
+
+ wwpLeosVlanTotalStatsCreateTime OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The value of sysUpTime when this control entry was last
+            activated. This value can be used by the management station to
+            ensure that the entry has not been deleted and recreated
+            between polls."
+    ::= { wwpLeosVlanTotalStatsEntry 2 }
+
+ wwpLeosVlanTotalStatsUniOctets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of unicast bytes through this VLAN."
+    ::= { wwpLeosVlanTotalStatsEntry 3 }
+
+ wwpLeosVlanTotalStatsUniPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of unicast packets through this VLAN."
+    ::= { wwpLeosVlanTotalStatsEntry 4 }
+
+wwpLeosVlanTotalStatsNonUniOctets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of broadcast or multicast bytes through this VLAN."
+    ::= { wwpLeosVlanTotalStatsEntry 5 }
+
+ wwpLeosVlanTotalStatsNonUniPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of broadcast or multicast packets through this VLAN."
+    ::= { wwpLeosVlanTotalStatsEntry 6 }
+    
+ wwpLeosVlanTotalStatsStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Setting this object to 'createAndGo' will enable the collection 
+         of statistics on the specified VLAN, clear the initial statistics
+         bucket and add the entry to the table.
+         Setting this object to 'destroy' will disable the collection of
+         statistics and remove the entry from the table for given VLAN."
+    ::= { wwpLeosVlanTotalStatsEntry 7 }
+    
+ wwpLeosVlanTotalStatsClear OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+          "Setting this object to True resets the statistics of the given VLAN.
+           Read on this object will always return False."
+    DEFVAL          { false }
+    ::= { wwpLeosVlanTotalStatsEntry 8 }
+
+ wwpLeosVlanTotalStatsPortId   OBJECT-TYPE
+     SYNTAX           INTEGER(0..65535)
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "The port ID to be associated with this VLAN statistics entry.
+             When a portId is specified, the VLAN statistics gathering is restricted
+             to the specified port. A port ID of zero means no port restriction.
+             Support for this object is currently not implemented."
+     DEFVAL		      { 0 }
+     ::= { wwpLeosVlanTotalStatsEntry 9 } 
+
+--
+-- VLAN Translation Table.
+--       
+ wwpLeosVlanTranslationTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanTranslationEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "VLAN translation table."
+     ::= { wwpLeosVlan 13 }   
+      
+ wwpLeosVlanTranslationEntry OBJECT-TYPE
+     SYNTAX       WwpLeosVlanTranslationEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+           "An entry in the VLAN translation table."
+     INDEX { wwpLeosVlanTranslationPgId, wwpLeosVlanTranslationFrameVid }
+     ::= { wwpLeosVlanTranslationTable 1 }   
+     
+  WwpLeosVlanTranslationEntry ::= SEQUENCE { 
+     wwpLeosVlanTranslationPgId               INTEGER,
+     wwpLeosVlanTranslationFrameVid			  VlanTag,
+     wwpLeosVlanTranslationVlanId				  VlanTag,
+     wwpLeosVlanTranslationStatus		  RowStatus
+    }
+    
+  wwpLeosVlanTranslationPgId		OBJECT-TYPE
+  	SYNTAX		INTEGER (1..65535)
+  	MAX-ACCESS	not-accessible
+  	STATUS		current
+  	DESCRIPTION
+  			"Logical port interface for which the translation applies."
+  	::= {wwpLeosVlanTranslationEntry 1}
+  	
+  wwpLeosVlanTranslationFrameVid	OBJECT-TYPE
+  	SYNTAX		VlanTag
+  	MAX-ACCESS	not-accessible
+  	STATUS		current
+  	DESCRIPTION
+  		"Frame Ingres-egress vlan-id."
+  	::= { wwpLeosVlanTranslationEntry 2 }
+  	
+  wwpLeosVlanTranslationVlanId		OBJECT-TYPE
+  	SYNTAX		VlanTag
+  	MAX-ACCESS	read-create
+  	STATUS		current
+  	DESCRIPTION	
+  		"Assign/stamp to this internal VLAN."
+  	::= { wwpLeosVlanTranslationEntry 3 }
+  	
+  wwpLeosVlanTranslationStatus		OBJECT-TYPE
+  	SYNTAX		RowStatus
+  	MAX-ACCESS	read-create
+  	STATUS		current
+  	DESCRIPTION
+  		"Setting this object to CreateAndGo will create a VLAn tranlsation entry. Setting 
+  		this object to destroy will delete a translation entry."
+  	::= { wwpLeosVlanTranslationEntry 4 }
+
+
+
+--
+-- EPR
+--
+ wwpLeosVlanEPRTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanEPREntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the egress port
+            restriction parameters for the VLAN."  
+     ::= { wwpLeosVlanEPR 1 }
+     
+ wwpLeosVlanEPREntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVlanEPREntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The egress port restriction entry for a VLAN."
+     INDEX { wwpLeosVlanId }
+     ::= { wwpLeosVlanEPRTable 1 }
+     
+ WwpLeosVlanEPREntry ::=  SEQUENCE { 
+     wwpLeosVlanEPRState             INTEGER    
+ } 
+ 
+ wwpLeosVlanEPRState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'enable' will enable the 
+         egress port restriction on this VLAN. Setting this 
+         object to 'disable' will disable the egress port 
+         restriction on this VLAN."
+      DEFVAL { disable } 
+     ::= { wwpLeosVlanEPREntry 1 }
+     
+ --
+ -- wwpLeosVlanEPRGrpMemTable
+ --  
+ wwpLeosVlanEPRGrpMemTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanEPRGrpMemEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the egress port
+            restriction group for the VLAN members."  
+     ::= { wwpLeosVlanEPR 2 }
+     
+ wwpLeosVlanEPRGrpMemEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVlanEPRGrpMemEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The egress port restriction group entry for the
+              VLAN members."
+     INDEX { wwpLeosVlanId, wwpLeosVlanMemberPortId, wwpLeosVlanMemberTagId }
+     ::= { wwpLeosVlanEPRGrpMemTable 1 }
+     
+ WwpLeosVlanEPRGrpMemEntry ::=  SEQUENCE {
+     wwpLeosVlanEPRGrpName      INTEGER     
+ }
+ 
+ wwpLeosVlanEPRGrpName OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    groupA(1),
+                    groupB(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Setting this object will assign the specified group to 
+        the given port-tag-vlan combination."      
+     ::= { wwpLeosVlanEPRGrpMemEntry 1 }
+      
+ --
+ -- wwpLeosVlanEPRGrpAccessTable
+ --  
+ wwpLeosVlanEPRGrpAccessTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVlanEPRGrpAccessEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the group access
+             for the given VLAN."  
+     ::= { wwpLeosVlanEPR 3 }
+     
+ wwpLeosVlanEPRGrpAccessEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVlanEPRGrpAccessEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Entry for the group access for the given VLAN."
+     INDEX { wwpLeosVlanId }
+     ::= { wwpLeosVlanEPRGrpAccessTable 1 }
+     
+ WwpLeosVlanEPRGrpAccessEntry ::=  SEQUENCE {
+     wwpLeosVlanEPRGrpAAccess           INTEGER,
+     wwpLeosVlanEPRGrpBAccess           INTEGER
+ }
+ 
+ wwpLeosVlanEPRGrpAAccess OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    groupA(1),
+                    groupB(2),
+                    groupAB(3)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Setting this object will allow group A members for this VLAN
+         to talk to specified group."      
+     ::= { wwpLeosVlanEPRGrpAccessEntry 1 }
+ 
+ wwpLeosVlanEPRGrpBAccess OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    groupA(1),
+                    groupB(2),
+                    groupAB(3)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Setting this object will allow group B members for this VLAN
+         to talk to specified group."      
+     ::= { wwpLeosVlanEPRGrpAccessEntry 2 } 
+
+
+ END
+

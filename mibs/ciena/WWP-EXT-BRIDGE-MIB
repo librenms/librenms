@@ -1,0 +1,563 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-EXT-BRIDGE-MIB.my
+ --
+ --
+
+ WWP-EXT-BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   TimeTicks, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY			
+	FROM SNMPv2-SMI			
+   DisplayString, MacAddress, TEXTUAL-CONVENTION, RowStatus, TruthValue			
+	FROM SNMPv2-TC							
+   wwpModules			
+	FROM WWP-SMI;
+
+	
+ wwpExtBridgeMIB MODULE-IDENTITY
+	    LAST-UPDATED "200511230900Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "This MIB module is for the Extension of the BRIDGE MIB for WWP Products"
+
+            REVISION    "200511230900Z"
+	    DESCRIPTION
+		    "Updated with port rate limit state and rate limit value controls."
+	    REVISION    "200104031700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModules 4 }
+
+ --
+ -- Textual conventions
+ --
+
+ PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING (SIZE (0..255))
+					
+
+ VlanId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      INTEGER (1..4094)
+
+
+
+ --
+ -- Node definitions
+ --
+	
+ wwpExtBridgeMIBObjects OBJECT IDENTIFIER ::= { wwpExtBridgeMIB 1 }
+ 
+ wwpPort OBJECT IDENTIFIER ::= { wwpExtBridgeMIBObjects 1 }
+
+ wwpVlan  OBJECT IDENTIFIER ::= { wwpExtBridgeMIBObjects 2 }
+ 
+ 
+ -- Notifications 
+  
+ wwpExtBridgeMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpExtBridgeMIB 2 } 
+ wwpExtBridgeMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpExtBridgeMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpExtBridgeMIBConformance OBJECT IDENTIFIER ::= { wwpExtBridgeMIB 3 } 
+ wwpExtBridgeMIBCompliances OBJECT IDENTIFIER ::= { wwpExtBridgeMIBConformance 1 } 		
+ wwpExtBridgeMIBGroups      OBJECT IDENTIFIER ::= { wwpExtBridgeMIBConformance 2 }
+
+		
+ wwpPortTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpPortEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Ports."
+     ::= { wwpPort 1 }
+		
+ wwpPortEntry OBJECT-TYPE
+     SYNTAX       WwpPortEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Port Entry in the Table."
+     INDEX { wwpPortId }
+     ::= { wwpPortTable 1 } 
+
+ WwpPortEntry ::= SEQUENCE { 
+     wwpPortId                 INTEGER,
+     wwpPortType               INTEGER,
+     wwpPortName               DisplayString,
+     wwpPortPhysAddr	       MacAddress,
+     wwpPortAutoNeg            TruthValue,
+     wwpPortAdminStatus	       INTEGER,
+     wwpPortOperStatus         INTEGER,
+     wwpPortAdminSpeed	       INTEGER,
+     wwpPortOperSpeed          Integer32,
+     wwpPortAdminDuplex        INTEGER,
+     wwpPortOperDuplex	       INTEGER,
+     wwpPortAdminFlowCtrl      INTEGER,
+     wwpPortOperFlowCtrl       INTEGER, 
+     wwpPortTagged             INTEGER,
+     wwpPortUntaggedPriority   INTEGER,
+     wwpPortMaxFrameSize       INTEGER,
+     wwpPortIngressFiltering   INTEGER,
+     wwpPortRateLimitState     TruthValue,
+     wwpPortRateLimitValue     INTEGER
+  } 
+ 
+
+ wwpPortId   OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Port ID for the instance.  Port ID's start at 1, and are
+	     consecutive for each additional port. This port Id should 
+             refer to the dot1dBasePort in the Dot1dBasePortEntry."
+     ::= { wwpPortEntry 1 }		
+ 
+ wwpPortType OBJECT-TYPE
+     SYNTAX        INTEGER {
+		        lx(1),
+		        fastEth(2),
+			voip(3),
+                        sx(4),
+                        hundredFx(5),
+                        unknown(6)
+		   }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+	     "The port type for the port."
+     ::= { wwpPortEntry 2 }
+
+		 
+ wwpPortName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..32))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "Friendly name for the port."
+     ::= { wwpPortEntry 3 }
+
+ wwpPortPhysAddr OBJECT-TYPE
+     SYNTAX       MacAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The ethernet MAC address for the port. This information can also
+             be achieved via dot1dTpFdbTable"
+     ::= { wwpPortEntry 4 }
+		
+ wwpPortAutoNeg  OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The object sets the port to AUTO NEG MOde and vice versa.
+             Specific platforms may have requirements of configuring
+             speed before moving the port to out of AUTO-NEG mode."
+     ::= { wwpPortEntry 5 }
+
+ wwpPortAdminStatus OBJECT-TYPE
+     SYNTAX       INTEGER{
+		       up(1),
+		       down(2)
+		  }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The desired state of the port."
+     ::= { wwpPortEntry 6 }
+		
+ wwpPortOperStatus OBJECT-TYPE
+     SYNTAX        INTEGER {
+			up(1),
+			down(2)
+		   }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+	     "The current operational state of Port."
+     ::= { wwpPortEntry 7 }
+		
+ wwpPortAdminSpeed OBJECT-TYPE
+     SYNTAX        INTEGER {
+			tenMb(1),
+			hundredMb(2),
+			gig(3),
+                        auto(4) 
+		   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "Desired speed of the port. 
+             Set the port speed to be either 10MB, 100MB, or gig.
+             The Management Station can't set the wwpPortAdminSpeed to auto.
+             The default value for this object depends upon the platform."
+     ::= { wwpPortEntry 8 }
+		
+ wwpPortOperSpeed OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "The current operational speed of the port in MB."
+     ::= { wwpPortEntry 9 }
+		
+ wwpPortAdminDuplex OBJECT-TYPE
+     SYNTAX         INTEGER {
+		         half(1),
+			 full(2),
+                         auto(3)
+		     }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "The desired mode for the port. It can be set to either half or full duplex 
+             operation but not to auto.The default value for this object 
+             depends upon the platform."
+     ::= { wwpPortEntry 10 }
+		
+ wwpPortOperDuplex OBJECT-TYPE
+     SYNTAX        INTEGER {
+			half(1),
+			full(2),
+			auto(3)
+		   }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+	     "The current duplex mode of the port."
+     ::= { wwpPortEntry 11 }
+		
+ wwpPortAdminFlowCtrl OBJECT-TYPE
+     SYNTAX           INTEGER {
+			   disable(0),
+			   enable(1)
+		      }
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "Configures the ports flow control operation.  Need to check
+	      802.3x for additional modes for gig ports."
+     ::= { wwpPortEntry 12 }
+		
+ wwpPortOperFlowCtrl OBJECT-TYPE
+     SYNTAX          INTEGER {
+			  disabled(0),
+			  enabled(1)
+		     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+	     "Shows ports flow control configuration."
+     ::= { wwpPortEntry 13 }
+		
+ wwpPortTagged OBJECT-TYPE
+     SYNTAX      INTEGER {
+		      untagged(0),
+		      tagged(1)
+		 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION 
+             "The port tagged Status can be set to tagged or untagged. If a port
+             is part of more than one VLAN, then the port Status should be 'tagged'."
+     ::= { wwpPortEntry 14 }
+		
+ wwpPortUntaggedPriority OBJECT-TYPE
+     SYNTAX       INTEGER {	
+		       p0(0),
+		       p1(1),
+		       p2(2),
+		       p3(3),
+		       p4(4),
+		       p5(5),
+		       p6(6),
+		       p7(7)
+		   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "The 802.1p packet priority to be assigned to packets associated
+	      with this port that do not have an 802.1Q VLAN header."
+     ::= { wwpPortEntry 15 }
+
+ wwpPortMaxFrameSize   OBJECT-TYPE
+     SYNTAX         INTEGER (1522..9126) 
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "Setting this object will set the max frame size allowed on a 
+	      port. The max frame size can vary between 1522 bytes till 
+	      9216 bytes. Default value is 1522 bytes"
+     ::= { wwpPortEntry 16 }
+
+ wwpPortIngressFiltering   OBJECT-TYPE
+     SYNTAX         INTEGER {
+			true(1),
+			false(2)
+		    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "When this is true(1) the device will discard incoming
+	      frames for VLANs which do not include this Port in its
+	      Member set.  When false(2), the port will accept all
+              incoming frames."
+     ::= { wwpPortEntry 17 }
+                            
+wwpPortRateLimitState  OBJECT-TYPE
+     SYNTAX            TruthValue 
+     MAX-ACCESS        read-write
+     STATUS            current
+     DESCRIPTION
+	     "When set to true, the rate limiting mechanism is enabled for
+       this port.  When set to false, the rate limiting mechanism
+       is disabled for this port."
+     DEFVAL { false }      
+     ::= { wwpPortEntry 18 }
+
+wwpPortRateLimitValue OBJECT-TYPE
+     SYNTAX           INTEGER (0..2147483647)
+     UNITS            "Bits per second"
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The value of this object represents the desired bit-rate limit 
+       for this port.  When the rate limiting mechanism is enabled for
+       this port, this value is enforced to the best extent possible by
+       the device.
+
+       For some devices the actual maximum bit-rate allowed may exceed the
+       rate limit parameter under certain circumstances due to hardware and
+       software limitations."
+     DEFVAL { 10000000 }
+     ::= { wwpPortEntry 19 }
+                            
+                            
+ wwpLocalMgmtPortEnable   OBJECT-TYPE
+     SYNTAX          TruthValue
+     MAX-ACCESS      read-write
+     STATUS          deprecated
+     DESCRIPTION
+    	     "Setting this object to false(2) will disable the local Management
+             Port. The object has been deprecated as we need to have the general
+             functionality of disabling and enabling any in-band and out-band
+             management interface."
+       DEFVAL { true }                
+       ::= { wwpPort 2 }	
+
+ wwpVlanVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    version1(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version number of IEEE 802.1Q that this device
+        supports."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.1.1"
+    ::= { wwpVlan 1 }
+
+ wwpMaxVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum IEEE 802.1Q VLAN ID that this device
+        supports."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 9.3.2.3"
+    ::= { wwpVlan 2 }
+
+
+ wwpMaxSupportedVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of IEEE 802.1Q VLANs that this
+        device supports."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.1.1"
+    ::= { wwpVlan 3 }
+
+ wwpNumVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of IEEE 802.1Q VLANs that are
+        configured in this device."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.1.1"
+    ::= { wwpVlan 4 }
+
+ wwpVlanTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpVlanEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+	     "VLAN table"
+     ::= { wwpVlan 5 }
+		
+ wwpVlanEntry OBJECT-TYPE
+     SYNTAX      WwpVlanEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	     "table of VLANs"
+     INDEX { wwpVlanId }
+     ::= { wwpVlanTable 1 }
+		
+ WwpVlanEntry ::=  SEQUENCE { 
+     wwpVlanId                        VlanId,
+     wwpVlanName                      DisplayString,
+     -- wwpVlanIfIndex                Integer32,     
+     wwpVlanCurrentEgressPorts	      PortList,
+     wwpVlanCurrentUntaggedPorts      PortList,
+     wwpVlanMgmtStatus                INTEGER, 
+     wwpVlanRowStatus                 RowStatus
+ }
+
+ wwpVlanId OBJECT-TYPE
+     SYNTAX      VlanId
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "802.1Q VLAN ID (1-4094)"
+     ::= { wwpVlanEntry 1 }
+		
+ wwpVlanName OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..32))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "Name associated with this VLAN."
+     ::= { wwpVlanEntry 2 }
+
+
+-- wwpVlanIfIndex OBJECT-TYPE
+--     SYNTAX        Integer32 (1..2147483647)
+--     MAX-ACCESS    read-write
+--     STATUS        current
+--     DESCRIPTION
+--             "The value of the instance of the ifIndex object,
+--             defined in MIB-II, for the interface corresponding
+--             to this Vlan."
+--     ::= { wwpVlanEntry 3 }
+	
+ wwpVlanCurrentEgressPorts OBJECT-TYPE
+     SYNTAX      PortList
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The set of ports which are transmitting traffic for
+             this VLAN as either tagged or untagged frames."
+     REFERENCE
+          "IEEE 802.1Q/D11 Section 12.10.2.1"
+     DEFVAL { '0000'h }
+     ::= { wwpVlanEntry 3 }
+	
+ wwpVlanCurrentUntaggedPorts OBJECT-TYPE
+     SYNTAX      PortList
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The set of ports which are transmitting traffic for
+        this VLAN as untagged frames."
+     REFERENCE
+         "IEEE 802.1Q/D11 Section 12.10.2.1"
+     ::= { wwpVlanEntry 4 }
+
+ wwpVlanMgmtStatus  OBJECT-TYPE
+     SYNTAX         INTEGER {
+                      notMgmtVlan(0),
+                      remoteMgmtVlan(1),
+                      localMgmtVlan(2)
+                   }                      
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+  	     "Indicates if this VLAN is a management VLAN.  The system
+	     can have at most one remote management VLAN, and one local
+	     management VLAN. Any VLAN can be set either to remoteMgmtVlan or
+             localMgmtvlan."
+     DEFVAL { notMgmtVlan }
+     ::= { wwpVlanEntry 5 }
+		
+ wwpVlanRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the 
+	     conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, there should not be any port associated with this VLAN."
+     ::= { wwpVlanEntry 6 }
+
+ wwpVlanXTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpVlanXEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+	     "Extension of the VLAN table"
+     ::= { wwpVlan 6 }
+		
+ wwpVlanXEntry OBJECT-TYPE
+     SYNTAX      WwpVlanXEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	     "Entry in the extended VLAN table."
+     AUGMENTS    { wwpVlanEntry }
+     ::= { wwpVlanXTable 1 }
+ 
+ WwpVlanXEntry ::=  SEQUENCE { 
+     wwpVlanTunnel    INTEGER  
+ }   
+ 
+ wwpVlanTunnel OBJECT-TYPE
+     SYNTAX INTEGER {
+              disable(0),
+              enable(1)
+            }
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+        "Enable/disable VLAN tunneling on this VLAN."
+     ::= { wwpVlanXEntry 1 }
+  
+ END
+ 
+ --
+ -- WWP-VLAN-MIB
+ --

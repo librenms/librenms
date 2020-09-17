@@ -1,0 +1,1575 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-BENCHMARK-MIB.my
+ --
+ --
+
+ WWP-LEOS-BENCHMARK-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+     Unsigned32, Counter64, IpAddress, OBJECT-TYPE, MODULE-IDENTITY
+	    FROM SNMPv2-SMI
+     TruthValue, DisplayString, MacAddress, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+     wwpModulesLeos		
+	    FROM WWP-SMI;	
+
+ wwpLeosBenchmarkMIB MODULE-IDENTITY
+            LAST-UPDATED "201202130800Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION  "The MIB module for monitoring benchmark testing."
+
+            REVISION     "201202130800Z"
+            DESCRIPTION  "Added active vid and dst mac address associated
+                          with latest version of results"
+            REVISION     "201202030800Z"
+            DESCRIPTION  "Added new attribute to the profile table
+                          for max searches during throughput test,
+                          max samples for latency, sampling interval
+                          for latency, vid validation switch and
+                          frame loss start bandwidth.
+                          Added new frame size table indexed by profile Id
+                          and frame size index representing the list
+                          of frame sizes used when running tests for the
+                          profile."
+	    REVISION     "201012140800Z"
+            DESCRIPTION  "Added bandwidth parameter to profile table
+                          Modified generator module to report iteration
+                          and total number of iteration"
+            REVISION     "201011250800Z"
+            DESCRIPTION  "Added RateIndex field to frameloss stats
+                          table index."
+            REVISION     "201011150800Z"
+	    DESCRIPTION  "Initial creation."
+	    ::= { wwpModulesLeos 43 }
+
+ --
+ -- Textual convention
+ --
+ BenchmarkLatencyPdvTestState ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Test state for latency and packet delay variation tests."
+     SYNTAX       INTEGER {
+                      idle(1),
+                      sendingTraffic(2),
+                      waitingForTimestampData(3),
+                      waitingForResidualPackets(4),
+                      processingResults(5),
+                      stoppedByIntervalTimer(6),
+                      stoppedByDurationTimer(7),
+                      stoppedByUser(8),
+                      done(9)
+                  }
+
+
+ wwpLeosBenchmarkMIBObjects OBJECT IDENTIFIER ::= { wwpLeosBenchmarkMIB 1 }
+
+ wwpLeosBenchmarkModule OBJECT IDENTIFIER ::= { wwpLeosBenchmarkMIBObjects 1 } 
+
+ wwpLeosBenchmarkReflectorModule OBJECT IDENTIFIER 
+     ::= { wwpLeosBenchmarkMIBObjects 2 }
+
+ wwpLeosBenchmarkGeneratorModule OBJECT IDENTIFIER 
+     ::= { wwpLeosBenchmarkMIBObjects 3 }
+
+ wwpLeosBenchmarkFpgaStats OBJECT IDENTIFIER 
+     ::= { wwpLeosBenchmarkMIBObjects 4 }
+
+ wwpLeosBenchmarkPortStats OBJECT IDENTIFIER 
+     ::= { wwpLeosBenchmarkMIBObjects 5 }
+
+ wwpLeosBenchmarkProfileObjects OBJECT IDENTIFIER 
+     ::= { wwpLeosBenchmarkMIBObjects 6 }
+
+ --
+ -- the Benchmark Module 
+ --
+ wwpLeosBenchmarkRole OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            none(1),
+                            reflector(2),
+                            generator(3)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "System level benchmark role"
+     ::= { wwpLeosBenchmarkModule 1 }   
+
+ wwpLeosBenchmarkPort OBJECT-TYPE
+     SYNTAX             INTEGER (1..64)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "System level port under test"
+     ::= { wwpLeosBenchmarkModule 2 }   
+     
+ wwpLeosBenchmarkMode OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            none(1),
+                            inService(2),
+                            outOfService(3)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "System level benchmark role"
+     ::= { wwpLeosBenchmarkModule 3 }   
+
+ wwpLeosBenchmarkEnable OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "System level benchmark enable/disable."
+     ::= { wwpLeosBenchmarkModule 4 }   
+
+ wwpLeosBenchmarkOperEnable OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "System level benchmark operation enable/disable."
+     ::= { wwpLeosBenchmarkModule 5 }   
+
+ wwpLeosBenchmarkLocalFpgaMac OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "The RFC2544 internal test port assigned mac address."
+     ::= { wwpLeosBenchmarkModule 6 }
+
+ --
+ -- BENCHMARK Reflector Module
+ --
+ wwpLeosBenchmarkReflectorEnable OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Reflector enable/disable."
+     ::= { wwpLeosBenchmarkReflectorModule 1 }
+
+ wwpLeosBenchmarkReflectorVid    OBJECT-TYPE
+     SYNTAX             INTEGER (-1..4095)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Vlan ID to match on in order for packet to be reflected.
+                 -1 instruct reflector to ignore vlan ID."
+     ::= { wwpLeosBenchmarkReflectorModule 2 }
+
+ wwpLeosBenchmarkReflectorVendorType  OBJECT-TYPE
+     SYNTAX             INTEGER {
+                           other(1),
+                           ciena(2)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Indicator as to what type of equipement is generating the 
+                 test traffic on the remote end."
+     ::= { wwpLeosBenchmarkReflectorModule 3 }
+
+ --
+ -- BENCHMARK Generator Module
+ --
+ wwpLeosBenchmarkGeneratorEnable OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Generator enable/disable."
+     ::= { wwpLeosBenchmarkGeneratorModule 1 }
+
+ wwpLeosBenchmarkGeneratorprofileUnderTest     OBJECT-TYPE
+     SYNTAX             DisplayString (SIZE(0..16))
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Profile currently under test or for which testing was last
+                 completed."
+     ::= { wwpLeosBenchmarkGeneratorModule 2 }
+
+ wwpLeosBenchmarkGeneratorThroughputTestState  OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            idle(1),
+                            running(2),
+                            waitingForResidualPackets(3),
+                            processingResults(4),
+                            stoppedByIntervalTimer(5),
+                            stoppedByDurationTimer(6),
+                            stoppedByUser(7),
+                            done(8)
+                        }
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Throughput test state."
+     ::= { wwpLeosBenchmarkGeneratorModule 3 }
+
+ wwpLeosBenchmarkGeneratorFramelossTestState  OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            idle(1),
+                            runningFirstTest(2),
+                            waitingForResidualFirstPackets(3),
+                            processingFirstResults(4),
+                            runningSecondTest(5),
+                            waitingForResidualSecondPackets(6),
+                            processingSecondResults(7),
+                            stoppedByIntervalTimer(8),
+                            stoppedByDurationTimer(9),
+                            stoppedByUser(10),
+                            done(11)
+                        }
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Frameloss test state."
+     ::= { wwpLeosBenchmarkGeneratorModule 4 }
+
+ wwpLeosBenchmarkGeneratorLatencyTestState   OBJECT-TYPE
+     SYNTAX             BenchmarkLatencyPdvTestState
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Latency test state."
+     ::= { wwpLeosBenchmarkGeneratorModule 5 }
+
+ wwpLeosBenchmarkGeneratorPdvTestState       OBJECT-TYPE
+     SYNTAX             BenchmarkLatencyPdvTestState
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet delay variation test state."
+     ::= { wwpLeosBenchmarkGeneratorModule 6 }
+
+ wwpLeosBenchmarkGeneratorRfc2544State       OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            idle(1),
+                            running(2),
+                            stoppedByIntervalTimer(3),
+                            stoppedByDurationTimer(4),
+                            stoppedByUser(5),
+                            done(6)
+                        }
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "RFC 2544 test suite state."
+     ::= { wwpLeosBenchmarkGeneratorModule 7 }
+
+ wwpLeosBenchmarkGeneratorCurrentPktSize     OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes currently used by the running test."
+     ::= { wwpLeosBenchmarkGeneratorModule 8 }
+
+ wwpLeosBenchmarkGeneratorCurrentRate        OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Traffic rate currently used to generate packets in percent 
+                 of the line rate"
+     ::= { wwpLeosBenchmarkGeneratorModule 9 }
+
+ wwpLeosBenchmarkGeneratorSamplesCompleted   OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "When latency and/or pdv is running, this indicates how 
+                 many samples have been gathered so far."
+     ::= { wwpLeosBenchmarkGeneratorModule 10 }
+
+ wwpLeosBenchmarkGeneratorCurrentIteration   OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Indicates which iteration of the test suite is
+                 currently running for the profile under test."
+     ::= { wwpLeosBenchmarkGeneratorModule 11 }
+
+ wwpLeosBenchmarkGeneratorTotalIterations    OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Indicates the total number of iterations that will
+                 be run in accordance to the interval and duration settings
+                 of the profile under test. A value of -1 indicates
+                 indefinite number of iterations; test traffic will stop
+                 when the user manually stops the profile under test."
+     ::= { wwpLeosBenchmarkGeneratorModule 12 }
+
+ --
+ -- BENCHMARK Profile table
+ --
+ wwpLeosBenchmarkProfileTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosBenchmarkProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of profile entries."
+     ::= { wwpLeosBenchmarkProfileObjects 1 }
+                
+ wwpLeosBenchmarkProfileEntry OBJECT-TYPE
+     SYNTAX       WwpLeosBenchmarkProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK Profile characteristics."
+     INDEX { wwpLeosBenchmarkProfileEntryId }
+     ::= { wwpLeosBenchmarkProfileTable 1 } 
+
+ WwpLeosBenchmarkProfileEntry ::= SEQUENCE { 
+     wwpLeosBenchmarkProfileEntryId             INTEGER,
+     wwpLeosBenchmarkProfileEntryName           DisplayString,     
+     wwpLeosBenchmarkProfileEntryEnabled        TruthValue,
+     wwpLeosBenchmarkProfileEntryStarted        TruthValue,     
+     wwpLeosBenchmarkProfileEntryInterval       INTEGER,
+     wwpLeosBenchmarkProfileEntryDuration       INTEGER,
+     wwpLeosBenchmarkProfileEntryThroughputTest TruthValue,
+     wwpLeosBenchmarkProfileEntryFramelossTest  TruthValue,
+     wwpLeosBenchmarkProfileEntryLatencyTest    TruthValue,
+     wwpLeosBenchmarkProfileEntryPdvTest        TruthValue,
+     wwpLeosBenchmarkProfileEntryRfc2544Suite   TruthValue,
+     wwpLeosBenchmarkProfileEntryDstmac         MacAddress,
+     wwpLeosBenchmarkProfileEntryEncapType      INTEGER,
+     wwpLeosBenchmarkProfileEntryVid            INTEGER,
+     wwpLeosBenchmarkProfileEntryPcp            INTEGER,
+     wwpLeosBenchmarkProfileEntryCfi            INTEGER,
+     wwpLeosBenchmarkProfileEntryTpid           INTEGER,
+     wwpLeosBenchmarkProfileEntryPduType        INTEGER,
+     wwpLeosBenchmarkProfileEntrySrcIpAddr      IpAddress,
+     wwpLeosBenchmarkProfileEntryDstIpAddr      IpAddress,
+     wwpLeosBenchmarkProfileEntryDscp           INTEGER, 
+     wwpLeosBenchmarkProfileEntryCustomPayload  OCTET STRING,
+     wwpLeosBenchmarkProfileEntryBandwidth      INTEGER,
+     wwpLeosBenchmarkProfileEntryVidValidation  TruthValue,
+     wwpLeosBenchmarkProfileEntryMaxSearches    INTEGER,
+     wwpLeosBenchmarkProfileEntryMaxSamples     INTEGER,
+     wwpLeosBenchmarkProfileEntrySamplingInterval INTEGER,
+     wwpLeosBenchmarkProfileEntryFrameLossStartBw INTEGER
+ } 
+
+ wwpLeosBenchmarkProfileEntryId     OBJECT-TYPE
+     SYNTAX             INTEGER (1..24)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Index for BENCHMARK profile records."
+     ::= { wwpLeosBenchmarkProfileEntry 1 }   
+     
+ wwpLeosBenchmarkProfileEntryName   OBJECT-TYPE
+     SYNTAX             DisplayString (SIZE (1..16))
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Name of the profile as entered when created."
+     ::= { wwpLeosBenchmarkProfileEntry 2 }
+
+ wwpLeosBenchmarkProfileEntryEnabled    OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Profile enable/disable"
+     ::= { wwpLeosBenchmarkProfileEntry 3 }   
+     
+ wwpLeosBenchmarkProfileEntryStarted   OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Profile start/stop"
+     ::= { wwpLeosBenchmarkProfileEntry 4 }   
+     
+ wwpLeosBenchmarkProfileEntryInterval OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            t15min(1),
+                            t1hr(2),
+                            t6hr(3),
+                            tCompletion(4)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Interval between the start of one test group to the start
+                 of the next test group."
+     ::= { wwpLeosBenchmarkProfileEntry 5 }
+
+ wwpLeosBenchmarkProfileEntryDuration OBJECT-TYPE    
+     SYNTAX             INTEGER {
+                            t15min(1),
+                            t1hr(2),
+                            t6hr(3),
+                            t24hr(4),
+                            tIndefinite(5),
+                            tOnce(6)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Duration of the testing. The test group is repeated until
+                 the duration ends. When indefinite is set, test group is
+                 run only once to completion"
+     ::= { wwpLeosBenchmarkProfileEntry 6 }
+
+ wwpLeosBenchmarkProfileEntryThroughputTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Run throughput test"
+     ::= { wwpLeosBenchmarkProfileEntry 7 }
+
+ wwpLeosBenchmarkProfileEntryFramelossTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Run frame loss test"
+     ::= { wwpLeosBenchmarkProfileEntry 8 }
+
+ wwpLeosBenchmarkProfileEntryLatencyTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Run latency test"
+     ::= { wwpLeosBenchmarkProfileEntry 9 }
+
+ wwpLeosBenchmarkProfileEntryPdvTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Run packet delay variation test"
+     ::= { wwpLeosBenchmarkProfileEntry 10 }
+
+ wwpLeosBenchmarkProfileEntryRfc2544Suite OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Run RFC2544 test suite which includes throughput, frame
+                 loss and latency tests"
+     ::= { wwpLeosBenchmarkProfileEntry 11 }
+
+ wwpLeosBenchmarkProfileEntryDstmac   OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "MAC address to use as the destination MAC address on
+                 the generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 12 }
+
+ wwpLeosBenchmarkProfileEntryEncapType OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            untagged(1),
+                            dot1q(2)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Encapsulation type to use for generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 13 }
+
+ wwpLeosBenchmarkProfileEntryVid       OBJECT-TYPE
+     SYNTAX             INTEGER (0..4095)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Vlan ID to used for generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 14 }
+
+ wwpLeosBenchmarkProfileEntryPcp       OBJECT-TYPE
+     SYNTAX             INTEGER (0..7)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Vlan priority code point value to use for the generated
+                 packets."
+     ::= { wwpLeosBenchmarkProfileEntry 15 }
+
+ wwpLeosBenchmarkProfileEntryCfi       OBJECT-TYPE
+     SYNTAX             INTEGER (0..1)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Vlan canonical format indicator to use for the generated
+                 packets."
+     ::= { wwpLeosBenchmarkProfileEntry 16 }
+
+ wwpLeosBenchmarkProfileEntryTpid      OBJECT-TYPE
+     SYNTAX             INTEGER (0..65535)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Vlan tag protocol identifier to use for the generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 17 }
+
+ wwpLeosBenchmarkProfileEntryPduType   OBJECT-TYPE
+     SYNTAX             INTEGER {
+                           ethernet(1),
+                           ip(2),
+                           udpecho(3)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Vlan tag protocol identifier to use for the generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 18 }
+
+ wwpLeosBenchmarkProfileEntrySrcIpAddr OBJECT-TYPE
+     SYNTAX             IpAddress
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Source IP address to use for the generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 19 }
+
+ wwpLeosBenchmarkProfileEntryDstIpAddr OBJECT-TYPE
+     SYNTAX             IpAddress
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Destination IP address to use for the generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 20 }
+
+ wwpLeosBenchmarkProfileEntryDscp      OBJECT-TYPE
+     SYNTAX             INTEGER (0..63)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "IP DSCP value to use for the generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 21 }
+
+ wwpLeosBenchmarkProfileEntryCustomPayload  OBJECT-TYPE 
+     SYNTAX             OCTET STRING (SIZE (256))
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Custom payload to be used on the generated packets."
+     ::= { wwpLeosBenchmarkProfileEntry 22 }
+
+ wwpLeosBenchmarkProfileEntryBandwidth      OBJECT-TYPE
+     SYNTAX             INTEGER (1..1000)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Maximum bandwidth to use when generating test
+                 traffic for the profile."
+     ::= { wwpLeosBenchmarkProfileEntry 23 }
+
+ wwpLeosBenchmarkProfileEntryVidValidation  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Indicates whether VID validation is performed in 
+                 the classifier or not on the returning packet."
+     ::= { wwpLeosBenchmarkProfileEntry 24 }
+
+ wwpLeosBenchmarkProfileEntryMaxSearches    OBJECT-TYPE
+     SYNTAX             INTEGER (1..16)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "For the throughput test, this is the maximum number of
+                 searches to find a transmit rate without drops for a
+                 given frame size."
+     ::= { wwpLeosBenchmarkProfileEntry 25 }
+
+ wwpLeosBenchmarkProfileEntryMaxSamples     OBJECT-TYPE
+     SYNTAX             INTEGER (2..20)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "For the latency and PDV tests, this is the number of
+                 samples to take in order to determine the min, avg
+                 and max latency and avg PDV."
+     ::= { wwpLeosBenchmarkProfileEntry 26 }
+
+ wwpLeosBenchmarkProfileEntrySamplingInterval  OBJECT-TYPE
+     SYNTAX             INTEGER (1..600)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "For the latency and PDV tests, this is the interval,
+                 in 100ms, to wait between samples."
+     ::= { wwpLeosBenchmarkProfileEntry 27 }
+
+ wwpLeosBenchmarkProfileEntryFrameLossStartBw OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            profileBandwidth(1),
+                            maximumThroughput(2),
+                            maximumLineRate(3)
+                        }
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "For the frame loss test, this indicates which bandwidth
+                 value to use as the starting bandwidth; the maximum
+                 bandwidth determined via the throughput test, the
+                 bandwidth parameter configured in the profile, or
+                 the maximum bandwidth of the link."
+     ::= { wwpLeosBenchmarkProfileEntry 28 }
+
+ --
+ -- Benchmark Profile Throughput Stats
+ --
+ wwpLeosBenchmarkProfileThroughputStatisticsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosBenchmarkProfileThroughputStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK profile throughput statistics in Mbps."
+     ::= { wwpLeosBenchmarkProfileObjects 2 }
+                
+ wwpLeosBenchmarkProfileThroughputStatsEntry OBJECT-TYPE
+     SYNTAX       WwpLeosBenchmarkProfileThroughputStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK profile throughput statistics."
+     INDEX { wwpLeosBenchmarkProfileThroughputStatsProfileId,
+             wwpLeosBenchmarkProfileThroughputStatsFrameSizeIndex }
+     ::= { wwpLeosBenchmarkProfileThroughputStatisticsTable 1 } 
+
+ WwpLeosBenchmarkProfileThroughputStatsEntry ::= SEQUENCE { 
+     wwpLeosBenchmarkProfileThroughputStatsProfileId       INTEGER,
+     wwpLeosBenchmarkProfileThroughputStatsFrameSizeIndex  INTEGER,
+     wwpLeosBenchmarkProfileThroughputStatsFrameSize       INTEGER,
+     wwpLeosBenchmarkProfileThroughputStatsMin             Unsigned32,
+     wwpLeosBenchmarkProfileThroughputStatsMax             Unsigned32,
+     wwpLeosBenchmarkProfileThroughputStatsAvg             Unsigned32,
+     wwpLeosBenchmarkProfileThroughputStatsIterations      INTEGER,
+     wwpLeosBenchmarkProfileThroughputStatsActiveVid       INTEGER,
+     wwpLeosBenchmarkProfileThroughputStatsActiveDstMac    MacAddress
+ } 
+
+ wwpLeosBenchmarkProfileThroughputStatsProfileId  OBJECT-TYPE
+     SYNTAX             INTEGER (1..20)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Profile Id for which those throughput stats are associated."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 1 }   
+     
+ wwpLeosBenchmarkProfileThroughputStatsFrameSizeIndex  OBJECT-TYPE
+     SYNTAX             INTEGER (0..9)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Frame size index for which those throughput stats are
+                 associated."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 2 }
+
+  wwpLeosBenchmarkProfileThroughputStatsFrameSize  OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 3 }
+
+ wwpLeosBenchmarkProfileThroughputStatsMin     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Minimum throughput recorded for the given packet size."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 4 }
+
+ wwpLeosBenchmarkProfileThroughputStatsMax     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum throughput recorded for the given packet size."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 5 }
+
+ wwpLeosBenchmarkProfileThroughputStatsAvg     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Average throughput recorded for the given packet size."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 6 }
+
+ wwpLeosBenchmarkProfileThroughputStatsIterations OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of times the test has been run for this packet size."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 7 }
+
+ wwpLeosBenchmarkProfileThroughputStatsActiveVid  OBJECT-TYPE
+     SYNTAX             INTEGER (0..4095)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Active VLAN Id. Either the value configured in the profile or
+                 the one specified with the start command."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 8 }
+
+ wwpLeosBenchmarkProfileThroughputStatsActiveDstMac  OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Active destination MAC address. Either the value configured
+                 in the profile or the value specified with the start command."
+     ::= { wwpLeosBenchmarkProfileThroughputStatsEntry 9 }
+
+ --
+ -- Benchmark Profile FrameLoss Stats
+ --
+ wwpLeosBenchmarkProfileFramelossStatisticsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosBenchmarkProfileFramelossStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK profile frameloss statistics."
+     ::= { wwpLeosBenchmarkProfileObjects 3 }
+                
+ wwpLeosBenchmarkProfileFramelossStatsEntry OBJECT-TYPE
+     SYNTAX       WwpLeosBenchmarkProfileFramelossStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK profile frameloss statistics."
+     INDEX { wwpLeosBenchmarkProfileFramelossStatsProfileId,
+             wwpLeosBenchmarkProfileFramelossStatsFrameSizeIndex,
+             wwpLeosBenchmarkProfileFramelossStatsRateIndex }
+     ::= { wwpLeosBenchmarkProfileFramelossStatisticsTable 1 } 
+
+ WwpLeosBenchmarkProfileFramelossStatsEntry ::= SEQUENCE { 
+     wwpLeosBenchmarkProfileFramelossStatsProfileId        INTEGER,
+     wwpLeosBenchmarkProfileFramelossStatsFrameSizeIndex   INTEGER,
+     wwpLeosBenchmarkProfileFramelossStatsRateIndex        INTEGER,
+     wwpLeosBenchmarkProfileFramelossStatsFrameSize        INTEGER,
+     wwpLeosBenchmarkProfileFramelossStatsRate             INTEGER,
+     wwpLeosBenchmarkProfileFramelossStatsFirst            Unsigned32,
+     wwpLeosBenchmarkProfileFramelossStatsSecond           Unsigned32,
+     wwpLeosBenchmarkProfileFramelossStatsActiveVid        INTEGER,
+     wwpLeosBenchmarkProfileFramelossStatsActiveDstMac     MacAddress
+ } 
+
+ wwpLeosBenchmarkProfileFramelossStatsProfileId  OBJECT-TYPE
+     SYNTAX             INTEGER (1..20)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Profile Id."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 1 }   
+     
+ wwpLeosBenchmarkProfileFramelossStatsFrameSizeIndex  OBJECT-TYPE
+     SYNTAX             INTEGER (0..9)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Frame size index."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 2 }
+
+ wwpLeosBenchmarkProfileFramelossStatsRateIndex  OBJECT-TYPE
+     SYNTAX             INTEGER (0..9)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Rate index."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 3 }
+ 
+ wwpLeosBenchmarkProfileFramelossStatsFrameSize  OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 4 }
+
+ wwpLeosBenchmarkProfileFramelossStatsRate       OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Rate in percent of line rate."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 5 }
+
+ wwpLeosBenchmarkProfileFramelossStatsFirst     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of frames lost on first test sequence."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 6 }
+
+ wwpLeosBenchmarkProfileFramelossStatsSecond    OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of frames lost on second test sequence."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 7 }
+
+ wwpLeosBenchmarkProfileFramelossStatsActiveVid  OBJECT-TYPE
+     SYNTAX             INTEGER (0..4095)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Active VLAN Id. Either the value configured in the profile or
+                 the one specified with the start command."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 8 }
+
+ wwpLeosBenchmarkProfileFramelossStatsActiveDstMac  OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Active destination MAC address. Either the value configured
+                 in the profile or the value specified with the start command."
+     ::= { wwpLeosBenchmarkProfileFramelossStatsEntry 9 }
+
+ --
+ -- Benchmark Profile Latency Stats
+ --
+ wwpLeosBenchmarkProfileLatencyStatisticsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosBenchmarkProfileLatencyStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK profile latency statistics in usec."
+     ::= { wwpLeosBenchmarkProfileObjects 4 }
+                
+ wwpLeosBenchmarkProfileLatencyStatsEntry OBJECT-TYPE
+     SYNTAX       WwpLeosBenchmarkProfileLatencyStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK profile latency statistics."
+     INDEX { wwpLeosBenchmarkProfileLatencyStatsProfileId,
+             wwpLeosBenchmarkProfileLatencyStatsFrameSizeIndex }
+     ::= { wwpLeosBenchmarkProfileLatencyStatisticsTable 1 } 
+
+ WwpLeosBenchmarkProfileLatencyStatsEntry ::= SEQUENCE { 
+     wwpLeosBenchmarkProfileLatencyStatsProfileId       INTEGER,
+     wwpLeosBenchmarkProfileLatencyStatsFrameSizeIndex  INTEGER,
+     wwpLeosBenchmarkProfileLatencyStatsFrameSize       INTEGER,
+     wwpLeosBenchmarkProfileLatencyStatsMin             Unsigned32,
+     wwpLeosBenchmarkProfileLatencyStatsMax             Unsigned32,
+     wwpLeosBenchmarkProfileLatencyStatsAvg             Unsigned32,
+     wwpLeosBenchmarkProfileLatencyStatsSamples         INTEGER,
+     wwpLeosBenchmarkProfileLatencyStatsActiveVid       INTEGER,
+     wwpLeosBenchmarkProfileLatencyStatsActiveDstMac    MacAddress
+ } 
+
+ wwpLeosBenchmarkProfileLatencyStatsProfileId  OBJECT-TYPE
+     SYNTAX             INTEGER (1..20)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Profile Id for which those latency stats are associated."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 1 }   
+     
+ wwpLeosBenchmarkProfileLatencyStatsFrameSizeIndex  OBJECT-TYPE
+     SYNTAX             INTEGER (0..9)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Frame size index."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 2 }
+
+ wwpLeosBenchmarkProfileLatencyStatsFrameSize  OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 3 }
+
+ wwpLeosBenchmarkProfileLatencyStatsMin     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Minimum latency recorded for the given packet size."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 4 }
+
+ wwpLeosBenchmarkProfileLatencyStatsMax     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum latency recorded for the given packet size."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 5 }
+
+ wwpLeosBenchmarkProfileLatencyStatsAvg     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Average latency recorded for the given packet size."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 6 }
+
+ wwpLeosBenchmarkProfileLatencyStatsSamples OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of samples taken during the test."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 7 }
+
+ wwpLeosBenchmarkProfileLatencyStatsActiveVid  OBJECT-TYPE
+     SYNTAX             INTEGER (0..4095)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Active VLAN Id. Either the value configured in the profile or
+                 the one specified with the start command."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 8 }
+
+ wwpLeosBenchmarkProfileLatencyStatsActiveDstMac  OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Active destination MAC address. Either the value configured
+                 in the profile or the value specified with the start command."
+     ::= { wwpLeosBenchmarkProfileLatencyStatsEntry 9 }
+
+ --
+ -- Benchmark Profile Packet Delay Variation Stats
+ --
+ wwpLeosBenchmarkProfilePdvStatisticsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosBenchmarkProfilePdvStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK profile packet delay variation statistics
+              in usec."
+     ::= { wwpLeosBenchmarkProfileObjects 5 }
+                
+ wwpLeosBenchmarkProfilePdvStatsEntry OBJECT-TYPE
+     SYNTAX       WwpLeosBenchmarkProfilePdvStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK profile packet delay variation statistics."
+     INDEX { wwpLeosBenchmarkProfilePdvStatsProfileId,
+             wwpLeosBenchmarkProfilePdvStatsFrameSizeIndex }
+     ::= { wwpLeosBenchmarkProfilePdvStatisticsTable 1 } 
+
+ WwpLeosBenchmarkProfilePdvStatsEntry ::= SEQUENCE { 
+     wwpLeosBenchmarkProfilePdvStatsProfileId       INTEGER,
+     wwpLeosBenchmarkProfilePdvStatsFrameSizeIndex  INTEGER,
+     wwpLeosBenchmarkProfilePdvStatsFrameSize       INTEGER,
+     wwpLeosBenchmarkProfilePdvStatsAvg             Unsigned32,
+     wwpLeosBenchmarkProfilePdvStatsSamples         INTEGER,
+     wwpLeosBenchmarkProfilePdvStatsActiveVid       INTEGER,
+     wwpLeosBenchmarkProfilePdvStatsActiveDstMac    MacAddress
+ } 
+
+ wwpLeosBenchmarkProfilePdvStatsProfileId  OBJECT-TYPE
+     SYNTAX             INTEGER (1..20)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Profile Id associated to those PDV stats."
+     ::= { wwpLeosBenchmarkProfilePdvStatsEntry 1 }   
+     
+ wwpLeosBenchmarkProfilePdvStatsFrameSizeIndex  OBJECT-TYPE
+     SYNTAX             INTEGER (0..9)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Frame size index associated to those PDV stats."
+     ::= { wwpLeosBenchmarkProfilePdvStatsEntry 2 }   
+     
+
+ wwpLeosBenchmarkProfilePdvStatsFrameSize  OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes."
+     ::= { wwpLeosBenchmarkProfilePdvStatsEntry 3 }
+
+ wwpLeosBenchmarkProfilePdvStatsAvg        OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Average PDV recorded for the given packet size."
+     ::= { wwpLeosBenchmarkProfilePdvStatsEntry 4 }
+
+ wwpLeosBenchmarkProfilePdvStatsSamples    OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of samples used for the test."
+     ::= { wwpLeosBenchmarkProfilePdvStatsEntry 5 }
+
+ wwpLeosBenchmarkProfilePdvStatsActiveVid  OBJECT-TYPE
+     SYNTAX             INTEGER (0..4095)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Active VLAN Id. Either the value configured in the profile or
+                 the one specified with the start command."
+     ::= { wwpLeosBenchmarkProfilePdvStatsEntry 6 }
+
+ wwpLeosBenchmarkProfilePdvStatsActiveDstMac  OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Active destination MAC address. Either the value configured
+                 in the profile or the value specified with the start command."
+     ::= { wwpLeosBenchmarkProfilePdvStatsEntry 7 }
+
+ --
+ -- Benchmark Profile Frame Size List
+ --
+ wwpLeosBenchmarkProfileFrameSizeTable  OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosBenchmarkProfileFrameSizeEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the list of frame sizes used for testing
+              the profiles."
+     ::= { wwpLeosBenchmarkProfileObjects 6 }
+
+ wwpLeosBenchmarkProfileFrameSizeEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosBenchmarkProfileFrameSizeEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Profile frame size entry."
+     INDEX { wwpLeosBenchmarkProfileFrameSizeProfileId,
+             wwpLeosBenchmarkProfileFrameSizeIndex }
+     ::= { wwpLeosBenchmarkProfileFrameSizeTable 1 }
+
+ WwpLeosBenchmarkProfileFrameSizeEntry ::= SEQUENCE {
+     wwpLeosBenchmarkProfileFrameSizeProfileId      INTEGER,
+     wwpLeosBenchmarkProfileFrameSizeIndex          INTEGER,
+     wwpLeosBenchmarkProfileFrameSize               INTEGER
+ }
+
+ wwpLeosBenchmarkProfileFrameSizeProfileId    OBJECT-TYPE
+     SYNTAX             INTEGER (1..20)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+            "Profile Id this frame size entry is associated with."
+     ::= { wwpLeosBenchmarkProfileFrameSizeEntry 1 }   
+     
+ wwpLeosBenchmarkProfileFrameSizeIndex        OBJECT-TYPE
+     SYNTAX             INTEGER (0..9)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+            "Frame size index into the targeted profile's frame size
+             list."
+     ::= { wwpLeosBenchmarkProfileFrameSizeEntry 2 }
+
+  wwpLeosBenchmarkProfileFrameSize            OBJECT-TYPE
+     SYNTAX             INTEGER
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+            "Frame size in bytes."
+     ::= { wwpLeosBenchmarkProfileFrameSizeEntry 3 }
+
+ --
+ -- Benchmark FPGA stats
+ --
+ wwpLeosBenchmarkFpgaStatsRxPkts          OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK FPGA stats received packets"
+     ::= { wwpLeosBenchmarkFpgaStats 1 }
+
+ wwpLeosBenchmarkFpgaStatsCrcPkts         OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK FPGA stats packets received with CRC errors"
+     ::= { wwpLeosBenchmarkFpgaStats 2 }
+
+ wwpLeosBenchmarkFpgaStatsUdpChecksumPkts OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK FPGA stats packets received with CRC errors"
+     ::= { wwpLeosBenchmarkFpgaStats 3 }
+
+ wwpLeosBenchmarkFpgaStatsDiscardPkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK FPGA stats packets received which don't match any 
+              active/enabled profile(s)."
+     ::= { wwpLeosBenchmarkFpgaStats 4 }
+
+ wwpLeosBenchmarkFpgaStatsDuplicatePkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK FPGA stats packets received with a duplicate sequence 
+              number."
+     ::= { wwpLeosBenchmarkFpgaStats 5 }
+ 
+ wwpLeosBenchmarkFpgaStatsOOSeqPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "BENCHMARK FPGA stats packets received out of sequence"
+     ::= { wwpLeosBenchmarkFpgaStats 6 }
+
+ wwpLeosBenchmarkFpgaStatsTxPkts          OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK FPGA stats packets transmitted"
+     ::= { wwpLeosBenchmarkFpgaStats 7 }
+
+ wwpLeosBenchmarkFpgaStatsOOOPkts         OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK FPGA stats packets received with an out of order sequence number"
+     ::= { wwpLeosBenchmarkFpgaStats 8 }
+
+ wwpLeosBenchmarkFpgaStatsDiscSeqNumPkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK FPGA stats packets received with a discontinued sequence number"
+     ::= { wwpLeosBenchmarkFpgaStats 9 }
+
+ --
+ -- Benchmark Port stats
+ --
+ wwpLeosBenchmarkPortStatsTxBytes            OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of bytes transmitted by the benchmak port"
+     ::= { wwpLeosBenchmarkPortStats 1 }
+
+ wwpLeosBenchmarkPortStatsTxPkts             OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets transmitted by the benchmak port"
+     ::= { wwpLeosBenchmarkPortStats 2 }
+
+ wwpLeosBenchmarkPortStatsCrcErrorPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets with CRC errors" 
+     ::= { wwpLeosBenchmarkPortStats 3 }
+
+ wwpLeosBenchmarkPortStatsUcastPkts          OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of unicast packets transmitted by the benchmak port"
+     ::= { wwpLeosBenchmarkPortStats 4 }
+
+ wwpLeosBenchmarkPortStatsMcastPkts          OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of multicast packets transmitted by the benchmak port"
+     ::= { wwpLeosBenchmarkPortStats 5 }
+
+ wwpLeosBenchmarkPortStatsBcastPkts          OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of broadcast packets transmitted by the benchmak port"
+     ::= { wwpLeosBenchmarkPortStats 6 }
+
+ wwpLeosBenchmarkPortStatsUndersizePkts      OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of packets received that were
+              less than 64 octets long (excluding framing bits,
+              but including FCS octets) and were otherwise well
+              formed."
+     ::= { wwpLeosBenchmarkPortStats 7 }
+
+ wwpLeosBenchmarkPortStatsOversizePkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of packets received that were
+              longer than 1518 octets (excluding framing bits,
+              but including FCS octets) and were otherwise
+              well formed."
+     ::= { wwpLeosBenchmarkPortStats 8 }
+
+ wwpLeosBenchmarkPortStatsFragmentsPkts      OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of packets received that were less
+              than 64 octets in length (excluding framing bits but
+              including FCS octets) and had either a bad Frame
+              Check Sequence (FCS) with an integral number of
+              octets (FCS Error) or a bad FCS with a non-integral
+              number of octets (Alignment Error)."
+     ::= { wwpLeosBenchmarkPortStats 9 }
+
+ wwpLeosBenchmarkPortStatsJabbersPkts        OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of packets received that were
+              longer than 1518 octets (excluding framing bits,
+              but including FCS octets), and had either a bad
+              Frame Check Sequence (FCS) with an integral number
+              of octets (FCS Error) or a bad FCS with a
+              non-integral number of octets (Alignment Error)."
+     ::= { wwpLeosBenchmarkPortStats 10 }
+
+ wwpLeosBenchmarkPortStatsTxPausePkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The transmit pause packets for the port."
+    ::= { wwpLeosBenchmarkPortStats 11 }
+
+ wwpLeosBenchmarkPortStatsTxDropPkts        OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of dropped packets on the benchmark port when
+              traffic profiles are enabled. (311v only)"
+    ::= { wwpLeosBenchmarkPortStats 12 }
+
+ wwpLeosBenchmarkPortStatsTxDiscardPkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of discarded packets."
+    ::= { wwpLeosBenchmarkPortStats 13 }
+
+ wwpLeosBenchmarkPortStatsTxLOutRangePkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The transmit length out of range packet count."
+    ::= { wwpLeosBenchmarkPortStats 14 }
+
+ wwpLeosBenchmarkPortStatsTx64OctsPkts      OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 64-byte packets transmitted on the benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 15 }
+
+ wwpLeosBenchmarkPortStatsTx65To127Pkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 64 to 127-byte packets transmitted on the 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 16 }
+
+ wwpLeosBenchmarkPortStatsTx128To255Pkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 128 to 255-byte packets transmitted on the 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 17 }
+
+ wwpLeosBenchmarkPortStatsTx256To511Pkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 256 to 511-byte packets transmitted on the 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 18 }
+
+ wwpLeosBenchmarkPortStatsTx512To1023Pkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 512 to 1023-byte packets transmitted on the 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 19 }
+
+ wwpLeosBenchmarkPortStatsTx1024To1518Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 1024 to 1518-byte packets transmitted on the 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 20 }
+
+ wwpLeosBenchmarkPortStatsTx1519To2047Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 1519 to 2047-byte packets transmitted on the 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 21 }
+
+ wwpLeosBenchmarkPortStatsTx2048To4095Pkts OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 2048 to 4095-byte packets transmitted on the 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 22 }
+
+ wwpLeosBenchmarkPortStatsTx4096To9216Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 4096 to 9216-byte packets transmitted on the 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 23 }
+
+ wwpLeosBenchmarkPortStatsRxBytes           OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of bytes received on the benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 24 }
+
+ wwpLeosBenchmarkPortStatsRxPkts            OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets received on the benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 25 }
+
+ wwpLeosBenchmarkPortStatsRxExDeferPkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of excessive deferred packets."
+    ::= { wwpLeosBenchmarkPortStats 26 }
+
+ wwpLeosBenchmarkPortStatsRxDeferPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of deferred packets."
+    ::= { wwpLeosBenchmarkPortStats 27 }
+
+ wwpLeosBenchmarkPortStatsRxGiantPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of too big packets."
+    ::= { wwpLeosBenchmarkPortStats 28 }
+
+ wwpLeosBenchmarkPortStatsRxUnderRunPkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Underrun packet count for the benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 29 }
+
+ wwpLeosBenchmarkPortStatsRxCrcErrorPkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets received with CRC errors."
+    ::= { wwpLeosBenchmarkPortStats 30 }
+
+ wwpLeosBenchmarkPortStatsRxLCheckErrorPkts OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets with length check errors."
+    ::= { wwpLeosBenchmarkPortStats 31 }
+
+ wwpLeosBenchmarkPortStatsRxLOutRangePkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The number of frames received by the benchmark port 
+              that exceeded the maximum permitted frame size."
+    ::= { wwpLeosBenchmarkPortStats 32 }
+
+ wwpLeosBenchmarkPortStatsRxPausePkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total receive pause packets for the port."
+    ::= { wwpLeosBenchmarkPortStats 33 }
+
+ wwpLeosBenchmarkPortStatsRxUcastPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of unicast packets received by benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 34 }
+
+ wwpLeosBenchmarkPortStatsRxMcastPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of multicast packets received by benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 35 }
+
+ wwpLeosBenchmarkPortStatsRxBcastPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of broadcast packets received by benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 36 }
+
+ wwpLeosBenchmarkPortStatsRx64Pkts          OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 64-byte packets received by benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 37 }
+
+ wwpLeosBenchmarkPortStatsRx65To127Pkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 65 to 127-byte packets received by 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 38 }
+
+ wwpLeosBenchmarkPortStatsRx128To255Pkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 128 to 255-byte packets received by 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 39 }
+
+ wwpLeosBenchmarkPortStatsRx256To511Pkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 256 to 511-byte packets received by 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 40 }
+
+ wwpLeosBenchmarkPortStatsRx512To1023Pkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 512 to 1023-byte packets received by 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 41 }
+
+ wwpLeosBenchmarkPortStatsRx1024To1518Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 1024 to 1518-byte packets received by 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 42 }
+
+ wwpLeosBenchmarkPortStatsRx1519To2047Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 1519 to 2047-byte packets received by 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 43 }
+
+ wwpLeosBenchmarkPortStatsRx2048To4095Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 2048 to 4095-byte packets received by 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 44 }
+
+ wwpLeosBenchmarkPortStatsRx4096To9216Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 4096 to 9216-byte packets received by 
+              benchmark port."
+    ::= { wwpLeosBenchmarkPortStats 45 }
+ 
+ END
+

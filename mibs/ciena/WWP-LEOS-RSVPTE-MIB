@@ -1,0 +1,396 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-RSVPTE-MIB.my
+ --
+
+ WWP-LEOS-RSVPTE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   TimeTicks, Integer32, Unsigned32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY			
+	FROM SNMPv2-SMI			
+   DisplayString, MacAddress, TEXTUAL-CONVENTION, RowStatus, TruthValue			
+	FROM SNMPv2-TC							
+   wwpModulesLeos		
+	FROM WWP-SMI;
+
+ wwpLeosRsvpteMIB MODULE-IDENTITY
+	    LAST-UPDATED "201107060000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+	            " Added new objects wwpLeosRsvpteIfHelloInterval,wwpLeosRsvpteIfHelloTolerance,
+		       wwpLeosRsvpteIfAdvertisedLabel."
+ 	    REVISION  "201107060000Z"
+	    DESCRIPTION
+		    "This MIB module is for the RSVP-TE configuration for MPLS tunnels"
+	    REVISION    "200508081700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 30 }
+
+ --
+ -- Textual convention
+ --
+ AdvertisedLabel ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Advertised Label"
+     SYNTAX       INTEGER {
+                    implicitnull(1),
+                    nonreserved(99)
+                   } 
+
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosRsvpteMIBObjects OBJECT IDENTIFIER ::= { wwpLeosRsvpteMIB 1 }
+ wwpLeosRsvpteObjects    OBJECT IDENTIFIER ::= { wwpLeosRsvpteMIBObjects 1 }
+ wwpLeosRsvpte           OBJECT IDENTIFIER ::= { wwpLeosRsvpteMIBObjects 2 }
+
+ wwpLeosRsvpteAdminStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                      enable(1),
+                      disable(2)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The desired administrative state of RSVP-TE."
+      ::= { wwpLeosRsvpteObjects 1 }
+
+ wwpLeosRsvpteOperStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                      up(1),          -- active
+                      down(2),        -- inactive
+                      goingUp(3),     -- activating
+                      goingDown(4),   -- deactivating
+                      actFailed(5)    -- activation failed
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The current operational state of RSVP-TE."
+      ::= { wwpLeosRsvpteObjects 2 }
+      
+ wwpLeosRsvpteRetryInterval OBJECT-TYPE
+      SYNTAX      Unsigned32 (3..65)
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The persistent tunnel retry interval.
+           This is the interval between the first failure of a persistent
+           tunnel and the first attempt to re-establish the tunnel.
+           This cannot be changed while admin status is enable or oper status is up"
+      DEFVAL      { 3 }
+      ::= { wwpLeosRsvpteObjects 3 }
+
+ wwpLeosRsvpteRetryInfiniteState OBJECT-TYPE
+      SYNTAX      INTEGER {
+      				on(1),
+      				off(2)
+      				}      
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The persistent tunnel retry infinity.
+           This is the State which when on will trigger RSVP-TE to try to restore the tunnels
+           infinite times. This object can only be set if RSVP-TE is globally disabled."
+      DEFVAL      { on }
+      ::= { wwpLeosRsvpteObjects 4 }
+
+ wwpLeosRsvpteRetryMax OBJECT-TYPE
+      SYNTAX      INTEGER (1..255)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The maximum number of retry attempts that will be made before a
+           persistent tunnel is deemed inoperable.  Once in this state,
+           a management agent should set mplsTunnelAdminStatus to 'up' to
+           attempt to reestablish the tunnel.
+           This field is not used when wwpLeosRsvpteRetryInfiniteState is on "
+      DEFVAL      { 10 }
+      ::= { wwpLeosRsvpteObjects 5 }
+
+
+ wwpLeosRsvpteRefreshInterval OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliseconds"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "This RSVP-TE value, R,  which is used to set the average
+        interval between refresh path and resv messages."
+      DEFVAL { 30000 }
+      ::= { wwpLeosRsvpteObjects 6 }
+
+ wwpLeosRsvpteRefreshMultiple OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The RSVP-TE value, K, which is the number of unresponded Path
+        or Resv refresh attempts which must be made, spaced by
+        the refresh interval before the state is deemed to have
+        timed out."
+      DEFVAL { 3 }
+      ::= { wwpLeosRsvpteObjects 7 }
+
+ wwpLeosRsvpteRfrshSlewDenom OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The denominator of the fraction, SlewMax, which is the
+        maximum allowable increase in the refresh interval, R, to
+        prevent state timeout while changing R.  R is increased by
+        this fraction until it reaches the new desired value."
+      DEFVAL { 10 }
+      ::= { wwpLeosRsvpteObjects 8 }
+
+ wwpLeosRsvpteRfrshSlewNumerator OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The numerator of the fraction, SlewMax, which is the maximum
+        allowable increase in the refresh interval, R, to prevent
+        state timeout while changing R.  R is increased by this
+        fraction until it reaches the new desired value."
+      DEFVAL { 3 }
+      ::= { wwpLeosRsvpteObjects 9 }
+
+ wwpLeosRsvpteBlockadeMultiple OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The RSVP-TE value, Kb, which is the number of refresh timeout
+        periods after which blockade state is deleted."
+      DEFVAL { 2 }
+      ::= { wwpLeosRsvpteObjects 10 }
+
+ wwpLeosRsvpteLSPSetupPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..7)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The setup priority to apply to LSPs which are not
+        signalling this parameter.  0 represents the highest
+        priority, 7 the lowest.  The value of this object must be
+        numerically more or equal (so lower or equal priority)
+        than the value of the holding priority object."
+      DEFVAL { 4 }
+      ::= { wwpLeosRsvpteObjects 11 }
+
+ wwpLeosRsvpteLSPHoldingPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..7)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+      "The holding priority to apply to LSPs which are not
+       signalling this parameter.  0 represents the highest
+       priority, 7 the lowest.  The value of this object must be
+       numerically less or equal (so higher or equal priority)
+       than the value of the holding priority object."
+      DEFVAL { 3 }
+      ::= { wwpLeosRsvpteObjects 12 }
+
+ wwpLeosRsvpteUseHopByHop OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "A flag to indicate that RSVP-TE should use the hop by hop
+         addressing scheme for PATH and PATH-TEAR messages it
+         sends.  If set then the IP addresses used in the IP header
+         of PATH messages forwarded by RSVP-TE set source as the
+         local outgoing interface IP address, and destination as
+         the next hop router IP address."
+      DEFVAL { false }
+      ::= { wwpLeosRsvpteObjects 13 }
+
+ wwpLeosRsvpteRestartCapable OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "A flag to indicate whether the local node should advertise
+           itself as restart capable."
+      DEFVAL { false }
+      ::= { wwpLeosRsvpteObjects 14 }
+
+ wwpLeosRsvpteRestartTime OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The time in milliseconds that the local node takes to
+         restart RSVP-TE and the communication channel used for
+         RSVP-TE communication.  This is advertised to neighbors in
+         the Restart_Cap object in Hello messages.
+
+         Only used if wwpLeosRsvpteRestartCapable is set to true."
+      DEFVAL { 10000 }
+      ::= { wwpLeosRsvpteObjects 15 }
+
+ wwpLeosRsvpteRecoveryTime OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The period of time in milliseconds that the local node
+         would like neighbors to take to resyncronize RSVP-TE and
+         MPLS forwarding information after the re-establishment of
+         Hello connectivity.  This is advertised to neighbors in
+         the Restart_Cap object in Hello messages.
+
+         A value of zero indicates that the node does not support
+         resynchronization following failure of the local node.
+
+         A value of 0xFFFFFFFF indicates an infinite recovery time.
+
+         Only used if wwpLeosRsvpteRestartCapable is set to true."
+      DEFVAL { 10000 }
+      ::= { wwpLeosRsvpteObjects 16 }
+
+ wwpLeosRsvpteMinPeerRestart OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The mininum period of time in milliseconds that RSVP-TE
+         should wait for a restart capable neighbor to regain
+         Hello connectivity before invoking procedures related to
+         communication loss.
+
+         RSVP-TE will wait for the maximum of this time and the
+         restart_time advertised in the RESTART_CAP object in Hello
+         messages from the neighbor."
+      DEFVAL { 0 }
+      ::= { wwpLeosRsvpteObjects 17 }
+
+ wwpLeosRsvpteIfTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF WwpLeosRsvpteIfEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A table of interfaces that RSVP-TE can be enabled on."
+      ::= { wwpLeosRsvpte 1 }
+    
+ wwpLeosRsvpteIfEntry OBJECT-TYPE
+      SYNTAX      WwpLeosRsvpteIfEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "WWP Descr."
+           INDEX       { wwpLeosRsvpteIfIndex }
+      ::= { wwpLeosRsvpteIfTable 1 }
+
+ WwpLeosRsvpteIfEntry ::= SEQUENCE {
+      wwpLeosRsvpteIfIndex           	INTEGER,
+      wwpLeosRsvpteIfName            	DisplayString,
+      wwpLeosRsvpteIfIpAddr          	IpAddress,
+      wwpLeosRsvpteIfMtu             	INTEGER,
+      wwpLeosRsvpteIfAdminStatus     	INTEGER,
+      wwpLeosRsvpteIfOperStatus      	INTEGER,
+      wwpLeosRsvpteIfHelloInterval   	Unsigned32,
+      wwpLeosRsvpteIfHelloTolerance  	Unsigned32,
+      wwpLeosRsvpteIfAdvertisedLabel 	AdvertisedLabel	
+ }
+
+ wwpLeosRsvpteIfName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE (0..32))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Interface Name"
+      ::= { wwpLeosRsvpteIfEntry 1 }
+
+ wwpLeosRsvpteIfIndex OBJECT-TYPE
+      SYNTAX      INTEGER (1..4096)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Interface Index"
+      ::= { wwpLeosRsvpteIfEntry 2 }
+
+ wwpLeosRsvpteIfIpAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Interface IP Address"
+      ::= { wwpLeosRsvpteIfEntry 3 }
+
+ wwpLeosRsvpteIfMtu OBJECT-TYPE
+      SYNTAX      INTEGER (1500..9216)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "RSVP-TE Interface MTU"
+      ::= { wwpLeosRsvpteIfEntry 4 }
+
+ wwpLeosRsvpteIfAdminStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Desired RSVP-TE status on this Interface"
+      ::= { wwpLeosRsvpteIfEntry 5 }
+
+ wwpLeosRsvpteIfOperStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                     up(1),
+                     down(2)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "RSVP-TE Operational Status on this Interface"
+      ::= { wwpLeosRsvpteIfEntry 6 }
+
+ wwpLeosRsvpteIfHelloInterval OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..30)    
+      UNITS	      "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "RSVP-TE hello message interval. "
+      DEFVAL	  { 1 }      
+      ::= { wwpLeosRsvpteIfEntry 7 }
+
+  wwpLeosRsvpteIfHelloTolerance OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..10)
+      MAX-ACCESS  read-write
+      STATUS      current            
+      DESCRIPTION
+          "RSVP-TE hello tolerance defines number of hello interval which may pass without receiving a
+           successful Hello message from a partner before the Hello session times out."
+      DEFVAL	  { 3 }     
+      ::= { wwpLeosRsvpteIfEntry 8 }
+ 
+ wwpLeosRsvpteIfAdvertisedLabel OBJECT-TYPE
+      SYNTAX      AdvertisedLabel
+      MAX-ACCESS  read-write
+      STATUS      current            
+      DESCRIPTION
+          "This attribute decides what kind of a Label will be advertised by RSVP-TE for a 
+          Label Request received on this L3 Interface"
+      DEFVAL	  { 99 }     
+      ::= { wwpLeosRsvpteIfEntry 9 }
+ 
+ END
+ 
+--
+-- WWP-LEOS-RSVPTE-MIB
+--

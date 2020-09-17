@@ -1,0 +1,1095 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+WWP-LEOS-MSTP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Counter32, Integer32                                      FROM SNMPv2-SMI
+      TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue  FROM SNMPv2-TC
+      wwpModulesLeos                                            FROM WWP-SMI;
+
+wwpLeosMstp MODULE-IDENTITY
+	    LAST-UPDATED "201108020000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "  Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+            DESCRIPTION 
+                   "Deprecated the wwpLeosMstpPvstBpduReceivedNotification mib"
+            REVISION    "201108020000Z"
+	    DESCRIPTION
+		    "The MIB module for the WWP MstpMib specific information."
+	    REVISION    "200609291700Z"
+	    DESCRIPTION
+		    "Initial creation."
+
+      ::= { wwpModulesLeos 37 } -- to be selected or moved
+    
+--
+-- Textual Conventions
+--
+MstiInstanceIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "A unique value, greater than zero, for each Multiple Spanning
+         Tree Instance (MSTI) in the managed Bridge. The value for each
+         MstiInstanceIndex remains constant for the instance."
+    SYNTAX  Integer32 (1..64)
+
+MstiOrCistInstanceIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "This textual convention is an extension of the
+         MstiInstanceIndex convention.  This extension permits the
+         additional value of zero, which means Common and Internal
+         Spanning Tree (CIST)."
+    SYNTAX  Integer32 (0..64)
+
+BpduCounter ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "An optional counter of received or transmitted Bridge Protocol
+         Data Units of different types to/from a Port. The agent may
+         return the value 0 for any counter that is not supported."
+    SYNTAX  Counter32
+
+
+wwpLeosMstpNotifications      OBJECT IDENTIFIER ::= { wwpLeosMstp 0 }
+wwpLeosMstpObjects            OBJECT IDENTIFIER ::= { wwpLeosMstp 1 }
+wwpLeosMstpConformance        OBJECT IDENTIFIER ::= { wwpLeosMstp 2 }
+
+wwpLeosMstpCfg         OBJECT IDENTIFIER ::= { wwpLeosMstpObjects 1 }
+wwpLeosMstpMstCfg      OBJECT IDENTIFIER ::= { wwpLeosMstpObjects 2 }
+wwpLeosMstpXstCfg      OBJECT IDENTIFIER ::= { wwpLeosMstpObjects 3 }
+wwpLeosMstpStats       OBJECT IDENTIFIER ::= { wwpLeosMstpObjects 4 }
+                       
+
+-- ---------------------------------------------------------------------
+-- wwpLeosMstpCfg         OBJECT IDENTIFIER ::= { wwpLeosMstpObjects 1 }
+-- ---------------------------------------------------------------------
+
+wwpLeosMstpBridgeEnable OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "When this object is set to true the MSTP operation
+          for the bridge is enabled.  Setting this object to
+          false disables bridge MSTP operations."
+     DEFVAL { true }
+     ::= { wwpLeosMstpCfg 1 }                       
+
+wwpLeosMstpForceVersion OBJECT-TYPE
+     SYNTAX      INTEGER {
+			stp(0),
+			rstp(2),
+			mstp(3)
+		    }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION                                              
+	     "This object contains the value of the ForceVersion
+	      MSTP State Machine Performance Parameter."   
+	 DEFVAL { mstp }
+     ::= { wwpLeosMstpCfg 2 } 
+
+wwpLeosMstpForwardDelay OBJECT-TYPE
+     SYNTAX      Integer32 (4..30)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This object represents the value of the FwdDelay
+	      MSTP State Machine Performance Parameter."
+	 DEFVAL { 15 }
+     ::= { wwpLeosMstpCfg 3 }
+
+wwpLeosMstpTxHoldCount OBJECT-TYPE
+     SYNTAX      Integer32 (1..10)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This object represents the value of the TxHoldCount
+	      MSTP State Machine Performance Parameter."
+	 DEFVAL { 6 }
+     ::= { wwpLeosMstpCfg 4 }
+                             
+wwpLeosMstpHelloTime OBJECT-TYPE
+     SYNTAX      Integer32 (1..10)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This object represents the value of the HelloTime
+	      MSTP State Machine Performance Parameter."
+	 DEFVAL { 2 }
+     ::= { wwpLeosMstpCfg 5 }
+
+wwpLeosMstpMaxAge OBJECT-TYPE
+     SYNTAX      Integer32 (6..40)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This object represents the value of the Max Age
+	      value used by the multiple spanning tree protocol."
+	 DEFVAL { 20 }
+     ::= { wwpLeosMstpCfg 6 }
+
+wwpLeosMstpMaxHops OBJECT-TYPE
+     SYNTAX      Integer32 (6..40)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This object represents the value of the MaxHops
+	      MSTP State Machine Performance Parameter."
+	 DEFVAL { 20 }
+     ::= { wwpLeosMstpCfg 7 }
+
+wwpLeosMstpLoopbackBlock OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This object specifies if loopback port blocking feature is 
+	      enabled/disabled for the multiple spanning tree protocol.
+	      Values of true or false will enable or disable this feature,
+	      respectively."
+	 DEFVAL { false }
+     ::= { wwpLeosMstpCfg 8 }
+
+wwpLeosMstpPathCostDefault OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    stp8021d1998(1),
+                    stp8021t2001(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The version of the Spanning Tree default Path Costs that
+         are to be used by this Bridge.  A value of 8021d1998(1)
+         uses the 16-bit default Path Costs from IEEE Std. 802.1D-1998.
+         A value of stp8021t2001(2) uses the 32-bit default Path
+         Costs from IEEE Std. 802.1t."
+	DEFVAL { stp8021t2001 }
+    ::= { wwpLeosMstpCfg 9 }
+
+wwpLeosMstpGlobalStpMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    rstp(1),
+                    mstp(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For devices that contain multiple STP code-bases, this object
+         allows the selection of the desired Spanning Tree Protocol
+         code-base that is to be in effect.  After a new value is
+         selected a configuration save and device reboot must be
+         performed for the new spanning tree code-base to take control
+         over spanning tree operations within the device.
+         
+         The value of rstp(1) selects legacy RSTP code-base which
+         is typically a highly optimized code-base intended for devices
+         which are connected to other RSTP equipped devices.  The value of
+         mstp(2) selects the MSTP code-base which offers inherent
+         backward compatibility for RSTP devices however this code-base
+         is optimized for MSTP operations and may not be desirable when
+         the device is operating in a network of only RSTP connected
+         devices."
+	DEFVAL { rstp }
+    ::= { wwpLeosMstpCfg 10 }
+              
+
+
+wwpLeosMstpPortCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosMstpPortCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	     "Table that contains configuration items for each port.
+	      This object has value similar to dot1dStpPortTable."
+     ::= { wwpLeosMstpCfg 11 }
+		
+wwpLeosMstpPortCfgEntry OBJECT-TYPE
+     SYNTAX      WwpLeosMstpPortCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	     "MSTP port information entry containing configuration items
+	      specific to a particular port on the Bridge."
+     INDEX { wwpLeosMstpPortInfoIndex }
+     ::= { wwpLeosMstpPortCfgTable 1 } 
+
+ WwpLeosMstpPortCfgEntry ::= SEQUENCE { 
+     wwpLeosMstpPortInfoIndex           Integer32,   
+     wwpLeosMstpPortEnable              TruthValue,
+     wwpLeosMstpPortAdminExtPathCost    Integer32,
+     wwpLeosMstpPortOperExtPathCost     Integer32,
+     wwpLeosMstpPortDynamicExtPathCost  TruthValue,
+     wwpLeosMstpPortAdminEdgePort       TruthValue,
+     wwpLeosMstpPortOperEdgePort        TruthValue,
+     wwpLeosMstpPortProtocolMigration   TruthValue,
+     wwpLeosMstpPortAdminPointToPoint   INTEGER,
+     wwpLeosMstpPortOperPointToPoint    TruthValue,
+     wwpLeosMstpPortAutoEdge            TruthValue,
+     wwpLeosMstpPortRestrictedRole      TruthValue,
+     wwpLeosMstpPortRestrictedTcn       TruthValue
+ }
+ 
+wwpLeosMstpPortInfoIndex OBJECT-TYPE
+     SYNTAX      Integer32 (1..65535)
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+	     "This is the port number used as index in the table.
+	      The value of this port id is similar to dot1dStpPort."
+     ::= { wwpLeosMstpPortCfgEntry 1 } 
+
+wwpLeosMstpPortEnable OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "When this object is set to true the mstp operation
+          for this port is enabled. Setting this object to
+          false disables mstp operations on this port."
+     DEFVAL { true }
+     ::= { wwpLeosMstpPortCfgEntry 2 }                       
+    
+wwpLeosMstpPortAdminExtPathCost OBJECT-TYPE
+     SYNTAX      Integer32 (1..200000000)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The administratively configurable external path cost.
+	      This object sets the ExternalPortPathCost MSTP State
+	      Machine Performance Parameter when configured to use
+	      manual port path cost values.  This is used as the
+	      CIST External Path Cost field for this port in BPDUs
+	      and used in vector calculations for this port.
+	      
+	      The default value for this object is system dependent."
+     ::= { wwpLeosMstpPortCfgEntry 3 }
+
+wwpLeosMstpPortOperExtPathCost OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "The current operational external path cost for this
+	      port.  Depending on the configuration, this may be the
+	      administratively configured external path cost or a
+	      value calculated by the system."
+     ::= { wwpLeosMstpPortCfgEntry 4 }
+   
+wwpLeosMstpPortDynamicExtPathCost OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This attribute enables or disables dynamic calculation
+	      of the external path cost for the given port.  Values
+	      of true or false will enable or disable this feature,
+	      respectively."
+     DEFVAL { true }
+     ::= { wwpLeosMstpPortCfgEntry 5 }
+
+wwpLeosMstpPortAdminEdgePort OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The administrative value of the Edge Port parameter.  A
+          value of true indicates that this port should be
+          assumed as an edge-port and a value of false indicates
+          that this port should be assumed as a non-edge-port.
+          
+	      The default value for this object is system dependent."
+     ::= { wwpLeosMstpPortCfgEntry 6 }
+
+wwpLeosMstpPortOperEdgePort OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The operational value of the Edge Port parameter.
+          The object is initialized to the value of
+          wwpLeosMstpPortAdminEdgePort and is set false on
+          reception of a BPDU."
+     ::= { wwpLeosMstpPortCfgEntry 7 }
+
+wwpLeosMstpPortProtocolMigration OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "When set to true, this object forces a spanning tree
+          migration check to initiate within the definitions of
+          the spanning tree state machines per IEEE.
+          Any other operation on this object has no effect and
+          it always returns false when read."
+     ::= { wwpLeosMstpPortCfgEntry 8 }
+
+wwpLeosMstpPortAdminPointToPoint OBJECT-TYPE
+     SYNTAX     INTEGER {
+                    forceTrue(0),
+                    forceFalse(1),
+                    auto(2)
+                }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The administrative point-to-point status of the LAN segment
+          attached to this port.  A value of forceTrue indicates that
+          this port should always be treated as if it is connected to
+          a point-to-point link.  A value of forceFalse indicates
+          that this port should be treated as having a shared media
+          connection.  A value of auto indicates that this port is
+          considered to have a point-to-point link if it is an Aggregator
+          and all of its members are aggregatable, or if the MAC entity
+          is configured for full duplex operation, either through
+          auto-negotiation or by management means."
+     DEFVAL { auto }
+     ::= { wwpLeosMstpPortCfgEntry 9 }
+
+wwpLeosMstpPortOperPointToPoint OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The operational point-to-point status of the LAN segment
+          attached to this port.  It indicates whether a port is
+          considered to have a point-to-point connection or not.
+          The value is determined by management or by auto-detection,
+          as described in the wwpMtpPortAdminPointToPoint object."
+     ::= { wwpLeosMstpPortCfgEntry 10 }
+
+wwpLeosMstpPortAutoEdge OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The value of the autoEdge parameter used by MSTP to
+          determine whether the value of wwpLeosMstpPortOperEdgePort
+          should be set to the value of wwpLeosMstpPortAdminEdgePort
+          or if it should be set according to the logic defined in
+          the Bridge Detection state machine."
+     DEFVAL { true }
+     ::= { wwpLeosMstpPortCfgEntry 11 }
+
+wwpLeosMstpPortRestrictedRole OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The value of the restrictedRole parameter used by MSTP.
+          When true, the port will not be selected as the root port
+          for the CIST or any MSTI, even if it has the best spanning
+          tree priority vector.  Such a port will be selected as an
+          alternate port after the root port has been selected.
+          When false, this port is allowed to be selected as the
+          root port."
+     DEFVAL { false }
+     ::= { wwpLeosMstpPortCfgEntry 12 }
+
+wwpLeosMstpPortRestrictedTcn OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The value of the restrictedTcn parameter used by MSTP.
+          When true, the port will not propagate received topology
+          change notifications and topology changes to other ports.
+          When false, normal topology change notification propagation
+          will occur on the port."
+     DEFVAL { false }
+     ::= { wwpLeosMstpPortCfgEntry 13 }
+
+
+
+-- ---------------------------------------------------------------------
+-- wwpLeosMstpMstCfg      OBJECT IDENTIFIER ::= { wwpLeosMstpObjects 2 }
+-- ---------------------------------------------------------------------
+
+wwpLeosMstpMstCfgName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..32))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+          "The configuration name that identifies the MST
+           region and is used as one of the inputs in the 
+           computation of the MST Configuration Identifier.
+           MSTP uses a fixed field of 32 characters when
+           computing the MST Configuration Identifier and
+           in MSTP BPDUs, when this object is set to a
+           string of characters less than 32 in length,
+           MST will fill in the remaining characters up
+           to character number 32 with NULL octets (hex
+           value 0x00).
+           
+           The default value for this object is the Bridge
+           MAC address represented as an ASCII character
+           string in canonical format, using upper-case
+           hexadecimal letters and hyphens to represent 
+           the 48-bit Bridge MAC, with the remaining
+           15 characters containing the NULL octet (hex
+           value 0x00)."
+     ::= { wwpLeosMstpMstCfg 1 }
+
+wwpLeosMstpMstCfgRevLevel OBJECT-TYPE
+     SYNTAX      Integer32 (0..65535)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The value of this object is used by MSTP as
+          the Revision Level field transmitted in MSTP
+          BPDUs and in the calculation of the MST
+          Configuration Identifier."
+     DEFVAL { 0 }
+     ::= { wwpLeosMstpMstCfg 2 }
+
+wwpLeosMstpMstCfgVlanTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosMstpMstCfgVlanEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The MST Configuration Table used by MSTP to maintain the
+          VLAN-to-MSTI mapping and for the calculation of the MST
+          Configuration Digest.  This table contains one entry for
+          each VlanId."
+     ::= { wwpLeosMstpMstCfg 3 }
+
+wwpLeosMstpMstCfgVlanEntry OBJECT-TYPE
+     SYNTAX      WwpLeosMstpMstCfgVlanEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Each MST Configuration Table entry contains the MSTI to
+          which the VLAN is mapped.  When the MSTI value is zero,
+          the VLAN is mapped to the CIST."
+     INDEX  { wwpLeosMstpMstCfgVlanIndex }
+     ::= { wwpLeosMstpMstCfgVlanTable 1 }
+
+WwpLeosMstpMstCfgVlanEntry ::= SEQUENCE {
+                   wwpLeosMstpMstCfgVlanIndex    Integer32,
+                   wwpLeosMstpMstCfgMstiIndex    MstiOrCistInstanceIndex
+                   }
+
+wwpLeosMstpMstCfgVlanIndex OBJECT-TYPE
+     SYNTAX      Integer32 (1..4094)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The VlanId for which this entry contains the CIST or MSTI
+          mapping."
+     ::= { wwpLeosMstpMstCfgVlanEntry 1 }
+
+wwpLeosMstpMstCfgMstiIndex OBJECT-TYPE
+     SYNTAX      MstiOrCistInstanceIndex
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "An integer with values ranging from 0 to 64 that identify a 
+          the CIST/MSTI instance to which this VLAN is mapped.  The
+          value of zero means this VLAN is mapped to the CIST, other
+          values indicate an MSTI mapping for this VLAN." 
+     DEFVAL { 0 }
+     ::= { wwpLeosMstpMstCfgVlanEntry 2 }
+                              
+wwpLeosMstpMstCfgXstMappingTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosMstpMstCfgXstMappingEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Table containing the VLAN to XST mapping information
+          from wwpLeosMstpMstCfgVlanTable in the format of VLAN-
+          mappings per CIST/MSTI.  A single table entry exists for
+          the CIST and one entry for each MSTI.  Each table entry
+          contains VLAN mappings indicating the VLAN identifiers
+          that are associated with the CIST or the particular MSTI.
+          
+          This table is read-only and is intended to provide
+          management an efficient method of retrieving the VLAN/XST
+          mapping information.  To modify the information within this
+          table, the wwpLeosMstpMstCfgVlanTable should be used."
+     ::= { wwpLeosMstpMstCfg 4 }
+
+wwpLeosMstpMstCfgXstMappingEntry OBJECT-TYPE
+     SYNTAX      WwpLeosMstpMstCfgXstMappingEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "A conceptual row containing a bitmap of all VLAN identifiers
+          that are mapped to the CIST or specified MSTI.  The mapping
+          of VLAN identifiers to CIST or MSTI is managed through the
+          wwpLeosMstpMstCfgVlanTable."
+     INDEX  { wwpLeosMstpMstCfgXstMappingIndex }
+     ::= { wwpLeosMstpMstCfgXstMappingTable 1 }
+
+WwpLeosMstpMstCfgXstMappingEntry ::= SEQUENCE {
+         wwpLeosMstpMstCfgXstMappingIndex    MstiOrCistInstanceIndex,
+         wwpLeosMstpMstCfgXstMapping1k       OCTET STRING,
+         wwpLeosMstpMstCfgXstMapping2k       OCTET STRING,
+         wwpLeosMstpMstCfgXstMapping3k       OCTET STRING,
+         wwpLeosMstpMstCfgXstMapping4k       OCTET STRING
+         }
+
+wwpLeosMstpMstCfgXstMappingIndex OBJECT-TYPE
+     SYNTAX      MstiOrCistInstanceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Uniquely identifies an instance. The entry of this table
+          with index 0 represents the CIST.  Non-zero index values
+          represent a particular MSTI."
+     ::= { wwpLeosMstpMstCfgXstMappingEntry 1 }
+
+wwpLeosMstpMstCfgXstMapping1k OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (128))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "A string of octets containing one bit for each VLAN
+          identifier.  The first octet represents VLAN identifier
+          values 0 through 7; the second octet represents
+          VLAN identifier values 8 through 15, etc.  The most
+          significant bit of each octet corresponds to the
+          lowest VLAN identifier value for that octet.
+          
+          This object represents VLAN identifier values
+          0 through 1023.
+          
+          Note, the bit representing VLAN identifier value 0
+          will always be clear (bit value 0)."
+     ::= { wwpLeosMstpMstCfgXstMappingEntry 2 }
+
+wwpLeosMstpMstCfgXstMapping2k OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (128))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "A string of octets containing one bit for each VLAN
+          identifier.  The first octet represents VLAN identifier
+          values 1024 through 1031; the second octet represents 
+          VLAN identifier values 1032 through 1039, etc.  The most
+          significant bit of each octet corresponds to the
+          lowest VLAN identifier value for that octet.
+          
+          This entire object represents VLAN identifier values
+          1024 through 2047."
+     ::= { wwpLeosMstpMstCfgXstMappingEntry 3 }
+
+wwpLeosMstpMstCfgXstMapping3k OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (128))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "A string of octets containing one bit for each VLAN
+          identifier.  The first octet represents VLAN identifier
+          values 2048 through 2055; the second octet represents 
+          VLAN identifier values 2056 through 2063, etc.  The most
+          significant bit of each octet corresponds to the
+          lowest VLAN identifier value for that octet.
+          
+          This entire object represents VLAN identifier values
+          2048 through 3071."
+     ::= { wwpLeosMstpMstCfgXstMappingEntry 4 }
+
+wwpLeosMstpMstCfgXstMapping4k OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (128))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "A string of octets containing one bit for each VLAN
+          identifier.  The first octet represents VLAN identifier
+          values 3072 through 3079; the second octet represents 
+          VLAN identifier values 3080 through 3087, etc.  The most
+          significant bit of each octet corresponds to the
+          lowest VLAN identifier value for that octet.
+          
+          This entire object represents VLAN identifier values
+          3072 through 4095.
+
+          Note, the bit representing VLAN identifier value 4095
+          will always be clear (bit value 0)."
+     ::= { wwpLeosMstpMstCfgXstMappingEntry 5 }
+
+wwpLeosMstpMstCfgIdDigest OBJECT-TYPE
+     SYNTAX      OCTET STRING(SIZE(16))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This object is the Configuration Digest calculated
+          by MSTP and is used in MSTP BPDUs."
+     ::= { wwpLeosMstpMstCfg 5 }
+
+
+
+-- ---------------------------------------------------------------------
+-- wwpLeosMstpXstCfg      OBJECT IDENTIFIER ::= { wwpLeosMstpObjects 3 }
+-- ---------------------------------------------------------------------
+
+wwpLeosMstpXstCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosMstpXstCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Table contains CIST and MSTI configuration items for
+          the bridge.  The CIST is identified as index 0 and
+          the MSTI entries use non-zero indices."
+     ::= { wwpLeosMstpXstCfg 1 }
+
+wwpLeosMstpXstCfgEntry OBJECT-TYPE
+     SYNTAX      WwpLeosMstpXstCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "CIST or MSTI entry containing configuration items
+          for the CIST or the specified MSTI."
+     INDEX { wwpLeosMstpXstCfgIndex }
+     ::= { wwpLeosMstpXstCfgTable 1 }
+
+WwpLeosMstpXstCfgEntry ::= SEQUENCE {
+       wwpLeosMstpXstCfgIndex                   MstiOrCistInstanceIndex,
+       wwpLeosMstpXstCfgBridgePriority          Integer32,     
+       wwpLeosMstpXstCfgStatus                  RowStatus
+    }
+
+wwpLeosMstpXstCfgIndex OBJECT-TYPE
+     SYNTAX      MstiOrCistInstanceIndex
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+         "The index number for this entry.  Zero refers to the CIST
+          and non-zero values refer to MSTI entries for this Bridge."
+     ::= { wwpLeosMstpXstCfgEntry 1 }
+
+wwpLeosMstpXstCfgBridgePriority OBJECT-TYPE
+     SYNTAX      Integer32 (0..15)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "The Bridge Priority value used by the multiple spanning
+          tree protocol in vector calculations and in BPDUs.
+          For the CIST, this value is used in the CIST Bridge
+          Identifier and for MSTIs this value is used in the MSTI
+          Bridge Priority field of BPDUs."
+     DEFVAL { 8 }
+     ::= { wwpLeosMstpXstCfgEntry 2 }
+             
+wwpLeosMstpXstCfgStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Used to manage the creation and deletion of the 
+	     conceptual rows in this table.
+	     
+	     To create a row in this table, a manager must
+         set this object to 'createAndGo'. 
+         To delete the entry set this to 'destroy'.
+         
+         Table rows representing MSTIs may be created or
+         deleted using this object.
+         
+         The table row representing the CIST (Index 0)
+         always exists, an attempt to delete this row
+         will result in an SNMP error."
+     ::= { wwpLeosMstpXstCfgEntry 3 }              
+             
+
+
+
+
+wwpLeosMstpXstPortCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosMstpXstPortCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Table of configuration items on a per-port per-CIST/MSTI
+          basis.  For each port, there is a single CIST (index 0) and
+          multiple MSTIs (non-zero index values)."
+     ::= { wwpLeosMstpXstCfg 2 }
+
+wwpLeosMstpXstPortCfgEntry OBJECT-TYPE
+     SYNTAX  WwpLeosMstpXstPortCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "Table entry containing configuration items specific to a
+          particular port/CIST combination or port/MSTI combination.
+          Each port on the bridge has a single CIST (index 0) and
+          may have multiple MSTI configurations (non-zero indices)."
+     INDEX  { wwpLeosMstpXstPortCfgPortIndex, wwpLeosMstpXstPortCfgXstIndex }
+     ::= { wwpLeosMstpXstPortCfgTable 1 }
+
+
+WwpLeosMstpXstPortCfgEntry ::= SEQUENCE {
+       wwpLeosMstpXstPortCfgPortIndex          Integer32,
+       wwpLeosMstpXstPortCfgXstIndex           MstiOrCistInstanceIndex,
+       wwpLeosMstpXstPortCfgPortPriority       Integer32,
+       wwpLeosMstpXstPortCfgAdminIntPathCost   Integer32,
+       wwpLeosMstpXstPortCfgOperIntPathCost    Integer32,
+       wwpLeosMstpXstPortCfgDynamicIntPathCost TruthValue
+    }
+
+wwpLeosMstpXstPortCfgPortIndex OBJECT-TYPE
+     SYNTAX      Integer32 (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	     "This is the port number used as index in the table.
+	      The value of this port id is similar to dot1dStpPort."
+     ::= { wwpLeosMstpXstPortCfgEntry 1 } 
+
+wwpLeosMstpXstPortCfgXstIndex OBJECT-TYPE
+     SYNTAX      MstiOrCistInstanceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The CIST or MSTI index number for this port.  Zero
+          refers to the CIST and non-zero values refer to
+          MSTI entries for this port."
+     ::= { wwpLeosMstpXstPortCfgEntry 2 }
+                  
+wwpLeosMstpXstPortCfgPortPriority OBJECT-TYPE
+     SYNTAX      Integer32 (0..15)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The port priority for this port used in vector calculations
+          and BPDUs.  For the CIST for this port, this value is the
+          priority component of the CIST Port Priority.  For MSTI
+          entries for this port, this value is the MSTI Port Priority."
+     DEFVAL { 8 }
+     ::= { wwpLeosMstpXstPortCfgEntry 3 }
+                  
+wwpLeosMstpXstPortCfgAdminIntPathCost OBJECT-TYPE 
+     SYNTAX      Integer32 (1..200000000)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The administratively configurable internal path cost.  For
+          the CIST for this port, this value is the CIST Internal Root
+          Path Cost.  For MSTI entries for this port, this value is
+          the MSTI Internal Root Path Cost.
+     
+	      The default value for this object is system dependent."
+     ::= { wwpLeosMstpXstPortCfgEntry 4 }
+
+wwpLeosMstpXstPortCfgOperIntPathCost OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The current operational internal path cost for either the
+          CIST or the specified MSTI.  Depending on the configuration
+          this value may be the administratively configured internal
+          path cost or some other value determined by the system."
+     ::= { wwpLeosMstpXstPortCfgEntry 5 }
+
+wwpLeosMstpXstPortCfgDynamicIntPathCost OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This attribute enables or disables dynamic calculation
+	      of the internal path cost for the given port.  When the
+	      XstIndex is zero, this applies to the CIST Internal Root
+	      Path Cost.  When the XstIndex is non-zero, this applies
+	      to the specified MSTI Internal Root Path Cost.  Values
+	      of true or false will enable or disable this feature,
+	      respectively."
+     DEFVAL { true }
+     ::= { wwpLeosMstpXstPortCfgEntry 6 }
+
+
+-- ---------------------------------------------------------------------
+-- wwpLeosMstpStats       OBJECT IDENTIFIER ::= { wwpLeosMstpObjects 4 }
+-- ---------------------------------------------------------------------
+
+wwpLeosMstpBridgeStatsClear OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This object allows all MSTP bridge statistics to be cleared.
+	      Setting this object to true will reset all statistics
+	      maintained under the wwpLeosMstpStats branch to a value of
+	      zero.  Setting this object to false will have no effect.
+	      This object always returns a value of false."
+     ::= { wwpLeosMstpStats 1 }
+
+wwpLeosMstpPortStatsTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosMstpPortStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "A table that contains MSTP statistical information
+          about each port that is associated with this bridge."
+     ::= { wwpLeosMstpStats 2 }
+
+wwpLeosMstpPortStatsEntry OBJECT-TYPE
+     SYNTAX      WwpLeosMstpPortStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "A list of statistics for each port of the bridge."
+     INDEX  { wwpLeosMstpPortStatsIndex }
+     ::= { wwpLeosMstpPortStatsTable 1 }
+
+WwpLeosMstpPortStatsEntry ::= SEQUENCE {
+                  wwpLeosMstpPortStatsIndex             Integer32,
+                  wwpLeosMstpPortStatsClear             TruthValue,
+                  wwpLeosMstpPortStatsRxTcnBpdu         BpduCounter,
+                  wwpLeosMstpPortStatsRxCfgBpdu         BpduCounter,
+                  wwpLeosMstpPortStatsRxRstBpdu         BpduCounter,
+                  wwpLeosMstpPortStatsRxMstBpdu         BpduCounter,
+                  wwpLeosMstpPortStatsTxTcnBpdu         BpduCounter,
+                  wwpLeosMstpPortStatsTxCfgBpdu         BpduCounter,
+                  wwpLeosMstpPortStatsTxRstBpdu         BpduCounter,
+                  wwpLeosMstpPortStatsTxMstBpdu         BpduCounter
+              }
+
+wwpLeosMstpPortStatsIndex OBJECT-TYPE
+     SYNTAX      Integer32 (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	     "This is the port number used as index in the table.
+	      The value of this port id is similar to dot1dStpPort."
+     ::= { wwpLeosMstpPortStatsEntry 1 } 
+
+wwpLeosMstpPortStatsClear OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "This object allows the port statistics contained within this
+	      table entry to be cleared.  Setting this object to true
+	      will reset all statistics for this port to a value of
+	      zero.  Setting this object to false will have no effect.
+	      This object always returns a value of false."
+     ::= { wwpLeosMstpPortStatsEntry 2 }
+
+wwpLeosMstpPortStatsRxTcnBpdu OBJECT-TYPE
+     SYNTAX      BpduCounter
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Received Topology Change Notification (TCN)
+          messages for this port."
+     ::= { wwpLeosMstpPortStatsEntry 3 }
+
+wwpLeosMstpPortStatsRxCfgBpdu OBJECT-TYPE
+     SYNTAX      BpduCounter
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Received Configuration BPDUs for this port."
+     ::= { wwpLeosMstpPortStatsEntry 4 }
+
+wwpLeosMstpPortStatsRxRstBpdu OBJECT-TYPE
+     SYNTAX      BpduCounter
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Received RST BPDUs for this port."
+     ::= { wwpLeosMstpPortStatsEntry 5 }
+
+wwpLeosMstpPortStatsRxMstBpdu OBJECT-TYPE
+     SYNTAX      BpduCounter
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Received MST BPDUs for this port."
+     ::= { wwpLeosMstpPortStatsEntry 6 }
+
+wwpLeosMstpPortStatsTxTcnBpdu OBJECT-TYPE
+     SYNTAX      BpduCounter
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Transmitted Topology Change Notification
+          (TCN) messages for this port."
+     ::= { wwpLeosMstpPortStatsEntry 7 }
+
+wwpLeosMstpPortStatsTxCfgBpdu OBJECT-TYPE
+     SYNTAX      BpduCounter
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Transmitted Configuration BPDUs for this port."
+     ::= { wwpLeosMstpPortStatsEntry 8 }
+
+wwpLeosMstpPortStatsTxRstBpdu OBJECT-TYPE
+     SYNTAX      BpduCounter
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Transmitted RST BPDUs for this port."
+     ::= { wwpLeosMstpPortStatsEntry 9 }
+
+wwpLeosMstpPortStatsTxMstBpdu OBJECT-TYPE
+     SYNTAX      BpduCounter
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Transmitted MST BPDUs for this port."
+     ::= { wwpLeosMstpPortStatsEntry 10 }                               
+
+
+
+-- -------------------------------------------------------------
+-- wwpLeosMstp - Traps/Notifications
+-- -------------------------------------------------------------
+wwpLeosMstpNewRootNotification NOTIFICATION-TYPE
+     OBJECTS {                
+                wwpLeosMstpXstCfgIndex
+             }
+     STATUS current
+     DESCRIPTION
+         "The wwpLeosMstpNewRootNotification indicates
+          that the sending agent has become the new root of
+          the Spanning Tree for the specified XST (CIST or
+          MSTI).  This notification is generated when the
+          Port Role Selection state machine invokes the
+          updtRolesTree procedure and this procedure operation
+          results in a calculation of a Root Priority Vector
+          for the XST which results in a value indicating that
+          the bridge itself has become the root bridge for the
+          XST."
+     ::= { wwpLeosMstpNotifications 1 }
+
+wwpLeosMstpTopologyChangeNotification NOTIFICATION-TYPE
+     OBJECTS {                
+                wwpLeosMstpPortInfoIndex,
+                wwpLeosMstpXstCfgIndex
+             }
+     STATUS current
+     DESCRIPTION
+         "A wwpLeosMstpTopologyChangeNotification is sent
+          by a bridge for the specified XST when the Topology
+          Change state machine invokes the newTcWhile procedure
+          which causes the tcWhile timer for the specified port
+          and XST to change from a zero value to a non-zero value."
+     ::= { wwpLeosMstpNotifications 2 }
+
+wwpLeosMstpPortBackupNotification NOTIFICATION-TYPE
+     OBJECTS {                
+                wwpLeosMstpPortInfoIndex
+             }
+     STATUS current
+     DESCRIPTION
+         "A wwpLeosMstpPortBackupNotification is sent whenever 
+          the MSTP state machine logic determines that a loop
+          has occurred and the received vector information
+          represents another port on the same device.  This
+          notification is sent when the updtRolesTree procedure
+          determines that the designated bridge and designated
+          port components of the port priority vector reflect
+          another port on this bridge which results in the
+          selectedRole parameter for the CIST to transition to
+          BackupPort."
+     ::= { wwpLeosMstpNotifications 3 }
+ 
+wwpLeosMstpPvstBpduReceivedNotification NOTIFICATION-TYPE
+     OBJECTS {                
+                wwpLeosMstpPortInfoIndex
+             }
+     STATUS deprecated
+     DESCRIPTION
+         "A wwpLeosMstpPvstBpduReceivedNotification is sent to 
+          indicate that one or more PVST BPDUs have been received
+          on the port in the past 60 seconds.  Each minute, all
+          ports are checked for reception of one or more PVST BPDUs
+          and this notification is generated if any PVST BPDUs
+          have been received."
+     ::= { wwpLeosMstpNotifications 4 }
+
+wwpLeosMstpSelfLoopNotification NOTIFICATION-TYPE
+     OBJECTS {                
+                wwpLeosMstpPortInfoIndex
+             }
+     STATUS current
+     DESCRIPTION
+         "A wwpLeosMstpSelfLoopNotification is sent whenever 
+          device detects same cable connected to a port in a loop back.
+          This determination is made by comparing the layer-2 address
+          of the received frame with that of the bridge.  This occurs
+          before the frame data reaches the MSTP state machine logic.
+          Also if loop-back blocking is enabled on the device then
+          mstp will block this port (self disable)."
+     ::= { wwpLeosMstpNotifications 5 }
+
+wwpLeosMstpPortOperEdgeNotification NOTIFICATION-TYPE
+     OBJECTS {                
+                wwpLeosMstpPortInfoIndex,
+                wwpLeosMstpPortOperEdgePort
+             }
+     STATUS current
+     DESCRIPTION
+         "A wwpLeosMstpPortOperEdgeNotification is sent whenever 
+          the MSTP state machine logic causes a change in the
+          operEdge parameter associated with the specified port."
+     ::= { wwpLeosMstpNotifications 6 }
+ 
+wwpLeosMstpPortFlapNotification NOTIFICATION-TYPE
+     OBJECTS {                
+                wwpLeosMstpPortInfoIndex
+             }
+     STATUS current
+     DESCRIPTION
+         "A wwpLeosMstpPortFlapNotification is sent whenever 
+          device detects a port flapping. 
+
+          This notification is generated under following criteria.
+          If device detects port flapped more than once
+          within 1 minute timer period and it has not sent
+          notification within last 5 minutes then it will
+          generate this notification."
+     ::= { wwpLeosMstpNotifications 7 }
+               
+wwpLeosMstpBridgeRootPortLostNotification NOTIFICATION-TYPE
+     OBJECTS {                
+                wwpLeosMstpPortInfoIndex,
+                wwpLeosMstpXstCfgIndex
+             }
+     STATUS current
+     DESCRIPTION
+         "A wwpLeosMstpBridgeRootPortLostNotification is sent
+          whenever device detects that bridge root port is lost
+          for a particular XST (CIST or MSTI).  This notification
+          is generated when a link has gone down and the role 
+          parameter for the CIST or any MSTI for that port is set
+          to Root Port.
+
+          This notification will indicate either the link failure
+          or link partner MSTP disabled."
+     ::= { wwpLeosMstpNotifications 8 }
+
+
+-- -------------------------------------------------------------
+-- wwpLeosMstp - Conformance Information
+-- -------------------------------------------------------------
+--- T.B.D.
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+--- T.B.D.
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+--- T.B.D.
+
+END

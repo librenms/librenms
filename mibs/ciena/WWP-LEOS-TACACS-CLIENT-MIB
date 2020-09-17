@@ -1,0 +1,1645 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-TACACS-CLIENT-MIB.my
+ --
+ --
+
+ WWP-LEOS-TACACS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   IpAddress, Integer32, Counter32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY			
+	    FROM SNMPv2-SMI			
+   DisplayString, RowStatus, TruthValue, TEXTUAL-CONVENTION
+	    FROM SNMPv2-TC						
+   InetAddressType,InetAddress
+            FROM INET-ADDRESS-MIB            
+   wwpModulesLeos			
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosTacacsClientMIB MODULE-IDENTITY
+            LAST-UPDATED "201204050000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "The MIB module for the WWP Tacacs Server specific configuration 
+                    and monitoring information."
+	    REVISION    "201204050000Z"
+	    DESCRIPTION
+                    "Added wwpLeosTacacsClientServerResolvedInetAddrType, 
+                     wwpLeosTacacsClientServerResolvedInetAddr,
+                     wwpLeosTacacsClientAuthenticationServerResolvedInetAddrType, 
+                     wwpLeosTacacsClientAuthenticationServerResolvedInetAddr,
+                     wwpLeosTacacsClientAuthorizationServerResolvedInetAddrType, 
+                     wwpLeosTacacsClientAuthorizationServerResolvedInetAddr,
+                     wwpLeosTacacsClientAccountingServerResolvedInetAddrType and 
+                     wwpLeosTacacsClientAccountingServerResolvedInetAddr for inet addressing."
+            REVISION    "201108040000Z"
+            DESCRIPTION
+                    "Deprecated wwpLeosTacacsClientGlobalServers."
+	    REVISION    "200104031700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 402 }
+ 
+
+
+ TacacsString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+            "Uset to repesent the tacacs authentication string"
+    SYNTAX       OCTET STRING (SIZE (2..127))
+
+ --
+ -- Node definitions
+ --
+ 
+ wwpLeosTacacsClientMIBObjects OBJECT IDENTIFIER ::= { wwpLeosTacacsClientMIB 1 }
+ 
+ wwpLeosTacacsClient OBJECT IDENTIFIER ::= {wwpLeosTacacsClientMIBObjects 1 }
+
+ -- Notifications 
+  
+ wwpLeosTacacsClientMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosTacacsClientMIB 2 } 
+ wwpLeosTacacsClientMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosTacacsClientMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosTacacsClientMIBConformance OBJECT IDENTIFIER ::= { wwpLeosTacacsClientMIB 3 } 
+ wwpLeosTacacsClientMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosTacacsClientMIBConformance 1 } 		
+ wwpLeosTacacsClientMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosTacacsClientMIBConformance 2 }
+			
+ 
+ wwpLeosTacacsAdminState OBJECT-TYPE     
+     SYNTAX        INTEGER {
+			disabled(1),
+			enabled(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "Setting this object will administratively enable/disable tacacs client on the device."
+     ::= { wwpLeosTacacsClient 1 }
+
+ wwpLeosTacacsOperState OBJECT-TYPE     
+     SYNTAX        INTEGER {
+			disabled(1),
+			enabled(2)
+                   }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+	     "This object returns the operational state of tacacs client."
+     ::= { wwpLeosTacacsClient 2 }
+
+ wwpLeosTacacsClientTimeout OBJECT-TYPE
+     SYNTAX       Integer32 (1..30)
+     UNITS        "seconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "This is the time in seconds between retransmissions
+	      to the TACACS server."
+     DEFVAL { 1 }
+     ::= { wwpLeosTacacsClient 3 }
+		
+ wwpLeosTacacsClientRetries   OBJECT-TYPE
+     SYNTAX         Integer32 (0..3)
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+	     "Indicates the number of times the TACACS server should be
+	      tried before giving up on the server."
+     DEFVAL { 3 }
+     ::= { wwpLeosTacacsClient 4 } 
+ 
+ wwpLeosTacacsClientPrivilegeLevelRW   OBJECT-TYPE
+     SYNTAX         Integer32 (2..14)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "Indicates the privilege level used for mapping a range of TACACS 
+	     privilege levels to LE-OS R-W user privilege level.  A privilege level returned
+	     by a server will be compared to wwpLeosTacacsClientPrivilegeLevelDiag.
+	     If the server privilege level is less than wwpLeosTacacsClientPrivilegeLevelDiag 
+	     and greater than or equal to the wwpLeosTacacsClientPrivilegeLevelRW, the LE-OS 
+	     privilege level is super-user."
+     DEFVAL { 2 }
+     ::= { wwpLeosTacacsClient 5 } 
+
+ wwpLeosTacacsClientPrivilegeLevelAdmin   OBJECT-TYPE
+     SYNTAX         Integer32 (2..13)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "Indicates the privilege level used for mapping a range of TACACS 
+	     privilege levels to LE-OS TCE Admin user privilege level. A privilege level returned
+	     by a server will be compared to wwpLeosTacacsClientPrivilegeLevelRW.
+	     If the server privilege level is less than wwpLeosTacacsClientPrivilegeLevelRW 
+	     and greater than or equal to the wwpLeosTacacsClientPrivilegeLevelAdmin, the LE-OS 
+	     privilege level is Admin. Not supported on all platforms"
+     DEFVAL { 5 }
+     ::= { wwpLeosTacacsClient 6 } 
+
+ wwpLeosTacacsClientPrivilegeLevelDiag   OBJECT-TYPE
+     SYNTAX         Integer32 (4..15)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "Indicates the privilege level used for mapping a range of TACACS 
+	     privilege levels to LE-OS Diagnostic user privilege level. A privilege level returned
+	     by a server will be compared to this value. If server privilege level is greater than 
+	     or equal to the wwpLeosTacacsClientPrivilegeLevelDiag, the LE-OS privilege level is diag."
+     DEFVAL { 15 }
+     ::= { wwpLeosTacacsClient 7 } 
+
+ wwpLeosTacacsClientAuthKey OBJECT-TYPE
+     SYNTAX        TacacsString
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "The Auth Key to be used for Tacacs Servers.  
+             Retrieving the value of this object via SNMP will 
+             return an empty string for security reasons."
+     ::= { wwpLeosTacacsClient 8 }
+
+ wwpLeosTacacsAuthenticationAdminState OBJECT-TYPE     
+     SYNTAX        INTEGER {
+			disabled(1),
+			enabled(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "Setting this object will administratively enable/disable tacacs authentication on the device."
+     DEFVAL { enabled }
+     ::= { wwpLeosTacacsClient 9 }
+
+ wwpLeosTacacsAuthorizationAdminState OBJECT-TYPE     
+     SYNTAX        INTEGER {
+			disabled(1),
+			enabled(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "Setting this object will administratively enable/disable tacacs authorization on the device."
+     DEFVAL { disabled }
+     ::= { wwpLeosTacacsClient 10 }
+
+ wwpLeosTacacsAccountingAdminState OBJECT-TYPE     
+     SYNTAX        INTEGER {
+			disabled(1),
+			enabled(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "Setting this object will administratively enable/disable tacacs accounting on the device."
+     DEFVAL { disabled }
+     ::= { wwpLeosTacacsClient 11 }
+
+ wwpLeosTacacsSyslogAdminState OBJECT-TYPE     
+     SYNTAX        INTEGER {
+			disabled(1),
+			enabled(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "Setting this object will administratively enable/disable tacacs syslog messages on the device."
+     DEFVAL { disabled }
+     ::= { wwpLeosTacacsClient 12 }
+
+
+ wwpLeosTacacsClientServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF WwpLeosTacacsClientServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+	     "Lists the possible TACACS servers. 
+	      While creating entry following mib objects must be specified
+	      wwpLeosTacacsClientServerStatus, wwpLeosTacacsClientServerAddr.
+	      SNMP multiple set operation must be used to create entry."
+     ::= { wwpLeosTacacsClient 13 }
+
+ wwpLeosTacacsClientServerEntry OBJECT-TYPE
+     SYNTAX       WwpLeosTacacsClientServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Tacacs server entry."
+     INDEX { wwpLeosTacacsClientServerIndex}
+     ::= { wwpLeosTacacsClientServerTable 1 }
+		
+ WwpLeosTacacsClientServerEntry ::= SEQUENCE {
+     wwpLeosTacacsClientServerIndex			      Integer32,     
+     wwpLeosTacacsClientServerAddr                            DisplayString,     
+     wwpLeosTacacsClientServerResolvedAddr                    IpAddress,
+     wwpLeosTacacsClientServerPriority			      Integer32,
+     wwpLeosTacacsClientServerAuthPort                        Integer32,     
+     wwpLeosTacacsClientServerAccessRequests                  Counter32,
+     wwpLeosTacacsClientServerAccessRetransmissions           Counter32,
+     wwpLeosTacacsClientServerAccessAccepts                   Counter32,
+     wwpLeosTacacsClientServerAccessRejects                   Counter32,
+     wwpLeosTacacsClientServerMalformedAccessResponses        Counter32,
+     wwpLeosTacacsClientServerBadAuthenticators               Counter32,
+     wwpLeosTacacsClientServerPendingRequests                 Gauge32,
+     wwpLeosTacacsClientServerTimeouts                        Counter32,
+     wwpLeosTacacsClientServerUnknownTypes                    Counter32,
+     wwpLeosTacacsClientServerBadHeaderSequence               Counter32,    
+     wwpLeosTacacsClientServerStatus                          RowStatus,     
+     wwpLeosTacacsClientServerApplication                     INTEGER,
+     wwpLeosTacacsClientServerClearStatistics                 TruthValue,
+     wwpLeosTacacsClientGlobalAuthorizationAccessRequests                  Counter32,
+     wwpLeosTacacsClientGlobalAuthorizationAccessRetransmissions           Counter32,
+     wwpLeosTacacsClientGlobalAuthorizationAccessAccepts                   Counter32,
+     wwpLeosTacacsClientGlobalAuthorizationAccessRejects                   Counter32,
+     wwpLeosTacacsClientGlobalAuthorizationMalformedAccessResponses        Counter32,
+     wwpLeosTacacsClientGlobalAuthorizationBadAuthenticators               Counter32,
+     wwpLeosTacacsClientGlobalAuthorizationTimeouts                        Counter32,
+     wwpLeosTacacsClientGlobalAuthorizationUnknownTypes                    Counter32,  
+     wwpLeosTacacsClientGlobalAuthorizationBadHeaderSequence               Counter32,  
+     
+     wwpLeosTacacsClientGlobalAccountingAccessRequests                  Counter32,
+     wwpLeosTacacsClientGlobalAccountingAccessRetransmissions           Counter32,
+     wwpLeosTacacsClientGlobalAccountingAccessAccepts                   Counter32,
+     wwpLeosTacacsClientGlobalAccountingAccessRejects                   Counter32,
+     wwpLeosTacacsClientGlobalAccountingMalformedAccessResponses        Counter32,
+     wwpLeosTacacsClientGlobalAccountingBadAuthenticators               Counter32,
+     wwpLeosTacacsClientGlobalAccountingTimeouts                        Counter32,
+     wwpLeosTacacsClientGlobalAccountingUnknownTypes                    Counter32,  
+     wwpLeosTacacsClientGlobalAccountingBadHeaderSequence               Counter32,
+     wwpLeosTacacsClientServerResolvedInetAddrType                      InetAddressType,
+     wwpLeosTacacsClientServerResolvedInetAddr                          InetAddress
+ }
+
+ wwpLeosTacacsClientServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Specifies the index of this table."
+     ::= { wwpLeosTacacsClientServerEntry 1 }
+	
+ wwpLeosTacacsClientServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..64))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Host name or ip address of the TACACS server."
+     ::= { wwpLeosTacacsClientServerEntry 2 }
+
+ wwpLeosTacacsClientServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+   	     "When wwpLeosTacacsClientServerAddr represents:
+          Host name    : The resolved address will either be Ipv4 address or Ipv6 address. 
+          Ipv4 address : The resolved address will be the same Ipv4 address.
+          Ipv6 address : The resolved address will be the same Ipv6 address.
+              
+          When the resolved address represents:
+          Ipv4 address : wwpLeosTacacsClientServerResolvedAddr will represent the resolved Ipv4 address.
+          wwpLeosTacacsClientServerResolvedInetAddr used in conjunction with wwpLeosTacacsClientServerResolvedInetAddrType 
+          will represent the same Ipv4 address.
+          Ipv6 address : wwpLeosTacacsClientServerResolvedAddr will represent 0.0.0.0.
+          wwpLeosTacacsClientServerResolvedInetAddr used in conjunction with wwpLeosTacacsClientServerResolvedInetAddrType 
+          will represent the Ipv6 address."
+     ::= { wwpLeosTacacsClientServerEntry 3 }
+ 
+  wwpLeosTacacsClientServerPriority OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "Specifies the priority of tacacs servers configured on the device. 
+	     This is the order in which the servers will accessed"
+     ::= { wwpLeosTacacsClientServerEntry 4 } 
+
+ wwpLeosTacacsClientServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	      "The destination TCP port number to which TACACS
+	      messages should be sent.  The TACACS server will not be
+	      used for authentication if this port number is 0."
+      DEFVAL { 49 }
+      ::= { wwpLeosTacacsClientServerEntry 5 }
+
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+ wwpLeosTacacsClientServerAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets sent
+             to this server from the global TACACS client. This does not include retransmissions."
+      ::= { wwpLeosTacacsClientServerEntry 6 }
+
+ wwpLeosTacacsClientServerAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Retransmission packets
+             retransmitted to this TACACS authentication server from the global TACACS client."
+      ::= { wwpLeosTacacsClientServerEntry 7 }
+
+ wwpLeosTacacsClientServerAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Accept packets
+             (valid or invalid) received from this server by the global TACACS client."
+      ::= { wwpLeosTacacsClientServerEntry 8 }
+
+ wwpLeosTacacsClientServerAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Reject packets
+             (valid or invalid) received from this server by the global TACACS client."
+      ::= { wwpLeosTacacsClientServerEntry  9 }
+
+ -- "Access-Response" includes an Access-Accept, Access-Challenge
+ -- or Access-Reject
+
+ wwpLeosTacacsClientServerMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed TACACS Access-Response
+             packets received from this server by the global TACACS client.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             Signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { wwpLeosTacacsClientServerEntry 10 }
+
+ wwpLeosTacacsClientServerBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-BadAuthenticator packets
+             containing invalid authenticators or Signature
+             attributes received from this server by the global TACACS client."
+      ::= { wwpLeosTacacsClientServerEntry 11 }
+
+ wwpLeosTacacsClientServerPendingRequests OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of TACACS Access-PendingRequest packets
+             destined for this server from the global TACACS client that have not yet timed out
+             or received a response. This variable is incremented
+             when an Access-Request is sent and decremented due to
+             receipt of an Access-Accept, Access-Reject or
+             Access-Challenge, a timeout or retransmission."
+      ::= { wwpLeosTacacsClientServerEntry 12 }
+
+ wwpLeosTacacsClientServerTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server on behalf of the global TACACS client.
+             After a timeout the client may retry to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a Request as well as a timeout."
+      ::= { wwpLeosTacacsClientServerEntry  13 }
+
+ wwpLeosTacacsClientServerUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of unknown type which
+             were received from this server on the authentication port by the global TACACS client."
+      ::= { wwpLeosTacacsClientServerEntry  14 }
+
+ wwpLeosTacacsClientServerBadHeaderSequence OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of which were
+             received from this server on the authentication port by the global TACACS client
+             and dropped for some other reason by the client."
+      ::= { wwpLeosTacacsClientServerEntry  15}
+		
+ wwpLeosTacacsClientServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+            "To create a row in this table, a manager must
+            set this object to either createAndGo(4).
+
+            While creating entry following mib objects must be specified
+	    wwpLeosTacacsClientServerStatus, wwpLeosTacacsClientServerAddr.
+	    SNMP multiple set operation must be used to create entry.
+
+            To disable a tacacs server, the operator can set wwpLeosTacacsClientServerStatus
+	    object to 'notInService' state."
+      ::= { wwpLeosTacacsClientServerEntry 16 } 
+
+ wwpLeosTacacsClientServerApplication OBJECT-TYPE
+      SYNTAX 		INTEGER {
+      					userLogin(1),
+					dot1x(2),
+      					all(3)   
+				}
+      MAX-ACCESS 	read-create
+      STATUS 		current
+      DESCRIPTION
+            "This object specifies how the tacacs server should be used for authentication.
+             Whether this tacacs server should be used for userLogin authentication or dot1x authentication 
+             or both is decided by the value of this mib object. Dot1x not supported on all platforms"
+      DEFVAL 	{userLogin}
+      ::= { wwpLeosTacacsClientServerEntry  17}
+ wwpLeosTacacsClientServerClearStatistics OBJECT-TYPE
+      SYNTAX            TruthValue
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+            "This object clears the statistics for a server"
+      DEFVAL { false }
+      ::= { wwpLeosTacacsClientServerEntry  18}
+
+ --  ADDED EXTRA TWAMP STATS for Authorization------------------
+ 
+  wwpLeosTacacsClientGlobalAuthorizationAccessRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Request packets sent
+              to this server. This does not include retransmissions."
+       ::= { wwpLeosTacacsClientServerEntry 19 }
+ 
+  wwpLeosTacacsClientGlobalAuthorizationAccessRetransmissions OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Request packets
+              retransmitted to this TACACS authentication server."
+       ::= { wwpLeosTacacsClientServerEntry 20 }
+ 
+  wwpLeosTacacsClientGlobalAuthorizationAccessAccepts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Accept packets
+              (valid or invalid) received from this server."
+       ::= { wwpLeosTacacsClientServerEntry 21 }
+ 
+  wwpLeosTacacsClientGlobalAuthorizationAccessRejects OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Reject packets
+              (valid or invalid) received from this server."
+       ::= { wwpLeosTacacsClientServerEntry  22 }
+ 
+  -- "Access-Response" includes an Access-Accept, Access-Challenge
+  -- or Access-Reject
+ 
+  wwpLeosTacacsClientGlobalAuthorizationMalformedAccessResponses OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of malformed TACACS Access-Response
+              packets received from this server.
+              Malformed packets include packets with
+              an invalid length. Bad authenticators or
+              signature attributes or unknown types are not
+              included as malformed access responses."
+       ::= { wwpLeosTacacsClientServerEntry 23 }
+ 
+  wwpLeosTacacsClientGlobalAuthorizationBadAuthenticators OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Response packets
+              containing invalid authenticators or signature
+              attributes received from this server."
+       ::= { wwpLeosTacacsClientServerEntry 24 }
+ 
+ 
+  wwpLeosTacacsClientGlobalAuthorizationTimeouts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of authentication timeouts to this server.
+              After a timeout the client may retry sending to the same
+              server, send to a different server, or
+              give up. A retry to the same server is counted as a
+              retransmit as well as a timeout. A send to a different
+              server is counted as a request as well as a timeout."
+       ::= { wwpLeosTacacsClientServerEntry  25 }
+ 
+  wwpLeosTacacsClientGlobalAuthorizationUnknownTypes OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS packets of unknown type which
+              were received from this server on the authentication port."
+       ::= { wwpLeosTacacsClientServerEntry  26 }
+ 
+  wwpLeosTacacsClientGlobalAuthorizationBadHeaderSequence OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS packets which were
+              received from this server on the authentication port
+              and dropped for some other reason."
+       ::= { wwpLeosTacacsClientServerEntry  27}
+                     
+      
+ --  ADDED EXTRA TWAMP STATS for Accounting------------------
+ 
+  wwpLeosTacacsClientGlobalAccountingAccessRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Request packets sent
+              to this server. This does not include retransmissions."
+       ::= { wwpLeosTacacsClientServerEntry 28 }
+ 
+  wwpLeosTacacsClientGlobalAccountingAccessRetransmissions OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Request packets
+              retransmitted to this TACACS authentication server."
+       ::= { wwpLeosTacacsClientServerEntry 29 }
+ 
+  wwpLeosTacacsClientGlobalAccountingAccessAccepts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Accept packets
+              (valid or invalid) received from this server."
+       ::= { wwpLeosTacacsClientServerEntry 30 }
+ 
+  wwpLeosTacacsClientGlobalAccountingAccessRejects OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Reject packets
+              (valid or invalid) received from this server."
+       ::= { wwpLeosTacacsClientServerEntry 31 }
+ 
+  -- "Access-Response" includes an Access-Accept, Access-Challenge
+  -- or Access-Reject
+ 
+  wwpLeosTacacsClientGlobalAccountingMalformedAccessResponses OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of malformed TACACS Access-Response
+              packets received from this server.
+              Malformed packets include packets with
+              an invalid length. Bad authenticators or
+              signature attributes or unknown types are not
+              included as malformed access responses."
+       ::= { wwpLeosTacacsClientServerEntry 32 }
+ 
+  wwpLeosTacacsClientGlobalAccountingBadAuthenticators OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Response packets
+              containing invalid authenticators or signature
+              attributes received from this server."
+       ::= { wwpLeosTacacsClientServerEntry 33 }
+ 
+ 
+  wwpLeosTacacsClientGlobalAccountingTimeouts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of authentication timeouts to this server.
+              After a timeout the client may retry sending to the same
+              server, send to a different server, or
+              give up. A retry to the same server is counted as a
+              retransmit as well as a timeout. A send to a different
+              server is counted as a request as well as a timeout."
+       ::= { wwpLeosTacacsClientServerEntry  34 }
+ 
+  wwpLeosTacacsClientGlobalAccountingUnknownTypes OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS packets of unknown type which
+              were received from this server on the authentication port."
+       ::= { wwpLeosTacacsClientServerEntry  35 }
+ 
+  wwpLeosTacacsClientGlobalAccountingBadHeaderSequence OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS packets which were
+              received from this server on the authentication port
+              and dropped for some other reason."
+       ::= { wwpLeosTacacsClientServerEntry  36}
+
+  wwpLeosTacacsClientServerResolvedInetAddrType OBJECT-TYPE
+       SYNTAX       InetAddressType
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+	     "Specifies the resolved IP address type .	Used in conjunction with 
+              wwpLeosTacacsClientServerResolvedInetAddr.
+              When set to :
+              ipv4 : wwpLeosTacacsClientServerResolvedInetAddr should be compliant 
+                     with InetAddressIPv4 
+              ipv6 : wwpLeosTacacsClientServerResolvedInetAddr should be compliant 
+                     with InetAddressIPv6 "
+     ::= { wwpLeosTacacsClientServerEntry 37 }
+ 
+  wwpLeosTacacsClientServerResolvedInetAddr OBJECT-TYPE
+       SYNTAX       InetAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+	     "Specifies the resolved IP address if wwpLeosTacacsClientServerAddr 
+              is set to host name.  If wwpLeosTacacsClientServerAddr is set to ip 
+              address then wwpLeosTacacsClientServerResolvedInetAddress will contain 
+              same information as wwpLeosTacacsClientServerAddr.  This OID should be 
+              used in conjuction with wwpLeosTacacsClientServerResolvedInetAddrType."
+     ::= { wwpLeosTacacsClientServerEntry 38 }
+                
+   
+   --  END OF TWAMP STATS-----------------
+     
+ wwpLeosTacacsClientAuthenticationServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF WwpLeosTacacsClientAuthenticationServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Lists the possible TACACS servers. 
+              While creating entry following mib objects must be specified
+              wwpLeosTacacsClientAuthenticationServerStatus, wwpLeosTacacsClientAuthenticationServerAddr.
+              SNMP multiple set operation must be used to create entry."
+     ::= { wwpLeosTacacsClient 14 }
+
+ wwpLeosTacacsClientAuthenticationServerEntry OBJECT-TYPE
+     SYNTAX       WwpLeosTacacsClientAuthenticationServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Tacacs server entry."
+     INDEX { wwpLeosTacacsClientAuthenticationServerIndex}
+     ::= { wwpLeosTacacsClientAuthenticationServerTable 1 }
+                
+ WwpLeosTacacsClientAuthenticationServerEntry ::= SEQUENCE {
+     wwpLeosTacacsClientAuthenticationServerIndex                               Integer32,     
+     wwpLeosTacacsClientAuthenticationServerAddr                            DisplayString,     
+     wwpLeosTacacsClientAuthenticationServerResolvedAddr                    IpAddress,
+     wwpLeosTacacsClientAuthenticationServerPriority                    Integer32,
+     wwpLeosTacacsClientAuthenticationServerAuthPort                        Integer32,     
+     wwpLeosTacacsClientAuthenticationServerAccessRequests                  Counter32,
+     wwpLeosTacacsClientAuthenticationServerAccessRetransmissions           Counter32,
+     wwpLeosTacacsClientAuthenticationServerAccessAccepts                   Counter32,
+     wwpLeosTacacsClientAuthenticationServerAccessRejects                   Counter32,
+     wwpLeosTacacsClientAuthenticationServerMalformedAccessResponses        Counter32,
+     wwpLeosTacacsClientAuthenticationServerBadAuthenticators               Counter32,
+     wwpLeosTacacsClientAuthenticationServerPendingRequests                 Gauge32,
+     wwpLeosTacacsClientAuthenticationServerTimeouts                        Counter32,
+     wwpLeosTacacsClientAuthenticationServerUnknownTypes                    Counter32,
+     wwpLeosTacacsClientAuthenticationServerBadHeaderSequence               Counter32,    
+     wwpLeosTacacsClientAuthenticationServerStatus                          RowStatus,     
+     wwpLeosTacacsClientAuthenticationServerApplication                 INTEGER,
+     wwpLeosTacacsClientAuthenticationServerClearStatistics                 TruthValue,
+     wwpLeosTacacsClientAuthenticationServerResolvedInetAddrType            InetAddressType,
+     wwpLeosTacacsClientAuthenticationServerResolvedInetAddr                InetAddress
+ }
+
+ wwpLeosTacacsClientAuthenticationServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Specifies the index of this table."
+     ::= { wwpLeosTacacsClientAuthenticationServerEntry 1 }
+        
+ wwpLeosTacacsClientAuthenticationServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..64))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Host name or ip address of the TACACS server."
+     ::= { wwpLeosTacacsClientAuthenticationServerEntry 2 }
+
+ wwpLeosTacacsClientAuthenticationServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "When wwpLeosTacacsClientAuthenticationServerAddr represents:
+          Host name    : The resolved address will either be Ipv4 address or Ipv6 address. 
+          Ipv4 address : The resolved address will be the same Ipv4 address.
+          Ipv6 address : The resolved address will be the same Ipv6 address.
+              
+          When the resolved address represents:
+          Ipv4 address : wwpLeosTacacsClientAuthenticationServerResolvedAddr will represent the resolved Ipv4 address.
+          wwpLeosTacacsClientAuthenticationServerResolvedInetAddr used in conjunction with 
+          wwpLeosTacacsClientAuthenticationServerResolvedInetAddrType will represent the same Ipv4 address.
+          Ipv6 address : wwpLeosTacacsClientAuthenticationServerResolvedAddr will represent 0.0.0.0.
+          wwpLeosTacacsClientAuthenticationServerResolvedInetAddr used in conjunction with 
+          wwpLeosTacacsClientAuthenticationServerResolvedInetAddrType will represent the Ipv6 address."
+     ::= { wwpLeosTacacsClientAuthenticationServerEntry 3 }
+ 
+  wwpLeosTacacsClientAuthenticationServerPriority OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the priority of tacacs servers configured on the device. 
+             This is the order in which the servers will accessed"
+     ::= { wwpLeosTacacsClientAuthenticationServerEntry 4 } 
+
+ wwpLeosTacacsClientAuthenticationServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The destination TCP port number to which TACACS
+              messages should be sent.  The TACACS server will not be
+              used for authentication if this port number is 0."
+      DEFVAL { 49 }
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry 5 }
+
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+ wwpLeosTacacsClientAuthenticationServerAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry 6 }
+
+ wwpLeosTacacsClientAuthenticationServerAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             retransmitted to this TACACS authentication server."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry 7 }
+
+ wwpLeosTacacsClientAuthenticationServerAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry 8 }
+
+ wwpLeosTacacsClientAuthenticationServerAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry  9 }
+
+ -- "Access-Response" includes an Access-Accept, Access-Challenge
+ -- or Access-Reject
+
+ wwpLeosTacacsClientAuthenticationServerMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed TACACS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             Signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry 10 }
+
+ wwpLeosTacacsClientAuthenticationServerBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Response packets
+             containing invalid authenticators or Signature
+             attributes received from this server."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry 11 }
+
+ wwpLeosTacacsClientAuthenticationServerPendingRequests OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             destined for this server that have not yet timed out
+             or received a response. This variable is incremented
+             when an Access-Request is sent and decremented due to
+             receipt of an Access-Accept, Access-Reject or
+             Access-Challenge, a timeout or retransmission."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry 12 }
+
+ wwpLeosTacacsClientAuthenticationServerTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a Request as well as a timeout."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry  13 }
+
+ wwpLeosTacacsClientAuthenticationServerUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry  14 }
+
+ wwpLeosTacacsClientAuthenticationServerBadHeaderSequence OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry  15}
+                
+ wwpLeosTacacsClientAuthenticationServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+            "To create a row in this table, a manager must
+            set this object to either createAndGo(4).
+
+            While creating entry following mib objects must be specified
+            wwpLeosTacacsClientAuthenticationServerStatus, wwpLeosTacacsClientAuthenticationServerAddr.
+            SNMP multiple set operation must be used to create entry.
+
+            To disable a tacacs server, the operator can set wwpLeosTacacsClientAuthenticationServerStatus
+            object to 'notInService' state."
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry 16 } 
+
+ wwpLeosTacacsClientAuthenticationServerApplication OBJECT-TYPE
+      SYNTAX            INTEGER {
+                                        userLogin(1),
+                                        dot1x(2),
+                                        all(3)   
+                                }
+      MAX-ACCESS        read-create
+      STATUS            current
+      DESCRIPTION
+            "This object specifies how the tacacs server should be used for authentication.
+             Whether this tacacs server should be used for userLogin authentication or dot1x authentication 
+             or both is decided by the value of this mib object. Dot1x not supported on all platforms"
+      DEFVAL    {userLogin}
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry  17}
+
+ wwpLeosTacacsClientAuthenticationServerClearStatistics OBJECT-TYPE
+      SYNTAX            TruthValue
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+            "This object clears the statistics for a server"
+      DEFVAL { false }
+      ::= { wwpLeosTacacsClientAuthenticationServerEntry  18}
+
+
+ wwpLeosTacacsClientAuthenticationServerResolvedInetAddrType OBJECT-TYPE
+      SYNTAX       InetAddressType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+	    "Specifies the resolved IP address type.  Used in conjunction with 
+             wwpLeosTacacsClientAuthenticationServerResolvedInetAddr.
+             When set to :
+             ipv4 : wwpLeosTacacsClientAuthenticationServerResolvedInetAddr should 
+                    be compliant with InetAddressIPv4 
+             ipv6 : wwpLeosTacacsClientAuthenticationServerResolvedInetAddr should 
+                    be compliant with InetAddressIPv6 "
+     ::= { wwpLeosTacacsClientAuthenticationServerEntry 19 }
+ 
+ wwpLeosTacacsClientAuthenticationServerResolvedInetAddr OBJECT-TYPE
+      SYNTAX       InetAddress
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+            "Specifies the resolved IP address if wwpLeosTacacsClientAuthenticationServerAddr
+             is set to host name.  If wwpLeosTacacsClientAuthenticationServerAddr is set to ip 
+             address then wwpLeosTacacsClientAuthenticationServerResolvedInetAddr 
+             will contain the same information as wwpLeosTacacsClientAuthenticationServerAddr.
+             This OID should be used in conjuction with 
+             wwpLeosTacacsClientAuthenticationServerResolvedInetAddrType."
+     ::= { wwpLeosTacacsClientAuthenticationServerEntry 20}
+
+ 
+ --
+ --wwpLeosTacacsClientAuthorizationServerTable
+ --
+ wwpLeosTacacsClientAuthorizationServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF WwpLeosTacacsClientAuthorizationServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Lists the possible TACACS servers. 
+              While creating entry following mib objects must be specified
+              wwpLeosTacacsClientAuthorizationServerStatus, wwpLeosTacacsClientAuthorizationServerAddr.
+              SNMP multiple set operation must be used to create entry."
+     ::= { wwpLeosTacacsClient 15 }
+
+ wwpLeosTacacsClientAuthorizationServerEntry OBJECT-TYPE
+     SYNTAX       WwpLeosTacacsClientAuthorizationServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Tacacs server entry."
+     INDEX { wwpLeosTacacsClientAuthorizationServerIndex}
+     ::= { wwpLeosTacacsClientAuthorizationServerTable 1 }
+                
+ WwpLeosTacacsClientAuthorizationServerEntry ::= SEQUENCE {
+     wwpLeosTacacsClientAuthorizationServerIndex                               Integer32,     
+     wwpLeosTacacsClientAuthorizationServerAddr                            DisplayString,     
+     wwpLeosTacacsClientAuthorizationServerResolvedAddr                    IpAddress,
+     wwpLeosTacacsClientAuthorizationServerPriority                            Integer32,
+     wwpLeosTacacsClientAuthorizationServerAuthPort                        Integer32,     
+     wwpLeosTacacsClientAuthorizationServerAccessRequests                  Counter32,
+     wwpLeosTacacsClientAuthorizationServerAccessRetransmissions           Counter32,
+     wwpLeosTacacsClientAuthorizationServerAccessAccepts                   Counter32,
+     wwpLeosTacacsClientAuthorizationServerAccessRejects                   Counter32,
+     wwpLeosTacacsClientAuthorizationServerMalformedAccessResponses        Counter32,
+     wwpLeosTacacsClientAuthorizationServerBadAuthenticators               Counter32,
+     wwpLeosTacacsClientAuthorizationServerPendingRequests                 Gauge32,
+     wwpLeosTacacsClientAuthorizationServerTimeouts                        Counter32,
+     wwpLeosTacacsClientAuthorizationServerUnknownTypes                    Counter32,
+     wwpLeosTacacsClientAuthorizationServerBadHeaderSequence               Counter32,    
+     wwpLeosTacacsClientAuthorizationServerStatus                          RowStatus,     
+     wwpLeosTacacsClientAuthorizationServerApplication                 INTEGER,
+     wwpLeosTacacsClientAuthorizationServerClearStatistics                 TruthValue,
+     wwpLeosTacacsClientAuthorizationServerResolvedInetAddrType            InetAddressType,
+     wwpLeosTacacsClientAuthorizationServerResolvedInetAddr                InetAddress
+ }
+
+ wwpLeosTacacsClientAuthorizationServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Specifies the index of this table."
+     ::= { wwpLeosTacacsClientAuthorizationServerEntry 1 }
+        
+ wwpLeosTacacsClientAuthorizationServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..64))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Host name or ip address of the TACACS server."
+     ::= { wwpLeosTacacsClientAuthorizationServerEntry 2 }
+
+ wwpLeosTacacsClientAuthorizationServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "When wwpLeosTacacsClientAuthorizationServerAddr represents:
+          Host name    : The resolved address will either be Ipv4 address or Ipv6 address. 
+          Ipv4 address : The resolved address will be the same Ipv4 address.
+          Ipv6 address : The resolved address will be the same Ipv6 address.
+              
+          When the resolved address represents:
+          Ipv4 address : wwpLeosTacacsClientAuthorizationServerResolvedAddr will represent the resolved Ipv4 address.
+          wwpLeosTacacsClientAuthorizationServerResolvedInetAddr used in conjunction with 
+          wwpLeosTacacsClientAuthorizationServerResolvedInetAddrType will represent the same Ipv4 address.
+          Ipv6 address : wwpLeosTacacsClientAuthorizationServerResolvedAddr will represent 0.0.0.0.
+          wwpLeosTacacsClientAuthorizationServerResolvedInetAddr used in conjunction with 
+          wwpLeosTacacsClientAuthorizationServerResolvedInetAddrType will represent the Ipv6 address."
+     ::= { wwpLeosTacacsClientAuthorizationServerEntry 3 }
+ 
+  wwpLeosTacacsClientAuthorizationServerPriority OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the priority of tacacs servers configured on the device. 
+             This is the order in which the servers will accessed"
+     ::= { wwpLeosTacacsClientAuthorizationServerEntry 4 } 
+
+ wwpLeosTacacsClientAuthorizationServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The destination TCP port number to which TACACS
+              messages should be sent.  The TACACS server will not be
+              used for authentication if this port number is 0."
+      DEFVAL { 49 }
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry 5 }
+
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+ wwpLeosTacacsClientAuthorizationServerAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry 6 }
+
+ wwpLeosTacacsClientAuthorizationServerAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             retransmitted to this TACACS authentication server."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry 7 }
+
+ wwpLeosTacacsClientAuthorizationServerAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry 8 }
+
+ wwpLeosTacacsClientAuthorizationServerAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry  9 }
+
+ -- "Access-Response" includes an Access-Accept, Access-Challenge
+ -- or Access-Reject
+
+ wwpLeosTacacsClientAuthorizationServerMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed TACACS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             Signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry 10 }
+
+ wwpLeosTacacsClientAuthorizationServerBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Response packets
+             containing invalid authenticators or Signature
+             attributes received from this server."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry 11 }
+
+ wwpLeosTacacsClientAuthorizationServerPendingRequests OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             destined for this server that have not yet timed out
+             or received a response. This variable is incremented
+             when an Access-Request is sent and decremented due to
+             receipt of an Access-Accept, Access-Reject or
+             Access-Challenge, a timeout or retransmission."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry 12 }
+
+ wwpLeosTacacsClientAuthorizationServerTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a Request as well as a timeout."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry  13 }
+
+ wwpLeosTacacsClientAuthorizationServerUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry  14 }
+
+ wwpLeosTacacsClientAuthorizationServerBadHeaderSequence OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry  15}
+                
+ wwpLeosTacacsClientAuthorizationServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+            "To create a row in this table, a manager must
+            set this object to either createAndGo(4).
+
+            While creating entry following mib objects must be specified
+            wwpLeosTacacsClientAuthorizationServerStatus, wwpLeosTacacsClientAuthorizationServerAddr.
+            SNMP multiple set operation must be used to create entry.
+
+            To disable a tacacs server, the operator can set wwpLeosTacacsClientAuthorizationServerStatus
+            object to 'notInService' state."
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry 16 } 
+
+ wwpLeosTacacsClientAuthorizationServerApplication OBJECT-TYPE
+      SYNTAX            INTEGER {
+                                        userLogin(1),
+                                        dot1x(2),
+                                        all(3)   
+                                }
+      MAX-ACCESS        read-create
+      STATUS            current
+      DESCRIPTION
+            "This object specifies how the tacacs server should be used for authentication.
+             Whether this tacacs server should be used for userLogin authentication or dot1x authentication 
+             or both is decided by the value of this mib object. Dot1x not supported on all platforms"
+      DEFVAL    {userLogin}
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry  17}
+
+ wwpLeosTacacsClientAuthorizationServerClearStatistics OBJECT-TYPE
+      SYNTAX            TruthValue
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+            "This object clears the statistics for a server"
+      DEFVAL { false }
+      ::= { wwpLeosTacacsClientAuthorizationServerEntry  18} 
+
+ wwpLeosTacacsClientAuthorizationServerResolvedInetAddrType OBJECT-TYPE
+      SYNTAX       InetAddressType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+	    "Specifies the resolved IP address type.  Used in conjunction with 
+             wwpLeosTacacsClientAuthorizationServerResolvedInetAddr.
+             When set to :
+             ipv4 : wwpLeosTacacsClientAuthorizationServerResolvedInetAddr should 
+                    be compliant with InetAddressIPv4 
+             ipv6 : wwpLeosTacacsClientAuthorizationServerResolvedInetAddr should 
+                    be compliant with InetAddressIPv6."
+     ::= { wwpLeosTacacsClientAuthorizationServerEntry 19 }
+ 
+ wwpLeosTacacsClientAuthorizationServerResolvedInetAddr OBJECT-TYPE
+      SYNTAX       InetAddress
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+            "Specifies the resolved IP address if wwpLeosTacacsClientAuthorizationServerAddr 
+             is set to host name.  If wwpLeosTacacsClientAuthorizationServerAddr is set to ip 
+             address then wwpLeosTacacsClientAuthorizationServerResolvedInetAddr will contain 
+             same information as wwpLeosTacacsClientAuthorizationServerAddr. This OID is used 
+             in conjunction with wwpLeosTacacsClientAuthorizationServerResolvedInetAddr."
+     ::= { wwpLeosTacacsClientAuthorizationServerEntry 20 }
+
+ --
+ -- wwpLeosTacacsClientAccountingServerTable
+ --
+ wwpLeosTacacsClientAccountingServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF WwpLeosTacacsClientAccountingServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Lists the possible TACACS servers. 
+              While creating entry following mib objects must be specified
+              wwpLeosTacacsClientAccountingServerStatus, wwpLeosTacacsClientAccountingServerAddr.
+              SNMP multiple set operation must be used to create entry."
+     ::= { wwpLeosTacacsClient 16 }
+
+ wwpLeosTacacsClientAccountingServerEntry OBJECT-TYPE
+     SYNTAX       WwpLeosTacacsClientAccountingServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Tacacs server entry."
+     INDEX { wwpLeosTacacsClientAccountingServerIndex}
+     ::= { wwpLeosTacacsClientAccountingServerTable 1 }
+                
+ WwpLeosTacacsClientAccountingServerEntry ::= SEQUENCE {
+     wwpLeosTacacsClientAccountingServerIndex                       Integer32,     
+     wwpLeosTacacsClientAccountingServerAddr                            DisplayString,     
+     wwpLeosTacacsClientAccountingServerResolvedAddr                    IpAddress,
+     wwpLeosTacacsClientAccountingServerPriority                            Integer32,
+     wwpLeosTacacsClientAccountingServerAuthPort                        Integer32,     
+     wwpLeosTacacsClientAccountingServerAccessRequests                  Counter32,
+     wwpLeosTacacsClientAccountingServerAccessRetransmissions           Counter32,
+     wwpLeosTacacsClientAccountingServerAccessAccepts                   Counter32,
+     wwpLeosTacacsClientAccountingServerAccessRejects                   Counter32,
+     wwpLeosTacacsClientAccountingServerMalformedAccessResponses        Counter32,
+     wwpLeosTacacsClientAccountingServerBadAuthenticators               Counter32,
+     wwpLeosTacacsClientAccountingServerPendingRequests                 Gauge32,
+     wwpLeosTacacsClientAccountingServerTimeouts                        Counter32,
+     wwpLeosTacacsClientAccountingServerUnknownTypes                    Counter32,
+     wwpLeosTacacsClientAccountingServerBadHeaderSequence               Counter32,    
+     wwpLeosTacacsClientAccountingServerStatus                          RowStatus,     
+     wwpLeosTacacsClientAccountingServerApplication                         INTEGER,
+     wwpLeosTacacsClientAccountingServerClearStatistics                 TruthValue,
+     wwpLeosTacacsClientAccountingServerResolvedInetAddrType            InetAddressType,
+     wwpLeosTacacsClientAccountingServerResolvedInetAddr                InetAddress
+ }
+
+ wwpLeosTacacsClientAccountingServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Specifies the index of this table."
+     ::= { wwpLeosTacacsClientAccountingServerEntry 1 }
+        
+ wwpLeosTacacsClientAccountingServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..64))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Host name or ip address of the TACACS server."
+     ::= { wwpLeosTacacsClientAccountingServerEntry 2 }
+
+ wwpLeosTacacsClientAccountingServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "When wwpLeosTacacsClientAccountingServerAddr represents:
+          Host name    : The resolved address will either be Ipv4 address or Ipv6 address. 
+          Ipv4 address : The resolved address will be the same Ipv4 address.
+          Ipv6 address : The resolved address will be the same Ipv6 address.
+              
+          When the resolved address represents:
+          Ipv4 address : wwpLeosTacacsClientAccountingServerResolvedAddr will represent the resolved Ipv4 address.
+          wwpLeosTacacsClientAccountingServerResolvedInetAddr used in conjunction with 
+          wwpLeosTacacsClientAccountingServerResolvedInetAddrType will represent the same Ipv4 address.
+          Ipv6 address : wwpLeosTacacsClientAccountingServerResolvedAddr will represent 0.0.0.0.
+          wwpLeosTacacsClientAccountingServerResolvedInetAddr used in conjunction with
+          wwpLeosTacacsClientAccountingServerResolvedInetAddrType will represent the Ipv6 address."
+     ::= { wwpLeosTacacsClientAccountingServerEntry 3 }
+ 
+  wwpLeosTacacsClientAccountingServerPriority OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the priority of tacacs servers configured on the device. 
+             This is the order in which the servers will accessed"
+     ::= { wwpLeosTacacsClientAccountingServerEntry 4 } 
+
+ wwpLeosTacacsClientAccountingServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The destination TCP port number to which TACACS
+              messages should be sent.  The TACACS server will not be
+              used for authentication if this port number is 0."
+      DEFVAL { 49 }
+      ::= { wwpLeosTacacsClientAccountingServerEntry 5 }
+
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+ wwpLeosTacacsClientAccountingServerAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 6 }
+
+ wwpLeosTacacsClientAccountingServerAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             retransmitted to this TACACS authentication server."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 7 }
+
+ wwpLeosTacacsClientAccountingServerAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 8 }
+
+ wwpLeosTacacsClientAccountingServerAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { wwpLeosTacacsClientAccountingServerEntry  9 }
+
+ -- "Access-Response" includes an Access-Accept, Access-Challenge
+ -- or Access-Reject
+
+ wwpLeosTacacsClientAccountingServerMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed TACACS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             Signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 10 }
+
+ wwpLeosTacacsClientAccountingServerBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Response packets
+             containing invalid authenticators or Signature
+             attributes received from this server."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 11 }
+
+ wwpLeosTacacsClientAccountingServerPendingRequests OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             destined for this server that have not yet timed out
+             or received a response. This variable is incremented
+             when an Access-Request is sent and decremented due to
+             receipt of an Access-Accept, Access-Reject or
+             Access-Challenge, a timeout or retransmission."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 12 }
+
+ wwpLeosTacacsClientAccountingServerTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a Request as well as a timeout."
+      ::= { wwpLeosTacacsClientAccountingServerEntry  13 }
+
+ wwpLeosTacacsClientAccountingServerUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { wwpLeosTacacsClientAccountingServerEntry  14 }
+
+ wwpLeosTacacsClientAccountingServerBadHeaderSequence OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { wwpLeosTacacsClientAccountingServerEntry  15}
+                
+ wwpLeosTacacsClientAccountingServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+            "To create a row in this table, a manager must
+            set this object to either createAndGo(4).
+
+            While creating entry following mib objects must be specified
+            wwpLeosTacacsClientAccountingServerStatus, wwpLeosTacacsClientAccountingServerAddr.
+            SNMP multiple set operation must be used to create entry.
+
+            To disable a tacacs server, the operator can set wwpLeosTacacsClientAccountingServerStatus
+            object to 'notInService' state."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 16 } 
+
+ wwpLeosTacacsClientAccountingServerApplication OBJECT-TYPE
+      SYNTAX            INTEGER {
+                                        userLogin(1),
+                                        dot1x(2),
+                                        all(3)   
+                                }
+      MAX-ACCESS        read-create
+      STATUS            current
+      DESCRIPTION
+            "This object specifies how the tacacs server should be used for authentication.
+             Whether this tacacs server should be used for userLogin authentication or dot1x authentication 
+             or both is decided by the value of this mib object. Dot1x not supported on all platforms"
+      DEFVAL    {userLogin}
+      ::= { wwpLeosTacacsClientAccountingServerEntry  17}
+
+ wwpLeosTacacsClientAccountingServerClearStatistics OBJECT-TYPE
+      SYNTAX            TruthValue
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+            "This object clears the statistics for a server"
+      DEFVAL { false }
+      ::= { wwpLeosTacacsClientAccountingServerEntry  18}
+ 
+ wwpLeosTacacsClientAccountingServerResolvedInetAddrType OBJECT-TYPE
+      SYNTAX       InetAddressType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+	    "Specifies the resolved IP address type.  Used in conjunction with 
+             wwpLeosTacacsClientAccountingServerResolvedInetAddr.
+             When set to :
+             ipv4 : wwpLeosTacacsClientAccountingServerResolvedInetAddr should 
+                    be compliant with InetAddressIPv4 
+             ipv6 : wwpLeosTacacsClientAccountingServerResolvedInetAddr should 
+                    be compliant with InetAddressIPv6."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 19 }
+  
+ wwpLeosTacacsClientAccountingServerResolvedInetAddr OBJECT-TYPE
+      SYNTAX       InetAddress
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+            "Specifies the resolved IP address if wwpLeosTacacsClientAccountingServerAddr
+             is set to host name.  If wwpLeosTacacsClientAccountingServerAddr is set to ip 
+             address then wwpLeosTacacsClientAccountingServerResolvedInetAddr will contain 
+             the same information as wwpLeosTacacsClientAccountingServerAddr. This OID is 
+             used in conjunction with wwpLeosTacacsClientAccountingServerResolvedInetAddrType."
+      ::= { wwpLeosTacacsClientAccountingServerEntry 20 }
+
+--
+--
+--    
+ wwpLeosTacacsClientAccountingSession OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        off(1),
+                        on(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object will turn on session logon/logoff logging with tacacs."
+     DEFVAL { off }
+     ::= { wwpLeosTacacsClient 20 }
+
+ wwpLeosTacacsClientAccountingCommand OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        off(1),
+                        on(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object will turn on command start/stop logging."
+     DEFVAL { off }
+     ::= { wwpLeosTacacsClient 21 }
+
+ wwpLeosTacacsClientGlobalServers OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        off(1),
+                        on(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        deprecated
+     DESCRIPTION
+             "Setting this object will turn off global servers."
+     DEFVAL { off }
+     ::= { wwpLeosTacacsClient 22 }
+
+ wwpLeosTacacsClientSearchMethod OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        priority(1),
+                        cached(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object will set the search method."
+     DEFVAL { priority }
+     ::= { wwpLeosTacacsClient 23 }
+
+  wwpLeosTacacsClientKeyMinLen   OBJECT-TYPE
+     SYNTAX         Integer32 (2..64)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "Setting this object will set the minimum length for TACACS secret key"
+     DEFVAL { 8 }
+     ::= { wwpLeosTacacsClient 24 } 
+
+ END
+
+ --
+ -- WWP-TACACS-CLIENT-MIB
+ --
+		

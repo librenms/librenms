@@ -1,0 +1,1363 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-PORT-XCVR-MIB.my
+ --
+ -- NOTE WELL
+ -- Starting from LE21X 2.0, the object wwpXcvrPortHoldDownTime mentioned 
+ -- in this MIB has been deprecated.
+ -- NOTE WELL
+
+ WWP-LEOS-PORT-XCVR-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY			
+	    FROM SNMPv2-SMI			
+   DisplayString, TruthValue
+	    FROM SNMPv2-TC						
+   wwpModules, wwpModulesLeos		
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosPortXcvrMIB MODULE-IDENTITY
+	    LAST-UPDATED "201107060000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+
+	   DESCRIPTION
+		    "Corrected Units changed watts to uW in descriptions."
+		REVISION    "201107060000Z"
+     	DESCRIPTION
+			"Added XFP objects. "
+		REVISION  "201105240000Z"
+		DESCRIPTION
+			"wwpLeosPortXcvrEventType object does not support the enumerations for
+			 'disabled' and 'enabled' as the backend does not support it ."
+		REVISION  "201103080000Z"
+		DESCRIPTION
+			"Added wwpLeosPortXcvrAdminFrequency, wwpLeosPortXcvrXfpLaserFirstFrequency,
+			 wwpLeosPortXcvrXfpLaserLastFrquency, wwpLeosPortXcvrXfpMaxGridScacing,
+			 wwpLeosPortXcvrXfpChannelNum, wwpLeosPortXcvrXfpFrequencyError"
+		REVISION  "201002010000Z"
+		DESCRIPTION
+		    "The MIB module for the WWP System physical transceiver devices."
+		REVISION    "200603150000Z"
+		DESCRIPTION
+		    "Added notification wwpLeosPortXcvrSpeedInfoMissingNotification."
+	    REVISION    "200104031700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 4}
+						
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosPortXcvrMIBObjects OBJECT IDENTIFIER ::= { wwpLeosPortXcvrMIB 1 }
+ 
+ wwpLeosPortXcvr  OBJECT IDENTIFIER ::= { wwpLeosPortXcvrMIBObjects 1 }
+
+ wwpLeosPortXcvrNotif  OBJECT IDENTIFIER ::= { wwpLeosPortXcvrMIBObjects 2 }
+
+ -- Notifications 
+  
+ wwpLeosPortXcvrMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosPortXcvrMIB 2 } 
+ wwpLeosPortXcvrMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosPortXcvrMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosPortXcvrMIBConformance OBJECT IDENTIFIER ::= { wwpLeosPortXcvrMIB 3 } 
+ wwpLeosPortXcvrMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosPortXcvrMIBConformance 1 } 		
+ wwpLeosPortXcvrMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosPortXcvrMIBConformance 2 }
+
+		
+ wwpLeosPortXcvrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosPortXcvrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "This table contains descriptions and settings for each of the 
+	     physical transceiver devices."
+    ::= { wwpLeosPortXcvr 1 }
+		 
+ wwpLeosPortXcvrEntry OBJECT-TYPE
+    SYNTAX        WwpLeosPortXcvrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION "The Transciever Device Entry."
+    INDEX { wwpLeosPortXcvrId }
+    ::= { wwpLeosPortXcvrTable 1 }
+
+ WwpLeosPortXcvrEntry ::= SEQUENCE {     
+    wwpLeosPortXcvrId                                INTEGER,    
+    wwpLeosPortXcvrOperState                         INTEGER,
+    wwpLeosPortXcvrIdentiferType                     INTEGER,
+    wwpLeosPortXcvrExtIdentiferType                  INTEGER,
+    wwpLeosPortXcvrConnectorType                     INTEGER,
+    wwpLeosPortXcvrType		                     INTEGER,
+    wwpLeosPortXcvrVendorName	 	             DisplayString,
+    wwpLeosPortXcvrVendorOUI	 	             OCTET STRING,
+    wwpLeosPortXcvrVendorPN                          DisplayString,    
+    wwpLeosPortXcvrRevNum                            DisplayString,
+    wwpLeosPortXcvrSerialNum	                     DisplayString,
+    wwpLeosPortXcvrEncodingType	                     INTEGER,
+    wwpLeosPortXcvrMfgDate		             DisplayString,    
+    wwpLeosPortXcvrComplianceVer                     INTEGER,
+    wwpLeosPortXcvrWaveLength	                     INTEGER,
+    wwpLeosPortXcvrTemperature	                     INTEGER, 
+    wwpLeosPortXcvrVcc				     INTEGER,
+    wwpLeosPortXcvrBias				     INTEGER,
+    wwpLeosPortXcvrRxPower		 	     INTEGER,
+    wwpLeosPortXcvrTxState                           INTEGER,
+    wwpLeosPortXcvrTxFaultStatus                     INTEGER,
+    wwpLeosPortXcvrRxRateStatus                      INTEGER,
+    wwpLeosPortXcvr9by125um	                     INTEGER,
+    wwpLeosPortXcvr50by125um		             INTEGER,
+    wwpLeosPortXcvr62dot5by125um	             INTEGER,
+    wwpLeosPortXcvrCu				     INTEGER,
+    wwpLeosPortXcvrTxOutputPw	                     INTEGER,    
+    wwpLeosPortXcvrLosState		             TruthValue,
+    wwpLeosPortXcvrDiagSupported	             TruthValue,
+    wwpLeosPortXcvrEnhDiagAlarmSupported	     TruthValue,
+    wwpLeosPortXcvrEnhDiagSoftTxDisableSupported     TruthValue,
+    wwpLeosPortXcvrEnhDiagSoftTxFaultSupported	     TruthValue,
+    wwpLeosPortXcvrEnhDiagRxLosSupported	     TruthValue,    
+    wwpLeosPortXcvrHighTempAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrLowTempAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrHighVccAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrLowVccAlarmThreshold	             Integer32,
+    wwpLeosPortXcvrHighBiasAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrLowBiasAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrHighTxPwAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrLowTxPwAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrHighRxPwAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrLowRxPwAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrLowRxPwAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrLowRxPwAlarmThreshold	     Integer32,
+    wwpLeosPortXcvrEnhDiagRateSelectSupported	     TruthValue,
+    wwpLeosPortXcvrAdminState			     INTEGER,
+    wwpLeosPortXcvrXfpMinBitRate                     INTEGER,
+    wwpLeosPortXcvrXfpMaxBitRate                     INTEGER,
+    wwpLeosPortXcvrXfpLinkLenSmf1km                  INTEGER,
+    wwpLeosPortXcvrXfpLinkLenE50u2m                  INTEGER,
+    wwpLeosPortXcvrXfpLinkLen50u1m                   INTEGER,
+    wwpLeosPortXcvrXfpLinkLen62dot5u1m               INTEGER,
+    wwpLeosPortXcvrXfpLinkLenCopper1m                INTEGER,
+    wwpLeosPortXcvrXfpDevTech                        INTEGER,
+    wwpLeosPortXcvrXfpTransmitterTech                INTEGER,
+    wwpLeosPortXcvrXfpCdrSupport                     INTEGER,
+    wwpLeosPortXcvrXfpWaveLengthTol                  INTEGER,
+    wwpLeosPortXcvrXfpMaxCaseTemp                    INTEGER,
+    wwpLeosPortXcvrXfpMaxPower                       INTEGER,
+    wwpLeosPortXcvrXfpMax5vCurrent                   INTEGER,
+    wwpLeosPortXcvrXfpMax3p3vCurrent                 INTEGER,
+    wwpLeosPortXcvrXfpMax1p8vCurrent                 INTEGER,
+    wwpLeosPortXcvrXfpMaxNeg5p2vCurrent              INTEGER,
+    wwpLeosPortXcvrXfpDiagMonitorType                INTEGER,
+    wwpLeosPortXcvrXfpEnhancedOptions                INTEGER,
+    wwpLeosPortXcvrXfpAuxMonitoringInput1            INTEGER,
+    wwpLeosPortXcvrXfpAuxMonitoringInput2            INTEGER,
+    wwpLeosPortXcvrAdminFrequency                    Unsigned32,
+    wwpLeosPortXcvrXfpLaserFirstFrequency            Unsigned32,
+    wwpLeosPortXcvrXfpLaserLastFrquency              Unsigned32,
+    wwpLeosPortXcvrXfpMaxGridScacing                 INTEGER,
+    wwpLeosPortXcvrXfpChannelNum                     INTEGER,
+    wwpLeosPortXcvrXfpFrequencyError                 INTEGER,
+    wwpLeosPortXcvrAdminWavelength                   Unsigned32,
+    wwpLeosPortXcvrAdminChannel                      Unsigned32,
+    wwpLeosPortXcvrXfpLaserFirstWavelenth            Unsigned32,
+    wwpLeosPortXcvrXfpLaserLastWavelength            Unsigned32,
+    wwpLeosPortXcvrXfpLaserFirstChannel              Unsigned32,
+    wwpLeosPortXcvrXfpLaserLastChannel               Unsigned32,
+    wwpLeosPortXcvrOperFrequency                     Unsigned32,
+    wwpLeosPortXcvrOperWavelength                    Unsigned32,
+    wwpLeosPortXcvrRxDbmPower                        Integer32,
+    wwpLeosPortXcvrTxDbmPower                        Integer32,    
+    wwpLeosPortXcvrHighTxDbmPwAlarmThreshold         Integer32,
+    wwpLeosPortXcvrLowTxDbmPwAlarmThreshold          Integer32,
+    wwpLeosPortXcvrHighRxDbmPwAlarmThreshold         Integer32,
+    wwpLeosPortXcvrLowRxDbmPwAlarmThreshold          Integer32
+ }
+
+ wwpLeosPortXcvrId OBJECT-TYPE
+    SYNTAX           INTEGER (1..65535)
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "The ID for the transceiver."
+    ::= { wwpLeosPortXcvrEntry 1 } 
+
+ wwpLeosPortXcvrOperState OBJECT-TYPE
+    SYNTAX           INTEGER {
+                        disabled(1),
+                        enabled(2),
+                        loopback(3),
+                        notPresent(4),
+                        faulted(5)
+                     }
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "The operational state of the transceiver."
+    ::= { wwpLeosPortXcvrEntry 2 }
+
+ wwpLeosPortXcvrIdentiferType OBJECT-TYPE
+    SYNTAX           INTEGER {
+                       unknown(1),
+		       gbic(2),
+		       solderedType(3),
+		       sfp(4),
+		       reserved(5),
+		       vendorSpecific(6),
+                       xbi(7),
+                       xenpak(8),
+                       xfp(9),
+                       xff(10),
+                       xfpe(11),
+                       xpak(12),
+                       x2(13)
+                     }
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "Type for the transceiver."
+    ::= { wwpLeosPortXcvrEntry 3 }
+   
+ wwpLeosPortXcvrExtIdentiferType OBJECT-TYPE
+    SYNTAX           INTEGER {
+			   unknown(1),
+			   sfp-gbic(2)
+			}
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "Extended identifier type for this transceiver."
+    ::= { wwpLeosPortXcvrEntry 4 }
+
+ wwpLeosPortXcvrConnectorType OBJECT-TYPE
+    SYNTAX     		 INTEGER (1..65535)
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "Type of connector.
+	    	   unknown(1),
+		       sc(2),
+		       fiberChannelStyle1(3),
+		       fiberChannelStyle2(4),
+		       bnc/tnc(5),
+		       coaxialHeader(6),
+		       fiberJack(7),
+		       lc(8),
+		       mt-rj(9),
+		       mu(10),
+		       sg(11),
+		       opticalPitTail(12),
+		       reserved(13..32),
+		       hssdc(33),
+		       copperPitTail(34),
+		       reserved(35..128),
+		       vendorSpecific(129..256)."
+    ::= { wwpLeosPortXcvrEntry 5 }
+
+ wwpLeosPortXcvrType OBJECT-TYPE
+    SYNTAX           INTEGER (1..65535)
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "Type of Transceiver."
+    ::= { wwpLeosPortXcvrEntry 6 }
+
+ wwpLeosPortXcvrVendorName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "String containing this transceiver's vendor name."
+    ::= { wwpLeosPortXcvrEntry 7 }
+
+ wwpLeosPortXcvrVendorOUI OBJECT-TYPE
+    SYNTAX        OCTET STRING(SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "String containing this transceiver's vendor OUI."
+    ::= { wwpLeosPortXcvrEntry 8 }
+
+ wwpLeosPortXcvrVendorPN OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "String containing this transceiver's vendor OUI."
+    ::= { wwpLeosPortXcvrEntry 9 }
+ 	
+ wwpLeosPortXcvrRevNum   OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+	    "String containing this transceiver's part revision number."
+    ::= { wwpLeosPortXcvrEntry 10 }
+
+ wwpLeosPortXcvrSerialNum   OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+	    "String containing this transceiver's part serial number."
+    ::= { wwpLeosPortXcvrEntry 11 } 		
+  
+ wwpLeosPortXcvrEncodingType OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "If wwpLeosPortXcvrIdentiferType is SFP, then the following values is defined for the encoding type:
+	             unspecified(1),
+		     8B10B(2),
+		     4b5b(3),
+		     NRZ(4),
+		     Manchester(5),
+		     SONET(6),
+		     reserved(7-256)
+	     If wwpLeosPortXcvrIdentiferType is XFP, then the following values is defined for the encoding type:
+	             Bit 7:  64B/66B (yes/no)
+	             Bit 6:  8B10B   (yes/no)
+	             Bit 5:  Sonet Scrambled (yes/no)
+	             Bit 4:  NRZ (yes/no)
+	             Bit 3:  RZ (yes/no)
+	             Bit 2:  Tx Dither Support (yes/no) 
+	             Bit 1:  Reserved 
+	             Bit 0:  Reserved
+	     Multiple bits can be set at once in the case of XFP. 
+	     For instance, to indicate support for NRZ(4) and Sonet scrambled (5), 
+	     the user would see this object with the value of 16 + 32 = 48" 
+    ::= { wwpLeosPortXcvrEntry 12 }
+
+ wwpLeosPortXcvrMfgDate OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "The transceiver's manufacture date in string."
+    ::= { wwpLeosPortXcvrEntry 13 }
+
+ wwpLeosPortXcvrComplianceVer OBJECT-TYPE
+    SYNTAX        INTEGER(1..4)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the compliance version.
+	     Value 1 means digital diagnostic functionality 
+	     not included or undefined
+	     Value 2 means includes functionality defined in 
+	     Rev 9.0 SFF-8472
+	     Value 3 means TBD
+	     Value 4 means TBD."
+    ::= { wwpLeosPortXcvrEntry 14 }
+
+ wwpLeosPortXcvrWaveLength OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the wavelength of the transceiver. Units are nano meter."
+    ::= { wwpLeosPortXcvrEntry 15 }
+
+ wwpLeosPortXcvrTemperature OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    UNITS         "centigrade"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the temperature of the transceiver. Units are in degrees C "
+    ::= { wwpLeosPortXcvrEntry 16 }
+ 
+ wwpLeosPortXcvrVcc OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the voltage of the transceiver."
+    ::= { wwpLeosPortXcvrEntry 17 }
+ 
+ wwpLeosPortXcvrBias OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the bias of the transceiver."
+    ::= { wwpLeosPortXcvrEntry 18 }
+
+ wwpLeosPortXcvrRxPower OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the measured receive power of the transceiver. 
+	     Units are micro Watts."
+    ::= { wwpLeosPortXcvrEntry 19 }
+
+ wwpLeosPortXcvrTxState OBJECT-TYPE
+    SYNTAX       INTEGER {	
+		      enabled(1),
+		      disabled(2)
+	         }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+	    "Indicates whether this transceiver is currently set to transmit."
+    ::= { wwpLeosPortXcvrEntry 20 }		
+ 		
+ wwpLeosPortXcvrTxFaultStatus OBJECT-TYPE
+    SYNTAX        INTEGER {	
+		       fault(1),
+		       noFault(2)
+	     	  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the fault status of this transceiver."
+    ::= { wwpLeosPortXcvrEntry 21 }
+ 
+ wwpLeosPortXcvrRxRateStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the Rx rate status of this transceiver."
+    ::= { wwpLeosPortXcvrEntry 22 }
+
+ wwpLeosPortXcvr9by125um OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the link length for 9/125um fiber."
+    ::= { wwpLeosPortXcvrEntry 23 }
+ 
+ wwpLeosPortXcvr50by125um OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the link length for 50/125um fiber."
+    ::= { wwpLeosPortXcvrEntry 24 }
+
+ wwpLeosPortXcvr62dot5by125um OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the link length for 62.5/125um fiber."
+    ::= { wwpLeosPortXcvrEntry 25 }
+
+ wwpLeosPortXcvrCu OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the link length for copper."
+    ::= { wwpLeosPortXcvrEntry 26 }
+
+ wwpLeosPortXcvrTxOutputPw OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+	 UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the Tx Output power for the transceiver.
+	     Units are micro Watts."
+    ::= { wwpLeosPortXcvrEntry 27 }
+ 
+ wwpLeosPortXcvrLosState OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the Loss Of Signal State for the optical transceiver.
+         Ports without optical transceiver will always report 'false'."
+    ::= { wwpLeosPortXcvrEntry 28 }
+
+ wwpLeosPortXcvrDiagSupported OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates if diagnostics are supported on this transceiver."
+    ::= { wwpLeosPortXcvrEntry 29 }
+
+ wwpLeosPortXcvrEnhDiagAlarmSupported OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates if enhanced diagnostics alarms / warnings implemented."
+    ::= { wwpLeosPortXcvrEntry 30 }
+
+ wwpLeosPortXcvrEnhDiagSoftTxDisableSupported OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates if enhanced diagnostics soft Tx disable control is implemented."
+    ::= { wwpLeosPortXcvrEntry 31 }
+
+ wwpLeosPortXcvrEnhDiagSoftTxFaultSupported OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates if enhanced diagnostics soft Tx fault monitoring is implemented."
+    ::= { wwpLeosPortXcvrEntry 32 }
+
+ wwpLeosPortXcvrEnhDiagRxLosSupported OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates if enhanced diagnostics Rx LOS monitoring is implemented."
+    ::= { wwpLeosPortXcvrEntry 33 }
+
+  wwpLeosPortXcvrHighTempAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the higher threshold for temperature alarm."
+    ::= { wwpLeosPortXcvrEntry 34 }
+  
+  wwpLeosPortXcvrLowTempAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the lower threshold for temperature alarm."
+    ::= { wwpLeosPortXcvrEntry 35 } 
+
+  wwpLeosPortXcvrHighVccAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the higher threshold for voltage alarm."
+    ::= { wwpLeosPortXcvrEntry 36 }
+  
+  wwpLeosPortXcvrLowVccAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the lower threshold for voltage alarm."
+    ::= { wwpLeosPortXcvrEntry 37 }
+ 
+ wwpLeosPortXcvrHighBiasAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the higher threshold for bias alarm."
+    ::= { wwpLeosPortXcvrEntry 38 }
+
+ wwpLeosPortXcvrLowBiasAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the lower threshold for bias alarm."
+    ::= { wwpLeosPortXcvrEntry 39 }
+
+ wwpLeosPortXcvrHighTxPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the higher threshold for Tx power alarm.
+	     Units are micro watts"
+    ::= { wwpLeosPortXcvrEntry 40 }
+
+ wwpLeosPortXcvrLowTxPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the lower threshold for Tx power alarm.
+	     Units are micro watts."
+    ::= { wwpLeosPortXcvrEntry 41 }
+
+  wwpLeosPortXcvrHighRxPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the higher threshold for Rx power alarm.
+	     Units are micro watts."
+    ::= { wwpLeosPortXcvrEntry 42 }
+
+  wwpLeosPortXcvrLowRxPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the lower threshold for Rx power alarm.
+	     Units are micro watts."
+    ::= { wwpLeosPortXcvrEntry 43 }
+    
+ wwpLeosPortXcvrEnhDiagRateSelectSupported OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates if enhanced diagnostics soft rate select control is implemented."
+    ::= { wwpLeosPortXcvrEntry 44 }
+    
+ wwpLeosPortXcvrAdminState OBJECT-TYPE
+    SYNTAX           INTEGER {
+                        disabled(1),
+                        enabled(2),
+                        loopback(3)                        
+                     }
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION
+	    "The admin state of the transceiver."
+    ::= { wwpLeosPortXcvrEntry 45 }
+
+  wwpLeosPortXcvrXfpMinBitRate OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the minimum bit rate."
+    ::= { wwpLeosPortXcvrEntry 70 }   
+
+  wwpLeosPortXcvrXfpMaxBitRate OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the maximum bit rate."
+    ::= { wwpLeosPortXcvrEntry 71 }
+
+  wwpLeosPortXcvrXfpLinkLenSmf1km OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the length (SMF fiber) 1km."
+    ::= { wwpLeosPortXcvrEntry 72 }
+
+  wwpLeosPortXcvrXfpLinkLenE50u2m OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the length (ext. BW MMF) 2m."
+    ::= { wwpLeosPortXcvrEntry 73 }
+   
+  wwpLeosPortXcvrXfpLinkLen50u1m OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the length (50um) 1m."
+    ::= { wwpLeosPortXcvrEntry 74 }
+   
+  wwpLeosPortXcvrXfpLinkLen62dot5u1m OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the length (62.5um) 1m."
+    ::= { wwpLeosPortXcvrEntry 75 }
+   
+  wwpLeosPortXcvrXfpLinkLenCopper1m OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the length (copper) 1m."
+    ::= { wwpLeosPortXcvrEntry 76 }
+   
+  wwpLeosPortXcvrXfpDevTech OBJECT-TYPE
+    SYNTAX        INTEGER {
+                    vcsel850nm(1),
+                    vcsel1310nm(2),
+                    vcsel1550nm(3),
+                    fp1310nm(4),
+                    dfb1310nm(5),
+                    dfb1550nm(6),
+                    eml1310nm(7),
+                    eml1550nm(8),
+                    copperOrOther(9),
+		    tunable1550nm(10),
+                    reserved(11)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the device technology."
+    ::= { wwpLeosPortXcvrEntry 77 }
+   
+  wwpLeosPortXcvrXfpTransmitterTech OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the device transmitter technology:
+        Bit 3: Wavelength Control (active/none)
+        Bit 2: Transmitter Cooling (cooled/uncooled)
+        Bit 1: Detector Type (apd/pin)
+        Bit 0: Transmitter Tuning (Tunable/non-Tunable)
+        "
+    ::= { wwpLeosPortXcvrEntry 78 }
+   
+  wwpLeosPortXcvrXfpCdrSupport OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the CDR support:
+         Bit 7:  9.95 Gb/s (yes/no)
+         Bit 6:  10.3  Gb/s (yes/no)
+         Bit 5:  10.5  Gb/s (yes/no)
+         Bit 4:  10.7  Gb/s (yes/no)
+         Bit 3:  11.1  Gb/s (yes/no)
+         Bit 2:  N/A
+         Bit 1:  Lineside Loopback (yes/no)
+         Bit 0:  XFI Loopback (yes/no)
+        "
+    ::= { wwpLeosPortXcvrEntry 79 }
+   
+  wwpLeosPortXcvrXfpWaveLengthTol OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the wavelength tolerance."
+    ::= { wwpLeosPortXcvrEntry 80 }
+   
+  wwpLeosPortXcvrXfpMaxCaseTemp OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the maximum case temperature."
+    ::= { wwpLeosPortXcvrEntry 81 }
+   
+  wwpLeosPortXcvrXfpMaxPower OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the maximum power dissipation."
+    ::= { wwpLeosPortXcvrEntry 82 }
+   
+  wwpLeosPortXcvrXfpMax5vCurrent OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the 5.0 Volt Max Current."
+    ::= { wwpLeosPortXcvrEntry 83 }
+   
+  wwpLeosPortXcvrXfpMax3p3vCurrent OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the 3.3 Volt Max Current."
+    ::= { wwpLeosPortXcvrEntry 84 }
+   
+  wwpLeosPortXcvrXfpMax1p8vCurrent OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the 1.8 Volt Max Current."
+    ::= { wwpLeosPortXcvrEntry 85 }
+   
+  wwpLeosPortXcvrXfpMaxNeg5p2vCurrent OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the -5.2 Volt Max Current."
+    ::= { wwpLeosPortXcvrEntry 86 }
+   
+  wwpLeosPortXcvrXfpDiagMonitorType OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the diag monitor type:
+         Bit 4 indicates BER support.
+         Bit 3 indidates the Rx Power Meas. type of Avg or OMA."
+    ::= { wwpLeosPortXcvrEntry 87 }
+   
+  wwpLeosPortXcvrXfpEnhancedOptions OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the enhanced options:
+         Bit 7: VPS Support (yes/no)
+         Bit 6: Soft TX_DISABLE (yes/no)
+         Bit 5: Soft P_down (yes/no)
+         Bit 4: VPS LV Regulator Mode (yes/no)
+         Bit 3: VPS bypassed Reg. Mode (yes/no)
+         Bit 2: Active FEC Ctrl (yes/no)
+         Bit 1: Wavelength or frequency Tunability (yes/no)
+         Bit 0: CMU Support Mode (yes/no)
+        "
+    ::= { wwpLeosPortXcvrEntry 88 }
+   
+  wwpLeosPortXcvrXfpAuxMonitoringInput1 OBJECT-TYPE
+    SYNTAX        INTEGER {
+                    none(1),
+                    aPDBiasVoltage(2),
+                    reserved(3),
+                    tECCurrentMa(4),
+                    laserTemp(5),
+                    laserWavelength(6),
+                    voltage5V(7),
+                    voltage3p3V(8),
+                    voltage1p8V(9),
+                    voltageNeg5p2V(10),
+                    voltage5VCurrent(11),
+                    voltage3p3VCurrent(12),
+                    voltage1p8VCurrent(13),
+                    voltageNeg5p2VCurrent(14),
+                    unknown(15)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the Aux monitoring of A/D input 1."
+    ::= { wwpLeosPortXcvrEntry 89 }
+
+  wwpLeosPortXcvrXfpAuxMonitoringInput2 OBJECT-TYPE
+    SYNTAX        INTEGER {
+                    none(1),
+                    aPDBiasVoltage(2),
+                    reserved(3),
+                    tECCurrentMa(4),
+                    laserTemp(5),
+                    laserWavelength(6),
+                    voltage5V(7),
+                    voltage3p3V(8),
+                    voltage1p8V(9),
+                    voltageNeg5p2V(10),
+                    voltage5VCurrent(11),
+                    voltage3p3VCurrent(12),
+                    voltage1p8VCurrent(13),
+                    voltageNeg5p2VCurrent(14),
+                    unknown(15)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the Aux monitoring of A/D input 2."
+    ::= { wwpLeosPortXcvrEntry 90 }
+
+   wwpLeosPortXcvrAdminFrequency OBJECT-TYPE
+    SYNTAX        Unsigned32(0..4294967295)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The admin frequency of the transceiver in GHz"
+    ::= { wwpLeosPortXcvrEntry 91 }
+
+  wwpLeosPortXcvrXfpLaserFirstFrequency OBJECT-TYPE
+    SYNTAX        Unsigned32(0..4294967295)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the first frequency in GHz"
+    ::= { wwpLeosPortXcvrEntry 92 }
+
+  wwpLeosPortXcvrXfpLaserLastFrquency OBJECT-TYPE
+    SYNTAX        Unsigned32(0..4294967295)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the last frequency in GHz"
+    ::= { wwpLeosPortXcvrEntry 93 }
+
+  wwpLeosPortXcvrXfpMaxGridScacing OBJECT-TYPE
+    SYNTAX        INTEGER (0..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the maximun support grid spacing in GHz"
+    ::= { wwpLeosPortXcvrEntry 94 }
+
+  wwpLeosPortXcvrXfpChannelNum OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the channel number"
+    ::= { wwpLeosPortXcvrEntry 95 }
+
+   wwpLeosPortXcvrXfpFrequencyError OBJECT-TYPE
+    SYNTAX        INTEGER (-32768..32767)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "This represents the frequency error"
+    ::= { wwpLeosPortXcvrEntry 96 }
+
+   wwpLeosPortXcvrAdminWavelength OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The admin wavelength of the transceiver in pico-meter"
+    ::= { wwpLeosPortXcvrEntry 97 }
+
+   wwpLeosPortXcvrAdminChannel OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The admin channel number of the transceiver"
+    ::= { wwpLeosPortXcvrEntry 98 }
+
+   wwpLeosPortXcvrXfpLaserFirstWavelenth OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This represents the first wavelength in pico meter"
+    ::= { wwpLeosPortXcvrEntry 99 }
+
+   wwpLeosPortXcvrXfpLaserLastWavelength OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This represents the last wavelength in pico meter"
+    ::= { wwpLeosPortXcvrEntry 100 }
+
+    wwpLeosPortXcvrXfpLaserFirstChannel OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This represents the first channel number"
+    ::= { wwpLeosPortXcvrEntry 101 }
+
+    wwpLeosPortXcvrXfpLaserLastChannel OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This represents the last channel number"
+    ::= { wwpLeosPortXcvrEntry 102 }
+
+   wwpLeosPortXcvrOperFrequency OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The operational frequency  of the transceiver in GHz"
+    ::= { wwpLeosPortXcvrEntry 103 }
+
+   wwpLeosPortXcvrOperWavelength OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The operational wavelength of the transceiver in pico-meter"
+    ::= { wwpLeosPortXcvrEntry 104 }
+
+   wwpLeosPortXcvrRxDbmPower OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "dBm"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the Rx power level in dBm after scaling and conversion to an integer.
+                   To convert back to dBm, convert this value to floating point and divide by 10,000."
+    ::= { wwpLeosPortXcvrEntry 105 }
+    
+   wwpLeosPortXcvrTxDbmPower OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "dBm"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the Tx power level in dBm after scaling and conversion to an integer.
+                   To convert back to dBm, convert this value to floating point and divide by 10,000."
+    ::= { wwpLeosPortXcvrEntry 106 }
+    
+   wwpLeosPortXcvrHighTxDbmPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "dBm"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the higher threshold for Tx power alarm in dBm after scaling and conversion to an integer.
+                   To convert back to dBm, convert this value to floating point and divide by 10,000."
+    ::= { wwpLeosPortXcvrEntry 107 }
+   
+   wwpLeosPortXcvrLowTxDbmPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "dBm"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the lower threshold for Tx power alarm in dBm after scaling and conversion to an integer.
+                   To convert back to dBm, convert this value to floating point and divide by 10,000."
+    ::= { wwpLeosPortXcvrEntry 108 }
+   
+   wwpLeosPortXcvrHighRxDbmPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "dBm"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the higher threshold for Rx power alarm in dBm after scaling and conversion to an integer.
+                   To convert back to dBm, convert this value to floating point and divide by 10,000."
+    ::= { wwpLeosPortXcvrEntry 109 }
+
+   wwpLeosPortXcvrLowRxDbmPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "dBm"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the lower threshold for Rx power alarm in dBm after scaling and conversion to an integer.
+                   To convert back to dBm, convert this value to floating point and divide by 10,000."
+    ::= { wwpLeosPortXcvrEntry 110 }
+
+ --
+ -- notification
+ --
+ wwpLeosPortXcvrEventType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                        inserted(1),
+                        removed(2),
+                        enabled(3),
+                        disabled(4)
+                   }                         
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+	    "Indicates if the Xcvr specified by the wwpLeosPortXcvrId has come up, 
+	     gone down or has been selected."
+    ::= { wwpLeosPortXcvrNotif 1}
+
+  wwpLeosPortXcvrErrorType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                        none(0),
+                        chksumFailed(1),
+                        opticalFault(2)                        
+                   }
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+	    "Indicates if the Xcvr specified by the wwpLeosPortXcvrId is faulted because of 
+	     checksum failure or optical fault. This object only makes sense if transceiver has 
+	     been detected faulted otherwise it returns none."
+    ::= { wwpLeosPortXcvrNotif 2 } 
+ 
+ wwpLeosPortXcvrLinkStateChangeNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+                wwpLeosPortXcvrId,
+                wwpLeosPortXcvrEventType        
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrLinkStateChangeNotification is sent if the Xcvr state has changed."
+	::= { wwpLeosPortXcvrMIBNotifications 4 }
+
+ wwpLeosPortXcvrErrorTypeNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		wwpLeosPortXcvrId,
+		wwpLeosPortXcvrErrorType        
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrErrorTypeNotification is sent if the Xcvr is detected faulted because of some reason. 
+		 Reason of failure is specified by wwpLeosPortXcvrErrorType."
+	::= { wwpLeosPortXcvrMIBNotifications 5 }
+
+ wwpLeosPortXcvrTempHighNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTempHighNotification is sent if the Xcvr 
+		 temperature exceeds the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 6 }
+ 
+ wwpLeosPortXcvrTempLowNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTempLowNotification is sent if the Xcvr 
+		 temperature decreases the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 7 }
+
+ wwpLeosPortXcvrTempNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTempNormalNotification is sent if the Xcvr 
+		 temperature returns back to normal state."		 
+	::= { wwpLeosPortXcvrMIBNotifications 8 }
+ 
+ wwpLeosPortXcvrVoltageHighNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrVoltageHighNotification is sent if the Xcvr 
+		 voltage exceeds the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 9 }
+ 
+ wwpLeosPortXcvrVoltageLowNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrVoltageLowNotification is sent if the Xcvr 
+		 voltage decreases the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 10 }
+
+ wwpLeosPortXcvrVoltageNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrVoltageNormalNotification is sent if the Xcvr 
+		 voltage returns back to normal state."		 
+	::= { wwpLeosPortXcvrMIBNotifications 11 }
+ 
+ wwpLeosPortXcvrBiasHighNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrBiasHighNotification is sent if the Xcvr 
+		 Bias exceeds the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 12 }
+ 
+ wwpLeosPortXcvrBiasLowNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrBiasLowNotification is sent if the Xcvr 
+		 voltage decreases the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 13 }
+
+ wwpLeosPortXcvrBiasNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrBiasNormalNotification is sent if the Xcvr 
+		 Bias returns back to normal state."		 
+	::= { wwpLeosPortXcvrMIBNotifications 14 }
+ 
+ wwpLeosPortXcvrTxPowerHighNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTxPowerHighNotification is sent if the Xcvr 
+		 TxPower exceeds the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 15 }
+ 
+ wwpLeosPortXcvrTxPowerLowNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTxPowerLowNotification is sent if the Xcvr 
+		 voltage decreases the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 16 }
+
+ wwpLeosPortXcvrTxPowerNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTxPowerNormalNotification is sent if the Xcvr 
+		 TxPower returns back to normal state."		 
+	::= { wwpLeosPortXcvrMIBNotifications 17 }
+ 
+ wwpLeosPortXcvrRxPowerHighNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrRxPowerHighNotification is sent if the Xcvr 
+		 RxPower exceeds the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 18 }
+ 
+ wwpLeosPortXcvrRxPowerLowNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrRxPowerLowNotification is sent if the Xcvr 
+		 voltage decreases the threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 19 }
+
+ wwpLeosPortXcvrRxPowerNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrRxPowerNormalNotification is sent if the Xcvr 
+		 RxPower returns back to normal state."		 
+	::= { wwpLeosPortXcvrMIBNotifications 20 }
+   
+  wwpLeosPortXcvrSpeedInfoMissingNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrSpeedInfoMissingNotification is sent if the Xcvr 
+		 speed information is not found."		 
+	::= { wwpLeosPortXcvrMIBNotifications 21 }
+
+ wwpLeosPortXcvrBiasHighWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrBiasHighNotification is sent if the Xcvr 
+		 Bias exceeds the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 22 }
+ 
+ wwpLeosPortXcvrBiasLowWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrBiasLowNotification is sent if the Xcvr 
+		 voltage decreases below the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 23 }
+
+ wwpLeosPortXcvrTempHighWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTempHighNotification is sent if the Xcvr 
+		 temperature exceeds the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 24 }
+ 
+ wwpLeosPortXcvrTempLowWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTempLowNotification is sent if the Xcvr 
+		 temperature decreases below the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 25 }
+ 
+ wwpLeosPortXcvrVoltageHighWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrVoltageHighNotification is sent if the Xcvr 
+		 voltage exceeds the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 26 }
+ 
+ wwpLeosPortXcvrVoltageLowWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrVoltageLowNotification is sent if the Xcvr 
+		 voltage decreases below  the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 27 }
+
+ wwpLeosPortXcvrTxPowerHighWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTxPowerHighNotification is sent if the Xcvr 
+		 TxPower exceeds the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 28 }
+ 
+ wwpLeosPortXcvrTxPowerLowWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrTxPowerLowNotification is sent if the Xcvr 
+		 TxPower decreases below the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 29 }
+
+ wwpLeosPortXcvrRxPowerHighWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrRxPowerHighNotification is sent if the Xcvr 
+		 RxPower exceeds the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 30 }
+ 
+ wwpLeosPortXcvrRxPowerLowWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosPortXcvrId		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosPortXcvrRxPowerLowNotification is sent if the Xcvr 
+		 RxPower decreases below the warning threshold."		 
+	::= { wwpLeosPortXcvrMIBNotifications 31 }
+
+
+ END
+
+ --
+ -- WWP-XCVR-MIB
+ --
+
+
+

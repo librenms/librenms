@@ -1,0 +1,185 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-PRODUCTS-MIB.my
+ --
+ --
+
+ WWP-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 
+   MODULE-IDENTITY			
+	FROM SNMPv2-SMI			
+   wwpProducts, wwpModules			
+	FROM WWP-SMI;
+	
+	
+ wwpProductsMIB MODULE-IDENTITY
+              LAST-UPDATED "200507280000Z"
+	      ORGANIZATION
+		       "Ciena, Inc"
+	      CONTACT-INFO
+		       "Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	      DESCRIPTION
+		       "This module defines the object identifiers that are
+		       assigned to WWP products and platforms.  It is these
+		       OID values that are returned in sysObjectID."
+	      REVISION "200507280000Z"
+	      DESCRIPTION
+		       "Initial creation."
+	      ::= { wwpModules 1 }
+		
+	
+ --
+ -- Node definitions
+ --
+
+ wwpLe21 OBJECT IDENTIFIER ::= { wwpProducts 1 }	
+
+ wwpLe22 OBJECT IDENTIFIER ::= { wwpProducts 2 }
+
+ wwpLe31 OBJECT IDENTIFIER ::= { wwpProducts 3 }
+
+ wwpLe32 OBJECT IDENTIFIER ::= { wwpProducts 4 }
+
+ wwpLe41 OBJECT IDENTIFIER ::= { wwpProducts 5 }
+
+ wwpLe42 OBJECT IDENTIFIER ::= { wwpProducts 6 }
+
+ wwpLe200 OBJECT IDENTIFIER ::= { wwpProducts 7 }
+		
+ wwpLe210 OBJECT IDENTIFIER ::= { wwpProducts 8 }
+ 
+ wwpLe220 OBJECT IDENTIFIER ::= { wwpProducts 9 }
+
+ wwpLe410 OBJECT IDENTIFIER ::= { wwpProducts 10 }
+
+ wwpLe3700 OBJECT IDENTIFIER ::= { wwpProducts 11 }
+
+ wwpLe4400 OBJECT IDENTIFIER ::= { wwpProducts 12 }
+
+ wwpLe211 OBJECT IDENTIFIER ::= { wwpProducts 13 }
+
+ wwpLe211H OBJECT IDENTIFIER ::= { wwpProducts 14 }
+
+ wwpLe216 OBJECT IDENTIFIER ::= { wwpProducts 15 }
+
+ wwpLe216H OBJECT IDENTIFIER ::= { wwpProducts 16 }
+
+ wwpLe218 OBJECT IDENTIFIER ::= { wwpProducts 17 }
+
+ wwpLe218H OBJECT IDENTIFIER ::= { wwpProducts 18 }
+
+ wwpLe410H OBJECT IDENTIFIER ::= { wwpProducts 19 }
+ 
+ wwpLe22H OBJECT IDENTIFIER ::= { wwpProducts 20 }
+
+ wwpLe32H OBJECT IDENTIFIER ::= { wwpProducts 21 }
+
+ wwpLe36 OBJECT IDENTIFIER ::= { wwpProducts 22 }
+
+ wwpLe36H OBJECT IDENTIFIER ::= { wwpProducts 23 }
+
+ wwpLe217 OBJECT IDENTIFIER ::= { wwpProducts 24 }
+
+ wwpLe217H OBJECT IDENTIFIER ::= { wwpProducts 25 }
+
+ wwpLe217DC OBJECT IDENTIFIER ::= { wwpProducts 26 }
+
+ wwpLe410DC OBJECT IDENTIFIER ::= { wwpProducts 27 }
+
+ wwpLe317 OBJECT IDENTIFIER ::= { wwpProducts 28 }
+
+ wwpLe317H OBJECT IDENTIFIER ::= { wwpProducts 29 }
+
+ wwpLe317DC OBJECT IDENTIFIER ::= { wwpProducts 30 }
+ 
+ wwpLe38  OBJECT IDENTIFIER ::= { wwpProducts 31 }
+ 
+ wwpLe46   OBJECT IDENTIFIER ::= { wwpProducts 32 }
+ 
+ wwpLe46Voip   OBJECT IDENTIFIER ::= { wwpProducts 33 }
+ 
+ wwpLe42H  OBJECT IDENTIFIER ::= { wwpProducts 34 }
+ 
+ wwpLe42HVoip  OBJECT IDENTIFIER ::= { wwpProducts 35 }
+ 
+ wwpLe407  OBJECT IDENTIFIER ::= { wwpProducts 36 }
+ 
+ wwpLe427  OBJECT IDENTIFIER ::= { wwpProducts 37 }
+ 
+ wwpLe307  OBJECT IDENTIFIER ::= { wwpProducts 38 }
+ 
+ wwpLe327  OBJECT IDENTIFIER ::= { wwpProducts 39 }
+ 
+ wwpLe337  OBJECT IDENTIFIER ::= { wwpProducts 40 }
+ 
+ wwpLe22P0100  OBJECT IDENTIFIER ::= { wwpProducts 41 }
+ 
+ wwpLe46H  OBJECT IDENTIFIER ::= { wwpProducts 42 }
+ 
+ wwpLe46HVoip  OBJECT IDENTIFIER ::= { wwpProducts 43 }
+ 
+ wwpLe42Voip OBJECT IDENTIFIER ::= { wwpProducts 44 } 
+
+ wwpLe17  OBJECT IDENTIFIER ::= { wwpProducts 45 }
+ 
+ wwpLe17Voip  OBJECT IDENTIFIER ::= { wwpProducts 46 }
+
+ wwpLe311 OBJECT IDENTIFIER ::= { wwpProducts 47 } 
+ wwpLe38Sfp  OBJECT IDENTIFIER ::= { wwpProducts 48 }
+ 
+ wwpLe38SfpVoip  OBJECT IDENTIFIER ::= { wwpProducts 49 }
+
+ -- start OID for leos with some OID which will not conflict with LEXXX
+ wwpLe311v  OBJECT IDENTIFIER ::= { wwpProducts 70 }
+
+ wwpLe310  OBJECT IDENTIFIER ::= { wwpProducts 71 }
+
+ wwpLe135  OBJECT IDENTIFIER ::= { wwpProducts 72 }
+ 
+ wwpLe3300  OBJECT IDENTIFIER ::= { wwpProducts 73 }
+
+ wwpLe3300Rev2  OBJECT IDENTIFIER ::= { wwpProducts 74 }
+
+ wwpLe3300FanTray  OBJECT IDENTIFIER ::= { wwpProducts 75 }
+
+ wwpLe58H  OBJECT IDENTIFIER ::= { wwpProducts 76 }
+
+ cn3920    OBJECT IDENTIFIER ::= { wwpProducts 77 }
+
+ cn3911	   OBJECT IDENTIFIER ::= { wwpProducts 78 }
+
+ cn3940	   OBJECT IDENTIFIER ::= { wwpProducts 79 }
+ 
+ cn5150	   OBJECT IDENTIFIER ::= { wwpProducts 80 }
+
+ cn3960	   OBJECT IDENTIFIER ::= { wwpProducts 81 }
+
+ cn5140    OBJECT IDENTIFIER ::= { wwpProducts 82 }
+
+ cn5305    OBJECT IDENTIFIER ::= { wwpProducts 83 }
+ 
+ cn3916    OBJECT IDENTIFIER ::= { wwpProducts 84 }
+ 
+ cn3930    OBJECT IDENTIFIER ::= { wwpProducts 85 }
+
+ cn3931    OBJECT IDENTIFIER ::= { wwpProducts 86 }
+
+ cn5142    OBJECT IDENTIFIER ::= { wwpProducts 88 }
+
+ cn3932    OBJECT IDENTIFIER ::= { wwpProducts 89 }
+
+ cn5160    OBJECT IDENTIFIER ::= { wwpProducts 90 }
+
+ cn3902    OBJECT IDENTIFIER ::= { wwpProducts 94 }
+ 
+END
+
+--
+-- WWP-PRODUCTS-MIB.my
+--

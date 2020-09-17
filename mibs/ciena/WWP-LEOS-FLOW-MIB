@@ -1,0 +1,3456 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-FLOW-MIB.my
+ --
+
+ WWP-LEOS-FLOW-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   Integer32, Unsigned32, Gauge32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+   RowStatus, DisplayString, MacAddress, TruthValue, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC                              
+   wwpModulesLeos
+            FROM WWP-SMI;
+        
+ wwpLeosFlowMIB MODULE-IDENTITY
+            LAST-UPDATED "201203290000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "Mib Meister
+                     115 North Sullivan Road
+                     Spokane Valley, WA 99037
+                     USA                             
+                     Phone:  +1 509 242 9000
+                     Email:  support@ciena.com"
+            DESCRIPTION
+                    "MIB module for the WWP FLOW specific information. This MIB module is common 
+		     between 4.x and 6.x platforms."
+	    	    
+	    REVISION    "201203290000Z"         
+	    DESCRIPTION
+                    "Added new objects to support Ipv6 rate limits wwpLeosFlowCpuRateLimitIpV6Mgmt,
+		     wwpLeosFlowCpuRateLimitStatsIpV6MgmtPassed,  wwpLeosFlowCpuRateLimitStatsIpV6MgmtDropped,
+		     wwpLeosFlowCpuRateLimitInet6, wwpLeosFlowCpuRateLimitStatsInet6Passed, 
+		     wwpLeosFlowCpuRateLimitStatsInet6Dropped ."
+           
+	    REVISION    "201102020000Z"
+            DESCRIPTION
+                    "Added RAPS Frame Type into CpuRateLimit related MIB objects"
+           
+	    REVISION    "200806161700Z"
+            DESCRIPTION
+                    "Added the Port Service Level table and the ability to 
+                     set secondary queue sizes for service levels."
+            
+	    REVISION    "200104031700Z"  
+            DESCRIPTION
+                    "Initial creation."
+            ::= { wwpModulesLeos 6 }
+        
+
+ PriorityMapping ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS       current
+    DESCRIPTION
+            "Represents the priority mapping.
+            Octets in this object represents the remarked
+            priority values for priority 0-7 respectively."
+    SYNTAX       OCTET STRING (SIZE (8))    
+                                        
+ --
+ -- Node definitions
+ --
+        
+ wwpLeosFlowMIBObjects OBJECT IDENTIFIER ::= { wwpLeosFlowMIB 1 }
+ 
+ wwpLeosFlow OBJECT IDENTIFIER ::= { wwpLeosFlowMIBObjects 1 }
+ wwpLeosFlowNotifAttrs OBJECT IDENTIFIER ::= { wwpLeosFlowMIBObjects 2 }
+
+ -- Notifications 
+  
+ wwpLeosFlowNotificationPrefix     OBJECT IDENTIFIER ::= { wwpLeosFlowMIB 2 } 
+ wwpLeosFlowNotifications          OBJECT IDENTIFIER ::= { wwpLeosFlowNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosFlowMIBConformance OBJECT IDENTIFIER ::= { wwpLeosFlowMIB 3 } 
+ wwpLeosFlowMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosFlowMIBConformance 1 }                
+ wwpLeosFlowMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosFlowMIBConformance 2 }   
+ 
+ 
+ --
+ -- 
+ --
+
+ wwpLeosFlowAgeTime  OBJECT-TYPE
+     SYNTAX       INTEGER (10..1000000)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the age time after which mac entries will be flushed out." 
+     ::= { wwpLeosFlow 1 }
+ 
+ wwpLeosFlowAgeTimeState  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies if age time is enabled or disabled." 
+     ::= { wwpLeosFlow 2 }
+
+ -- 
+ -- Flow Service Level Entry 
+ --
+ wwpLeosFlowServiceLevelTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowServiceLevelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A table of flow service level entries. Following criteria must be met
+              while creating entry in the table.
+              - All indexes must be specified
+              - wwpLeosFlowServiceLevelCirBW and wwpLeosFlowServiceLevelPirBW must be set.
+              - wwpLeosFlowServiceLevelStatus must be set to create and go."
+     ::= { wwpLeosFlow 3 }
+                
+ wwpLeosFlowServiceLevelEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowServiceLevelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The flow service level entry in the Table."
+     INDEX { wwpLeosFlowServiceLevelPort, wwpLeosFlowServiceLevelId, wwpLeosFlowServiceLevelDirection}
+     ::= { wwpLeosFlowServiceLevelTable 1 } 
+
+ WwpLeosFlowServiceLevelEntry ::= SEQUENCE {
+     wwpLeosFlowServiceLevelPort              INTEGER, 
+     wwpLeosFlowServiceLevelId                INTEGER,
+     wwpLeosFlowServiceLevelDirection         INTEGER,
+     wwpLeosFlowServiceLevelName              DisplayString,
+     wwpLeosFlowServiceLevelPriority          INTEGER,
+     wwpLeosFlowServiceLevelQueueSize         INTEGER,
+     wwpLeosFlowServiceLevelDropEligibility   INTEGER,
+     wwpLeosFlowServiceLevelShareEligibility  INTEGER,
+     wwpLeosFlowServiceLevelCirBW             Integer32,
+     wwpLeosFlowServiceLevelPirBW             Integer32,     
+     wwpLeosFlowServiceStatus                 RowStatus,
+     wwpLeosFlowServiceRedCurveId             Unsigned32,
+     wwpLeosFlowServiceLevelQueueSizeYellow   INTEGER,
+     wwpLeosFlowServiceLevelQueueSizeRed      INTEGER,
+     wwpLeosFlowServiceLevelFlowGroup         INTEGER
+ }
+ 
+ wwpLeosFlowServiceLevelDirection  OBJECT-TYPE
+     SYNTAX       INTEGER { 
+                        ingress(1),
+                        egress(2)                       
+                        }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Service level Id direction used as index in the service level entry." 
+     ::= { wwpLeosFlowServiceLevelEntry 1 }
+
+ wwpLeosFlowServiceLevelPort  OBJECT-TYPE
+     SYNTAX       INTEGER(0..65535) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port id used as index in the service level entry. 
+              If it is intended to not specify the port id in 
+              the index, this value should be set to 0." 
+     ::= { wwpLeosFlowServiceLevelEntry 2 }      
+
+ wwpLeosFlowServiceLevelId  OBJECT-TYPE
+     SYNTAX       INTEGER(1..65535) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Service level Id used as index in the service level entry." 
+     ::= { wwpLeosFlowServiceLevelEntry 3 } 
+
+ wwpLeosFlowServiceLevelName  OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "The flow service level name associated with 
+             this service level." 
+     ::= { wwpLeosFlowServiceLevelEntry 4 }     
+ 
+ wwpLeosFlowServiceLevelPriority  OBJECT-TYPE
+     SYNTAX       INTEGER(0..7) 
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "The internal traffic-queue priority.  
+              This may also be used as a weighting factor." 
+     ::= { wwpLeosFlowServiceLevelEntry 5 } 
+     
+ wwpLeosFlowServiceLevelQueueSize  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      size0KB(0),
+                      small(1),
+                      medium(2),
+                      large(3),
+                      jumbo(4),
+                      x5(5),
+                      x6(6),
+                      x7(7),
+                      x8(8),
+                      size16KB(9),
+                      size32KB(10),
+                      size64KB(11),
+                      size128KB(12),
+                      size256KB(13),
+                      size512KB(14),
+                      size1MB(15),
+                      size2MB(16),
+                      size4MB(17)
+                  }     
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "The size of the traffic queue provisioned for 
+              this service level entry.  This may also be 
+              referred to as Latency Tolerance." 
+     ::= { wwpLeosFlowServiceLevelEntry 6 }  
+   
+ wwpLeosFlowServiceLevelDropEligibility  OBJECT-TYPE
+     SYNTAX       INTEGER { 
+                        enabled(1),
+                        disabled(2)                     
+                      }    
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "This item is used to indicate whether or not 
+              frames should be dropped or queued when frame 
+              buffer resources become scarce." 
+     ::= { wwpLeosFlowServiceLevelEntry 7 }  
+
+ wwpLeosFlowServiceLevelShareEligibility  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      enabled(1),
+                      disabled(2)    
+                  }     
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "This item is used to indicate whether or not 
+              a service level may be shared among entries 
+              in the flow service-mapping table." 
+     ::= { wwpLeosFlowServiceLevelEntry 8 }
+ 
+ wwpLeosFlowServiceLevelCirBW  OBJECT-TYPE
+     SYNTAX       Integer32(0..2147483647) 
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "The committed information rate (bandwidth) in 
+              Kbps associated with this service level entry." 
+     ::= { wwpLeosFlowServiceLevelEntry 9 }
+   
+ wwpLeosFlowServiceLevelPirBW  OBJECT-TYPE
+     SYNTAX       Integer32(0..2147483647) 
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "The peak information rate (maximum bandwidth) in 
+              Kbps associated with this service level entry." 
+     ::= { wwpLeosFlowServiceLevelEntry 10 }
+     
+ wwpLeosFlowServiceStatus   OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'.
+             
+             In particular, a newly created row cannot be made
+             active until one of the following instances
+             have been set:
+             
+              - wwpLeosFlowServiceLevelCirBW 
+              - wwpLeosFlowServiceLevelPirBW."
+     ::= { wwpLeosFlowServiceLevelEntry 11 }     
+ 
+ wwpLeosFlowServiceRedCurveId    OBJECT-TYPE
+      SYNTAX         Unsigned32 (5..64)
+      MAX-ACCESS     read-create
+      STATUS         current
+      DESCRIPTION
+             "This object is used to specifies the red curve index to be
+              used for the given service level.  If this OID is not specified, the system
+              will use the default value of this object which is dependent on the queue size
+              wwpLeosFlowServiceLevelQueueSize"
+      ::= { wwpLeosFlowServiceLevelEntry 12 } 
+
+ wwpLeosFlowServiceLevelQueueSizeYellow  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      size16KB(1),
+                      size32KB(2),
+                      size64KB(3),
+                      size128KB(4)
+                  }     
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "The size of the yellow traffic queue provisioned for 
+              this service level entry. Also known as the discard
+              preferred queue size. " 
+     ::= { wwpLeosFlowServiceLevelEntry 13 }  
+
+     wwpLeosFlowServiceLevelQueueSizeRed  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      size16KB(1),
+                      size32KB(2),
+                      size64KB(3),
+                      size128KB(4)
+                  }
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "The size of the red traffic queue provisioned for 
+              this service level entry.  Also known as the 
+              discard wanted queue size" 
+     ::= { wwpLeosFlowServiceLevelEntry 14 }  
+
+ wwpLeosFlowServiceLevelFlowGroup  OBJECT-TYPE
+     SYNTAX       INTEGER { 
+                        enable(1),
+                        disable(2)                      
+                        }
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Service level Id direction used as index in the service level entry." 
+     ::= { wwpLeosFlowServiceLevelEntry 15 }
+      
+ --
+ -- Flow Service Mapping Table
+ -- 
+ 
+ wwpLeosFlowServiceMappingTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowServiceMappingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             " A service mapping entry in the service-mapping table.
+              To create entry in this table following criteria must be met and SNMP
+              multiple set operation must be used to create entries.
+              - wwpLeosFlowServiceMapDstSlidId must be set to valid SLID and this slid must exist 
+                on the device. Use wwpLeosFlowServiceLevelTable to create slid.
+              - All indexes must be specified with exception to following objects.
+              - wwpLeosFlowServiceMappingVid must be set to 0 if don't care else 
+                set it to some valid value. VID must exist on the device.
+              - wwpLeosFlowServiceMappingSrcPort must be set to 0 if don't care else 
+                set it to some valid value.
+              - wwpLeosFlowServiceMappingSrcTag must be set to 0 if don't care else 
+                set it to some valid value.
+              - wwpLeosFlowServiceMappingDstPort must be set to 0 if don't care else 
+                set it to some valid value.
+              - wwpLeosFlowServiceMappingDstTag must be set to 0 if don't care else 
+                set it to some valid value.
+              - wwpLeosFlowServiceMappingProtocolType must be set to 1 if don't care else 
+                set it to some valid value.
+              - wwpLeosFlowServiceMappingProtocolPortNum must be set to 0 if don't care else 
+                set it to some valid value.
+              - wwpLeosFlowServiceMapSrcPri must be set to 255 if don't care else 
+                set it to some valid value."          
+     ::= { wwpLeosFlow 4 }
+                
+ wwpLeosFlowServiceMappingEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowServiceMappingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "A service mapping entry in the wwpLeosFlowServiceMappingTable."
+     INDEX { wwpLeosFlowServiceMapVid, wwpLeosFlowServiceMapSrcPort, 
+             wwpLeosFlowServiceMapSrcTag, wwpLeosFlowServiceMapDstPort,
+             wwpLeosFlowServiceMapDstTag, wwpLeosFlowServiceMapSrcPri,
+             wwpLeosFlowServiceMapProtocolType, wwpLeosFlowServiceMapProtocolPortNum}
+     ::= { wwpLeosFlowServiceMappingTable 1 } 
+
+ WwpLeosFlowServiceMappingEntry ::= SEQUENCE {
+     wwpLeosFlowServiceMapVid                INTEGER,
+     wwpLeosFlowServiceMapSrcPort            INTEGER,
+     wwpLeosFlowServiceMapSrcTag             INTEGER,
+     wwpLeosFlowServiceMapDstPort            INTEGER,
+     wwpLeosFlowServiceMapDstTag             INTEGER,
+     wwpLeosFlowServiceMapSrcPri             INTEGER,
+     wwpLeosFlowServiceMapProtocolType       INTEGER,
+     wwpLeosFlowServiceMapProtocolPortNum    INTEGER,
+     wwpLeosFlowServiceMapDstSlidId          INTEGER,
+     wwpLeosFlowServiceMapSrcSlidId          INTEGER,
+     wwpLeosFlowServiceMapPriRemarkStatus    TruthValue,
+     wwpLeosFlowServiceMapRemarkPri          INTEGER,     
+     wwpLeosFlowServiceMapStatus             RowStatus
+ }
+ 
+ wwpLeosFlowServiceMapVid   OBJECT-TYPE
+     SYNTAX       INTEGER(0..24576)
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "The VLAN id associated with this service 
+              mapping entry. If this object is set to 0, 
+              then this object should be ignored while 
+              creating the service-mapping entry." 
+     ::= { wwpLeosFlowServiceMappingEntry 1 }
+
+ wwpLeosFlowServiceMapSrcPort  OBJECT-TYPE
+     SYNTAX       INTEGER(0..65535)
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "The source port id for the instance.  This 
+              represents the ingress location of a flow.  
+              This port id should refer to the dot1dBasePort 
+              in the Dot1dBasePortEntry. If this object is 
+              set to 0, then this object should be ignored 
+              while creating the service-mapping entry."
+     ::= { wwpLeosFlowServiceMappingEntry 2 }
+ 
+ wwpLeosFlowServiceMapSrcTag   OBJECT-TYPE
+     SYNTAX       INTEGER(0..4095)
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "The source VLAN tag associated with this 
+              service mapping entry. If this object is set 
+              to 0, then this object should be ignored while creating the 
+              service-mapping entry."
+     ::= { wwpLeosFlowServiceMappingEntry 3 } 
+
+ wwpLeosFlowServiceMapDstPort  OBJECT-TYPE
+     SYNTAX       INTEGER(0..65535)
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "The destination port id for the instance. This 
+              represents the egress location for a flow. This 
+              port id should refer to the dot1dBasePort in the 
+              Dot1dBasePortEntry. If this object is set to 0, 
+              then this object should be ignored while creating 
+              the service-mapping entry."
+     ::= { wwpLeosFlowServiceMappingEntry 4 }
+
+ wwpLeosFlowServiceMapDstTag   OBJECT-TYPE
+     SYNTAX       INTEGER(0..4095)
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "The destination VLAN tag associated with this service 
+              mapping entry. If this object is set to 0, then this 
+              object should be ignored while creating the service-mapping 
+              entry."
+     ::= { wwpLeosFlowServiceMappingEntry 5 }      
+     
+ wwpLeosFlowServiceMapSrcPri  OBJECT-TYPE
+     SYNTAX       INTEGER (0..255)   
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION 
+             "The incoming packet vlan tag priority on the wwpLeosFlowServiceMapSrcPort. 
+              The 802.1p packet priority valid values are only from 0 to 7. If this 
+              object is set to 255 (or signed 8-bit integer -1), then this object 
+              should be ignored while creating the service-mapping entry." 
+     ::= { wwpLeosFlowServiceMappingEntry 6 }
+
+ wwpLeosFlowServiceMapProtocolType  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      none(1),
+                      tcp(2),
+                      udp(3)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION 
+             "The Layer 4 protocol type used as index in the table. This will 
+              correspond to the TCP or UDP protocol. If this object is set to 1, 
+              then this object should be ignored while creating the service-mapping 
+              entry." 
+     ::= { wwpLeosFlowServiceMappingEntry 7 }
+ 
+ wwpLeosFlowServiceMapProtocolPortNum  OBJECT-TYPE
+     SYNTAX       INTEGER (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION 
+             "The Layer 4 protocol port number used as index in the table.  This will 
+              correspond to a TCP or UDP port number.  If this object is set to 0, 
+              then this object should be ignored while creating the service-mapping 
+              entry." 
+     ::= { wwpLeosFlowServiceMappingEntry 8 }
+ 
+ wwpLeosFlowServiceMapDstSlidId   OBJECT-TYPE
+     SYNTAX       INTEGER(0..4095)
+     MAX-ACCESS   read-write
+     STATUS       deprecated
+     DESCRIPTION
+             "The service level id to apply to the flow at egress. If this object is set 
+              to 0, then this object should be ignored while creating the service-mapping 
+              entry."
+     ::= { wwpLeosFlowServiceMappingEntry 9 } 
+
+ wwpLeosFlowServiceMapSrcSlidId   OBJECT-TYPE
+     SYNTAX       INTEGER(0..4095)
+     MAX-ACCESS   read-write
+     STATUS       deprecated
+     DESCRIPTION
+             "The service level id to apply to the flow at ingress.  If this object is set 
+              to 0, then this object should be ignored while creating the service-mapping 
+              entry."
+     ::= { wwpLeosFlowServiceMappingEntry 10 }
+
+ wwpLeosFlowServiceMapPriRemarkStatus  OBJECT-TYPE
+     SYNTAX       TruthValue 
+     MAX-ACCESS   read-write
+     STATUS       deprecated
+     DESCRIPTION 
+             "Setting this object to 'true' will enable remarking of the VLAN tag priority 
+              for frames that match the classification defined by this service-mapping entry."
+     ::= { wwpLeosFlowServiceMappingEntry 11 } 
+
+  wwpLeosFlowServiceMapRemarkPri   OBJECT-TYPE
+     SYNTAX       INTEGER(0..4095)
+     MAX-ACCESS   read-write
+     STATUS       deprecated
+     DESCRIPTION
+             "The remark priority value. For frames that match the 
+              classification defined by this service-mapping entry, 
+              the VLAN tag priority will be remarked with this value."
+     ::= { wwpLeosFlowServiceMappingEntry 12 } 
+     
+ wwpLeosFlowServiceMapStatus   OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       deprecated
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'."
+     ::= { wwpLeosFlowServiceMappingEntry 13 }
+ 
+
+ --
+ -- Flow Service Access Ctrl Table
+ --
+ wwpLeosFlowServiceACTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowServiceACEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A Table of FLOW Service Access Control Entries."
+     ::= { wwpLeosFlow 5 }
+                
+ wwpLeosFlowServiceACEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowServiceACEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A service Access entry in the 
+             wwpLeosFlowServiceACTable."
+     INDEX { wwpLeosFlowServiceACPortId, wwpLeosFlowServiceACVid }
+     ::= { wwpLeosFlowServiceACTable 1 } 
+
+ WwpLeosFlowServiceACEntry ::= SEQUENCE {
+     wwpLeosFlowServiceACPortId                           INTEGER,
+     wwpLeosFlowServiceACVid                              INTEGER,     
+     wwpLeosFlowServiceACMaxDynamicMacCount               Integer32, 
+     wwpLeosFlowServiceACDynamicNonFilteredMacCount       Integer32,
+     wwpLeosFlowServiceACDynamicFilteredMacCount   Integer32,     
+     wwpLeosFlowServiceACStatus                           RowStatus,
+     wwpLeosFlowServiceACForwardLearning			INTEGER
+ } 
+ 
+  wwpLeosFlowServiceACPortId OBJECT-TYPE
+     SYNTAX       INTEGER(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port id for the instance. This port id should refer 
+              to the dot1dBasePort in the Dot1dBasePortEntry. 
+              Used as index in service access table."
+     ::= { wwpLeosFlowServiceACEntry 1 }
+
+ wwpLeosFlowServiceACVid    OBJECT-TYPE
+     SYNTAX       INTEGER(0..24576)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The VLAN id associated with this access control entry. 
+              Used as index in service access table. If the platform 
+              supports only port-based service access control, this 
+	      value should be set to 0." 
+     ::= { wwpLeosFlowServiceACEntry 2 } 
+     
+ wwpLeosFlowServiceACMaxDynamicMacCount  OBJECT-TYPE
+     SYNTAX       Integer32(0..2147483647) 
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION 
+             "The maximum number of dynamic MAC Addresses that will 
+              be learned and authorized by this access control entry. 
+              This value should default to 24." 
+     ::= { wwpLeosFlowServiceACEntry 3 }  
+     
+ wwpLeosFlowServiceACDynamicNonFilteredMacCount  OBJECT-TYPE
+     SYNTAX       Integer32(0..2147483647) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "The current number of non-filtered or authorized dynamic 
+              MAC addresses recorded in this access control entry." 
+     ::= { wwpLeosFlowServiceACEntry 4 }   
+
+ wwpLeosFlowServiceACDynamicFilteredMacCount  OBJECT-TYPE
+     SYNTAX       Integer32(0..2147483647) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "The current number of filtered or non-authorized dynamic 
+              MAC addresses recorded in this access control entry." 
+     ::= { wwpLeosFlowServiceACEntry 5 }     
+        
+ wwpLeosFlowServiceACStatus   OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'."
+     ::= { wwpLeosFlowServiceACEntry 7 }
+
+ wwpLeosFlowServiceACForwardLearning   OBJECT-TYPE
+     SYNTAX       INTEGER {
+     					on(1),
+     					off(2)
+     	}
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "To specify whether or not unlearned frames are forwarded or dropped."    
+     DEFVAL		{off}
+     ::= { wwpLeosFlowServiceACEntry 50 }
+
+ --
+ --  The Flow Static Mac Table
+ --
+
+ wwpLeosFlowStaticMacTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosFlowStaticMacEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table to add the static mac addresses."
+     ::= { wwpLeosFlow 6 }
+
+ wwpLeosFlowStaticMacEntry OBJECT-TYPE
+     SYNTAX     WwpLeosFlowStaticMacEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosFlowStaticMacTable."
+     INDEX      { wwpLeosFlowSMVid, wwpLeosFlowSMMacAddr }
+     ::= { wwpLeosFlowStaticMacTable 1 }
+
+
+ WwpLeosFlowStaticMacEntry ::= SEQUENCE {   
+     wwpLeosFlowSMVid                 INTEGER,
+     wwpLeosFlowSMMacAddr             MacAddress,
+     wwpLeosFlowSMPortId              INTEGER, 
+     wwpLeosFlowSMTag                 INTEGER, 
+     wwpLeosFlowSMStatus              RowStatus
+ }
+  
+ wwpLeosFlowSMVid    OBJECT-TYPE
+     SYNTAX       INTEGER(1..24576)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The service network id associated with this 
+              entry. Used as index in static MAC table." 
+     ::= { wwpLeosFlowStaticMacEntry 1 }
+
+ wwpLeosFlowSMMacAddr OBJECT-TYPE
+     SYNTAX       MacAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "A unicast MAC address to be statically 
+              configured. Used as index in static MAC 
+              table."
+     ::= { wwpLeosFlowStaticMacEntry 2 }    
+
+ wwpLeosFlowSMPortId OBJECT-TYPE
+     SYNTAX       INTEGER(1..65535)
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Port id for the static MAC instance. This port 
+              id should refer to the dot1dBasePort in the 
+              Dot1dBasePortEntry."
+     ::= { wwpLeosFlowStaticMacEntry 3 }
+
+ wwpLeosFlowSMTag    OBJECT-TYPE
+     SYNTAX       INTEGER(1..4095)
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "The VLAN tag for this static MAC instance."
+     ::= { wwpLeosFlowStaticMacEntry 4 } 
+     
+ wwpLeosFlowSMStatus    OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'.
+             In particular, a newly created row cannot be made
+             active until the corresponding instances of
+             wwpLeosFlowSMPortId and wwpLeosFlowSMTag have been set. 
+             
+             The following objects may not be modified while the
+             value of this object is active(1):
+                - wwpLeosFlowSMPortId
+                - wwpLeosFlowSMTag
+           "
+     ::= { wwpLeosFlowStaticMacEntry 5 }
+
+ --
+ -- Flow Learn Table
+ -- 
+ wwpLeosFlowLearnTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowLearnEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A Table of flow learn entries."
+     ::= { wwpLeosFlow 7 }
+                
+ wwpLeosFlowLearnEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowLearnEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A flow learn entry in the wwpLeosFlowLearnTable."
+     INDEX { wwpLeosFlowLearnVid, wwpLeosFlowLearnAddr, wwpLeosFlowLearnSrcPort, 
+             wwpLeosFlowLearnSrcTag, wwpLeosFlowLearnSrcPri, wwpLeosFlowLearnAddrType}
+     ::= { wwpLeosFlowLearnTable 1 } 
+
+ WwpLeosFlowLearnEntry ::= SEQUENCE {
+     wwpLeosFlowLearnVid                INTEGER,
+     wwpLeosFlowLearnAddr               MacAddress,
+     wwpLeosFlowLearnSrcPort            INTEGER,
+     wwpLeosFlowLearnSrcTag             INTEGER,
+     wwpLeosFlowLearnSrcPri             INTEGER,
+     wwpLeosFlowLearnAddrType       INTEGER,
+     wwpLeosFlowLearnDstPort            INTEGER,
+     wwpLeosFlowLearnDstTag             INTEGER,
+     wwpLeosFlowLearnType               INTEGER,
+     wwpLeosFlowLearnIsFiltered         TruthValue     
+ }
+ 
+ wwpLeosFlowLearnVid   OBJECT-TYPE
+     SYNTAX       INTEGER(1..24576)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The VLAN id associated with this flow-learn entry." 
+     ::= { wwpLeosFlowLearnEntry 1 }
+
+ wwpLeosFlowLearnAddr  OBJECT-TYPE
+     SYNTAX       MacAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The address associated with this flow learn entry.
+              Address can be layer 2 mac address or layer 3 ip address.
+              If address is layer 3 ip address then first two bytes will be 0."
+     ::= { wwpLeosFlowLearnEntry 2 }
+    
+ wwpLeosFlowLearnSrcPort  OBJECT-TYPE
+     SYNTAX       INTEGER(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Source port Id for the instance. 
+              This port Id should refer to the dot1dBasePort 
+              in the Dot1dBasePortEntry."
+     ::= { wwpLeosFlowLearnEntry 3 }
+ 
+ wwpLeosFlowLearnSrcTag   OBJECT-TYPE
+     SYNTAX       INTEGER(1..4095)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The source VLAN tag associated with this flow-learn entry."
+     ::= { wwpLeosFlowLearnEntry 4 }
+ 
+ wwpLeosFlowLearnSrcPri  OBJECT-TYPE
+     SYNTAX       INTEGER(0..7) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "The source Layer 2 priority associated with this flow-learn entry."  
+     ::= { wwpLeosFlowLearnEntry 5 }   
+
+ wwpLeosFlowLearnAddrType  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                    layer2(1),
+                    layer3(2)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "The address type associated with this flow-learn entry.
+              Address can be layer 2 type or layer 3 type."  
+     ::= { wwpLeosFlowLearnEntry 6 }
+
+ wwpLeosFlowLearnDstPort  OBJECT-TYPE
+     SYNTAX       INTEGER(1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Destination port id associated with this flow-learn entry.
+              This port id should refer to the dot1dBasePort in the 
+	      Dot1dBasePortEntry."
+     ::= { wwpLeosFlowLearnEntry 7 }
+               
+ wwpLeosFlowLearnDstTag   OBJECT-TYPE
+     SYNTAX       INTEGER(1..4095)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The destination VLAN tag associated with this flow-learn entry."
+     ::= { wwpLeosFlowLearnEntry 8 } 
+     
+ wwpLeosFlowLearnType  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                       dynamic(1),
+                       static(2)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "The flow-learn entry type. This indicates whether or not the 
+              device was learned dynamically or entered as a static MAC." 
+     ::= { wwpLeosFlowLearnEntry 9 }
+     
+ wwpLeosFlowLearnIsFiltered  OBJECT-TYPE
+     SYNTAX       TruthValue  
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "This value indicates whether or not the flow-learn entry is filtered. 
+              A value of 'true' indicates the flow-learn entry is filtered." 
+     ::= { wwpLeosFlowLearnEntry 10 }
+
+ --
+ --  Flow Service Level Stats Table
+ -- 
+ wwpLeosFlowServiceStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowServiceStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+	     "A Table of flow service statistics entries."
+     ::= { wwpLeosFlow 8 }
+                
+ wwpLeosFlowServiceStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowServiceStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+	     "A flow service statistics entry in the 
+             wwpLeosFlowServiceStatsTable."
+     INDEX { wwpLeosFlowServiceMapVid, wwpLeosFlowServiceMapSrcPort, 
+             wwpLeosFlowServiceMapSrcTag, wwpLeosFlowServiceMapDstPort,
+                 wwpLeosFlowServiceMapDstTag, wwpLeosFlowServiceMapSrcPri, 
+                 wwpLeosFlowServiceMapProtocolType, wwpLeosFlowServiceMapProtocolPortNum}    
+
+     ::= { wwpLeosFlowServiceStatsTable 1 }
+     
+ WwpLeosFlowServiceStatsEntry ::= SEQUENCE {
+     wwpLeosFlowServiceStatsRxHi             Counter32,
+     wwpLeosFlowServiceStatsRxLo             Counter32,
+     wwpLeosFlowServiceStatsTxHi             Counter32,
+     wwpLeosFlowServiceStatsTxLo             Counter32,
+     wwpLeosFlowServiceStatsType             INTEGER
+ }    
+     
+ wwpLeosFlowServiceStatsRxHi    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         deprecated
+     DESCRIPTION
+             "The number of bytes received for this flow service 
+              entry. This counter represents the upper 32 bits 
+	      of the counter value."
+     ::= { wwpLeosFlowServiceStatsEntry 1 }     
+     
+ wwpLeosFlowServiceStatsRxLo    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         deprecated
+     DESCRIPTION
+             "The number of bytes received for this flow service 
+              entry. This counter represents the lower 32 bits 
+              of the counter value."
+     ::= { wwpLeosFlowServiceStatsEntry 2 }  
+     
+ wwpLeosFlowServiceStatsTxHi    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         deprecated
+     DESCRIPTION
+             "The number of bytes transmitted for this flow service 
+              entry. This counter represents the upper 32 bits of 
+              the counter value."
+     ::= { wwpLeosFlowServiceStatsEntry 3 }     
+     
+ wwpLeosFlowServiceStatsTxLo    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         deprecated
+     DESCRIPTION
+             "The number of bytes transmitted for this flow service 
+              entry. This counter represents the lower 32 bits of 
+              the counter value."
+     ::= { wwpLeosFlowServiceStatsEntry 4 }
+
+ wwpLeosFlowServiceStatsType    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        forward(1),
+                        drop(2)
+                    }   
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+	     "Specifies the type of statistics for given entry."
+     ::= { wwpLeosFlowServiceStatsEntry 5 }
+ 
+ --
+ -- Mac Find table
+ -- 
+ wwpLeosFlowMacFindTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowMacFindEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "A flow MAC-find table. MAC address must be specified to walk through the MIB."
+     ::= { wwpLeosFlow 9 }
+                
+ wwpLeosFlowMacFindEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowMacFindEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "A flow service MAC statistics table."
+
+     INDEX { wwpLeosFlowMacFindVlanId, wwpLeosFlowMacFindMacAddr }    
+
+     ::= { wwpLeosFlowMacFindTable 1 }
+     
+ WwpLeosFlowMacFindEntry ::= SEQUENCE {
+     wwpLeosFlowMacFindMacAddr        MacAddress,
+     wwpLeosFlowMacFindVlanId         INTEGER,
+     wwpLeosFlowMacFindPort           INTEGER,
+     wwpLeosFlowMacFindVlanTag        INTEGER
+ }
+     
+ wwpLeosFlowMacFindMacAddr    OBJECT-TYPE
+     SYNTAX         MacAddress
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This variable defines the mac address 
+              used as index in the MAC-find table."           
+     ::= { wwpLeosFlowMacFindEntry 1 }     
+     
+ wwpLeosFlowMacFindVlanId    OBJECT-TYPE
+     SYNTAX         INTEGER (1..24576)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "The VLAN ID on which this MAC address is learned."
+     ::= { wwpLeosFlowMacFindEntry 2 }
+
+ wwpLeosFlowMacFindPort    OBJECT-TYPE
+     SYNTAX         INTEGER(1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This specifies the port id on which this MAC address is learned."
+     ::= { wwpLeosFlowMacFindEntry 3 }
+ 
+ wwpLeosFlowMacFindVlanTag    OBJECT-TYPE
+     SYNTAX         INTEGER(1..24576)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This specifies the VLAN tag on which this MAC address is learned."
+     ::= { wwpLeosFlowMacFindEntry 4 }  
+
+ 
+ --
+ --  The Flow Priority Remapping Table
+ --
+ wwpLeosFlowPriRemapTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosFlowPriRemapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table to add the static mac addresses."
+     ::= { wwpLeosFlow 10 }
+
+ wwpLeosFlowPriRemapEntry OBJECT-TYPE
+     SYNTAX     WwpLeosFlowPriRemapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosFlowStaticMacTable."
+     INDEX      { wwpLeosFlowUserPri }
+     ::= { wwpLeosFlowPriRemapTable 1 }
+
+ WwpLeosFlowPriRemapEntry ::= SEQUENCE {   
+     wwpLeosFlowUserPri                 INTEGER,
+     wwpLeosFlowRemappedPri             INTEGER
+ }
+  
+ wwpLeosFlowUserPri    OBJECT-TYPE
+     SYNTAX       INTEGER(0..7)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the user priority. Also used as index in the table." 
+     ::= { wwpLeosFlowPriRemapEntry 1 }
+
+ wwpLeosFlowRemappedPri    OBJECT-TYPE
+     SYNTAX       INTEGER(0..7)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the remapped priority for given 'wwpLeosFlowUserPri'." 
+     ::= { wwpLeosFlowPriRemapEntry 2 }  
+
+ --
+ -- NEW Flow Service Level Table use wwpLeosFlow 11/12
+ -- 
+
+ --
+ -- NEW Flow Service Mapping Table
+ -- 
+ 
+ wwpLeosFlowSMappingTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowSMappingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A service mapping entry in the service-mapping table.
+              To create entry in this table following criteria must be met.
+         - The indexes to the service mapping entry consist of type-value pairs.
+         - There are four(4) sections to the entry.
+               -- NETWORK          (type / value)
+               -- SOURCE           (type / value)
+               -- DESTINATION      (type / value)
+               -- CLASS OF SERVICE (type / value)
+              - All indexes must be specified with the appropriate enumerated
+         - type.  If the TYPE is set to 'none', the corresponding VALUE
+         - MUST be set to zero(0).
+         -
+         - The service-mapping entry is very generic.  As such, acceptable
+         - combinations of types and values will be scrutinized by the
+         - running platform."
+     ::= { wwpLeosFlow 13 }
+                
+ wwpLeosFlowSMappingEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowSMappingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A service mapping entry in the wwpLeosFlowSMappingTable."
+     INDEX { wwpLeosFlowSMappingNetType, wwpLeosFlowSMappingNetValue, 
+             wwpLeosFlowSMappingSrcType, wwpLeosFlowSMappingSrcValue,
+                  wwpLeosFlowSMappingDstType, wwpLeosFlowSMappingDstValue, 
+                  wwpLeosFlowSMappingCosType, wwpLeosFlowSMappingCosValue }
+     ::= { wwpLeosFlowSMappingTable 1 } 
+
+ WwpLeosFlowSMappingEntry ::= SEQUENCE {
+     wwpLeosFlowSMappingNetType              INTEGER,
+     wwpLeosFlowSMappingNetValue             Unsigned32,
+     wwpLeosFlowSMappingSrcType              INTEGER,
+     wwpLeosFlowSMappingSrcValue             Unsigned32,
+     wwpLeosFlowSMappingDstType              INTEGER,
+     wwpLeosFlowSMappingDstValue             Unsigned32,
+     wwpLeosFlowSMappingCosType              INTEGER,
+     wwpLeosFlowSMappingCosValue             Unsigned32,
+     wwpLeosFlowSMappingDstSlid              Unsigned32,
+     wwpLeosFlowSMappingSrcSlid              Unsigned32,     
+     wwpLeosFlowSMappingStatus               RowStatus, 
+     wwpLeosFlowSMappingRedCurveOffset       Integer32,
+     wwpLeosFlowSMappingCpuPort              TruthValue
+ }
+ 
+ wwpLeosFlowSMappingNetType      OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        none(1),
+                        vlan(2),
+                        vsi(3),
+                        vsiMpls(4)
+     }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "This object specifies the NETWORK object TYPE for the entry.
+              -
+              - If set to 'none', the corresponding value in
+              - wwpLeosFlowSMappingNetValue MUST be zero(0).
+              -
+              - If set to vlan, a valid vlan-id must be specified.
+              - If set to vsi, a valid ethernet virtual-switch-instance id must be specified.
+              - If set to vsi_mpls, a valid mpls virtual-switch-instance id must be specified
+              -
+              - This used as index in the table." 
+     ::= { wwpLeosFlowSMappingEntry 1 }
+ 
+ wwpLeosFlowSMappingNetValue     OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the NETWORK object ID for the entry.
+              -
+              - This item must be set according to the value set
+              - in wwpLeosFlowSMappingNetType. If wwpLeosFlowSMappingNetType
+              - equals:
+                  - none(1): MUST be set to zero(0).
+                  - vlan(2): MUST be set to valid existing vlan id.
+                  - vsi(3):  MUST be set to valid existing ethernet virtual switch id.
+                  - vsiMpls(4):  MUST be set to valid existing mpls virtual switch id.
+              -
+              - This used as index in the table." 
+     ::= { wwpLeosFlowSMappingEntry 2 }
+
+ wwpLeosFlowSMappingSrcType      OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        none(1),
+                        port(2),
+                        mplsVc(3)
+     }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "This object specifies the SOURCE object TYPE for the entry.
+              -
+              - If set to 'none', the corresponding value in
+              - wwpLeosFlowSMappingSrcValue MUST be zero(0).
+              -
+              - If set to port, a valid port group id must be specified.
+              - If set to mplsVc, a valid mpls-virtual-circuit id must be specified.
+              -
+              - This used as index in the table." 
+     ::= { wwpLeosFlowSMappingEntry 3 }
+ 
+ wwpLeosFlowSMappingSrcValue     OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the SOURCE object ID for the entry.
+              -
+              - This item must be set according to the value set
+              - in wwpLeosFlowSMappingSrcType. If wwpLeosFlowSMappingSrcType
+              - equals:
+                  - none(1):   MUST be set to zero(0).
+                  - port(2):   MUST be set to valid existing port group id.
+                  - mplsVc(3): MUST be set to valid existing mpls-virtual-circuit id.
+              -
+              - This used as index in the table." 
+     ::= { wwpLeosFlowSMappingEntry 4 }
+
+ wwpLeosFlowSMappingDstType      OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        none(1),
+                        port(2),
+                        mplsVc(3)
+     }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "This object specifies the DESTINATION object TYPE for the entry.
+              -
+              - If set to 'none', the corresponding value in
+              - wwpLeosFlowSMappingDstValue MUST be zero(0).
+              -
+              - If set to port, a valid port group id must be specified.
+              - If set to mplsVc, a valid mpls-virtual-circuit id must be specified.
+              -
+              - This used as index in the table." 
+     ::= { wwpLeosFlowSMappingEntry 5 }
+ 
+ wwpLeosFlowSMappingDstValue     OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the DESTINATION object ID for the entry.
+              -
+              - This item must be set according to the value set
+              - in wwpLeosFlowSMappingDstType. If wwpLeosFlowSMappingDstType
+              - equals:
+                  - none(1):   MUST be set to zero(0).
+                  - port(2):   MUST be set to valid existing port group id.
+                  - mplsVc(3): MUST be set to valid existing mpls-virtual-circuit id.
+              -
+              - This used as index in the table." 
+     ::= { wwpLeosFlowSMappingEntry 6 }
+
+ wwpLeosFlowSMappingCosType      OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        none(1),
+                        phb(2),
+                        dscp(3),
+                        ipPrec(4),
+                        dot1dPri(5),
+                        mplsExp(6),
+                        tcpSrcPort(7),
+                        tcpDstPort(8),
+                        udpSrcPort(9),
+                        udpDstPort(10),
+                        pcp(11),
+                        cvlan(12)
+     }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "This object specifies the CLASS OF SERVICE object TYPE for the entry.
+              -
+              - If set to 'none', the corresponding value in
+              - wwpLeosFlowSMappingCosValue MUST be zero(0).
+              -
+              - If set to tcpSrcPort, tcpDstPort, udpSrcPort, or udpDstPort,
+              - a valid, NON-ZERO tcp or udp port must be specified.
+              -
+              - If set to phb, a valid per-hop-behavior enumeration must be specified.
+              - If set to dscp, a valid differentiated services code point must be specified.
+              - If set to ipPrec, a valid ip-precedence must be specified.
+              - If set to dot1dPri, a valid 802.1d/p priority must be specified.              
+              - If set to cvlan, a support Customer VLAN must be specified
+              -
+              - This used as index in the table." 
+     ::= { wwpLeosFlowSMappingEntry 7 }
+ 
+ wwpLeosFlowSMappingCosValue     OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the CLASS OF SERVICE object ID for the entry.
+              -
+              - This item must be set according to the value set
+              - in wwpLeosFlowSMappingCosType. If wwpLeosFlowSMappingCosType
+              - equals:
+                  - none(1):        MUST be set to zero(0).
+                  -
+                  - phb(2):         (1..13)
+                  -                 cs0(1),cs1(2),cs2(3),cs3(4),cs4(5),cs5(6),cs6(7),cs7(8),
+                  -                 af1(9),af2(10),af3(11),af4(12),ef(13)
+                  -
+                  - dscp(3):        (0..63)
+                  - ipPrec(4):      (0..7)
+                  - dot1dPri(5):    (0..7)
+                  - mplsExp(6):     (0..7)
+                  -
+                  - tcpSrcPort(7):  (1..65535).
+                  - tcpDstPort(8):  (1..65535).
+                  - udpSrcPort(9):  (1..65535).
+                  - udpDstPort(10): (1..65535).
+                  -
+                  - cvlan(12):      (1..4094)
+              -
+              - Depending on the platform, the COS type/value may be recognized for certain
+              - frame tag-structures.  For example, some platforms can recognize ipPrec, dscp
+              - dot1dPri only for double-tagged frames.  Some require untagged or single-tagged
+              - frames to recognize TCP/UDP ports.  Operator should consult the software 
+              - configuration guide for the	specified product.
+              -
+              - This used as index in the table." 
+     ::= { wwpLeosFlowSMappingEntry 8 }
+ 
+ wwpLeosFlowSMappingDstSlid     OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "The service level id to apply to the flow at the destination point. Depending on the platform
+              this object may or may not be set to 0 while creating the service-mapping 
+              entry.  The corresponding destination-port and slid must exist in the service-level table."
+     ::= { wwpLeosFlowSMappingEntry 9 } 
+
+ wwpLeosFlowSMappingSrcSlid     OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The service level ID to apply to the flow at the source-port. Depending on the platform
+              this object may or may not be set to 0 while creating the service-mapping 
+	      entry.  The corresponding source-port and SLID must exist in the service-level table"
+     ::= { wwpLeosFlowSMappingEntry 10 } 
+     
+ wwpLeosFlowSMappingStatus   OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'."
+     ::= { wwpLeosFlowSMappingEntry 11 } 
+  
+  wwpLeosFlowSMappingRedCurveOffset     OBJECT-TYPE
+     SYNTAX       Integer32 (0..3)
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the red curve offset to be used for given
+              service mapping. If this object is not set then the device will choose default red curve offset
+              which is 0."
+         DEFVAL {0}
+     ::= { wwpLeosFlowSMappingEntry 12 }
+
+ wwpLeosFlowSMappingCpuPort     OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "This object specifies if the CPU port is to be used as the src port."
+         DEFVAL {false}
+     ::= { wwpLeosFlowSMappingEntry 13 }      
+     
+ 
+
+ --
+ --  Flow Service Mapping Stats Table
+ -- 
+ wwpLeosFlowSMappingStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowSMappingStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "A Table of flow service statistics entries."
+     ::= { wwpLeosFlow 14 }
+                
+ wwpLeosFlowSMappingStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowSMappingStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "A flow service statistics entry in the 
+             wwpLeosFlowSMappingStatsTable."
+     INDEX { wwpLeosFlowSMappingNetType, wwpLeosFlowSMappingNetValue, 
+             wwpLeosFlowSMappingSrcType, wwpLeosFlowSMappingSrcValue,
+                  wwpLeosFlowSMappingDstType, wwpLeosFlowSMappingDstValue, 
+                  wwpLeosFlowSMappingCosType, wwpLeosFlowSMappingCosValue }
+     ::= { wwpLeosFlowSMappingStatsTable 1 }
+     
+ WwpLeosFlowSMappingStatsEntry ::= SEQUENCE {
+     wwpLeosFlowSMappingStatsRxHi             Counter32,
+     wwpLeosFlowSMappingStatsRxLo             Counter32,
+     wwpLeosFlowSMappingStatsTxHi             Counter32,
+     wwpLeosFlowSMappingStatsTxLo             Counter32,     
+     wwpLeosFlowSMappingStatsType             INTEGER
+ }    
+     
+ wwpLeosFlowSMappingStatsRxHi    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The number of bytes received for this flow service 
+              entry. This counter represents the upper 32 bits 
+              of the counter value"
+     ::= { wwpLeosFlowSMappingStatsEntry 1 }     
+     
+ wwpLeosFlowSMappingStatsRxLo    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The number of bytes received for this flow service 
+              entry. This counter represents the lower 32 bits 
+              of the counter value."
+     ::= { wwpLeosFlowSMappingStatsEntry 2 }  
+     
+ wwpLeosFlowSMappingStatsTxHi    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The number of bytes transmitted for this flow service 
+              entry. This counter represents the upper 32 bits of 
+              the counter value."
+     ::= { wwpLeosFlowSMappingStatsEntry 3 }     
+     
+ wwpLeosFlowSMappingStatsTxLo    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The number of bytes transmitted for this flow service 
+              entry. This counter represents the lower 32 bits of 
+              the counter value."
+     ::= { wwpLeosFlowSMappingStatsEntry 4 } 
+     
+ wwpLeosFlowSMappingStatsType   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        forward(1),
+                        drop(2)
+          }     
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "Specifies the type of statistics for given entry."
+     ::= { wwpLeosFlowSMappingStatsEntry 5 }
+  
+ --
+ --  Flow Cos Sync 1d to Exp Table
+ -- 
+  wwpLeosFlowCosSync1dToExpTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowCosSync1dToExpEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table of flow cos sync 1d to exp entries.
+              Entries cannot be created or destroyed."
+      ::= { wwpLeosFlow 15 }
+                
+  wwpLeosFlowCosSync1dToExpEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowCosSync1dToExpEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A flow cos sync 1d to 1d entry in the wwpLeosFlowCosSync1dToExpTable."
+      INDEX { wwpLeosFlowCosSync1dToExpMapFrom }    
+ 
+      ::= { wwpLeosFlowCosSync1dToExpTable 1 }
+     
+  WwpLeosFlowCosSync1dToExpEntry ::= SEQUENCE {
+      wwpLeosFlowCosSync1dToExpMapFrom      INTEGER,
+      wwpLeosFlowCosSync1dToExpMapTo        INTEGER      
+  }    
+     
+  wwpLeosFlowCosSync1dToExpMapFrom    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This object is used as index in the table and represents 
+              cos 1d priority. Any frame coming in with this priority will be
+ 	      synchronized with priority specified by wwpLeosFlowCosSync1dToExpMapTo."
+      ::= { wwpLeosFlowCosSync1dToExpEntry 1 }     
+     
+  wwpLeosFlowCosSync1dToExpMapTo    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This object specifies the remapped exp value of the frame 
+              which ingresses with dot1d priority of wwpLeosFlowCosSync1dToExpMapFrom."
+      ::= { wwpLeosFlowCosSync1dToExpEntry 2 }      
+        
+ --
+ --  Flow Cos Sync Exp to 1d Table
+ -- 
+  wwpLeosFlowCosSyncExpTo1dTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowCosSyncExpTo1dEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table of flow cos sync 1d to exp entries."
+      ::= { wwpLeosFlow 16 }
+                
+  wwpLeosFlowCosSyncExpTo1dEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowCosSyncExpTo1dEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A flow cos sync 1d to 1d entry in the wwpLeosFlowCosSyncExpTo1dTable."
+     INDEX { wwpLeosFlowCosSyncExpTo1dMapFrom }    
+ 
+      ::= { wwpLeosFlowCosSyncExpTo1dTable 1 }
+     
+  WwpLeosFlowCosSyncExpTo1dEntry ::= SEQUENCE {
+      wwpLeosFlowCosSyncExpTo1dMapFrom      INTEGER,
+      wwpLeosFlowCosSyncExpTo1dMapTo        INTEGER     
+  }    
+     
+  wwpLeosFlowCosSyncExpTo1dMapFrom    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This object is used as index in the table and represents 
+              cos 1d priority. Any frame coming in with this priority will be
+ 	      synchronized with priority specified by wwpLeosFlowCosSyncExpTo1dMapTo."
+      ::= { wwpLeosFlowCosSyncExpTo1dEntry 1 }     
+     
+  wwpLeosFlowCosSyncExpTo1dMapTo    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This object specifies the remapped exp value of the frame 
+              which ingresses with dot1d priority of wwpLeosFlowCosSyncExpTo1dMapFrom."
+      ::= { wwpLeosFlowCosSyncExpTo1dEntry 2 }  
+     
+ --
+ --  Flow Cos Sync Ip precedence to 1d Table, Exp
+ -- 
+  wwpLeosFlowCosSyncIpPrecTo1dTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowCosSyncIpPrecTo1dEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table of flow cos sync IP precedence to 1d entries."
+      ::= { wwpLeosFlow 17 }
+                
+  wwpLeosFlowCosSyncIpPrecTo1dEntry  OBJECT-TYPE
+      SYNTAX       WwpLeosFlowCosSyncIpPrecTo1dEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A flow cos sync Ip Precedence to 1d entry in the wwpLeosFlowCosSyncIpPrecTo1dTable."
+      INDEX { wwpLeosFlowCosSyncIpPrecTo1dMapFrom }
+      ::= { wwpLeosFlowCosSyncIpPrecTo1dTable 1 }
+     
+  WwpLeosFlowCosSyncIpPrecTo1dEntry ::= SEQUENCE {
+      wwpLeosFlowCosSyncIpPrecTo1dMapFrom      INTEGER,
+      wwpLeosFlowCosSyncIpPrecTo1dMapTo        INTEGER      
+  }    
+     
+  wwpLeosFlowCosSyncIpPrecTo1dMapFrom    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This object is used as index in the table and represents 
+              ip precedence value. Any frame coming in with wwpLeosFlowCosSyncIpPrecTo1dMapFrom
+ 	      IP precedence will be synchronized with dot1d specified by 
+              wwpLeosFlowCosSyncIpPrecTo1dMapTo."
+      ::= { wwpLeosFlowCosSyncIpPrecTo1dEntry 1 }     
+     
+  wwpLeosFlowCosSyncIpPrecTo1dMapTo    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+	     "This object specifies the ip precedence value to synchronize with when the 
+              frame ingresses with ip precedence value of wwpLeosFlowCosSyncIpPrecTo1dMapFrom."
+      ::= { wwpLeosFlowCosSyncIpPrecTo1dEntry 2 }  
+  
+ --
+ --  Flow cos sync standard per hop behavior (PHB) to 1d, Exp table
+ -- 
+ wwpLeosFlowCosSyncStdPhbTo1dTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowCosSyncStdPhbTo1dEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table of flow cos sync standard per hop behavior to 1d or Exp entries."
+      ::= { wwpLeosFlow 18 }
+                
+ wwpLeosFlowCosSyncStdPhbTo1dEntry  OBJECT-TYPE
+      SYNTAX       WwpLeosFlowCosSyncStdPhbTo1dEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A flow cos sync standard per hop behavior to 1d entry in the 
+              wwpLeosFlowCosSyncStdPhbTo1dTable."
+      INDEX { wwpLeosFlowCosSyncStdPhbTo1dMapFrom }
+      ::= { wwpLeosFlowCosSyncStdPhbTo1dTable 1 }
+     
+ WwpLeosFlowCosSyncStdPhbTo1dEntry ::= SEQUENCE {
+      wwpLeosFlowCosSyncStdPhbTo1dMapFrom      INTEGER,
+      wwpLeosFlowCosSyncStdPhbTo1dMapTo        INTEGER      
+ }    
+     
+ wwpLeosFlowCosSyncStdPhbTo1dMapFrom    OBJECT-TYPE
+      SYNTAX         INTEGER {                  
+                cs0(1),
+                        cs1(2),
+                        cs2(3),
+                        cs3(4),
+                        cs4(5),
+                        cs5(6),
+                        cs6(7),
+                        cs7(8),
+                        af1(9),
+                        af2(10),
+                        af3(11),
+                        af4(12),
+                        ef(13)
+                    }
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This object is used as index in the table and represents 
+              AFx or EF value. Any frame coming in with wwpLeosFlowCosSyncStdPhbTo1dMapFrom
+ 	      AFx or EF value will be synchronized with dot1d priority specified by 
+              wwpLeosFlowCosSyncStdPhbTo1dMapTo.
+ 	      If wwpLeosFlowCosSyncStdPhbTo1dValue is not specified then no synchronization 
+              will happen."
+      ::= { wwpLeosFlowCosSyncStdPhbTo1dEntry 1 }     
+     
+ wwpLeosFlowCosSyncStdPhbTo1dMapTo    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+ 	     "This object specifies the AFx or EF dscp value to synchronize with when the
+              frame ingresses with AFx or EF dscp value of wwpLeosFlowCosSyncDscpTo1dMapTo."
+      ::= { wwpLeosFlowCosSyncStdPhbTo1dEntry 2 }    
+      
+ --
+ --  Flow l2 Sac table
+ -- 
+ wwpLeosFlowL2SacTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowL2SacEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table of flow l2 sac table."
+      ::= { wwpLeosFlow 19 }
+                
+ wwpLeosFlowL2SacEntry  OBJECT-TYPE
+      SYNTAX       WwpLeosFlowL2SacEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "Represents each entry in the l2 Sac Table"
+      INDEX { wwpLeosFlowL2SacPortId, wwpLeosFlowL2SacNetType , wwpLeosFlowSacNetValue}
+      ::= { wwpLeosFlowL2SacTable 1 }
+     
+ WwpLeosFlowL2SacEntry ::= SEQUENCE {
+      wwpLeosFlowL2SacPortId           INTEGER,
+      wwpLeosFlowL2SacNetType                 INTEGER,
+      wwpLeosFlowSacNetValue             INTEGER,
+      wwpLeosFlowL2SacLimit              Integer32,
+      wwpLeosFlowL2SacCurMac             Counter32,
+      wwpLeosFlowL2SacCurFilteredMac   Counter32,
+      wwpLeosFlowL2SacOperState       INTEGER,
+      wwpLeosFlowL2SacRowStatus       RowStatus       
+ }    
+     
+ wwpLeosFlowL2SacPortId    OBJECT-TYPE
+      SYNTAX         INTEGER (0..65535)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+ 	     "This mib object is index in the table. If port is not involved in L2 SAC then set this value to 0.
+              0 represents don't care."
+      ::= { wwpLeosFlowL2SacEntry 1 }    
+      
+ wwpLeosFlowL2SacNetType    OBJECT-TYPE
+      SYNTAX         INTEGER {
+                                        none(1),
+                                        vlan(2),
+                                        vsiEth(3),
+                                        vsiMpls(4)
+                                        }
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This mib object is used as index in the table. This object specifies how wwpLeosFlowSacValue should be interpreted.
+              If this object is set to none then the wwpLeosFlowSacValue must be set to 0."
+      ::= { wwpLeosFlowL2SacEntry 2 }   
+      
+ wwpLeosFlowSacNetValue    OBJECT-TYPE
+      SYNTAX         INTEGER (1..65535)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This mib object is used as index in the table. This object is only meaningful if wwpLeosFlowL2SacNetType is not set to none."
+      ::= { wwpLeosFlowL2SacEntry 3 } 
+
+ wwpLeosFlowL2SacLimit    OBJECT-TYPE
+     SYNTAX          Integer32(0..2147483647) 
+      MAX-ACCESS     read-create
+      STATUS         current
+      DESCRIPTION
+             "This mib object specifies the l2 SAC limit. Device will not learn any mac greater than the 
+              limit specified by this object."
+      ::= { wwpLeosFlowL2SacEntry 4 } 
+
+ wwpLeosFlowL2SacCurMac   OBJECT-TYPE
+     SYNTAX          Counter32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This mib object specifies the current mac count for the given l2 SAC entry."  
+      ::= { wwpLeosFlowL2SacEntry 5 }  
+ 
+ wwpLeosFlowL2SacCurFilteredMac   OBJECT-TYPE
+      SYNTAX         Counter32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This mib object specifies the current number of filtered macs for the given l2 SAC entry."  
+      ::= { wwpLeosFlowL2SacEntry 6 }  
+                                      
+ wwpLeosFlowL2SacOperState   OBJECT-TYPE
+     SYNTAX       INTEGER {
+                                enabled(1),
+                                disabled(2)
+                          }
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This mib object specifies the current operation state for the given l2 SAC entry."  
+      ::= { wwpLeosFlowL2SacEntry 7 }                                                   
+
+  wwpLeosFlowL2SacRowStatus   OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+              conceptual rows in this table.
+              
+              To create a row in this table, a manager must
+              set this object to 'createAndGo'."
+     ::= { wwpLeosFlowL2SacEntry 8 }      
+                 
+ --
+ -- Some global modes
+ --                      
+ wwpLeosFlowL2SacTrapState  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                                enabled(1),
+                                disabled(2)
+                                }                               
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies if device should send L2 sac traps."
+     ::= { wwpLeosFlow 20 }
+
+ wwpLeosFlowStrictQueuingState  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                                enabled(1),
+                                disabled(2)
+                                }                               
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies if device should adjust queues to support strict queuing."
+         DEFVAL { disabled }
+     ::= { wwpLeosFlow 21 }
+
+ wwpLeosFlowBwCalcMode  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                                transport(1),
+                                payload(2)
+                                }                               
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies if the device should operate in transport or payload mode.
+         In transport mode the frame length of an Ethernet frame used in measuring
+         CIR will be from IFG through FCS.  In payload mode the frame length of an
+         Ethernet frame used in measuring CIR will be from the MAC DA through FCS."
+         DEFVAL { transport }
+     ::= { wwpLeosFlow 22 }  
+ 
+ --
+ -- Global Attributes
+ --     
+ wwpLeosFlowGlobal OBJECT IDENTIFIER ::= { wwpLeosFlow 23 }    
+ 
+ wwpLeosFlowServiceLevelFlowGroupState  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        disabled(1),
+                        enabled(2)
+                        }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the current state of service level flow groups." 
+     ::= { wwpLeosFlowGlobal 1 }
+
+ wwpLeosFlowServiceMappingCosRedMappingState  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        disabled(1),
+                        enabled(2)
+                        }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the current state of service mapping dot1d to Red offset mapping table(wwpLeosFlowCos1dToRedCurveOffsetTable).
+              If this object is set to disable then wwpLeosFlowCos1dToRedCurveOffsetTable will not be used for dot1d to red offset mapping
+              else it will be used."
+         DEFVAL {disabled} 
+     ::= { wwpLeosFlowGlobal 2 } 
+     
+ wwpLeosFlowServiceAllRedCurveUnset   OBJECT-TYPE
+      SYNTAX         TruthValue
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "Setting this object to true will reset all the red curves in wwpLeosFlowServiceRedCurveTable
+ 	      table to factory default settings."  
+          DEFVAL                {false}
+      ::= { wwpLeosFlowGlobal 3 }
+ 
+ --
+ --  Flow service RED curve table
+ -- 
+ wwpLeosFlowServiceRedCurveTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowServiceRedCurveEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table to configure flow service red curve table."
+      ::= { wwpLeosFlow 24 }
+                
+ wwpLeosFlowServiceRedCurveEntry  OBJECT-TYPE
+      SYNTAX       WwpLeosFlowServiceRedCurveEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+ 	     "Represents each entry in the flow service RED curve table."
+      INDEX { wwpLeosFlowServiceRedCurveIndex }
+      ::= { wwpLeosFlowServiceRedCurveTable 1 }
+     
+ WwpLeosFlowServiceRedCurveEntry ::= SEQUENCE {
+      wwpLeosFlowServiceRedCurveIndex                   Unsigned32,
+      wwpLeosFlowServiceRedCurveName                    DisplayString,
+      wwpLeosFlowServiceRedCurveState                   INTEGER,
+      wwpLeosFlowServiceRedCurveMinThreshold            Unsigned32,
+      wwpLeosFlowServiceRedCurveMaxThreshold            Unsigned32,
+      wwpLeosFlowServiceRedCurveDropProbability         Unsigned32,
+      wwpLeosFlowServiceRedCurveUnset                   TruthValue
+      
+ } 
+ 
+ wwpLeosFlowServiceRedCurveIndex    OBJECT-TYPE
+      SYNTAX         Unsigned32 (5..64)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This object is used as index in the red curve table."
+      ::= { wwpLeosFlowServiceRedCurveEntry 1 } 
+       
+ wwpLeosFlowServiceRedCurveName    OBJECT-TYPE
+      SYNTAX         DisplayString (SIZE(1..31))
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This object specifies the name of the red curve."
+      ::= { wwpLeosFlowServiceRedCurveEntry 2 }   
+      
+ wwpLeosFlowServiceRedCurveState    OBJECT-TYPE
+      SYNTAX         INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This object specifies the current state of the red curve. This object can be set to enable or disable."
+      ::= { wwpLeosFlowServiceRedCurveEntry 3 } 
+
+ wwpLeosFlowServiceRedCurveMinThreshold    OBJECT-TYPE
+          SYNTAX         Unsigned32 (0..65535)
+          UNITS          "kbps"
+      MAX-ACCESS     read-write                
+      STATUS         current
+      DESCRIPTION
+             "This represents the minimum threshold in KBytes.  
+              When the queue length associated with this service reaches this number, 
+              RED begins to drop packets matching this Service-Mappings traffic classification. 
+              The valid range is between 0 and 65535 Kbytes. The actual number varies depending on the platform."         
+      ::= { wwpLeosFlowServiceRedCurveEntry 4 } 
+
+ wwpLeosFlowServiceRedCurveMaxThreshold   OBJECT-TYPE
+      SYNTAX          Unsigned32 (0..65535)
+      UNITS          "kbps"
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This represents the maximum threshold in KBytes.  When the queue length associated with this service reaches this 
+              number, RED drops packets matching this Service-Mappings traffic classification at the rate specified in 
+              wwpLeosFlowServiceRedCurveDropProbability."  
+      ::= { wwpLeosFlowServiceRedCurveEntry 5 }  
+ 
+ wwpLeosFlowServiceRedCurveDropProbability   OBJECT-TYPE
+      SYNTAX         Unsigned32 (0..100)
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This object specifies the drop probability of a packet (matching this Service-Mapping classification) of being 
+              dropped when the queue length associated with this Service-Level reaches the value configured in wwpLeosFlowServiceMaxThreshold.  
+              The value represents a percentage (0-100)."  
+      ::= { wwpLeosFlowServiceRedCurveEntry 6 }                                        
+      
+ wwpLeosFlowServiceRedCurveUnset   OBJECT-TYPE
+      SYNTAX         TruthValue
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "Setting this object to true will reset the red curve settings to factory
+              defaults."  
+          DEFVAL                {false}
+      ::= { wwpLeosFlowServiceRedCurveEntry 7 }
+     
+ --
+ --  Flow Cos Sync 1d to red curve offset Table
+ -- 
+  wwpLeosFlowCos1dToRedCurveOffsetTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowCos1dToRedCurveOffsetEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table of flow cos 1d to red curve offset entries."
+      ::= { wwpLeosFlow 25 }
+                
+  wwpLeosFlowCos1dToRedCurveOffsetEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowCos1dToRedCurveOffsetEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table entry of flow cos 1d to red curve offset."
+      INDEX { wwpLeosFlowCos1dToRedCurveOffset1dValue }     
+      ::= { wwpLeosFlowCos1dToRedCurveOffsetTable 1 }
+     
+  WwpLeosFlowCos1dToRedCurveOffsetEntry ::= SEQUENCE {
+      wwpLeosFlowCos1dToRedCurveOffset1dValue           Unsigned32,
+      wwpLeosFlowCos1dToRedCurveOffsetValue             Unsigned32
+  }    
+     
+  wwpLeosFlowCos1dToRedCurveOffset1dValue    OBJECT-TYPE
+      SYNTAX         Unsigned32 (0..7)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This object is used as index in the table and represents 
+              cos 1d priority. Any frame coming in with this priority will be
+              mapped to red cos offset value specified by wwpLeosFlowCos1dToRedCurveOffsetValue."
+      ::= { wwpLeosFlowCos1dToRedCurveOffsetEntry 1 }     
+     
+  wwpLeosFlowCos1dToRedCurveOffsetValue    OBJECT-TYPE
+      SYNTAX         Unsigned32 (0..3)
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This object specifies the red curve offset value to be used when frame 
+              which ingresses with dot1d priority specified by wwpLeosFlowCos1dToRedCurveOffset1dValue."
+      ::= { wwpLeosFlowCos1dToRedCurveOffsetEntry 2 }      
+                    
+ --
+ --  Flow cos Mapping for PCP to .1d
+ -- 
+ wwpLeosFlowCosMapPCPTo1dTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowCosMapPCPTo1dEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table of flow cos mapping of PCP to .1d Pri."
+      ::= { wwpLeosFlow 26 }
+                
+ wwpLeosFlowCosMapPCPTo1dEntry  OBJECT-TYPE
+      SYNTAX       WwpLeosFlowCosMapPCPTo1dEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A flow cos sync standard per hop behavior to 1d entry in the 
+              wwpLeosFlowCosSyncStdPhbTo1dTable."
+      INDEX { wwpLeosFlowCosMapPCPTo1dMapFrom }
+      ::= { wwpLeosFlowCosMapPCPTo1dTable 1 }
+     
+ WwpLeosFlowCosMapPCPTo1dEntry ::= SEQUENCE {
+      wwpLeosFlowCosMapPCPTo1dMapFrom      INTEGER,
+      wwpLeosFlowCosMapPCPTo1dMapTo     INTEGER      
+ }    
+     
+ wwpLeosFlowCosMapPCPTo1dMapFrom    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This object is used as index in the table and represents 
+              PCP priority. Any frame coming in with wwpLeosFlowCosMapPCPTo1dMapFrom
+              priority will be mapped to .1d priority specified by wwpLeosFlowCosMapPCPTo1dMapTo.
+              "
+      ::= { wwpLeosFlowCosMapPCPTo1dEntry 1 }     
+     
+ wwpLeosFlowCosMapPCPTo1dMapTo    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This object specifies the .1d priority to map with when the
+              frame ingresses with PCP priority specified by wwpLeosFlowCosMapPCPTo1dMapFrom."
+      ::= { wwpLeosFlowCosMapPCPTo1dEntry 2 }  
+ 
+ --
+ --  Flow cos Mapping for .1d to PCP
+ wwpLeosFlowCosMap1dToPCPTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF WwpLeosFlowCosMap1dToPCPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A table of flow cos mapping of PCP to .1d Pri."
+      ::= { wwpLeosFlow 27 }
+                
+ wwpLeosFlowCosMap1dToPCPEntry  OBJECT-TYPE
+      SYNTAX       WwpLeosFlowCosMap1dToPCPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "A flow cos sync standard per hop behavior to 1d entry in the 
+              wwpLeosFlowCosSyncStdPhbTo1dTable."
+      INDEX { wwpLeosFlowCosMap1dToPCPMapFrom }
+      ::= { wwpLeosFlowCosMap1dToPCPTable 1 }
+     
+ WwpLeosFlowCosMap1dToPCPEntry ::= SEQUENCE {
+      wwpLeosFlowCosMap1dToPCPMapFrom      INTEGER,
+      wwpLeosFlowCosMap1dToPCPMapTo     INTEGER      
+ }    
+     
+ wwpLeosFlowCosMap1dToPCPMapFrom    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+             "This object is used as index in the table and represents 
+              PCP priority. Any frame coming in with wwpLeosFlowCosMap1dToPCPMapFrom
+              priority will be mapped to .1d priority specified by wwpLeosFlowCosMap1dToPCPMapTo.
+              "
+      ::= { wwpLeosFlowCosMap1dToPCPEntry 1 }     
+     
+ wwpLeosFlowCosMap1dToPCPMapTo    OBJECT-TYPE
+      SYNTAX         INTEGER (0..7)
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+             "This object specifies the .1d priority to map with when the
+              frame ingresses with PCP priority specified by wwpLeosFlowCosMap1dToPCPMapFrom."
+      ::= { wwpLeosFlowCosMap1dToPCPEntry 2 }
+
+wwpLeosFlowMacMotionEventsEnable        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                enabled(1),
+                                disabled(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "Specifies whether MAC Motion traps and syslog messages will be generated
+                when a MAC shifts from one port/vlan to another port/vlan." 
+        ::= { wwpLeosFlow 28 }
+        
+wwpLeosFlowMacMotionEventsInterval      OBJECT-TYPE
+        SYNTAX          INTEGER (15..300)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The minimum time in seconds that must elapse between each MAC Motion trap
+                and syslog message that is generated."
+        ::= { wwpLeosFlow 29 }  
+
+ wwpLeosFlowCpuRateLimitsEnable  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                enabled(1),
+                                disabled(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "Enable is used to activate the port-associated rate-limits." 
+        ::= { wwpLeosFlow 30 } 
+
+ -- 
+ -- Flow Cpu Rate Limit Entry 
+ --
+ wwpLeosFlowCpuRateLimitTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowCpuRateLimitEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A table of flow rate limit entries. "
+     ::= { wwpLeosFlow 31 }
+                
+ wwpLeosFlowCpuRateLimitEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowCpuRateLimitEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The flow service level entry in the Table."
+     INDEX { wwpLeosFlowCpuRateLimitPort }
+     ::= { wwpLeosFlowCpuRateLimitTable 1 } 
+
+ WwpLeosFlowCpuRateLimitEntry ::= SEQUENCE {
+     wwpLeosFlowCpuRateLimitPort                INTEGER, 
+     wwpLeosFlowCpuRateLimitEnable              INTEGER,
+     wwpLeosFlowCpuRateLimitBootp               INTEGER,
+     wwpLeosFlowCpuRateLimitCfm                 INTEGER,
+     wwpLeosFlowCpuRateLimitCft                 INTEGER,
+     wwpLeosFlowCpuRateLimitDot1x               INTEGER,
+     wwpLeosFlowCpuRateLimitOam                 INTEGER,
+     wwpLeosFlowCpuRateLimitEprArp              INTEGER,
+     wwpLeosFlowCpuRateLimitIgmp                INTEGER,
+     wwpLeosFlowCpuRateLimitInet	        INTEGER,
+     wwpLeosFlowCpuRateLimitLacp                INTEGER,
+     wwpLeosFlowCpuRateLimitLldp                INTEGER,
+     wwpLeosFlowCpuRateLimitMpls                INTEGER,
+     wwpLeosFlowCpuRateLimitMstp                INTEGER,
+     wwpLeosFlowCpuRateLimitPeArp               INTEGER,
+     wwpLeosFlowCpuRateLimitPvst                INTEGER,
+     wwpLeosFlowCpuRateLimitRstp                INTEGER,
+     wwpLeosFlowCpuRateLimitLpbk                INTEGER,
+     wwpLeosFlowCpuRateLimitRmtLpbk             INTEGER,
+     wwpLeosFlowCpuRateLimitCxeRx               INTEGER,
+     wwpLeosFlowCpuRateLimitCxeTx               INTEGER,
+     wwpLeosFlowCpuRateLimitTwamp               INTEGER,
+     wwpLeosFlowCpuRateLimitDflt                INTEGER,
+     wwpLeosFlowCpuRateLimitTwampRsp            INTEGER,
+     wwpLeosFlowCpuRateLimitMultiCast           INTEGER,
+     wwpLeosFlowCpuRateLimitBroadCast           INTEGER,
+     wwpLeosFlowCpuRateLimitArp                 INTEGER,
+     wwpLeosFlowCpuRateLimitIcmp                INTEGER,
+     wwpLeosFlowCpuRateLimitTcpSyn              INTEGER,
+     wwpLeosFlowCpuRateLimitRaps                INTEGER,
+     wwpLeosFlowCpuRateLimitIpMgmt              INTEGER,
+     wwpLeosFlowCpuRateLimitIpControl           INTEGER,
+     wwpLeosFlowCpuRateLimitIpV6Mgmt            INTEGER,
+     wwpLeosFlowCpuRateLimitInet6	        INTEGER
+    
+ }
+
+ wwpLeosFlowCpuRateLimitPort  OBJECT-TYPE
+     SYNTAX       INTEGER(1..64) 
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Port id used as index in the rate limit entry." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 1 }      
+
+ wwpLeosFlowCpuRateLimitEnable  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                             enabled(1),
+                             disabled(2)
+                  }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Enable is used to activate the port-associated rate-limits." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 2 } 
+
+ wwpLeosFlowCpuRateLimitBootp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 3 } 
+
+ wwpLeosFlowCpuRateLimitCfm  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 4 } 
+
+ wwpLeosFlowCpuRateLimitCft  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 5 } 
+
+ wwpLeosFlowCpuRateLimitDot1x  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 6 } 
+
+ wwpLeosFlowCpuRateLimitOam  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 7 } 
+
+ wwpLeosFlowCpuRateLimitEprArp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 8 } 
+
+ wwpLeosFlowCpuRateLimitIgmp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 9 } 
+
+ wwpLeosFlowCpuRateLimitInet  OBJECT-TYPE
+     SYNTAX       INTEGER(0..5000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type ." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 10 } 
+     
+ wwpLeosFlowCpuRateLimitLacp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 11 } 
+
+ wwpLeosFlowCpuRateLimitLldp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 12 } 
+
+ wwpLeosFlowCpuRateLimitMpls  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 13 } 
+
+ wwpLeosFlowCpuRateLimitMstp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 14 } 
+
+ wwpLeosFlowCpuRateLimitPeArp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 15 } 
+
+ wwpLeosFlowCpuRateLimitPvst  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 16 } 
+
+ wwpLeosFlowCpuRateLimitRstp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 17 } 
+
+ wwpLeosFlowCpuRateLimitLpbk  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 18 } 
+
+ wwpLeosFlowCpuRateLimitRmtLpbk  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 19 } 
+
+ wwpLeosFlowCpuRateLimitCxeRx  OBJECT-TYPE
+     SYNTAX       INTEGER(0..500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 20 } 
+
+ wwpLeosFlowCpuRateLimitCxeTx  OBJECT-TYPE
+     SYNTAX       INTEGER(0..500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 21 } 
+
+ wwpLeosFlowCpuRateLimitTwamp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 22 } 
+
+ wwpLeosFlowCpuRateLimitDflt  OBJECT-TYPE
+     SYNTAX       INTEGER(0..10000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 23 } 
+
+ wwpLeosFlowCpuRateLimitTwampRsp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 24 } 
+
+ wwpLeosFlowCpuRateLimitMultiCast  OBJECT-TYPE
+     SYNTAX       INTEGER(0..1000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 25 } 
+ 
+ wwpLeosFlowCpuRateLimitBroadCast  OBJECT-TYPE
+     SYNTAX       INTEGER(0..500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 26 } 
+ 
+ wwpLeosFlowCpuRateLimitArp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..1000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 27 } 
+ 
+ wwpLeosFlowCpuRateLimitIcmp  OBJECT-TYPE
+     SYNTAX       INTEGER(0..1000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 28 } 
+ 
+ wwpLeosFlowCpuRateLimitTcpSyn  OBJECT-TYPE
+     SYNTAX       INTEGER(0..1000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 29 } 
+
+ wwpLeosFlowCpuRateLimitRaps  OBJECT-TYPE
+     SYNTAX       INTEGER(0..2500) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type.
+              Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitEntry 30 } 
+ 
+ wwpLeosFlowCpuRateLimitIpMgmt  OBJECT-TYPE
+     SYNTAX       INTEGER(0..5000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type.
+              Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitEntry 31 }
+     
+ wwpLeosFlowCpuRateLimitIpControl  OBJECT-TYPE
+     SYNTAX       INTEGER(0..5000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type.
+              Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitEntry 32 } 
+
+ wwpLeosFlowCpuRateLimitIpV6Mgmt  OBJECT-TYPE
+     SYNTAX       INTEGER(0..5000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 33 }
+
+ wwpLeosFlowCpuRateLimitInet6  OBJECT-TYPE
+     SYNTAX       INTEGER(0..5000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Port packet-per-second rate limit for packet type." 
+     ::= { wwpLeosFlowCpuRateLimitEntry 34 } 
+
+ -- 
+ -- Flow Rate Limit Stats Entry 
+ --
+ wwpLeosFlowCpuRateLimitStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowCpuRateLimitStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A table of flow rate limit statistics entries. "
+     ::= { wwpLeosFlow 32 }
+                
+ wwpLeosFlowCpuRateLimitStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowCpuRateLimitStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The rate limit statistics entry in the Table."
+     INDEX { wwpLeosFlowCpuRateLimitStatsPort }
+     ::= { wwpLeosFlowCpuRateLimitStatsTable 1 } 
+
+ WwpLeosFlowCpuRateLimitStatsEntry ::= SEQUENCE {
+     wwpLeosFlowCpuRateLimitStatsPort              INTEGER, 
+     wwpLeosFlowCpuRateLimitStatsBootpPassed       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsCfmPassed         Gauge32,
+     wwpLeosFlowCpuRateLimitStatsCftPassed         Gauge32,
+     wwpLeosFlowCpuRateLimitStatsDot1xPassed       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsOamPassed         Gauge32,
+     wwpLeosFlowCpuRateLimitStatsEprArpPassed      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIgmpPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsInetPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsLacpPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsLldpPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsMplsPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsMstpPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsPeArpPassed       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsPvstPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsRstpPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsLpbkPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsRmtLpbkPassed     Gauge32,
+     wwpLeosFlowCpuRateLimitStatsCxeRxPassed       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsCxeTxPassed       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsTwampPassed       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsDfltPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsBootpDropped      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsCfmDropped        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsCftDropped        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsDot1xDropped      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsOamDropped        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsEprArpDropped     Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIgmpDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsInetDropped  	   Gauge32,
+     wwpLeosFlowCpuRateLimitStatsLacpDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsLldpDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsMplsDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsMstpDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsPeArpDropped      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsPvstDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsRstpDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsLpbkDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsRmtLpbkDropped    Gauge32,
+     wwpLeosFlowCpuRateLimitStatsCxeRxDropped      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsCxeTxDropped      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsTwampDropped      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsDfltDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsTwampRspPassed    Gauge32,
+     wwpLeosFlowCpuRateLimitStatsTwampRspDropped   Gauge32,
+     wwpLeosFlowCpuRateLimitStatsMultiCastPassed   Gauge32,
+     wwpLeosFlowCpuRateLimitStatsMultiCastDropped  Gauge32,
+     wwpLeosFlowCpuRateLimitStatsBroadCastPassed   Gauge32,
+     wwpLeosFlowCpuRateLimitStatsBroadCastDropped  Gauge32,
+     wwpLeosFlowCpuRateLimitStatsArpPassed         Gauge32,
+     wwpLeosFlowCpuRateLimitStatsArpDropped        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIcmpPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIcmpDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsTcpSynPassed      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsTcpSynDropped     Gauge32,
+     wwpLeosFlowCpuRateLimitStatsRapsPassed        Gauge32,
+     wwpLeosFlowCpuRateLimitStatsRapsDropped       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIpMgmtPassed      Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIpMgmtDropped     Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIpControlPassed   Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIpControlDropped  Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIpV6MgmtPassed    Gauge32,
+     wwpLeosFlowCpuRateLimitStatsIpV6MgmtDropped   Gauge32,
+     wwpLeosFlowCpuRateLimitStatsInet6Passed       Gauge32,
+     wwpLeosFlowCpuRateLimitStatsInet6Dropped      Gauge32
+
+ }
+
+ wwpLeosFlowCpuRateLimitStatsPort  OBJECT-TYPE
+     SYNTAX       INTEGER(1..64) 
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Port id used as index in the rate limit entry." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 1 }         
+
+ wwpLeosFlowCpuRateLimitStatsBootpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 2 } 
+
+ wwpLeosFlowCpuRateLimitStatsCfmPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 3 } 
+
+ wwpLeosFlowCpuRateLimitStatsCftPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 4 } 
+
+ wwpLeosFlowCpuRateLimitStatsDot1xPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 5 } 
+
+ wwpLeosFlowCpuRateLimitStatsOamPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 6 } 
+
+ wwpLeosFlowCpuRateLimitStatsEprArpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 7 } 
+
+ wwpLeosFlowCpuRateLimitStatsIgmpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 8 } 
+
+ wwpLeosFlowCpuRateLimitStatsInetPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 9 } 
+
+ wwpLeosFlowCpuRateLimitStatsLacpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 10 } 
+
+ wwpLeosFlowCpuRateLimitStatsLldpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 11 } 
+
+ wwpLeosFlowCpuRateLimitStatsMplsPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 12 } 
+
+ wwpLeosFlowCpuRateLimitStatsMstpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 13 } 
+
+ wwpLeosFlowCpuRateLimitStatsPeArpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 14 } 
+
+ wwpLeosFlowCpuRateLimitStatsPvstPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 15 } 
+
+ wwpLeosFlowCpuRateLimitStatsRstpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 16 } 
+
+ wwpLeosFlowCpuRateLimitStatsLpbkPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 17 } 
+
+ wwpLeosFlowCpuRateLimitStatsRmtLpbkPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 18 } 
+
+ wwpLeosFlowCpuRateLimitStatsCxeRxPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 19 } 
+
+ wwpLeosFlowCpuRateLimitStatsCxeTxPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 20 } 
+
+ wwpLeosFlowCpuRateLimitStatsTwampPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 21 } 
+
+ wwpLeosFlowCpuRateLimitStatsDfltPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 22 } 
+
+ wwpLeosFlowCpuRateLimitStatsBootpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 23 } 
+
+ wwpLeosFlowCpuRateLimitStatsCfmDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 24 } 
+
+ wwpLeosFlowCpuRateLimitStatsCftDropped  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 25 } 
+
+ wwpLeosFlowCpuRateLimitStatsDot1xDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 26 } 
+
+ wwpLeosFlowCpuRateLimitStatsOamDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 27 } 
+
+ wwpLeosFlowCpuRateLimitStatsEprArpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 28 } 
+
+ wwpLeosFlowCpuRateLimitStatsIgmpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 29 } 
+
+ wwpLeosFlowCpuRateLimitStatsInetDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 30 } 
+
+ wwpLeosFlowCpuRateLimitStatsLacpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 31 } 
+
+ wwpLeosFlowCpuRateLimitStatsLldpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 32 } 
+
+ wwpLeosFlowCpuRateLimitStatsMplsDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 33 } 
+
+ wwpLeosFlowCpuRateLimitStatsMstpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 34 } 
+
+ wwpLeosFlowCpuRateLimitStatsPeArpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 35 } 
+
+ wwpLeosFlowCpuRateLimitStatsPvstDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 36 } 
+
+ wwpLeosFlowCpuRateLimitStatsRstpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 37 } 
+
+ wwpLeosFlowCpuRateLimitStatsLpbkDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 38 } 
+
+ wwpLeosFlowCpuRateLimitStatsRmtLpbkDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 39 } 
+
+ wwpLeosFlowCpuRateLimitStatsCxeRxDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 40 } 
+
+ wwpLeosFlowCpuRateLimitStatsCxeTxDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 41 } 
+
+ wwpLeosFlowCpuRateLimitStatsTwampDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 42 } 
+
+ wwpLeosFlowCpuRateLimitStatsDfltDropped  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 43 } 
+
+ wwpLeosFlowCpuRateLimitStatsTwampRspPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 44 } 
+
+ wwpLeosFlowCpuRateLimitStatsTwampRspDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 45 } 
+
+ wwpLeosFlowCpuRateLimitStatsMultiCastPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 46 } 
+
+ wwpLeosFlowCpuRateLimitStatsMultiCastDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 47 }
+      
+ wwpLeosFlowCpuRateLimitStatsBroadCastPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 48 } 
+
+ wwpLeosFlowCpuRateLimitStatsBroadCastDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 49 } 
+     
+ wwpLeosFlowCpuRateLimitStatsArpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 50 } 
+
+ wwpLeosFlowCpuRateLimitStatsArpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 51 }
+      
+ wwpLeosFlowCpuRateLimitStatsIcmpPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 52 } 
+
+ wwpLeosFlowCpuRateLimitStatsIcmpDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 53 }
+      
+ wwpLeosFlowCpuRateLimitStatsTcpSynPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 54 } 
+
+ wwpLeosFlowCpuRateLimitStatsTcpSynDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts." 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 55 } 
+
+wwpLeosFlowCpuRateLimitStatsRapsPassed  OBJECT-TYPE
+     SYNTAX       Gauge32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts.Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 56 } 
+
+ wwpLeosFlowCpuRateLimitStatsRapsDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts.Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 57 } 
+ 
+ wwpLeosFlowCpuRateLimitStatsIpMgmtPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts.Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 58 } 
+     
+ wwpLeosFlowCpuRateLimitStatsIpMgmtDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts.Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 59 } 
+     
+ wwpLeosFlowCpuRateLimitStatsIpControlPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts. Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 60 } 
+     
+ wwpLeosFlowCpuRateLimitStatsIpControlDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts. Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 61 } 
+
+ wwpLeosFlowCpuRateLimitStatsIpV6MgmtPassed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts. Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 62 } 
+     
+ wwpLeosFlowCpuRateLimitStatsIpV6MgmtDropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts. Not supported on 4.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 63 } 
+
+ wwpLeosFlowCpuRateLimitStatsInet6Passed  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts for Ipv6. Not supported on 6.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 64 } 
+
+ wwpLeosFlowCpuRateLimitStatsInet6Dropped  OBJECT-TYPE
+     SYNTAX       Gauge32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port packet type counts for Ipv6. Not supported on 6.x" 
+     ::= { wwpLeosFlowCpuRateLimitStatsEntry 65 } 
+ -- 
+ -- Flow Rate Limit Stats Clear Entry  
+ --
+ wwpLeosFlowCpuRateLimitStatsClearTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowCpuRateLimitStatsClearEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A table of flow rate limit entries. "
+     ::= { wwpLeosFlow 33 }
+                
+ wwpLeosFlowCpuRateLimitStatsClearEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowCpuRateLimitStatsClearEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The flow service level entry in the Table."
+     INDEX { wwpLeosFlowCpuRateLimitStatsClearPort }
+     ::= { wwpLeosFlowCpuRateLimitStatsClearTable 1 } 
+
+ WwpLeosFlowCpuRateLimitStatsClearEntry ::= SEQUENCE {
+     wwpLeosFlowCpuRateLimitStatsClearPort    INTEGER, 
+     wwpLeosFlowCpuRateLimitStatsClear        TruthValue
+ }
+
+ wwpLeosFlowCpuRateLimitStatsClearPort  OBJECT-TYPE
+     SYNTAX       INTEGER(1..64) 
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Port id used as index in the rate limit statistics clear entry." 
+     ::= { wwpLeosFlowCpuRateLimitStatsClearEntry 1 }    
+
+ wwpLeosFlowCpuRateLimitStatsClear  OBJECT-TYPE
+     SYNTAX       TruthValue 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Flag indicating whether to clear port packet statistics." 
+     ::= { wwpLeosFlowCpuRateLimitStatsClearEntry 2 } 
+
+ --
+ -- notifications
+ -- 
+ 
+ wwpLeosFlowServiceLevelPortOverProvisionedTrap NOTIFICATION-TYPE
+        OBJECTS {
+                        wwpLeosFlowServiceLevelPort
+                }
+        STATUS     current
+        DESCRIPTION
+                "A wwpLeosFlowServiceLevelPortOverProvisionedTrap notification is sent 
+                 when the provisioned bandwidth exceeds the total bandwidth available 
+                 for a port. This situation may also occur when changes in a 
+                 link aggregation group (such as deleting a port from the group) 
+                 decrease the total bandwidth or at the bootTime when the  
+                 link aggregation groups are formed."
+        ::= { wwpLeosFlowNotifications 1 }
+
+ wwpLeosFlowServiceLevelPortUnderProvisionedTrap NOTIFICATION-TYPE
+        OBJECTS {
+                        wwpLeosFlowServiceLevelPort
+                }
+        STATUS     current
+        DESCRIPTION
+                "A wwpLeosFlowServiceLevelPortUnderProvisionedTrap notification is sent when 
+                 the previously over-provisioned situation is resolved for a port."
+        ::= { wwpLeosFlowNotifications 2 }
+        
+ wwpLeosFlowL2SacHighThreshold  NOTIFICATION-TYPE
+        OBJECTS {
+                        wwpLeosFlowL2SacPortId,
+                        wwpLeosFlowL2SacNetType,
+                        wwpLeosFlowSacNetValue
+                }
+        STATUS     current
+        DESCRIPTION
+                "A wwpLeosFlowL2SacHighThreshold notification is sent whenever Macs learned exceeds SAC threshold limit."
+        ::= { wwpLeosFlowNotifications 3 }     
+        
+ wwpLeosFlowL2SacNormalThreshold  NOTIFICATION-TYPE
+        OBJECTS {
+                        wwpLeosFlowL2SacPortId,
+                        wwpLeosFlowL2SacNetType,
+                        wwpLeosFlowSacNetValue
+                }
+        STATUS     current
+        DESCRIPTION
+                "A wwpLeosFlowL2SacNormalThreshold notification is sent whenever Macs learned gets back to normal after 
+                exceeding the SAC threshold limit."
+        ::= { wwpLeosFlowNotifications 4 }
+        
+wwpLeosFlowMacMotionNotification NOTIFICATION-TYPE
+        OBJECTS {
+                                wwpLeosFlowMacMotionAttrOldPort,
+                                wwpLeosFlowMacMotionAttrOldVlan,
+                wwpLeosFlowMacMotionAttrNewPort,
+                wwpLeosFlowMacMotionAttrNewVlan,
+                                wwpLeosFlowMacMotionAttrMacAddr
+                }
+        STATUS     current
+        DESCRIPTION
+                "A wwpLeosFlowMacMotionNotification is sent whenever a learned MAC
+                moves from one port/vlan to a new port/vlan, at a rate defined by
+                wwpLeosFlowMacMotionEventsInterval.  The five objects returned by
+                this trap are the MAC address that moved, the original port/vlan
+                the MAC was learned on, and the new port/vlan the MAC has moved to."
+        ::= { wwpLeosFlowNotifications 5 }
+
+--
+-- Notification Attributes
+--
+
+wwpLeosFlowMacMotionAttrOldPort OBJECT-TYPE
+        SYNTAX          INTEGER(1..65536)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The port number associated with the MAC that moved."
+        ::= { wwpLeosFlowNotifAttrs 1 }
+        
+wwpLeosFlowMacMotionAttrOldVlan OBJECT-TYPE
+        SYNTAX          INTEGER(1..4094)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The vlan number associated with the MAC that moved."
+        ::= { wwpLeosFlowNotifAttrs 2 } 
+        
+wwpLeosFlowMacMotionAttrNewPort OBJECT-TYPE
+        SYNTAX          INTEGER(1..65536)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The port number associated with the MAC that moved."
+        ::= { wwpLeosFlowNotifAttrs 3 }
+        
+wwpLeosFlowMacMotionAttrNewVlan OBJECT-TYPE
+        SYNTAX          INTEGER(1..4094)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The vlan number associated with the MAC that moved."
+        ::= { wwpLeosFlowNotifAttrs 4 }
+        
+wwpLeosFlowMacMotionAttrMacAddr OBJECT-TYPE
+                SYNTAX                  MacAddress
+                MAX-ACCESS              accessible-for-notify
+                STATUS                  current
+                DESCRIPTION             "The MAC address that moved."
+                ::= { wwpLeosFlowNotifAttrs 5 }
+                
+ --
+ --  Flow Service Level Total Stats Table
+ -- 
+ wwpLeosFlowServiceTotalStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowServiceTotalStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "A table of flow service statistics entries."
+     ::= { wwpLeosFlow 34 }
+                
+ wwpLeosFlowServiceTotalStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowServiceTotalStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "A flow service statistics entry in the 
+             wwpLeosFlowServiceTotalStatsTable."
+     INDEX { wwpLeosFlowSMappingNetType, wwpLeosFlowSMappingNetValue, 
+             wwpLeosFlowSMappingSrcType, wwpLeosFlowSMappingSrcValue,
+                  wwpLeosFlowSMappingDstType, wwpLeosFlowSMappingDstValue, 
+                  wwpLeosFlowSMappingCosType, wwpLeosFlowSMappingCosValue }
+   
+
+     ::= { wwpLeosFlowServiceTotalStatsTable 1 }
+     
+ WwpLeosFlowServiceTotalStatsEntry ::= SEQUENCE {
+     wwpLeosFlowServiceTotalStatsRxHi             Counter32,
+     wwpLeosFlowServiceTotalStatsRxLo             Counter32,
+     wwpLeosFlowServiceTotalStatsTxHi             Counter32,
+     wwpLeosFlowServiceTotalStatsTxLo             Counter32,
+     wwpLeosFlowServiceTotalStatsType             INTEGER
+ }    
+     
+ wwpLeosFlowServiceTotalStatsRxHi    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The number of bytes received for this flow service 
+              entry. This counter represents the upper 32 bits 
+              of the counter value"
+     ::= { wwpLeosFlowServiceTotalStatsEntry 1 }     
+     
+ wwpLeosFlowServiceTotalStatsRxLo    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The number of bytes received for this flow service 
+              entry. This counter represents the lower 32 bits 
+              of the counter value."
+     ::= { wwpLeosFlowServiceTotalStatsEntry 2 }  
+     
+ wwpLeosFlowServiceTotalStatsTxHi    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The number of bytes transmitted for this flow service 
+              entry. This counter represents the upper 32 bits of 
+              the counter value."
+     ::= { wwpLeosFlowServiceTotalStatsEntry 3 }     
+     
+ wwpLeosFlowServiceTotalStatsTxLo    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The number of bytes transmitted for this flow service 
+              entry. This counter represents the lower 32 bits of 
+              the counter value."
+     ::= { wwpLeosFlowServiceTotalStatsEntry 4 }
+
+ wwpLeosFlowServiceTotalStatsType       OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        forward(1),
+                        drop(2)
+                    }   
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Specifies the type of statistics for given entry."
+     ::= { wwpLeosFlowServiceTotalStatsEntry 5 }
+ 
+ --
+ --  Flow Service Level Total Stats Table
+ -- 
+ wwpLeosFlowPortServiceLevelTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosFlowPortServiceLevelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A Table of flow Port Service Level  entries."
+     ::= { wwpLeosFlow 40 }
+                
+ wwpLeosFlowPortServiceLevelEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosFlowPortServiceLevelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "A flow service statistics entry in the 
+             wwpLeosFlowPortServiceLevelTable."
+     INDEX { wwpLeosFlowPortServiceLevelPort}
+     ::= { wwpLeosFlowPortServiceLevelTable 1 }
+     
+ WwpLeosFlowPortServiceLevelEntry ::= SEQUENCE {
+     wwpLeosFlowPortServiceLevelPort            INTEGER,
+     wwpLeosFlowPortServiceLevelMaxBandwidth    Integer32,
+     wwpLeosFlowPortServiceLevelQueueSize       INTEGER,
+     wwpLeosFlowPortServiceLevelQueueSizeYellow INTEGER,
+     wwpLeosFlowPortServiceLevelQueueSizeRed    INTEGER,
+     wwpLeosFlowPortServiceLevelFlowGroup       INTEGER,
+     wwpLeosFlowPortServiceLevelRedCurve        Unsigned32
+ }
+
+ wwpLeosFlowPortServiceLevelPort        OBJECT-TYPE
+     SYNTAX       INTEGER(0..65535) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port id used as index in the port service level entry. 
+              " 
+     ::= { wwpLeosFlowPortServiceLevelEntry 1 } 
+   
+ wwpLeosFlowPortServiceLevelMaxBandwidth        OBJECT-TYPE
+     SYNTAX       Integer32 (0..8000000) 
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Sets the max egress bandwidth on a port. 
+              " 
+     ::= { wwpLeosFlowPortServiceLevelEntry 2 } 
+
+ wwpLeosFlowPortServiceLevelQueueSize  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      size0KB(0),
+                      size16KB(1),
+                      size32KB(2),
+                      size64KB(3),
+                      size128KB(4),
+                      size256KB(5),
+                      size512KB(6),
+                      size1MB(7),
+                      size2MB(8),
+                      size4MB(9)
+                  }     
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "The size of the traffic queue provisioned for 
+              this port service level entry.  This may also be 
+              referred to as Latency Tolerance." 
+     ::= { wwpLeosFlowPortServiceLevelEntry 3 } 
+
+ wwpLeosFlowPortServiceLevelQueueSizeYellow  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      size16KB(1),
+                      size32KB(2),
+                      size64KB(3),
+                      size128KB(4)
+                  }     
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "The size of the yellow traffic queue provisioned for 
+              this service level entry. Also known as the discard
+              preferred queue size. " 
+     ::= { wwpLeosFlowPortServiceLevelEntry 4 } 
+
+ wwpLeosFlowPortServiceLevelQueueSizeRed  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      size16KB(1),
+                      size32KB(2),
+                      size64KB(3),
+                      size128KB(4)
+                  }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "The size of the red traffic queue provisioned for 
+              this service level entry.  Also known as the 
+              discard wanted queue size" 
+     ::= { wwpLeosFlowPortServiceLevelEntry 5 } 
+
+ wwpLeosFlowPortServiceLevelFlowGroup  OBJECT-TYPE
+     SYNTAX       INTEGER { 
+                        enable(1),
+                        disable(2)                      
+                        }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Service level Id direction used as index in the service level entry." 
+     ::= { wwpLeosFlowPortServiceLevelEntry 6 } 
+
+ wwpLeosFlowPortServiceLevelRedCurve    OBJECT-TYPE
+      SYNTAX         Unsigned32 (0..64)
+      MAX-ACCESS     read-create
+      STATUS         current
+      DESCRIPTION
+             "This object is used to specifies the red curve index to be
+              used for the given port service level.  If this OID is not
+              specified, the system will use the default value of this object
+              which is the default port red-curve (zero). Valid values for this 
+              OID are 0, 5-64"
+      ::= { wwpLeosFlowPortServiceLevelEntry 7 } 
+   
+ --
+ -- burst config
+ --
+ wwpLeosFlowBurstConfigBacklogLimit OBJECT-TYPE
+		SYNTAX			Unsigned32(0..131072)
+		MAX-ACCESS     read-write
+		STATUS   		current
+		DESCRIPTION
+			"Sets the queue backlog-limit"
+		::={wwpLeosFlow 41}
+
+ wwpLeosFlowBurstConfigMulticastLimit OBJECT-TYPE
+		SYNTAX			Unsigned32(0..131072)
+		MAX-ACCESS     read-write
+		STATUS   		current
+		DESCRIPTION
+			"Sets the multicast backlog-limit"
+		::={wwpLeosFlow 42}
+
+ wwpLeosFlowBurstConfigVlanPriFltrOnThld OBJECT-TYPE
+		SYNTAX 			INTEGER(0..255)
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The threshold of buffer use at which Vlan Priority Filtering
+			is activated if enabled"
+		::={ wwpLeosFlow 43 } 
+
+ wwpLeosFlowBurstConfigVlanPriFltrOffThld OBJECT-TYPE
+		SYNTAX 			INTEGER(0..255)
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The threshold of buffer use at which Vlan Priority Filtering
+			is deactivated if enabled"
+		::={ wwpLeosFlow 44 } 
+
+ wwpLeosFlowBurstConfigVlanPriFltrPriMatch OBJECT-TYPE
+		SYNTAX 			INTEGER(0..7)
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"when the Vlan Priority filter is activated 
+			all priorities less than this are dropped"
+		::={ wwpLeosFlow 45 } 
+
+ wwpLeosFlowBurstConfigVlanPriFltrState OBJECT-TYPE
+		SYNTAX			INTEGER{
+										enabled(1),
+										disabled(2)
+										}
+		MAX-ACCESS     read-write
+		STATUS   		current
+		DESCRIPTION
+			"Globaly enables or disabled the Flow Vlan Priority Filter"
+		::={wwpLeosFlow 46}
+END
+
+ --
+ -- WWP-LE-OS-FLOW-MIB
+ --
+ 
+

@@ -1,0 +1,2095 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-PBT-MIB.my
+ --
+ --
+
+ WWP-LEOS-PBT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   Integer32, Unsigned32, Counter32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY                       
+        FROM SNMPv2-SMI                 
+   TruthValue, DisplayString, MacAddress, RowStatus                 
+        FROM SNMPv2-TC
+   OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+   wwpLeosVplsEncapTunnelId, wwpLeosVplsEncapTunnelName, wwpLeosVplsEncapTunnelActive, wwpLeosVplsEncapTunnelBVID
+   			FROM WWP-LEOS-VPLS-MIB     
+   wwpModulesLeos           
+        FROM WWP-SMI;
+                    
+ wwpLeosPbtMIB MODULE-IDENTITY
+            LAST-UPDATED "201107050000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+            DESCRIPTION
+	            "Added objects wwpLeosPbtVirtualCircuitDestBridgeIndex, wwpLeosPbtTunnelSwitchOverHoldTime, WwpLeosTcePbtServiceEntry
+		     wwpLeosPbtLocalBridgeNameMacMapEntry, wwpLeosTcePbtTnlGroupEntry, wwpLeosTcePbtEncapTnlEntry, 
+		     wwpLeosTcePbtDecapTnlEntry, wwpLeosTcePbtServiceUserFrameL2TransformEntry. 
+		     Added Notifications wwpLeosTcePbtTunnelActivateNotification, wwpLeosTcePbtTunnelDeactivateNotification, 
+		     wwpLeosTcePbtTunnelReversionNotification."
+	    REVISION   "201107050000Z"
+	    DESCRIPTION
+                  "Added wwpLeosPbtTransitTunnelEtypeRemark."
+            REVISION    "201105051600Z"  
+	    DESCRIPTION
+	            "Deprecated object wwpLeosPbtTunnelFaultNotification."
+	    REVISION     "201101310000Z"
+	    DESCRIPTION
+                    "Added wwpLeosPbtTunnelReversionState and wwpLeosPbtTunnelReversionHoldTime."
+            REVISION    "200703021700Z"
+            DESCRIPTION
+                    "This MIB module defines the managed objects for the PBT 
+                     (Provider Backbone Transport) feature for LEOS based WWP products."  
+            REVISION    "200608251700Z"
+            DESCRIPTION
+                  "Initial creation." 
+            ::= { wwpModulesLeos 38 }
+
+ --
+ -- Node definitions
+ --
+ wwpLeosPbtMIBObjects OBJECT IDENTIFIER ::= { wwpLeosPbtMIB 1 }
+ wwpLeosPbt           OBJECT IDENTIFIER ::= { wwpLeosPbtMIBObjects 1 } 
+  
+ -- Notifications   
+ wwpLeosPbtMIBNotificationPrefix  OBJECT IDENTIFIER ::=  { wwpLeosPbtMIB 2 } 
+ wwpLeosPbtMIBNotifications       OBJECT IDENTIFIER ::=  { wwpLeosPbtMIBNotificationPrefix 0 }
+
+ -- Conformance information  
+ wwpLeosPbtMIBConformance OBJECT IDENTIFIER ::= { wwpLeosPbtMIB 3 } 
+ wwpLeosPbtMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosPbtMIBConformance 1 }                
+ wwpLeosPbtMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosPbtMIBConformance 2 } 
+
+ --
+ -- Pbt Global Attrs
+ --                                                           
+ wwpLeosPbtGlobalAttrs  OBJECT IDENTIFIER ::= { wwpLeosPbt 1 } 
+ 
+ wwpLeosPbtBridgeMac OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This represents the provider mac address to be used as source mac during PBT encapsulation.
+         If this object is not set then it will return default mac derived from chassis mac."
+     ::= { wwpLeosPbtGlobalAttrs 1 }
+ 
+ wwpLeosPbtServiceTagEType OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(1..2))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This represents the etype value to be used in I-Tag (Service tag) section of PBT encapsulation. 
+        The I-tag ether type cannot be modified in native mode PBT"
+     ::= { wwpLeosPbtGlobalAttrs 2 }
+ 
+ wwpLeosPbtTunnelTagEtype OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(1..2))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This represents the etype value to be used in B-Tag section of PBT encapsulation. Valid values are
+        8100, 9100 & 88a8"
+     ::= { wwpLeosPbtGlobalAttrs 3 }                                     
+                               
+ wwpLeosPbtTunnelReversionState OBJECT-TYPE
+     SYNTAX      INTEGER {
+     				enabled(1),
+     				disabled(2)
+     			 }     			 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Setting this object will enable or disable automatic tunnel reversion from backup to primary
+         if primary comes back up. Device will wait for wwpLeosPbtTunnelReversionHoldTime before switching
+         that data traffic back to primary automatically."  
+     DEFVAL     {disabled}
+     ::= { wwpLeosPbtGlobalAttrs 4 } 
+     
+ wwpLeosPbtTunnelReversionHoldTime OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-write
+     STATUS      current     
+     DESCRIPTION
+        "This object represents the hold time before data traffic on the backup tunnel will automatically 
+         revert to the primary tunnel. "
+     DEFVAL     {3000}     
+     ::= { wwpLeosPbtGlobalAttrs 5 }
+
+ wwpLeosPbtTransitTunnelEtypeRemark OBJECT-TYPE
+      SYNTAX     INTEGER {
+     				enabled(1),
+     				disabled(2)
+     			 }     			 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Setting this object will enable or disable remarking of the EtherType field in the B-Tag
+         (tunnel) portion of PBT frames that are transiting through the device without PBT encapsulation,
+         nor decapsulation.  While enabled, applicable PBT transit frames egressing a PBT enhanced port
+         will have their B-Tag EtherType marked with the value configured as the wwpLeosPbtTunnelTagEtype."
+     DEFVAL     {enabled}
+     ::= { wwpLeosPbtGlobalAttrs 6 } 
+
+wwpLeosPbtAdminMode OBJECT-TYPE
+     SYNTAX     INTEGER {
+    				nonNative(1),
+     				native(2)
+     			 }     			 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        " This object represents PBT Admin mode. Some platforms support either non-native or native mode."
+     ::= { wwpLeosPbtGlobalAttrs 7 } 
+     
+wwpLeosPbtOperMode OBJECT-TYPE
+     SYNTAX     INTEGER {
+    				nonNative(1),
+     				native(2)
+     			 }     			 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        " This object represents PBT Oper mode. Some platforms support either non-native or native mode."
+     ::= { wwpLeosPbtGlobalAttrs 8 }     
+     
+ wwpLeosPbtServiceVlanTpid OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(1..2))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION     
+        "When operating in native mode, this is the value of the
+        service vlan TPID that will be used if retain-stag is set to TRUE.
+        This is configurable only in native mode PBT. In non-native
+        mode, this value defaults to the 0x8100 and cannot be changed. Valid
+        values are 8100, 9100 and 88a8"
+     ::= { wwpLeosPbtGlobalAttrs 9 }  
+
+ wwpLeosPbtTunnelSwitchOverHoldTime OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-write
+     STATUS      current     
+     DESCRIPTION
+        "This object represents the hold time before data traffic on backup tunnel will automatically 
+         switchover to primary tunnel."
+     DEFVAL     {0}     
+     ::= { wwpLeosPbtGlobalAttrs 10 }
+
+ -- 
+ -- add new tce attribute for reverseTime? Yes, to add in the revsere tinme.
+ -- 
+     
+ --
+ -- PBT host name to mac table
+ -- 
+ wwpLeosPbtBridgeNameMacMapTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosPbtBridgeNameMacMapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the host names to mac mapping table.
+             To create entry in this table use SNMP multiple set operation.
+             -  wwpLeosPbtBridgeNameMacMapBridgeName must be specified.
+             -  wwpLeosPbtBridgeNameMacMapMacAddr must be specified.
+             -  wwpLeosPbtBridgeNameMacMapRowStatus must be  specified.
+             "
+     ::= { wwpLeosPbt 2 }
+     
+ wwpLeosPbtBridgeNameMacMapEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosPbtBridgeNameMacMapEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The host name to mac address table entry indexed by wwpLeosPbtBridgeNameMacMapIndex."
+     INDEX { wwpLeosPbtBridgeNameMacMapIndex }
+     ::= { wwpLeosPbtBridgeNameMacMapTable 1 }
+     
+ WwpLeosPbtBridgeNameMacMapEntry ::=  SEQUENCE {
+     wwpLeosPbtBridgeNameMacMapIndex                     INTEGER,
+     wwpLeosPbtBridgeNameMacMapBridgeName                  DisplayString,
+     wwpLeosPbtBridgeNameMacMapMacAddr                   MacAddress,
+     wwpLeosPbtBridgeNameMacMapUseCount				   Counter32,
+     wwpLeosPbtBridgeNameMacMapRowStatus                 RowStatus
+ }
+ 
+ wwpLeosPbtBridgeNameMacMapIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..64)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the unique index in the table."
+     ::= { wwpLeosPbtBridgeNameMacMapEntry 1 }
+  
+ wwpLeosPbtBridgeNameMacMapBridgeName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..15))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the host name of the provider edge device.
+         This object is not allowed to be modified."
+     ::= { wwpLeosPbtBridgeNameMacMapEntry 2 }
+  
+ wwpLeosPbtBridgeNameMacMapMacAddr OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the mac address of the provider edge device.
+         This object is not allowed to be modified."
+     ::= { wwpLeosPbtBridgeNameMacMapEntry 3 }
+ 
+ wwpLeosPbtBridgeNameMacMapUseCount OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object specifies the total number of encap tunnels using this entry."
+     ::= { wwpLeosPbtBridgeNameMacMapEntry 4 }
+     
+ wwpLeosPbtBridgeNameMacMapRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry 
+         in the table.       
+         Setting this object to 'destroy' will delete the entry
+         from the table."
+     ::= { wwpLeosPbtBridgeNameMacMapEntry 5 }
+ 
+  --
+  -- BVID Reservation
+  wwpLeosPbtReservedBVIDTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosPbtReservedBVIDEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the BVID vlans reserved for provider backbone bridge tunnels."
+     ::= { wwpLeosPbt 3 }
+     
+ wwpLeosPbtReservedBVIDEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosPbtReservedBVIDEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The entry to reserve BVID vlans vlans for provider backbone bridge tunnels."
+     INDEX {wwpLeosPbtReservedBVID}
+     ::= { wwpLeosPbtReservedBVIDTable 1 }
+     
+ WwpLeosPbtReservedBVIDEntry ::=  SEQUENCE { 
+     wwpLeosPbtReservedBVID          Integer32,
+     wwpLeosPbtReservedBVIDRowStatus    RowStatus
+ }
+
+ wwpLeosPbtReservedBVID OBJECT-TYPE
+     SYNTAX      Integer32 (2..4094)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object is used to specify the VLAN ID to be reserved for PBT tunnels. "
+     ::= { wwpLeosPbtReservedBVIDEntry 1 }
+
+ wwpLeosPbtReservedBVIDRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'createandgo' will reserve the BVID VLAN
+         for provider backbone bridge tunnels.
+         Setting this object to 'destroy will no longer have BVID VLAN
+         reserved for the virtual switch."
+     ::= { wwpLeosPbtReservedBVIDEntry 2 }                              
+ 
+ --
+ -- Virtual circuit pbt table
+ -- 
+ wwpLeosPbtVirtualCircuitTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosPbtVirtualCircuitEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the virtual circuit mac in mac table.
+             To create entry use SNMP multiple set operation because following mib objects 
+             needs to be set when creating entry in the table.
+             - wwpLeosPbtVirtualCircuitName must be specified.             
+             - wwpLeosPbtVirtualCircuitIngressISID must be specified.
+             - wwpLeosPbtVirtualCircuitEgressISID must be specified.             
+             - wwpLeosPbtVirtualCircuitRowStatus must be specified.
+             - wwpLeosPbtVirtualCircuitIngressISID & wwpLeosPbtVirtualCircuitEgressISID
+               must be the same values."
+     ::= { wwpLeosPbt 4 }
+     
+ wwpLeosPbtVirtualCircuitEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosPbtVirtualCircuitEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The virtual circuit table entry index by wwpLeosPbtVirtualCircuitIndex."
+     INDEX { wwpLeosPbtVirtualCircuitIndex }
+     ::= { wwpLeosPbtVirtualCircuitTable 1 }
+     
+ WwpLeosPbtVirtualCircuitEntry ::=  SEQUENCE {
+     wwpLeosPbtVirtualCircuitIndex                         INTEGER,                
+     wwpLeosPbtVirtualCircuitName                          DisplayString,     
+     wwpLeosPbtVirtualCircuitFixedEncapTunnelId              Integer32,     
+     wwpLeosPbtVirtualCircuitDestBridgeIndex               Integer32,     
+     wwpLeosPbtVirtualCircuitIngressISID                   Integer32,
+     wwpLeosPbtVirtualCircuitEgressISID                    Integer32,      
+     wwpLeosPbtVirtualCircuitOperState					   INTEGER,
+     wwpLeosPbtVirtualCircuitEncapTunnelIdInUse            Integer32,     
+     wwpLeosPbtVirtualCircuitRowStatus                	   RowStatus,     
+     wwpLeosPbtVirtualCircuitRetainSTAG                    TruthValue,
+     wwpLeosPbtVirtualCircuitStag                          Integer32     
+ }
+ 
+ wwpLeosPbtVirtualCircuitIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the virtual circuit mac in mac index in the table.
+         This number should be unique in the table."
+     ::= { wwpLeosPbtVirtualCircuitEntry 1 }
+ 
+ wwpLeosPbtVirtualCircuitName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..15))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the name of the mac in mac virtual circuit."
+     ::= { wwpLeosPbtVirtualCircuitEntry 2 } 
+ 
+ wwpLeosPbtVirtualCircuitFixedEncapTunnelId OBJECT-TYPE
+     SYNTAX      Integer32 
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the fixed tunnel this virtual circuit should be mapped to."
+     ::= { wwpLeosPbtVirtualCircuitEntry 3 }     
+   
+ wwpLeosPbtVirtualCircuitDestBridgeIndex OBJECT-TYPE
+     SYNTAX      Integer32 (0..64)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the provider destination host name used for this tunnel.
+         This must be set to one of the value specified by wwpLeosPbtBridgeNameMacMapIndex.
+         if set to 0, device will interpret it as not specified."
+     ::= { wwpLeosPbtVirtualCircuitEntry 4 }
+  
+  wwpLeosPbtVirtualCircuitIngressISID OBJECT-TYPE
+     SYNTAX      Integer32 (1..16777215)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the ingress ISID associated with the virtual circuit."
+     ::= { wwpLeosPbtVirtualCircuitEntry 5 }
+  
+  wwpLeosPbtVirtualCircuitEgressISID OBJECT-TYPE
+     SYNTAX      Integer32 (1..16777215)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the egress ISID associated with the virtual circuit."
+     ::= { wwpLeosPbtVirtualCircuitEntry 6 }  
+  
+  wwpLeosPbtVirtualCircuitOperState OBJECT-TYPE
+     SYNTAX      INTEGER {
+     				disabled(1),
+     				enabled(2)     				
+     			}
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the operational state of this virtual circuit."
+     ::= { wwpLeosPbtVirtualCircuitEntry 7 }
+  
+  wwpLeosPbtVirtualCircuitEncapTunnelIdInUse OBJECT-TYPE
+     SYNTAX      Integer32 
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the tunnels ID of the active tunnel this virtual circuit is currently using. 
+         This tunnel can be primary of backup tunnel."
+     ::= { wwpLeosPbtVirtualCircuitEntry 8 }
+
+  wwpLeosPbtVirtualCircuitRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, a manager must set this object to 'destroy'
+             If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosPbtVirtualCircuitEntry 9 }
+   
+  wwpLeosPbtVirtualCircuitRetainSTAG OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "When operating in PBT mode, writing TRUE(1)
+         to this object forces this vc to retain the S-Tag.
+         When FALSE(0) is written, the S-Tag will be popped
+         on egress and push the tag on ingress."
+     ::= { wwpLeosPbtVirtualCircuitEntry 10 } 
+     
+  wwpLeosPbtVirtualCircuitStag OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "When operating in PBT mode, this is the value of the
+        s-tag that will be used if retain-stag is set to TRUE.
+        This is configurable only in native mode PBT. In non-native
+        mode, this value defaults to the RVID and cannot be changed."
+     ::= { wwpLeosPbtVirtualCircuitEntry 11 }      
+  
+ --
+ -- PBT VC stats
+ wwpLeosPbtVirtualCircuitStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosPbtVirtualCircuitStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the mpls virtual circuit stats
+             table."
+     ::= { wwpLeosPbt 5 }
+     
+ wwpLeosPbtVirtualCircuitStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosPbtVirtualCircuitStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The mpls virtual circuit stats table entry index by 
+              wwpLeosPbtVirtualCircuitMplsIndex."
+     INDEX { wwpLeosPbtVirtualCircuitIndex }
+     ::= { wwpLeosPbtVirtualCircuitStatsTable 1 }
+     
+ WwpLeosPbtVirtualCircuitStatsEntry ::=  SEQUENCE {   
+         wwpLeosPbtVirtualCircuitTxBytesHi Counter32,
+         wwpLeosPbtVirtualCircuitTxBytesLo Counter32,    
+         wwpLeosPbtVirtualCircuitRxBytesHi Counter32,
+         wwpLeosPbtVirtualCircuitRxBytesLo Counter32
+ }
+ 
+ wwpLeosPbtVirtualCircuitTxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits transmitted for 
+         given virtual circuit."
+     ::= { wwpLeosPbtVirtualCircuitStatsEntry 1 }
+     
+ wwpLeosPbtVirtualCircuitTxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits transmitted for 
+         given virtual circuit."
+     ::= { wwpLeosPbtVirtualCircuitStatsEntry 2 }
+      
+ wwpLeosPbtVirtualCircuitRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for 
+         given mpls virtual circuit."
+     ::= { wwpLeosPbtVirtualCircuitStatsEntry 3 }
+     
+ wwpLeosPbtVirtualCircuitRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for 
+         given virtual circuit."
+     ::= { wwpLeosPbtVirtualCircuitStatsEntry 4 }  
+     
+     
+ --
+ -- Local Bridge
+ --        
+ 
+ wwpLeosPbtLocalBridgeNameMacMapTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosPbtLocalBridgeNameMacMapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the host names to mac mapping table.
+             To create entry in this table use SNMP multiple set operation.
+             -  wwpLeosPbtHostNameMacMapHostName must be specified.
+             -  wwpLeosPbtHostNameMacMapMacAddr must be specified.
+             -  wwpLeosPbtHostNameMacMapRowStatus must be  specified.
+             "
+     ::= { wwpLeosPbt 6 }
+     
+ wwpLeosPbtLocalBridgeNameMacMapEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosPbtLocalBridgeNameMacMapEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The host name to mac address table entry indexed by wwpLeosPbtLocalBridgeNameMacMapIndex."
+     INDEX { wwpLeosPbtLocalBridgeNameMacMapIndex }
+     ::= { wwpLeosPbtLocalBridgeNameMacMapTable 1 }
+     
+ WwpLeosPbtLocalBridgeNameMacMapEntry ::=  SEQUENCE {
+     wwpLeosPbtLocalBridgeNameMacMapIndex                     INTEGER,
+     wwpLeosPbtLocalBridgeNameMacMapBridgeName                  DisplayString,
+     wwpLeosPbtLocalBridgeNameMacMapMacAddr                   MacAddress,
+     wwpLeosPbtLocalBridgeNameMacMapUseCount				   Counter32,
+     wwpLeosPbtLocalBridgeNameMacMapRowStatus                 RowStatus
+ }
+ 
+ wwpLeosPbtLocalBridgeNameMacMapIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..64)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the unique index in the table."
+     ::= { wwpLeosPbtLocalBridgeNameMacMapEntry 1 }
+  
+ wwpLeosPbtLocalBridgeNameMacMapBridgeName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..15))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the host name of the provider edge device.
+         This object is not allowed to be modified."
+     ::= { wwpLeosPbtLocalBridgeNameMacMapEntry 2 }
+  
+ wwpLeosPbtLocalBridgeNameMacMapMacAddr OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the mac address of the provider edge device.
+         This object is not allowed to be modified."
+     ::= { wwpLeosPbtLocalBridgeNameMacMapEntry 3 }
+ 
+ wwpLeosPbtLocalBridgeNameMacMapUseCount OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object specifies the total number of encap tunnels using this entry."
+     ::= { wwpLeosPbtLocalBridgeNameMacMapEntry 4 }
+     
+ wwpLeosPbtLocalBridgeNameMacMapRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry 
+         in the table.       
+         Setting this object to 'destroy' will delete the entry
+         from the table."
+     ::= { wwpLeosPbtLocalBridgeNameMacMapEntry 5 }
+
+ --
+ -- TCE PBT 
+ --
+ wwpLeosTcePbt        OBJECT IDENTIFIER ::= { wwpLeosPbt 10 } 
+ 
+ --
+ -- TCE PBT service table
+ --
+ wwpLeosTcePbtServiceTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosTcePbtServiceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the Pbt Service table.
+             To create entry in this table use SNMP multiple set operation.
+             -  wwpLeosTcePbtServiceName must be specified.
+             -  wwpLeosTcePbtServiceIngressIsId must be specified.
+             -  wwpLeosTcePbtServiceEgressIsId must be specified.
+             -  wwpLeosTcePbtServiceRowStatus must be  specified.
+             "
+     ::= { wwpLeosTcePbt 1 }
+     
+ wwpLeosTcePbtServiceEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosTcePbtServiceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The Pbt Service table entry indexed by wwpLeosTcePbtServiceIndex."
+     INDEX { wwpLeosTcePbtServiceIndex }
+     ::= { wwpLeosTcePbtServiceTable 1 }
+     
+ WwpLeosTcePbtServiceEntry ::=  SEQUENCE {
+     wwpLeosTcePbtServiceIndex                     Unsigned32,
+     wwpLeosTcePbtServiceName                      DisplayString,
+     wwpLeosTcePbtServiceOperStatus                INTEGER,
+     wwpLeosTcePbtServiceFloodContProfileId        INTEGER,
+     wwpLeosTcePbtServiceFloodContProfileName      DisplayString,
+     wwpLeosTcePbtServiceVsIndex                   Unsigned32,
+     wwpLeosTcePbtServiceVsName                    DisplayString,
+     wwpLeosTcePbtServiceTnlGroupIndex             Unsigned32,
+     wwpLeosTcePbtServiceTnlGroupName              DisplayString,
+     wwpLeosTcePbtServiceIngressIsId               Unsigned32,
+     wwpLeosTcePbtServiceEgressIsId                Unsigned32,
+     wwpLeosTcePbtServiceFixedEgressPcp            INTEGER,
+     wwpLeosTcePbtServiceFrameCosPolicy            INTEGER,
+     wwpLeosTcePbtServiceFrameCosMapIndex          INTEGER,
+     wwpLeosTcePbtServiceFrameCosMapName           DisplayString,
+     wwpLeosTcePbtServiceResolvedCosPolicy         INTEGER,
+     wwpLeosTcePbtServiceResolvedCosProfileIndex   INTEGER,
+     wwpLeosTcePbtServiceResolvedCosProfileName    DisplayString, 
+     wwpLeosTcePbtServiceIngressMeterProfileId	   INTEGER,
+     wwpLeosTcePbtServiceIngressMeterProfileName   DisplayString,
+     wwpLeosTcePbtServiceIngressMeterPolicy	   INTEGER,
+     wwpLeosTcePbtServiceRowStatus                 RowStatus
+ }
+ 
+ wwpLeosTcePbtServiceIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This represents the unique index in the table."
+     ::= { wwpLeosTcePbtServiceEntry 1 }
+  
+ wwpLeosTcePbtServiceName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the Pbt service name. This object is not allowed 
+         to be modified."
+     ::= { wwpLeosTcePbtServiceEntry 2 }
+  
+  wwpLeosTcePbtServiceOperStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     disabled(1),
+                     enabled(2)                 
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the operational state of this service."
+     ::= { wwpLeosTcePbtServiceEntry 3 }
+    
+ wwpLeosTcePbtServiceFloodContProfileId OBJECT-TYPE
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Ingress Flood Container Profile Index"
+     ::= { wwpLeosTcePbtServiceEntry 4 }
+  
+ wwpLeosTcePbtServiceFloodContProfileName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Ingress Flood Container Profile Name"
+     ::= { wwpLeosTcePbtServiceEntry 5 }
+  
+ wwpLeosTcePbtServiceVsIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Vs Index to which Pbt service is attached. To detach Pbt Service with the VS, set this object to 0."
+     ::= { wwpLeosTcePbtServiceEntry 6 }
+  
+ wwpLeosTcePbtServiceVsName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Virtual Switch Name to which Pbt Service is attached."
+     ::= { wwpLeosTcePbtServiceEntry 7 }
+  
+ wwpLeosTcePbtServiceTnlGroupIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Tunnel Group Index"
+     ::= { wwpLeosTcePbtServiceEntry 8 }
+  
+ wwpLeosTcePbtServiceTnlGroupName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Tunnel Group Name"
+     ::= { wwpLeosTcePbtServiceEntry 9 }
+  
+ wwpLeosTcePbtServiceIngressIsId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Ingress Isid"
+     ::= { wwpLeosTcePbtServiceEntry 10 }
+  
+ wwpLeosTcePbtServiceEgressIsId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Egress-Isid"
+     ::= { wwpLeosTcePbtServiceEntry 11 }
+  
+ wwpLeosTcePbtServiceFixedEgressPcp OBJECT-TYPE
+     SYNTAX      INTEGER (0..15)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Fixed Egress Pcp"
+     DEFVAL     {2}
+     ::= { wwpLeosTcePbtServiceEntry 12 }
+  
+ wwpLeosTcePbtServiceFrameCosPolicy OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     fixed(1),
+                     isidPcPMap(2)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Frame Cos Policy"
+     DEFVAL     {isidPcPMap}
+     ::= { wwpLeosTcePbtServiceEntry 13 }
+  
+ wwpLeosTcePbtServiceFrameCosMapIndex OBJECT-TYPE
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Frame Cos Map Index"
+     DEFVAL     {1}
+     ::= { wwpLeosTcePbtServiceEntry 14 }
+  
+ wwpLeosTcePbtServiceFrameCosMapName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Frame Cos Map Name"
+     ::= { wwpLeosTcePbtServiceEntry 15 }
+  
+ wwpLeosTcePbtServiceResolvedCosPolicy OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        ignore(1),
+                        fixed(2),
+                        isidPcpMap(3)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Resolved Cos Policy"
+     DEFVAL     {isidPcpMap}
+     ::= { wwpLeosTcePbtServiceEntry 16 }
+  
+ wwpLeosTcePbtServiceResolvedCosProfileIndex OBJECT-TYPE
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Resolved Cos Profile Index"
+     DEFVAL     {1}
+     ::= { wwpLeosTcePbtServiceEntry 17 }
+  
+ wwpLeosTcePbtServiceResolvedCosProfileName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Pbt Service Resolved Cos Profile Name"
+     ::= { wwpLeosTcePbtServiceEntry 18 }   
+  
+ wwpLeosTcePbtServiceIngressMeterProfileId OBJECT-TYPE
+ 	SYNTAX   INTEGER  (0..65535)
+ 	MAX-ACCESS read-create
+ 	STATUS current
+ 	DESCRIPTION
+ 		"Ingress Meter  Profile Id"
+ 	::= {wwpLeosTcePbtServiceEntry 19 }
+ 
+ wwpLeosTcePbtServiceIngressMeterProfileName OBJECT-TYPE
+ 	SYNTAX DisplayString
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION 
+ 		"Ingress Meter Profile Name"
+ 	::= {wwpLeosTcePbtServiceEntry 20} 
+
+ wwpLeosTcePbtServiceIngressMeterPolicy OBJECT-TYPE
+ 	SYNTAX INTEGER {
+ 			nonhierarchical(1),
+ 			hierarchical(2)
+ 			}
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION 
+ 			"Ingress Meter Policy"
+ 	::= { wwpLeosTcePbtServiceEntry 21}			
+ 			
+  
+ wwpLeosTcePbtServiceRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry 
+         in the table.       
+         Setting this object to 'destroy' will delete the entry
+         from the table."
+     ::= { wwpLeosTcePbtServiceEntry 64 }
+
+   
+ --
+ -- PBT tunnel group table. look at leos mpls mib for commonalities. Look 
+ -- encap and decap tunnel table. 
+ -- keep new table in leos file
+ -- 
+ wwpLeosTcePbtTnlGroupTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosTcePbtTnlGroupEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the Pbt tunnel group table.
+             To create entry in this table use SNMP multiple set operation.
+             -  wwpLeosTcePbtTnlGroupName must be specified.
+             -  wwpLeosTcePbtTnlGroupRowStatus must be specified.
+             "
+     ::= { wwpLeosTcePbt 5 }
+     
+ wwpLeosTcePbtTnlGroupEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosTcePbtTnlGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This represents an entry of the Pbt tunnel group table."
+     INDEX { wwpLeosTcePbtTnlGroupIndex }
+     ::= { wwpLeosTcePbtTnlGroupTable 1 }
+     
+ WwpLeosTcePbtTnlGroupEntry ::=  SEQUENCE {
+     wwpLeosTcePbtTnlGroupIndex                    Unsigned32,
+     wwpLeosTcePbtTnlGroupName                     DisplayString,
+     wwpLeosTcePbtTnlGroupSyncEnabled              TruthValue,
+     wwpLeosTcePbtTnlGroupOperStatus               INTEGER,
+     wwpLeosTcePbtTnlGroupUseCount                 Unsigned32,
+     wwpLeosTcePbtTnlGroupActivePair               Unsigned32,
+     wwpLeosTcePbtTnlGroupReverting                TruthValue,
+     wwpLeosTcePbtTnlGroupRowStatus                RowStatus
+ }
+
+ wwpLeosTcePbtTnlGroupIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+        "This represents the unique index in the table."
+     ::= { wwpLeosTcePbtTnlGroupEntry 1 }
+  
+ wwpLeosTcePbtTnlGroupName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the tunnel group name. This object is not allowed to be modified."
+     ::= { wwpLeosTcePbtTnlGroupEntry 2 }
+  
+  wwpLeosTcePbtTnlGroupSyncEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "TBD - ."
+     DEFVAL     { false }
+     ::= { wwpLeosTcePbtTnlGroupEntry 3 }
+  
+  wwpLeosTcePbtTnlGroupOperStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     disabled(1),
+                     enabled(2)                 
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the operational state of this service."
+     ::= { wwpLeosTcePbtTnlGroupEntry 4 }
+  
+ wwpLeosTcePbtTnlGroupUseCount OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "TBD "
+     ::= { wwpLeosTcePbtTnlGroupEntry 5 }
+
+ wwpLeosTcePbtTnlGroupActivePair OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "An active PBT tunnel pair is two bidirectional tunnels, one inbound and 
+		 the other outbound, between the same pair of devices paired together
+		 to represent a bidirectional PBT trunk. An inbound and an outbound 
+		 tunnel must map to the same physical port of the device to qualify
+		 for the pairing. "
+     ::= { wwpLeosTcePbtTnlGroupEntry 6 }
+
+ wwpLeosTcePbtTnlGroupReverting OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtTnlGroupEntry 7}
+
+ wwpLeosTcePbtTnlGroupRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry 
+         in the table. Setting this object to 'destroy' will delete 
+         the entry from the table."
+     ::= { wwpLeosTcePbtTnlGroupEntry 64 }
+     
+
+ --
+ -- Pbt Encap tunnel table
+ --
+
+ wwpLeosTcePbtEncapTnlTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosTcePbtEncapTnlEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the PBT encap tunnels.
+             To create entry in this table use SNMP multiple set operation.
+             -  wwpLeosTcePbtEncapTnlName must be specified.
+             -  wwpLeosTcePbtEncapTnlRemoteBridgeIndex must be specified.
+             -  wwpLeosTcePbtEncapTnlBvId must be specified.
+             -  wwpLeosTcePbtEncapTnlPgId must be specified.
+             -  wwpLeosTcePbtEncapTnlRowStatus must be specified.
+            "
+
+     ::= { wwpLeosTcePbt 6 }
+     
+ wwpLeosTcePbtEncapTnlEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosTcePbtEncapTnlEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             " "
+     INDEX {wwpLeosTcePbtEncapTnlIndex}
+     ::= { wwpLeosTcePbtEncapTnlTable 1 }
+     
+ WwpLeosTcePbtEncapTnlEntry ::=  SEQUENCE { 
+     wwpLeosTcePbtEncapTnlIndex                 Unsigned32,
+     wwpLeosTcePbtEncapTnlName                  DisplayString,
+     wwpLeosTcePbtEncapTnlRemoteBridgeIndex     Unsigned32,
+     wwpLeosTcePbtEncapTnlRemoteBridgeName      DisplayString,
+     wwpLeosTcePbtEncapTnlGroupIndex            Unsigned32,
+     wwpLeosTcePbtEncapTnlGroupName             DisplayString,
+     wwpLeosTcePbtEncapTnlBvId                  Unsigned32,
+     wwpLeosTcePbtEncapTnlPgId                  Unsigned32,
+     wwpLeosTcePbtEncapTnlPortName              DisplayString,
+     wwpLeosTcePbtEncapTnlFaults                Unsigned32,
+     wwpLeosTcePbtEncapTnlAdminState            INTEGER,
+     wwpLeosTcePbtEncapTnlOperState             INTEGER,
+     wwpLeosTcePbtEncapTnlFwdState              INTEGER,
+     wwpLeosTcePbtEncapTnlPaired                TruthValue,
+     wwpLeosTcePbtEncapTnlPairIndex             INTEGER,
+     wwpLeosTcePbtEncapTnlPairOperState         INTEGER,
+     wwpLeosTcePbtEncapTnlFrameCosPolicy        INTEGER,
+     wwpLeosTcePbtEncapTnlFrameCosMapIndex      Unsigned32,
+     wwpLeosTcePbtEncapTnlFrameCosMapName       DisplayString,
+     wwpLeosTcePbtEncapTnlFixedPcp              INTEGER,
+     wwpLeosTcePbtEncapTnlCfmConfigured         TruthValue,
+     wwpLeosTcePbtEncapTnlPairedDecapIndex      Unsigned32,
+     wwpLeosTcePbtEncapTnlPairedDecapName       DisplayString,
+     wwpLeosTcePbtEncapTnlWeight                Unsigned32,
+     wwpLeosTcePbtEncapTnlStatsEnabled          TruthValue,
+     wwpLeosTcePbtEncapTnlLocalBridgeIndex      Unsigned32,
+     wwpLeosTcePbtEncapTnlLocalBridgeName       DisplayString,
+     wwpLeosTcePbtEncapTnlReversionToPairIndex    Unsigned32,
+     wwpLeosTcePbtEncapTnlReversionFromPairIndex    Unsigned32,
+     wwpLeosTcePbtEncapTnlRowStatus             RowStatus
+   }
+
+ wwpLeosTcePbtEncapTnlIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+        "This represents the unique index in the table."
+     ::= { wwpLeosTcePbtEncapTnlEntry 1 }
+  
+ wwpLeosTcePbtEncapTnlName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the encap tunnel name. This object is not allowed to be modified."
+     ::= { wwpLeosTcePbtEncapTnlEntry 2 }
+  
+ wwpLeosTcePbtEncapTnlRemoteBridgeIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 3 }
+  
+ wwpLeosTcePbtEncapTnlRemoteBridgeName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 4 }
+  
+ wwpLeosTcePbtEncapTnlGroupIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 5 }
+  
+ wwpLeosTcePbtEncapTnlGroupName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 6 }
+  
+ wwpLeosTcePbtEncapTnlBvId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 7 }
+  
+ wwpLeosTcePbtEncapTnlPgId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 8 }
+  
+ wwpLeosTcePbtEncapTnlPortName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 9 }
+  
+
+ wwpLeosTcePbtEncapTnlFaults OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Each Bit Represents a fault. Value 0 represents no fault. First LSB represents port Fault. 
+        Second LSB represents CFM fault and third LSB represent Admin Fault."
+     ::= { wwpLeosTcePbtEncapTnlEntry 10 }
+  
+ wwpLeosTcePbtEncapTnlAdminState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 11 }
+  
+ wwpLeosTcePbtEncapTnlOperState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 12 }
+  
+ wwpLeosTcePbtEncapTnlFwdState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    active(1),
+                    standby(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 13 }
+  
+ wwpLeosTcePbtEncapTnlPaired OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 14 }
+  
+ wwpLeosTcePbtEncapTnlPairIndex OBJECT-TYPE
+     SYNTAX      INTEGER (0..7)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 15 }
+
+ wwpLeosTcePbtEncapTnlPairOperState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 16 }
+  
+ wwpLeosTcePbtEncapTnlFrameCosPolicy OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     fixed(1),
+                     isidPcPMap(2)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 17 }
+  
+ wwpLeosTcePbtEncapTnlFrameCosMapIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 18 }
+  
+ wwpLeosTcePbtEncapTnlFrameCosMapName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 19 }
+  
+ wwpLeosTcePbtEncapTnlFixedPcp OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 20 }
+  
+ wwpLeosTcePbtEncapTnlCfmConfigured OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 21 }
+  
+ wwpLeosTcePbtEncapTnlPairedDecapIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 22 }
+
+ wwpLeosTcePbtEncapTnlPairedDecapName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 23 }
+  
+ wwpLeosTcePbtEncapTnlWeight OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 24 }
+  
+ wwpLeosTcePbtEncapTnlStatsEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtEncapTnlEntry 25 }  
+ 
+ wwpLeosTcePbtEncapTnlLocalBridgeIndex     OBJECT-TYPE
+ 	 SYNTAX Unsigned32
+ 	 MAX-ACCESS read-create
+ 	 STATUS current
+ 	 DESCRIPTION
+ 	 	" "
+ 	 ::= {wwpLeosTcePbtEncapTnlEntry 26 }
+ 
+ wwpLeosTcePbtEncapTnlLocalBridgeName      OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   	" "
+   ::= { wwpLeosTcePbtEncapTnlEntry 27 }
+     
+  wwpLeosTcePbtEncapTnlReversionToPairIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+        "Reversion occurs to this tunnel pair index in a tunnel group 
+        and is used in the definition of trap.."
+     ::= { wwpLeosTcePbtEncapTnlEntry 28 }   
+
+ wwpLeosTcePbtEncapTnlReversionFromPairIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+        "Reversion occurs from this tunnel pair index in a tunnel group 
+        and is used in the definition of trap."
+     ::= { wwpLeosTcePbtEncapTnlEntry 29 }   
+ 
+ wwpLeosTcePbtEncapTnlRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry 
+         in the table. Setting this object to 'destroy' will delete 
+         the entry from the table."
+     ::= { wwpLeosTcePbtEncapTnlEntry 64 }
+ 
+
+ --
+ -- PBT Decap tunnel table
+ --
+
+ wwpLeosTcePbtDecapTnlTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosTcePbtDecapTnlEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the PBT decap tunnels.
+             To create entry in this table use SNMP multiple set operation.
+             -  wwpLeosTcePbtDecapTnlName must be specified.
+             -  wwpLeosTcePbtDecapTnlBvId must be specified.
+             -  wwpLeosTcePbtDecapTnlPgId must be specified.
+             -  wwpLeosTcePbtDecapTnlRowStatus must be specified.
+            "
+     ::= { wwpLeosTcePbt 7 }
+     
+ wwpLeosTcePbtDecapTnlEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosTcePbtDecapTnlEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             " "
+     INDEX {wwpLeosTcePbtDecapTnlIndex}
+     ::= { wwpLeosTcePbtDecapTnlTable 1 }
+     
+ WwpLeosTcePbtDecapTnlEntry ::=  SEQUENCE { 
+     wwpLeosTcePbtDecapTnlIndex                 Unsigned32,
+     wwpLeosTcePbtDecapTnlName                  DisplayString,
+     wwpLeosTcePbtDecapTnlRemoteBridgeIndex     Unsigned32,
+     wwpLeosTcePbtDecapTnlRemoteBridgeName      DisplayString,
+     wwpLeosTcePbtDecapTnlGroupIndex            Unsigned32,
+     wwpLeosTcePbtDecapTnlGroupName             DisplayString,
+     wwpLeosTcePbtDecapTnlBvId                  Unsigned32,
+     wwpLeosTcePbtDecapTnlPgId                  Unsigned32,
+     wwpLeosTcePbtDecapTnlPortName              DisplayString,
+     wwpLeosTcePbtDecapTnlFaults                Unsigned32,
+     wwpLeosTcePbtDecapTnlOperState             INTEGER,
+     wwpLeosTcePbtDecapTnlFwdState              INTEGER,
+     wwpLeosTcePbtDecapTnlPaired                TruthValue,
+     wwpLeosTcePbtDecapTnlPairIndex             INTEGER,
+     wwpLeosTcePbtDecapTnlPairOperState         INTEGER,
+     wwpLeosTcePbtDecapTnlResolvedCosPolicy     INTEGER,
+     wwpLeosTcePbtDecapTnlResolvedCosMapIndex   Unsigned32,
+     wwpLeosTcePbtDecapTnlResolvedCosMapName    DisplayString,
+     wwpLeosTcePbtDecapTnlCfmConfigured         TruthValue,
+     wwpLeosTcePbtDecapTnlPairedEncapIndex      Unsigned32,
+     wwpLeosTcePbtDecapTnlPairedEncapName       DisplayString,
+     wwpLeosTcePbtDecapTnlStatsEnabled          TruthValue,
+     wwpLeosTcePbtDecapTnlRowStatus             RowStatus
+   }
+
+ wwpLeosTcePbtDecapTnlIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This represents the unique index in the table."
+     ::= { wwpLeosTcePbtDecapTnlEntry 1 }
+  
+ wwpLeosTcePbtDecapTnlName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..32))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the decap tunnel name. This object is not allowed to be modified."
+     ::= { wwpLeosTcePbtDecapTnlEntry 2 }
+  
+ wwpLeosTcePbtDecapTnlRemoteBridgeIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create 
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 3 }
+  
+ wwpLeosTcePbtDecapTnlRemoteBridgeName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 4 }
+  
+ wwpLeosTcePbtDecapTnlGroupIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 5 }
+  
+ wwpLeosTcePbtDecapTnlGroupName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 6 }
+  
+ wwpLeosTcePbtDecapTnlBvId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " not allow to modify "
+     ::= { wwpLeosTcePbtDecapTnlEntry 7 }
+  
+ wwpLeosTcePbtDecapTnlPgId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " not allow to modify "
+     ::= { wwpLeosTcePbtDecapTnlEntry 8 }
+  
+ wwpLeosTcePbtDecapTnlPortName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 9 }
+  
+
+ wwpLeosTcePbtDecapTnlFaults OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Each Bit Represents a fault. Value 0 represents no fault. First LSB represents port Fault. 
+        Second LSB represents CFM fault and value 3 represents port and CFM fault."
+     ::= { wwpLeosTcePbtDecapTnlEntry 10 }
+  
+ wwpLeosTcePbtDecapTnlOperState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 11 }
+  
+ wwpLeosTcePbtDecapTnlFwdState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    active(1),
+                    standby(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 12 }
+  
+ wwpLeosTcePbtDecapTnlPaired OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 13 }
+  
+ wwpLeosTcePbtDecapTnlPairIndex OBJECT-TYPE
+     SYNTAX      INTEGER (0..7)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 14 }
+
+ wwpLeosTcePbtDecapTnlPairOperState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 15 }
+  
+ wwpLeosTcePbtDecapTnlResolvedCosPolicy OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        ignore(1),
+                        fixed(2),
+                        isidPcpMap(3)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 16 }
+  
+ wwpLeosTcePbtDecapTnlResolvedCosMapIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 17 }
+  
+ wwpLeosTcePbtDecapTnlResolvedCosMapName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 18 }
+    
+ wwpLeosTcePbtDecapTnlCfmConfigured OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 19 }
+  
+ wwpLeosTcePbtDecapTnlPairedEncapIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 20 }
+
+ wwpLeosTcePbtDecapTnlPairedEncapName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 21 }
+  
+ wwpLeosTcePbtDecapTnlStatsEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        " "
+     ::= { wwpLeosTcePbtDecapTnlEntry 22 }
+  
+ wwpLeosTcePbtDecapTnlRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry 
+         in the table. Setting this object to 'destroy' will delete 
+         the entry from the table."
+     ::= { wwpLeosTcePbtDecapTnlEntry 64 }
+
+ --
+ -- PBT Service User-Frame Ingress and Egress L2 Tranform table
+ --
+ wwpLeosTcePbtServiceUserFrameL2TransformTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosTcePbtServiceUserFrameL2TransformEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of pbt service user frame L2 Transform table.
+	 Two entries in this table are automatically
+         created when a pbt service is created (one for ingress and one for egress).  
+         The entries are deleted from this table when the corresponding pbt service is deleted.  
+         Therefore, there is no rowStatus field exposed in this mib-table entry."
+     ::= { wwpLeosTcePbt 8 }
+ 		
+ wwpLeosTcePbtServiceUserFrameL2TransformEntry OBJECT-TYPE
+     SYNTAX       WwpLeosTcePbtServiceUserFrameL2TransformEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Logical Interface entry in the Logical Interfaces Table."
+     INDEX { wwpLeosTcePbtServiceIndex,
+             wwpLeosTcePbtServiceUserFrameL2TransformDirection,
+             wwpLeosTcePbtServiceUserFrameL2TransformTagIndex }
+     ::= { wwpLeosTcePbtServiceUserFrameL2TransformTable 1 } 
+
+ WwpLeosTcePbtServiceUserFrameL2TransformEntry ::= SEQUENCE {
+     wwpLeosTcePbtServiceUserFrameL2TransformDirection      INTEGER,
+     wwpLeosTcePbtServiceUserFrameL2TransformTagIndex       INTEGER,
+     wwpLeosTcePbtServiceUserFrameL2TransformTagAction      INTEGER,
+     wwpLeosTcePbtServiceUserFrameL2TransformTagValue       INTEGER,
+     wwpLeosTcePbtServiceUserFrameL2TransformTagEtype       INTEGER,
+     wwpLeosTcePbtServiceUserFrameL2TransformTagPriority    INTEGER,
+     wwpLeosTcePbtServiceUserFrameL2TransformPriPolicy      INTEGER,
+     wwpLeosTcePbtServiceUserFrameL2TransformUseTagValue    TruthValue,
+     wwpLeosTcePbtServiceUserFrameL2TransformUseTagEtype    TruthValue
+ }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformDirection OBJECT-TYPE
+      SYNTAX        INTEGER  {
+                        ingress(1),
+                        egress(2)
+                    }
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies pbt service L2 Transform direction of either 
+           ingress or egress."
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 1 }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformTagIndex OBJECT-TYPE
+      SYNTAX        INTEGER  (1..2)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies pbt service user frame L2 Transform direction entry index.
+                   Initial deployment supports a single tag transform.
+	           As such, tag index 2 will always have tag action of none(1).
+	      "
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 2 }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformTagAction OBJECT-TYPE
+      SYNTAX        INTEGER  {
+                        none(1),
+                        push(2),
+                        pop(3),
+                        stamp1(4),
+                        stamp2(5)
+                    }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies pbt service L2 Transform Action Type.
+                   Initial deployment supports egress/encap actions
+	           including none(1) and push(2).
+                   Initial deployment supports ingress/decap actions
+	           including none(1) and pop(3)."
+      DEFVAL        {none}
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 3 }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformTagValue OBJECT-TYPE
+      SYNTAX        INTEGER  (0..4094)
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies pbt service L2 Transform tag value."
+      DEFVAL        {0}
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 4 }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformTagEtype OBJECT-TYPE
+      SYNTAX        INTEGER  (0..65534)
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the L2 transform Etype.  The Etype must be specified for a push action.
+         The Etype MAY be specified for a stamp action."
+      DEFVAL        {0}
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 5 }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformTagPriority OBJECT-TYPE
+      SYNTAX        INTEGER  (0..7)
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the L2 transform tag static or fixed priority.  Use of
+         this value depends on the L2 transform action, e.g., push or stamp, as well
+         as the priority policy."
+      DEFVAL        {0}
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 6 }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformPriPolicy OBJECT-TYPE
+      SYNTAX        INTEGER  {
+                        leave(1),
+                        static(2),
+                        mapped(3)
+                    }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies L2 Transform for the L2 tag priority."
+      DEFVAL        {leave}
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 7 }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformUseTagValue OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies to use the tag value when stamping.  If
+         the action is to push, the tag value will always be used."
+      DEFVAL        {false}
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 8 }
+
+ wwpLeosTcePbtServiceUserFrameL2TransformUseTagEtype OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies to use the tag etype when stamping.  If
+         the action is to push, the tag etype will always be used."
+      DEFVAL        {false}
+      ::= { wwpLeosTcePbtServiceUserFrameL2TransformEntry 9 }
+  
+  --
+  -- Notification
+  --   
+  wwpLeosPbtTunnelFaultNotification NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosVplsEncapTunnelId								
+            }
+	STATUS	deprecated
+	DESCRIPTION
+		"This notification is sent every time the tunnel becomes operationally down." 
+	::= { wwpLeosPbtMIBNotifications 1 }                               
+ 
+ wwpLeosPbtTunnelReversionNotification NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosVplsEncapTunnelId,
+				wwpLeosVplsEncapTunnelName				
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent every time backup tunnel reverts back to primary tunnel,
+		once primary tunnel comes up. Var binding wwpLeosVplsEncapTunnelId represents the primary tunnel ID." 
+	::= { wwpLeosPbtMIBNotifications 2 }                               
+
+wwpLeosPbtTunnelActivateNotification NOTIFICATION-TYPE
+    OBJECTS {
+                wwpLeosVplsEncapTunnelId,
+                wwpLeosVplsEncapTunnelName,
+                wwpLeosVplsEncapTunnelId,
+                wwpLeosVplsEncapTunnelName,
+                wwpLeosVplsEncapTunnelActive,
+                wwpLeosVplsEncapTunnelBVID
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent every time tunnel is activated. Var binding wwpLeosVplsEncapTunnelId represents the tunnel ID." 
+    ::= { wwpLeosPbtMIBNotifications 3 }    
+
+    wwpLeosPbtTunnelDeactivateNotification NOTIFICATION-TYPE
+    OBJECTS {
+                wwpLeosVplsEncapTunnelId,
+                wwpLeosVplsEncapTunnelName,
+                wwpLeosVplsEncapTunnelId,
+                wwpLeosVplsEncapTunnelName,
+                wwpLeosVplsEncapTunnelActive,
+                wwpLeosVplsEncapTunnelBVID
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent every time tunnel is de-activated. Var binding wwpLeosVplsEncapTunnelId represents the tunnel ID." 
+    ::= { wwpLeosPbtMIBNotifications 4 }   
+
+  --
+  -- TCE PBT Notification - add new object for notifi- only for the index
+  --   
+
+  wwpLeosTcePbtTunnelActivateNotification NOTIFICATION-TYPE
+     	OBJECTS  {
+                 wwpLeosTcePbtEncapTnlIndex,
+                 wwpLeosTcePbtEncapTnlName,
+                 wwpLeosTcePbtTnlGroupIndex,
+                 wwpLeosTcePbtTnlGroupName,
+                 wwpLeosTcePbtEncapTnlFwdState
+                 }
+    	STATUS   current
+    	DESCRIPTION
+       	"This notification is sent everytime tunnel of the given
+        tunnel group is activated."
+    ::= { wwpLeosPbtMIBNotifications 10 }                               
+     
+
+  wwpLeosTcePbtTunnelDeactivateNotification NOTIFICATION-TYPE
+     	OBJECTS  {
+                 wwpLeosTcePbtEncapTnlIndex,
+                 wwpLeosTcePbtEncapTnlName,
+                 wwpLeosTcePbtTnlGroupIndex,
+                 wwpLeosTcePbtTnlGroupName,
+                 wwpLeosTcePbtEncapTnlFwdState
+                 }
+    	STATUS   current
+    	DESCRIPTION
+       	"This notification is sent everytime tunnel of the given
+        tunnel group is deactivated."
+    ::= { wwpLeosPbtMIBNotifications 11 }                               
+ 
+   wwpLeosTcePbtTunnelReversionNotification NOTIFICATION-TYPE
+     	OBJECTS  {      
+                 wwpLeosTcePbtTnlGroupIndex,
+                 wwpLeosTcePbtTnlGroupName,
+                 wwpLeosTcePbtEncapTnlReversionToPairIndex,
+                 wwpLeosTcePbtEncapTnlReversionFromPairIndex
+                 }
+    	STATUS   current
+    	DESCRIPTION
+       	"Upon the failure of the primary tunnel, traffic is moved over to the backup 
+       	 tunnel at the tunnel ingress. Tunnel reversion signifies the restoration of
+       	 traffic from this backup tunnel (now active) to the primary (now standby)
+       	 after the primary tunnel is restored.
+       	 This notification is generated when this reversion occurs."
+    ::= { wwpLeosPbtMIBNotifications 12 }                               
+          
+                
+ --
+ -- Groups definition
+ --   
+ pbtGlobalConfigGroup    OBJECT-GROUP
+       OBJECTS { wwpLeosPbtBridgeMac, wwpLeosPbtServiceTagEType, wwpLeosPbtTunnelTagEtype, 
+                 wwpLeosPbtTunnelReversionState, wwpLeosPbtTunnelReversionHoldTime, wwpLeosPbtAdminMode, wwpLeosPbtOperMode, 
+                 wwpLeosPbtServiceVlanTpid }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               applicable global PBT confoguration."
+       ::= { wwpLeosPbtMIBGroups 1 }
+
+
+ pbtBridgeNameMacMapGroup    OBJECT-GROUP
+       OBJECTS { wwpLeosPbtBridgeNameMacMapIndex, wwpLeosPbtBridgeNameMacMapBridgeName, wwpLeosPbtBridgeNameMacMapMacAddr, wwpLeosPbtBridgeNameMacMapUseCount, wwpLeosPbtBridgeNameMacMapRowStatus }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               applicable to BridgeName to mac mapping."
+       ::= { wwpLeosPbtMIBGroups 2 } 
+       
+ pbtReserveBvidGroup    OBJECT-GROUP
+       OBJECTS { wwpLeosPbtReservedBVID, wwpLeosPbtReservedBVIDRowStatus }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               applicable to BVID reservation."
+       ::= { wwpLeosPbtMIBGroups 3 }
+ 
+ pbtVirtualCircuitGroup    OBJECT-GROUP
+       OBJECTS { wwpLeosPbtVirtualCircuitIndex, wwpLeosPbtVirtualCircuitName, wwpLeosPbtVirtualCircuitFixedEncapTunnelId,
+                 wwpLeosPbtVirtualCircuitDestBridgeIndex, wwpLeosPbtVirtualCircuitIngressISID, wwpLeosPbtVirtualCircuitEgressISID, 
+                              wwpLeosPbtVirtualCircuitOperState, wwpLeosPbtVirtualCircuitEncapTunnelIdInUse, wwpLeosPbtVirtualCircuitRowStatus}
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               applicable to PBT virtual circuit configuration."
+       ::= { wwpLeosPbtMIBGroups 4 }
+ 
+ pbtVirtualCircuitStatsGroup    OBJECT-GROUP
+       OBJECTS { wwpLeosPbtVirtualCircuitTxBytesHi, wwpLeosPbtVirtualCircuitTxBytesLo, wwpLeosPbtVirtualCircuitRxBytesHi, wwpLeosPbtVirtualCircuitRxBytesLo }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               applicable to virtual circuit stats group."
+       ::= { wwpLeosPbtMIBGroups 5 }
+ 
+  pbtNotificationGroups NOTIFICATION-GROUP
+  	   NOTIFICATIONS { wwpLeosPbtTunnelFaultNotification,
+                       wwpLeosTcePbtTunnelActivateNotification,
+                       wwpLeosTcePbtTunnelDeactivateNotification,
+		       wwpLeosTcePbtTunnelReversionNotification}
+       STATUS        current
+       DESCRIPTION
+            "Contains Notification supported for PBT."
+       ::= { wwpLeosPbtMIBGroups 6 }
+   
+
+ --
+ -- add tce group tables
+ --
+ --    
+ END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
