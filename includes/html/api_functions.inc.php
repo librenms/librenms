@@ -452,6 +452,46 @@ function del_device(\Illuminate\Http\Request $request)
 }
 
 
+function device_availability(\Illuminate\Http\Request $request)
+{
+    // return availability per device
+
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided to get availability');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    return check_device_permission($device_id, function ($device_id) {
+        $availabilities = dbFetchRows('SELECT duration, availability_perc FROM availability WHERE `device_id` = ? ORDER BY `duration`', [$device_id]);
+
+        return api_success($availabilities, 'availability');
+    });
+}
+
+
+function device_outages(\Illuminate\Http\Request $request)
+{
+    // return outages per device
+
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided to get availability');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    return check_device_permission($device_id, function ($device_id) {
+        $outages = dbFetchRows('SELECT going_down, up_again FROM device_outages WHERE `device_id` = ?', [$device_id]);
+
+        return api_success($outages, 'outages');
+    });
+}
+
+
 function get_vlans(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
