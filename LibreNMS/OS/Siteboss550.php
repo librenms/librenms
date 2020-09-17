@@ -25,11 +25,9 @@ namespace LibreNMS\OS;
 
 use LibreNMS\OS;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Polling\OSPolling;
 
 class Siteboss550 extends OS implements
-    OSDiscovery,
-    OSPolling
+    OSDiscovery
 {
     public function discoverOS(): void
     {
