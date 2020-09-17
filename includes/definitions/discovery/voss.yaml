@@ -1,5 +1,10 @@
 mib: RAPID-CITY
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+) \((?<version>[\d.]+)\)/'
+        version: RAPID-CITY::rcSysVersion.0
+        version_regex: '/(?<version>\d+\.\d+\S+)/'
+        serial: RAPID-CITY::rcChasSerialNumber.0
     processors:
         data:
             -

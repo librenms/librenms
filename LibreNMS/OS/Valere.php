@@ -1,6 +1,6 @@
 <?php
-/**
- * valere.inc.php
+/*
+ * Valere.php
  *
  * -Description-
  *
@@ -19,10 +19,19 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$hardware = snmp_get($device, 'vpwrIdentModel.0', '-Ovqa', 'VALERE-DC-POWER-MIB');
-$version = snmp_get($device, 'vpwrIdentControllerVersion.0', '-Ovqa', 'VALERE-DC-POWER-MIB');
-$features = implode(', ', explode(PHP_EOL, snmp_walk($device, 'vpwrModuleOID', '-Oqvs', 'VALERE-DC-POWER-MIB')));
+namespace LibreNMS\OS;
+
+use App\Models\Device;
+
+class Valere extends \LibreNMS\OS
+{
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml
+        $device->features = implode(', ', explode(PHP_EOL, snmp_walk($this->getDevice(), 'vpwrModuleOID', '-Oqvs', 'VALERE-DC-POWER-MIB')));
+    }
+}
