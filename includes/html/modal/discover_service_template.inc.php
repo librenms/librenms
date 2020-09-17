@@ -60,17 +60,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                     if (result.status == 0) {
                         // Yay.
                         $('#message').html('<div class="alert alert-info">' + result.message + '</div>');
-                        $("#confirm-delete").modal('hide');
+                        $("#confirm-discover").modal('hide');
                     }
                     else {
                         // Nay.
                         $("#message").html('<div class="alert alert-danger">' + result.message + '</div>');
-                        $("#confirm-delete").modal('hide');
+                        $("#confirm-discover").modal('hide');
                     }
                 },
                 error: function () {
                     $("#message").html('<div class="alert alert-info">An error occurred discovering this service template.</div>');
-                    $("#confirm-delete").modal('hide');
+                    $("#confirm-discover").modal('hide');
                 }
             });
         });
