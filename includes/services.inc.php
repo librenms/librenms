@@ -180,10 +180,10 @@ function delete_service_template($service_template = null)
     return dbDelete('services_template', '`service_template_id` =  ?', array($service_template));
 }
 
-function discover_service_template($device_group_id, $service_template_id)
+function discover_service_template($device_group, $service_template)
 {
-    if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service_template_id, $device_group['device_group_id']))) {
-        $service=service_template_get($device_group_id, $service_template_id);
+    if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service_template['service_template_id'], $device_group['device_group_id']))) {
+        $service=service_template_get($device_group, $service_template);
         $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
         foreach ($device_ids as $device) {
             add_service($device, $service);
