@@ -1,6 +1,6 @@
 <?php
 /*
- * Jetdirect.php
+ * Printer.php
  *
  * -Description-
  *
@@ -23,27 +23,18 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\OS;
+namespace LibreNMS\OS\Shared;
 
-use App\Models\Device;
-
-class Jetdirect extends \LibreNMS\OS\Shared\Printer
+class Printer extends \LibreNMS\OS
 {
-    public function discoverOS(Device $device): void
+    protected function parseDeviceId($data)
     {
-        parent::discoverOS($device); // yaml
-        $device = $this->getDeviceModel();
-
-        $info = $this->parseDeviceId(snmp_get($this->getDevice(), '.1.3.6.1.4.1.11.2.3.9.1.1.7.0', '-OQv'));
-        $hardware = $info['MDL'] ?? $info['MODEL'] ?? $info['DES'] ?? $info['DESCRIPTION'];
-        if (!empty($hardware)) {
-            $hardware = str_ireplace([
-                'HP ',
-                'Hewlett-Packard ',
-                ' Series',
-            ], '', $hardware);
-            $device->hardware = ucfirst($hardware);
+        $vars = [];
+        foreach (explode(';', $data) as $pair) {
+            [$key, $value] = explode(':', $pair);
+            $vars[trim($key)] = $value;
         }
-    }
 
+        return $vars;
+    }
 }

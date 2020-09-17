@@ -1,6 +1,6 @@
 <?php
 /*
- * Jetdirect.php
+ * Xerox.php
  *
  * -Description-
  *
@@ -27,23 +27,13 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 
-class Jetdirect extends \LibreNMS\OS\Shared\Printer
+class Xerox extends Shared\Printer
 {
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device = $this->getDeviceModel();
 
-        $info = $this->parseDeviceId(snmp_get($this->getDevice(), '.1.3.6.1.4.1.11.2.3.9.1.1.7.0', '-OQv'));
-        $hardware = $info['MDL'] ?? $info['MODEL'] ?? $info['DES'] ?? $info['DESCRIPTION'];
-        if (!empty($hardware)) {
-            $hardware = str_ireplace([
-                'HP ',
-                'Hewlett-Packard ',
-                ' Series',
-            ], '', $hardware);
-            $device->hardware = ucfirst($hardware);
-        }
+        $info = $this->parseDeviceId(snmp_get($this->getDevice(), '.1.3.6.1.4.1.253.8.51.1.2.1.20.1', '-OQv'));
+        $device->hardware = $info['MDL'] ?? $info['DES'] ?? $device->hardware;
     }
-
 }
