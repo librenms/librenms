@@ -153,9 +153,8 @@ Within the discovery code base if you are using php then the following helpers a
 OS discovery is done within `LibreNMS/OS/$os.php` and is where we detect certain values.
 
 ```php
-public function discoverOS(): void
+public function discoverOS(\App\Models\Device $device): void
 {
-    $device = $this->getDeviceModel();
     $info = snmp_getnext_multi($this->getDevice(), 'enclosureModel enclosureSerialNum entPhysicalFirmwareRev', '-OQUs', 'NAS-MIB:ENTITY-MIB');
     $device->version = Str::replaceFirst('\"', '', $info['entPhysicalFirmwareRev']);
     $device->hardware = $info['enclosureModel'];

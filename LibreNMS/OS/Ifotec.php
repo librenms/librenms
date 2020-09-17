@@ -25,16 +25,15 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Ifotec extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-
         if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.21362.100.')) {
             $ifoSysProductIndex = snmp_get($this->getDevice(), 'ifoSysProductIndex.0', '-Oqv', 'IFOTEC-SMI');
 
@@ -52,6 +51,6 @@ class Ifotec extends OS implements OSDiscovery
         }
 
         // sysDecr struct = (<product_reference> . ' : ' . <product_description>) OR (<product_reference>)
-        list($device->hardware) = explode(' : ', $device->sysDescr, 2);
+        [$device->hardware] = explode(' : ', $device->sysDescr, 2);
     }
 }

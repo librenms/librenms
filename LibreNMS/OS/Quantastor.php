@@ -25,14 +25,14 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Quantastor extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $info = snmp_get_multi_oid($this->getDevice(), 'storageSystem-ServiceVersion.0 hwEnclosure-Vendor.0 hwEnclosure-Model.0 storageSystem-SerialNumber.0', '-OQUs', 'QUANTASTOR-SYS-STATS');
         $device->version = $info['storageSystem-ServiceVersion.0'];
         $device->hardware = $info['hwEnclosure-Vendor.0'] . ' ' . $info['hwEnclosure-Model.0'];
