@@ -20,11 +20,11 @@ class CreateServicesTemplateTable extends Migration
             $table->string('service_template_type');
             $table->text('service_template_desc');
             $table->text('service_template_param');
-            $table->boolean('service_template_ignore');
+            $table->tinyInteger('service_template_ignore');
             $table->tinyInteger('service_template_status')->default(0);
             $table->unsignedInteger('service_template_changed')->default(0);
             $table->text('service_template_message');
-            $table->boolean('service_template_disabled')->default(0);
+            $table->tinyInteger('service_template_disabled')->default(0);
         });
     }
 
