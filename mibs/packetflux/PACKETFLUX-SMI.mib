@@ -1,0 +1,57 @@
+PACKETFLUX-SMI DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, enterprises, OBJECT-IDENTITY
+        FROM SNMPv2-SMI;
+
+    packetflux MODULE-IDENTITY
+        LAST-UPDATED        "201807071255Z"
+        ORGANIZATION        "PacketFlux Technologies"
+        CONTACT-INFO        "custsvc@packetflux.com http://www.packetflux.com"
+        DESCRIPTION         "SMI MIB for PacketFlux Technologies"
+
+        REVISION            "201807071255Z"
+        DESCRIPTION         "Modernized naming convention and added additional oid definitions."
+        REVISION            "201306041632Z"
+        DESCRIPTION         "initial version of this module"
+        ::= { enterprises 32050 }
+
+
+    packetfluxProductIDs OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "packetfluxProducts is used to make allocations
+                            for use as sysObjectID values for products released
+                            by packetflux technologies. The allocations are
+                            made in PACKETFLUX-PRODUCTS-MIB."
+        ::= { packetflux 1 }
+
+    packetfluxProductSpecific OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "This is the main subtree for all packetflux product
+                            management MIBs. MIBs found in this subtree are
+                            for specific products."
+        ::= { packetflux 2 }
+
+    packetfluxFeatureSpecific OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "This is the main subtree for all packetflux feature
+                            management MIBs. MIBs found in this subtree are
+                            NOT for specific products, although specific
+                            products do make heavy use of these mibs."
+        ::= { packetflux 3 }
+
+    packetfluxModuleIdentities OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "This object is used as a object identifier from
+                            which MODULE-IDENTITY values can be assigned."
+        ::= { packetflux 4 }
+
+    packetfluxExperimental OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "This subtree is used for experimental mibs. OIDs
+                            in this tree can and will change. Customers should
+                            not trust the OID definitions to remain stable."
+        ::= { packetflux 5 }
+
+
+END
+

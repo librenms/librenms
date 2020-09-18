@@ -1,0 +1,420 @@
+PACKETFLUX-GNSS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    packetfluxFeatureSpecific
+        FROM PACKETFLUX-SMI
+    Fixed2DecimalDigits, Fixed6DecimalDigits
+        FROM PACKETFLUX-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, Gauge32, MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    ;
+
+packetfluxGnss MODULE-IDENTITY
+    LAST-UPDATED  "201807071257Z" -- July 07, 2018
+    ORGANIZATION
+        "PacketFlux Technologies"
+    CONTACT-INFO
+        "custsvc@packetflux.com http://www.packetflux.com"
+    DESCRIPTION
+        "MIB for PacketFlux Devices containing or able to monitor a
+         GNSS receiver"
+    REVISION      "201807071257Z" -- July 07, 2018
+    DESCRIPTION
+        "Initial version of the mib"
+    ::= { packetfluxFeatureSpecific 4 }
+
+GnssConstellationEnum ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "A list of the different types of GNSS constellations"
+    SYNTAX        INTEGER {
+        gps(1),
+        glonass(2),
+        galileo(3),
+        beidou(4),
+        irnss(5),
+        qzss(6)
+    }
+
+GnssFixTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "A list of the different types of GNSS fixes"
+    SYNTAX        INTEGER {
+        none(1),
+        twodimensional(2),
+        threedimensional(3),
+        differential3d(4)
+    }
+
+gnssReceiverTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF GnssReceiverEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table holding data for all gnss receivers known to the
+         system. Note that if the same gnss receiver is attached to
+         multiple devices in the system, it may appear in this table
+         multiple times."
+    ::= { packetfluxGnss 1 }
+
+gnssReceiverEntry OBJECT-TYPE
+    SYNTAX        GnssReceiverEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A single row of the gnssReceiverTable"
+    INDEX
+        { gnssReceiverSlot, gnssReceiverPort }
+    ::= { gnssReceiverTable 1 }
+
+GnssReceiverEntry ::= SEQUENCE
+{
+    gnssReceiverSlot            Unsigned32,
+    gnssReceiverPort            Unsigned32,
+    gnssLatitude                Fixed6DecimalDigits,
+    gnssLongitude               Fixed6DecimalDigits,
+    gnssAltitude                Fixed2DecimalDigits,
+    gnssDateAndTime             DateAndTime,
+    gnssSatellitesInView        Gauge32,
+    gnssSatellitesUsed          Gauge32,
+    gnssPDOP                    Fixed2DecimalDigits,
+    gnssHDOP                    Fixed2DecimalDigits,
+    gnssVDOP                    Fixed2DecimalDigits,
+    gnssFixType                 GnssFixTypeEnum,
+    gnss1PPSCorrectPulses       Counter32,
+    gnss1PPSMissingPulses       Counter32,
+    gnss1PPSMissingInRowPulses  Counter32,
+    gnss1PPSDoublePulses        Counter32,
+    gnss1PPSVeryEarlyPulses     Counter32,
+    gnss1PPSSlightlyEarlyPulses Counter32,
+    gnss1PPSSlightlyLatePulses  Counter32,
+    gnss1PPSVeryLatePulses      Counter32,
+    gnss1PPSFailedSeconds       Counter32,
+    gnss1PPSFailed              TruthValue
+}
+
+
+gnssReceiverSlot OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The slot number the gnss Receiver is attached to."
+    ::= { gnssReceiverEntry 1 }
+
+gnssReceiverPort OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The Port Number in the Slot that the GNSS receiver is attached
+         to."
+    ::= { gnssReceiverEntry 2 }
+
+gnssLatitude OBJECT-TYPE
+    SYNTAX        Fixed6DecimalDigits
+    UNITS         "degrees"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The latitude portion of the position being reported by the
+         GNSS receiver, in decimal degrees."
+    ::= { gnssReceiverEntry 3 }
+
+gnssLongitude OBJECT-TYPE
+    SYNTAX        Fixed6DecimalDigits
+    UNITS         "degrees"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The longitude of the position being reported by the GNSS
+         receiver."
+    ::= { gnssReceiverEntry 4 }
+
+gnssAltitude OBJECT-TYPE
+    SYNTAX        Fixed2DecimalDigits
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The altitude being reported by the gnss receiver"
+    ::= { gnssReceiverEntry 5 }
+
+gnssDateAndTime OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The date as reported by the gnss receiver"
+    ::= { gnssReceiverEntry 6 }
+
+gnssSatellitesInView OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of GNSS satellites visible from the GNSS
+         receiver."
+    ::= { gnssReceiverEntry 7 }
+
+gnssSatellitesUsed OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of GNS satellites used in the position solution."
+    ::= { gnssReceiverEntry 8 }
+
+gnssPDOP OBJECT-TYPE
+    SYNTAX        Fixed2DecimalDigits
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the GNSS Position Dilution of Precision value. It can
+         be used to help determine how accurate the position is."
+    ::= { gnssReceiverEntry 9 }
+
+gnssHDOP OBJECT-TYPE
+    SYNTAX        Fixed2DecimalDigits
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the GNSS Horizontal Dilution of Precision value. It
+         can be used to help determine how accurate the position is."
+    ::= { gnssReceiverEntry 10 }
+
+gnssVDOP OBJECT-TYPE
+    SYNTAX        Fixed2DecimalDigits
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the GNSS Vertical Dilution of Precision value. It can
+         be used to help determine how accurate the position is."
+    ::= { gnssReceiverEntry 11 }
+
+gnssFixType OBJECT-TYPE
+    SYNTAX        GnssFixTypeEnum
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "What type of position fix the GNSS receiver is reporting."
+    ::= { gnssReceiverEntry 12 }
+
+gnss1PPSCorrectPulses OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This counter shows how many pulses were received when
+         expected."
+    ::= { gnssReceiverEntry 13 }
+
+gnss1PPSMissingPulses OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This counter shows how many pulses the RackInjector has
+         detected as missing."
+    ::= { gnssReceiverEntry 14 }
+
+gnss1PPSMissingInRowPulses OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "In the condition where pulses are being continually missed,
+         i.e., in a GPS receiver failure, it is helpful to know how long
+         it has been since the most recent pulse. This counter counts
+         how many pulses have been missed since the last correct
+         pulse."
+    ::= { gnssReceiverEntry 15 }
+
+gnss1PPSDoublePulses OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This counter counts how many pulses occur right after another.
+         This counter is intended to show those failures often caused by
+         cabling issues including cross-induction between cables and rf
+         noise."
+    ::= { gnssReceiverEntry 16 }
+
+gnss1PPSVeryEarlyPulses OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This counter shows how many pulses were received a large
+         amount of time before they were expected."
+    ::= { gnssReceiverEntry 17 }
+
+gnss1PPSSlightlyEarlyPulses OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This counter shows how many pulses were received a small
+         amount of time before they were expected."
+    ::= { gnssReceiverEntry 18 }
+
+gnss1PPSSlightlyLatePulses OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This counter shows how many pulses were received a small
+         amount of time after they were expected."
+    ::= { gnssReceiverEntry 19 }
+
+gnss1PPSVeryLatePulses OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This counter shows how many pulses were received a small
+         amount of time after they were expected."
+    ::= { gnssReceiverEntry 20 }
+
+gnss1PPSFailedSeconds OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This counter counts the total number of seconds where the 1PPS
+         signal seems to have failed. This counter does not increment
+         upon every missed pulse, but instead only counts those periods
+         where the 1PPS signal appears to be missing for an extended
+         period."
+    ::= { gnssReceiverEntry 21 }
+
+gnss1PPSFailed OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The 1PPS signal has not been seen in a while."
+    ::= { gnssReceiverEntry 22 }
+
+gnssSatelliteTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF GnssSatelliteEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Contains data about the satellites visible and used by the
+         gnss system"
+    ::= { packetfluxGnss 2 }
+
+gnssSatelliteEntry OBJECT-TYPE
+    SYNTAX        GnssSatelliteEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A single row of the satellite table"
+    INDEX
+        { gnssReceiverSlot, gnssReceiverPort, gnssSatelliteIndex }
+    ::= { gnssSatelliteTable 1 }
+
+GnssSatelliteEntry ::= SEQUENCE
+{
+    gnssSatelliteIndex         Unsigned32,
+    gnssSatelliteConstellation GnssConstellationEnum,
+    gnssSatelliteNumber        Unsigned32,
+    gnssSatelliteAzimuth       Unsigned32,
+    gnssSatelliteElevation     Unsigned32,
+    gnssSatelliteSNR           Gauge32,
+    gnsSatelliteUsedInSolution TruthValue
+}
+
+
+gnssSatelliteIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This is the index value for the table"
+    ::= { gnssSatelliteEntry 1 }
+
+gnssSatelliteConstellation OBJECT-TYPE
+    SYNTAX        GnssConstellationEnum
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Which constellation this port is part of."
+    ::= { gnssSatelliteEntry 2 }
+
+gnssSatelliteNumber OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The satellite vehicle number as reported by the GNSS
+         receiver"
+    ::= { gnssSatelliteEntry 3 }
+
+gnssSatelliteAzimuth OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The bearing to the GNSS satellite in degrees from true
+         north."
+    ::= { gnssSatelliteEntry 4 }
+
+gnssSatelliteElevation OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of degrees the GNSS satellite is above the
+         horizon."
+    ::= { gnssSatelliteEntry 5 }
+
+gnssSatelliteSNR OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The strength of the signal received from this satellite as
+         reported by the GNSS receiver."
+    ::= { gnssSatelliteEntry 6 }
+
+gnsSatelliteUsedInSolution OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Whether or not this satellite was used in computing the
+         position."
+    ::= { gnssSatelliteEntry 7 }
+
+packetfluxGnssConformance OBJECT IDENTIFIER ::= { packetfluxGnss 127 }
+
+packetfluxGnssGroups OBJECT IDENTIFIER ::= { packetfluxGnssConformance 1 }
+
+packetfluxGnssMibAllObjects OBJECT-GROUP
+    OBJECTS
+        { gnss1PPSCorrectPulses, gnss1PPSDoublePulses, gnss1PPSFailed,
+        gnss1PPSFailedSeconds, gnss1PPSMissingInRowPulses,
+        gnss1PPSMissingPulses, gnss1PPSSlightlyEarlyPulses,
+        gnss1PPSSlightlyLatePulses, gnss1PPSVeryEarlyPulses,
+        gnss1PPSVeryLatePulses, gnssAltitude,
+        gnsSatelliteUsedInSolution, gnssDateAndTime, gnssFixType,
+        gnssHDOP, gnssLatitude, gnssLongitude, gnssPDOP,
+        gnssSatelliteAzimuth, gnssSatelliteConstellation,
+        gnssSatelliteElevation, gnssSatelliteNumber,
+        gnssSatellitesInView, gnssSatelliteSNR, gnssSatellitesUsed,
+        gnssVDOP }
+    STATUS        current
+    DESCRIPTION
+        "This automatically created object group contains all those
+         objects that do not belong to any other OBJECT-GROUP"
+    ::= { packetfluxGnssGroups 1 }
+
+END

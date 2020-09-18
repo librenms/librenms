@@ -1,0 +1,66 @@
+PACKETFLUX-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    packetfluxModuleIdentities
+        FROM PACKETFLUX-SMI
+    Integer32, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ;
+
+packetfluxTC MODULE-IDENTITY
+    LAST-UPDATED  "201807071302Z" -- July 07, 2018
+    ORGANIZATION  "PacketFlux Technologies"
+    CONTACT-INFO  "custsvc@packetflux.com http://www.packetflux.com" 
+    DESCRIPTION
+        "This file containes standard Textual Conventions Used
+         throughout other PacketFlux MIBs."
+    REVISION      "201807071302Z" -- July 07, 2018
+    DESCRIPTION
+        "initial version of this module"
+    ::= { packetfluxModuleIdentities 1 }
+
+Fixed1DecimalDigit ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-1"
+    STATUS        current
+    DESCRIPTION
+        "Fixed Integer value with one decimal digit"
+    SYNTAX        Integer32
+
+Fixed2DecimalDigits ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-2"
+    STATUS        current
+    DESCRIPTION
+        "Fixed Integer value with two decimal digits"
+    SYNTAX        Integer32
+
+Fixed3DecimalDigits ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-3"
+    STATUS        current
+    DESCRIPTION
+        "Fixed Integer value with three decimal digits"
+    SYNTAX        Integer32
+
+Fixed4DecimalDigits ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-4"
+    STATUS        current
+    DESCRIPTION
+        "Fixed Integer value with four decimal digits"
+    SYNTAX        Integer32
+
+Fixed5DecimalDigits ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-5"
+    STATUS        current
+    DESCRIPTION
+        "Fixed Integer value with five decimal digits"
+    SYNTAX        Integer32
+
+Fixed6DecimalDigits ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-6"
+    STATUS        current
+    DESCRIPTION
+        "Fixed Integer value with six decimal digits"
+    SYNTAX        Integer32
+
+END
