@@ -1,7 +1,9 @@
 mib: HUAWEI-DEVICE-MIB:HUAWEI-POWER-MIB:HWMUSA-DEV-MIB:HUAWEI-XPON-MIB:IF-MIB
 modules:
     os:
-        hardware: ENTITY-MIB::entPhysicalDescr.888624
+        hardware:
+            - ENTITY-MIB::entPhysicalDescr.36
+            - ENTITY-MIB::entPhysicalDescr.888624
         hardware_regex: '/(?<hardware>[^,]+)/'
         serial: HUAWEI-DEVICE-MIB::hwBackplanePhySerialNum.0
         version: HUAWEI-DEVICE-MIB::hwSysVersionVrcb.0
