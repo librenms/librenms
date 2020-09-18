@@ -1,5 +1,12 @@
 mib: SL-EDFA-MIB:SL-MAIN-MIB:SL-SFP-MIB:IF-MIB
 modules:
+    os:
+        hardware:
+            - .1.3.6.1.4.1.4515.1.3.6.1.1.1.2.0 # SL-ENTITY-MIB::slEntPhysicalDescr.0
+            - .1.3.6.1.4.1.4515.1.3.6.1.1.1.4.0 # SL-ENTITY-MIB::slEntPhysicalHardwareRev.0
+        hardware_template: '{{ .1.3.6.1.4.1.4515.1.3.6.1.1.1.2.0 }} rev {{ .1.3.6.1.4.1.4515.1.3.6.1.1.1.4.0 }}'
+        serial: .1.3.6.1.4.1.4515.1.3.6.1.1.1.7.0 # SL-ENTITY-MIB::slEntPhysicalSerialNum.0
+        version: .1.3.6.1.4.1.4515.1.3.6.1.1.1.5.0 # SL-ENTITY-MIB::slEntPhysicalFirmwareRev.0
     processors:
         data:
             -

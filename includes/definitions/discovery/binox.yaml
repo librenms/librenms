@@ -1,5 +1,9 @@
 mib: PRVT-INTERWORKING-OS-MIB:PRVT-SYS-MON-MIB
 modules:
+    os:
+        hardware: PRVT-SWITCH-MIB::sysPartNumber.0
+        serial: PRVT-SWITCH-MIB::sysSerialNumber.0
+        version: PRVT-INTERWORKING-OS-MIB::oSversionNumber.0
     processors:
         data:
             -

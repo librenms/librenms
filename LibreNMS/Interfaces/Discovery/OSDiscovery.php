@@ -26,11 +26,15 @@
 
 namespace LibreNMS\Interfaces\Discovery;
 
+use App\Models\Device;
+
 interface OSDiscovery
 {
     /**
      * Discover additional information about the OS.
      * Primarily this is just version, hardware, features, serial, but could be anything
+     *
+     * @param \App\Models\Device $device
      */
-    public function discoverOS(): void;
+    public function discoverOS(Device $device): void;
 }

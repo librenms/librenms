@@ -10,6 +10,11 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB');
 
+// Get correct eth0 port status for AirFiber 5XHD devices
+if ($device['os'] == 'airos-af-ltu') {
+            require 'ports/airos-af-ltu.inc.php';
+}
+
 // End Building SNMP Cache Array
 d_echo($port_stats);
 

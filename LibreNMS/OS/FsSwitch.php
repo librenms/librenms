@@ -42,7 +42,7 @@ class FsSwitch extends OS implements ProcessorDiscovery
         $processors = [];
 
         // Tests OID from SWITCH MIB.
-        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'ssCpuIdle', [], 'SWITCH', 'fs');
+        $processors_data = snmpwalk_cache_oid($this->getDeviceArray(), 'ssCpuIdle', [], 'SWITCH', 'fs');
 
         foreach ($processors_data as $index => $entry) {
             $processors[] = Processor::discover(

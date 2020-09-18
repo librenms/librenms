@@ -8,13 +8,13 @@
                     "sysDescr": "SensorProbe",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "AKCP sensorProbe8 v2.0",
                     "features": null,
                     "os": "akcp",
                     "type": "environment",
                     "serial": null,
                     "icon": "akcp.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

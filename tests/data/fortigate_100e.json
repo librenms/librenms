@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.12356.101.1.1041",
                     "sysDescr": "Gecom",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "v5.4.4,build7650,170529 (GA)",
+                    "hardware": "FGT_100E",
                     "features": null,
                     "os": "fortigate",
                     "type": "firewall",
-                    "serial": null,
+                    "serial": "FG100E4Q17011652",
                     "icon": "fortinet.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -25,9 +25,9 @@
                     "sysObjectID": ".1.3.6.1.4.1.12356.101.1.1041",
                     "sysDescr": "Gecom",
                     "sysContact": "<private>",
-                    "version": "v5.4.4",
+                    "version": "v5.4.4,build7650,170529 (GA)",
                     "hardware": "FGT_100E",
-                    "features": "build7650",
+                    "features": null,
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FG100E4Q17011652",

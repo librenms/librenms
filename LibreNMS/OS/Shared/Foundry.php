@@ -39,7 +39,7 @@ class Foundry extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $processors_data = snmpwalk_cache_triple_oid($this->getDevice(), 'snAgentCpuUtilTable', array(), 'FOUNDRY-SN-AGENT-MIB');
+        $processors_data = snmpwalk_cache_triple_oid($this->getDeviceArray(), 'snAgentCpuUtilTable', array(), 'FOUNDRY-SN-AGENT-MIB');
         $module_descriptions = $this->getCacheByIndex('snAgentConfigModuleDescription', 'FOUNDRY-SN-AGENT-MIB');
 
         $processors = array();
@@ -62,7 +62,7 @@ class Foundry extends OS implements ProcessorDiscovery
             }
 
             $module_description = $module_descriptions[$entry['snAgentCpuUtilSlotNum']];
-            list($module_description) = explode(' ', $module_description);
+            [$module_description] = explode(' ', $module_description);
             $descr = "Slot {$entry['snAgentCpuUtilSlotNum']} $module_description [{$entry['snAgentCpuUtilSlotNum']}]";
 
             $processors[] = Processor::discover(

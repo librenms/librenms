@@ -28,18 +28,21 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 
 class Routeros extends OS implements
+    OSPolling,
     WirelessCcqDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
@@ -103,7 +106,7 @@ class Routeros extends OS implements
     public function discoverWirelessFrequency()
     {
         $data = $this->fetchData();
-       
+
         $sensors = array();
         foreach ($data as $index => $entry) {
             if ($entry['mtxrWlApFreq'] == null) {
@@ -207,9 +210,9 @@ class Routeros extends OS implements
     private function fetchData()
     {
         if (is_null($this->data)) {
-            $wl60 = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
-            $wlap = snmpwalk_cache_oid($this->getDevice(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
-            $wl60sta = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GStaTable', array(), 'MIKROTIK-MIB');
+            $wl60 = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
+            $wlap = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
+            $wl60sta = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GStaTable', array(), 'MIKROTIK-MIB');
             $this->data = $wl60+$wlap;
             $this->data = $this->data+$wl60sta;
         }
@@ -307,5 +310,36 @@ class Routeros extends OS implements
                 null
             )
         );
+    }
+
+    public function pollOS()
+    {
+        $leases = snmp_get($this->getDeviceArray(), 'mtxrDHCPLeaseCount.0', '-OQv', 'MIKROTIK-MIB');
+
+        if (is_numeric($leases)) {
+            $rrd_def = RrdDefinition::make()->addDataset('leases', 'GAUGE', 0);
+
+            $fields = array(
+                'leases' => $leases,
+            );
+
+            $tags = compact('rrd_def');
+            data_update($this->getDeviceArray(), 'routeros_leases', $tags, $fields);
+            $this->enableGraph('routeros_leases');
+        }
+
+        $pppoe_sessions = snmp_get($this->getDeviceArray(), '1.3.6.1.4.1.9.9.150.1.1.1.0', '-OQv', '', '');
+
+        if (is_numeric($pppoe_sessions)) {
+            $rrd_def = RrdDefinition::make()->addDataset('pppoe_sessions', 'GAUGE', 0);
+
+            $fields = array(
+                'pppoe_sessions' => $pppoe_sessions,
+            );
+
+            $tags = compact('rrd_def');
+            data_update($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
+            $this->enableGraph('routeros_pppoe_sessions');
+        }
     }
 }

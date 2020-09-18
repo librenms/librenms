@@ -194,7 +194,7 @@ class YamlDiscovery
     {
         // Pre-cache data for later use
         $pre_cache = array();
-        $device = $os->getDevice();
+        $device = $os->getDeviceArray();
 
         $pre_cache_file = 'includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php';
         if (is_file($pre_cache_file)) {

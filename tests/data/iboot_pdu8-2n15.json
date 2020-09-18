@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux ibootpdu 4.4.9 #6 SMP Thu Apr 27 15:48:52 EDT 2017 armv7l",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "1.03.12212017",
+                    "hardware": "iBoot-PDU8-2N15",
                     "features": null,
                     "os": "iboot",
                     "type": "power",
                     "serial": null,
                     "icon": "generic.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

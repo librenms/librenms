@@ -1,5 +1,9 @@
 mib: ADTRAN-AOSCPU
 modules:
+    os:
+        hardware: ADTRAN-AOSUNIT::adAOSDeviceProductName.0
+        serial: ADTRAN-AOSUNIT::adAOSDeviceSerialNumber.0
+        version: ADTRAN-AOSUNIT::adAOSDeviceVersion.0
     processors:
         data:
             -

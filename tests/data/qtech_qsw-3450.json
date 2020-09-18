@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.27514.1.1.1.228",
                     "sysDescr": "QSW-3450-28T-AC Device, Compiled Dec 30 11:22:40 2014\n SoftWare Version 7.0.3.5(R0237.0034)\n BootRom Version 7.1.36\n HardWare Version R01\n  Serial No.:00030661509010026177\n Copyright (C) 2014 by QTECH LLC\n All rights reserved",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "7.0.3.5(R0237.0034)",
+                    "hardware": "QSW-3450-28T-AC",
                     "features": null,
                     "os": "qtech",
                     "type": "network",
-                    "serial": null,
+                    "serial": "00030661509010026177",
                     "icon": "qtech.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

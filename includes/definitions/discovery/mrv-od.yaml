@@ -1,5 +1,9 @@
 mib: NBS-CMMC-MIB
 modules:
+    os:
+        hardware: NBS-CMMC-MIB::nbsCmmcChassisModel.1
+        serial: NBS-CMMC-MIB::nbsCmmcChassisSerialNum.1
+        version: NBS-CMMC-MIB::nbsCmmcSysFwVers.0
     sensors:
         pre-cache:
             data:

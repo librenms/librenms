@@ -1,5 +1,11 @@
 mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB
 modules:
+    os:
+        version:
+            - TIMETRA-SYSTEM-MIB::sgiSwMajorVersion.0
+            - TIMETRA-SYSTEM-MIB::sgiSwMinorVersion.0
+            - TIMETRA-SYSTEM-MIB::sgiSwVersionModifier.0
+        version_template: '{{ TIMETRA-SYSTEM-MIB::sgiSwMajorVersion.0 }}.{{ TIMETRA-SYSTEM-MIB::sgiSwMinorVersion.0 }}.{{ TIMETRA-SYSTEM-MIB::sgiSwVersionModifier.0 }}'
     processors:
         data:
             -

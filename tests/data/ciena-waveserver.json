@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.1271.3",
                     "sysDescr": "Waveserver Platform",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "1.5.0-ej76_svrbuild_wvsrvr",
+                    "hardware": "Waveserver 40x10GE/10x40GE/4x100GE QSFP+/QSFP28, 2x100G/2x150G/2x200G Wavelogic 3 Extreme Coherent Optical Processors",
                     "features": null,
                     "os": "ciena-waveserver",
                     "type": "network",
-                    "serial": null,
+                    "serial": "AAAAAAAA",
                     "icon": "ciena.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

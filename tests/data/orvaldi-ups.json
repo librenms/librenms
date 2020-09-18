@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux SNMP-System",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "VERFW:01428.1400",
+                    "hardware": "G2-6KL",
                     "features": null,
                     "os": "orvaldi-ups",
                     "type": "power",
-                    "serial": null,
+                    "serial": "11112222333344",
                     "icon": "orvaldi.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

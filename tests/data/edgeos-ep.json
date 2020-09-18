@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.10002.1",
                     "sysDescr": "Linux 2.6.32.71 #1 Fri Jan 24 08:44:01 UTC 2020 mips",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "EP.v1.6.0",
+                    "hardware": "EP-54V-150W",
                     "features": null,
                     "os": "edgeos-ep",
                     "type": "power",
                     "serial": null,
                     "icon": "ubiquiti.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "Linux 2.6.32.71 #1 Fri Jan 24 08:44:01 UTC 2020 mips",
                     "sysContact": "<private>",
                     "version": "EP.v1.6.0",
-                    "hardware": "Ubiquiti EP-54V-150W",
+                    "hardware": "EP-54V-150W",
                     "features": null,
                     "os": "edgeos-ep",
                     "type": "power",

@@ -26,10 +26,8 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\OS;
 use LibreNMS\OS\Shared\Cisco;
 
 class Ciscowlc extends Cisco implements
@@ -93,7 +91,7 @@ class Ciscowlc extends Cisco implements
             'CISCO-LWAPP-SYS-MIB::clsSysApConnectCount.0',
             'AIRESPACE-SWITCHING-MIB::agentInventoryMaxNumberOfAPsSupported.0',
         );
-        $data = snmp_get_multi($this->getDevice(), $oids);
+        $data = snmp_get_multi($this->getDeviceArray(), $oids);
 
         if (isset($data[0]['clsSysApConnectCount'])) {
             return array(

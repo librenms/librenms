@@ -39,7 +39,7 @@ class MoxaEtherdevice extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
         // Moxa people enjoy creating MIBs for each model!
         // .1.3.6.1.4.1.8691.7.116.1.54.0 = MOXA-IKS6726A-MIB::cpuLoading30s.0

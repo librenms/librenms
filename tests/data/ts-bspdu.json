@@ -14,7 +14,7 @@
                     "type": "power",
                     "serial": null,
                     "icon": "bladeshelterpdu.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

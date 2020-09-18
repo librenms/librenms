@@ -27,11 +27,11 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class Pepwave extends OS implements
@@ -53,7 +53,7 @@ class Pepwave extends OS implements
 
     public function discoverWirelessRssi()
     {
-        $data = snmpwalk_group($this->getDevice(), 'cellularSignalRssi', 'CELLULAR');
+        $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalRssi', 'CELLULAR');
         $sensors = [];
         foreach ($data as $index => $rssi_value) {
             if ($rssi_value['cellularSignalRssi'] != '-9999') {
@@ -65,7 +65,7 @@ class Pepwave extends OS implements
 
     public function discoverWirelessSnr()
     {
-        $data = snmpwalk_group($this->getDevice(), 'cellularSignalSnr', 'CELLULAR');
+        $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalSnr', 'CELLULAR');
         $sensors = [];
         foreach ($data as $index => $snr_value) {
             if ($snr_value['cellularSignalSnr'] != '-9999') {
@@ -77,7 +77,7 @@ class Pepwave extends OS implements
 
     public function discoverWirelessSinr()
     {
-        $data = snmpwalk_group($this->getDevice(), 'cellularSignalSinr', 'CELLULAR');
+        $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalSinr', 'CELLULAR');
         $sensors = [];
         foreach ($data as $index => $sinr_value) {
             if ($sinr_value['cellularSignalSinr'] != '-9999') {
@@ -89,7 +89,7 @@ class Pepwave extends OS implements
 
     public function discoverWirelessRsrp()
     {
-        $data = snmpwalk_group($this->getDevice(), 'cellularSignalRsrp', 'CELLULAR');
+        $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalRsrp', 'CELLULAR');
         $sensors = [];
         foreach ($data as $index => $rsrp_value) {
             if ($rsrp_value['cellularSignalRsrp'] != '-9999') {
@@ -101,7 +101,7 @@ class Pepwave extends OS implements
 
     public function discoverWirelessRsrq()
     {
-        $data = snmpwalk_group($this->getDevice(), 'cellularSignalRsrq', 'CELLULAR');
+        $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalRsrq', 'CELLULAR');
         $sensors = [];
         foreach ($data as $index => $rsrq_value) {
             if ($rsrq_value['cellularSignalRsrq'] != '-9999') {

@@ -1,5 +1,7 @@
 mib: ZYXEL-ZYWALL-ZLD-COMMON-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<>.*)/'
     processors:
         data:
             -

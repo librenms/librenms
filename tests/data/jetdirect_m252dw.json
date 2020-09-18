@@ -8,13 +8,13 @@
                     "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:VNB3J99999,FN:1F31B6C,SVCID:99999,PID:HP Color LaserJet Pro M252dw",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Color LaserJet Pro M252dw",
                     "features": null,
                     "os": "jetdirect",
                     "type": "printer",
                     "serial": null,
                     "icon": "hp.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

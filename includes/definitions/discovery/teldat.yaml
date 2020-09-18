@@ -1,0 +1,8 @@
+modules:
+    os:
+        hardware:
+            - TELDAT-MIB::telAdminStatusSystemBoardType.0
+            - TELDAT-MIB::telAdminStatusSystemBoardRevision.0
+        hardware_template: '{{ TELDAT-MIB::telAdminStatusSystemBoardType.0 }} (rev {{ TELDAT-MIB::telAdminStatusSystemBoardRevision.0 }})'
+        serial: TELDAT-MIB::telAdminStatusSystemNumSerie.0
+        version: TELDAT-MIB::telAdminStatusSystemAppVersion.0

@@ -1,5 +1,9 @@
 mib: IES5206-MIB
 modules:
+    os:
+        hardware: IES5206-MIB::sysProductDescr.0
+        serial: IES5206-MIB::sysSerialNumber.0
+        version: IES5206-MIB::sysBootupFwVersion.0
     processors:
         data:
             -
