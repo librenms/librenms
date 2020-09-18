@@ -14,11 +14,11 @@
 // Grab the coordinates read from GPS stats and update the location if different
 
 // PACKETFLUX-GNSS-MIB::gnssLatitude.0.0
-$latitude = snmp_get($device, '.1.3.6.1.4.1.32050.3.4.1.1.3.0.0','-OQv', 'PACKETFLUX-GNSS-MIB');
+$latitude = snmp_getnext_multi($device, '.1.3.6.1.4.1.32050.3.4.1.1.3.0.0','-OQv', 'PACKETFLUX-GNSS-MIB');
 $lat = str_replace(' degrees', '', $latitude);
 
 // PACKETFLUX-GNSS-MIB::gnssLongitude.0.0
-$longitude = snmp_get($device, '.1.3.6.1.4.1.32050.3.4.1.1.4.0.0','-OQv', 'PACKETFLUX-GNSS-MIB');
+$longitude = snmp_getnext_multi($device, '.1.3.6.1.4.1.32050.3.4.1.1.4.0.0','-OQv', 'PACKETFLUX-GNSS-MIB');
 $lng = str_replace(' degrees', '', $longitude);
 
 $coord = "[".round($location->lat,3).", ".round($location->lng,3)."]";
@@ -32,7 +32,7 @@ if (isset($location) and $coord != $newcoord and abs($lat)>0 and abs($lng)>0) {
     log_event('Location Update '. $coord . ' -> ' . $newcoord.'('.$lat.','.$lng.')', $device, 'system', 3);
 }
 
-$serial = snmp_get($device, 'ifPhysAddress.1','-OQv', 'IF-MIB');
+$serial = snmp_getnext_multi($device, 'ifPhysAddress.1','-OQv', 'IF-MIB');
 
 unset(
         $latitutude, $lat,
