@@ -71,6 +71,8 @@ Note that some services (procs, inodes, load and similar) will always
 poll the local LibreNMS server it's running on, regardless of which
 device you add it to.
 
+You can also add Service Templates which are applied Device Groups.
+
 ## Performance data
 
 By default, the check-services script will collect all performance
