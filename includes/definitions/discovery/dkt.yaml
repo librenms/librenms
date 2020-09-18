@@ -1,5 +1,8 @@
 mib: DKT-CATV-MIB:DKT-FE-MIB:DKT-GE-MIB:DKT-GENERIC-MIB:DKT-MIB:DKT-RMON-MIB
 modules:
+    os:
+        hardware: DKT-GENERIC-MIB::hwVersion.0
+        version: DKT-GENERIC-MIB::swVersion.0
     sensors:
         state:
             data:

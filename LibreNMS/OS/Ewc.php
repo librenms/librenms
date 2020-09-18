@@ -59,7 +59,7 @@ class Ewc extends OS implements
             'HIPATH-WIRELESS-HWC-MIB::licenseLocalAP.0',
             'HIPATH-WIRELESS-HWC-MIB::licenseForeignAP.0'
         );
-        $data = snmp_get_multi($this->getDevice(), $oids);
+        $data = snmp_get_multi($this->getDeviceArray(), $oids);
         $licCount = $data[0]['licenseLocalAP'] + $data[0]['licenseForeignAP'];
         return array(
             new WirelessSensor(
@@ -105,7 +105,7 @@ class Ewc extends OS implements
             )
         );
 
-        $apstats = snmpwalk_cache_oid($this->getDevice(), 'apStatsMuCounts', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $apstats = snmpwalk_cache_oid($this->getDeviceArray(), 'apStatsMuCounts', array(), 'HIPATH-WIRELESS-HWC-MIB');
         $apnames = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
         foreach ($apstats as $index => $entry) {
@@ -122,7 +122,7 @@ class Ewc extends OS implements
             );
         }
 
-        $wlanstats = snmpwalk_cache_oid($this->getDevice(), 'wlanStatsAssociatedClients', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $wlanstats = snmpwalk_cache_oid($this->getDeviceArray(), 'wlanStatsAssociatedClients', array(), 'HIPATH-WIRELESS-HWC-MIB');
         $wlannames = $this->getCacheByIndex('wlanName', 'HIPATH-WIRELESS-HWC-MIB');
 
         foreach ($wlanstats as $index => $entry) {
@@ -147,7 +147,7 @@ class Ewc extends OS implements
      */
     public function discoverWirelessErrors()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioPktRetx', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioPktRetx', array(), 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
         $sensors = array();
@@ -173,7 +173,7 @@ class Ewc extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apRadioStatusChannel', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apRadioStatusChannel', array(), 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('ifName', 'IF-MIB');
 
         $sensors = array();
@@ -199,7 +199,7 @@ class Ewc extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'dot11ExtRadioMaxNfCount', array(), 'HIPATH-WIRELESS-DOT11-EXTNS-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'dot11ExtRadioMaxNfCount', array(), 'HIPATH-WIRELESS-DOT11-EXTNS-MIB');
         $ap_interfaces = $this->getCacheByIndex('ifName', 'IF-MIB');
 
         $sensors = array();
@@ -232,7 +232,7 @@ class Ewc extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentRSS', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentRSS', array(), 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
         $sensors = array();
@@ -258,7 +258,7 @@ class Ewc extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentSNR', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentSNR', array(), 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
         $sensors = array();
@@ -284,7 +284,7 @@ class Ewc extends OS implements
      */
     public function discoverWirelessUtilization()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentChannelUtilization', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentChannelUtilization', array(), 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
 
         $sensors = array();

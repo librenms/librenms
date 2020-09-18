@@ -26,7 +26,6 @@
 namespace LibreNMS\Device;
 
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -192,7 +191,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
                 $rrd_name = array('processor', $processor_type, $processor_index);
                 $fields = compact('usage');
                 $tags = compact('processor_type', 'processor_index', 'rrd_name', 'rrd_def');
-                data_update($os->getDevice(), 'processors', $tags, $fields);
+                data_update($os->getDeviceArray(), 'processors', $tags, $fields);
 
                 if ($usage != $processor_usage) {
                     dbUpdate(array('processor_usage' => $usage), 'processors', '`processor_id` = ?', array($processor_id));
@@ -211,8 +210,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         // don't fetch too many at a time TODO build into snmp_get_multi_oid?
         $snmp_data = array();
-        foreach (array_chunk($oids, get_device_oid_limit($os->getDevice())) as $oid_chunk) {
-            $multi_data = snmp_get_multi_oid($os->getDevice(), $oid_chunk);
+        foreach (array_chunk($oids, get_device_oid_limit($os->getDeviceArray())) as $oid_chunk) {
+            $multi_data = snmp_get_multi_oid($os->getDeviceArray(), $oid_chunk);
             $snmp_data = array_merge($snmp_data, $multi_data);
         }
 
@@ -252,7 +251,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     public static function processYaml(OS $os)
     {
-        $device = $os->getDevice();
+        $device = $os->getDeviceArray();
         if (empty($device['dynamic_discovery']['modules']['processors'])) {
             d_echo("No YAML Discovery data.\n");
             return array();

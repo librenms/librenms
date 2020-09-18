@@ -1,5 +1,7 @@
 mib: COLUBRIS-USAGE-INFORMATION-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>MSM\S+) .* Serial number (?<serial>\S+) - Firmware version (?<version>\S+)/'
     processors:
         data:
             -

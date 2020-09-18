@@ -18,10 +18,11 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\OS;
+use LibreNMS\OS\Shared\Zyxel;
 
-class Zyxelnwa extends OS implements WirelessClientsDiscovery
+class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery
 {
     public function discoverWirelessClients()
     {

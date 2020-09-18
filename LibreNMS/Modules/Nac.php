@@ -60,7 +60,7 @@ class Nac implements Module
             }
 
             $nac_entries = $os->pollNac()->keyBy('mac_address');
-            $existing_entries = $os->getDeviceModel()->portsNac->keyBy('mac_address');
+            $existing_entries = $os->getDevice()->portsNac->keyBy('mac_address');
 
             // update existing models
             foreach ($nac_entries as $nac_entry) {
@@ -70,7 +70,7 @@ class Nac implements Module
             }
 
             // persist to DB
-            $os->getDeviceModel()->portsNac()->saveMany($nac_entries);
+            $os->getDevice()->portsNac()->saveMany($nac_entries);
 
             $delete = $existing_entries->diffKeys($nac_entries)->pluck('ports_nac_id');
             if ($delete->isNotEmpty()) {
@@ -88,6 +88,6 @@ class Nac implements Module
      */
     public function cleanup(OS $os)
     {
-        $os->getDeviceModel()->portsNac()->delete();
+        $os->getDevice()->portsNac()->delete();
     }
 }

@@ -1,5 +1,12 @@
 mib: NAG-MIB
 modules:
+    os:
+        hardware:
+            - NAG-MIB::sysHardwareVersion.0
+            - NAG-MIB::sysHardwareVersion.1
+        version:
+            - NAG-MIB::sysSoftwareVersion.0
+            - NAG-MIB::sysSoftwareVersion.1
     pre-cache:
         data:
             -

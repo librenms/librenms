@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.27514.1.1.1.221",
                     "sysDescr": "QSW-3400-28T-AC Device, Compiled Jun 17 14:34:45 2013\n SoftWare Version 6.2.201.11\n BootRom Version 4.30.8\n HardWare Version 2.0\n Device serial number 00019711401010007262\n Copyright (C) 2013 by QTECH LLC\n All rights reserved",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "6.2.201.11",
+                    "hardware": "QSW-3400-28T-AC",
                     "features": null,
                     "os": "qtech",
                     "type": "network",
-                    "serial": null,
+                    "serial": "00019711401010007262",
                     "icon": "qtech.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.15",
                     "sysDescr": "AIX testhost 1 7 <private>",
                     "sysContact": null,
-                    "version": null,
+                    "version": "7.1",
                     "hardware": null,
                     "features": null,
                     "os": "aix",
                     "type": "server",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "aix.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

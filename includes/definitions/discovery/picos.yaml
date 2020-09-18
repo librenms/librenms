@@ -1,5 +1,8 @@
 mib: PICA-PRIVATE-MIB
 modules:
+    os:
+        sysDescr_regex: '/for (?<hardware>\S+)/'
+        serial: PICA-PRIVATE-MIB::hostStatusGroup.16.0
     processors:
         data:
             -

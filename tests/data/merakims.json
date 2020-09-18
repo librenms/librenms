@@ -8,11 +8,11 @@
                     "sysDescr": "Meraki MS",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Meraki MS",
                     "features": null,
                     "os": "merakims",
                     "type": "network",
-                    "serial": null,
+                    "serial": "9999999999",
                     "icon": "meraki.png",
                     "location": null
                 }

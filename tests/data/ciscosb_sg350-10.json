@@ -3013,14 +3013,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.6.1.95.10.3",
                     "sysDescr": "SG350-10 10-Port Gigabit Managed Switch",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "Software 1.0.0, Firmware 1.0.0",
+                    "hardware": "SG350-10",
                     "features": null,
                     "os": "ciscosb",
                     "type": "network",
                     "serial": null,
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -3032,7 +3032,7 @@
                     "sysDescr": "SG350-10 10-Port Gigabit Managed Switch",
                     "sysContact": "<private>",
                     "version": "Software 1.0.0, Firmware 1.0.0",
-                    "hardware": null,
+                    "hardware": "SG350-10",
                     "features": null,
                     "os": "ciscosb",
                     "type": "network",

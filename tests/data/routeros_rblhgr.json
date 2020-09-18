@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.14988.1",
                     "sysDescr": "RouterOS RBLHGR",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "version": "6.45.7",
+                    "hardware": "RBLHGR",
+                    "features": "Level 3",
                     "os": "routeros",
                     "type": "network",
-                    "serial": null,
+                    "serial": "A33309596248",
                     "icon": "mikrotik.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

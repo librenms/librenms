@@ -316,7 +316,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
  * For example instead of get sysName.0, you can getnext sysName to get the .0 value.
  *
  * @param array $device Target device
- * @param string $oids The oids to getnext
+ * @param array $oids The oids to getnext
  * @param string $options Options to pass to snmpgetnext (-OQUs for example)
  * @param string $mib The MIB to use
  * @param string $mibdir Optional mib directory to search

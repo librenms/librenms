@@ -1,5 +1,15 @@
 mib: LINKSYS-rndMng
 modules:
+    os:
+        hardware:
+            - LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1
+            - LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamHardwareVersion.1
+        hardware_template: '{{ LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1 }} {{ LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamHardwareVersion.1 }}'
+        serial: LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamSerialNum.1
+        version:
+            - LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion.1
+            - LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamFirmwareVersion.1
+        version_template: 'SW: {{ LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion.1 }}, FW: {{ LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamFirmwareVersion.1 }}'
     processors:
         data:
             -

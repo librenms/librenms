@@ -49770,9 +49770,9 @@
                     "features": null,
                     "os": "comware",
                     "type": "network",
-                    "serial": null,
+                    "serial": "DM20F3000F",
                     "icon": "hpe.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

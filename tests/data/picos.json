@@ -8,13 +8,13 @@
                     "sysDescr": "Pica8, Inc. PicOS for as5812_54x",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "as5812_54x",
                     "features": null,
                     "os": "picos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "581254X1919216",
                     "icon": "picos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

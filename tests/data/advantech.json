@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.10297.202.7000",
                     "sysDescr": "Switch",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "1.01.01",
+                    "hardware": "EKI-7708G-4FP",
                     "features": null,
                     "os": "advantech",
                     "type": "network",
                     "serial": null,
                     "icon": "advantech.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

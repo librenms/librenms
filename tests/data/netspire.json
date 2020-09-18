@@ -8,13 +8,13 @@
                     "sysDescr": "NetSpire CONAC01/4004:70FM r1.0",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "CONAC01/4004:70FM",
                     "features": null,
                     "os": "netspire",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "141100002",
                     "icon": "openaccess.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

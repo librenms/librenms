@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.3224.1.29",
                     "sysDescr": "SSG5-Serial version 6.3.0r24.0 (SN: 0000000000000000, Firewall+VPN)",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "version": "6.3.0r24.0",
+                    "hardware": "SSG5-Serial",
+                    "features": "Firewall+VPN",
                     "os": "screenos",
                     "type": "firewall",
-                    "serial": null,
+                    "serial": "0000000000000000",
                     "icon": "screenos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

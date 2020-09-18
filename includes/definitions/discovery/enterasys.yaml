@@ -1,5 +1,7 @@
 mib: ENTERASYS-RESOURCE-UTILIZATION-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+) Rev (?<version>\S+)/'
     processors:
         data:
             -

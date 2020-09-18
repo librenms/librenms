@@ -39,7 +39,7 @@ trait VxworksProcessorUsage
      */
     public function discoverProcessors($oid = '.1.3.6.1.4.1.4413.1.1.1.1.4.9.0')
     {
-        $usage = $this->parseCpuUsage(snmp_get($this->getDevice(), $oid, '-Ovq'));
+        $usage = $this->parseCpuUsage(snmp_get($this->getDeviceArray(), $oid, '-Ovq'));
         if (is_numeric($usage)) {
             return array(
                 Processor::discover(
@@ -69,7 +69,7 @@ trait VxworksProcessorUsage
 
         foreach ($processors as $processor) {
             $data[$processor['processor_id']] = $this->parseCpuUsage(
-                snmp_get($this->getDevice(), $processor['processor_oid'])
+                snmp_get($this->getDeviceArray(), $processor['processor_oid'])
             );
         }
 

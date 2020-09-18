@@ -1,5 +1,7 @@
 mib: MICROSEMI-PDSINE-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+)\.  (Unit S\/N=(?<serial>\d*)\.  )?App Ver=(?<version>[^,]*),/'
     sensors:
         power:
             data:

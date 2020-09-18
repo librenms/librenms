@@ -1,5 +1,9 @@
 mib: TELESTE-COMMON-MIB
 modules:
+    os:
+        hardware: TELESTE-LUMINATO-MIB::deviceName.0
+        serial: TELESTE-LUMINATO-MIB::hwSerialNumber.0
+        version: TELESTE-LUMINATO-MIB::swVersion.0
     sensors:
         pre-cache:
             data:

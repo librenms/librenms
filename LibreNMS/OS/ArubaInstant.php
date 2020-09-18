@@ -26,8 +26,10 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -42,6 +44,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\Rewrite;
 
 class ArubaInstant extends OS implements
+    OSDiscovery,
     ProcessorDiscovery,
     WirelessApCountDiscovery,
     WirelessApCountPolling,
@@ -53,6 +56,12 @@ class ArubaInstant extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml
+        $device->serial = snmp_getnext($this->getDeviceArray(), 'aiAPSerialNum', '-Oqv', 'AI-AP-MIB');
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -85,7 +94,7 @@ class ArubaInstant extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = array();
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
         $ai_mib = 'AI-AP-MIB';
 
         if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
@@ -280,7 +289,7 @@ class ArubaInstant extends OS implements
     {
         $data = array();
         if (!empty($sensors)) {
-            $device = $this->getDevice();
+            $device = $this->getDeviceArray();
 
             if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
                 // version is at least 8.4.0.0
@@ -290,7 +299,7 @@ class ArubaInstant extends OS implements
                     $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
                 }
 
-                $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids);
+                $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
 
                 foreach ($oids as $id => $oid) {
                       $data[$id] = $snmp_data[$oid];

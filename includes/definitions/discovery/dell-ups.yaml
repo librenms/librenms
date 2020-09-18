@@ -1,5 +1,12 @@
 mib: DELL-SNMP-UPS-MIB
 modules:
+    os:
+        hardware: DELL-SNMP-UPS-MIB::productIDDisplayName.0
+        serial: DELL-SNMP-UPS-MIB::physicalIdentSerialNumber.0
+        version:
+            - DELL-SNMP-UPS-MIB::productIDVersion.0
+            - DELL-SNMP-UPS-MIB::productIDBuildNumber.0
+        version_template: '{{ DELL-SNMP-UPS-MIB::productIDVersion.0 }} {{ DELL-SNMP-UPS-MIB::productIDBuildNumber.0 }}'
     sensors:
         state:
             data:

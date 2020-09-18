@@ -25,17 +25,16 @@
 
 namespace LibreNMS\OS;
 
-use Illuminate\Support\Str;
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Qnap extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-        $info = snmp_getnext_multi($this->getDevice(), 'enclosureModel enclosureSerialNum entPhysicalFirmwareRev', '-OQUs', 'NAS-MIB:ENTITY-MIB');
-        $device->version = Str::replaceFirst('\"', '', $info['entPhysicalFirmwareRev']);
+        $info = snmp_getnext_multi($this->getDeviceArray(), ['enclosureModel', 'enclosureSerialNum', 'entPhysicalFirmwareRev'], '-OQUs', 'NAS-MIB:ENTITY-MIB');
+        $device->version = trim($info['entPhysicalFirmwareRev'], '\"');
         $device->hardware = $info['enclosureModel'];
         $device->serial = $info['enclosureSerialNum'];
     }
