@@ -49,10 +49,38 @@ $factory->define(\App\Models\Bill::class, function (Faker\Generator $faker) {
 
 $factory->define(\App\Models\Device::class, function (Faker\Generator $faker) {
     return [
-        'hostname' => $faker->domainWord . '.' . $faker->domainName,
+        'hostname' => $faker->domainWord . '-' . $faker->domainWord . '-' . $faker->domainWord . '.' . $faker->domainName,
         'ip' => $faker->randomElement([$faker->ipv4, $faker->ipv6]),
+        'type' => $faker->randomElement([
+            'appliance',
+            'camera',
+            'collaboration',
+            'encoder',
+            'environment',
+            'firewall',
+            'loadbalancer',
+            'management',
+            'network',
+            'power',
+            'printer',
+            'proxy',
+            'sensor',
+            'server',
+            'storage',
+            'timing',
+            'wireless',
+            'workstation'
+            ]),
         'status' => $status = random_int(0, 1),
         'status_reason' => $status == 0 ? $faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
+    ];
+});
+
+$factory->define(\App\Models\DeviceGroup::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->domainWord,
+        'desc' => $faker->text(255),
+        'type' =>'static',
     ];
 });
 
