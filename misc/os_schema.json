@@ -347,7 +347,9 @@
         "ifname": {
             "type": "boolean"
         },
-        "mib_dir": {"$ref": "#/definitions/string_group"},
+        "mib_dir": {
+            "type":  "string"
+        },
         "good_if": {
             "type": "array",
             "items": {

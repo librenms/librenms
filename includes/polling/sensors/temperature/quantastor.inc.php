@@ -1,8 +1,8 @@
 <?php
 /**
- * Openwrt.inc.php
+ * quantastor.inc.php
  *
- * LibreNMS os polling module for Tomato
+ * OSNEXUS QuantaStor poller temperatures
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,9 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2020 Cercel Valentin
+ * @author     Cercel Valentin <crc@nuamchefazi.ro>
  */
 
-list($ignore, $version) = explode(' ', snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'));
-$hardware = snmp_get($device, '.1.3.6.1.4.1.2021.7890.2.101.1', '-Osqnv');
-
-unset($ignore);
+preg_match('/([0-9]+)/', $sensor_value, $temps);
+$sensor_value = $temps[0];

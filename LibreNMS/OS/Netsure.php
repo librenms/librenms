@@ -1,8 +1,8 @@
 <?php
 /**
- * asuswrt-merlin.inc.php
+ * Netsure.php
  *
- * LibreNMS os polling module for AsusWRT-Merlin
+ * Emerson Power Vortex Controllers
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,20 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @author     Craig Harris
  */
 
-list($ignore, $hardware, $version) = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
+namespace LibreNMS\OS;
 
-unset($ignore);
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\OS;
+
+class Netsure extends OS implements OSDiscovery
+{
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $info = snmp_getnext_multi($this->getDevice(), 'vecFirmwareVersion', '-OQUs', 'VEC-MIBv5-9');
+        $device->version = $info['vecFirmwareVersion'];
+    }
+}

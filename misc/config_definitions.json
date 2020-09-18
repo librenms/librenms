@@ -654,18 +654,6 @@
                 "/-K9W8-/"
             ]
         },
-        "graphing.availability": {
-            "group": "graphing",
-            "section": "availability",
-            "order": 0,
-            "default": [
-                "86400",
-                "604800",
-                "2592000",
-                "31536000"
-            ],
-            "type": "array"
-        },
         "bad_disk_regexp": {
             "default": [],
             "type": "array"
@@ -1270,6 +1258,18 @@
             "order": 2,
             "type": "integer"
         },
+        "graphing.availability": {
+            "group": "poller",
+            "section": "availability",
+            "order": 10,
+            "default": [
+                "86400",
+                "604800",
+                "2592000",
+                "31536000"
+            ],
+            "type": "array"
+        },
         "dot": {
             "default": "/usr/bin/dot",
             "type": "executable"
@@ -1547,9 +1547,9 @@
         "fping6": {
             "default": "fping6",
             "group": "external",
-            "section": "executable",
+            "section": "binaries",
             "order": 1,
-            "type": "text"
+            "type": "executable"
         },
         "fping_options.count": {
             "default": 3,
@@ -3697,6 +3697,9 @@
             "default": "/usr/lib/nagios/plugins",
             "type": "directory"
         },
+        "nets": {
+            "type": "array"
+        },
         "network_map_items": {
             "default": [
                 "xdp",
@@ -4091,13 +4094,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.availability": {
-            "order": 25,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "poller_modules.os": {
             "order": 320,
             "group": "poller",
@@ -4480,6 +4476,13 @@
             "section": "prometheus",
             "order": 2
         },
+        "prometheus.attach_sysname": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 3
+        },
         "public_status": {
             "default": false,
             "group": "auth",
@@ -4550,7 +4553,7 @@
             "type": "integer"
         },
         "rrd_rra": {
-            "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 ",
+            "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440 RRA:MIN:0.5:24:1440 RRA:MIN:0.5:288:1440 RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440 RRA:MAX:0.5:24:1440 RRA:MAX:0.5:288:1440 RRA:LAST:0.5:1:2016 ",
             "group": "poller",
             "section": "rrdtool",
             "order": 4,

@@ -3,8 +3,7 @@ text: 'Extreme BOSS'
 type: network
 icon: extremeboss
 ifname: true
-mib_dir:
-    - nortel
+mib_dir: nortel
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

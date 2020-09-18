@@ -53,11 +53,11 @@ you should only run ping.php on a single node.
 
 ## Sub minute ping check
 
-Cron only has a resolution of one minute, so we have to use a trick to
-allow sub minute checks. We add two entries, but add a delay before one.
+Cron only has a resolution of one minute, so for sub-minute ping checks we need to adapt both `ping`
+and `alerts` entries. We add two entries per function, but add a delay before one of these entries.
 
-Alerts are only run every minute, so you will have to modify them as
-well. Remove the original alerts.php entry.
+Remember, you need to remove the original `ping.php` and `alerts.php` entries in crontab before
+proceeding!
 
 1: Set ping_rrd_step
 
@@ -89,9 +89,9 @@ down before the parent.
 
 # Settings
 
-ping.php uses much the same settings as the poller fping with one
+`ping.php` uses much the same settings as the poller fping with one
 exception: retries is used instead of count.
-ping.php does not measure loss and avg response time, only up/down, so
+`ping.php` does not measure loss and avg response time, only up/down, so
 once a device responds it stops pinging it.
 
 ```

@@ -575,7 +575,6 @@ device_outages:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
     - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: uptime, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }

@@ -5,8 +5,7 @@ icon: rittal
 over:
     - { graph: device_temperature, text: Temperatures }
     - { graph: device_cooling, text: 'Cooling capacity' }
-mib_dir:
-    - rittal
+mib_dir: rittal
 discovery_modules:
     storage: false
     mempools: false

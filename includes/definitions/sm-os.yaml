@@ -2,8 +2,7 @@ os: sm-os
 text: 'SM-OS'
 type: wireless
 icon: siae
-mib_dir:
-    - siae
+mib_dir: siae
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

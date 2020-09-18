@@ -155,7 +155,12 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
                     echo(' >' . ucfirst($type['type']) . '</option>');
                 }
                 if ($unknown) {
-                    echo('          <option value="other">Other</option>');
+                    if (!is_null($device_model->type)) {
+                        $device_type = htmlspecialchars($device_model->type);
+                        echo('          <option value="'. $device_type .'" selected="1" >' . ucfirst($device_type) . '</option>');
+                    } else {
+                        echo('          <option value="other">Other</option>');
+                    }
                 }
                 ?>
             </select>

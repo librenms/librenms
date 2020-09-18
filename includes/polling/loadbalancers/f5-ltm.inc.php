@@ -180,7 +180,7 @@ if (count($components > 0)) {
                 'pktsout' => $f5_stats['ltmPoolMemberStatEntryPktsout']['1.3.6.1.4.1.3375.2.2.5.4.3.1.7.'.$UID],
                 'bytesin' => $f5_stats['ltmPoolMemberStatEntryBytesin']['1.3.6.1.4.1.3375.2.2.5.4.3.1.6.'.$UID],
                 'bytesout' => $f5_stats['ltmPoolMemberStatEntryBytesout']['1.3.6.1.4.1.3375.2.2.5.4.3.1.8.'.$UID],
-                'totalconns' => $f5_stats['ltmPoolMemberStatEntryTotconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.10.'.$UID],
+                'totconns' => $f5_stats['ltmPoolMemberStatEntryTotconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.10.'.$UID],
             );
 
             // Let's print some debugging info.

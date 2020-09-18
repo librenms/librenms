@@ -2,8 +2,7 @@ os: pepwave
 text: 'Pepwave'
 type: network
 icon: peplink
-mib_dir:
-    - peplink
+mib_dir: peplink
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

@@ -3,7 +3,7 @@ return [
     "checks" => [
         "comment" => "Comment",
         "item" => "Item",
-        "php_required" => ":version required",
+        "php_required" => ":version or higher required",
         "status" => "Status",
         "title" => "Pre-Install Checks"
     ],

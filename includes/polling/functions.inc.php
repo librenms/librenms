@@ -291,10 +291,10 @@ function poll_device($device, $force_module = false)
 
     if ($response['status'] == '1') {
         if ($device['snmp_disable']) {
-            Config::set('poller_modules', []);
+            Config::set('poller_modules', ['availability' => true]);
         } else {
             // we always want the core module to be included, prepend it
-            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
+            Config::set('poller_modules', ['core' => true, 'availability' => true] + Config::get('poller_modules'));
         }
 
         printChangedStats(true); // don't count previous stats
