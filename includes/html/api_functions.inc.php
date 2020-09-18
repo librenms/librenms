@@ -12,8 +12,10 @@
  * the source code distribution for details.
  */
 
+use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\DeviceOutage;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
@@ -465,9 +467,11 @@ function device_availability(\Illuminate\Http\Request $request)
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
     return check_device_permission($device_id, function ($device_id) {
-        $availabilities = dbFetchRows('SELECT duration, availability_perc FROM availability WHERE `device_id` = ? ORDER BY `duration`', [$device_id]);
+        $availabilities = Availability::select('duration', 'availability_perc')
+            ->where('device_id', '=', $device_id)
+            ->orderBy('duration', 'ASC');
 
-        return api_success($availabilities, 'availability');
+        return api_success($availabilities->get(), 'availability');
     });
 }
 
@@ -485,9 +489,11 @@ function device_outages(\Illuminate\Http\Request $request)
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
     return check_device_permission($device_id, function ($device_id) {
-        $outages = dbFetchRows('SELECT going_down, up_again FROM device_outages WHERE `device_id` = ?', [$device_id]);
+        $outages = DeviceOutage::select('going_down', 'up_again')
+            ->where('device_id', '=', $device_id)
+            ->orderBy('going_down', 'DESC');
 
-        return api_success($outages, 'outages');
+        return api_success($outages->get(), 'outages');
     });
 }
 
