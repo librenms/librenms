@@ -16,10 +16,10 @@ if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-$service_id = $vars['service_id'];
+$service__template_id = $vars['service_template_id'];
 
-if (is_numeric($service_id) && $service_id > 0) {
-    $service = service_get(null, $service_id);
+if (is_numeric($service_template_id) && $service_template_id > 0) {
+    $service_template = service_template_get(null, $service_template_id);
 
     $output = array(
         'stype'     => $service[0]['service_type'],
@@ -27,8 +27,7 @@ if (is_numeric($service_id) && $service_id > 0) {
         'desc'      => $service[0]['service_desc'],
         'param'     => $service[0]['service_param'],
         'ignore'    => $service[0]['service_ignore'],
-        'disabled'  => $service[0]['service_disabled'],
-        'service_template_id' => $service[0]['service_template_id']
+        'disabled'  => $service[0]['service_disabled']        
     );
 
     header('Content-Type: application/json');

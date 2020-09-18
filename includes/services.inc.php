@@ -36,7 +36,7 @@ function get_service_status($device = null)
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip = '', $param = "", $ignore = 0, $disabled = 0)
+function add_service($device, $type, $desc, $ip = '', $param = "", $ignore = 0, $disabled = 0, $service_template_id = "")
 {
 
     if (!is_array($device)) {
@@ -47,13 +47,13 @@ function add_service($device, $type, $desc, $ip = '', $param = "", $ignore = 0, 
         $ip = Device::pollerTarget($device['hostname']);
     }
 
-    $insert = array('device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled);
+    $insert = array('device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $service_template_id);
     return dbInsert($insert, 'services');
 }
 
 function service_get($device = null, $service = null)
 {
-    $sql_query = "SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds` FROM `services` WHERE";
+    $sql_query = "SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds`,`service_template_id` FROM `services` WHERE";
     $sql_param = array();
     $add = 0;
 
@@ -182,7 +182,7 @@ function delete_service_template($service_template = null)
 
 function discover_service_template($device_group, $service_template)
 {
-    if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service_template['service_template_id'], $device_group['device_group_id']))) {
+    if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_template_id`= ? AND `device_group_id` = ?', array($service_template['service_template_id'], $device_group['device_group_id']))) {
         $service=service_template_get($device_group, $service_template);
         $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
         foreach ($device_ids as $device) {

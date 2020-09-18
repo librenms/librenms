@@ -1720,6 +1720,7 @@ services:
     - { Field: service_message, Type: text, 'Null': false, Extra: '' }
     - { Field: service_disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: service_ds, Type: text, 'Null': false, Extra: '' }
+    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: ''}
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     services_device_id_index: { Name: services_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
