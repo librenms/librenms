@@ -75,13 +75,7 @@ print_optionbar_end();
 
 echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
 
-$i = '1';
-
-foreach (dbFetchRows("SELECT * FROM `vlans` WHERE `device_id` = ? ORDER BY 'vlan_vlan'", array($device['device_id'])) as $vlan) {
-    include 'includes/html/print-vlan.inc.php';
-
-    $i++;
-}
+include 'includes/html/print-vlan.inc.php';
 
 echo '</table>';
 
