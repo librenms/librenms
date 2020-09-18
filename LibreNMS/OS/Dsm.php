@@ -1,6 +1,6 @@
 <?php
 /**
- * dsm.inc.php
+ * Dsm.php
  *
  * -Description-
  *
@@ -17,14 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Nick Peelman
+ * @copyright  2020 Daniel Baeza
  * @author     Nick Peelman <nick@peelman.us>
+ * @author     Daniel Baeza <doctoruve@gmail.com>
  */
 
-$tmp_dsm  = snmp_get_multi_oid($device, ['modelName.0', 'version.0', 'serialNumber.0'], '-OUQs', 'SYNOLOGY-SYSTEM-MIB');
-$hardware = $tmp_dsm['modelName.0'];
-$version  = $tmp_dsm['version.0'];
-$serial   = $tmp_dsm['serialNumber.0'];
-unset($tmp_dsm);
+namespace LibreNMS\OS;
+
+use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\OS;
+
+class Dsm extends OS implements OSDiscovery
+{
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $tmp_dsm = snmp_get_multi_oid($this->getDevice(), ['modelName.0', 'version.0', 'serialNumber.0'], '-OUQs', 'SYNOLOGY-SYSTEM-MIB');
+        $device->hardware = $tmp_dsm['modelName.0'];
+        $device->version = Str::replaceFirst('DSM ', '', $tmp_dsm['version.0']);
+        $device->serial = $tmp_dsm['serialNumber.0'];
+        unset($tmp_dsm);
+    }
+}
