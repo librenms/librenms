@@ -13,8 +13,6 @@
 
 // Grab the coordinates read from GPS stats and update the location if different
 
-public function discoverOS(): void
-{
     // PACKETFLUX-GNSS-MIB::gnssLatitude.0.0
     // PACKETFLUX-GNSS-MIB::gnssLongitude.0.0
     $oids = array('.1.3.6.1.4.1.32050.3.4.1.1.3.0.0', '.1.3.6.1.4.1.32050.3.4.1.1.4.0.0')
@@ -36,9 +34,3 @@ public function discoverOS(): void
 
     $serial = snmp_get($device, 'ifPhysAddress.1','-OQv', 'IF-MIB');
 
-    unset(
-            $latitutude, $lat,
-            $longitude, $lng,
-            $coord, $newcoord
-    );
-}
