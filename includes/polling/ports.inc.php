@@ -292,6 +292,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         // If the device doesn't have ifXentry data, fetch ifEntry instead.
         if ((!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) ||
             ((!isset($hc_test[0]['ifHighSpeed']) && !is_numeric($hc_test[0]['ifHighSpeed'])))) {
+            $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB', null, '-OQUst');
             $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
         } else {
             // For devices with ifXentry data, only specific ifEntry keys are fetched to reduce SNMP load
@@ -568,7 +569,7 @@ foreach ($ports as $port) {
 
         // rewrite the ifPhysAddress
         if (strpos($this_port['ifPhysAddress'], ':')) {
-            list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(':', $this_port['ifPhysAddress']);
+            [$a_a, $a_b, $a_c, $a_d, $a_e, $a_f] = explode(':', $this_port['ifPhysAddress']);
             $this_port['ifPhysAddress'] = zeropad($a_a) . zeropad($a_b) . zeropad($a_c) . zeropad($a_d) . zeropad($a_e) . zeropad($a_f);
         }
 
