@@ -23,8 +23,8 @@ class CreateServicesTemplateTable extends Migration
             $table->boolean('service_template_ignore');
             $table->tinyInteger('service_template_status')->default(0);
             $table->unsignedInteger('service_template_changed')->default(0);
-            $table->text('service_message');
-            $table->boolean('service_disabled')->default(0);
+            $table->text('service_template_message');
+            $table->boolean('service_template_disabled')->default(0);
         });
     }
 
