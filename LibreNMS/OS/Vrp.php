@@ -49,7 +49,7 @@ class Vrp extends OS implements
 {
     public function discoverOS(Device $device): void
     {
-        parent::discoverOS($device);
+        parent::discoverOS($device); // yaml
 
         //Huawei VRP devices are not providing the HW description in a unified way
         preg_match('/Version (\S+)/', $device->sysDescr, $matches);

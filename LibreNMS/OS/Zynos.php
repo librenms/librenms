@@ -33,7 +33,7 @@ class Zynos extends Zyxel implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        parent::discoverOS($device);
+        parent::discoverOS($device); // yaml
 
         // if not already set, let's fill the gaps
         if (empty($device->hardware)) {

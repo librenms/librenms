@@ -35,7 +35,7 @@ class Zywall extends Zyxel implements OSDiscovery, OSPolling
 {
     public function discoverOS(Device $device): void
     {
-        parent::discoverOS($device);
+        parent::discoverOS($device); // yaml
 
         $device->hardware = $device->hardware ?: $device->sysDescr;
         // ZYXEL-ES-COMMON::sysSwVersionString.0
