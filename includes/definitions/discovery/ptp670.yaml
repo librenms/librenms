@@ -1,5 +1,11 @@
 mib: CAMBIUM-PTP670-MIB
 modules:
+    os:
+        sysDescr_regex: '/Version (?<version>\S+)/'
+        hardware:
+            - CAMBIUM-PTP670-MIB::masterSlaveMode.0
+            - CAMBIUM-PTP670-MIB::hardwareVersion.0
+        hardware_template: 'PTP 670 {{ CAMBIUM-PTP670-MIB::masterSlaveMode.0 }} ({{ CAMBIUM-PTP670-MIB::hardwareVersion.0 }})'
     sensors:
         state:
             data:

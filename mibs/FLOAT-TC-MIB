@@ -1,0 +1,61 @@
+FLOAT-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    mib-2                                 FROM SNMPv2-SMI  -- RFC 2578
+    TEXTUAL-CONVENTION                    FROM SNMPv2-TC;  -- RFC 2579
+
+floatTcMIB    MODULE-IDENTITY
+    LAST-UPDATED "201107270000Z"          -- July 27, 2011
+    ORGANIZATION "IETF OPSAWG Working Group"
+    CONTACT-INFO "WG Email: opsawg@ietf.org
+
+                  Editor: Randy Presuhn
+                  randy_presuhn@mindspring.com"
+    DESCRIPTION  "Textual conventions for the representation
+                  of floating-point numbers.
+
+                  Copyright (c) 2011 IETF Trust and the persons
+                  identified as authors of the code.  All rights
+                  reserved.
+
+                  Redistribution and use in source and binary forms,
+                  with or without modification, is permitted pursuant
+                  to, and subject to the license terms contained in,
+                  the Simplified BSD License set forth in Section
+                  4.c of the IETF Trust's Legal Provisions Relating
+                  to IETF Documents
+                  (http://trustee.ietf.org/license-info).
+
+                  This version of this MIB module is part of RFC 6340;
+                  see the RFC itself for full legal notices."
+
+    REVISION     "201107270000Z"          -- July 27, 2011
+    DESCRIPTION  "Initial version, published as RFC 6340."
+     ::= { mib-2 201 }
+
+Float32TC ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "This type represents a 32-bit (4-octet) IEEE
+                  floating-point number in binary interchange format."
+    REFERENCE    "IEEE Standard for Floating-Point Arithmetic,
+                  Standard 754-2008"
+    SYNTAX       OCTET STRING (SIZE(4))
+
+Float64TC ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "This type represents a 64-bit (8-octet) IEEE
+                  floating-point number in binary interchange format."
+    REFERENCE    "IEEE Standard for Floating-Point Arithmetic,
+                  Standard 754-2008"
+    SYNTAX       OCTET STRING (SIZE(8))
+
+Float128TC ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "This type represents a 128-bit (16-octet) IEEE
+                  floating-point number in binary interchange format."
+    REFERENCE    "IEEE Standard for Floating-Point Arithmetic,
+                  Standard 754-2008"
+    SYNTAX       OCTET STRING (SIZE(16))
+
+END

@@ -14,7 +14,7 @@
                     "sysDescr": "Huawei AR1220 Huawei Versatile Routing Platform Software  VRP (R) software,Version 5.120 (AR1220 V200R003C01SPC900) Copyright (C) 2011-2013 Huawei Technologies Co., Ltd",
                     "sysContact": null,
                     "version": "5.120 (V200R003C01SPC900)",
-                    "hardware": "Huawei AR1220",
+                    "hardware": "AR1220",
                     "features": null,
                     "os": "vrp",
                     "type": "network",

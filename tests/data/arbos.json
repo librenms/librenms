@@ -2912,7 +2912,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "arbor.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

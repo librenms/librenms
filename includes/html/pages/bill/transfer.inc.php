@@ -31,7 +31,7 @@ $yesterday      = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 
 $rightnow       = date('U');
 
 $cur_days   = date('d', (strtotime('now') - strtotime($datefrom)));
-$total_days = date('d', (strtotime($dateto) - strtotime($datefrom)));
+$total_days = round((strtotime($dateto) - strtotime($datefrom)) / (60 * 60 * 24));
 
 $total['data'] = format_bytes_billing($bill_data['total_data']);
 if ($bill_data['bill_type'] == 'quota') {

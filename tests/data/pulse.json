@@ -44,7 +44,7 @@
                     "sysDescr": "Pulse Secure, LLC,Pulse Connect Secure,VMware-VA-DTE,8.2R5 (build 49363)",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "Juniper ",
+                    "hardware": null,
                     "features": null,
                     "os": "pulse",
                     "type": "firewall",

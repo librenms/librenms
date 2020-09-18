@@ -1,5 +1,9 @@
 mib: WRI-CPU-MIB:WRI-TEMPERATURE-MIB:WRI-VOLTAGE-MIB:FAN-MIB:WRI-POWER-MIB:WRI-DEVICE-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>.*) \(R\) Software, Version (?<version>[^ ,]+),Hw Version (?<features>[^ ,]+)/'
+#        version: WRI-DEVICE-MIB::msppDevSwVersion.0
+#        features: WRI-DEVICE-MIB::msppDevHwVersion.0
     processors:
         data:
             -

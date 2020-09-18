@@ -8,6 +8,60 @@
         "modules": {
             "type": "object",
             "properties": {
+                "os": {
+                    "type": "object",
+                    "properties": {
+                        "version": {
+                            "type": ["string", "array"]
+                        },
+                        "hardware": {
+                            "type": ["string", "array"]
+                        },
+                        "features": {
+                            "type": ["string", "array"]
+                        },
+                        "serial": {
+                            "type": ["string", "array"]
+                        },
+                        "location": {
+                            "type": ["string", "array"]
+                        },
+                        "sysDescr_regex": {
+                            "type": ["string", "array"]
+                        },
+                        "version_regex": {
+                            "type": "string"
+                        },
+                        "hardware_regex": {
+                            "type": "string"
+                        },
+                        "features_regex": {
+                            "type": "string"
+                        },
+                        "serial_regex": {
+                            "type": "string"
+                        },
+                        "location_regex": {
+                            "type": "string"
+                        },
+                        "version_template": {
+                            "type": "string"
+                        },
+                        "hardware_template": {
+                            "type": "string"
+                        },
+                        "features_template": {
+                            "type": "string"
+                        },
+                        "serial_template": {
+                            "type": "string"
+                        },
+                        "location_template": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
                 "processors": {
                     "type": "object",
                     "properties": {

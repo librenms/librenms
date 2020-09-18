@@ -61,7 +61,7 @@ trait HostResources
                 continue;
             }
 
-            $device = $this->getDevice();
+            $device = $this->getDeviceArray();
             if ($device['os'] == 'arista-eos' && $index == '1') {
                 continue;
             }
@@ -86,7 +86,7 @@ trait HostResources
 
             $old_name = array('hrProcessor', $index);
             $new_name = array('processor', 'hr', $index);
-            rrd_file_rename($this->getDevice(), $old_name, $new_name);
+            rrd_file_rename($this->getDeviceArray(), $old_name, $new_name);
 
             $processor = Processor::discover(
                 'hr',

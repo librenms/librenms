@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.9303.1.5.64",
                     "sysDescr": "MS4026-AC, iBOS Version ibos-ms4k-7.1.2-ED-R  Copyright (c) 2001-2018 by Waystream AB Compiled Thu Aug 30 22:12:28 CST 2018 by builder",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "7.1.2-ED-R ",
+                    "hardware": "MS4026-AC",
                     "features": null,
                     "os": "ibos",
                     "type": "network",
                     "serial": null,
                     "icon": "waystream.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

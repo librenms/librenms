@@ -8,13 +8,13 @@
                     "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,ROM none,JETDIRECT,JD149,EEPROM JDI99999999,CIDATE 05/28/2018",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Color LaserJet flow MFP M880",
                     "features": null,
                     "os": "jetdirect",
                     "type": "printer",
                     "serial": null,
                     "icon": "hp.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

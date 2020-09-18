@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.674.10902.2",
                     "sysDescr": "Dell UPS Tower 1000W HV",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "01.14 0003",
+                    "hardware": "Dell UPS Tower 1000W HV",
                     "features": null,
                     "os": "dell-ups",
                     "type": "power",
-                    "serial": null,
+                    "serial": "CN-0H914N-75162-15K-0050-A04",
                     "icon": "dell.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -25,7 +25,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.674.10902.2",
                     "sysDescr": "Dell UPS Tower 1000W HV",
                     "sysContact": "<private>",
-                    "version": "01.14.0003",
+                    "version": "01.14 0003",
                     "hardware": "Dell UPS Tower 1000W HV",
                     "features": null,
                     "os": "dell-ups",

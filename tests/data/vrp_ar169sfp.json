@@ -8,13 +8,13 @@
                     "sysDescr": "Huawei AR169F Huawei Versatile Routing Platform Software  VRP (R) software,Version 5.170 (AR160 V200R009C00SPC500) Copyright (C) 2011-2018 Huawei Technologies Co., Ltd",
                     "sysContact": null,
                     "version": "5.170 (V200R009C00SPC500) [ARV200R009SPH025]",
-                    "hardware": "Huawei AR169F",
+                    "hardware": "AR169F",
                     "features": null,
                     "os": "vrp",
                     "type": "network",
                     "serial": "21500101573GK1000299",
                     "icon": "huawei.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "Huawei AR169F Huawei Versatile Routing Platform Software  VRP (R) software,Version 5.170 (AR160 V200R009C00SPC500) Copyright (C) 2011-2018 Huawei Technologies Co., Ltd",
                     "sysContact": "<private>",
                     "version": "5.170 (V200R009C00SPC500) [ARV200R009SPH025]",
-                    "hardware": "Huawei AR169F",
+                    "hardware": "AR169F",
                     "features": null,
                     "os": "vrp",
                     "type": "network",

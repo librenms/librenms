@@ -8,13 +8,13 @@
                     "sysDescr": "C9500",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "C9500",
                     "features": null,
                     "os": "ubiquoss-pon",
                     "type": "network",
-                    "serial": null,
+                    "serial": "U34M16450002",
                     "icon": "generic.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "C9500",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "Ubiquoss C9500",
+                    "hardware": "C9500",
                     "features": null,
                     "os": "ubiquoss-pon",
                     "type": "network",

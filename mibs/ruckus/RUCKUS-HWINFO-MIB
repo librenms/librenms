@@ -1,0 +1,97 @@
+--
+-- Copyright (c) 2010 by Ruckus Wireless, Inc.
+-- All Rights Reserved
+--
+
+RUCKUS-HWINFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusCommonHwInfoModule
+        FROM RUCKUS-ROOT-MIB
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI;
+
+ruckusHwInfoMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless Inc.
+
+        Postal:
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus hardware information objects."
+    ::= { ruckusCommonHwInfoModule 1 }
+
+
+-- Groups
+--
+
+ruckusHwInfoObjects OBJECT IDENTIFIER   ::= { ruckusHwInfoMIB 1 }
+
+ruckusHwInfo OBJECT IDENTIFIER  ::= { ruckusHwInfoObjects 1 }
+
+ruckusHwInfoEvents OBJECT IDENTIFIER    ::= { ruckusHwInfoMIB 2 }
+
+-- Hardware Information
+--
+
+ruckusHwInfoModelNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the model number of the device."
+    ::= { ruckusHwInfo 1 }
+
+
+ruckusHwInfoSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the serial number of the device."
+    ::= { ruckusHwInfo 2 }
+
+
+ruckusHwInfoCustomerID OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the name of the customer."
+    ::= { ruckusHwInfo 3 }
+
+
+ruckusHwInfoHWMajorRevision OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies major hardware revision."
+    ::= { ruckusHwInfo 4 }
+
+
+ruckusHwInfoHWMinorRevision OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies minor hardware revision."
+    ::= { ruckusHwInfo 5 }
+
+
+END

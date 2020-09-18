@@ -39,7 +39,7 @@ trait CiscoCellular
     {
         $sensors = array();
 
-        $data = snmpwalk_cache_oid($this->getDevice(), 'c3gCurrentGsmRssi', array(), 'CISCO-WAN-3G-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gCurrentGsmRssi', array(), 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rssi',

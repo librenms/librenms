@@ -1,5 +1,9 @@
 mib: CYBEROAM-MIB
 modules:
+    os:
+        hardware: CYBEROAM-MIB::applianceModel.0
+        version: CYBEROAM-MIB::cyberoamVersion.0
+        serial: CYBEROAM-MIB::applianceKey.0
     processors:
         data:
             -
