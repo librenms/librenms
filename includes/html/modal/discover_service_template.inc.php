@@ -14,7 +14,7 @@
 if (Auth::user()->hasGlobalAdmin()) {
     ?>
 
-    <div class="modal fade" id="confirm-discovery" tabindex="-1" role="dialog" aria-labelledby="Discover" aria-hidden="true">
+    <div class="modal fade" id="discover-service-template" tabindex="-1" role="dialog" aria-labelledby="Discover" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
@@ -28,8 +28,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <form role="form" class="remove_token_form">
                         <?php echo csrf_field() ?>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger danger" id="discovery-service-template"
-                                data-target="discovery-service-template">Discover
+                        <button type="submit" class="btn btn-danger danger" id="confirm-discovery-service-template"
+                                data-target="confirm-discovery-service-template">Discover
                         </button>
                         <input type="hidden" name="device_group_id" id="device_group_id" value="">
                         <input type="hidden" name="service_template_id" id="service_template_id" value="">
@@ -41,14 +41,14 @@ if (Auth::user()->hasGlobalAdmin()) {
     </div>
 
     <script>
-        $('#confirm-discovery').on('show.bs.modal', function (e) {
+        $('#discover-service-template').on('show.bs.modal', function (e) {
             device_group_id = $(e.relatedTarget).data('device_group_id');
             $("#device_group_id").val(device_group_id);
             service_template_id = $(e.relatedTarget).data('service_template_id');
             $("#service_template_id").val(service_template_id);
         });
 
-        $('#discovery-service-template').click('', function (e) {
+        $('#confirm-discover-service-template').click('', function (e) {
             e.preventDefault();
             var device_group_id = $("#device_group_id").val();
             var service_template_id = $("#service_template_id").val();
@@ -60,17 +60,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                     if (result.status == 0) {
                         // Yay.
                         $('#message').html('<div class="alert alert-info">' + result.message + '</div>');
-                        $("#confirm-discover").modal('hide');
+                        $("#discover-service-template").modal('hide');
                     }
                     else {
                         // Nay.
                         $("#message").html('<div class="alert alert-danger">' + result.message + '</div>');
-                        $("#confirm-discover").modal('hide');
+                        $("#discover-service-template").modal('hide');
                     }
                 },
                 error: function () {
                     $("#message").html('<div class="alert alert-info">An error occurred discovering this service template.</div>');
-                    $("#confirm-discover").modal('hide');
+                    $("#discover-service-template").modal('hide');
                 }
             });
         });
