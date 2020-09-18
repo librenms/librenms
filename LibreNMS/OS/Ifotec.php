@@ -35,7 +35,7 @@ class Ifotec extends OS implements OSDiscovery
     public function discoverOS(Device $device): void
     {
         if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.21362.100.')) {
-            $ifoSysProductIndex = snmp_get($this->getDevice(), 'ifoSysProductIndex.0', '-Oqv', 'IFOTEC-SMI');
+            $ifoSysProductIndex = snmp_get($this->getDeviceArray(), 'ifoSysProductIndex.0', '-Oqv', 'IFOTEC-SMI');
 
             if ($ifoSysProductIndex !== null) {
                 $oids = [
@@ -43,7 +43,7 @@ class Ifotec extends OS implements OSDiscovery
                     'ifoSysFirmware.'     . $ifoSysProductIndex,
                     'ifoSysBootloader.'   . $ifoSysProductIndex
                 ];
-                $data = snmp_get_multi($this->getDevice(), $oids, ['-OQUs'], 'IFOTEC-SMI');
+                $data = snmp_get_multi($this->getDeviceArray(), $oids, ['-OQUs'], 'IFOTEC-SMI');
 
                 $device->version  = $data[1]['ifoSysFirmware'] . " (Bootloader " . $data[1]['ifoSysBootloader'] . ")";
                 $device->serial   = $data[1]['ifoSysSerialNumber'];

@@ -35,13 +35,13 @@ class DellLaser extends \LibreNMS\OS
 
         // SNMPv2-SMI::enterprises.253.8.51.10.2.1.7.2.28110202 = STRING: "MFG:Dell;CMD:PJL,RASTER,DOWNLOAD,PCLXL,PCL,POSTSCRIPT;MDL:Laser Printer
         // 3100cn;DES:Dell Laser Printer 3100cn;CLS:PRINTER;STS:AAAMAwAAAAAAAgJ/HgMKBigDCgY8AwAzcJqwggAAwAAACAAAAAAA/w==;"
-        $modelinfo = explode(';', snmp_get($this->getDevice(), '1.3.6.1.4.1.253.8.51.10.2.1.7.2.28110202', '-OQv'));
+        $modelinfo = explode(';', snmp_get($this->getDeviceArray(), '1.3.6.1.4.1.253.8.51.10.2.1.7.2.28110202', '-OQv'));
 
         // SNMPv2-SMI::enterprises.674.10898.100.2.1.2.1.3.1 = STRING: "COMMAND SET:;MODEL:Dell Laser Printer 5310n"
-        $modelinfo = array_merge($modelinfo, explode(';', snmp_get($this->getDevice(), '1.3.6.1.4.1.674.10898.100.2.1.2.1.3.1', '-OQv', '', '')));
+        $modelinfo = array_merge($modelinfo, explode(';', snmp_get($this->getDeviceArray(), '1.3.6.1.4.1.674.10898.100.2.1.2.1.3.1', '-OQv', '', '')));
 
         // SNMPv2-SMI::enterprises.641.2.1.2.1.3.1 = STRING: "COMMAND SET:;MODEL:Dell Laser Printer 1700n"
-        $modelinfo = array_merge($modelinfo, explode(';', snmp_get($this->getDevice(), '1.3.6.1.4.1.641.2.1.2.1.3.1', '-OQv', '', '')));
+        $modelinfo = array_merge($modelinfo, explode(';', snmp_get($this->getDeviceArray(), '1.3.6.1.4.1.641.2.1.2.1.3.1', '-OQv', '', '')));
 
         $dell_laser = [];
         foreach ($modelinfo as $line) {

@@ -34,22 +34,22 @@ class Topvision extends \LibreNMS\OS implements OSPolling
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device->serial = snmp_getnext($this->getDevice(), ".1.3.6.1.4.1.32285.11.1.1.2.1.1.1.16", "-OQv") ?? null;
+        $device->serial = snmp_getnext($this->getDeviceArray(), ".1.3.6.1.4.1.32285.11.1.1.2.1.1.1.16", "-OQv") ?? null;
         if (empty($device->hardware)) {
-            $device->hardware = snmp_getnext($this->getDevice(), ".1.3.6.1.4.1.32285.11.1.1.2.1.1.1.18", "-OQv") ?? null;
+            $device->hardware = snmp_getnext($this->getDeviceArray(), ".1.3.6.1.4.1.32285.11.1.1.2.1.1.1.18", "-OQv") ?? null;
         }
     }
 
     public function pollOS()
     {
-        $cmstats = snmp_get_multi_oid($this->getDevice(), ['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.6.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.5.0']);
+        $cmstats = snmp_get_multi_oid($this->getDeviceArray(), ['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.6.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.5.0']);
         if (is_numeric($cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0'])) {
             $rrd_def = RrdDefinition::make()->addDataset('cmtotal', 'GAUGE', 0);
             $fields = [
                 'cmtotal' => $cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'topvision_cmtotal', $tags, $fields);
+            data_update($this->getDeviceArray(), 'topvision_cmtotal', $tags, $fields);
             $this->enableGraph('topvision_cmtotal');
         }
 
@@ -59,7 +59,7 @@ class Topvision extends \LibreNMS\OS implements OSPolling
                 'cmreg' => $cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.6.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'topvision_cmreg', $tags, $fields);
+            data_update($this->getDeviceArray(), 'topvision_cmreg', $tags, $fields);
             $this->enableGraph('topvision_cmreg');
         }
 
@@ -69,7 +69,7 @@ class Topvision extends \LibreNMS\OS implements OSPolling
                 'cmoffline' => $cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.5.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'topvision_cmoffline', $tags, $fields);
+            data_update($this->getDeviceArray(), 'topvision_cmoffline', $tags, $fields);
             $this->enableGraph('topvision_cmoffline');
         }
     }

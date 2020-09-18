@@ -39,7 +39,7 @@ class Aen extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
         // don't poll v5.3.1_22558 devices due to bug that crashes snmpd
         if ($device['version'] == 'AEN_5.3.1_22558') {

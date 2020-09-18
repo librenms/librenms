@@ -59,7 +59,7 @@ class ArubaInstant extends OS implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device->serial = snmp_getnext($this->getDevice(), 'aiAPSerialNum', '-Oqv', 'AI-AP-MIB');
+        $device->serial = snmp_getnext($this->getDeviceArray(), 'aiAPSerialNum', '-Oqv', 'AI-AP-MIB');
     }
 
     /**
@@ -94,7 +94,7 @@ class ArubaInstant extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = array();
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
         $ai_mib = 'AI-AP-MIB';
 
         if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
@@ -289,7 +289,7 @@ class ArubaInstant extends OS implements
     {
         $data = array();
         if (!empty($sensors)) {
-            $device = $this->getDevice();
+            $device = $this->getDeviceArray();
 
             if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
                 // version is at least 8.4.0.0
@@ -299,7 +299,7 @@ class ArubaInstant extends OS implements
                     $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
                 }
 
-                $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids);
+                $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
 
                 foreach ($oids as $id => $oid) {
                       $data[$id] = $snmp_data[$oid];

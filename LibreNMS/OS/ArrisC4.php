@@ -35,7 +35,7 @@ class ArrisC4 extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
+        $device = $this->getDevice();
 
         preg_match("/CMTS_V([\d.]+),/", $device->sysDescr, $match);
         $device->version = $match[1];

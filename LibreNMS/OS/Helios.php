@@ -69,7 +69,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
 
     private function discoverOid($type, $oid, $oid_prefix)
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), $oid, array(), 'IGNITENET-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), $oid, array(), 'IGNITENET-MIB');
 
         $sensors = array();
         foreach ($oids as $index => $data) {

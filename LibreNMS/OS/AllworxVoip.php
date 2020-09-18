@@ -35,6 +35,6 @@ class AllworxVoip extends OS implements OSDiscovery
     {
         $device->hardware = $device->sysDescr;
         $device->serial = $device->sysName;
-        $device->version = snmp_get($this->getDevice(), 'applVersion.1', '-OQv', 'NETWORK-SERVICES-MIB');
+        $device->version = snmp_get($this->getDeviceArray(), 'applVersion.1', '-OQv', 'NETWORK-SERVICES-MIB');
     }
 }

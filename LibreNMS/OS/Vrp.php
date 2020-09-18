@@ -56,7 +56,7 @@ class Vrp extends OS implements
         $device->version = isset($matches[1]) ? ($matches[1] . ($device->version ? " ($device->version)" : '')) : null; // version from yaml sysDescr
 
         if ($device->version) {
-            $patch = snmp_getnext($this->getDevice(), 'HUAWEI-SYS-MAN-MIB::hwPatchVersion', '-OQv');
+            $patch = snmp_getnext($this->getDeviceArray(), 'HUAWEI-SYS-MAN-MIB::hwPatchVersion', '-OQv');
             if ($patch) {
                 $device->version .= " [$patch]";
             }
@@ -70,7 +70,7 @@ class Vrp extends OS implements
     public function pollOS()
     {
         // Polling the Wireless data TODO port to module
-        $apTable = snmpwalk_group($this->getDevice(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
+        $apTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
 
         //Check for existence of at least 1 AP to continue the polling)
         if (!empty($apTable)) {
@@ -79,7 +79,7 @@ class Vrp extends OS implements
                 'hwWlanApTypeInfo',
             ];
             foreach ($apTableOids as $apTableOid) {
-                $apTable = snmpwalk_group($this->getDevice(), $apTableOid, 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
+                $apTable = snmpwalk_group($this->getDeviceArray(), $apTableOid, 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
             }
 
             $apRadioTableOids = [ // hwWlanRadioInfoTable
@@ -94,11 +94,11 @@ class Vrp extends OS implements
             $clientPerRadio = [];
             $radioTable = [];
             foreach ($apRadioTableOids as $apRadioTableOid) {
-                $radioTable = snmpwalk_group($this->getDevice(), $apRadioTableOid, 'HUAWEI-WLAN-AP-RADIO-MIB', 2, $radioTable);
+                $radioTable = snmpwalk_group($this->getDeviceArray(), $apRadioTableOid, 'HUAWEI-WLAN-AP-RADIO-MIB', 2, $radioTable);
             }
 
             $numClients = 0;
-            $vapInfoTable = snmpwalk_group($this->getDevice(), 'hwWlanVapStaOnlineCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
+            $vapInfoTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanVapStaOnlineCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
             foreach ($vapInfoTable as $ap_id => $ap) {
                 //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
                 //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
@@ -122,9 +122,9 @@ class Vrp extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'vrp', $tags, $fields);
+            data_update($this->getDeviceArray(), 'vrp', $tags, $fields);
 
-            $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', [$this->getDevice()['device_id']]);
+            $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', [$this->getDeviceArray()['device_id']]);
 
             foreach ($radioTable as $ap_id => $ap) {
                 foreach ($ap as $r_id => $radio) {
@@ -183,7 +183,7 @@ class Vrp extends OS implements
                     ];
 
                     $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
-                    data_update($this->getDevice(), 'arubaap', $tags, $fields);
+                    data_update($this->getDeviceArray(), 'arubaap', $tags, $fields);
 
                     $foundid = 0;
 
@@ -198,7 +198,7 @@ class Vrp extends OS implements
                     if ($foundid == 0) {
                         $ap_id = dbInsert(
                             [
-                                'device_id' => $this->getDevice()['device_id'],
+                                'device_id' => $this->getDeviceArray()['device_id'],
                                 'name' => $name,
                                 'radio_number' => $radionum,
                                 'type' => $type,
@@ -253,7 +253,7 @@ class Vrp extends OS implements
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
         $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityCpuUsage', array(), 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
 
@@ -300,13 +300,13 @@ class Vrp extends OS implements
     {
         $nac = collect();
         // We collect the first table
-        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'hwAccessTable', [], 'HUAWEI-AAA-MIB');
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'hwAccessTable', [], 'HUAWEI-AAA-MIB');
 
         if (!empty($portAuthSessionEntry)) {
             // If it is not empty, lets add the Extended table
-            $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'hwAccessExtTable', $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
+            $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'hwAccessExtTable', $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
             // We cache a port_ifName -> port_id map
-            $ifName_map = $this->getDeviceModel()->ports()->pluck('port_id', 'ifName');
+            $ifName_map = $this->getDevice()->ports()->pluck('port_id', 'ifName');
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
@@ -339,7 +339,7 @@ class Vrp extends OS implements
     public function discoverWirelessApCount()
     {
         $sensors = array();
-        $ap_number = snmpwalk_cache_oid($this->getDevice(), 'hwWlanCurJointApNum.0', array(), 'HUAWEI-WLAN-GLOBAL-MIB');
+        $ap_number = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanCurJointApNum.0', array(), 'HUAWEI-WLAN-GLOBAL-MIB');
 
         $sensors[] = new WirelessSensor(
             'ap-count',

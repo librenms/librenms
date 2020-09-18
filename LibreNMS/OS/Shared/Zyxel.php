@@ -51,7 +51,7 @@ class Zyxel extends OS
             '.1.3.6.1.4.1.890.1.15.3.1.12.0', // ZYXEL-ES-COMMON::sysProductSerialNumber.0
             // ZYXEL-ES-ZyxelAPMgmt::operationMode.0
         ];
-        $data = snmp_get_multi_oid($this->getDevice(), $oids, '-OUQnt');
+        $data = snmp_get_multi_oid($this->getDeviceArray(), $oids, '-OUQnt');
 
         $device->hardware = $data['.1.3.6.1.4.1.890.1.15.3.1.11.0'];
         [$device->version,] = explode(' | ', $data['.1.3.6.1.4.1.890.1.15.3.1.6.0']);

@@ -44,9 +44,9 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         $device->hardware = $this->fetchHardware();
 
         $sn_oid = Str::contains($device->hardware, 'IP10') ? 'genEquipUnitIDUSerialNumber.0' : 'genEquipInventorySerialNumber.127';
-        $device->serial = snmp_get($this->getDevice(), $sn_oid, '-Oqv', 'MWRM-UNIT-MIB');
+        $device->serial = snmp_get($this->getDeviceArray(), $sn_oid, '-Oqv', 'MWRM-UNIT-MIB');
 
-        $data = snmp_get_multi($this->getDevice(), ['genEquipMngSwIDUVersionsRunningVersion.1', 'genEquipUnitLatitude.0', 'genEquipUnitLongitude.0'], '-OQU', 'MWRM-RADIO-MIB');
+        $data = snmp_get_multi($this->getDeviceArray(), ['genEquipMngSwIDUVersionsRunningVersion.1', 'genEquipUnitLatitude.0', 'genEquipUnitLongitude.0'], '-OQU', 'MWRM-RADIO-MIB');
         $device->version = $data[1]['MWRM-UNIT-MIB::genEquipMngSwIDUVersionsRunningVersion'] ?? null;
 
         // update location lat/lng
@@ -57,7 +57,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         }
 
         $num_radios = 0;
-        foreach (snmpwalk_group($this->getDevice(), 'ifDescr', 'IF-MIB') as $interface) {
+        foreach (snmpwalk_group($this->getDeviceArray(), 'ifDescr', 'IF-MIB') as $interface) {
             if ($interface['ifDescr'] == 'Radio') {
                 $num_radios++;
             }
@@ -73,7 +73,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         $sensors = [];
         $divisor = 100;
 
-        $xpi = snmpwalk_group($this->getDevice(), 'genEquipRadioStatusXPI', 'MWRM-RADIO-MIB');
+        $xpi = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioStatusXPI', 'MWRM-RADIO-MIB');
         foreach ($xpi as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'xpi',
@@ -95,7 +95,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
     {
         $sensors = [];
         // MWRM-RADIO-MIB::genEquipRfuCfgTxFreq
-        $tx = snmpwalk_group($this->getDevice(), 'genEquipRfuCfgTxFreq', 'MWRM-RADIO-MIB');
+        $tx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuCfgTxFreq', 'MWRM-RADIO-MIB');
         $TxRadio = 0;
         foreach ($tx as $index => $data) {
             $TxRadio++;
@@ -112,7 +112,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
             );
         }
         // MWRM-RADIO-MIB::genEquipRfuCfgRxFreq
-        $rx = snmpwalk_group($this->getDevice(), 'genEquipRfuCfgRxFreq', 'MWRM-RADIO-MIB');
+        $rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuCfgRxFreq', 'MWRM-RADIO-MIB');
         $RxRadio = 0;
         foreach ($rx as $index => $data) {
             $RxRadio++;
@@ -143,7 +143,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
         $sensors = [];
 
-        $tx = snmpwalk_group($this->getDevice(), 'genEquipRadioMRMCCurrTxBitrate', 'MWRM-RADIO-MIB');
+        $tx = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioMRMCCurrTxBitrate', 'MWRM-RADIO-MIB');
         foreach ($tx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'rate',
@@ -157,7 +157,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
             );
         }
 
-        $rx = snmpwalk_group($this->getDevice(), 'genEquipRadioMRMCCurrRxBitrate', 'MWRM-RADIO-MIB');
+        $rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioMRMCCurrRxBitrate', 'MWRM-RADIO-MIB');
         foreach ($rx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'rate',
@@ -186,7 +186,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
         $sensors = [];
 
-        $mse = snmpwalk_group($this->getDevice(), 'genEquipRadioStatusDefectedBlocks', 'MWRM-RADIO-MIB');
+        $mse = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioStatusDefectedBlocks', 'MWRM-RADIO-MIB');
         foreach ($mse as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'errors',
@@ -215,7 +215,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         $sensors = [];
         $divisor = 100;
 
-        $mse = snmpwalk_group($this->getDevice(), 'genEquipRadioStatusMSE', 'MWRM-RADIO-MIB');
+        $mse = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioStatusMSE', 'MWRM-RADIO-MIB');
         foreach ($mse as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'mse',
@@ -245,7 +245,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
         $sensors = [];
 
-        $tx = snmpwalk_group($this->getDevice(), 'genEquipRfuStatusTxLevel', 'MWRM-RADIO-MIB');
+        $tx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuStatusTxLevel', 'MWRM-RADIO-MIB');
         foreach ($tx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -258,7 +258,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
             );
         }
 
-        $rx = snmpwalk_group($this->getDevice(), 'genEquipRfuStatusRxLevel', 'MWRM-RADIO-MIB');
+        $rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuStatusRxLevel', 'MWRM-RADIO-MIB');
         foreach ($rx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -276,7 +276,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
     private function fetchHardware()
     {
-        $sysObjectID = $this->getDeviceModel()->sysObjectID;
+        $sysObjectID = $this->getDevice()->sysObjectID;
 
         if (Str::contains($sysObjectID, '.2281.1.10')) {
             return 'IP10 Family';
@@ -306,6 +306,6 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
             return 'IP-20C';
         }
 
-        return snmp_get($this->getDevice(), 'genEquipInventoryCardName', '-Oqv', 'MWRM-UNIT-NAME');
+        return snmp_get($this->getDeviceArray(), 'genEquipInventoryCardName', '-Oqv', 'MWRM-UNIT-NAME');
     }
 }

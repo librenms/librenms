@@ -33,7 +33,7 @@ class Brother extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $data = snmp_get_multi($this->getDevice(), [
+        $data = snmp_get_multi($this->getDeviceArray(), [
             'brmDNSPrinterName.0', // Brother HL-2070N series
             'brInfoSerialNumber.0', // 000A5J431816
             'brpsFirmwareDescription.0', // Firmware Ver.1.33 (06.07.21)

@@ -32,7 +32,7 @@ class Pulse extends \LibreNMS\OS implements OSPolling
 {
     public function pollOS()
     {
-        $users = snmp_get($this->getDevice(), 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
+        $users = snmp_get($this->getDeviceArray(), 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
         if (is_numeric($users)) {
             $rrd_def = RrdDefinition::make()->addDataset('users', 'GAUGE', 0);
@@ -42,7 +42,7 @@ class Pulse extends \LibreNMS\OS implements OSPolling
             );
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pulse_users', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pulse_users', $tags, $fields);
             $this->enableGraph('pulse_users');
         }
     }

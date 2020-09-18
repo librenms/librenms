@@ -44,7 +44,7 @@ class Iosxr extends Shared\Cisco implements OSDiscovery
         }
 
         $oids = ['entPhysicalSoftwareRev.1', 'entPhysicalModelName.8384513', 'entPhysicalModelName.8384518'];
-        $data = snmp_get_multi($this->getDevice(), $oids, '-OQUs', 'ENTITY-MIB');
+        $data = snmp_get_multi($this->getDeviceArray(), $oids, '-OQUs', 'ENTITY-MIB');
 
         if (!empty($data[1]['entPhysicalSoftwareRev'])) {
             $device->version = $data[1]['entPhysicalSoftwareRev'];

@@ -40,7 +40,7 @@ class Rutos2xx extends OS implements
     public function pollOS()
     {
         # Mobile Data Usage
-        $usage = snmp_get_multi_oid($this->getDevice(), [
+        $usage = snmp_get_multi_oid($this->getDeviceArray(), [
             '.1.3.6.1.4.1.48690.2.11.0',
             '.1.3.6.1.4.1.48690.2.10.0',
         ]);
@@ -59,7 +59,7 @@ class Rutos2xx extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'rutos_2xx_mobileDataUsage', $tags, $fields);
+            data_update($this->getDeviceArray(), 'rutos_2xx_mobileDataUsage', $tags, $fields);
             $this->enableGraph('rutos_2xx_mobileDataUsage');
         }
     }

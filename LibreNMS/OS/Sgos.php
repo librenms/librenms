@@ -39,7 +39,7 @@ class Sgos extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $data = snmpwalk_group($this->getDevice(), 'sgProxyCpuCoreBusyPerCent', 'BLUECOAT-SG-PROXY-MIB');
+        $data = snmpwalk_group($this->getDeviceArray(), 'sgProxyCpuCoreBusyPerCent', 'BLUECOAT-SG-PROXY-MIB');
 
         $processors = array();
         $count = 1;

@@ -210,9 +210,9 @@ class Routeros extends OS implements
     private function fetchData()
     {
         if (is_null($this->data)) {
-            $wl60 = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
-            $wlap = snmpwalk_cache_oid($this->getDevice(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
-            $wl60sta = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GStaTable', array(), 'MIKROTIK-MIB');
+            $wl60 = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
+            $wlap = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
+            $wl60sta = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GStaTable', array(), 'MIKROTIK-MIB');
             $this->data = $wl60+$wlap;
             $this->data = $this->data+$wl60sta;
         }
@@ -314,7 +314,7 @@ class Routeros extends OS implements
 
     public function pollOS()
     {
-        $leases = snmp_get($this->getDevice(), 'mtxrDHCPLeaseCount.0', '-OQv', 'MIKROTIK-MIB');
+        $leases = snmp_get($this->getDeviceArray(), 'mtxrDHCPLeaseCount.0', '-OQv', 'MIKROTIK-MIB');
 
         if (is_numeric($leases)) {
             $rrd_def = RrdDefinition::make()->addDataset('leases', 'GAUGE', 0);
@@ -324,11 +324,11 @@ class Routeros extends OS implements
             );
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'routeros_leases', $tags, $fields);
+            data_update($this->getDeviceArray(), 'routeros_leases', $tags, $fields);
             $this->enableGraph('routeros_leases');
         }
 
-        $pppoe_sessions = snmp_get($this->getDevice(), '1.3.6.1.4.1.9.9.150.1.1.1.0', '-OQv', '', '');
+        $pppoe_sessions = snmp_get($this->getDeviceArray(), '1.3.6.1.4.1.9.9.150.1.1.1.0', '-OQv', '', '');
 
         if (is_numeric($pppoe_sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('pppoe_sessions', 'GAUGE', 0);
@@ -338,7 +338,7 @@ class Routeros extends OS implements
             );
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'routeros_pppoe_sessions', $tags, $fields);
+            data_update($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
             $this->enableGraph('routeros_pppoe_sessions');
         }
     }

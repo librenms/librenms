@@ -33,9 +33,9 @@ class Edgeos extends \LibreNMS\OS
     {
         parent::discoverOS($device); // yaml
 
-        $hw = snmp_get($this->getDevice(), ['.1.3.6.1.2.1.25.4.2.1.5.3818', '.1.3.6.1.2.1.25.4.2.1.5.3819'], '-Ovq');
+        $hw = snmp_get($this->getDeviceArray(), ['.1.3.6.1.2.1.25.4.2.1.5.3818', '.1.3.6.1.2.1.25.4.2.1.5.3819'], '-Ovq');
         if (preg_match('/(?<=UBNT )(.*)(?= running on)/', $hw, $matches)) {
-            $this->getDeviceModel()->hardware = $matches[0];
+            $this->getDevice()->hardware = $matches[0];
         }
     }
 }

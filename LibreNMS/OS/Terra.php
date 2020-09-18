@@ -72,7 +72,7 @@ class Terra extends OS implements ProcessorDiscovery, OSDiscovery
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
         $query = [
             "sti410C" => ".1.3.6.1.4.1.30631.1.9.1.1.3.0",

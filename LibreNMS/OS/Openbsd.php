@@ -33,7 +33,7 @@ class Openbsd extends Unix implements OSPolling
 {
     public function pollOS()
     {
-        $oids = snmp_get_multi($this->getDevice(), ['pfStateCount.0', 'pfStateSearches.0', 'pfStateInserts.0', 'pfStateRemovals.0'], '-OQUs', 'OPENBSD-PF-MIB');
+        $oids = snmp_get_multi($this->getDeviceArray(), ['pfStateCount.0', 'pfStateSearches.0', 'pfStateInserts.0', 'pfStateRemovals.0'], '-OQUs', 'OPENBSD-PF-MIB');
 
         if (is_numeric($oids[0]['pfStateCount'])) {
             $rrd_def = RrdDefinition::make()->addDataset('states', 'GAUGE', 0);
@@ -43,7 +43,7 @@ class Openbsd extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_states', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_states', $tags, $fields);
 
             $this->enableGraph('pf_states');
         }
@@ -56,7 +56,7 @@ class Openbsd extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_searches', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_searches', $tags, $fields);
 
             $this->enableGraph('pf_searches');
         }
@@ -69,7 +69,7 @@ class Openbsd extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_inserts', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_inserts', $tags, $fields);
 
             $this->enableGraph('pf_inserts');
         }
@@ -82,7 +82,7 @@ class Openbsd extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_removals', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_removals', $tags, $fields);
 
             $this->enableGraph('pf_removals');
         }

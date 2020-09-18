@@ -59,7 +59,7 @@ trait YamlOSDiscovery
         $fetch_oids = array_unique(Arr::flatten($oids));
         $numeric = $this->isNumeric($fetch_oids);
         $flags = $numeric ? '-OUQn' : '-OUQ';
-        $data = snmp_get_multi_oid($this->getDevice(), $fetch_oids, $flags);
+        $data = snmp_get_multi_oid($this->getDeviceArray(), $fetch_oids, $flags);
 
         Log::debug("Yaml OS data:", $data);
 
@@ -87,7 +87,7 @@ trait YamlOSDiscovery
     {
         foreach (Arr::wrap($oids) as $oid) {
             // translate all to numeric to make it easier to match
-            $oid = ($numeric && !oid_is_numeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDevice()) : $oid;
+            $oid = ($numeric && !oid_is_numeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDeviceArray()) : $oid;
             if (!empty($data[$oid])) {
                 return $data[$oid];
             }
@@ -97,7 +97,7 @@ trait YamlOSDiscovery
 
     private function parseRegex($regexes, $subject)
     {
-        $device = $this->getDeviceModel();
+        $device = $this->getDevice();
 
         foreach (Arr::wrap($regexes) as $regex) {
             if (preg_match($regex, $subject, $matches)) {

@@ -32,7 +32,7 @@ class Secureplatform extends \LibreNMS\OS implements OSPolling
 {
     public function pollOS()
     {
-        $connections = snmp_get($this->getDevice(), 'fwNumConn.0', '-OQv', 'CHECKPOINT-MIB');
+        $connections = snmp_get($this->getDeviceArray(), 'fwNumConn.0', '-OQv', 'CHECKPOINT-MIB');
 
         if (is_numeric($connections)) {
             $rrd_def = RrdDefinition::make()->addDataset('NumConn', 'GAUGE', 0);
@@ -42,7 +42,7 @@ class Secureplatform extends \LibreNMS\OS implements OSPolling
             );
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'secureplatform_sessions', $tags, $fields);
+            data_update($this->getDeviceArray(), 'secureplatform_sessions', $tags, $fields);
             $this->enableGraph('secureplatform_sessions');
         }
     }

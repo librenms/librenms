@@ -36,7 +36,7 @@ class Apsoluteos extends OS implements OSDiscovery
     public function discoverOS(Device $device): void
     {
         $oids = ['genGroupHWVersion.0', 'rndSerialNumber.0', 'rndApsoluteOSVersion.0', 'rdwrDevicePortsConfig.0'];
-        $data = snmp_get_multi($this->getDevice(), $oids, '-OQs', 'RADWARE-MIB');
+        $data = snmp_get_multi($this->getDeviceArray(), $oids, '-OQs', 'RADWARE-MIB');
 
         $device->serial = $data[0]['rndSerialNumber'] ?? null;
         $device->version = $data[0]['rndApsoluteOSVersion'] ?? null;

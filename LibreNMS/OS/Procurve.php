@@ -32,7 +32,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling
 {
     public function pollOS()
     {
-        $FdbAddressCount = snmp_get($this->getDevice(), 'hpSwitchFdbAddressCount.0', '-Ovqn', 'STATISTICS-MIB');
+        $FdbAddressCount = snmp_get($this->getDeviceArray(), 'hpSwitchFdbAddressCount.0', '-Ovqn', 'STATISTICS-MIB');
 
         if (is_numeric($FdbAddressCount)) {
             $rrd_def = RrdDefinition::make()->addDataset('value', 'GAUGE', -1, 100000);
@@ -42,7 +42,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'fdb_count', $tags, $fields);
+            data_update($this->getDeviceArray(), 'fdb_count', $tags, $fields);
 
             $this->enableGraph('fdb_count');
         }

@@ -31,7 +31,7 @@ class Cumulus extends \LibreNMS\OS
 {
     public function discoverOS(Device $device): void
     {
-        $data = snmp_getnext_multi($this->getDevice(), ['entPhysicalDescr', 'entPhysicalSoftwareRev', 'entPhysicalSerialNum'], '-OQUs', 'ENTITY-MIB');
+        $data = snmp_getnext_multi($this->getDeviceArray(), ['entPhysicalDescr', 'entPhysicalSoftwareRev', 'entPhysicalSerialNum'], '-OQUs', 'ENTITY-MIB');
         $device->hardware = $data['entPhysicalDescr'];
         $device->serial = $data['entPhysicalSerialNum'];
         $device->version = preg_replace('/^Cumulus Linux /', '', $data['entPhysicalSoftwareRev']);

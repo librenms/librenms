@@ -41,7 +41,7 @@ class Siklu extends OS implements
 {
     public function discoverOS(Device $device): void
     {
-        $data = snmp_get_multi_oid($this->getDevice(), [
+        $data = snmp_get_multi_oid($this->getDeviceArray(), [
             'rbSwBank1Running.0',
             'rbSwBank1Version.0',
             'rbSwBank2Version.0',

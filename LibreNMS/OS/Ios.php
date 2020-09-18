@@ -27,7 +27,6 @@ namespace LibreNMS\OS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS\Shared\Cisco;
@@ -44,7 +43,7 @@ class Ios extends Cisco implements
      */
     public function discoverWirelessClients()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
         if (!Str::startsWith($device['hardware'], 'AIR-') && !Str::contains($device['hardware'], 'ciscoAIR')) {
             // unsupported IOS hardware

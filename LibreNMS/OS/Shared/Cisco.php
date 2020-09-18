@@ -83,7 +83,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
             'entPhysicalContainedIn.1001',
         ];
 
-        $data = snmp_get_multi($this->getDevice(), $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $data = snmp_get_multi($this->getDeviceArray(), $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 
         if (isset($data[1]['entPhysicalContainedIn']) && $data[1]['entPhysicalContainedIn'] == '0') {
             if (!empty($data[1]['entPhysicalSoftwareRev'])) {
@@ -118,7 +118,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
      */
     public function discoverProcessors()
     {
-        $processors_data = snmpwalk_group($this->getDevice(), 'cpmCPU', 'CISCO-PROCESS-MIB');
+        $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCPU', 'CISCO-PROCESS-MIB');
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
@@ -141,7 +141,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
                 }
 
                 if (empty($descr)) {
-                    $descr = snmp_get($this->getDevice(), 'entPhysicalName.' . $entPhysicalIndex, '-Oqv', 'ENTITY-MIB');
+                    $descr = snmp_get($this->getDeviceArray(), 'entPhysicalName.' . $entPhysicalIndex, '-Oqv', 'ENTITY-MIB');
                 }
             }
 
@@ -190,7 +190,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
         }
 
         // QFP processors (Forwarding Processors)
-        $qfp_data = snmpwalk_group($this->getDevice(), 'ceqfpUtilProcessingLoad', 'CISCO-ENTITY-QFP-MIB');
+        $qfp_data = snmpwalk_group($this->getDeviceArray(), 'ceqfpUtilProcessingLoad', 'CISCO-ENTITY-QFP-MIB');
 
         foreach ($qfp_data as $entQfpPhysicalIndex => $entry) {
             /*
@@ -207,7 +207,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
                     $qfp_descr = $entPhysicalName_array[$entQfpPhysicalIndex];
                 }
                 if (empty($qfp_descr)) {
-                    $qfp_descr = snmp_get($this->getDevice(), 'entPhysicalName.' . $entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
+                    $qfp_descr = snmp_get($this->getDeviceArray(), 'entPhysicalName.' . $entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
                 }
             }
 
@@ -235,16 +235,16 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
     {
         $nac = collect();
 
-        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
         if (!empty($portAuthSessionEntry)) {
-            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDevice(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
+            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
                 $key_parts = explode('.', $key);
                 $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
                 return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
             });
 
             // cache port ifIndex -> port_id map
-            $ifIndex_map = $this->getDeviceModel()->ports()->pluck('port_id', 'ifIndex');
+            $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
             // update the DB
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
@@ -276,7 +276,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
 
     protected function getMainSerial()
     {
-        $serial_output = snmp_get_multi($this->getDevice(), ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $serial_output = snmp_get_multi($this->getDeviceArray(), ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 //        $serial_output = snmp_getnext($this->getDevice(), 'entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 
         if (!empty($serial_output[1]['entPhysicalSerialNum'])) {

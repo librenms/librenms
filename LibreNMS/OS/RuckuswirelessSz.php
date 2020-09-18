@@ -13,12 +13,12 @@ class RuckuswirelessSz extends OS implements
 {
     public function discoverOS(Device $device): void
     {
-        $device->hardware      = snmp_getnext($this->getDevice(), '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.3', "-OQv");
-        $device->version       = snmp_getnext($this->getDevice(), '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.9', "-OQv");
-        $device->serial        = snmp_get($this->getDevice(), '.1.3.6.1.4.1.25053.1.4.1.1.1.15.13.0', "-OQv");
-        $device->features      = "Licenses: " . snmp_get($this->getDevice(), '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.0', "-OQv") . "/" . snmp_getnext($this->getDevice(), '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.10', "-OQv");
+        $device->hardware      = snmp_getnext($this->getDeviceArray(), '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.3', "-OQv");
+        $device->version       = snmp_getnext($this->getDeviceArray(), '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.9', "-OQv");
+        $device->serial        = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.25053.1.4.1.1.1.15.13.0', "-OQv");
+        $device->features      = "Licenses: " . snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.0', "-OQv") . "/" . snmp_getnext($this->getDeviceArray(), '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.10', "-OQv");
 
-        $ruckuscountry = snmp_getnext($this->getDevice(), '.1.3.6.1.4.1.25053.1.8.1.1.1.1.3.1.4', "-OQv");
+        $ruckuscountry = snmp_getnext($this->getDeviceArray(), '.1.3.6.1.4.1.25053.1.8.1.1.1.1.3.1.4', "-OQv");
         if (!empty($ruckuscountry)) {
             $device->version .= " ($ruckuscountry)";
         }

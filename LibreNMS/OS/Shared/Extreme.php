@@ -118,6 +118,6 @@ class Extreme extends \LibreNMS\OS
             '.1.3.6.1.4.1.1916.2.168' => 'Summit x670v-48x',
         ];
 
-        return $hardware[$this->getDeviceModel()->sysObjectID] ?? null;
+        return $hardware[$this->getDevice()->sysObjectID] ?? null;
     }
 }

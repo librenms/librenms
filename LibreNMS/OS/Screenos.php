@@ -32,7 +32,7 @@ class Screenos extends \LibreNMS\OS implements OSPolling
 {
     public function pollOS()
     {
-        $sess_data = snmp_get_multi_oid($this->getDevice(), [
+        $sess_data = snmp_get_multi_oid($this->getDeviceArray(), [
             '.1.3.6.1.4.1.3224.16.3.2.0',
             '.1.3.6.1.4.1.3224.16.3.3.0',
             '.1.3.6.1.4.1.3224.16.3.4.0',
@@ -51,7 +51,7 @@ class Screenos extends \LibreNMS\OS implements OSPolling
         ];
 
         $tags = compact('rrd_def');
-        data_update($this->getDevice(), 'screenos_sessions', $tags, $fields);
+        data_update($this->getDeviceArray(), 'screenos_sessions', $tags, $fields);
 
         $this->enableGraph('screenos_sessions');
     }

@@ -32,7 +32,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
 {
     public function pollOS()
     {
-        $data = snmp_get_multi($this->getDevice(), [
+        $data = snmp_get_multi($this->getDeviceArray(), [
             'panSessionActive.0',
             'panSessionActiveTcp.0',
             'panSessionActiveUdp.0',
@@ -50,7 +50,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'panos-sessions', $tags, $fields);
+            data_update($this->getDeviceArray(), 'panos-sessions', $tags, $fields);
 
             $this->enableGraph('panos_sessions');
         }
@@ -63,7 +63,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'panos-sessions-tcp', $tags, $fields);
+            data_update($this->getDeviceArray(), 'panos-sessions-tcp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_tcp');
         }
@@ -76,7 +76,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'panos-sessions-udp', $tags, $fields);
+            data_update($this->getDeviceArray(), 'panos-sessions-udp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_udp');
         }
@@ -89,7 +89,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'panos-sessions-icmp', $tags, $fields);
+            data_update($this->getDeviceArray(), 'panos-sessions-icmp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_icmp');
         }
@@ -102,7 +102,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'panos-sessions-ssl', $tags, $fields);
+            data_update($this->getDeviceArray(), 'panos-sessions-ssl', $tags, $fields);
 
             $this->enableGraph('panos_sessions_ssl');
         }
@@ -115,7 +115,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'panos-sessions-sslutil', $tags, $fields);
+            data_update($this->getDeviceArray(), 'panos-sessions-sslutil', $tags, $fields);
 
             $this->enableGraph('panos_sessions_sslutil');
         }
@@ -128,7 +128,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'panos-activetunnels', $tags, $fields);
+            data_update($this->getDeviceArray(), 'panos-activetunnels', $tags, $fields);
 
             $this->enableGraph('panos_activetunnels');
         }

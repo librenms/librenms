@@ -57,7 +57,7 @@ class Edgecos extends OS implements ProcessorDiscovery
             return;
         }
 
-        $data = snmp_get_multi($this->getDevice(), ['swOpCodeVer.1', 'swProdName.0', 'swSerialNumber.1', 'swHardwareVer.1'], '-OQUs', $tmp_mib);
+        $data = snmp_get_multi($this->getDeviceArray(), ['swOpCodeVer.1', 'swProdName.0', 'swSerialNumber.1', 'swHardwareVer.1'], '-OQUs', $tmp_mib);
 
         $device->version  = trim($data[1]['swHardwareVer'] . ' ' . $data[1]['swOpCodeVer']) ?: null;
         $device->hardware = $data[0]['swProdName'] ?? null;
@@ -72,7 +72,7 @@ class Edgecos extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $device = $this->getDeviceModel();
+        $device = $this->getDevice();
 
         if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
             $oid = '.1.3.6.1.4.1.259.10.1.24.1.39.2.1.0';

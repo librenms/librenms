@@ -127,7 +127,7 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
 
         $oids = array_merge($oids_gauge, $oids_counter);
 
-        $data = snmpwalk_cache_oid($this->getDevice(), 'nsTcpStatsGroup', [], 'NS-ROOT-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'nsTcpStatsGroup', [], 'NS-ROOT-MIB');
 
         $shorten = [
             'tcp',
@@ -158,7 +158,7 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
         }
 
         $tags = compact('rrd_def');
-        data_update($this->getDevice(), 'netscaler-stats-tcp', $tags, $fields);
+        data_update($this->getDeviceArray(), 'netscaler-stats-tcp', $tags, $fields);
 
         $this->enableGraph('netscaler_tcp_conn');
         $this->enableGraph('netscaler_tcp_bits');

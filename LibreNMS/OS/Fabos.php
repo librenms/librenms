@@ -33,9 +33,9 @@ class Fabos extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $device->version = snmp_get($this->getDevice(), 'swFirmwareVersion.0', '-Ovq', 'SYSTEM-MIB');
+        $device->version = snmp_get($this->getDeviceArray(), 'swFirmwareVersion.0', '-Ovq', 'SYSTEM-MIB');
 
-        $module = snmp_get($this->getDevice(), 'fcFeModuleObjectID.1', '-Ovqn', 'FIBRE-CHANNEL-FE-MIB');
+        $module = snmp_get($this->getDeviceArray(), 'fcFeModuleObjectID.1', '-Ovqn', 'FIBRE-CHANNEL-FE-MIB');
         $revboard = str_replace('.1.3.6.1.4.1.1588.2.1.1.', '', $module);
         $device->hardware = $this->fcSwitchModelToName($revboard);
     }

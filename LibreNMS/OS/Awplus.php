@@ -37,7 +37,7 @@ class Awplus extends OS implements OSDiscovery
         //$hardware and $serial use snmp_getnext as the OID for these is not always fixed.
         //However, the first OID is the device baseboard.
 
-        $data = snmp_getnext_multi($this->getDevice(), ['rscBoardName', 'rscBoardSerialNumber'], '-OQs', 'AT-RESOURCE-MIB');
+        $data = snmp_getnext_multi($this->getDeviceArray(), ['rscBoardName', 'rscBoardSerialNumber'], '-OQs', 'AT-RESOURCE-MIB');
         $hardware = $data['rscBoardName'];
         $serial = $data['rscBoardSerialNumber'];
 
@@ -45,10 +45,10 @@ class Awplus extends OS implements OSDiscovery
         //Instead use sysObjectID.0
 
         if (Str::contains($hardware, 'SBx81')) {
-            $data_array = snmpwalk_cache_multi_oid($this->getDevice(), 'rscBoardName', [], 'AT-RESOURCE-MIB', '-OUsb');
-            $data_array = snmpwalk_cache_multi_oid($this->getDevice(), 'rscBoardSerialNumber', $data_array, 'AT-RESOURCE-MIB', '-OUsb');
+            $data_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'rscBoardName', [], 'AT-RESOURCE-MIB', '-OUsb');
+            $data_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'rscBoardSerialNumber', $data_array, 'AT-RESOURCE-MIB', '-OUsb');
 
-            $hardware = snmp_translate($device->sysObjectID, 'AT-PRODUCT-MIB', null, null, $this->getDevice());
+            $hardware = snmp_translate($device->sysObjectID, 'AT-PRODUCT-MIB', null, null, $this->getDeviceArray());
             $hardware = str_replace('at', 'AT-', $hardware);
 
             // Features and Serial is set to Controller card 1.5
@@ -62,7 +62,7 @@ class Awplus extends OS implements OSDiscovery
             }
         }
 
-        $device->version = snmp_get($this->getDevice(), "currSoftVersion.0", "-OQv", "AT-SETUP-MIB");
+        $device->version = snmp_get($this->getDeviceArray(), "currSoftVersion.0", "-OQv", "AT-SETUP-MIB");
         $device->serial = $serial;
         $device->hardware = $hardware;
         $device->features = $features ?? null;

@@ -33,7 +33,7 @@ class Pfsense extends Unix implements OSPolling
 {
     public function pollOS()
     {
-        $oids = snmp_get_multi($this->getDevice(), [
+        $oids = snmp_get_multi($this->getDeviceArray(), [
             'pfStateTableCount.0',
             'pfStateTableSearches.0',
             'pfStateTableInserts.0',
@@ -54,7 +54,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_states', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_states', $tags, $fields);
 
             $this->enableGraph('pf_states');
         }
@@ -67,7 +67,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_searches', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_searches', $tags, $fields);
 
             $this->enableGraph('pf_searches');
         }
@@ -80,7 +80,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_inserts', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_inserts', $tags, $fields);
 
             $this->enableGraph('pf_inserts');
         }
@@ -93,7 +93,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_removals', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_removals', $tags, $fields);
 
             $this->enableGraph('pf_removals');
         }
@@ -106,7 +106,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_matches', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_matches', $tags, $fields);
 
             $this->enableGraph('pf_matches');
         }
@@ -119,7 +119,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_badoffset', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_badoffset', $tags, $fields);
 
             $this->enableGraph('pf_badoffset');
         }
@@ -132,7 +132,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_fragmented', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_fragmented', $tags, $fields);
 
             $this->enableGraph('pf_fragmented');
         }
@@ -145,7 +145,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_short', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_short', $tags, $fields);
 
             $this->enableGraph('pf_short');
         }
@@ -158,7 +158,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_normalized', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_normalized', $tags, $fields);
 
             $this->enableGraph('pf_normalized');
         }
@@ -171,7 +171,7 @@ class Pfsense extends Unix implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'pf_memdropped', $tags, $fields);
+            data_update($this->getDeviceArray(), 'pf_memdropped', $tags, $fields);
 
             $this->enableGraph('pf_memdropped');
         }

@@ -34,7 +34,7 @@ class Dhcpatriot extends Shared\Unix
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $license = snmp_get($this->getDevice(), '.1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1', '-Oqv');
+        $license = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1', '-Oqv');
 
         if (!empty($license)) {
             if ($license === 'FULL:0') {

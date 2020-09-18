@@ -49,13 +49,13 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         parent::discoverOS($device); // yaml
 
-        $hardware_index = snmp_get($this->getDevice(), 'tmnxChassisType.1', '-Ovq', 'TIMETRA-CHASSIS-MIB');
-        $device->hardware = snmp_get($this->getDevice(), "tmnxChassisTypeName.$hardware_index", '-Ovq', 'TIMETRA-CHASSIS-MIB');
+        $hardware_index = snmp_get($this->getDeviceArray(), 'tmnxChassisType.1', '-Ovq', 'TIMETRA-CHASSIS-MIB');
+        $device->hardware = snmp_get($this->getDeviceArray(), "tmnxChassisTypeName.$hardware_index", '-Ovq', 'TIMETRA-CHASSIS-MIB');
 
-        $hw = snmpwalk_group($this->getDevice(), 'tmnxHwClass', 'TIMETRA-CHASSIS-MIB');
+        $hw = snmpwalk_group($this->getDeviceArray(), 'tmnxHwClass', 'TIMETRA-CHASSIS-MIB');
         foreach ($hw[1]['tmnxHwClass'] as $unitID => $class) {
             if ($class == 3) {
-                $device->serial = snmp_get($this->getDevice(), "1.3.6.1.4.1.6527.3.1.2.2.1.8.1.5.1.$unitID", '-OQv', 'TIMETRA-CHASSIS-MIB');
+                $device->serial = snmp_get($this->getDeviceArray(), "1.3.6.1.4.1.6527.3.1.2.2.1.8.1.5.1.$unitID", '-OQv', 'TIMETRA-CHASSIS-MIB');
                 return;
             }
         }
@@ -70,7 +70,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     public function discoverWirelesspower()
     {
         $name = $this->getCacheByIndex('aluMwRadioName', 'ALU-MICROWAVE-MIB');
-        $rsl = snmpwalk_cache_oid($this->getDevice(), 'aluMwRadioLocalRxMainPower', array(), 'ALU-MICROWAVE-MIB');
+        $rsl = snmpwalk_cache_oid($this->getDeviceArray(), 'aluMwRadioLocalRxMainPower', array(), 'ALU-MICROWAVE-MIB');
 
         $sensors = array();
         $divisor = 10;
@@ -115,9 +115,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsLsps()
     {
-        $mplsLspCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
+        $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
         if (!empty($mplsLspCache)) {
-            $mplsLspCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspLastChange', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
+            $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspLastChange', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
         }
 
         $lsps = collect();
@@ -158,9 +158,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsPaths($lsps)
     {
-        $mplsPathCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspPathTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
+        $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
         if (!empty($mplsPathCache)) {
-            $mplsPathCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspPathLastChange', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
+            $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathLastChange', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
         }
 
         $paths = collect();
@@ -196,7 +196,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsSdps()
     {
-        $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
+        $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
 
         $sdps = collect();
         foreach ($mplsSdpCache as $value) {
@@ -232,8 +232,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsServices()
     {
-        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDevice(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
-        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDevice(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
+        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
+        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
 
         $svcs = collect();
 
@@ -277,7 +277,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsSaps($svcs)
     {
-        $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
         $saps = collect();
 
@@ -318,8 +318,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsSdpBinds($sdps, $svcs)
     {
-        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
-        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
+        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
+        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
 
         $binds = collect();
         foreach ($mplsBindCache as $key => $value) {
@@ -358,8 +358,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsTunnelArHops($paths)
     {
-        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'mplsTunnelARHopTable', [], 'MPLS-TE-MIB', 'nokia', '-OQUsbt');
-        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelARHopTable', $mplsTunnelArHopCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
+        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'mplsTunnelARHopTable', [], 'MPLS-TE-MIB', 'nokia', '-OQUsbt');
+        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsTunnelARHopTable', $mplsTunnelArHopCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         // vRtrMplsTunnelARHopProtection Bits
         $localAvailable = 0b10000000;
@@ -413,7 +413,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsTunnelCHops($paths)
     {
-        $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
+        $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         $chops = collect();
         foreach ($mplsTunnelCHopCache as $key => $value) {
@@ -441,10 +441,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsLsps()
     {
-        $mplsLspCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
+        $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
         if (!empty($mplsLspCache)) {
-            $mplsLspCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspLastChange', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
-            $mplsLspCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspStatTable', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia');
+            $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspLastChange', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
+            $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspStatTable', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia');
         }
 
         $lsps = collect();
@@ -494,10 +494,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsPaths($lsps)
     {
-        $mplsPathCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspPathTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
+        $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
         if (!empty($mplsPathCache)) {
-            $mplsPathCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspPathLastChange', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
-            $mplsPathCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsLspPathStatTable', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia');
+            $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathLastChange', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
+            $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathStatTable', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia');
         }
 
         $paths = collect();
@@ -536,7 +536,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsSdps()
     {
-        $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
+        $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
 
         $sdps = collect();
         foreach ($mplsSdpCache as $value) {
@@ -572,8 +572,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsServices()
     {
-        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDevice(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
-        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDevice(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
+        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
+        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
 
         $svcs = collect();
 
@@ -617,7 +617,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsSaps($svcs)
     {
-        $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
         $saps = collect();
 
@@ -628,7 +628,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $filter_value = '/^Internal SAP/';
 
         // cache a ifIndex -> ifName
-        $ifIndexNames = $this->getDeviceModel()->ports()->pluck('ifName', 'ifIndex');
+        $ifIndexNames = $this->getDevice()->ports()->pluck('ifName', 'ifIndex');
 
         foreach ($mplsSapCache as $key => $value) {
             if (preg_match($filter_key, $key) || preg_match($filter_value, $value['sapDescription'])) {
@@ -662,8 +662,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsSdpBinds($sdps, $svcs)
     {
-        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
-        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
+        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
+        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
 
         $binds = collect();
         foreach ($mplsBindCache as $key => $value) {
@@ -702,8 +702,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsTunnelArHops($paths)
     {
-        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'mplsTunnelARHopTable', [], 'MPLS-TE-MIB', 'nokia', '-OQUsbt');
-        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelARHopTable', $mplsTunnelArHopCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
+        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'mplsTunnelARHopTable', [], 'MPLS-TE-MIB', 'nokia', '-OQUsbt');
+        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsTunnelARHopTable', $mplsTunnelArHopCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         // vRtrMplsTunnelARHopProtection Bits
         $localAvailable = 0b10000000;
@@ -757,7 +757,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsTunnelCHops($paths)
     {
-        $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
+        $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         $chops = collect();
         foreach ($mplsTunnelCHopCache as $key => $value) {

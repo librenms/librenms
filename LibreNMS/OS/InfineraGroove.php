@@ -40,7 +40,7 @@ class InfineraGroove extends \LibreNMS\OS
             'inventoryManufacturerNumber.shelf.1.0.0.0',
         ];
 
-        $data = snmp_get_multi($this->getDevice(), $oid_list, '-OUQs', 'CORIANT-GROOVE-MIB');
+        $data = snmp_get_multi($this->getDeviceArray(), $oid_list, '-OUQs', 'CORIANT-GROOVE-MIB');
 
         foreach ($data as $value) {
             if (isset($value['softwareloadSwloadState']) && $value['softwareloadSwloadState'] == 'active') {

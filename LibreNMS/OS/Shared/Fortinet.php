@@ -124,6 +124,6 @@ class Fortinet extends \LibreNMS\OS
             '.1.3.6.1.4.1.12356.101.1.613' => 'FortiWiFi 60B',
         ];
 
-        return $rewrite_fortinet_hardware[$this->getDeviceModel()->sysObjectID] ?? null;
+        return $rewrite_fortinet_hardware[$this->getDevice()->sysObjectID] ?? null;
     }
 }

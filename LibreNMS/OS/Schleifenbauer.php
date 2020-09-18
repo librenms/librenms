@@ -31,7 +31,7 @@ class Schleifenbauer extends \LibreNMS\OS
 {
     public function discoverOS(Device $device): void
     {
-        $master_unit = snmp_get($this->getDevice(), ".1.3.6.1.4.1.31034.12.1.1.1.2.4.1.2.1", '-Oqv');
+        $master_unit = snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.31034.12.1.1.1.2.4.1.2.1", '-Oqv');
 
         $oids = [
             'hardware' => ".1.3.6.1.4.1.31034.12.1.1.2.1.1.1.5.$master_unit",
@@ -40,7 +40,7 @@ class Schleifenbauer extends \LibreNMS\OS
             'build' => ".1.3.6.1.4.1.31034.12.1.1.2.1.1.1.3.$master_unit"
         ];
 
-        $data = snmp_get_multi_oid($this->getDevice(), $oids);
+        $data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
 
         $device->hardware = $data[$oids['hardware']] ?? null;
         $device->serial = $data[$oids['serial']] ?? null;

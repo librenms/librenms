@@ -69,7 +69,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
      *
      * @return array
      */
-    public function &getDevice()
+    public function &getDeviceArray()
     {
         return $this->device;
     }
@@ -89,7 +89,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
      *
      * @return Device
      */
-    public function getDeviceModel()
+    public function getDevice()
     {
         return DeviceCache::get($this->getDeviceId());
     }
@@ -106,7 +106,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
 
     public function persistGraphs()
     {
-        $device = $this->getDeviceModel();
+        $device = $this->getDevice();
         $graphs = collect(array_keys($this->graphs));
 
         // delete extra graphs
@@ -144,7 +144,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
         }
 
         if (!isset($this->cache['cache_oid'][$oid])) {
-            $data = snmpwalk_cache_oid($this->getDevice(), $oid, [], $mib, null, $snmpflags);
+            $data = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], $mib, null, $snmpflags);
             $this->cache['cache_oid'][$oid] = array_map('current', $data);
         }
 
@@ -169,7 +169,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
         }
 
         if (!isset($this->cache['group'][$depth][$oid])) {
-            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDevice(), $oid, $mib, $depth);
+            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDeviceArray(), $oid, $mib, $depth);
         }
 
         return $this->cache['group'][$depth][$oid];
@@ -248,7 +248,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
             $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
         }
 
-        $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids);
+        $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
 
         $data = [];
         foreach ($oids as $id => $oid) {

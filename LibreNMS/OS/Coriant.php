@@ -45,7 +45,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
         $c_list = [];
         ModuleModelObserver::observe('\App\Models\MplsLsp\TnmsneInfo');
 
-        foreach (snmpwalk_cache_multi_oid($this->getDevice(), 'enmsNETable', [], 'TNMS-NBI-MIB') as $index => $ne) {
+        foreach (snmpwalk_cache_multi_oid($this->getDeviceArray(), 'enmsNETable', [], 'TNMS-NBI-MIB') as $index => $ne) {
             $ne = TnmsneInfo::firstOrNew(['device_id' => $this->getDeviceId(), 'neID' => $index], [
                 'device_id' => $this->getDeviceId(),
                 'neID' => $index,
@@ -59,7 +59,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
 
             if ($ne->isDirty()) {
                 $ne->save();
-                Log::event("Coriant enmsNETable Hardware $ne->neType : $ne->neName ($index) at $ne->neLocation Discovered", $this->getDeviceModel(), 'system', 2);
+                Log::event("Coriant enmsNETable Hardware $ne->neType : $ne->neName ($index) at $ne->neLocation Discovered", $this->getDevice(), 'system', 2);
             }
             $c_list[] = $index;
         }
@@ -68,7 +68,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
         foreach (TnmsneInfo::where('device_id', $this->getDeviceId())->whereNotIn('neID', $c_list)->get() as $ne) {
             /** @var TnmsneInfo $ne */
             $ne->delete();
-            Log::event("Coriant enmsNETable Hardware $ne->neName at $ne->neLocation Removed", $this->getDeviceModel(), 'system', $ne->neID);
+            Log::event("Coriant enmsNETable Hardware $ne->neName at $ne->neLocation Removed", $this->getDevice(), 'system', $ne->neID);
         }
     }
 }

@@ -50,7 +50,7 @@ class Arubaos extends OS implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $aruba_info = snmp_get_multi($this->getDevice(), [
+        $aruba_info = snmp_get_multi($this->getDeviceArray(), [
             'wlsxSwitchRole.0',
             'wlsxSwitchMasterIp.0',
             'wlsxSwitchLicenseSerialNumber.0'
@@ -165,7 +165,7 @@ class Arubaos extends OS implements
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
     {
-        $data = snmpwalk_cache_numerical_oid($this->getDevice(), $oid, [], 'AI-AP-MIB');
+        $data = snmpwalk_cache_numerical_oid($this->getDeviceArray(), $oid, [], 'AI-AP-MIB');
 
         $sensors = [];
         foreach ($data as $index => $entry) {

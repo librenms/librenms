@@ -33,7 +33,7 @@ class Ftos extends Dnos
     {
         parent::discoverOS($device); // yaml
 
-        $device = $this->getDeviceModel();
+        $device = $this->getDevice();
         $device->hardware = $this->getHardware();
     }
 
@@ -60,6 +60,6 @@ class Ftos extends Dnos
             '.1.3.6.1.4.1.6027.1.3.11' => 'S25N',
         ];
 
-        return $hardware[$this->getDeviceModel()->sysObjectID] ?? null;
+        return $hardware[$this->getDevice()->sysObjectID] ?? null;
     }
 }

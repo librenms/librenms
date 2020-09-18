@@ -38,7 +38,7 @@ class OS implements Module
         $this->updateLocation($os);
         if ($os instanceof OSDiscovery) {
             // null out values in case they aren't filled.
-            $os->getDeviceModel()->fill([
+            $os->getDevice()->fill([
                 'hardware' => null,
                 'version' => null,
                 'features' => null,
@@ -46,14 +46,14 @@ class OS implements Module
                 'icon' => null,
             ]);
 
-            $os->discoverOS($os->getDeviceModel());
+            $os->discoverOS($os->getDevice());
         }
         $this->handleChanges($os);
     }
 
     public function poll(\LibreNMS\OS $os)
     {
-        $deviceModel = $os->getDeviceModel();
+        $deviceModel = $os->getDevice();
         if ($os instanceof OSPolling) {
             $os->pollOS();
         } else {
@@ -89,7 +89,7 @@ class OS implements Module
 
     private function handleChanges(\LibreNMS\OS $os)
     {
-        $device = $os->getDeviceModel();
+        $device = $os->getDevice();
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
@@ -103,9 +103,9 @@ class OS implements Module
 
     private function updateLocation(\LibreNMS\OS $os, $altLocation = null)
     {
-        $device = $os->getDeviceModel();
+        $device = $os->getDevice();
         if ($device->override_sysLocation == 0) {
-            $device->setLocation(snmp_get($os->getDevice(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
+            $device->setLocation(snmp_get($os->getDeviceArray(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
         }
 
         // make sure the location has coordinates

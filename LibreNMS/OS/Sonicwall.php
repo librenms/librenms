@@ -28,7 +28,7 @@ class Sonicwall extends OS implements OSPolling, ProcessorDiscovery
 {
     public function pollOS()
     {
-        $data = snmp_get_multi($this->getDevice(), [
+        $data = snmp_get_multi($this->getDeviceArray(), [
             'sonicCurrentConnCacheEntries.0',
             'sonicMaxConnCacheEntries.0',
         ], '-OQUs', 'SONICWALL-FIREWALL-IP-STATISTICS-MIB');
@@ -42,7 +42,7 @@ class Sonicwall extends OS implements OSPolling, ProcessorDiscovery
                 'maxsessions' => $data[0]['sonicMaxConnCacheEntries'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDevice(), 'sonicwall_sessions', $tags, $fields);
+            data_update($this->getDeviceArray(), 'sonicwall_sessions', $tags, $fields);
             $this->enableGraph('sonicwall_sessions');
         }
     }
@@ -55,7 +55,7 @@ class Sonicwall extends OS implements OSPolling, ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        if (Str::startsWith($this->getDevice()['sysObjectID'], '.1.3.6.1.4.1.8741.1')) {
+        if (Str::startsWith($this->getDeviceArray()['sysObjectID'], '.1.3.6.1.4.1.8741.1')) {
             return array(
                 Processor::discover(
                     'sonicwall',
@@ -71,7 +71,7 @@ class Sonicwall extends OS implements OSPolling, ProcessorDiscovery
                 Processor::discover(
                     'sonicwall',
                     $this->getDeviceId(),
-                    $this->getDevice()['sysObjectID'] . '.2.1.3.0',  // different OID for each model
+                    $this->getDeviceArray()['sysObjectID'] . '.2.1.3.0',  // different OID for each model
                     0,
                     'CPU',
                     1

@@ -41,10 +41,10 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
         $version = $version_matches[1] ?? null;
 
         if (empty($version)) {
-            $version = explode(' on', snmp_get($this->getDevice(), '.1.3.6.1.4.1.2272.1.1.7.0', '-Oqvn'))[0] ?? null;
+            $version = explode(' on', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2272.1.1.7.0', '-Oqvn'))[0] ?? null;
         }
         if (empty($version)) {
-            $version = snmp_get($this->getDevice(), '.1.3.6.1.4.1.45.1.6.4.2.1.10.0', '-Oqvn') ?? null;
+            $version = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.45.1.6.4.2.1.10.0', '-Oqvn') ?? null;
         }
         $device->version = $version;
 
@@ -57,7 +57,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
         $device->hardware = explode(' ', $details, 2)[0] ?? null;
 
         // Is this a 5500 series or 5600 series stack?
-        $stack = snmp_walk($this->getDevice(), '.1.3.6.1.4.1.45.1.6.3.3.1.1.6.8', '-OsqnU');
+        $stack = snmp_walk($this->getDeviceArray(), '.1.3.6.1.4.1.45.1.6.3.3.1.1.6.8', '-OsqnU');
         $stack = explode("\n", $stack);
         $stack_size = count($stack);
         if ($stack_size > 1) {
@@ -73,7 +73,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $data = snmpwalk_group($this->getDevice(), 's5ChasUtilCPUUsageLast10Minutes', 'S5-CHASSIS-MIB');
+        $data = snmpwalk_group($this->getDeviceArray(), 's5ChasUtilCPUUsageLast10Minutes', 'S5-CHASSIS-MIB');
 
         $processors = [];
         $count = 1;

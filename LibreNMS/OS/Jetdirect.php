@@ -32,9 +32,9 @@ class Jetdirect extends \LibreNMS\OS\Shared\Printer
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device = $this->getDeviceModel();
+        $device = $this->getDevice();
 
-        $info = $this->parseDeviceId(snmp_get($this->getDevice(), '.1.3.6.1.4.1.11.2.3.9.1.1.7.0', '-OQv'));
+        $info = $this->parseDeviceId(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.11.2.3.9.1.1.7.0', '-OQv'));
         $hardware = $info['MDL'] ?? $info['MODEL'] ?? $info['DES'] ?? $info['DESCRIPTION'];
         if (!empty($hardware)) {
             $hardware = str_ireplace([

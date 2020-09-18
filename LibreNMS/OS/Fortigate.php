@@ -41,7 +41,7 @@ class Fortigate extends Fortinet implements OSPolling
 
     public function pollOS()
     {
-        $sessions = snmp_get($this->getDevice(), 'FORTINET-FORTIGATE-MIB::fgSysSesCount.0', '-Ovq');
+        $sessions = snmp_get($this->getDeviceArray(), 'FORTINET-FORTIGATE-MIB::fgSysSesCount.0', '-Ovq');
         if (is_numeric($sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
 
@@ -51,11 +51,11 @@ class Fortigate extends Fortinet implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            app()->make('Datastore')->put($this->getDevice(), 'fortigate_sessions', $tags, $fields);
+            app()->make('Datastore')->put($this->getDeviceArray(), 'fortigate_sessions', $tags, $fields);
             $this->enableGraph('fortigate_sessions');
         }
 
-        $cpu_usage = snmp_get($this->getDevice(), 'FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0', '-Ovq');
+        $cpu_usage = snmp_get($this->getDeviceArray(), 'FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0', '-Ovq');
         if (is_numeric($cpu_usage)) {
             $rrd_def = RrdDefinition::make()->addDataset('LOAD', 'GAUGE', -1, 100);
 
@@ -65,7 +65,7 @@ class Fortigate extends Fortinet implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            app()->make('Datastore')->put($this->getDevice(), 'fortigate_cpu', $tags, $fields);
+            app()->make('Datastore')->put($this->getDeviceArray(), 'fortigate_cpu', $tags, $fields);
             $this->enableGraph('fortigate_cpu');
         }
     }

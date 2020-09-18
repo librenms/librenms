@@ -33,7 +33,7 @@ class Junos extends \LibreNMS\OS implements OSPolling
 {
     public function discoverOS(Device $device): void
     {
-        $data = snmp_get_multi($this->getDevice(), [
+        $data = snmp_get_multi($this->getDeviceArray(), [
             'JUNIPER-MIB::jnxBoxDescr.0',
             'JUNIPER-MIB::jnxBoxSerialNo.0',
             'JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberSWVersion.0',
@@ -52,10 +52,10 @@ class Junos extends \LibreNMS\OS implements OSPolling
 
     public function pollOS()
     {
-        $data = snmp_get_multi($this->getDevice(), 'jnxJsSPUMonitoringCurrentFlowSession.0', '-OUQs', 'JUNIPER-SRX5000-SPU-MONITORING-MIB');
+        $data = snmp_get_multi($this->getDeviceArray(), 'jnxJsSPUMonitoringCurrentFlowSession.0', '-OUQs', 'JUNIPER-SRX5000-SPU-MONITORING-MIB');
 
         if (is_numeric($data[0]['jnxJsSPUMonitoringCurrentFlowSession'])) {
-            data_update($this->getDevice(), 'junos_jsrx_spu_sessions', [
+            data_update($this->getDeviceArray(), 'junos_jsrx_spu_sessions', [
                 'rrd_def' => RrdDefinition::make()->addDataset('spu_flow_sessions', 'GAUGE', 0),
             ], [
                 'spu_flow_sessions' => $data[0]['jnxJsSPUMonitoringCurrentFlowSession'],

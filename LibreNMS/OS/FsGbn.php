@@ -42,8 +42,8 @@ class FsGbn extends OS implements ProcessorDiscovery
         $processors = [];
 
         // Test first pair of OIDs from GBNPlatformOAM-MIB
-        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
-        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
+        $processors_data = snmpwalk_cache_oid($this->getDeviceArray(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
+        $processors_data = snmpwalk_cache_oid($this->getDeviceArray(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
         foreach ($processors_data as $index => $entry) {
             $processors[] = Processor::discover(
                 $this->getName(),

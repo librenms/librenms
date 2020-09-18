@@ -44,14 +44,14 @@ class Barracudangfirewall extends OS implements OSDiscovery, OSPolling
     public function pollOS()
     {
         // TODO move to count sensor
-        $sessions = snmp_get($this->getDevice(), 'firewallSessions64.8.102.119.83.116.97.116.115.0', '-OQv', 'PHION-MIB');
+        $sessions = snmp_get($this->getDeviceArray(), 'firewallSessions64.8.102.119.83.116.97.116.115.0', '-OQv', 'PHION-MIB');
 
         if (is_numeric($sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('fw_sessions', 'GAUGE', 0);
             $fields = ['fw_sessions' => $sessions];
 
             $tags = compact('rrd_def');
-            app('Datastore')->put($this->getDevice(), 'barracuda_firewall_sessions', $tags, $fields);
+            app('Datastore')->put($this->getDeviceArray(), 'barracuda_firewall_sessions', $tags, $fields);
             $this->enableGraph('barracuda_firewall_sessions');
         }
     }

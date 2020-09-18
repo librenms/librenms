@@ -58,7 +58,7 @@ class Airos extends OS implements
     public function discoverOS(Device $device): void
     {
         $oids = ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'];
-        $data = snmp_getnext_multi($this->getDevice(), $oids, '-OQUs', 'IEEE802dot11-MIB');
+        $data = snmp_getnext_multi($this->getDeviceArray(), $oids, '-OQUs', 'IEEE802dot11-MIB');
 
         $device->hardware = $data['dot11manufacturerProductName'] ?? null;
 
@@ -211,7 +211,7 @@ class Airos extends OS implements
             new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'airos', 0, 'Overall RSSI')
         );
 
-        $data = snmpwalk_cache_oid($this->getDevice(), 'ubntRadioRssi', array(), 'UBNT-AirMAX-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'ubntRadioRssi', array(), 'UBNT-AirMAX-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rssi',
