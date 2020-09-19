@@ -130,9 +130,9 @@ if (is_numeric($ss['ssCpuRawSteal'])) {
 // UCD-SNMP-MIB::memSwapError.0 = INTEGER: noError(0)
 // UCD-SNMP-MIB::memSwapErrorMsg.0 = STRING:
 
-$snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memAvailReal.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
+$snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memSysAvail.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
 if (is_array($snmpdata[0])) {
-    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
+    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
     foreach (array_keys($snmpdata[0]) as $key) {
         $$key = $snmpdata[0][$key];
     }
@@ -140,7 +140,7 @@ if (is_array($snmpdata[0])) {
 
 $snmpdata = $snmpdata[0];
 
-if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree)) {
+if (is_numeric($memTotalReal) && is_numeric($memSysAvail) && is_numeric($memTotalFree)) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('totalswap', 'GAUGE', 0, 10000000000)
         ->addDataset('availswap', 'GAUGE', 0, 10000000000)
@@ -155,7 +155,7 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
         'totalswap'    => $memTotalSwap,
         'availswap'    => $memAvailSwap,
         'totalreal'    => $memTotalReal,
-        'availreal'    => $memAvailReal,
+        'availreal'    => $memSysAvail,
         'totalfree'    => $memTotalFree,
         'shared'       => $memShared,
         'buffered'     => $memBuffer,
@@ -195,5 +195,5 @@ if (is_numeric($load_raw[2]['laLoadInt'])) {
 }
 
 unset($ss, $load_raw, $snmpdata);
-unset($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached);
+unset($memTotalSwap, $memAvailSwap, $memTotalReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached);
 unset($key, $collect_oids, $rrd_name, $rrd_def, $oid);
