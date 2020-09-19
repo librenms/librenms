@@ -19,10 +19,10 @@ if (!Auth::user()->hasGlobalAdmin()) {
     } elseif (!is_numeric($vars['device_group_id'])) {
             $status = array('status' =>1, 'message' => 'No Device Group has been selected');
     } else {
-        if (discover_service_template($vars['device_group_id'],$vars['service_template_id'])) {
-            $status = array('status' =>0, 'message' => 'Device Group: <i>'.$vars['device_group_id'].',Service Template: <i>'.$vars['service_template_id'].', has been discovered.</i>');
+        if (discover_service_template($vars['device_group_id'], $vars['service_template_id'])) {
+            $status = array('status' =>0, 'message' => 'Device Group: <i>'.$vars['device_group_id'].', Service Template: <i>'.$vars['service_template_id'].', has been discovered.</i>');
         } else {
-            $status = array('status' =>1, 'message' => 'Device Group: <i>'.$vars['device_group_id'].',Service Template: <i>'.$vars['service_template_id'].', has been discovered.</i>');
+            $status = array('status' =>1, 'message' => 'Device Group: <i>'.$vars['device_group_id'].', Service Template: <i>'.$vars['service_template_id'].', has been discovered.</i>');
         }
     }
 }

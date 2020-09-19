@@ -187,7 +187,7 @@ function discover_service_template($device_group, $service_template)
         $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
         foreach ($device_ids as $device) {
             add_service($device, $service);
-        }    
+        }
         log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
         echo '+';
     }
