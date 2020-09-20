@@ -58,7 +58,7 @@ class Dispatcher
         // log an event if appropriate
         $fallback = $handler instanceof Fallback;
         $logging = Config::get('snmptraps.eventlog', 'unhandled');
-        $detailed = Config::get('snmptraps.enable_details', false);
+        $detailed = Config::get('snmptraps.eventlog_detailed', false);
         if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
             Log::event('SNMP trap received: ' . $trap->toString($detailed), $trap->getDevice(), 'trap');
         } else {

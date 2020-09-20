@@ -164,11 +164,12 @@ an event of the type trap for received traps. These events can be utilized for a
 In config.php
 
 ```php
-$config['snmptraps']['eventlog'] = 'unhandled';
+$config['snmptraps']['eventlog'] = 'unhandled'; //default value
+$config['snmptraps']['eventlog_detailed'] = 'false'; //default value
 ```
 
 Valid options are:
 
-- `unhandled` only unhandled traps will be logged
+- `unhandled` only unhandled traps will be logged (default value)
 - `all` log all traps
 - `none` no traps will create a generic event log (handled traps may still log events)
