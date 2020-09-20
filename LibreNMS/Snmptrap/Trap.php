@@ -152,7 +152,7 @@ class Trap
     public function toString($detailed = false)
     {
         if ($detailed) {
-            return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(function ($value, $key) use ($search) {
+            return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(function ($value, $key) {
                 return Str::contains($key, 'SNMPv2-MIB::snmpTrapOID.0');
             })->all());
         }
