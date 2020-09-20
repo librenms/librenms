@@ -42,6 +42,14 @@ class Dispatcher
             return false;
         }
 
+        if ($trap->findOid('iso.3.6.1.6.3.1.1.4.1.0')) {
+            // Even the TrapOid is not properly converted to text, so snmptrapd is probably not
+            // configured with any MIBs (-M and/or -m).
+            // LibreNMS snmptraps code cannot process received data. Let's inform the user.
+            Log::event("Misconfigured MIBS or MIBDIRS for snmptrapd, check https://docs.librenms.org/Extensions/SNMP-Trap-Handler/ : " . $trap->getRaw(), $trap->getDevice() , 'system');
+            return false;
+        }
+
         // note, this doesn't clear the resolved SnpmtrapHandler so only one per run
         /** @var \LibreNMS\Interfaces\SnmptrapHandler $handler */
         $handler = app(\LibreNMS\Interfaces\SnmptrapHandler::class, [$trap->getTrapOid()]);
@@ -50,8 +58,9 @@ class Dispatcher
         // log an event if appropriate
         $fallback = $handler instanceof Fallback;
         $logging = Config::get('snmptraps.eventlog', 'unhandled');
+        $detailed = Config::get('snmptraps.enable_details', false);
         if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
-            Log::event('SNMP trap received: ' . $trap->getTrapOid(), $trap->getDevice(), 'trap');
+            Log::event('SNMP trap received: ' . $trap->toString($detailed), $trap->getDevice(), 'trap');
         } else {
             $rules = new AlertRules;
             $rules->runRules($trap->getDevice()->device_id);

@@ -142,4 +142,21 @@ class Trap
     {
         return $this->raw;
     }
+
+    /**
+     * Render the Trap for debugging purpose
+     *
+     * @param $detailed
+     * @return string
+     */
+    public function toString($detailed=false)
+    {
+        if ($detailed) {
+            return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(function ($value, $key) use ($search) {
+                return Str::contains($oid, 'SNMPv2-MIB::snmpTrapOID.0');
+            })->all());
+        } else {
+            return $this->getTrapOid();
+        }
+    }
 }
