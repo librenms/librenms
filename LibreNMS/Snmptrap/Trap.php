@@ -149,7 +149,7 @@ class Trap
      * @param $detailed
      * @return string
      */
-    public function toString($detailed=false)
+    public function toString($detailed = false)
     {
         if ($detailed) {
             return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(function ($value, $key) use ($search) {
