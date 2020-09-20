@@ -22,6 +22,7 @@ if (is_numeric($service_template_id) && $service_template_id > 0) {
     $service_template = service_template_get(null, $service_template_id);
 
     $output = array(
+        'device_group_id' => $service[0]['device_group_id']
         'stype'     => $service[0]['service_type'],
         'ip'        => $service[0]['service_ip'],
         'desc'      => $service[0]['service_desc'],

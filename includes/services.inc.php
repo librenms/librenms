@@ -184,7 +184,7 @@ function discover_service_template($device_group, $service_template)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_template_id`= ? AND `device_group_id` = ?', array($service_template['service_template_id'], $device_group['device_group_id']))) {
         $service=service_template_get($device_group, $service_template);
-        $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
+        $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE '`device_group_id` = ?", array($device_group));
         foreach ($device_ids as $device) {
             add_service($device, $service);
         }
@@ -192,7 +192,7 @@ function discover_service_template($device_group, $service_template)
         echo '+';
     }
 
-    echo "$service ";
+    echo "$service_template ";
 }
 
 function poll_service($service)
