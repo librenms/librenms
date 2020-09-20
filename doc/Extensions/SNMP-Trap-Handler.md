@@ -159,9 +159,9 @@ So what value should you type in the commands below? Oddly enough, simply supply
 ### Event logging
 
 You can configure generic event logging for snmp traps.  This will log
-an event of the type trap for received traps. These events can be utilized for alerting.
-By default, only the TrapOID is logged. Buf you can enable the "detailed" variant, 
-and all the data received with the trap will be logged. 
+an event of the type trap for received traps. These events can be used for alerting.
+By default, only the TrapOID is logged. Buf you can enable the "detailed" variant,
+and all the data received with the trap will be logged.
 
 In config.php
 

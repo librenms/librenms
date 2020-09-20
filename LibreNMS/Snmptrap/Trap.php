@@ -153,10 +153,9 @@ class Trap
     {
         if ($detailed) {
             return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(function ($value, $key) use ($search) {
-                return Str::contains($oid, 'SNMPv2-MIB::snmpTrapOID.0');
+                return Str::contains($key, 'SNMPv2-MIB::snmpTrapOID.0');
             })->all());
-        } else {
-            return $this->getTrapOid();
         }
+        return $this->getTrapOid();
     }
 }
