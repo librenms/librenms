@@ -28,7 +28,7 @@ class CreateServicesTemplateTable extends Migration
         });
         Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id');
-        });  
+        });
     }
 
     /**
@@ -39,5 +39,10 @@ class CreateServicesTemplateTable extends Migration
     public function down()
     {
         Schema::drop('services_template');
+        Schema::table('services', function (Blueprint $table) {
+            $table->dropColumn([
+                'service_template_id'
+            ]);
+        });
     }
 }
