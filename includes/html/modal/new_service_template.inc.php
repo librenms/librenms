@@ -18,8 +18,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         $files = scandir($dir);
         $dir .= DIRECTORY_SEPARATOR;
         foreach ($files as $file) {
-            if (is_executable($dir.$file) && is_file($dir.$file) && strstr($file, 'check_')) {
-                list(,$check_name) = explode('_', $file, 2);
+            if (is_executable($dir . $file) && is_file($dir . $file) && strstr($file, 'check_')) {
+                [,$check_name] = explode('_', $file, 2);
                 $stype .= "<option value='$check_name'>$check_name</option>";
             }
         }

@@ -2,7 +2,7 @@
 
 $no_refresh = true;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     if ($vars['addsrv-template']) {
@@ -11,7 +11,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 
             $service_template_id = add_service_template($vars['device_group'], $vars['type'], $vars['descr'], $vars['params'], 0);
             if ($service_template_id) {
-                $message       .= $message_break.'Service Template added ('.$service_template_id.')!';
+                $message .= $message_break . 'Service Template added (' . $service_template_id . ')!';
                 $message_break .= '<br />';
             }
         }
@@ -21,7 +21,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
     }
 
     foreach (dbFetchRows('SELECT * FROM `device_groups` ORDER BY `name`') as $device_group) {
-        $devicegroupsform .= "<option value='".$device_group['id']."'>".$device_group['name'].'</option>';
+        $devicegroupsform .= "<option value='" . $device_group['id'] . "'>" . $device_group['name'] . '</option>';
     }
 
     if ($updated) {

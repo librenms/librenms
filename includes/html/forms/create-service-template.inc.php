@@ -30,17 +30,17 @@ if (is_numeric($service_template_id) && $service_template_id > 0) {
     // Need to edit.
     $update = ['device_group_id' => $device_group_id, 'service_template_type' => $type, 'service_template_desc' => $desc, 'service_template_ip' => $ip, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled];
     if (is_numeric(edit_service_template($update, $service_template_id))) {
-        $status = array('status' =>0, 'message' => 'Modified Service Template: <i>'.$service_template_id.': '.$type.'</i>');
+        $status = ['status' =>0, 'message' => 'Modified Service Template: <i>' . $service_template_id . ': ' . $type . '</i>'];
     } else {
-        $status = array('status' =>1, 'message' => 'ERROR: Failed to modify Service Template: <i>'.$service_template_id.'</i>');
+        $status = ['status' =>1, 'message' => 'ERROR: Failed to modify Service Template: <i>' . $service_template_id . '</i>'];
     }
 } else {
     // Need to add.
     $service_template_id = add_service_template($device_group_id, $type, $desc, $ip, $param, $ignore, $disabled);
     if ($service_template_id == null) {
-        $status = ['status' =>1, 'message' => 'ERROR: Failed to add Service Template: <i>'.$service_template_id.': '.$type.'</i>'];
+        $status = ['status' =>1, 'message' => 'ERROR: Failed to add Service Template: <i>' . $service_template_id . ': ' . $type . '</i>'];
     } else {
-        $status = ['status' =>0, 'message' => 'Added Service Template: <i>'.$service_template_id.': '.$type.'</i>'];
+        $status = ['status' =>0, 'message' => 'Added Service Template: <i>' . $service_template_id . ': ' . $type . '</i>'];
     }
 }
 header('Content-Type: application/json');

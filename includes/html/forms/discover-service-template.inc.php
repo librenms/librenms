@@ -11,18 +11,18 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    $status = array('status' =>1, 'message' => 'ERROR: You need to be admin to apply service templates');
+if (! Auth::user()->hasGlobalAdmin()) {
+    $status = ['status' =>1, 'message' => 'ERROR: You need to be admin to apply service templates'];
 } else {
-    if (!is_numeric($vars['service_template_id'])) {
-        $status = array('status' =>1, 'message' => 'No Service Template has been selected');
-    } elseif (!is_numeric($vars['device_group_id'])) {
-            $status = array('status' =>1, 'message' => 'No Device Group has been selected');
+    if (! is_numeric($vars['service_template_id'])) {
+        $status = ['status' =>1, 'message' => 'No Service Template has been selected'];
+    } elseif (! is_numeric($vars['device_group_id'])) {
+        $status = ['status' =>1, 'message' => 'No Device Group has been selected'];
     } else {
         if (discover_service_template($vars['device_group_id'], $vars['service_template_id'])) {
-            $status = array('status' =>0, 'message' => 'Device Group: <i>'.$vars['device_group_id'].', Service Template: <i>'.$vars['service_template_id'].', has been discovered.</i>');
+            $status = ['status' =>0, 'message' => 'Device Group: <i>' . $vars['device_group_id'] . ', Service Template: <i>' . $vars['service_template_id'] . ', has been discovered.</i>'];
         } else {
-            $status = array('status' =>1, 'message' => 'Device Group: <i>'.$vars['device_group_id'].', Service Template: <i>'.$vars['service_template_id'].', has been discovered.</i>');
+            $status = ['status' =>1, 'message' => 'Device Group: <i>' . $vars['device_group_id'] . ', Service Template: <i>' . $vars['service_template_id'] . ', has NOT been discovered.</i>'];
         }
     }
 }

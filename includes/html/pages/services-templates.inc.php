@@ -28,11 +28,11 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                 <span style="font-weight: bold;">Services Templates</span> &#187;
 
                 <?php
-                $menu_options = array(
+                $menu_options = [
                     'basic' => 'Basic',
-                );
+                ];
 
-                if (!$vars['view']) {
+                if (! $vars['view']) {
                     $vars['view'] = 'basic';
                 }
 
@@ -50,9 +50,9 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                         echo "<span class='pagemenu-selected'>";
                     }
 
-                    echo generate_link($text, $vars, array(
+                    echo generate_link($text, $vars, [
                         'view' => $option
-                    ));
+                    ]);
                     if ($vars['view'] == $option) {
                         echo '</span>';
                     }
@@ -72,13 +72,13 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                 echo '<div style="margin:10px 10px 0px 10px;" id="message"></div>';
                 echo '<div class="panel-body">';
 
-                $sql_param = array();
+                $sql_param = [];
 
-                $host_par = array();
+                $host_par = [];
                 $perms_sql = null;
-                if (!Auth::user()->hasGlobalRead()) {
+                if (! Auth::user()->hasGlobalRead()) {
                     $device_group_ids = Permissions::devicesForUser()->toArray() ?: [0];
-                    $perms_sql .= " AND `D`.`device_group_id` IN " .dbGenPlaceholders(count($device_group_ids));
+                    $perms_sql .= ' AND `D`.`device_group_id` IN ' . dbGenPlaceholders(count($device_group_ids));
                     $host_par = $device_group_ids;
                 }
 
@@ -88,8 +88,8 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                 foreach (dbFetchRows($host_sql, $host_par) as $device_group) {
                     $device_group_id = $device_group['id'];
                     $device_group_name = $device_group['name'];
-                    #$device_sysName = $device_group['name'];
-                    #$devlink = generate_device_link($device_group, null, array('tab' => 'services'));
+                    //$device_sysName = $device_group['name'];
+                    //$devlink = generate_device_link($device_group, null, array('tab' => 'services'));
                     if ($shift == 1) {
                         array_unshift($sql_param, $device_group_id);
                         $shift = 0;
