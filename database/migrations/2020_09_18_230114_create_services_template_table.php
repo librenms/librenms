@@ -26,7 +26,7 @@ class CreateServicesTemplateTable extends Migration
             //$table->index(['services_template_device_group_id_index','device_group_id']);
         });
         Schema::table('services', function (Blueprint $table) {
-            $table->unsignedInteger('service_template_id');
+            $table->unsignedInteger('service_template_id')->default(0);
         });
     }
 
