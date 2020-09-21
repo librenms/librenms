@@ -156,6 +156,7 @@ class Trap
                 return Str::contains($key, 'SNMPv2-MIB::snmpTrapOID.0');
             })->all());
         }
-        return "" . $this->getTrapOid();
+
+        return '' . $this->getTrapOid();
     }
 }
