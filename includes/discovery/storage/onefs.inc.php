@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
@@ -25,8 +24,8 @@
 if ($device['os'] === 'onefs') {
     $oids = snmp_get_multi_oid($device, ['ifsTotalBytes.0', 'ifsUsedBytes.0', 'ifsAvailableBytes.0'], '-OUQn', 'ISILON-MIB');
 
-    $fstype = "ifs";
-    $descr = "Internal File System";
+    $fstype = 'ifs';
+    $descr = 'Internal File System';
     $units = 1024;
     $index = 0;
     $free = $oids['.1.3.6.1.4.1.12124.1.3.3.0'];

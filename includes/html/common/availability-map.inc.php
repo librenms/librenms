@@ -317,7 +317,7 @@ if (defined('SHOW_SETTINGS')) {
                 }
             }
         } else {
-            $temp_output [] = '';
+            $temp_output[] = '';
         }
     }
 
