@@ -20,7 +20,7 @@
  *
  * Used covert alarm ID in the JnxDomLaneAlarm traps from Hex to a
  * descriptive string.
-
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
@@ -60,6 +60,7 @@ class JnxDomLaneAlarmId
             $index++;
         }
         $message = implode(', ', $descr);
+
         return $message;
     }
 }

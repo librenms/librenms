@@ -45,7 +45,7 @@ class Ios extends Cisco implements
     {
         $device = $this->getDeviceArray();
 
-        if (!Str::startsWith($device['hardware'], 'AIR-') && !Str::contains($device['hardware'], 'ciscoAIR')) {
+        if (! Str::startsWith($device['hardware'], 'AIR-') && ! Str::contains($device['hardware'], 'ciscoAIR')) {
             // unsupported IOS hardware
             return [];
         }
@@ -89,6 +89,7 @@ class Ios extends Cisco implements
                 'ports'
             );
         }
+
         return $sensors;
     }
 }

@@ -33,7 +33,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Barracudangfirewall extends OS implements OSDiscovery, OSPolling
 {
-
     public function discoverOS(Device $device): void
     {
         if ($device->sysObjectID == '.1.3.6.1.4.1.10704.1.10') {

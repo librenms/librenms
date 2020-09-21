@@ -23,11 +23,10 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-if (!is_writable(getenv('HOME'))) {
+if (! is_writable(getenv('HOME'))) {
     // set COMPOSER_HOME in case HOME isn't set or writable
     putenv("COMPOSER_HOME=$install_dir/.composer");
 }
@@ -73,7 +72,7 @@ if (is_file($install_dir . '/composer.phar')) {
         $installer_url = ($use_https ? 'https' : 'http') . '://getcomposer.org/installer';
         curl_fetch($installer_url, $proxy, $use_https, $dest);
 
-        if (!is_file($dest)) {
+        if (! is_file($dest)) {
             echo "Error: Failed to download $installer_url\n";
         } elseif (@hash_file('SHA384', $dest) === $good_sha) {
             // Installer verified
@@ -87,7 +86,7 @@ if (is_file($install_dir . '/composer.phar')) {
 }
 
 // if nothing else, use system supplied composer
-if (!$exec) {
+if (! $exec) {
     $path_exec = trim(shell_exec("which composer 2> /dev/null"));
     if ($path_exec) {
         $exec = $path_exec;
@@ -99,7 +98,6 @@ if ($exec) {
 } else {
     echo "Composer not available, please manually install composer.\n";
 }
-
 
 function curl_fetch($url, $proxy, $use_https, $output = false)
 {

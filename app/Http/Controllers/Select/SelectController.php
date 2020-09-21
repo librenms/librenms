@@ -66,7 +66,7 @@ abstract class SelectController extends PaginatedAjaxController
     {
         return response()->json([
             'results' => collect($paginator->items())->map([$this, 'formatItem']),
-            'pagination' => ['more' => $paginator->hasMorePages()]
+            'pagination' => ['more' => $paginator->hasMorePages()],
         ]);
     }
 
@@ -82,6 +82,7 @@ abstract class SelectController extends PaginatedAjaxController
     public function formatItem($model)
     {
         $attributes = collect($model->getAttributes());
+
         return [
             'id' => $attributes->count() == 1 ? $attributes->first() : $model->getKey(),
             'text' => $attributes->forget($model->getKeyName())->first(),

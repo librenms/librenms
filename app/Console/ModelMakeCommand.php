@@ -37,6 +37,6 @@ class ModelMakeCommand extends LaravelModelMakeCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\Models';
+        return $rootNamespace . '\Models';
     }
 }

@@ -50,8 +50,9 @@ class OspfIfStateChange implements SnmptrapHandler
 
         $port = $device->ports()->where('port_id', $ospfPort->port_id)->first();
 
-        if (!$port) {
+        if (! $port) {
             Log::warning("Snmptrap ospfIfStateChange: Could not find port at port_id $ospfPort->port_id for device: " . $device->hostname);
+
             return;
         }
 

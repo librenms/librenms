@@ -28,8 +28,8 @@
 
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 
 class Discord extends Transport
 {
@@ -38,7 +38,7 @@ class Discord extends Transport
         'severity' => 'Severity',
         'hostname' => 'Hostname',
         'name' => 'Rule Name',
-        'rule' => 'Rule'
+        'rule' => 'Rule',
     ];
 
     public function deliverAlert($obj, $opts)
@@ -53,16 +53,16 @@ class Discord extends Transport
 
     public function contactDiscord($obj, $discord_opts)
     {
-        $host          = $discord_opts['url'];
-        $curl          = curl_init();
-        $discord_title = '#' . $obj['uid'] . ' '  . $obj['title'];
-        $discord_msg   = strip_tags($obj['msg']);
-        $color         = self::getColorForState($obj['state']);
+        $host = $discord_opts['url'];
+        $curl = curl_init();
+        $discord_title = '#' . $obj['uid'] . ' ' . $obj['title'];
+        $discord_msg = strip_tags($obj['msg']);
+        $color = self::getColorForState($obj['state']);
 
         // Special handling for the elapsed text in the footer if the elapsed is not set.
         $footer_text = $obj['elapsed'] ? 'alert took ' . $obj['elapsed'] : '';
 
-        $data          = [
+        $data = [
             'embeds' => [
                 [
                     'title' => $discord_title,
@@ -70,31 +70,33 @@ class Discord extends Transport
                     'description' => $discord_msg,
                     'fields' => $this->createDiscordFields($obj, $discord_opts),
                     'footer' => [
-                        'text' => $footer_text
-                    ]
-                ]
-            ]
+                        'text' => $footer_text,
+                    ],
+                ],
+            ],
         ];
-        if (!empty($discord_opts['options'])) {
+        if (! empty($discord_opts['options'])) {
             $data = array_merge($data, $discord_opts['options']);
         }
 
         $alert_message = json_encode($data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, $host);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
 
-        $ret  = curl_exec($curl);
+        $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 204) {
             var_dump("API '$host' returned Error"); //FIXME: propper debuging
             var_dump("Params: " . $alert_message); //FIXME: propper debuging
             var_dump("Return: " . $ret); //FIXME: propper debuging
+
             return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -104,7 +106,7 @@ class Discord extends Transport
 
         foreach (self::ALERT_FIELDS_TO_DISCORD_FIELDS as $objKey => $discordKey) {
             // Skip over keys that do not exist so Discord does not give us a 400.
-            if (!$obj[$objKey]) {
+            if (! $obj[$objKey]) {
                 continue;
             }
 
@@ -132,11 +134,11 @@ class Discord extends Transport
                     'name' => 'options',
                     'descr' => 'Enter the config options (format: option=value separated by new lines)',
                     'type' => 'textarea',
-                ]
+                ],
             ],
             'validation' => [
                 'url' => 'required|url',
-            ]
+            ],
         ];
     }
 }

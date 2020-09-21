@@ -46,8 +46,9 @@ class LinkDown implements SnmptrapHandler
 
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
-        if (!$port) {
+        if (! $port) {
             Log::warning("Snmptrap linkDown: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
+
             return;
         }
 

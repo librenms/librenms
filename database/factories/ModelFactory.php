@@ -69,8 +69,8 @@ $factory->define(\App\Models\Device::class, function (Faker\Generator $faker) {
             'storage',
             'timing',
             'wireless',
-            'workstation'
-            ]),
+            'workstation',
+        ]),
         'status' => $status = random_int(0, 1),
         'status_reason' => $status == 0 ? $faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
     ];
@@ -193,8 +193,9 @@ $factory->define(\App\Models\Component::class, function (Faker\Generator $faker)
     ];
 });
 $factory->define(\App\Models\Sensor::class, function (Faker\Generator $faker) {
-    $sensor_class = ['airflow','ber','charge','chromatic_dispersion','cooling','count','current','dbm','delay','eer','fanspeed','frequency','humidity','load','loss','power','power_consumed','power_factor','pressure','quality_factor','runtime','signal','snr','state','temperature','voltage','waterflow'];
+    $sensor_class = ['airflow', 'ber', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dbm', 'delay', 'eer', 'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'power', 'power_consumed', 'power_factor', 'pressure', 'quality_factor', 'runtime', 'signal', 'snr', 'state', 'temperature', 'voltage', 'waterflow'];
     $sensor_oid = ".1.3.6.1.4.1.4115.1.4.3.3." . $faker->numberBetween(0, 10) . "." . $faker->numberBetween(0, 10) . "." . $faker->numberBetween(0, 10);
+
     return [
         'sensor_index' => $faker->randomDigit,
         'sensor_class' => $faker->randomElement($sensor_class),

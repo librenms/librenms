@@ -87,7 +87,7 @@ class TwoFactor
         "4" => 28,
         "5" => 29,
         "6" => 30,
-        "7" => 31
+        "7" => 31,
     ];
 
     /**
@@ -121,6 +121,7 @@ class TwoFactor
         while (++$x < sizeof($bin)) {
             $ret .= self::$base32_enc[base_convert(str_pad($bin[$x], 5, '0'), 2, 10)];
         }
+
         return $ret;
     }
 
@@ -129,8 +130,8 @@ class TwoFactor
      *
      * @param string $key Secret Key
      * @param int $otp OTP supplied by user
-     * @param int|boolean $counter Counter, if false timestamp is used
-     * @return boolean|int
+     * @param int|bool $counter Counter, if false timestamp is used
+     * @return bool|int
      */
     public static function verifyHOTP($key, $otp, $counter = false)
     {
@@ -151,7 +152,7 @@ class TwoFactor
             }
             while (++$initcount <= $endcount) {
                 if (self::oathHOTP($key, $initcount) == $otp) {
-                    if (!$totp) {
+                    if (! $totp) {
                         return $initcount;
                     } else {
                         return true;
@@ -159,13 +160,14 @@ class TwoFactor
                 }
             }
         }
+
         return false;
     }
 
     /**
      * Generate HOTP (RFC 4226)
      * @param string $key Secret Key
-     * @param int|boolean $counter Optional Counter, Defaults to Timestamp
+     * @param int|bool $counter Optional Counter, Defaults to Timestamp
      * @return int
      */
     private static function oathHOTP($key, $counter = false)
@@ -193,6 +195,7 @@ class TwoFactor
                 ((ord($hash[$offset + 1]) & 0xff) << 16) |
                 ((ord($hash[$offset + 2]) & 0xff) << 8) |
                 (ord($hash[$offset + 3]) & 0xff)) % pow(10, self::OTP_SIZE);
+
         return str_pad($truncated, self::OTP_SIZE, '0', STR_PAD_LEFT);
     }
 

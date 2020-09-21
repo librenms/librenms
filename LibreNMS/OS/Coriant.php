@@ -32,7 +32,6 @@ use Log;
 
 class Coriant extends \LibreNMS\OS implements OSPolling
 {
-
     public function pollOS()
     {
         echo 'TNMS-NBI-MIB: enmsNETable';
@@ -54,7 +53,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
                 'neLocation' => $ne['enmsNeLocation'],
                 'neAlarm' => $ne['enmsNeAlarmSeverity'],
                 'neOpMode' => $ne['enmsNeOperatingMode'],
-                'neOpState' => $ne['enmsNeOpState']
+                'neOpState' => $ne['enmsNeOpState'],
             ]);
 
             if ($ne->isDirty()) {
@@ -63,7 +62,6 @@ class Coriant extends \LibreNMS\OS implements OSPolling
             }
             $c_list[] = $index;
         }
-
 
         foreach (TnmsneInfo::where('device_id', $this->getDeviceId())->whereNotIn('neID', $c_list)->get() as $ne) {
             /** @var TnmsneInfo $ne */

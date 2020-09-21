@@ -30,14 +30,14 @@ interface Datastore
     /**
      * Check if this is enabled by the configuration
      *
-     * @return boolean
+     * @return bool
      */
     public static function isEnabled();
 
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
-     * @return boolean
+     * @return bool
      */
     public function wantsRrdTags();
 

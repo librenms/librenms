@@ -21,16 +21,18 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 
 class Dummy extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
         var_dump($obj);
+
         return true;
     }
 

@@ -74,7 +74,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     public function handle()
     {
-        if (!$this->validateOptions()) {
+        if (! $this->validateOptions()) {
             return 1;
         }
 
@@ -82,6 +82,7 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         if (sizeof($devices) < 1) {
             $this->error(__('commands.smokeping:generate.no-devices'));
+
             return 3;
         }
 
@@ -98,12 +99,12 @@ class SmokepingGenerateCommand extends LnmsCommand
      * Disable DNS lookups by the configuration builder
      *
      * @return bool
-    */
+     */
     public function disableDNSLookup()
     {
         return $this->dnsLookup = false;
     }
-  
+
     /**
      * Build and output the probe configuration
      *
@@ -139,7 +140,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * Set a warning to be emitted
      *
      * @return void
-    */
+     */
     public function setWarning($warning)
     {
         $this->warnings[] = sprintf('# %s', $warning);
@@ -157,7 +158,7 @@ class SmokepingGenerateCommand extends LnmsCommand
         if ($probeCount < 1) {
             return [];
         }
-        
+
         return array_merge(
             $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, Config::get('fping'), $probeCount),
             $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, Config::get('fping6'), $probeCount)
@@ -209,17 +210,16 @@ class SmokepingGenerateCommand extends LnmsCommand
             $lines[] = '';
         }
 
-        if (!$noHeader) {
+        if (! $noHeader) {
             $lines[] = sprintf('# %s', __('commands.smokeping:generate.header-first'));
             $lines[] = sprintf('# %s', __('commands.smokeping:generate.header-second'));
             $lines[] = sprintf('# %s', __('commands.smokeping:generate.header-third'));
- 
+
             return array_merge($lines, $this->warnings, ['']);
         }
 
         return $lines;
     }
-
 
     /**
      * Determine if a list of targets is needed, and write one if so
@@ -256,26 +256,30 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function validateOptions()
     {
-        if (!Config::has('smokeping.probes') ||
-            !Config::has('fping') ||
-            !Config::has('fping6')
+        if (! Config::has('smokeping.probes') ||
+            ! Config::has('fping') ||
+            ! Config::has('fping6')
         ) {
             $this->error(__('commands.smokeping:generate.config-insufficient'));
+
             return false;
         }
 
-        if (!($this->option('probes') xor $this->option('targets'))) {
+        if (! ($this->option('probes') xor $this->option('targets'))) {
             $this->error(__('commands.smokeping:generate.args-nonsense'));
+
             return false;
         }
 
         if (Config::get('smokeping.probes') < 1) {
             $this->error(__('commands.smokeping:generate.no-probes'));
+
             return false;
         }
 
-        if ($this->option('compat') && !$this->option('targets')) {
+        if ($this->option('compat') && ! $this->option('targets')) {
             $this->error(__('commands.smokeping:generate.args-nonsense'));
+
             return false;
         }
 
@@ -314,12 +318,12 @@ class SmokepingGenerateCommand extends LnmsCommand
         $lines = [];
 
         foreach ($devices as $hostname => $config) {
-            if (!$this->dnsLookup || $this->deviceIsResolvable($hostname)) {
+            if (! $this->dnsLookup || $this->deviceIsResolvable($hostname)) {
                 $lines[] = sprintf('++ %s', $this->buildMenuEntry($hostname));
                 $lines[] = sprintf('   menu = %s', $hostname);
                 $lines[] = sprintf('   title = %s', $hostname);
 
-                if (!$singleProcess) {
+                if (! $singleProcess) {
                     $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport'], $probeCount));
                 }
 
@@ -347,6 +351,7 @@ class SmokepingGenerateCommand extends LnmsCommand
         }
 
         $this->setWarning(sprintf('"%s" %s', $hostname, __('commands.smokeping:generate.dns-fail')));
+
         return false;
     }
 

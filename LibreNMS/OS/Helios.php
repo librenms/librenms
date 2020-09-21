@@ -33,7 +33,6 @@ use LibreNMS\OS;
 
 class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDiscovery, WirelessRssiDiscovery
 {
-
     /**
      * Discover wireless frequency.  This is in GHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -69,9 +68,9 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
 
     private function discoverOid($type, $oid, $oid_prefix)
     {
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), $oid, array(), 'IGNITENET-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'IGNITENET-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($oids as $index => $data) {
             $sensors[] = new WirelessSensor(
                 $type,
@@ -83,6 +82,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
                 $data[$oid]
             );
         }
+
         return $sensors;
     }
 }

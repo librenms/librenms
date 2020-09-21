@@ -49,7 +49,7 @@ class Zynos extends Zyxel implements OSDiscovery
             $serials = snmp_get_multi_oid($this->getDeviceArray(), $serial_oids);
 
             foreach ($serial_oids as $oid) {
-                if (!empty($serials[$oid])) {
+                if (! empty($serials[$oid])) {
                     $device->serial = $serials[$oid];
                     break;
                 }

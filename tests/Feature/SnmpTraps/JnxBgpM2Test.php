@@ -37,7 +37,6 @@ class JnxBgpM2Test extends SnmpTrapTestCase
 {
     public function testBgpPeerUnknown()
     {
-
         $device = factory(Device::class)->create();
 
         $trapText = "$device->hostname
@@ -65,7 +64,6 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
 
     public function testBgpBackwardTrasition()
     {
-
         $device = factory(Device::class)->create();
         $bgppeer = factory(BgpPeer::class)->make(['bgpPeerIdentifier' => '2001:d88:1::2', 'bgpPeerState' => 'established']);
         $device->bgppeers()->save($bgppeer);

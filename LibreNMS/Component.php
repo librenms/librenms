@@ -65,7 +65,7 @@ class Component
             $row = dbFetchRow($SQL, [$TYPE]);
         }
 
-        if (!isset($row)) {
+        if (! isset($row)) {
             // We didn't find any component types
             return false;
         } else {
@@ -80,7 +80,7 @@ class Component
             ->with('prefs');
 
         // Device_id is shorthand for filter C.device_id = $device_id.
-        if (!is_null($device_id)) {
+        if (! is_null($device_id)) {
             $options['filter']['device_id'] = ['=', $device_id];
         }
 
@@ -126,7 +126,7 @@ class Component
         $sql_param = [];
         $add = 0;
 
-        if (!is_null($device)) {
+        if (! is_null($device)) {
             // Add a device filter to the SQL query.
             $sql_query .= " `device_id` = ?";
             $sql_param[] = $device;
@@ -151,6 +151,7 @@ class Component
         }
 
         d_echo("Component Count by Status: " . print_r($count, true) . "\n");
+
         return $count;
     }
 
@@ -159,6 +160,7 @@ class Component
         if (($component_id == null) || ($start == null) || ($end == null)) {
             // Error...
             d_echo("Required arguments are missing. Component ID: " . $component_id . ", Start: " . $start . ", End: " . $end . "\n");
+
             return false;
         }
 
@@ -181,6 +183,7 @@ class Component
         $return['data'] = dbFetchRows($sql_query, $sql_param);
 
         d_echo("Status Log Data: " . print_r($return, true) . "\n");
+
         return $return;
     }
 
@@ -243,7 +246,7 @@ class Component
 
                 // update preferences
                 $prefs = collect($updated[$component->id])->filter(function ($value, $attr) {
-                    return !array_key_exists($attr, $this->reserved);
+                    return ! array_key_exists($attr, $this->reserved);
                 });
 
                 $invalid = $component->prefs->keyBy('id');
@@ -282,13 +285,14 @@ class Component
      */
     public function getFirstComponentID($component_array, $device_id = null)
     {
-        if (!is_null($device_id) && isset($component_array[$device_id])) {
+        if (! is_null($device_id) && isset($component_array[$device_id])) {
             $component_array = $component_array[$device_id];
         }
 
         foreach ($component_array as $id => $array) {
             return $id;
         }
+
         return -1;
     }
 }

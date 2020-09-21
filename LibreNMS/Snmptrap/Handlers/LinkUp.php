@@ -32,7 +32,6 @@ use Log;
 
 class LinkUp implements SnmptrapHandler
 {
-
     /**
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
@@ -47,8 +46,9 @@ class LinkUp implements SnmptrapHandler
 
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
-        if (!$port) {
+        if (! $port) {
             Log::warning("Snmptrap linkUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
+
             return;
         }
 

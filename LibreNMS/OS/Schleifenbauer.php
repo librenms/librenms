@@ -37,7 +37,7 @@ class Schleifenbauer extends \LibreNMS\OS
             'hardware' => ".1.3.6.1.4.1.31034.12.1.1.2.1.1.1.5.$master_unit",
             'serial' => ".1.3.6.1.4.1.31034.12.1.1.2.1.1.1.6.$master_unit",
             'firmware' => ".1.3.6.1.4.1.31034.12.1.1.2.1.1.1.2.$master_unit",
-            'build' => ".1.3.6.1.4.1.31034.12.1.1.2.1.1.1.3.$master_unit"
+            'build' => ".1.3.6.1.4.1.31034.12.1.1.2.1.1.1.3.$master_unit",
         ];
 
         $data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
@@ -45,7 +45,7 @@ class Schleifenbauer extends \LibreNMS\OS
         $device->hardware = $data[$oids['hardware']] ?? null;
         $device->serial = $data[$oids['serial']] ?? null;
         $device->version = $data[$oids['firmware']] ?? null;
-        if (!empty($data[$oids['build']])) {
+        if (! empty($data[$oids['build']])) {
             $device->version = trim("$device->version ({$data[$oids['build']]})");
         }
     }

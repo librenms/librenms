@@ -26,7 +26,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 
-$snmpMockCache = array();
+$snmpMockCache = [];
 
 /**
  * Cache the data from an snmprec file
@@ -40,12 +40,12 @@ function cache_snmprec($file)
     if (isset($snmpMockCache[$file])) {
         return;
     }
-    $snmpMockCache[$file] = array();
+    $snmpMockCache[$file] = [];
 
     $data = file_get_contents(Config::get('install_dir') . "/tests/snmpsim/$file.snmprec");
     $line = strtok($data, "\r\n");
     while ($line !== false) {
-        list($oid, $type, $data) = explode('|', $line, 3);
+        [$oid, $type, $data] = explode('|', $line, 3);
         if ($type == '4') {
             $data = trim($data);
         } elseif ($type == '6') {
@@ -54,7 +54,7 @@ function cache_snmprec($file)
             $data = hex2str($data);
         }
 
-        $snmpMockCache[$file][$oid] = array($type, $data);
+        $snmpMockCache[$file][$oid] = [$type, $data];
         $line = strtok("\r\n");
     }
 }
@@ -222,18 +222,18 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
         return $result;
     } catch (Exception $e) {
         d_echo("[SNMP] snmpget $community $oid ($num_oid): no data\n");
+
         return false;
     }
 }
 
-
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
-    if (!is_array($oids)) {
+    if (! is_array($oids)) {
         $oids = explode(' ', $oids);
     }
 
-    $data = array();
+    $data = [];
     foreach ($oids as $index => $oid) {
         if (Str::contains($options, 'n')) {
             $oid_name = '.' . snmp_translate_number($oid, $mib, $mibdir);
@@ -279,6 +279,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
         return false;
     } else {
         d_echo($output);
+
         return $output;
     }
 }

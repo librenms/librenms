@@ -105,6 +105,7 @@ class AlertSchedule extends Model
     public function getEndRecurringDtAttribute()
     {
         $end = $this->end;
+
         return $end->year == '9000' ? null : $end->toDateString();
     }
 
@@ -144,7 +145,7 @@ class AlertSchedule extends Model
             return self::SCHEDULE_LAPSED;
         }
 
-        if (!$this->recurring) {
+        if (! $this->recurring) {
             return $now > $this->start ? self::SCHEDULE_ACTIVE : self::SCHEDULE_SET;
         }
 

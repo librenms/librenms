@@ -30,6 +30,6 @@ class Application extends \Illuminate\Foundation\Application
     public function publicPath()
     {
         // override the public path
-        return $this->basePath.DIRECTORY_SEPARATOR.'html';
+        return $this->basePath . DIRECTORY_SEPARATOR . 'html';
     }
 }

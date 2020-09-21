@@ -463,6 +463,7 @@ class Ironware extends Foundry
         ];
 
         $hardware = snmp_translate($this->getDevice()->sysObjectID, 'FOUNDRY-SN-ROOT-MIB', null, null, $this->getDeviceArray());
+
         return array_str_replace($rewrite_ironware_hardware, $hardware);
     }
 }

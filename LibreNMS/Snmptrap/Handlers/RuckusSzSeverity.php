@@ -52,6 +52,7 @@ class RuckusSzSeverity
                 $severityNum = 2;
                 break;
         }
+
         return $severityNum;
     }
 }

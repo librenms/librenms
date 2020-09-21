@@ -60,7 +60,7 @@ class FileLock implements Lock
      */
     public function release()
     {
-        if (!$this->acquired) {
+        if (! $this->acquired) {
             return;
         }
 
@@ -93,6 +93,7 @@ class FileLock implements Lock
         for ($i = 0; $i <= $wait || $wait < 0; $i++) {
             if (flock($lock->handle, $wait < 0 ? LOCK_EX : LOCK_EX | LOCK_NB)) {
                 $lock->acquired = true;
+
                 return $lock;
             }
 

@@ -75,7 +75,7 @@ class MibTest extends TestCase
 
         static $existing_mibs;
         if (is_null($existing_mibs)) {
-            $existing_mibs = array();
+            $existing_mibs = [];
         }
 
         if (isset($existing_mibs[$mib_name])) {
@@ -83,7 +83,7 @@ class MibTest extends TestCase
 
             $this->fail("$highligted_mib has duplicates: " . implode(', ', $existing_mibs[$mib_name]));
         } else {
-            $existing_mibs[$mib_name] = array($file_path);
+            $existing_mibs[$mib_name] = [$file_path];
         }
     }
 
@@ -104,7 +104,6 @@ class MibTest extends TestCase
         $highlighted_file = $console_color->convert("%r$file_path%n");
         $this->assertEquals($mib_name, $file, "$highlighted_file should be named $mib_name");
     }
-
 
     /**
      * Test each mib file for errors
@@ -134,18 +133,18 @@ class MibTest extends TestCase
      */
     public function mibFiles()
     {
-        $file_list = array();
+        $file_list = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(Config::get('mib_dir'))) as $file) {
             /** @var SplFileInfo $file */
             if ($file->isDir()) {
                 continue;
             }
             $mib_path = str_replace(Config::get('mib_dir') . '/', '', $file->getPathName());
-            $file_list[$mib_path] = array(
+            $file_list[$mib_path] = [
                 str_replace(Config::get('install_dir'), '.', $file->getPath()),
                 $file->getFilename(),
-                $this->extractMibName($file->getPathname())
-            );
+                $this->extractMibName($file->getPathname()),
+            ];
         }
 
         return $file_list;
@@ -160,11 +159,12 @@ class MibTest extends TestCase
         $dirs = glob(Config::get('mib_dir') . '/*', GLOB_ONLYDIR);
         array_unshift($dirs, Config::get('mib_dir'));
 
-        $final_list = array();
+        $final_list = [];
         foreach ($dirs as $dir) {
             $relative_dir = str_replace(Config::get('mib_dir') . '/', '', $dir);
-            $final_list[$relative_dir] = array($dir);
+            $final_list[$relative_dir] = [$dir];
         }
+
         return $final_list;
     }
 
@@ -192,6 +192,7 @@ class MibTest extends TestCase
                 if (Str::contains($trimmed, 'DEFINITIONS')) {
                     preg_match('/(\S+)\s+(?=DEFINITIONS)/', $header, $matches);
                     fclose($handle);
+
                     return $matches[1];
                 }
             }

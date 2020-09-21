@@ -46,8 +46,8 @@ class RipeApi extends BaseApi
     {
         return $this->makeApiCall($this->whois_uri, [
             'query' => [
-                'resource' => $resource
-            ]
+                'resource' => $resource,
+            ],
         ]);
     }
 
@@ -62,8 +62,8 @@ class RipeApi extends BaseApi
     {
         return $this->makeApiCall($this->abuse_uri, [
             'query' => [
-                'resource' => $resource
-            ]
+                'resource' => $resource,
+            ],
         ]);
     }
 

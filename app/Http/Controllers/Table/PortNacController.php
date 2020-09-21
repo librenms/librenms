@@ -59,7 +59,7 @@ class PortNacController extends TableController
             'time_left',
             'authc_status',
             'authz_status',
-            'method'
+            'method',
         ];
     }
 

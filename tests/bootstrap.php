@@ -28,9 +28,9 @@ use LibreNMS\Util\Snmpsim;
 
 $install_dir = realpath(__DIR__ . '/..');
 
-$init_modules = array('web', 'discovery', 'polling', 'nodb');
+$init_modules = ['web', 'discovery', 'polling', 'nodb'];
 
-if (!getenv('SNMPSIM')) {
+if (! getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
 }
 
@@ -71,7 +71,7 @@ if (getenv('DBTEST')) {
 
     // try to avoid erasing people's primary databases
     if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
-        if (!getenv('SKIP_DB_REFRESH')) {
+        if (! getenv('SKIP_DB_REFRESH')) {
             echo "Refreshing database...";
             $migrate_result = Artisan::call('migrate:fresh', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
             $migrate_output = Artisan::output();

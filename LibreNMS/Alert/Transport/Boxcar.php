@@ -39,8 +39,8 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 class Boxcar extends Transport
 {
@@ -54,19 +54,19 @@ class Boxcar extends Transport
 
     public static function contactBoxcar($obj, $api)
     {
-        $data                              = [];
-        $data['user_credentials']          = $api['access_token'];
+        $data = [];
+        $data['user_credentials'] = $api['access_token'];
         $data['notification[source_name]'] = Config::get('project_id', 'librenms');
         switch ($obj['severity']) {
             case "critical":
                 $severity = "Critical";
-                if (!empty($api['sound_critical'])) {
+                if (! empty($api['sound_critical'])) {
                     $data['notification[sound]'] = $api['sound_critical'];
                 }
                 break;
             case "warning":
                 $severity = "Warning";
-                if (!empty($api['sound_warning'])) {
+                if (! empty($api['sound_warning'])) {
                     $data['notification[sound]'] = $api['sound_warning'];
                 }
                 break;
@@ -74,7 +74,7 @@ class Boxcar extends Transport
         switch ($obj['state']) {
             case AlertState::RECOVERED:
                 $title_text = "OK";
-                if (!empty($api['sound_ok'])) {
+                if (! empty($api['sound_ok'])) {
                     $data['notification[sound]'] = $api['sound_ok'];
                 }
                 break;
@@ -86,15 +86,15 @@ class Boxcar extends Transport
                 break;
         }
         $data['notification[title]'] = $title_text . " - " . $obj['hostname'] . " - " . $obj['name'];
-        $message_text                = "Timestamp: " . $obj['timestamp'];
-        if (!empty($obj['faults'])) {
+        $message_text = "Timestamp: " . $obj['timestamp'];
+        if (! empty($obj['faults'])) {
             $message_text .= "\n\nFaults:\n";
             foreach ($obj['faults'] as $k => $faults) {
                 $message_text .= "#" . $k . " " . $faults['string'] . "\n";
             }
         }
         $data['notification[long_message]'] = $message_text;
-        $curl                               = curl_init();
+        $curl = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://new.boxcar.io/api/notifications');
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
@@ -104,6 +104,7 @@ class Boxcar extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 201) {
             var_dump("Boxcar returned error"); //FIXME: proper debugging
+
             return false;
         }
 
@@ -125,11 +126,11 @@ class Boxcar extends Transport
                     'name' => 'boxcar-options',
                     'descr' => 'Boxcar Options',
                     'type' => 'textarea',
-                ]
+                ],
             ],
             'validation' => [
                 'boxcar-token' => 'required',
-            ]
+            ],
         ];
     }
 }

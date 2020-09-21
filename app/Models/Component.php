@@ -35,17 +35,17 @@ class Component extends DeviceRelatedModel
 
     public function setStatusAttribute($status)
     {
-        $this->attributes['status'] = (int)$status;
+        $this->attributes['status'] = (int) $status;
     }
 
     public function setDisabledAttribute($disabled)
     {
-        $this->attributes['disabled'] = (int)$disabled;
+        $this->attributes['disabled'] = (int) $disabled;
     }
 
     public function setIgnoreAttribute($ignore)
     {
-        $this->attributes['ignore'] = (int)$ignore;
+        $this->attributes['ignore'] = (int) $ignore;
     }
 
     // ---- Define Relationships ----

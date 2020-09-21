@@ -86,7 +86,6 @@ class UserPref extends BaseModel
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
-
     /**
      * Set the keys for a save update query. (no primary key)
      *
@@ -96,7 +95,7 @@ class UserPref extends BaseModel
     protected function setKeysForSaveQuery(Builder $query)
     {
         $keys = $this->getKeyName();
-        if (!is_array($keys)) {
+        if (! is_array($keys)) {
             return parent::setKeysForSaveQuery($query);
         }
 

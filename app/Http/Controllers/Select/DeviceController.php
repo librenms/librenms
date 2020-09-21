@@ -36,7 +36,7 @@ class DeviceController extends SelectController
         return [
             'access' => 'nullable|in:normal,inverted',
             'user' => 'nullable|int',
-            'id' => 'nullable|in:device_id,hostname'
+            'id' => 'nullable|in:device_id,hostname',
         ];
     }
 

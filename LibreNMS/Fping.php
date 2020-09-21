@@ -61,7 +61,7 @@ class Fping
             $interval,
             '-t',
             max($timeout, $interval),
-            $host
+            $host,
         ]);
 
         $process = app()->make(Process::class, ['command' => $cmd]);
@@ -79,12 +79,12 @@ class Fping
         }
 
         $response = [
-            'xmt'  => (int)$xmt,
-            'rcv'  => (int)$rcv,
-            'loss' => (int)$loss,
-            'min'  => (float)$min,
-            'max'  => (float)$max,
-            'avg'  => (float)$avg,
+            'xmt'  => (int) $xmt,
+            'rcv'  => (int) $rcv,
+            'loss' => (int) $loss,
+            'min'  => (float) $min,
+            'max'  => (float) $max,
+            'avg'  => (float) $avg,
             'dup'  => substr_count($output, 'duplicate'),
             'exitcode' => $process->getExitCode(),
         ];

@@ -21,10 +21,11 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 
 class Hipchat extends Transport
 {
@@ -92,9 +93,9 @@ class Hipchat extends Transport
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-Type: application/x-www-form-urlencoded',
-        ));
+        ]);
         $ret = curl_exec($curl);
 
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -102,6 +103,7 @@ class Hipchat extends Transport
             var_dump("API '$url' returned Error");
             var_dump("Params: " . $message);
             var_dump("Return: " . $ret);
+
             return 'HTTP Status code ' . $code;
         }
 
@@ -140,7 +142,7 @@ class Hipchat extends Transport
             'validation' => [
                 'hipchat-url' => 'required|url',
                 'hipchat-room-id' => 'required|numeric',
-            ]
+            ],
         ];
     }
 }

@@ -80,6 +80,7 @@ class AdvaAttributeChange implements SnmptrapHandler
             $this->handleAccPortShaperChg($device, $trap);
         }
     }
+
     public static function handleSyslogChg($device, $trap)
     {
         $syslogEntry = substr($trap->findOid('CM-SYSTEM-MIB::sysLog'), -1);
@@ -100,16 +101,19 @@ class AdvaAttributeChange implements SnmptrapHandler
             Log::event("Syslog server $syslogEntry port changed to $syslogPort", $device->device_id, 'trap', 2);
         }
     }
+
     public static function handleAclChg($device, $trap)
     {
         $aclEntry = substr($trap->findOid('CM-SYSTEM-MIB::aclEntry'), -1);
         Log::event("ACL $aclEntry modified", $device->device_id, 'trap', 2);
     }
+
     public static function handleTimeSrcChg($device, $trap)
     {
         $timeSrc = $trap->getOidData($trap->findOid('CM-SYSTEM-MIB::sysTimeOfDayType'));
         Log::event("Time source set to $timeSrc", $device->device_id, 'trap', 2);
     }
+
     public static function handleTimeZoneChg($device, $trap)
     {
         $enabled = $trap->getOidData($trap->findOid('F3-TIMEZONE-MIB::f3TimeZoneDstControlEnabled'));
@@ -123,6 +127,7 @@ class AdvaAttributeChange implements SnmptrapHandler
             Log::event("UTC offset (timezone) change to $dstOffset", $device->device_id, 'trap', 2);
         }
     }
+
     public static function handleNtpChg($device, $trap)
     {
         if ($trap->findOid('CM-SYSTEM-MIB::ntpPrimaryServer')) {
@@ -134,6 +139,7 @@ class AdvaAttributeChange implements SnmptrapHandler
             Log::event("Backup NTP server IP changed to $backupIP", $device->device_id, 'trap', 2);
         }
     }
+
     public static function handleAuthSvrChg($device, $trap)
     {
         if ($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerIpAddress')) {
@@ -155,6 +161,7 @@ class AdvaAttributeChange implements SnmptrapHandler
             }
         }
     }
+
     public static function handleNeChg($device, $trap)
     {
         if ($trap->findOid('CM-ENTITY-MIB::neName')) {
@@ -166,6 +173,7 @@ class AdvaAttributeChange implements SnmptrapHandler
             Log::event("Network Element prompt changed to $neCLI", $device->device_id, 'trap', 2);
         }
     }
+
     public static function handleDyingGaspChg($device, $trap)
     {
         $nteSDGEnable = $trap->getOidData($trap->findOid('CM-ENTITY-MIB::ethernetNTEGE114ProCardSnmpDyingGaspEnabled'));
@@ -175,6 +183,7 @@ class AdvaAttributeChange implements SnmptrapHandler
             Log::event("SNMP Dying Gasp is disabled", $device->device_id, 'trap', 2);
         }
     }
+
     public static function handleNetPortChg($device, $trap)
     {
         $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPort'), -7);
@@ -220,6 +229,7 @@ class AdvaAttributeChange implements SnmptrapHandler
             Log::event("Network Port $netPort modified", $device->device_id, 'trap', 2);
         }
     }
+
     public static function handleAccPortChg($device, $trap)
     {
         $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPort'), -7);
@@ -265,29 +275,34 @@ class AdvaAttributeChange implements SnmptrapHandler
             Log::event("Access Port $accPort modified", $device->device_id, 'trap', 2);
         }
     }
+
     public static function handleFlowChg($device, $trap)
     {
         $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmFlow'), -9);
         $flowID = str_replace(".", "-", $flowID);
         Log::event("Access Flow $flowID modified", $device->device_id, 'trap', 2);
     }
+
     public static function handleLagChg($device, $trap)
     {
         $lagID = substr($trap->findOid('F3-LAG-MIB::f3'), -1);
         Log::event("LAG $lagID modified", $device->device_id, 'trap', 2);
     }
+
     public static function handleQosFlowChg($device, $trap)
     {
         $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmQosFlow'), -13, 9);
         $flowID = str_replace(".", "-", $flowID);
         Log::event("QoS on flow $flowID modified", $device->device_id, 'trap', 2);
     }
+
     public static function handleQosShaperChg($device, $trap)
     {
         $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmQosShaper'), -13, 9);
         $flowID = str_replace(".", "-", $flowID);
         Log::event("QoS on flow $flowID modified", $device->device_id, 'trap', 2);
     }
+
     public static function handleAccPortShaperChg($device, $trap)
     {
         $shaperID = substr($trap->findOid('CM-FACILITY-MIB::cmAccPort'), -9);

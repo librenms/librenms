@@ -32,7 +32,6 @@ use Log;
 
 class LogTrap implements SnmptrapHandler
 {
-
     /**
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
@@ -46,14 +45,14 @@ class LogTrap implements SnmptrapHandler
         $index = $trap->findOid('LOG-MIB::logIndex');
         $index = $trap->getOidData($index);
 
-        $logName = $trap->getOidData('LOG-MIB::logName.'.$index);
-        $logEvent = $trap->getOidData('LOG-MIB::logEvent.'.$index);
-        $logPC = $trap->getOidData('LOG-MIB::logPC.'.$index);
-        $logAI = $trap->getOidData('LOG-MIB::logAI.'.$index);
-        $state = $trap->getOidData('LOG-MIB::logEquipStatusV2.'.$index);
-        
+        $logName = $trap->getOidData('LOG-MIB::logName.' . $index);
+        $logEvent = $trap->getOidData('LOG-MIB::logEvent.' . $index);
+        $logPC = $trap->getOidData('LOG-MIB::logPC.' . $index);
+        $logAI = $trap->getOidData('LOG-MIB::logAI.' . $index);
+        $state = $trap->getOidData('LOG-MIB::logEquipStatusV2.' . $index);
+
         $severity = $this->getSeverity($state);
-        Log::event('SNMP Trap: Log '.$logName.' '.$logEvent.' '.$logPC.' '.$logAI.' '.$state, $device->device_id, 'log', $severity);
+        Log::event('SNMP Trap: Log ' . $logName . ' ' . $logEvent . ' ' . $logPC . ' ' . $logAI . ' ' . $state, $device->device_id, 'log', $severity);
     }
 
     private function getSeverity($state)
@@ -70,6 +69,7 @@ class LogTrap implements SnmptrapHandler
             'nonAlarmed' => 1,
             '1' => 1,
         ];
+
         return $severity_map[$state] ?? 0;
     }
 }

@@ -27,7 +27,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-# class DeviceOutage extends Model
+// class DeviceOutage extends Model
 class DeviceOutage extends DeviceRelatedModel
 {
     public $timestamps = false;

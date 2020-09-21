@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class SerializeConfig extends Migration
 {
@@ -17,9 +17,9 @@ class SerializeConfig extends Migration
             $value = $config->config_value;
 
             if (filter_var($value, FILTER_VALIDATE_INT)) {
-                $value = (int)$value;
+                $value = (int) $value;
             } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-                $value = (float)$value;
+                $value = (float) $value;
             } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
             }
@@ -39,7 +39,7 @@ class SerializeConfig extends Migration
     {
         DB::table('config')->get()->each(function ($config) {
             $value = json_decode($config->config_value);
-            $value = is_bool($value) ? var_export($value, true) : (string)$value;
+            $value = is_bool($value) ? var_export($value, true) : (string) $value;
 
             DB::table('config')
                 ->where('config_id', $config->config_id)

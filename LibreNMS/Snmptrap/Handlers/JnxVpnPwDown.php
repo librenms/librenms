@@ -42,10 +42,9 @@ class JnxVpnPwDown implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        
         $vpnType = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnPwVpnType'));
         $vpnName = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnPwVpnName'));
-       
+
         Log::event("$vpnType on a pseudowire belonging to $vpnName has gone down", $device->device_id, 'trap', 4);
     }
 }

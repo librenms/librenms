@@ -81,7 +81,6 @@ class AuthSSOTest extends DBTestCase
         $_SERVER['displayName'] = Str::random();
     }
 
-
     // Set up $_SERVER in header mode
     public function basicEnvironmentHeader()
     {

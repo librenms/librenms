@@ -84,8 +84,9 @@ class Graphite extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        if (!$this->connection) {
+        if (! $this->connection) {
             d_echo("Graphite Error: not connected\n");
+
             return;
         }
 

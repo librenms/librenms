@@ -195,6 +195,7 @@ class ComponentTest extends DBTestCase
     private function buildExpected($target)
     {
         $collection = $target instanceof \App\Models\Component ? collect([$target]) : $target;
+
         return $collection->groupBy('device_id')->map(function ($group) {
             return $group->keyBy('id')->map(function ($model) {
                 $base = ['type' => null, 'label' => null, 'status' => 0, 'ignore' => 0, 'disabled' => 0, 'error' => null];

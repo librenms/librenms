@@ -30,7 +30,6 @@ use LibreNMS\Data\Store\Rrd;
 
 class RrdtoolTest extends TestCase
 {
-
     public function testBuildCommandLocal()
     {
         Config::set('rrdcached', '');
@@ -45,7 +44,6 @@ class RrdtoolTest extends TestCase
 
         $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
-
 
         $this->app->forgetInstance(Rrd::class);
         Config::set('rrdtool_version', '1.6');

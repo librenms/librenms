@@ -39,7 +39,7 @@ class Apc extends OS implements OSDiscovery
         $apc_model = snmp_get_multi_oid($this->getDeviceArray(), ['rPDUIdentModelNumber.0', 'atsIdentModelNumber.0', 'upsBasicIdentModel.0', 'sPDUIdentModelNumber.0', 'airIRRCUnitIdentModelNumber.0', 'isxModularPduIdentModelNumber.0', 'airIRRP100UnitIdentModelNumber.0', 'airIRRP500UnitIdentModelNumber.0'], '-OUQs', 'PowerNet-MIB');
         $hardware = array_pop($apc_model);
         $apc_hardware = snmp_get_multi_oid($this->getDeviceArray(), ['rPDUIdentHardwareRev.0', 'atsIdentHardwareRev.0', 'upsAdvIdentFirmwareRevision.0', 'sPDUIdentHardwareRev.0', 'airIRRCUnitIdentHardwareRevision.0', 'isxModularPduIdentMonitorCardHardwareRev.0', 'airIRRP100UnitIdentHardwareRevision.0', 'airIRRP500UnitIdentHardwareRevision.0'], '-OUQs', 'PowerNet-MIB');
-        if (!empty($apc_hardware)) {
+        if (! empty($apc_hardware)) {
             $hardware = trim($hardware . ' ' . array_pop($apc_hardware));
         }
         if (empty($hardware)) {

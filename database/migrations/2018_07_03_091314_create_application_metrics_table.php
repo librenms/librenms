@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateApplicationMetricsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,7 +17,7 @@ class CreateApplicationMetricsTable extends Migration
             $table->string('metric', 32);
             $table->double('value')->nullable();
             $table->double('value_prev')->nullable();
-            $table->unique(['app_id','metric']);
+            $table->unique(['app_id', 'metric']);
         });
     }
 

@@ -50,7 +50,7 @@ class EnvHelper
 
             // only write if the content has changed
             if ($new_content !== $original_content) {
-                if (!file_put_contents($file, $new_content)) {
+                if (! file_put_contents($file, $new_content)) {
                     throw new FileWriteFailedException($file);
                 }
             }
@@ -78,7 +78,7 @@ class EnvHelper
         }
 
         // unset the given keys
-        if (!empty($unset)) {
+        if (! empty($unset)) {
             $regex = '/^(' . implode('|', $unset) . ')=.*$\n/m';
             $content = preg_replace($regex, '', $content);
         }
@@ -113,14 +113,14 @@ class EnvHelper
     {
         $env_file = base_path('.env');
         try {
-            if (!file_exists($env_file)) {
+            if (! file_exists($env_file)) {
                 copy(base_path('.env.example'), $env_file);
 
                 $key = trim(exec(PHP_BINDIR . '/php ' . base_path('artisan') . ' key:generate --show'));
 
                 self::writeEnv([
                     'APP_KEY' => $key,
-                    'INSTALL' => !file_exists(base_path('config.php')) ? 'true' : false, // if both .env and config.php are missing, assume install is needed
+                    'INSTALL' => ! file_exists(base_path('config.php')) ? 'true' : false, // if both .env and config.php are missing, assume install is needed
                 ], [], $env_file);
 
                 try {
@@ -150,7 +150,7 @@ class EnvHelper
             $parts = explode('=', $line, 2);
             if (isset($parts[1])
                 && preg_match('/(?<!\s)#/', $parts[1]) // number symbol without a space before it
-                && !preg_match('/^(".*"|\'.*\')$/', $parts[1]) // not already quoted
+                && ! preg_match('/^(".*"|\'.*\')$/', $parts[1]) // not already quoted
             ) {
                 return trim($parts[0]) . '="' . trim($parts[1]) . '"';
             }
@@ -189,7 +189,7 @@ class EnvHelper
             $value = $default;
         }
 
-        if (is_string($value) && !in_array($value, $except)) {
+        if (is_string($value) && ! in_array($value, $except)) {
             $value = explode(',', $value);
         }
 

@@ -34,17 +34,18 @@ trait SnmpsimHelpers
 
     public function requireSnmpsim()
     {
-        if (!getenv('SNMPSIM')) {
+        if (! getenv('SNMPSIM')) {
             $this->markTestSkipped('Snmpsim required for this test.  Set SNMPSIM=1 to enable.');
         }
     }
 
     public function getSnmpsim()
     {
-        if (!$this->snmpsim) {
+        if (! $this->snmpsim) {
             global $snmpsim;
             $this->snmpsim = $snmpsim;
         }
+
         return $this->snmpsim;
     }
 }

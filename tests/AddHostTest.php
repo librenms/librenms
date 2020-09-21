@@ -76,11 +76,11 @@ class AddHostTest extends DBTestCase
 
     public function testAddping()
     {
-        $additional = array(
+        $additional = [
             'snmp_disable' => 1,
             'os'           => 'nameOfOS',
             'hardware'     => 'hardware',
-        );
+        ];
         addHost($this->host, "", 0, 0, 0, true, "ifIndex", $additional);
         $device = Device::findByHostname($this->host);
         $this->assertNotNull($device);

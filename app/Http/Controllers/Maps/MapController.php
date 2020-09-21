@@ -38,11 +38,11 @@ class MapController extends Controller
     protected function nodeDisabledStyle()
     {
         return ['color' => [
-                         'highlight' => [
-                             'background' => Config::get('network_map_legend.di.node'),
-                         ],
-                         'border' => Config::get('network_map_legend.di.border'),
-                         'background' => Config::get('network_map_legend.di.node'),
+            'highlight' => [
+                'background' => Config::get('network_map_legend.di.node'),
+            ],
+            'border' => Config::get('network_map_legend.di.border'),
+            'background' => Config::get('network_map_legend.di.node'),
                      ],
                ];
     }
@@ -50,10 +50,10 @@ class MapController extends Controller
     protected function nodeHighlightStyle()
     {
         return ['color' => [
-                         'highlight' => [
-                             'border' => Config::get('network_map_legend.highlight.border'),
-                         ],
-                         'border' => Config::get('network_map_legend.highlight.border'),
+            'highlight' => [
+                'border' => Config::get('network_map_legend.highlight.border'),
+            ],
+            'border' => Config::get('network_map_legend.highlight.border'),
                      ],
                 'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
                ];
@@ -62,12 +62,12 @@ class MapController extends Controller
     protected function nodeDownStyle()
     {
         return ['color' => [
-                         'highlight' => [
-                             'background' => Config::get('network_map_legend.dn.node'),
-                             'border' => Config::get('network_map_legend.dn.border'),
-                         ],
-                         'border' => Config::get('network_map_legend.dn.border'),
-                         'background' => Config::get('network_map_legend.dn.node'),
+            'highlight' => [
+                'background' => Config::get('network_map_legend.dn.node'),
+                'border' => Config::get('network_map_legend.dn.border'),
+            ],
+            'border' => Config::get('network_map_legend.dn.border'),
+            'background' => Config::get('network_map_legend.dn.node'),
                      ],
                ];
     }

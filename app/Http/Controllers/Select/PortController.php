@@ -49,7 +49,7 @@ class PortController extends SelectController
      */
     protected function searchFields($request)
     {
-        return (array)$request->get('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
+        return (array) $request->get('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
     }
 
     /**

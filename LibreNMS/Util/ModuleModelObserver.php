@@ -39,14 +39,14 @@ class ModuleModelObserver
     {
         $model = Str::start($model, '\\');
         // discovery output (but don't install it twice (testing can can do this)
-        if (!$model::getEventDispatcher()->hasListeners('eloquent.created: ' . ltrim('\\', $model))) {
+        if (! $model::getEventDispatcher()->hasListeners('eloquent.created: ' . ltrim('\\', $model))) {
             $model::observe(new ModuleModelObserver());
         }
     }
 
     public function saving(Eloquent $model)
     {
-        if (!$model->isDirty()) {
+        if (! $model->isDirty()) {
             echo '.';
         }
     }

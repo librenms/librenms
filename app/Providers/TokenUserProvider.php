@@ -52,7 +52,6 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        return;
     }
 
     /**
@@ -63,12 +62,12 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (!ApiToken::isValid($credentials['api_token'])) {
+        if (! ApiToken::isValid($credentials['api_token'])) {
             return null;
         }
 
         $user = ApiToken::userFromToken($credentials['api_token']);
-        if (!is_null($user)) {
+        if (! is_null($user)) {
             return $user;
         }
 

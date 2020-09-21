@@ -28,7 +28,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateAlertTransportsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -44,7 +43,6 @@ class CreateAlertTransportsTable extends Migration
             $table->text('transport_config')->nullable();
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -37,13 +37,13 @@ trait FrogfootResources
      */
     public function discoverProcessors()
     {
-        return array(
+        return [
             Processor::discover(
                 $this->getName(),
                 $this->getDeviceID(),
                 '1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2',
                 0
-            )
-        );
+            ),
+        ];
     }
 }

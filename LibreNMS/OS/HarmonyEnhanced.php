@@ -13,8 +13,8 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
 {
     public function discoverWirelessRssi()
     {
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mwrEmcRadioRSL', array(), 'MWR-RADIO-MC-MIB', null, '-Ob');
-        $sensors = array();
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mwrEmcRadioRSL', [], 'MWR-RADIO-MC-MIB', null, '-Ob');
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rssi',
@@ -22,19 +22,20 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
                 '.1.3.6.1.4.1.7262.4.5.12.203.1.1.5.' . $index,
                 'harmony_enhanced',
                 $index,
-                'RSL Radio ' .$index,
+                'RSL Radio ' . $index,
                 null,
                 null,
                 10
             );
         }
+
         return $sensors;
     }
 
     public function discoverWirelessSnr()
     {
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mwrEmcRadioSNR', array(), 'MWR-RADIO-MC-MIB', null, '-Ob');
-        $sensors = array();
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mwrEmcRadioSNR', [], 'MWR-RADIO-MC-MIB', null, '-Ob');
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'snr',
@@ -48,13 +49,14 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
                 10
             );
         }
+
         return $sensors;
     }
 
     public function discoverWirelessPower()
     {
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mwrEmcRadioActualTxPower', array(), 'MWR-RADIO-MC-MIB', null, '-Ob');
-        $sensors = array();
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mwrEmcRadioActualTxPower', [], 'MWR-RADIO-MC-MIB', null, '-Ob');
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -68,13 +70,14 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
                 10
             );
         }
+
         return $sensors;
     }
 
     public function discoverWirelessErrors()
     {
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mwrEmcRadioRxErrsFrames', array(), 'MWR-RADIO-MC-MIB', null, '-Ob');
-        $sensors = array();
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mwrEmcRadioRxErrsFrames', [], 'MWR-RADIO-MC-MIB', null, '-Ob');
+        $sensors = [];
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'errors',
@@ -85,6 +88,7 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
                 'RX Errors Radio ' . $index
             );
         }
+
         return $sensors;
     }
 }

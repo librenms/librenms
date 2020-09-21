@@ -38,6 +38,7 @@ abstract class TableController extends PaginatedAjaxController
     {
         if (isset($this->model)) {
             $fields = \Schema::getColumnListing((new $this->model)->getTable());
+
             return array_combine($fields, $fields);
         }
 

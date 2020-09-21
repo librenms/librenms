@@ -38,7 +38,6 @@ use LibreNMS\Alerting\QueryBuilderParser;
 
 class AlertDB
 {
-
     /**
      * @param $rule
      * @param $query_builder
@@ -56,7 +55,7 @@ class AlertDB
     /**
      * Generate SQL from Rule
      * @param string $rule Rule to generate SQL for
-     * @return string|boolean
+     * @return string|bool
      */
     public static function genSQLOld($rule)
     {
@@ -66,29 +65,29 @@ class AlertDB
             return false;
         }
         //Pretty-print rule to dissect easier
-        $pretty = array('&&' => ' && ', '||' => ' || ');
+        $pretty = ['&&' => ' && ', '||' => ' || '];
         $rule = str_replace(array_keys($pretty), $pretty, $rule);
         $tmp = explode(" ", $rule);
-        $tables = array();
+        $tables = [];
         foreach ($tmp as $opt) {
             if (strstr($opt, '%') && strstr($opt, '.')) {
                 $tmpp = explode(".", $opt, 2);
                 $tmpp[0] = str_replace("%", "", $tmpp[0]);
                 $tables[] = mres(str_replace("(", "", $tmpp[0]));
-                $rule = str_replace($opt, $tmpp[0].'.'.$tmpp[1], $rule);
+                $rule = str_replace($opt, $tmpp[0] . '.' . $tmpp[1], $rule);
             }
         }
         $tables = array_keys(array_flip($tables));
-        if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
+        if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', [$tables[0], 'device_id']) != 1) {
             //Our first table has no valid glue, append the 'devices' table to it!
             array_unshift($tables, 'devices');
         }
-        $x = sizeof($tables)-1;
+        $x = sizeof($tables) - 1;
         $i = 0;
         $join = "";
         while ($i < $x) {
-            if (isset($tables[$i+1])) {
-                $gtmp = ResolveGlues(array($tables[$i+1]), 'device_id');
+            if (isset($tables[$i + 1])) {
+                $gtmp = ResolveGlues([$tables[$i + 1]], 'device_id');
                 if ($gtmp === false) {
                     //Cannot resolve glue-chain. Rule is invalid.
                     return false;
@@ -97,22 +96,23 @@ class AlertDB
                 $qry = "";
                 foreach ($gtmp as $glue) {
                     if (empty($last)) {
-                        list($tmp,$last) = explode('.', $glue);
-                        $qry .= $glue.' = ';
+                        [$tmp,$last] = explode('.', $glue);
+                        $qry .= $glue . ' = ';
                     } else {
-                        list($tmp,$new) = explode('.', $glue);
-                        $qry .= $tmp.'.'.$last.' && '.$tmp.'.'.$new.' = ';
+                        [$tmp,$new] = explode('.', $glue);
+                        $qry .= $tmp . '.' . $last . ' && ' . $tmp . '.' . $new . ' = ';
                         $last = $new;
                     }
-                    if (!in_array($tmp, $tables)) {
+                    if (! in_array($tmp, $tables)) {
                         $tables[] = $tmp;
                     }
                 }
-                $join .= "( ".$qry.$tables[0].".device_id ) && ";
+                $join .= "( " . $qry . $tables[0] . ".device_id ) && ";
             }
             $i++;
         }
-        $sql = "SELECT * FROM ".implode(",", $tables)." WHERE (".$join."".str_replace("(", "", $tables[0]).".device_id = ?) && (".str_replace(array("%","@","!~","~"), array("",".*","NOT REGEXP","REGEXP"), $rule).")";
+        $sql = "SELECT * FROM " . implode(",", $tables) . " WHERE (" . $join . "" . str_replace("(", "", $tables[0]) . ".device_id = ?) && (" . str_replace(["%", "@", "!~", "~"], ["", ".*", "NOT REGEXP", "REGEXP"], $rule) . ")";
+
         return $sql;
     }
 }

@@ -12,7 +12,7 @@ if (isset($options['r']) && isset($options['h'])) {
     set_debug(isset($options['d']));
     $runAlerts = new RunAlerts();
 
-    $rule_id = (int)$options['r'];
+    $rule_id = (int) $options['r'];
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $where = "alerts.device_id = $device_id && alerts.rule_id = $rule_id";
     $alerts = $runAlerts->loadAlerts($where);

@@ -47,7 +47,7 @@ class Terra extends OS implements ProcessorDiscovery, OSDiscovery
             "ttx410C" => "15",
             "tdx410C" => "16",
             "sdi480" => "17",
-            "sti440" => "18"
+            "sti440" => "18",
         ];
 
         foreach ($models as $model => $index) {
@@ -76,7 +76,7 @@ class Terra extends OS implements ProcessorDiscovery, OSDiscovery
 
         $query = [
             "sti410C" => ".1.3.6.1.4.1.30631.1.9.1.1.3.0",
-            "sti440" => ".1.3.6.1.4.1.30631.1.18.1.326.3.0"
+            "sti440" => ".1.3.6.1.4.1.30631.1.18.1.326.3.0",
         ];
 
         foreach ($query as $decr => $oid) {
@@ -87,7 +87,7 @@ class Terra extends OS implements ProcessorDiscovery, OSDiscovery
                         $this->getDeviceId(),
                         $oid,
                         0
-                    )
+                    ),
                 ];
             }
         }

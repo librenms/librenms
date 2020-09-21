@@ -45,7 +45,7 @@ class Fortigate extends Fortinet implements OSPolling
         if (is_numeric($sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
 
-            print "Sessions: $sessions\n";
+            echo "Sessions: $sessions\n";
             $fields = [
                 'sessions' => $sessions,
             ];

@@ -52,19 +52,19 @@ class Url
             return '';
         }
 
-        if (!$device->canAccess(Auth::user())) {
+        if (! $device->canAccess(Auth::user())) {
             return $device->displayName();
         }
 
-        if (!$start) {
+        if (! $start) {
             $start = Carbon::now()->subDay()->timestamp;
         }
 
-        if (!$end) {
+        if (! $end) {
             $end = Carbon::now()->timestamp;
         }
 
-        if (!$text) {
+        if (! $text) {
             $text = $device->displayName();
         }
 
@@ -100,7 +100,7 @@ class Url
 
         $contents .= '</div>';
 
-        foreach ((array)$graphs as $entry) {
+        foreach ((array) $graphs as $entry) {
             $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';
             $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
             $contents .= '<div class="overlib-box">';
@@ -124,15 +124,14 @@ class Url
      * @param Port $port
      * @param string $text
      * @param string $type
-     * @param boolean $overlib
-     * @param boolean $single_graph
+     * @param bool $overlib
+     * @param bool $single_graph
      * @return mixed|string
      */
     public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
     {
-
         $label = Rewrite::normalizeIfName($port->getLabel());
-        if (!$text) {
+        if (! $text) {
             $text = $label;
         }
 
@@ -153,7 +152,7 @@ class Url
         ];
 
         $content .= self::graphTag($graph_array);
-        if (!$single_graph) {
+        if (! $single_graph) {
             $graph_array['from'] = Carbon::now()->subWeek()->timestamp;
             $content .= self::graphTag($graph_array);
             $graph_array['from'] = Carbon::now()->subMonth()->timestamp;
@@ -164,7 +163,7 @@ class Url
 
         $content .= '</div>';
 
-        if (!$overlib) {
+        if (! $overlib) {
             return $content;
         } elseif ($port->canAccess(Auth::user())) {
             return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
@@ -177,15 +176,14 @@ class Url
      * @param Sensor $sensor
      * @param string $text
      * @param string $type
-     * @param boolean $overlib
-     * @param boolean $single_graph
+     * @param bool $overlib
+     * @param bool $single_graph
      * @return mixed|string
      */
     public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false)
     {
-
         $label = $sensor->sensor_descr;
-        if (!$text) {
+        if (! $text) {
             $text = $label;
         }
 
@@ -203,7 +201,7 @@ class Url
         ];
 
         $content .= self::graphTag($graph_array);
-        if (!$single_graph) {
+        if (! $single_graph) {
             $graph_array['from'] = Carbon::now()->subWeek()->timestamp;
             $content .= self::graphTag($graph_array);
             $graph_array['from'] = Carbon::now()->subMonth()->timestamp;
@@ -214,9 +212,10 @@ class Url
 
         $content .= '</div>';
 
-        if (!$overlib) {
+        if (! $overlib) {
             return $content;
         }
+
         return self::overlibLink(self::sensorUrl($sensor), $text, $content, self::sensorLinkDisplayClass($sensor));
     }
 
@@ -243,7 +242,7 @@ class Url
 
     public static function sensorUrl($sensor, $vars = [])
     {
-        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health' , 'metric' => $sensor->sensor_class], $vars);
+        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
     }
 
     /**
@@ -295,7 +294,7 @@ class Url
     {
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
-            if ($value == '0' || $value != '' && !Str::contains($var, 'opt') && !is_numeric($var)) {
+            if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
                 $url .= $var . '=' . urlencode($value) . '/';
             }
         }
@@ -353,7 +352,6 @@ class Url
         foreach ($args as $key => $arg) {
             $urlargs[] = $key . "=" . urlencode($arg);
         }
-
 
         if (Config::get('enable_lazy_load', true)) {
             return '<img class="lazy img-responsive" data-original="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
@@ -418,6 +416,7 @@ class Url
     public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
     {
         $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
+
         return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
     }
 

@@ -20,15 +20,15 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
-namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
-use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
+namespace LibreNMS\Alert\Transport;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Alert\Transport;
+use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 class Sensu extends Transport
 {
@@ -38,19 +38,19 @@ class Sensu extends Transport
     const CRITICAL = 2;
     const UNKNOWN = 3;
 
-    private static $status = array(
+    private static $status = [
         'ok' => Sensu::OK,
         'warning' => Sensu::WARNING,
-        'critical' => Sensu::CRITICAL
-    );
+        'critical' => Sensu::CRITICAL,
+    ];
 
-    private static $severity = array(
+    private static $severity = [
         'recovered' => AlertState::RECOVERED,
         'alert' => AlertState::ACTIVE,
         'acknowledged' => AlertState::ACKNOWLEDGED,
         'worse' => AlertState::WORSE,
         'better' => AlertState::BETTER,
-    );
+    ];
 
     private static $client = null;
 
@@ -58,8 +58,8 @@ class Sensu extends Transport
     {
         $sensu_opts = [];
         $sensu_opts['url'] = $this->config['sensu-url'] ? $this->config['sensu-url'] : 'http://127.0.0.1:3031';
-        $sensu_opts['namespace'] =  $this->config['sensu-namespace'] ? $this->config['sensu-namespace'] : 'default';
-        $sensu_opts['prefix'] =  $this->config['sensu-prefix'];
+        $sensu_opts['namespace'] = $this->config['sensu-namespace'] ? $this->config['sensu-namespace'] : 'default';
+        $sensu_opts['prefix'] = $this->config['sensu-prefix'];
         $sensu_opts['source-key'] = $this->config['sensu-source-key'];
 
         Sensu::$client = new Client();
@@ -127,7 +127,7 @@ class Sensu extends Transport
                 'system' => [
                     'hostname' => $obj['hostname'],
                     'os' => $obj['os'],
-                ]
+                ],
             ],
         ];
     }
@@ -237,15 +237,15 @@ class Sensu extends Transport
                     'options' => [
                         'hostname' => 'hostname',
                         'sysName' => 'sysName',
-                        'shortname' => 'shortname'
+                        'shortname' => 'shortname',
                     ],
-                    'default' => 'hostname'
+                    'default' => 'hostname',
                 ],
             ],
             'validation' => [
                 'sensu-url' => 'url',
                 'sensu-source-key' => 'required|in:hostname,sysName,shortname',
-            ]
+            ],
         ];
     }
 }

@@ -35,7 +35,6 @@ class Html
      * return icon and color for application state
      * @param string $app_state
      * @return array
-     *
      */
     public static function appStateIcon($app_state)
     {
@@ -80,21 +79,21 @@ class Html
     public static function graphRow($graph_array, $print = false)
     {
         if (session('widescreen')) {
-            if (!array_key_exists('height', $graph_array)) {
+            if (! array_key_exists('height', $graph_array)) {
                 $graph_array['height'] = '110';
             }
 
-            if (!array_key_exists('width', $graph_array)) {
+            if (! array_key_exists('width', $graph_array)) {
                 $graph_array['width'] = '215';
             }
 
             $periods = Config::get('graphs.mini.widescreen');
         } else {
-            if (!array_key_exists('height', $graph_array)) {
+            if (! array_key_exists('height', $graph_array)) {
                 $graph_array['height'] = '100';
             }
 
-            if (!array_key_exists('width', $graph_array)) {
+            if (! array_key_exists('width', $graph_array)) {
                 $graph_array['width'] = '215';
             }
 
@@ -146,13 +145,13 @@ class Html
         }
 
         $output = '
-        <div style="width:'.$width.'px; height:'.$height.'px; position: relative;">
-        <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;margin-bottom:-'.$height.'px;">
-        <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
+        <div style="width:' . $width . 'px; height:' . $height . 'px; position: relative;">
+        <div class="progress" style="min-width: 2em; background-color:#' . $right_background . '; height:' . $height . 'px;margin-bottom:-' . $height . 'px;">
+        <div class="progress-bar" role="progressbar" aria-valuenow="' . $size_percent . '" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:' . $size_percent . '%; background-color: #' . $left_background . ';">
         </div>
         </div>
-        <b style="padding-left: 2%; position: absolute; top: 0; left: 0;color:#'.$left_colour.';">'.$left_text.'</b>
-        <b style="padding-right: 2%; position: absolute; top: 0; right: 0;color:#'.$right_colour.';">'.$right_text.'</b>
+        <b style="padding-left: 2%; position: absolute; top: 0; left: 0;color:#' . $left_colour . ';">' . $left_text . '</b>
+        <b style="padding-right: 2%; position: absolute; top: 0; right: 0;color:#' . $right_colour . ';">' . $right_text . '</b>
         </div>
         ';
 

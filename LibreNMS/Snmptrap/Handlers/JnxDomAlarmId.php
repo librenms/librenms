@@ -20,7 +20,7 @@
  *
  * Used covert alarm ID in the JnxDomAlarm traps from Hex to a
  * descriptive string.
-
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
@@ -41,27 +41,27 @@ class JnxDomAlarmId
         );
 
         $alarmDescr = [
-        'input loss of signal',
-        'input loss of lock',
-        'input rx path not ready',
-        'input laser power high',
-        'input laser power low',
-        'output laser bias current high',
-        'output laser bias current low',
-        'output laser power high',
-        'output laser power low',
-        'output data not ready',
-        'output tx path not ready',
-        'output laser fault',
-        'output loss of lock',
-        'module temperature high',
-        'module temperature low',
-        'module not ready',
-        'module power down',
-        'wire unplugged or down',
-        'module unplugged or down',
-        'module voltage high',
-        'module voltage low',
+            'input loss of signal',
+            'input loss of lock',
+            'input rx path not ready',
+            'input laser power high',
+            'input laser power low',
+            'output laser bias current high',
+            'output laser bias current low',
+            'output laser power high',
+            'output laser power low',
+            'output data not ready',
+            'output tx path not ready',
+            'output laser fault',
+            'output loss of lock',
+            'module temperature high',
+            'module temperature low',
+            'module not ready',
+            'module power down',
+            'wire unplugged or down',
+            'module unplugged or down',
+            'module voltage high',
+            'module voltage low',
         ];
 
         $index = 0;
@@ -73,6 +73,7 @@ class JnxDomAlarmId
             $index++;
         }
         $message = implode(', ', $descr);
+
         return $message;
     }
 }

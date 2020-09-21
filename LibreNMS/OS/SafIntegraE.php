@@ -48,7 +48,7 @@ class SafIntegraE extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return array(
+        return [
             // SAF-INTEGRAE-MIB::integraEradioTxFrequency
             new WirelessSensor(
                 'frequency',
@@ -73,7 +73,7 @@ class SafIntegraE extends OS implements
                 1,
                 1000
             ),
-        );
+        ];
     }
 
     /**
@@ -84,7 +84,7 @@ class SafIntegraE extends OS implements
      */
     public function discoverWirelessMse()
     {
-        return array(
+        return [
             // SAF-INTEGRAE-MIB::integraEmodemMse
             new WirelessSensor(
                 'mse',
@@ -97,7 +97,7 @@ class SafIntegraE extends OS implements
                 1,
                 10
             ),
-        );
+        ];
     }
 
     /**
@@ -108,7 +108,7 @@ class SafIntegraE extends OS implements
      */
     public function discoverWirelessPower()
     {
-        return array(
+        return [
             // SAF-INTEGRAE-MIB::integraEradioTxPower
             new WirelessSensor(
                 'power',
@@ -127,7 +127,7 @@ class SafIntegraE extends OS implements
                 'integraEradioRxLevel',
                 'Rx Level'
             ),
-        );
+        ];
     }
 
     /**
@@ -138,7 +138,7 @@ class SafIntegraE extends OS implements
      */
     public function discoverWirelessRate()
     {
-        return array(
+        return [
             // SAF-INTEGRAE-MIB::integraEmodemRxCapacity
             new WirelessSensor(
                 'rate',
@@ -161,7 +161,7 @@ class SafIntegraE extends OS implements
                 null,
                 1000
             ),
-        );
+        ];
     }
 
     /**
@@ -172,7 +172,7 @@ class SafIntegraE extends OS implements
      */
     public function discoverWirelessQuality()
     {
-        return array(
+        return [
             // SAF-INTEGRAE-MIB::integraEmodemSignalQuality
             new WirelessSensor(
                 'quality',
@@ -184,6 +184,6 @@ class SafIntegraE extends OS implements
                 null,
                 1
             ),
-        );
+        ];
     }
 }

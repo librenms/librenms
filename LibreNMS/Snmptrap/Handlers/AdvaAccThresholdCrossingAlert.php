@@ -62,6 +62,7 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
                 return $descr;
             }
         }
+
         return 'unknown';
     }
 

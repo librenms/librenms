@@ -70,18 +70,18 @@ class AddUserCommand extends LnmsCommand
         $roles = [
             'normal' => 1,
             'global-read' => 5,
-            'admin' => 10
+            'admin' => 10,
         ];
 
         $this->validate([
             'username' => ['required', Rule::unique('users', 'username')->where('auth_type', 'mysql')],
             'email' => 'nullable|email',
-            'role' => Rule::in(array_keys($roles))
+            'role' => Rule::in(array_keys($roles)),
         ]);
 
         // set get password
         $password = $this->option('password');
-        if (!$password) {
+        if (! $password) {
             $password = $this->secret(__('commands.user:add.password-request'));
         }
 
@@ -101,6 +101,7 @@ class AddUserCommand extends LnmsCommand
         $user->save();
 
         $this->info(__('commands.user:add.success', ['username' => $user->username]));
+
         return 0;
     }
 }

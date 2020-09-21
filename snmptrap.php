@@ -12,7 +12,6 @@
  * @copyright  (C) 2018 LibreNMS
  * Adapted from old snmptrap.php handler
  */
-
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 

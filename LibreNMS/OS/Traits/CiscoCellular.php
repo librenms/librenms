@@ -37,9 +37,9 @@ trait CiscoCellular
      */
     public function discoverWirelessRssi()
     {
-        $sensors = array();
+        $sensors = [];
 
-        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gCurrentGsmRssi', array(), 'CISCO-WAN-3G-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gCurrentGsmRssi', [], 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rssi',

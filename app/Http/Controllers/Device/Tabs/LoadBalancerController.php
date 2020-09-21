@@ -75,7 +75,7 @@ class LoadBalancerController implements DeviceTab
 
     public function visible(Device $device): bool
     {
-        return !empty($this->tabs);
+        return ! empty($this->tabs);
     }
 
     public function slug(): string

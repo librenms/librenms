@@ -36,7 +36,7 @@ class GraphiteStoreTest extends TestCase
 {
     protected $timestamp = 997464400;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +44,7 @@ class GraphiteStoreTest extends TestCase
         Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();
@@ -90,7 +90,6 @@ class GraphiteStoreTest extends TestCase
         $graphite->put($device, $measurement, $tags, $fields);
     }
 
-
     /**
      * @param $mockSocket
      * @return Graphite
@@ -103,6 +102,7 @@ class GraphiteStoreTest extends TestCase
             ->andReturn($mockSocket);
 
         $graphite = new Graphite($mockFactory);
+
         return $graphite;
     }
 }

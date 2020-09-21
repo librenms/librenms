@@ -46,7 +46,7 @@ class Permissions
      *
      * @param \App\Models\Device|int $device
      * @param \App\Models\User|int $user
-     * @return boolean
+     * @return bool
      */
     public function canAccessDevice($device, $user = null)
     {
@@ -60,7 +60,7 @@ class Permissions
      *
      * @param \App\Models\Port|int $port
      * @param \App\Models\User|int $user
-     * @return boolean
+     * @return bool
      */
     public function canAccessPort($port, $user = null)
     {
@@ -76,7 +76,7 @@ class Permissions
      *
      * @param \App\Models\Bill|int $bill
      * @param \App\Models\User|int $user
-     * @return boolean
+     * @return bool
      */
     public function canAccessBill($bill, $user = null)
     {
@@ -92,14 +92,15 @@ class Permissions
      * @param \App\Models\Device|int $device
      * @return \Illuminate\Support\Collection
      */
-/*
-    public function usersForDevice($device)
-    {
-        return $this->getDevicePermissions()
-            ->where('device_id', $this->getDeviceId($device))
-            ->pluck('user_id');
-    }
-*/
+    /*
+        public function usersForDevice($device)
+        {
+            return $this->getDevicePermissions()
+                ->where('device_id', $this->getDeviceId($device))
+                ->pluck('user_id');
+        }
+    */
+
     /**
      * Get the user_id of users that have been granted access to port
      *
@@ -175,7 +176,7 @@ class Permissions
         $user_id = $this->getUserId($user);
 
         // if we don't have a map for this user yet, populate it.
-        if (!isset($this->deviceGroupMap[$user_id])) {
+        if (! isset($this->deviceGroupMap[$user_id])) {
             $this->deviceGroupMap[$user_id] = DB::table('device_group_device')
                 ->whereIn('device_id', $this->devicesForUser($user))
                 ->distinct('device_group_id')
@@ -195,7 +196,7 @@ class Permissions
     {
         $user_id = $this->getUserId($user);
 
-        if (!isset($this->devicePermissions[$user_id])) {
+        if (! isset($this->devicePermissions[$user_id])) {
             $this->devicePermissions[$user_id] = DB::table('devices_perms')->where('user_id', $user_id)
                 ->union($this->getDeviceGroupPermissionsQuery()->where('user_id', $user_id))
                 ->get();
@@ -238,7 +239,7 @@ class Permissions
      */
     private function getUserId($user)
     {
-        return $user instanceof User ? $user->user_id : (is_numeric($user) ? (int)$user : Auth::id());
+        return $user instanceof User ? $user->user_id : (is_numeric($user) ? (int) $user : Auth::id());
     }
 
     /**
@@ -247,7 +248,7 @@ class Permissions
      */
     private function getDeviceId($device)
     {
-        return $device instanceof Device ? $device->device_id : (is_numeric($device) ? (int)$device : 0);
+        return $device instanceof Device ? $device->device_id : (is_numeric($device) ? (int) $device : 0);
     }
 
     /**
@@ -256,7 +257,7 @@ class Permissions
      */
     private function getPortId($port)
     {
-        return $port instanceof Port ? $port->port_id : (is_numeric($port) ? (int)$port : 0);
+        return $port instanceof Port ? $port->port_id : (is_numeric($port) ? (int) $port : 0);
     }
 
     /**
@@ -265,7 +266,7 @@ class Permissions
      */
     private function getBillId($bill)
     {
-        return $bill instanceof Bill ? $bill->bill_id : (is_numeric($bill) ? (int)$bill : 0);
+        return $bill instanceof Bill ? $bill->bill_id : (is_numeric($bill) ? (int) $bill : 0);
     }
 
     /**
@@ -276,7 +277,7 @@ class Permissions
         return DB::table('devices_group_perms')
         ->select('devices_group_perms.user_id', 'device_group_device.device_id')
         ->join('device_group_device', 'device_group_device.device_group_id', '=', 'devices_group_perms.device_group_id')
-        ->when(!Config::get('permission.device_group.allow_dynamic'), function ($query) {
+        ->when(! Config::get('permission.device_group.allow_dynamic'), function ($query) {
             return $query
                 ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
                 ->where('device_groups.type', 'static');

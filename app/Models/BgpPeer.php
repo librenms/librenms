@@ -33,7 +33,6 @@ class BgpPeer extends DeviceRelatedModel
     protected $table = 'bgpPeers';
     protected $primaryKey = 'bgpPeer_id';
 
-
     // ---- Query scopes ----
 
     public function scopeInAlarm(Builder $query)

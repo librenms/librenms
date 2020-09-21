@@ -36,7 +36,7 @@ class AddHostCliTest extends DBTestCase
 
     public function testCLIsnmpV1()
     {
-        $result = \Artisan::call('device:add '.$this->hostName.' -force -ccommunity --v1');
+        $result = \Artisan::call('device:add ' . $this->hostName . ' -force -ccommunity --v1');
         $this->assertEquals(0, $result, "command returned non zero value");
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
@@ -48,7 +48,7 @@ class AddHostCliTest extends DBTestCase
 
     public function testCLIsnmpV2()
     {
-        $result = \Artisan::call('device:add '.$this->hostName.' -force -ccommunity --v2c');
+        $result = \Artisan::call('device:add ' . $this->hostName . ' -force -ccommunity --v2c');
         $this->assertEquals(0, $result, "command returned non zero value");
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
@@ -60,7 +60,7 @@ class AddHostCliTest extends DBTestCase
 
     public function testCLIsnmpV3UserAndPW()
     {
-        $result = \Artisan::call('device:add '.$this->hostName.' -force -uSecName -AAuthPW -XPrivPW --v3');
+        $result = \Artisan::call('device:add ' . $this->hostName . ' -force -uSecName -AAuthPW -XPrivPW --v3');
         $this->assertEquals(0, $result, "command returned non zero value");
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
@@ -75,23 +75,23 @@ class AddHostCliTest extends DBTestCase
 
     public function testPortAssociationMode()
     {
-        $modes = array('ifIndex', 'ifName', 'ifDescr', 'ifAlias');
+        $modes = ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'];
         foreach ($modes as $index => $mode) {
-            $host = "hostName".$mode;
-            $result = \Artisan::call('device:add '.$host.' -force -p '.$mode.' --v1');
+            $host = "hostName" . $mode;
+            $result = \Artisan::call('device:add ' . $host . ' -force -p ' . $mode . ' --v1');
             $this->assertEquals(0, $result, "command returned non zero value");
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
-            $this->assertEquals($index+1, $device->port_association_mode, "Wrong port association mode ".$mode);
+            $this->assertEquals($index + 1, $device->port_association_mode, "Wrong port association mode " . $mode);
         }
     }
 
     public function testSnmpTransport()
     {
-        $modes = array('udp', 'udp6', 'tcp', 'tcp6');
+        $modes = ['udp', 'udp6', 'tcp', 'tcp6'];
         foreach ($modes as $mode) {
-            $host = "hostName".$mode;
-            $result = \Artisan::call('device:add '.$host.' -force -t '.$mode.' --v1');
+            $host = "hostName" . $mode;
+            $result = \Artisan::call('device:add ' . $host . ' -force -t ' . $mode . ' --v1');
             $this->assertEquals(0, $result, "command returned non zero value");
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
@@ -103,10 +103,10 @@ class AddHostCliTest extends DBTestCase
     public function testSnmpV3AuthProtocol()
     {
 //        $modes = array('md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224');
-        $modes = array('md5', 'sha');
+        $modes = ['md5', 'sha'];
         foreach ($modes as $mode) {
-            $host = "hostName".$mode;
-            $result = \Artisan::call('device:add '.$host.' -force -a '.$mode.' --v3');
+            $host = "hostName" . $mode;
+            $result = \Artisan::call('device:add ' . $host . ' -force -a ' . $mode . ' --v3');
             $this->assertEquals(0, $result, "command returned non zero value");
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
@@ -117,10 +117,10 @@ class AddHostCliTest extends DBTestCase
 
     public function testSnmpV3PrivacyProtocol()
     {
-        $modes = array('des', 'aes');
+        $modes = ['des', 'aes'];
         foreach ($modes as $mode) {
-            $host = "hostName".$mode;
-            $result = \Artisan::call('device:add '.$host.' -force -x '.$mode.' --v3');
+            $host = "hostName" . $mode;
+            $result = \Artisan::call('device:add ' . $host . ' -force -x ' . $mode . ' --v3');
             $this->assertEquals(0, $result, "command returned non zero value");
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
@@ -131,7 +131,7 @@ class AddHostCliTest extends DBTestCase
 
     public function testCLIping()
     {
-        $result = \Artisan::call('device:add '.$this->hostName.' -force -P -onameOfOS -whardware -sSystem --v1');
+        $result = \Artisan::call('device:add ' . $this->hostName . ' -force -P -onameOfOS -whardware -sSystem --v1');
         $this->assertEquals(0, $result, "command returned non zero value");
 
         $device = Device::findByHostname($this->hostName);

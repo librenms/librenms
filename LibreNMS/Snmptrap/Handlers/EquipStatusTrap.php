@@ -62,6 +62,7 @@ class EquipStatusTrap implements SnmptrapHandler
             'nonAlarmed' => 1,
             '1' => 1,
         ];
+
         return $severity_map[$state] ?? 0;
     }
 }

@@ -33,7 +33,7 @@ class AvailabilityMapController extends Controller
     public function setView(Request $request)
     {
         $this->validate($request, [
-            'map_view' => 'required|numeric|in:0,1,2'
+            'map_view' => 'required|numeric|in:0,1,2',
         ]);
 
         return $this->setSessionValue($request, 'map_view');
@@ -42,7 +42,7 @@ class AvailabilityMapController extends Controller
     public function setGroup(Request $request)
     {
         $this->validate($request, [
-            'group_view' => 'required|numeric'
+            'group_view' => 'required|numeric',
         ]);
 
         return $this->setSessionValue($request, 'group_view');

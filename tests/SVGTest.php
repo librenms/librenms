@@ -82,6 +82,7 @@ class SVGTest extends TestCase
     private function getSvgFiles()
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('html/images'));
+
         return new RegexIterator($iterator, '/^.+\.svg$/i', RecursiveRegexIterator::GET_MATCH);
     }
 }

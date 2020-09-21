@@ -27,8 +27,8 @@ namespace LibreNMS\Alert\Transport;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 use Log;
 use Validator;
 
@@ -45,6 +45,7 @@ class Pagerduty extends Transport
         } else {
             $obj['event_type'] = 'trigger';
         }
+
         return $this->contactPagerduty($obj, $this->config);
     }
 
@@ -58,7 +59,7 @@ class Pagerduty extends Transport
         $data = [
             'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
-            'dedup_key'    => (string)$obj['alert_id'],
+            'dedup_key'    => (string) $obj['alert_id'],
             'payload'    => [
                 'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
                 'device_groups'   => \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
@@ -94,7 +95,7 @@ class Pagerduty extends Transport
                     'type'  => 'oauth',
                     'icon'  => 'pagerduty-white.svg',
                     'class' => 'btn-success',
-                    'url'   => 'https://connect.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback='
+                    'url'   => 'https://connect.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback=',
                 ],
                 [
                     'title' => 'Account',
@@ -110,9 +111,9 @@ class Pagerduty extends Transport
                     'title' => 'Integration Key',
                     'type'  => 'text',
                     'name'  => 'service_key',
-                ]
+                ],
             ],
-            'validation' => []
+            'validation' => [],
         ];
     }
 
@@ -126,15 +127,16 @@ class Pagerduty extends Transport
 
         if ($validator->fails()) {
             Log::error('Pagerduty oauth failed validation.', ['request' => $request->all()]);
+
             return false;
         }
 
         $config = json_encode($request->only('account', 'service_key', 'service_name'));
 
         if ($id = $request->get('id')) {
-            return (bool)dbUpdate(['transport_config' => $config], 'alert_transports', 'transport_id=?', [$id]);
+            return (bool) dbUpdate(['transport_config' => $config], 'alert_transports', 'transport_id=?', [$id]);
         } else {
-            return (bool)dbInsert([
+            return (bool) dbInsert([
                 'transport_name' => $request->get('service_name', 'PagerDuty'),
                 'transport_type' => 'pagerduty',
                 'is_default' => 0,

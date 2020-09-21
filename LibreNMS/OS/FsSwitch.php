@@ -55,6 +55,7 @@ class FsSwitch extends OS implements ProcessorDiscovery
                 100 - $entry['ssCpuIdle']
             );
         }
+
         return $processors;
     }
 }

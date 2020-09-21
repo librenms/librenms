@@ -66,8 +66,8 @@ class AuthHTTPTest extends TestCase
         $old_username = null;
         $new_username = null;
 
-        $users = array('steve',  '   steve', 'steve   ', '   steve   ', '    steve   ', '', 'CAT');
-        $vars = array('REMOTE_USER', 'PHP_AUTH_USER');
+        $users = ['steve',  '   steve', 'steve   ', '   steve   ', '    steve   ', '', 'CAT'];
+        $vars = ['REMOTE_USER', 'PHP_AUTH_USER'];
 
         $a = LegacyAuth::reset();
 

@@ -46,7 +46,6 @@ class XirrusAos extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
-
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -55,9 +54,10 @@ class XirrusAos extends OS implements
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.21013.1.2.12.1.2.22.0'; // XIRRUS-MIB::globalNumStations.0
-        return array(
+
+        return [
             new WirelessSensor('clients', $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
-        );
+        ];
     }
 
     /**
@@ -141,9 +141,9 @@ class XirrusAos extends OS implements
     private function discoverSensor($type, $oid, $oid_num_prefix)
     {
         $names = $this->getCacheByIndex('realtimeMonitorIfaceName', 'XIRRUS-MIB');
-        $nf = snmp_cache_oid($oid, $this->getDeviceArray(), array(), 'XIRRUS-MIB');
+        $nf = snmp_cache_oid($oid, $this->getDeviceArray(), [], 'XIRRUS-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($nf as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 $type,
@@ -152,7 +152,7 @@ class XirrusAos extends OS implements
                 'xirrus',
                 $index,
                 $names[$index],
-                $type == 'frequency' ? WirelessSensor::channelToFrequency($entry[$oid]) :$entry[$oid]
+                $type == 'frequency' ? WirelessSensor::channelToFrequency($entry[$oid]) : $entry[$oid]
             );
         }
 

@@ -101,13 +101,13 @@ class DefaultWidgetSeeder extends Seeder
                 "widget_title" => "Alert History",
                 "widget" => "alertlog",
                 "base_dimensions" => "6,3",
-            ]
+            ],
         ];
 
         $existing = DB::table('widgets')->pluck('widget');
 
         \DB::table('widgets')->insert(array_filter($widgets, function ($entry) use ($existing) {
-            return !$existing->contains($entry['widget']);
+            return ! $existing->contains($entry['widget']);
         }));
     }
 }

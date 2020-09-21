@@ -51,7 +51,7 @@ class GraylogStreamsController extends Controller
         $streams = [];
         try {
             $streams = collect($api->getStreams()['streams'])->filter(function ($stream) use ($search) {
-                return !$search || Str::contains(strtolower($stream['title']), $search) || Str::contains(strtolower($stream['description']), $search);
+                return ! $search || Str::contains(strtolower($stream['title']), $search) || Str::contains(strtolower($stream['description']), $search);
             })->map(function ($stream) {
                 $text = $stream['title'];
                 if ($stream['description']) {
@@ -66,7 +66,7 @@ class GraylogStreamsController extends Controller
 
         return response()->json([
             'results' => $streams,
-            'pagination' => ['more' => false]
+            'pagination' => ['more' => false],
         ]);
     }
 }

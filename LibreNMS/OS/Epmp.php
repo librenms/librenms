@@ -26,10 +26,10 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
 class Epmp extends OS implements
@@ -47,7 +47,8 @@ class Epmp extends OS implements
     public function discoverWirelessRssi()
     {
         $rssi_oid = '.1.3.6.1.4.1.17713.21.1.2.3.0'; //CAMBIUM-PMP80211-MIB::cambiumSTADLRSSI.0
-        return array(
+
+        return [
             new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
@@ -56,8 +57,8 @@ class Epmp extends OS implements
                 0,
                 'Cambium ePMP RSSI',
                 null
-            )
-        );
+            ),
+        ];
     }
 
     /**
@@ -70,7 +71,8 @@ class Epmp extends OS implements
     public function discoverWirelessSnr()
     {
         $snr = '.1.3.6.1.4.1.17713.21.1.2.18.0'; //CAMBIUM-PMP80211-MIB::cambiumSTADLSNR.0
-        return array(
+
+        return [
             new WirelessSensor(
                 'snr',
                 $this->getDeviceId(),
@@ -79,8 +81,8 @@ class Epmp extends OS implements
                 0,
                 'Cambium ePMP SNR',
                 null
-            )
-        );
+            ),
+        ];
     }
 
     /**
@@ -92,7 +94,8 @@ class Epmp extends OS implements
     public function discoverWirelessFrequency()
     {
         $frequency = '.1.3.6.1.4.1.17713.21.1.2.1.0'; //CAMBIUM-PMP80211-MIB::cambiumSTAConnectedRFFrequency"
-        return array(
+
+        return [
             new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
@@ -101,11 +104,9 @@ class Epmp extends OS implements
                 0,
                 'Cambium ePMP Frequency',
                 null
-            )
-        );
+            ),
+        ];
     }
-
-
 
     /**
      * Discover wireless client counts. Type is clients.
@@ -116,7 +117,8 @@ class Epmp extends OS implements
     public function discoverWirelessClients()
     {
         $registeredSM = '.1.3.6.1.4.1.17713.21.1.2.10.0'; //CAMBIUM-PMP80211-MIB::cambiumAPNumberOfConnectedSTA.0
-        return array(
+
+        return [
             new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
@@ -125,7 +127,7 @@ class Epmp extends OS implements
                 0,
                 'Client Count',
                 null
-            )
-        );
+            ),
+        ];
     }
 }

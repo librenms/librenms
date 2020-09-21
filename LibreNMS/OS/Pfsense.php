@@ -43,7 +43,7 @@ class Pfsense extends Unix implements OSPolling
             'pfCounterFragment.0',
             'pfCounterShort.0',
             'pfCounterNormalize.0',
-            'pfCounterMemDrop.0'
+            'pfCounterMemDrop.0',
         ], '-OQUs', 'BEGEMOT-PF-MIB');
 
         if (is_numeric($oids[0]['pfStateTableCount'])) {

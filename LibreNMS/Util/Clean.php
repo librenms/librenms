@@ -85,7 +85,7 @@ class Clean
             $value = htmlentities($value);
         }
 
-        if (!isset($purifier)) {
+        if (! isset($purifier)) {
             // initialize HTML Purifier here since this is the only user
             $p_config = HTMLPurifier_Config::createDefault();
             $p_config->set('Cache.SerializerPath', Config::get('temp_dir', '/tmp'));
