@@ -205,6 +205,11 @@ class CiHelper
      */
     public function checkStyle()
     {
+
+        // Disabled in favor of styleci
+        echo "Style check disabled.\n";
+        return 0;
+
         $cs_cmd = [
             $this->checkPhpExec('phpcs'),
             '-n',
