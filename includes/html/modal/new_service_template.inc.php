@@ -23,8 +23,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $stype .= "<option value='$check_name'>$check_name</option>";
             }
         }
-    }
-    ?>
+    } ?>
 
 <div class="modal fade bs-example-modal-sm" id="create-service-template" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">

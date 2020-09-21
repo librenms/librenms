@@ -25,7 +25,6 @@ $param = $vars['param'];
 $ignore = isset($vars['ignore']) ? 1 : 0;
 $disabled = isset($vars['disabled']) ? 1 : 0;
 
-
 if (is_numeric($service_template_id) && $service_template_id > 0) {
     // Need to edit.
     $update = ['device_group_id' => $device_group_id, 'service_template_type' => $type, 'service_template_desc' => $desc, 'service_template_ip' => $ip, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled];
