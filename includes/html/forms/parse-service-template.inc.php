@@ -19,7 +19,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 $service_template_id = $vars['service_template_id'];
 
 if (is_numeric($service_template_id) && $service_template_id > 0) {
-    $service_template = service_template_get(null, $service_template_id);
+    $service_template = service_template_get($service_template_id);
 
     $output = [
         'device_group_id' => $service[0]['device_group_id'],

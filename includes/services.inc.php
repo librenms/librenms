@@ -127,7 +127,7 @@ function add_service_template($device_group, $type, $desc, $param = '', $ignore 
     return dbInsert($insert, 'services_template');
 }
 
-function service_template_get($device_group = null, $service_template = null)
+function service_template_get($service_template = null)
 {
     $sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE';
     $sql_param = [];
@@ -184,7 +184,7 @@ function delete_service_template($service_template = null)
 function discover_service_template($device_group, $service_template)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_template_id`= ? AND `device_group_id` = ?', [$service_template['service_template_id'], $device_group['device_group_id']])) {
-        $service = service_template_get($device_group, $service_template);
+        $service = service_template_get($service_template);
         $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?', [$device_group]);
         foreach ($device_ids as $device) {
             add_service($device, $service);
