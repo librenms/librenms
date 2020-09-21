@@ -55,7 +55,7 @@ function process_syslog($entry, $update)
         }
     }
 
-    $entry['host'] = preg_replace("/^::ffff:/", "", $entry['host']);
+    $entry['host'] = preg_replace('/^::ffff:/', '', $entry['host']);
     if ($new_host = Config::get("syslog_xlate.{$entry['host']}")) {
         $entry['host'] = $new_host;
     }
@@ -66,7 +66,7 @@ function process_syslog($entry, $update)
 
         if (Config::get('enable_syslog_hooks') && is_array(Config::getOsSetting($os, 'syslog_hook'))) {
             foreach (Config::getOsSetting($os, 'syslog_hook') as $k => $v) {
-                $syslogprogmsg = $entry['program'] . ": " . $entry['msg'];
+                $syslogprogmsg = $entry['program'] . ': ' . $entry['msg'];
                 if ((isset($v['script'])) && (isset($v['regex'])) && ((preg_match($v['regex'], $syslogprogmsg)))) {
                     shell_exec(escapeshellcmd($v['script']) . ' ' . escapeshellarg($hostname) . ' ' . escapeshellarg($os) . ' ' . escapeshellarg($syslogprogmsg) . ' >/dev/null 2>&1 &');
                 }
@@ -125,22 +125,22 @@ function process_syslog($entry, $update)
         } elseif ($os == 'procurve') {
             $matches = [];
             if (preg_match('/^(?P<program>[A-Za-z]+): {2}(?P<msg>.*)/', $entry['msg'], $matches)) {
-                $entry['msg'] = $matches['msg'] . " [" . $entry['program'] . "]";
+                $entry['msg'] = $matches['msg'] . ' [' . $entry['program'] . ']';
                 $entry['program'] = $matches['program'];
             }
             unset($matches);
         } elseif ($os == 'zywall') {
             // Zwwall sends messages without all the fields, so the offset is wrong
-            $msg = preg_replace("/\" /", '";', stripslashes($entry['program'] . ':' . $entry['msg']));
+            $msg = preg_replace('/" /', '";', stripslashes($entry['program'] . ':' . $entry['msg']));
             $msg = str_getcsv($msg, ';');
             $entry['program'] = null;
             foreach ($msg as $param) {
-                [$var, $val] = explode("=", $param);
+                [$var, $val] = explode('=', $param);
                 if ($var == 'cat') {
                     $entry['program'] = str_replace('"', '', $val);
                 }
             }
-            $entry['msg'] = join(" ", $msg);
+            $entry['msg'] = join(' ', $msg);
         }//end if
 
         if (! isset($entry['program'])) {

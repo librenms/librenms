@@ -5,7 +5,7 @@ $app_id = $app['app_id'];
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo "postgres";
+echo 'postgres';
 
 $options = '-Oqv';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
@@ -67,7 +67,7 @@ $found_dbs = [];
 
 while (isset($db_lines[$db_lines_int])) {
     [$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
-        $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del, $dbname] = explode(" ", $db_lines[$db_lines_int]);
+        $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del, $dbname] = explode(' ', $db_lines[$db_lines_int]);
 
     $rrd_name = ['app', $name, $app_id, $dbname];
 

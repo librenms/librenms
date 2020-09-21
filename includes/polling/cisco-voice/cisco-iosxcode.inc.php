@@ -13,14 +13,14 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-if ($device['os_group'] == "cisco") {
+if ($device['os_group'] == 'cisco') {
     // Total
-    $total = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.7.1.0", null);
+    $total = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.7.1.0', null);
     $total = $total['1.3.6.1.4.1.9.9.86.1.7.1.0'][''];
 
     if (isset($total) && $total > 0) {
         // Available
-        $available = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.7.2.0", null);
+        $available = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.7.2.0', null);
         $available = $available['1.3.6.1.4.1.9.9.86.1.7.2.0'][''];
 
         // Active
@@ -39,7 +39,7 @@ if ($device['os_group'] == "cisco") {
         data_update($device, 'cisco-iosxcode', $tags, $fields);
 
         $os->enableGraph('cisco-iosxcode');
-        echo " Cisco IOS Transcoder ";
+        echo ' Cisco IOS Transcoder ';
     }
     unset($rrd_def, $total, $active, $available, $fields, $tags);
 }

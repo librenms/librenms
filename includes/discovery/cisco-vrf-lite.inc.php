@@ -23,20 +23,20 @@ if (Config::get('enable_vrf_lite_cisco')) {
     $ids = [];
 
     // For the moment only will be cisco and the version 3
-    if ($device['os_group'] == "cisco" && $device['snmpver'] == 'v3') {
-        $mib = "SNMP-COMMUNITY-MIB";
-        $mib = "CISCO-CONTEXT-MAPPING-MIB";
+    if ($device['os_group'] == 'cisco' && $device['snmpver'] == 'v3') {
+        $mib = 'SNMP-COMMUNITY-MIB';
+        $mib = 'CISCO-CONTEXT-MAPPING-MIB';
         //-Osq because if i put the n the oid from the first command is not the same of this one
-        $listVrf = snmp_walk($device, "cContextMappingVrfName", ['-Osq', '-Ln'], $mib, null);
-        $listVrf = str_replace("cContextMappingVrfName.", "", $listVrf);
-        $listVrf = str_replace('"', "", $listVrf);
+        $listVrf = snmp_walk($device, 'cContextMappingVrfName', ['-Osq', '-Ln'], $mib, null);
+        $listVrf = str_replace('cContextMappingVrfName.', '', $listVrf);
+        $listVrf = str_replace('"', '', $listVrf);
         $listVrf = trim($listVrf);
 
         d_echo("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
         d_echo("\n[DEBUG List Vrf only name]\n$listVrf\n[/DEBUG]\n");
 
         foreach (explode("\n", $listVrf) as $lineVrf) {
-            $tmpVrf = explode(" ", $lineVrf, 2);
+            $tmpVrf = explode(' ', $lineVrf, 2);
             //the $tmpVrf[0] will be the context
             if (count($tmpVrf) == 2 && ! empty($tmpVrf[1])) {
                 $tableVrf[$tmpVrf[0]]['vrf_name'] = $tmpVrf[1];
@@ -44,16 +44,16 @@ if (Config::get('enable_vrf_lite_cisco')) {
         }
         unset($listVrf);
 
-        $listIntance = snmp_walk($device, "cContextMappingProtoInstName", ['-Osq', '-Ln'], $mib, null);
-        $listIntance = str_replace("cContextMappingProtoInstName.", "", $listIntance);
-        $listIntance = str_replace('"', "", $listIntance);
+        $listIntance = snmp_walk($device, 'cContextMappingProtoInstName', ['-Osq', '-Ln'], $mib, null);
+        $listIntance = str_replace('cContextMappingProtoInstName.', '', $listIntance);
+        $listIntance = str_replace('"', '', $listIntance);
         $listIntance = trim($listIntance);
 
         d_echo("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
         d_echo("\n[DEBUG]\n List Intance only names\n$listIntance\n[/DEBUG]\n");
 
         foreach (explode("\n", $listIntance) as $lineIntance) {
-            $tmpIntance = explode(" ", $lineIntance, 2);
+            $tmpIntance = explode(' ', $lineIntance, 2);
             //the $tmpIntance[0] will be the context and $tmpIntance[1] the intance
             if (count($tmpIntance) == 2 && ! empty($tmpIntance[1])) {
                 $tableVrf[$tmpIntance[0]]['intance_name'] = $tmpIntance[1];
@@ -63,10 +63,10 @@ if (Config::get('enable_vrf_lite_cisco')) {
 
         foreach ((array) $tableVrf as $context => $vrf) {
             if ($debug) {
-                echo "\n[DEBUG]\nRelation:t" . $context . "t" . $vrf['intance'] . "t" . $vrf['vrf'] . "\n[/DEBUG]\n";
+                echo "\n[DEBUG]\nRelation:t" . $context . 't' . $vrf['intance'] . 't' . $vrf['vrf'] . "\n[/DEBUG]\n";
             }
 
-            $tmpVrf = dbFetchRow("SELECT * FROM vrf_lite_cisco WHERE device_id = ? and context_name=?", [
+            $tmpVrf = dbFetchRow('SELECT * FROM vrf_lite_cisco WHERE device_id = ? and context_name=?', [
                 $device ['device_id'],
                 $context,
             ]);
@@ -98,7 +98,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
     }
 
     //get all vrf_lite_cisco, this will used where the value depend of the context, be careful with the order that you call this module, if the module is disabled the context search will not work
-    $tmpVrfC = dbFetchRows("SELECT * FROM vrf_lite_cisco WHERE device_id = ? ", [
+    $tmpVrfC = dbFetchRows('SELECT * FROM vrf_lite_cisco WHERE device_id = ? ', [
         $device ['device_id'], ]);
     $device['vrf_lite_cisco'] = $tmpVrfC;
 

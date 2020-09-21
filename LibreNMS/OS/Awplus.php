@@ -61,7 +61,7 @@ class Awplus extends OS implements OSDiscovery
             }
         }
 
-        $device->version = snmp_get($this->getDeviceArray(), "currSoftVersion.0", "-OQv", "AT-SETUP-MIB");
+        $device->version = snmp_get($this->getDeviceArray(), 'currSoftVersion.0', '-OQv', 'AT-SETUP-MIB');
         $device->serial = $serial;
         $device->hardware = $hardware;
         $device->features = $features ?? null;

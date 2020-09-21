@@ -36,7 +36,7 @@ trait UcdResources
      */
     public function discoverProcessors()
     {
-        echo "UCD Resources: ";
+        echo 'UCD Resources: ';
 
         return [
             Processor::discover(

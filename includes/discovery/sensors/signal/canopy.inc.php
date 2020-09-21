@@ -4,7 +4,7 @@ $cambium_type = snmp_get($device, 'sysDescr.0', '-Oqv', '');
 $divisor = 1;
 if (strstr($cambium_type, 'BHUL450')) {
     $masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
-    if ($masterSlaveMode == "timingMaster") {
+    if ($masterSlaveMode == 'timingMaster') {
         $oid = '.1.3.6.1.4.1.17713.21.1.2.3.2';
         $mib = 'WHISP-APS-MIB';
     } else {
@@ -13,7 +13,7 @@ if (strstr($cambium_type, 'BHUL450')) {
     }
 } elseif (strstr($cambium_type, 'BHUL') || strstr($cambium_type, 'BH')) {
     $masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
-    if ($masterSlaveMode == "timingMaster") {
+    if ($masterSlaveMode == 'timingMaster') {
         $oid = '.1.3.6.1.4.1.17713.21.1.2.3.2';
         $mib = 'WHISP-APS-MIB';
     } else {

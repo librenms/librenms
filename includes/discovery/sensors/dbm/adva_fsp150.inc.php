@@ -30,7 +30,7 @@
  * @copyright  2020 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
-echo "Adva FSP-150 dBm";
+echo 'Adva FSP-150 dBm';
 
 $multiplier = 1;
 $divisor = 1;

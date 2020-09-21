@@ -80,9 +80,9 @@ class DeviceGroup extends BaseModel
         if (! $device instanceof Device) {
             // could not load device
             return [
-                "attached" => [],
-                "detached" => [],
-                "updated" => [],
+                'attached' => [],
+                'detached' => [],
+                'updated' => [],
             ];
         }
 

@@ -186,7 +186,7 @@ if ($device['os_group'] == 'cisco') {
                         }
                         if ($entity_array[$phys_index]['entPhysicalClass'] === 'port') {
                             if (Str::contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
-                                [, $tmp_ifindex] = explode(".", $entity_array[$phys_index][0]['entAliasMappingIdentifier']);
+                                [, $tmp_ifindex] = explode('.', $entity_array[$phys_index][0]['entAliasMappingIdentifier']);
                                 $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
                                 if (is_array($tmp_port)) {
                                     $entPhysicalIndex = $tmp_ifindex;
@@ -200,9 +200,9 @@ if ($device['os_group'] == 'cisco') {
                     }
                     discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null);
                     //Cisco IOS-XR : add a fake sensor to graph as dbm
-                    if ($type == "power" and $device['os'] == "iosxr" and (preg_match("/power (R|T)x/i", $descr) or preg_match("/(R|T)x Power/i", $descr))) {
+                    if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr))) {
                         // convert Watts to dbm
-                        $type = "dbm";
+                        $type = 'dbm';
                         $limit_low = 10 * log10($limit_low * 1000);
                         $warn_limit_low = 10 * log10($warn_limit_low * 1000);
                         $warn_limit = 10 * log10($warn_limit * 1000);

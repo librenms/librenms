@@ -35,6 +35,6 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= " DEF:pingX=$rrd_filename:ping:AVERAGE:start=$prev_from:end=$from";
     $rrd_options .= " SHIFT:pingX:$period";
     $rrd_options .= " LINE1.25:pingX#CCCCCC:'Prev Ping'\t\t";
-    $rrd_options .= " GPRINT:pingX:AVERAGE:%6.2lf";
+    $rrd_options .= ' GPRINT:pingX:AVERAGE:%6.2lf';
     $rrd_options .= " GPRINT:pingX:MAX:%6.2lf  'GPRINT:pingX:AVERAGE:%6.2lf\\n'";
 }

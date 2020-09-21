@@ -30,7 +30,7 @@
         if ($array['type'] != 'f5-ltm-vs') {
             continue;
         }
-        $string = $array['IP'] . ":" . $array['port'];
+        $string = $array['IP'] . ':' . $array['port'];
         if ($array['status'] != 0) {
             $message = $array['error'];
             $status = 2;

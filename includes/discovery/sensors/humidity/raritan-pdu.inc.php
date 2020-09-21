@@ -39,14 +39,14 @@ foreach ($pre_cache['raritan_extSensorConfig'] as $index => $data) {
         $current = ($measure_data['measurementsExternalSensorValue'] / $divisor);
         $sensor_available = $measure_data['measurementsExternalSensorIsAvailable'];
         $user_func = null;
-        if (is_numeric($current) && $current >= 0 && $sensor_available === "true") {
+        if (is_numeric($current) && $current >= 0 && $sensor_available === 'true') {
             discover_sensor($valid['sensor'], 'humidity', $device, $oid, 'measurementsExternalSensorValue.' . $index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
         }
     }
 }
 
 d_echo('Humidity for Raritan PDU');
-$oids = snmpwalk_cache_multi_oid($device, "externalSensorTable", [], "PDU-MIB");
+$oids = snmpwalk_cache_multi_oid($device, 'externalSensorTable', [], 'PDU-MIB');
 $offset = 0;
 foreach ($oids as $index => $sensor) {
     if ($sensor['externalSensorType'] == 'humidity') {

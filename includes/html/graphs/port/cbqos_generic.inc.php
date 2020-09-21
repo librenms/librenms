@@ -30,15 +30,15 @@ if (! isset($vars['policy'])) {
     }
 }
 
-include "includes/html/graphs/common.inc.php";
-$rrd_options .= " -l 0 -E ";
+include 'includes/html/graphs/common.inc.php';
+$rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'Class-Map              Now      Avg      Max\\n'";
-$rrd_additions = "";
+$rrd_additions = '';
 
 $colours = array_merge(\LibreNMS\Config::get('graph_colours.mixed'), \LibreNMS\Config::get('graph_colours.manycolours'), \LibreNMS\Config::get('graph_colours.manycolours'));
 $count = 0;
 
-d_echo("<pre>Policy: " . $vars['policy']);
+d_echo('<pre>Policy: ' . $vars['policy']);
 d_echo("\nSP-OBJ: " . $components[$vars['policy']]['sp-obj']);
 foreach ($components as $id => $array) {
     $addtograph = false;
@@ -63,24 +63,24 @@ foreach ($components as $id => $array) {
 
             if (rrdtool_check_rrd_exists($rrd_filename)) {
                 // Stack the area on the second and subsequent DS's
-                $stack = "";
+                $stack = '';
                 if ($count != 0) {
-                    $stack = ":STACK ";
+                    $stack = ':STACK ';
                 }
 
                 // Grab a colour from the array.
                 if (isset($colours[$count])) {
                     $colour = $colours[$count];
                 } else {
-                    d_echo("\nError: Out of colours. Have: " . (count($colours) - 1) . ", Requesting:" . $count);
+                    d_echo("\nError: Out of colours. Have: " . (count($colours) - 1) . ', Requesting:' . $count);
                 }
 
-                $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":" . $cbqos_parameter_name . ":AVERAGE ";
-                $rrd_additions .= " CDEF:MOD" . $count . "=DS" . $count . "," . $cbqos_operator_param . "," . $cbqos_operator . " ";
-                $rrd_additions .= " AREA:MOD" . $count . "#" . $colour . ":'" . str_pad(substr($components[$id]['label'], 0, 15), 15) . "'" . $stack;
-                $rrd_additions .= " GPRINT:MOD" . $count . ":LAST:%6.2lf%s ";
-                $rrd_additions .= " GPRINT:MOD" . $count . ":AVERAGE:%6.2lf%s ";
-                $rrd_additions .= " GPRINT:MOD" . $count . ":MAX:%6.2lf%s\\\l ";
+                $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':' . $cbqos_parameter_name . ':AVERAGE ';
+                $rrd_additions .= ' CDEF:MOD' . $count . '=DS' . $count . ',' . $cbqos_operator_param . ',' . $cbqos_operator . ' ';
+                $rrd_additions .= ' AREA:MOD' . $count . '#' . $colour . ":'" . str_pad(substr($components[$id]['label'], 0, 15), 15) . "'" . $stack;
+                $rrd_additions .= ' GPRINT:MOD' . $count . ':LAST:%6.2lf%s ';
+                $rrd_additions .= ' GPRINT:MOD' . $count . ':AVERAGE:%6.2lf%s ';
+                $rrd_additions .= ' GPRINT:MOD' . $count . ":MAX:%6.2lf%s\\\l ";
 
                 $count++;
             } // End if file exists
@@ -89,11 +89,11 @@ foreach ($components as $id => $array) {
         } // End if addtograph
     }
 }
-d_echo("</pre>");
+d_echo('</pre>');
 
-if ($rrd_additions == "") {
+if ($rrd_additions == '') {
     // We didn't add any data sources.
-    d_echo("<pre>No DS to add</pre>");
+    d_echo('<pre>No DS to add</pre>');
 } else {
     $rrd_options .= $rrd_additions;
 }

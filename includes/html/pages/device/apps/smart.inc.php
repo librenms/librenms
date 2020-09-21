@@ -23,7 +23,7 @@ foreach ($disks as $label) {
     array_push($drives, generate_link($label, $link_array, ['disk'=>$disk]));
 }
 
-printf("%s | drives: %s", generate_link('All Drives', $link_array), implode(', ', $drives));
+printf('%s | drives: %s', generate_link('All Drives', $link_array), implode(', ', $drives));
 
 print_optionbar_end();
 

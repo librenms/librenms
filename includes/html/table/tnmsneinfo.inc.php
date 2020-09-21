@@ -31,11 +31,11 @@ if (isset($vars['device_id'])) {
     $sql = 'SELECT `neName`,`neLocation`,`neType`,`neOpMode`,`neAlarm`,`neOpState` FROM `tnmsneinfo`';
     $wheresql = ' WHERE `device_id` = ?';
     $sortcolumns = 3;
-    $count_sql = "SELECT COUNT(id) FROM `tnmsneinfo`" . $wheresql;
+    $count_sql = 'SELECT COUNT(id) FROM `tnmsneinfo`' . $wheresql;
 
     // all columns are searchable - search across them
     if (isset($searchPhrase) && ! empty($searchPhrase)) {
-        $searchsql = implode(' OR ', array_map("search_phrase_column", array_map("mres", $columns)));
+        $searchsql = implode(' OR ', array_map('search_phrase_column', array_map('mres', $columns)));
         $wheresql .= " AND ( $searchsql )";
     }
     $sql .= $wheresql;
@@ -48,7 +48,7 @@ if (isset($vars['device_id'])) {
 
     // set up default sort
     if (! isset($sort) || empty($sort)) {
-        $sort = implode(', ', array_map("mres", array_slice($columns, 0, $sortcolumns)));
+        $sort = implode(', ', array_map('mres', array_slice($columns, 0, $sortcolumns)));
     }
     $sql .= " ORDER BY $sort";
 
@@ -70,16 +70,16 @@ if (isset($vars['device_id'])) {
             $neop = '<span style="min-width:40px; display:inlink-block;" class="label label-danger">' . $tnmsne['neOpMode'] . '</span>';
         }
         switch ($tnmsne['neAlarm']) {
-            case "cleared":
+            case 'cleared':
                 $alarm = '<span style="min-width:40px; display:inline-block;" class="label label-success">cleared</span>';
                 break;
-            case "warning":
+            case 'warning':
                 $alarm = '<span style="min-width:40px; display:inline-block;" class="label label-warning">warning</span>';
                 break;
-            case "minor":
-            case "major":
-            case "critical":
-            case "indeterminate":
+            case 'minor':
+            case 'major':
+            case 'critical':
+            case 'indeterminate':
                 $alarm = '<span style="min-width:40px; display:inline-block;" class="label label-danger">' . $tnmsne['neAlarm'] . '</span>';
                 break;
             default:

@@ -29,16 +29,16 @@ if (isset($options['v'])) {
     Config::set('auth_ldap_debug', 1);
 }
 
-echo "Authentication Method: " . Config::get('auth_mechanism') . PHP_EOL;
+echo 'Authentication Method: ' . Config::get('auth_mechanism') . PHP_EOL;
 
 // if ldap like, check selinux
-if (Config::get('auth_mechanism') == 'ldap' || Config::get('auth_mechanism') == "active_directory") {
+if (Config::get('auth_mechanism') == 'ldap' || Config::get('auth_mechanism') == 'active_directory') {
     $enforce = shell_exec('getenforce 2>/dev/null');
     if (Str::contains($enforce, 'Enforcing')) {
         // has selinux
         $output = shell_exec('getsebool httpd_can_connect_ldap');
         if ($output != "httpd_can_connect_ldap --> on\n") {
-            print_error("You need to run: setsebool -P httpd_can_connect_ldap=1");
+            print_error('You need to run: setsebool -P httpd_can_connect_ldap=1');
             exit;
         }
     }
@@ -76,14 +76,14 @@ try {
             $bind_success = $adbind_rm->invoke($authorizer, true, true);
             if (! $bind_success) {
                 echo ldap_error($lc_rp->getValue($authorizer)) . PHP_EOL;
-                print_message("Could not anonymous bind to AD");
+                print_message('Could not anonymous bind to AD');
             } else {
                 print_message('AD bind anonymous successful');
             }
         }
 
         if (! $bind_success) {
-            print_error("Could not bind to AD, you will not be able to use the API or alert AD users");
+            print_error('Could not bind to AD, you will not be able to use the API or alert AD users');
         }
     }
 
@@ -93,8 +93,8 @@ try {
             return "{$user['username']} ({$user['user_id']})";
         }, $users);
 
-        echo "Users: " . implode(', ', $output) . PHP_EOL;
-        echo "Total users: " . count($users) . PHP_EOL;
+        echo 'Users: ' . implode(', ', $output) . PHP_EOL;
+        echo 'Total users: ' . count($users) . PHP_EOL;
         exit;
     }
 
@@ -139,6 +139,6 @@ try {
         }
     }
 } catch (Exception $e) {
-    echo "Error: " . get_class($e) . " thrown!\n";
+    echo 'Error: ' . get_class($e) . " thrown!\n";
     echo $e->getMessage() . PHP_EOL;
 }

@@ -202,7 +202,7 @@ class ArubaInstant extends OS implements
     public function discoverWirelessPower()
     {
         // instant
-        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', "%s Radio %s: Tx Power");
+        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', '%s Radio %s: Tx Power');
     }
 
     /**

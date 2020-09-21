@@ -8,9 +8,9 @@ foreach ($pre_cache['aos7_fan_oids'] as $index => $data) {
         [$revindex, $revchass, $revdata,] = explode('.', strrev($oid), 4);
         $chassis = strrev($revchass);
         $indexName = strrev($revindex);
-        $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7." . $chassis;
+        $descr_oid = '.1.3.6.1.2.1.47.1.1.1.1.7.' . $chassis;
         $chas_descr = (string) snmp_get($device, $descr_oid, '-Oqv');
-        $descr = "CHASSIS-" . substr($chas_descr, 0, strpos($chas_descr, '/')) . " Fan $indexName";
+        $descr = 'CHASSIS-' . substr($chas_descr, 0, strpos($chas_descr, '/')) . " Fan $indexName";
         $states = [
             ['value' => 0, 'generic' => 2, 'graph' => 1, 'descr' => 'no-error'],
             ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'notRunning'],
@@ -36,7 +36,7 @@ foreach (explode("\n", $oids) as $chas_entry) {
         $value = $data2[2];
         $chas_oid_index = $chas_oid . $number;
         $chas_current = "chasEntPhysOperStatus.$number";
-        $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7." . $number;
+        $descr_oid = '.1.3.6.1.2.1.47.1.1.1.1.7.' . $number;
         $chas_descr = (string) snmp_get($device, $descr_oid, '-Oqv');
         $chas_state_name = 'chasEntPhysOperStatus';
         $chas_states = [

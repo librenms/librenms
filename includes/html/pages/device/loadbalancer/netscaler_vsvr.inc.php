@@ -17,8 +17,8 @@ if (is_numeric($vars['vsvr'])) {
 
     echo "<div style='margin: 0px;'><table class='table'>";
     // Table header
-    echo "<tr><th width=320>VServer</th><th width=320>VIP and port</th><th width=100>State</th>";
-    echo "<th width=320>Type</th><th width=320>Inbound traffic</th><th width=320>Outbound traffic</th></tr>";
+    echo '<tr><th width=320>VServer</th><th width=320>VIP and port</th><th width=100>State</th>';
+    echo '<th width=320>Type</th><th width=320>Inbound traffic</th><th width=320>Outbound traffic</th></tr>';
     // Vserver graphs
     // Can this really return more than one row?
     $vservers = dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? AND `vsvr_id` = ? ORDER BY `vsvr_name`', [$device['device_id'], $vars['vsvr']]);
@@ -121,10 +121,10 @@ if (is_numeric($vars['vsvr'])) {
 
     echo "<div style='margin: 0px;'><table class='table'>";
     // Table header
-    echo "<tr><th width=320><a href=" . generate_url($vars, ['sort' => "vsvr_name"]) . ">VServer</a></th>";
-    echo "<th width=320>VIP and port</th><th width=100>State</th><th width=320>Type</th>";
-    echo "<th width=320><a href=" . generate_url($vars, ['sort' => "vsvr_bps_in"]) . ">Inbound traffic</a></th>";
-    echo "<th width=320><a href=" . generate_url($vars, ['sort' => "vsvr_bps_out"]) . ">Outbound traffic</a></th></tr>";
+    echo '<tr><th width=320><a href=' . generate_url($vars, ['sort' => 'vsvr_name']) . '>VServer</a></th>';
+    echo '<th width=320>VIP and port</th><th width=100>State</th><th width=320>Type</th>';
+    echo '<th width=320><a href=' . generate_url($vars, ['sort' => 'vsvr_bps_in']) . '>Inbound traffic</a></th>';
+    echo '<th width=320><a href=' . generate_url($vars, ['sort' => 'vsvr_bps_out']) . '>Outbound traffic</a></th></tr>';
     // Vserver list
     $vservers = dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? ORDER BY `vsvr_name`', [$device['device_id']]);
 

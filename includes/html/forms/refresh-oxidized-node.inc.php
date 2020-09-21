@@ -14,7 +14,7 @@ header('Content-type: application/json');
 
 $device_hostname = clean($_POST['device_hostname']);
 if (Auth::user()->hasGlobalAdmin() && isset($device_hostname)) {
-    if (oxidized_node_update($device_hostname, "LibreNMS GUI refresh", Auth::user()->username)) {
+    if (oxidized_node_update($device_hostname, 'LibreNMS GUI refresh', Auth::user()->username)) {
         $status = 'ok';
         $message = 'Queued refresh in oxidized for device ' . $device_hostname;
     } else {

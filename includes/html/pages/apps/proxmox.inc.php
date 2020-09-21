@@ -5,7 +5,7 @@ $graphs['proxmox'] = [
     'netif',
 ];
 
-$pmxcl = dbFetchRows("SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ?", ['proxmox']);
+$pmxcl = dbFetchRows('SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ?', ['proxmox']);
 
 print_optionbar_start();
 
@@ -43,7 +43,7 @@ if (! isset($vars['instance'])) {
 }
 
 if (isset($vars['vmid'])) {
-    include "includes/html/pages/apps/proxmox/vm.inc.php";
+    include 'includes/html/pages/apps/proxmox/vm.inc.php';
     $pagetitle[] = $vars['vmid'];
 } else {
     echo '
@@ -53,7 +53,7 @@ if (isset($vars['vmid'])) {
             <div class="row">';
     foreach (proxmox_cluster_vms($instance) as $pmxvm) {
         echo '
-                <div class="col-sm-4 col-md-3 col-lg-2">' . generate_link($pmxvm['vmid'] . " (" . $pmxvm['description'] . ")", ['page' => 'apps', 'app' => 'proxmox', 'instance' => $instance, 'vmid' => $pmxvm['vmid']]) . '</div>';
+                <div class="col-sm-4 col-md-3 col-lg-2">' . generate_link($pmxvm['vmid'] . ' (' . $pmxvm['description'] . ')', ['page' => 'apps', 'app' => 'proxmox', 'instance' => $instance, 'vmid' => $pmxvm['vmid']]) . '</div>';
     }
     echo '
             </div>

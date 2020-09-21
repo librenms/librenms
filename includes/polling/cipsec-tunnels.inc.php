@@ -123,7 +123,7 @@ if ($device['os_group'] == 'cisco') {
         d_echo($valid_tunnels);
         dbDelete(
             'ipsec_tunnels',
-            "`tunnel_id` NOT IN " . dbGenPlaceholders(count($valid_tunnels)) . " AND `device_id`=?",
+            '`tunnel_id` NOT IN ' . dbGenPlaceholders(count($valid_tunnels)) . ' AND `device_id`=?',
             array_merge([$device['device_id']], $valid_tunnels)
         );
     }

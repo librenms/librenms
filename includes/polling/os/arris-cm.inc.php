@@ -23,5 +23,5 @@
  */
 preg_match('/<<HW_REV: (.+); VENDOR:.*SW_REV: (.+); MODEL: (.+)>>/', $device['sysDescr'], $matches);
 
-$hardware = $matches[3] . " (Rev: " . $matches[1] . ")";
+$hardware = $matches[3] . ' (Rev: ' . $matches[1] . ')';
 $version = $matches[2];

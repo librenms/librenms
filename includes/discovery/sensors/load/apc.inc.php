@@ -38,7 +38,7 @@ if ($phasecount > 1) {
             $item['divisor'] = 1;
         } else {
             $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.3.3';
-            $value = explode(" ", $oids);
+            $value = explode(' ', $oids);
             $current = $value[1] / $item['divisor'];
         }
         if (! empty($oids)) {

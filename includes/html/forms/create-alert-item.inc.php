@@ -28,10 +28,10 @@ $interval = mres($_POST['interval']);
 $mute = mres($_POST['mute']);
 $invert = mres($_POST['invert']);
 $name = mres($_POST['name']);
-if ($_POST['proc'] != "") {
+if ($_POST['proc'] != '') {
     $proc = $_POST['proc'];
 } else {
-    $proc = "";
+    $proc = '';
 }
 
 if (empty($rule)) {

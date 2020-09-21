@@ -14,7 +14,7 @@ if (Auth::user()->hasGlobalRead()) {
     $data['ignored'] = ['query' => "SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.`deleted` = '0' AND D.`device_id` = I.`device_id` AND (I.`ignore` = '1' OR D.`ignore` = '1')"];
 } else {
     $device_ids = Permissions::portsForUser()->toArray() ?: [0];
-    $perms_sql = "`I`.`port_id` IN " . dbGenPlaceholders(count($device_ids));
+    $perms_sql = '`I`.`port_id` IN ' . dbGenPlaceholders(count($device_ids));
 
     $data['count'] = [
         'query'  => "SELECT COUNT(*) FROM ports AS I WHERE $perms_sql AND I.`deleted` = '0'",

@@ -44,7 +44,7 @@ class Ifotec extends OS implements OSDiscovery
                 ];
                 $data = snmp_get_multi($this->getDeviceArray(), $oids, ['-OQUs'], 'IFOTEC-SMI');
 
-                $device->version = $data[1]['ifoSysFirmware'] . " (Bootloader " . $data[1]['ifoSysBootloader'] . ")";
+                $device->version = $data[1]['ifoSysFirmware'] . ' (Bootloader ' . $data[1]['ifoSysBootloader'] . ')';
                 $device->serial = $data[1]['ifoSysSerialNumber'];
             }
         }

@@ -50,11 +50,11 @@ class Smseagle extends Transport
         $curl = curl_init($url);
 
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         $ret = curl_exec($curl);
-        if (substr($ret, 0, 2) == "OK") {
+        if (substr($ret, 0, 2) == 'OK') {
             return true;
         } else {
             return false;

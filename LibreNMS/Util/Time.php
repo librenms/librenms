@@ -95,9 +95,9 @@ class Time
             $d = floor($s / 86400);
             $s -= $d * 86400;
             if ($d == 1) {
-                $ret[] = $d . " day";
+                $ret[] = $d . ' day';
             } else {
-                $ret[] = $d . " days";
+                $ret[] = $d . ' days';
             }
         }
 
@@ -105,9 +105,9 @@ class Time
             $h = floor($s / 3600);
             $s -= $h * 3600;
             if ($h == 1) {
-                $ret[] = $h . " hour";
+                $ret[] = $h . ' hour';
             } else {
-                $ret[] = $h . " hours";
+                $ret[] = $h . ' hours';
             }
         }
 
@@ -115,17 +115,17 @@ class Time
             $m = floor($s / 60);
             $s -= $m * 60;
             if ($m == 1) {
-                $ret[] = $m . " minute";
+                $ret[] = $m . ' minute';
             } else {
-                $ret[] = $m . " minutes";
+                $ret[] = $m . ' minutes';
             }
         }
 
         if ($s > 0) {
             if ($s == 1) {
-                $ret[] = $s . " second";
+                $ret[] = $s . ' second';
             } else {
-                $ret[] = $s . " seconds";
+                $ret[] = $s . ' seconds';
             }
         }
 

@@ -45,7 +45,7 @@ class MibTest extends TestCase
      */
     public function testMibDirectory($dir)
     {
-        $output = shell_exec("snmptranslate -M +" . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
+        $output = shell_exec('snmptranslate -M +' . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
         $this->assertEmpty($errors, "MIBs in $dir have errors!\n$errors");
@@ -114,7 +114,7 @@ class MibTest extends TestCase
         $file_path = "$path/$file";
         $highlighted_file = $console_color->convert("%r$file_path%n");
 
-        $output = shell_exec("snmptranslate -M +" . Config::get('mib_dir') . ":$path -m +$mib_name SNMPv2-MIB::system 2>&1");
+        $output = shell_exec('snmptranslate -M +' . Config::get('mib_dir') . ":$path -m +$mib_name SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
         $this->assertEmpty($errors, "$highlighted_file has errors!\n$errors");
@@ -173,7 +173,7 @@ class MibTest extends TestCase
     {
         // extract the mib name (tried regex, but was too complex and I had to read the whole file)
         $mib_name = null;
-        if ($handle = fopen($file, "r")) {
+        if ($handle = fopen($file, 'r')) {
             $header = '';
             while (($line = fgets($handle)) !== false) {
                 $trimmed = trim($line);

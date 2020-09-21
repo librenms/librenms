@@ -52,7 +52,7 @@ class ModuleModelObserver
 
     public function updated(Eloquent $model)
     {
-        d_echo("Updated data:", 'U');
+        d_echo('Updated data:', 'U');
         d_echo($model->getDirty());
     }
 

@@ -52,20 +52,20 @@ class Database extends BaseValidation
         if ($current === 0 || $current === $latest) {
             // Using Laravel migrations
             if (! Schema::isCurrent()) {
-                $validator->fail("Your database is out of date!", './lnms migrate');
+                $validator->fail('Your database is out of date!', './lnms migrate');
 
                 return;
             }
 
             $migrations = Schema::getUnexpectedMigrations();
             if ($migrations->isNotEmpty()) {
-                $validator->warn("Your database schema has extra migrations (" . $migrations->implode(', ') .
-                "). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
+                $validator->warn('Your database schema has extra migrations (' . $migrations->implode(', ') .
+                '). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.');
             }
         } elseif ($current < $latest) {
             $validator->fail(
                 "Your database schema ($current) is older than the latest ($latest).",
-                "Manually run ./daily.sh, and check for any errors."
+                'Manually run ./daily.sh, and check for any errors.'
             );
 
             return;
@@ -87,8 +87,8 @@ class Database extends BaseValidation
 
         if ($diff->compare(CarbonInterval::minute(1)) > 0) {
             $message = "Time between this server and the mysql database is off\n";
-            $message .= " Mysql time " . $db_time->toDateTimeString() . PHP_EOL;
-            $message .= " PHP time " . $php_time->toDateTimeString() . PHP_EOL;
+            $message .= ' Mysql time ' . $db_time->toDateTimeString() . PHP_EOL;
+            $message .= ' PHP time ' . $php_time->toDateTimeString() . PHP_EOL;
 
             $validator->fail($message);
         }
@@ -97,7 +97,7 @@ class Database extends BaseValidation
     private function checkMode(Validator $validator)
     {
         // Test for lower case table name support
-        $lc_mode = dbFetchCell("SELECT @@global.lower_case_table_names");
+        $lc_mode = dbFetchCell('SELECT @@global.lower_case_table_names');
         if ($lc_mode != 0) {
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
@@ -113,7 +113,7 @@ class Database extends BaseValidation
         $tables = dbFetchRows($query);
         if (! empty($tables)) {
             $validator->result(
-                ValidationResult::warn("Some tables are not using the recommended InnoDB engine, this may cause you issues.")
+                ValidationResult::warn('Some tables are not using the recommended InnoDB engine, this may cause you issues.')
                     ->setList('Tables', $tables)
             );
         }
@@ -190,7 +190,7 @@ class Database extends BaseValidation
 
                     // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
                     if ($cdata['Type'] == 'timestamp') {
-                        $current_columns[$column]['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $current_columns[$column]['Extra']);
+                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED[ ]*/', '', $current_columns[$column]['Extra']);
                     }
 
                     if (empty($current_columns[$column])) {
@@ -274,7 +274,7 @@ class Database extends BaseValidation
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):")
+            $result = ValidationResult::fail('We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):')
                 ->setFix('Run the following SQL statements to fix.')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);

@@ -335,8 +335,8 @@ return [
             'description' => 'LDAP 版本',
             'help' => '用來與 LDAP Server 進行連接的版本，通常應是 v3',
             'options' => [
-                "2" => "2",
-                "3" => "3",
+                '2' => '2',
+                '3' => '3',
             ],
         ],
         'auth_mechanism' => [
@@ -935,7 +935,7 @@ return [
     ],
     'twofactor' => [
         'description' => '啟用雙因素驗證',
-        'help' => "Enables the built in Two-Factor authentication. You must set up each account to make it active.",
+        'help' => 'Enables the built in Two-Factor authentication. You must set up each account to make it active.',
     ],
     'units' => [
         'days' => '日',

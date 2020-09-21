@@ -51,7 +51,7 @@ ADVA-MIB::neEventLogTimeStamp.79 2018-12-10,11:45:10.8,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Access PORT-1-1-1-2 unavailable seconds threshold exceeded for interval-15min";
+        $message = 'Access PORT-1-1-1-2 unavailable seconds threshold exceeded for interval-15min';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmEthernetAccPortThresholdCrossingAlert UAS');
@@ -95,7 +95,7 @@ ADVA-MIB::neEventLogTimeStamp.79 2018-12-10,11:45:10.8,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Access PORT-1-1-1-3 unicast frames received threshold exceeded for interval-1day";
+        $message = 'Access PORT-1-1-1-3 unicast frames received threshold exceeded for interval-1day';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmEthernetAccPortThresholdCrossingAlert unicast frames sent');
@@ -114,7 +114,7 @@ ADVA-MIB::neEventLogTimeStamp.79 2018-12-10,11:45:10.8,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "Access PORT-1-1-1-3 unknown threshold exceeded for interval-1day";
+        $message = 'Access PORT-1-1-1-3 unknown threshold exceeded for interval-1day';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmEthernetAccPortThresholdCrossingAlert unknown threshold');

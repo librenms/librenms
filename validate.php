@@ -96,7 +96,7 @@ if (file_exists('config.php')) {
         $pre_checks_failed = true;
     }
     if (strpos(`tail config.php`, '?>') !== false) {
-        print_fail("Remove the ?> at the end of config.php");
+        print_fail('Remove the ?> at the end of config.php');
         $pre_checks_failed = true;
     }
 }
@@ -169,7 +169,7 @@ function print_fail($msg, $fix = null)
 {
     c_echo("[%RFAIL%n]  $msg");
     if ($fix && strlen($msg) > 72) {
-        echo PHP_EOL . "       ";
+        echo PHP_EOL . '       ';
     }
 
     if (! empty($fix)) {

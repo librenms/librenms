@@ -61,9 +61,9 @@ function getPredictedUsage($bill_day, $cur_used)
     $tmp = getDates($bill_day, 0);
     $start = new DateTime($tmp[0], new DateTimeZone(date_default_timezone_get()));
     $end = new DateTime($tmp[1], new DateTimeZone(date_default_timezone_get()));
-    $now = new DateTime(date("Y-m-d"), new DateTimeZone(date_default_timezone_get()));
-    $total = $end->diff($start)->format("%a");
-    $since = $now->diff($start)->format("%a");
+    $now = new DateTime(date('Y-m-d'), new DateTimeZone(date_default_timezone_get()));
+    $total = $end->diff($start)->format('%a');
+    $since = $now->diff($start)->format('%a');
 
     return $cur_used / $since * $total;
 }
@@ -71,7 +71,7 @@ function getPredictedUsage($bill_day, $cur_used)
 function getValue($host, $port, $id, $inout)
 {
     $oid = 'IF-MIB::ifHC' . $inout . 'Octets.' . $id;
-    $device = dbFetchRow("SELECT * from `devices` WHERE `hostname` = ? LIMIT 1", [$host]);
+    $device = dbFetchRow('SELECT * from `devices` WHERE `hostname` = ? LIMIT 1', [$host]);
     $value = snmp_get($device, $oid, '-Oqv');
 
     if (! is_numeric($value)) {
@@ -85,7 +85,7 @@ function getValue($host, $port, $id, $inout)
 function getLastPortCounter($port_id, $bill_id)
 {
     $return = [];
-    $row = dbFetchRow("SELECT timestamp, in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ? AND `bill_id` = ?", [$port_id, $bill_id]);
+    $row = dbFetchRow('SELECT timestamp, in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ? AND `bill_id` = ?', [$port_id, $bill_id]);
     if (! is_null($row)) {
         $return['timestamp'] = $row['timestamp'];
         $return['in_counter'] = $row['in_counter'];
@@ -103,7 +103,7 @@ function getLastPortCounter($port_id, $bill_id)
 function getLastMeasurement($bill_id)
 {
     $return = [];
-    $row = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1", [$bill_id]);
+    $row = dbFetchRow('SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1', [$bill_id]);
     if (! is_null($row)) {
         $return['delta'] = $row['delta'];
         $return['delta_in'] = $row['delta_in'];
@@ -119,13 +119,13 @@ function getLastMeasurement($bill_id)
 
 function get95thagg($bill_id, $datefrom, $dateto)
 {
-    $mq_sql = "SELECT count(delta) FROM bill_data WHERE bill_id = ?";
-    $mq_sql .= " AND timestamp > ? AND timestamp <= ?";
+    $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
+    $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
     $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
     $measurement_95th = (round(($measurements / 100 * 95)) - 1);
 
-    $q_95_sql = "SELECT (delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?";
-    $q_95_sql .= " AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC";
+    $q_95_sql = 'SELECT (delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
+    $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
     $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
     $m_95th = $a_95th[$measurement_95th];
 
@@ -134,13 +134,13 @@ function get95thagg($bill_id, $datefrom, $dateto)
 
 function get95thIn($bill_id, $datefrom, $dateto)
 {
-    $mq_sql = "SELECT count(delta) FROM bill_data WHERE bill_id = ?";
-    $mq_sql .= " AND timestamp > ? AND timestamp <= ?";
+    $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
+    $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
     $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
     $measurement_95th = (round(($measurements / 100 * 95)) - 1);
 
-    $q_95_sql = "SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?";
-    $q_95_sql .= " AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC";
+    $q_95_sql = 'SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
+    $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
     $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
     $m_95th = $a_95th[$measurement_95th];
 
@@ -149,13 +149,13 @@ function get95thIn($bill_id, $datefrom, $dateto)
 
 function get95thout($bill_id, $datefrom, $dateto)
 {
-    $mq_sql = "SELECT count(delta) FROM bill_data WHERE bill_id = ?";
-    $mq_sql .= " AND timestamp > ? AND timestamp <= ?";
+    $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
+    $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
     $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
     $measurement_95th = (round(($measurements / 100 * 95)) - 1);
 
-    $q_95_sql = "SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?";
-    $q_95_sql .= " AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC";
+    $q_95_sql = 'SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
+    $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
     $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
     $m_95th = $a_95th[$measurement_95th];
 
@@ -201,21 +201,21 @@ function getRates($bill_id, $datefrom, $dateto, $dir_95th)
 
 function getTotal($bill_id, $datefrom, $dateto)
 {
-    $mtot = dbFetchCell("SELECT SUM(delta) FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?", [$bill_id, $datefrom, $dateto]);
+    $mtot = dbFetchCell('SELECT SUM(delta) FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?', [$bill_id, $datefrom, $dateto]);
 
     return $mtot;
 }//end getTotal()
 
 function getSum($bill_id, $datefrom, $dateto)
 {
-    $sum = dbFetchRow("SELECT SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?", [$bill_id, $datefrom, $dateto]);
+    $sum = dbFetchRow('SELECT SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?', [$bill_id, $datefrom, $dateto]);
 
     return $sum;
 }//end getSum()
 
 function getPeriod($bill_id, $datefrom, $dateto)
 {
-    $ptot = dbFetchCell("SELECT SUM(period) FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?", [$bill_id, $datefrom, $dateto]);
+    $ptot = dbFetchCell('SELECT SUM(period) FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?', [$bill_id, $datefrom, $dateto]);
 
     return $ptot;
 }//end getPeriod()
@@ -354,7 +354,7 @@ function getHistoricTransferGraphData($bill_id)
     foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12', [$bill_id]) as $data) {
         $datefrom = strftime('%Y-%m-%d', strtotime($data['bill_datefrom']));
         $dateto = strftime('%Y-%m-%d', strtotime($data['bill_dateto']));
-        $datelabel = $datefrom . " - " . $dateto;
+        $datelabel = $datefrom . ' - ' . $dateto;
 
         array_push($ticklabels, $datelabel);
         array_push($in_data, $data['traf_in']);
@@ -420,7 +420,7 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
     $average = 0;
     if ($imgtype == 'day') {
         foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $data) {
-            array_push($ticklabels, strftime("%Y-%m-%d", $data['timestamp']));
+            array_push($ticklabels, strftime('%Y-%m-%d', $data['timestamp']));
             array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
             array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
             array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
@@ -439,7 +439,7 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
         }
     } elseif ($imgtype == 'hour') {
         foreach (dbFetch('SELECT DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY HOUR(timestamp) ASC', [$bill_id, $from, $to]) as $data) {
-            array_push($ticklabels, sprintf('%02d', $data['hour']) . ":00");
+            array_push($ticklabels, sprintf('%02d', $data['hour']) . ':00');
             array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
             array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
             array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);

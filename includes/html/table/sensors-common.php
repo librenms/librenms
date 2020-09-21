@@ -23,17 +23,17 @@ $class = mres($vars['class']);
 
 $sql = " FROM `$table` AS S, `devices` AS D";
 
-$sql .= " WHERE S.sensor_class=? AND S.device_id = D.device_id ";
+$sql .= ' WHERE S.sensor_class=? AND S.device_id = D.device_id ';
 $param[] = mres($vars['class']);
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $sql .= " AND `D`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $sql .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE ? OR `sensor_descr` LIKE ? OR `sensor_current` LIKE ?)";
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `sensor_descr` LIKE ? OR `sensor_current` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase";

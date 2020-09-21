@@ -38,7 +38,7 @@ if (Auth::user()->hasGlobalRead()) {
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE ? OR `D`.`sysName` LIKE ? OR `E`.`datetime` LIKE ? OR `E`.`message` LIKE ? OR `E`.`type` LIKE ? OR `E`.`username` LIKE ?)";
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `D`.`sysName` LIKE ? OR `E`.`datetime` LIKE ? OR `E`.`message` LIKE ? OR `E`.`type` LIKE ? OR `E`.`username` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
@@ -85,7 +85,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     }
 
     $response[] = [
-        'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span><span style='display:inline;'>" . $eventlog['humandate'] . "</span>",
+        'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span><span style='display:inline;'>" . $eventlog['humandate'] . '</span>',
         'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
         'type' => $type,
         'message' => htmlspecialchars($eventlog['message']),

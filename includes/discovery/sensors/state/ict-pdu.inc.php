@@ -34,7 +34,7 @@ if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
         $fuse_state_oid = '.1.3.6.1.4.1.39145.10.8.1.4.' . $index;
         $fuse_number = (int) $index + 1;
-        $descr = "Fuse #" . $fuse_number;
+        $descr = 'Fuse #' . $fuse_number;
 
         $current_value_string = $entry[$state_name];
         if ($current_value_string == 'OK') {

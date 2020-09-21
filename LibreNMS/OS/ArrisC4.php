@@ -39,12 +39,12 @@ class ArrisC4 extends OS implements OSDiscovery
         preg_match("/CMTS_V([\d.]+),/", $device->sysDescr, $match);
         $device->version = $match[1];
 
-        $data = explode(".", $device->sysObjectID);
+        $data = explode('.', $device->sysObjectID);
         $id = end($data);
-        if ($id == "1") {
-            $device->hardware = "C4";
-        } elseif ($id == "2") {
-            $device->hardware = "C4c";
+        if ($id == '1') {
+            $device->hardware = 'C4';
+        } elseif ($id == '2') {
+            $device->hardware = 'C4c';
         }
     }
 }

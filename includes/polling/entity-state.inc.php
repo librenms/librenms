@@ -85,7 +85,7 @@ if (! empty($entityStatesIndexes)) {
                 }
             } catch (Exception $e) {
                 // no update
-                d_echo("Error: " . $e->getMessage() . PHP_EOL);
+                d_echo('Error: ' . $e->getMessage() . PHP_EOL);
             }
         }
         echo '.';

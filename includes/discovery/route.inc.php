@@ -62,14 +62,14 @@ foreach ($dbRoute as $dbRow) {
 
 if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
     //RFC1213-MIB
-    $mib = "RFC1213-MIB";
+    $mib = 'RFC1213-MIB';
     $tableRoute = [];
 
     $oid = '.1.3.6.1.2.1.4.21';
     $tableRoute = snmpwalk_group($device, $oid, $mib, 1, []);
     d_echo('Routing table:');
     d_echo($tableRoute);
-    echo "RFC1213 ";
+    echo 'RFC1213 ';
     foreach ($tableRoute as $ipRoute) {
         if (empty($ipRoute['ipRouteDest']) || $ipRoute['ipRouteDest'] == '') {
             continue;
@@ -116,7 +116,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
     $oid = '.1.3.6.1.2.1.4.24.7.1';
     $res = snmpwalk_group($device, $oid, $mib, 6, []);
     $ipForwardNb['0']['inetCidrRouteNumber'] = count($res); // Some cisco devices report ipv4+ipv6 but only include ipv6 in this table
-    echo "inetCidrRoute ";
+    echo 'inetCidrRoute ';
     foreach ($res as $inetCidrRouteDestType => $next1) {
         //ipv4 or ipv6
         foreach ($next1 as $inetCidrRouteDest => $next2) {
@@ -177,7 +177,7 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
     $mib = 'IP-FORWARD-MIB';
     $oid = '.1.3.6.1.2.1.4.24.4.1';
     $ipCidrTable = snmpwalk_group($device, $oid, $mib, 6, []);
-    echo "ipCidrRouteTable ";
+    echo 'ipCidrRouteTable ';
     // we need to translate the values to inetCidr structure;
     //d_echo($ipCidrTable);
     foreach ($ipCidrTable as $inetCidrRouteDest => $next1) {
@@ -232,7 +232,7 @@ foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
 }
 
 if ($mpls_skip != 1) {
-    echo "mplsL3VpnVrfRteTable ";
+    echo 'mplsL3VpnVrfRteTable ';
     // We can discover the routes;
     $oid = 'mplsL3VpnVrfRteTable';
     $mpls_route_table = snmpwalk_group($device, $oid, $mib, 7, []);

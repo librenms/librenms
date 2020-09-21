@@ -1,6 +1,6 @@
 <?php
 if (! isset($var['section'])) {
-    $vars['section'] = "tnmsne";
+    $vars['section'] = 'tnmsne';
 }
 $pagetitle[] = 'Hardware';
 ?>

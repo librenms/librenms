@@ -12,7 +12,7 @@ if (! function_exists('proxmox_port_exists')) {
      */
     function proxmox_port_exists($i, $c, $p)
     {
-        if ($row = dbFetchRow("SELECT pmp.id FROM proxmox_ports pmp, proxmox pm WHERE pm.id = pmp.vm_id AND pmp.port = ? AND pm.cluster = ? AND pm.vmid = ?", [$p, $c, $i])) {
+        if ($row = dbFetchRow('SELECT pmp.id FROM proxmox_ports pmp, proxmox pm WHERE pm.id = pmp.vm_id AND pmp.port = ? AND pm.cluster = ? AND pm.vmid = ?', [$p, $c, $i])) {
             return $row['id'];
         }
 
@@ -33,7 +33,7 @@ if (! function_exists('proxmox_vm_exists')) {
         if (isset($pmxcache[$c][$i]) && $pmxcache[$c][$i] > 0) {
             return true;
         }
-        if ($row = dbFetchRow("SELECT id FROM proxmox WHERE vmid = ? AND cluster = ?", [$i, $c])) {
+        if ($row = dbFetchRow('SELECT id FROM proxmox WHERE vmid = ? AND cluster = ?', [$i, $c])) {
             $pmxcache[$c][$i] = (int) $row['id'];
 
             return true;

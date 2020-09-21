@@ -6,7 +6,7 @@ $param = [];
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
@@ -15,7 +15,7 @@ if ($vars['search_type'] == 'ipv4') {
     $sql = ' FROM `ipv4_addresses` AS A, `ports` AS I, `ipv4_networks` AS N, `devices` AS D';
     $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id $where ";
     if (! empty($address)) {
-        $sql .= " AND ipv4_address LIKE ?";
+        $sql .= ' AND ipv4_address LIKE ?';
         $param[] = "%$address%";
     }
 
@@ -27,7 +27,7 @@ if ($vars['search_type'] == 'ipv4') {
     $sql = ' FROM `ipv6_addresses` AS A, `ports` AS I, `ipv6_networks` AS N, `devices` AS D';
     $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id $where ";
     if (! empty($address)) {
-        $sql .= " AND (ipv6_address LIKE ? OR ipv6_compressed LIKE ?)";
+        $sql .= ' AND (ipv6_address LIKE ? OR ipv6_compressed LIKE ?)';
         $param[] = "%$address%";
         $param[] = "%$address%";
     }
@@ -45,7 +45,7 @@ if (is_numeric($vars['device_id'])) {
 }
 
 if ($vars['interface']) {
-    $sql .= " AND I.ifDescr LIKE ?";
+    $sql .= ' AND I.ifDescr LIKE ?';
     $param[] = $vars['interface'];
 }
 

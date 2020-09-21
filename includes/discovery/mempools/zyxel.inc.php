@@ -23,7 +23,7 @@
  */
 if ($device['os_group'] == 'zyxel') {
     d_echo('Zyxel');
-    $usage = snmp_get($device, "sysMgmtMemUsage.0", '-OvQ', 'ZYXEL-ES-COMMON');
+    $usage = snmp_get($device, 'sysMgmtMemUsage.0', '-OvQ', 'ZYXEL-ES-COMMON');
     if (is_numeric($usage)) {
         discover_mempool($valid_mempool, $device, '0', 'zyxel', 'Memory', '1', null, null);
     }

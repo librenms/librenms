@@ -44,13 +44,13 @@ if (Config::get('enable_bgp')) {
         }
         $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeers', [], 'HUAWEI-BGP-VPN-MIB');
         foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode(".", $key);
+            $oid = explode('.', $key);
             $vrfInstance = $value['hwBgpPeerVrfName'];
             if ($oid[0] == 0) {
                 $vrfInstance = '';
                 $value['hwBgpPeerVrfName'] = '';
             }
-            $address = str_replace($oid[0] . "." . $oid[1] . "." . $oid[2] . "." . $oid[3] . ".", '', $key);
+            $address = str_replace($oid[0] . '.' . $oid[1] . '.' . $oid[2] . '.' . $oid[3] . '.', '', $key);
             if ($oid[3] == 'ipv6') {
                 $address = IP::fromHexString($address)->compressed();
             } elseif ($oid[3] != 'ipv4') {
@@ -142,7 +142,7 @@ if (Config::get('enable_bgp')) {
             }
         }
 
-        $af_query = "SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=?";
+        $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=?';
         foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip']]) as $entry) {
             $afi = $entry['afi'];
             $safi = $entry['safi'];

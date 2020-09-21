@@ -171,35 +171,35 @@ class Rewrite
      */
     public static function ciscoHardware(&$device, $short = false)
     {
-        if ($device['os'] == "ios") {
+        if ($device['os'] == 'ios') {
             if ($device['hardware']) {
-                if (preg_match("/^WS-C([A-Za-z0-9]+)/", $device['hardware'], $matches)) {
+                if (preg_match('/^WS-C([A-Za-z0-9]+)/', $device['hardware'], $matches)) {
                     if (! $short) {
-                        $device['hardware'] = "Catalyst " . $matches[1] . " (" . $device['hardware'] . ")";
+                        $device['hardware'] = 'Catalyst ' . $matches[1] . ' (' . $device['hardware'] . ')';
                     } else {
-                        $device['hardware'] = "Catalyst " . $matches[1];
+                        $device['hardware'] = 'Catalyst ' . $matches[1];
                     }
-                } elseif (preg_match("/^CISCO([0-9]+)(.*)/", $device['hardware'], $matches)) {
+                } elseif (preg_match('/^CISCO([0-9]+)(.*)/', $device['hardware'], $matches)) {
                     if (! $short && $matches[2]) {
-                        $device['hardware'] = "Cisco " . $matches[1] . " (" . $device['hardware'] . ")";
+                        $device['hardware'] = 'Cisco ' . $matches[1] . ' (' . $device['hardware'] . ')';
                     } else {
-                        $device['hardware'] = "Cisco " . $matches[1];
+                        $device['hardware'] = 'Cisco ' . $matches[1];
                     }
                 }
-            } elseif (preg_match("/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/", $device['sysDescr'], $matches)) {
-                $device['hardware'] = "Catalyst " . $matches[1];
-            } elseif (preg_match("/Cisco IOS Software, ([0-9]+) Software.*/", $device['sysDescr'], $matches)) {
-                $device['hardware'] = "Cisco " . $matches[1];
+            } elseif (preg_match('/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/', $device['sysDescr'], $matches)) {
+                $device['hardware'] = 'Catalyst ' . $matches[1];
+            } elseif (preg_match('/Cisco IOS Software, ([0-9]+) Software.*/', $device['sysDescr'], $matches)) {
+                $device['hardware'] = 'Cisco ' . $matches[1];
             }
         }
 
-        if ($device['os'] == "iosxe") {
+        if ($device['os'] == 'iosxe') {
             if ($device['hardware']) {
-                if (preg_match('/CAT9K/', $device['sysDescr'], $matches) && preg_match("/^C(9[A-Za-z0-9]+)/", $device['hardware'], $matches2)) {
+                if (preg_match('/CAT9K/', $device['sysDescr'], $matches) && preg_match('/^C(9[A-Za-z0-9]+)/', $device['hardware'], $matches2)) {
                     if (! $short) {
-                        $device['hardware'] = "Catalyst " . $matches2[1] . " (" . $device['hardware'] . ")";
+                        $device['hardware'] = 'Catalyst ' . $matches2[1] . ' (' . $device['hardware'] . ')';
                     } else {
-                        $device['hardware'] = "Catalyst " . $matches2[1];
+                        $device['hardware'] = 'Catalyst ' . $matches2[1];
                     }
                 }
             }

@@ -151,7 +151,7 @@ class CommonFunctionsTest extends TestCase
 //        $expected = array('bill_data.bill_id', 'bill_ports.port_id', 'ports.device_id');
 //        $this->assertSame($expected, ResolveGlues(array('bill_data'), 'device_id'));
 
-        $expected = ['application_metrics.app_id', "applications.device_id"];
+        $expected = ['application_metrics.app_id', 'applications.device_id'];
         $this->assertSame($expected, ResolveGlues(['application_metrics'], 'device_id'));
 
         $expected = ['state_translations.state_index_id', 'sensors_to_state_indexes.sensor_id', 'sensors.device_id'];

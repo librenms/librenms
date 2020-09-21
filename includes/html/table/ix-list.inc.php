@@ -21,11 +21,11 @@
  */
 $asn = clean($vars['asn']);
 
-$sql = " FROM `pdb_ix` WHERE `asn` = ?";
+$sql = ' FROM `pdb_ix` WHERE `asn` = ?';
 $params = [$asn];
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`name` LIKE ?)";
+    $sql .= ' AND (`name` LIKE ?)';
     $params[] = "%$searchPhrase%";
 }
 

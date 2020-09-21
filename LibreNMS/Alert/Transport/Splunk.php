@@ -40,34 +40,34 @@ class Splunk extends Transport
         $device = device_by_id_cache($obj['device_id']); // for event logging
 
         if (! empty($opts['splunk_host'])) {
-            if (preg_match("/[a-zA-Z]/", $opts['splunk_host'])) {
+            if (preg_match('/[a-zA-Z]/', $opts['splunk_host'])) {
                 $splunk_host = gethostbyname($opts['splunk_host']);
                 if ($splunk_host === $opts['splunk_host']) {
-                    log_event("Alphanumeric hostname found but does not resolve to an IP.", $device, 'poller', 5);
+                    log_event('Alphanumeric hostname found but does not resolve to an IP.', $device, 'poller', 5);
 
                     return false;
                 }
             } elseif (filter_var($opts['splunk_host'], FILTER_VALIDATE_IP)) {
                 $splunk_host = $opts['splunk_host'];
             } else {
-                log_event("Splunk host is not a valid IP: " . $opts['splunk_host'], $device, 'poller', 5);
+                log_event('Splunk host is not a valid IP: ' . $opts['splunk_host'], $device, 'poller', 5);
 
                 return false;
             }
         } else {
-            log_event("Splunk host is empty.", $device, 'poller');
+            log_event('Splunk host is empty.', $device, 'poller');
         }
         if (! empty($opts['splunk_port']) && preg_match("/^\d+$/", $opts['splunk_port'])) {
             $splunk_port = $opts['splunk_port'];
         } else {
-            log_event("Splunk port is not an integer.", $device, 'poller', 5);
+            log_event('Splunk port is not an integer.', $device, 'poller', 5);
         }
 
         switch ($obj['severity']) {
-            case "critical":
+            case 'critical':
                 $severity = 2;
                 break;
-            case "warning":
+            case 'warning':
                 $severity = 4;
                 break;
         }
@@ -81,7 +81,7 @@ class Splunk extends Transport
                 break;
         }
 
-        $ignore = ["template", "contacts", "rule", "string", "debug", "faults", "builder", "transport", "alert", "msg", "transport_name"];
+        $ignore = ['template', 'contacts', 'rule', 'string', 'debug', 'faults', 'builder', 'transport', 'alert', 'msg', 'transport_name'];
         $splunk_prefix = '<' . $severity . '> ';
         foreach ($obj as $key => $val) {
             if (in_array($key, $ignore)) {
@@ -91,7 +91,7 @@ class Splunk extends Transport
             $splunk_prefix .= $key . '="' . $val . '", ';
         }
 
-        $ignore = ["attribs", "vrf_lite_cisco", "community", "authlevel", "authname", "authpass", "authalgo", "cryptopass", "cryptoalgo", "snmpver", "port"];
+        $ignore = ['attribs', 'vrf_lite_cisco', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'snmpver', 'port'];
         foreach ($device as $key => $val) {
             if (in_array($key, $ignore)) {
                 continue;
@@ -102,7 +102,7 @@ class Splunk extends Transport
         $splunk_prefix = substr($splunk_prefix, 0, -1);
 
         if (($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) === false) {
-            log_event("socket_create() failed: reason: " . socket_strerror(socket_last_error()), $device, 'poller', 5);
+            log_event('socket_create() failed: reason: ' . socket_strerror(socket_last_error()), $device, 'poller', 5);
 
             return false;
         } else {

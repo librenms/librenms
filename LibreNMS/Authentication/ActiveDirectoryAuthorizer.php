@@ -71,7 +71,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             $connection,
             Config::get('auth_ad_base_dn'),
             $search_filter,
-            ["cn"]
+            ['cn']
         );
         $result = ldap_get_entries($connection, $search);
 
@@ -90,19 +90,19 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             throw new AuthenticationException();
         }
 
-        $group_dn = $result[0]["dn"];
+        $group_dn = $result[0]['dn'];
 
         $search = ldap_search(
             $connection,
             Config::get('auth_ad_base_dn'),
             // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
             // limiting to "DN" for shorter array
-            "(&" . $this->userFilter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
-            ["DN"]
+            '(&' . $this->userFilter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
+            ['DN']
         );
         $entries = ldap_get_entries($connection, $search);
 
-        return $entries["count"] > 0;
+        return $entries['count'] > 0;
     }
 
     public function userExists($username, $throw_exception = false)

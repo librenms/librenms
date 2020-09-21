@@ -10,7 +10,7 @@ foreach (explode("\n", $temps) as $temp) {
     $temp = trim($temp);
     if ($temp) {
         [$oid, $descr] = explode(' ', $temp, 2);
-        if ($descr != "") {
+        if ($descr != '') {
             $split_oid = explode('.', $oid);
             $current_id = $split_oid[(count($split_oid) - 1)];
             $current_oid = $sensor_value_oid . $current_id;

@@ -13,7 +13,7 @@ foreach ($graphs as $key => $text) {
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['id'] = $app['app_id'];
 
-    if ($key == "ceph_poolstats") {
+    if ($key == 'ceph_poolstats') {
         foreach (glob(rrd_name($device['hostname'], ['app', 'ceph', $app['app_id'], 'pool'], '-*.rrd')) as $rrd_filename) {
             if (preg_match("/.*-pool-(.+)\.rrd$/", $rrd_filename, $pools)) {
                 $graph_array['to'] = \LibreNMS\Config::get('time.now');
@@ -38,7 +38,7 @@ foreach ($graphs as $key => $text) {
                 echo '</td></tr>';
             }
         }
-    } elseif ($key == "ceph_osdperf") {
+    } elseif ($key == 'ceph_osdperf') {
         foreach (glob(rrd_name($device['hostname'], ['app', 'ceph', $app['app_id'], 'osd'], '-*.rrd')) as $rrd_filename) {
             $graph_array['to'] = \LibreNMS\Config::get('time.now');
             $graph_array['id'] = $app['app_id'];
@@ -53,11 +53,11 @@ foreach ($graphs as $key => $text) {
                 echo '</td></tr>';
             }
         }
-    } elseif ($key == "ceph_df") {
+    } elseif ($key == 'ceph_df') {
         foreach (glob(rrd_name($device['hostname'], ['app', 'ceph', $app['app_id'], 'df'], '-*.rrd')) as $rrd_filename) {
             if (preg_match("/.*-df-(.+)\.rrd$/", $rrd_filename, $pools)) {
                 $pool = $pools[1];
-                if ($pool == "c") {
+                if ($pool == 'c') {
                     echo '<h3>Cluster Usage</h3>';
                     $graph_array['to'] = \LibreNMS\Config::get('time.now');
                     $graph_array['id'] = $app['app_id'];

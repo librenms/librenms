@@ -20,14 +20,14 @@ $rrd_filename = rrd_name($device['hostname'], ['sla', $sla['sla_nr'], 'icmpjitte
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                          Cur    Min    Max    Avg\\n'";
 
-    $rrd_options .= " DEF:SD=" . $rrd_filename . ":LatencyOWAvgSD:AVERAGE ";
+    $rrd_options .= ' DEF:SD=' . $rrd_filename . ':LatencyOWAvgSD:AVERAGE ';
     $rrd_options .= " LINE1.25:SD#0000ee:'Src to Dst (ms)    ' ";
     $rrd_options .= " GPRINT:SD:LAST:'%5.2lf' ";
     $rrd_options .= " GPRINT:SD:MIN:'%5.2lf' ";
     $rrd_options .= " GPRINT:SD:MAX:'%5.2lf' ";
     $rrd_options .= " GPRINT:SD:AVERAGE:'%5.2lf'\\\l ";
 
-    $rrd_options .= " DEF:DS=" . $rrd_filename . ":LatencyOWAvgDS:AVERAGE ";
+    $rrd_options .= ' DEF:DS=' . $rrd_filename . ':LatencyOWAvgDS:AVERAGE ';
     $rrd_options .= " LINE1.25:DS#008C00:'Dst to Src (ms)    ' ";
     $rrd_options .= " GPRINT:DS:LAST:'%5.2lf' ";
     $rrd_options .= " GPRINT:DS:MIN:'%5.2lf' ";

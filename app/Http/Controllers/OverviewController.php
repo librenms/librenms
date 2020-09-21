@@ -62,8 +62,8 @@ class OverviewController extends Controller
             if (isset($dashboard) && ! empty($request->dashboard)) {
                 Toastr::error(
                     "Dashboard <code>#$request->dashboard</code> does not exist! Loaded <code>
-                    " . htmlentities($dashboard->dashboard_name) . "</code> instead.",
-                    "Requested Dashboard Not Found!"
+                    " . htmlentities($dashboard->dashboard_name) . '</code> instead.',
+                    'Requested Dashboard Not Found!'
                 );
             }
         }

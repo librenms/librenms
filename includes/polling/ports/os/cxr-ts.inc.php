@@ -38,14 +38,14 @@ foreach ($cxr_stats as $index => $serialport_stats) {
     $port_stats[$curIfIndex]['ifName'] = "Serial$index";
     $port_stats[$curIfIndex]['ifInOctets'] = $serialport_stats['bytesReceiveFromV24'];
     $port_stats[$curIfIndex]['ifOutOctets'] = $serialport_stats['bytesSendToV24'];
-    $port_stats[$curIfIndex]['ifSpeed'] = preg_replace("/[^0-9.]/", '', $serialport_stats['baudRate']);
+    $port_stats[$curIfIndex]['ifSpeed'] = preg_replace('/[^0-9.]/', '', $serialport_stats['baudRate']);
     $port_stats[$curIfIndex]['ifAdminStatus'] = 'up';
     $port_stats[$curIfIndex]['ifOperStatus'] = 'up';
-    $port_stats[$curIfIndex]['ifAlias'] = "Port $index, " . $serialport_stats['terminalType'] . ", " . $serialport_stats['mode'] . ", " . $serialport_stats['baudRate'] . " " . $serialport_stats['nbParStop'];
-    if ($serialport_stats['aliasIpAddress'] != "0.0.0.0") {
-        $port_stats[$curIfIndex]['ifAlias'] .= ", Alias IP: " . $serialport_stats['aliasIpAddress'] . ":" . $serialport_stats['tcpPort'];
+    $port_stats[$curIfIndex]['ifAlias'] = "Port $index, " . $serialport_stats['terminalType'] . ', ' . $serialport_stats['mode'] . ', ' . $serialport_stats['baudRate'] . ' ' . $serialport_stats['nbParStop'];
+    if ($serialport_stats['aliasIpAddress'] != '0.0.0.0') {
+        $port_stats[$curIfIndex]['ifAlias'] .= ', Alias IP: ' . $serialport_stats['aliasIpAddress'] . ':' . $serialport_stats['tcpPort'];
     }
-    if ($serialport_stats['remoteIpAddress'] != "0.0.0.0") {
-        $port_stats[$curIfIndex]['ifAlias'] .= ", Remote IP: " . $serialport_stats['remoteIpAddress'] . ":" . $serialport_stats['remoteTcpPort'];
+    if ($serialport_stats['remoteIpAddress'] != '0.0.0.0') {
+        $port_stats[$curIfIndex]['ifAlias'] .= ', Remote IP: ' . $serialport_stats['remoteIpAddress'] . ':' . $serialport_stats['remoteTcpPort'];
     }
 }

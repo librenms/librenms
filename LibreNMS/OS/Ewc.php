@@ -160,7 +160,7 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.18.' . $index,
                 'ewc',
                 $index . 'Retx',
-                "Retransmits ($name radio " . explode('.', $index)[1] . ")"
+                "Retransmits ($name radio " . explode('.', $index)[1] . ')'
             );
         }
 
@@ -248,7 +248,7 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.9.' . $index,
                 'ewc',
                 $index,
-                "RSS ($name radio " . explode('.', $index)[1] . ")"
+                "RSS ($name radio " . explode('.', $index)[1] . ')'
             );
         }
 
@@ -275,7 +275,7 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.13.' . $index,
                 'ewc',
                 $index,
-                "SNR ($name radio " . explode('.', $index)[1] . ")"
+                "SNR ($name radio " . explode('.', $index)[1] . ')'
             );
         }
 
@@ -302,7 +302,7 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.5.' . $index,
                 'ewc',
                 $index,
-                "Utilization ($name radio " . explode('.', $index)[1] . ")"
+                "Utilization ($name radio " . explode('.', $index)[1] . ')'
             );
         }
 

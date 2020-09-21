@@ -45,7 +45,7 @@ if (! empty($_POST['hostname'])) {
             $snmpver = 'v2c';
             $additional = [
                 'snmp_disable' => 1,
-                'os'           => $_POST['os'] ? mres($_POST['os_id']) : "ping",
+                'os'           => $_POST['os'] ? mres($_POST['os_id']) : 'ping',
                 'hardware'     => mres($_POST['hardware']),
                 'sysName'      => mres($_POST['sysName']),
             ];
@@ -182,9 +182,9 @@ foreach (Config::get('snmp.transports') as $transport) {
 <?php
 
 foreach (get_port_assoc_modes() as $mode) {
-    $selected = "";
+    $selected = '';
     if ($mode == Config::get('default_port_association_mode')) {
-        $selected = "selected";
+        $selected = 'selected';
     }
 
     echo "              <option value=\"$mode\" $selected>$mode</option>\n";

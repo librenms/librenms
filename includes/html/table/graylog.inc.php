@@ -61,8 +61,8 @@ $graylog_url = Config::get('graylog.server') . ':' . Config::get('graylog.port')
 
 $context = stream_context_create([
     'http' => [
-        'header' => "Authorization: Basic " . base64_encode(Config::get('graylog.username') . ':' . Config::get('graylog.password')) . "\r\n" .
-                     "Accept: application/json",
+        'header' => 'Authorization: Basic ' . base64_encode(Config::get('graylog.username') . ':' . Config::get('graylog.password')) . "\r\n" .
+                     'Accept: application/json',
     ],
 ]);
 

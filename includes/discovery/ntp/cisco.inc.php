@@ -49,7 +49,7 @@ if (is_null($cntpPeersVarEntry)) {
         $result['port'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][4][$index];
         $result['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$index];
         $result['peerref'] = IP::fromHexString($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][15][$index], true);
-        $result['label'] = $result['peer'] . ":" . $result['port'];
+        $result['label'] = $result['peer'] . ':' . $result['port'];
 
         // Set the status, 16 = Bad
         if ($result['stratum'] == 16) {
@@ -60,7 +60,7 @@ if (is_null($cntpPeersVarEntry)) {
             $result['error'] = '';
         }
 
-        d_echo("NTP Peer found: ");
+        d_echo('NTP Peer found: ');
         d_echo($result);
         $tblComponents[] = $result;
     }
@@ -86,11 +86,11 @@ if (is_null($cntpPeersVarEntry)) {
             $new_component = $component->createComponent($device['device_id'], $module);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
-            echo "+";
+            echo '+';
         } else {
             // The component does exist, merge the details in - UPDATE.
             $components[$component_key] = array_merge($components[$component_key], $array);
-            echo ".";
+            echo '.';
         }
     }
 
@@ -110,7 +110,7 @@ if (is_null($cntpPeersVarEntry)) {
 
         if ($found === false) {
             // The component has not been found. we should delete it.
-            echo "-";
+            echo '-';
             $component->deleteComponent($key);
         }
     }

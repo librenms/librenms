@@ -36,7 +36,7 @@ foreach ($sensors as $sensor) {
         echo " <span class='label label-default'>high: $sensor_limit</span>";
     }
 
-    echo "        </div></h3>" .
+    echo '        </div></h3>' .
          "    </div>\n" .
          "    <div class='panel-body'>\n";
 

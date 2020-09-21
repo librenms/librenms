@@ -155,7 +155,7 @@ class Arubaos extends OS implements
     public function discoverWirelessPower()
     {
         // instant
-        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', "Radio %s: Tx Power");
+        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', 'Radio %s: Tx Power');
     }
 
     protected function decodeChannel($channel)

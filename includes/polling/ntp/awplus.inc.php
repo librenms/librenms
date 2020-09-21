@@ -66,12 +66,12 @@ if (count($components > 0)) {
 
         // Let's print some debugging info.
         d_echo("\n\nComponent: " . $key . "\n");
-        d_echo("    Index:      " . $array['UID'] . "\n");
-        d_echo("    Peer:       " . $array['peer'] . ":" . $array['port'] . "\n");
-        d_echo("    Stratum:    atNtpAssociationStratum." . $array['UID'] . "  = " . $rrd['stratum'] . "\n");
-        d_echo("    Offset:     atNtpAssociationOffset." . $array['UID'] . " = " . $rrd['offset'] . "\n");
-        d_echo("    Delay:      atNtpAssociationDelay." . $array['UID'] . " = " . $rrd['delay'] . "\n");
-        d_echo("    Dispersion: atNtpAssociationDisp." . $array['UID'] . " = " . $rrd['dispersion'] . "\n");
+        d_echo('    Index:      ' . $array['UID'] . "\n");
+        d_echo('    Peer:       ' . $array['peer'] . ':' . $array['port'] . "\n");
+        d_echo('    Stratum:    atNtpAssociationStratum.' . $array['UID'] . '  = ' . $rrd['stratum'] . "\n");
+        d_echo('    Offset:     atNtpAssociationOffset.' . $array['UID'] . ' = ' . $rrd['offset'] . "\n");
+        d_echo('    Delay:      atNtpAssociationDelay.' . $array['UID'] . ' = ' . $rrd['delay'] . "\n");
+        d_echo('    Dispersion: atNtpAssociationDisp.' . $array['UID'] . ' = ' . $rrd['dispersion'] . "\n");
 
         // Clean-up after yourself!
         unset($filename, $rrd_filename, $rrd);

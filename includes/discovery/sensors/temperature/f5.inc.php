@@ -6,10 +6,10 @@ $f5_chassis = [];
 $f5_chassis = snmpwalk_cache_multi_oid($device, 'sysChassisTempTable', [], 'F5-BIGIP-SYSTEM-MIB');
 
 if (is_array($f5_chassis)) {
-    echo "sysChassisTempTable: ";
+    echo 'sysChassisTempTable: ';
 
     foreach (array_keys($f5_chassis) as $index) {
-        $descr = "sysChassisTempTemperature." . $f5_chassis[$index]['sysChassisTempIndex'];
+        $descr = 'sysChassisTempTemperature.' . $f5_chassis[$index]['sysChassisTempIndex'];
         $current = $f5_chassis[$index]['sysChassisTempTemperature'];
         $sensorType = 'f5';
         $oid = '.1.3.6.1.4.1.3375.2.1.3.2.3.2.1.2.' . $index;
@@ -23,12 +23,12 @@ $f5cpu = [];
 $f5cpu = snmpwalk_cache_multi_oid($device, 'sysCpuSensorTemperature', [], 'F5-BIGIP-SYSTEM-MIB');
 
 if (is_array($f5cpu)) {
-    echo "sysCpuSensorTemperature: ";
+    echo 'sysCpuSensorTemperature: ';
 
     foreach (array_keys($f5cpu) as $index) {
         $slotnum = $f5cpu[$index]['sysCpuSensorSlot'];
         $cpuname = $f5cpu[$index]['sysCpuSensorName'];
-        $descr = "Cpu Temperature slot" . $index;
+        $descr = 'Cpu Temperature slot' . $index;
         $current = $f5cpu[$index]['sysCpuSensorTemperature'];
         $sensorType = 'f5';
         $oid = '.1.3.6.1.4.1.3375.2.1.3.6.2.1.2.' . $index;

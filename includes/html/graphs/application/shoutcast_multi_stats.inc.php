@@ -30,9 +30,9 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options .= ' COMMENT:"' . substr(str_pad($unit_text, ($descr_len + 2)), 0, ($descr_len + 2)) . "  Current  Unique  Average    Peak\\n\"";
+    $rrd_options .= ' COMMENT:"' . substr(str_pad($unit_text, ($descr_len + 2)), 0, ($descr_len + 2)) . '  Current  Unique  Average    Peak\\n"';
 } else {
-    $rrd_options .= ' COMMENT:"' . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "  Now   Unique  Average    Peak\\n\"";
+    $rrd_options .= ' COMMENT:"' . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . '  Now   Unique  Average    Peak\\n"';
 }
 
 foreach ($rrd_list as $rrd) {
@@ -57,7 +57,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' GPRINT:unique' . $x . ':LAST:"%6.2lf%s"';
     $rrd_options .= ' GPRINT:avg' . $x . ':"%6.2lf"';
     $rrd_options .= ' GPRINT:peak' . $x . ':LAST:"%6.2lf"';
-    $rrd_options .= " COMMENT:\"\\n\"";
+    $rrd_options .= ' COMMENT:"\\n"';
     if ($x) {
         $totcur .= ',cur' . $x . ',+';
         $totpeak .= ',peak' . $x . ',+';
@@ -85,5 +85,5 @@ if (! $nototal) {
     $rrd_options .= ' GPRINT:totunique:LAST:"%6.2lf%s"';
     $rrd_options .= ' GPRINT:totavg:"%6.2lf"';
     $rrd_options .= ' GPRINT:totpeak:LAST:"%6.2lf"';
-    $rrd_options .= " COMMENT:\"\\n\"";
+    $rrd_options .= ' COMMENT:"\\n"';
 }

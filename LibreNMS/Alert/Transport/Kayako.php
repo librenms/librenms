@@ -31,7 +31,7 @@ class Kayako extends Transport
 
     public function contactKayako($host, $kayako)
     {
-        $url = $kayako['url'] . "/Tickets/Ticket";
+        $url = $kayako['url'] . '/Tickets/Ticket';
         $key = $kayako['key'];
         $secret = $kayako['secret'];
         $user = Config::get('email_from');
@@ -68,7 +68,7 @@ class Kayako extends Transport
 
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("Kayako returned Error, retry later");
+            var_dump('Kayako returned Error, retry later');
 
             return false;
         }

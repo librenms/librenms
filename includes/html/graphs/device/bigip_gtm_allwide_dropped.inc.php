@@ -20,8 +20,8 @@ $components = $component->getComponents($device['device_id'], $options);
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-include "includes/html/graphs/common.inc.php";
-$rrd_options .= " -l 0 -E ";
+include 'includes/html/graphs/common.inc.php';
+$rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'Wide IP Dropped Requests       Now      Avg      Max\\n'";
 $colours = array_merge(\LibreNMS\Config::get('graph_colours.mixed'), \LibreNMS\Config::get('graph_colours.manycolours'));
 $colcount = 0;
@@ -41,11 +41,11 @@ foreach ($components as $compid => $comp) {
             $colour = $colours[$colcount];
         }
 
-        $rrd_options .= " DEF:DS" . $count . "=" . $rrd_filename . ":dropped:AVERAGE ";
-        $rrd_options .= " LINE1.25:DS" . $count . "#" . $colour . ":'" . str_pad(substr($label, 0, 60), 60) . "'";
-        $rrd_options .= " GPRINT:DS" . $count . ":LAST:%6.2lf%s ";
-        $rrd_options .= " GPRINT:DS" . $count . ":AVERAGE:%6.2lf%s ";
-        $rrd_options .= " GPRINT:DS" . $count . ":MAX:%6.2lf%s\l ";
+        $rrd_options .= ' DEF:DS' . $count . '=' . $rrd_filename . ':dropped:AVERAGE ';
+        $rrd_options .= ' LINE1.25:DS' . $count . '#' . $colour . ":'" . str_pad(substr($label, 0, 60), 60) . "'";
+        $rrd_options .= ' GPRINT:DS' . $count . ':LAST:%6.2lf%s ';
+        $rrd_options .= ' GPRINT:DS' . $count . ':AVERAGE:%6.2lf%s ';
+        $rrd_options .= ' GPRINT:DS' . $count . ":MAX:%6.2lf%s\l ";
         $count++;
         $colcount++;
     }

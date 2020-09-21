@@ -17,6 +17,6 @@ if ($version['build'] >= 16607) {
         $mempool['free'] = ($memory_available - $mempool['used']);
     }
 
-    echo "PERC " . $perc . "%\n";
-    echo "Avail " . $mempool['total'] . "\n";
+    echo 'PERC ' . $perc . "%\n";
+    echo 'Avail ' . $mempool['total'] . "\n";
 }

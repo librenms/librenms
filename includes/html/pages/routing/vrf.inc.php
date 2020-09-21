@@ -98,10 +98,10 @@ if (! Auth::user()->hasGlobalRead()) {
             }
 
             echo "<tr valign=top bgcolor='$bg_colour'>";
-            echo "<td width=240>";
-            echo "<a class=list-large href=" . generate_url($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . ">";
+            echo '<td width=240>';
+            echo '<a class=list-large href=' . generate_url($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
             echo $vrf['vrf_name'] . '</a><br />';
-            echo "<span class=box-desc>" . $vrf['mplsVpnVrfDescription'] . '</span></td>';
+            echo '<span class=box-desc>' . $vrf['mplsVpnVrfDescription'] . '</span></td>';
             echo '<td width=100 class=box-desc>' . $vrf['mplsVpnVrfRouteDistinguisher'] . '</td>';
             echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
             $x = 1;
@@ -125,7 +125,7 @@ if (! Auth::user()->hasGlobalRead()) {
                     ['page' => 'device'],
                     ['tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf', 'device' => $device['device_id']]
                 );
-                echo "'>" . $device['hostname'] . "</a> ";
+                echo "'>" . $device['hostname'] . '</a> ';
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
                     echo "<a href='#' onmouseover=\" return overlib('Expected Name : " . $vrf['vrf_name'] . '<br />Configured : ' . $device['vrf_name'] . "', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i></a>";
@@ -173,6 +173,6 @@ if (! Auth::user()->hasGlobalRead()) {
         }//end foreach
         echo '</table></div>';
     } elseif ($vars['view'] == 'detail') {
-        echo "Not Implemented";
+        echo 'Not Implemented';
     }//end if
 } //end if

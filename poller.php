@@ -48,7 +48,7 @@ if (isset($options['h'])) {
         $doing = 'all';
     } elseif ($options['h']) {
         if (is_numeric($options['h'])) {
-            $where = "AND `device_id` = " . $options['h'];
+            $where = 'AND `device_id` = ' . $options['h'];
             $doing = $options['h'];
         } else {
             if (preg_match('/\*/', $options['h'])) {
@@ -132,7 +132,7 @@ if (! isset($query)) {
 foreach (dbFetch($query) as $device) {
     DeviceCache::setPrimary($device['device_id']);
     if ($device['os_group'] == 'cisco') {
-        $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = " . $device['device_id']);
+        $device['vrf_lite_cisco'] = dbFetchRows('SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ' . $device['device_id']);
     } else {
         $device['vrf_lite_cisco'] = '';
     }
@@ -145,9 +145,9 @@ foreach (dbFetch($query) as $device) {
     echo "### Start Device Groups ###\n";
     $dg_start = microtime(true);
     $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
-    d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
-    d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
-    echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
+    d_echo('Groups Added: ' . implode(',', $group_changes['attached']) . PHP_EOL);
+    d_echo('Groups Removed: ' . implode(',', $group_changes['detached']) . PHP_EOL);
+    echo '### End Device Groups, runtime: ' . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
 
     echo "#### Start Alerts ####\n";
     $rules = new AlertRules();

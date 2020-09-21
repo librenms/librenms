@@ -124,15 +124,15 @@ $param = [];
 if (isset($device['device_id']) && $device['device_id'] > 0) {
     //device selected
 
-    $global_rules = "SELECT ar1.* FROM alert_rules AS ar1 WHERE ar1.id NOT IN (SELECT agm1.rule_id FROM alert_group_map AS agm1 UNION DISTINCT SELECT adm1.rule_id FROM alert_device_map AS adm1)";
+    $global_rules = 'SELECT ar1.* FROM alert_rules AS ar1 WHERE ar1.id NOT IN (SELECT agm1.rule_id FROM alert_group_map AS agm1 UNION DISTINCT SELECT adm1.rule_id FROM alert_device_map AS adm1)';
 
-    $device_rules = "SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)";
+    $device_rules = 'SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)';
     $param[] = $device['device_id'];
 
-    $device_group_rules = "SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)";
+    $device_group_rules = 'SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)';
     $param[] = $device['device_id'];
 
-    $device_location_rules = "SELECT ar4.* FROM alert_rules AS ar4 WHERE ar4.id IN (SELECT alm4.rule_id FROM alert_location_map AS alm4 LEFT JOIN devices AS d4 ON alm4.location_id=d4.location_id WHERE d4.device_id=?)";
+    $device_location_rules = 'SELECT ar4.* FROM alert_rules AS ar4 WHERE ar4.id IN (SELECT alm4.rule_id FROM alert_location_map AS alm4 LEFT JOIN devices AS d4 ON alm4.location_id=d4.location_id WHERE d4.device_id=?)';
     $param[] = $device['device_id'];
 
     $full_query = '(' . $global_rules . ') UNION DISTINCT (' . $device_rules . ') UNION DISTINCT (' . $device_group_rules . ') UNION DISTINCT (' . $device_location_rules . ')';
@@ -196,14 +196,14 @@ foreach ($rule_list as $rule) {
         if ((int) $sub['state'] === 0) {
             $ico = 'check';
             $col = 'success';
-            $status_msg = "All devices matching " . $rule['name'] . "  are OK";
+            $status_msg = 'All devices matching ' . $rule['name'] . '  are OK';
         }
         if ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
             $alert_style = alert_layout($severity);
             $ico = $alert_style['icon'];
             $col = $alert_style['icon_color'];
             $extra = $alert_style['background_color'];
-            $status_msg = "Some devices matching " . $rule['name'] . " are currently alerting";
+            $status_msg = 'Some devices matching ' . $rule['name'] . ' are currently alerting';
         }
     }
 
@@ -215,7 +215,7 @@ foreach ($rule_list as $rule) {
         $ico = 'pause';
         $col = '';
         $extra = 'active';
-        $status_msg = $rule['name'] . " is OFF";
+        $status_msg = $rule['name'] . ' is OFF';
     } else {
         $alert_checked = 'checked';
     }
@@ -281,7 +281,7 @@ foreach ($rule_list as $rule) {
         $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
-            $locations .= "$except_device_or_group<a href=\"/devices\/location=" . $location_map['id'] . "\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">" . $location_map['location'] . "</a><br>";
+            $locations .= "$except_device_or_group<a href=\"/devices\/location=" . $location_map['id'] . "\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">" . $location_map['location'] . '</a><br>';
         }
     }
 
@@ -290,7 +290,7 @@ foreach ($rule_list as $rule) {
         $group_query = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
         $group_maps = dbFetchRows($group_query, [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $group_map['name'] . "' title='$groups_msg' target=\"_blank\">" . $group_map['name'] . "</a><br>";
+            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $group_map['name'] . "' title='$groups_msg' target=\"_blank\">" . $group_map['name'] . '</a><br>';
         }
     }
 
@@ -299,7 +299,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $device_map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $device_map['hostname'] . "</a><br>";
+            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $device_map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $device_map['hostname'] . '</a><br>';
         }
     }
 
@@ -318,7 +318,7 @@ foreach ($rule_list as $rule) {
         echo "<a href=\"/devices\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View All Devices' target=\"_blank\">All Devices</a><br>";
     }
 
-    echo "</td>";
+    echo '</td>';
 
     // Transports
     $transport_count = dbFetchCell('SELECT COUNT(*) FROM alert_transport_map WHERE rule_id=?', [$rule['id']]);
@@ -330,28 +330,28 @@ foreach ($rule_list as $rule) {
         $transport_maps = dbFetchRows('SELECT transport_or_group_id,target_type FROM alert_transport_map WHERE alert_transport_map.rule_id=? ORDER BY target_type', [$rule['id']]);
         foreach ($transport_maps as $transport_map) {
             $transport_name = null;
-            if ($transport_map['target_type'] == "group") {
+            if ($transport_map['target_type'] == 'group') {
                 $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group  $transport_name'>" . $transport_name . "</a>";
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group  $transport_name'>" . $transport_name . '</a>';
             }
-            if ($transport_map['target_type'] == "single") {
+            if ($transport_map['target_type'] == 'single') {
                 $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport $transport_name'>" . $transport_name . "</a>";
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport $transport_name'>" . $transport_name . '</a>';
             }
-            $transports .= $transport_edit . "<br>";
+            $transports .= $transport_edit . '<br>';
         }
     }
 
     if (! $transport_count || ! $transports) {
         $default_transports = dbFetchRows('SELECT transport_id, transport_name FROM alert_transports WHERE is_default=1 ORDER BY transport_name', []);
         foreach ($default_transports as $default_transport) {
-            $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $default_transport['transport_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit default transport " . $default_transport['transport_name'] . "'>" . $default_transport['transport_name'] . "</a>";
-            $transports .= $transport_edit . "<br>";
+            $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $default_transport['transport_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit default transport " . $default_transport['transport_name'] . "'>" . $default_transport['transport_name'] . '</a>';
+            $transports .= $transport_edit . '<br>';
         }
     }
 
     if (! $transports) {
-        $transports = "none";
+        $transports = 'none';
     }
 
     echo "<td colspan='2'>$transports</td>";
@@ -377,7 +377,7 @@ foreach ($rule_list as $rule) {
     echo '<i>' . htmlentities($rule_display) . '</i></td>';
 
     // Severity
-    echo '<td>' . ($rule['severity'] == "ok" ? strtoupper($rule['severity']) : ucwords($rule['severity'])) . '</td>';
+    echo '<td>' . ($rule['severity'] == 'ok' ? strtoupper($rule['severity']) : ucwords($rule['severity'])) . '</td>';
 
     // Status
 
@@ -394,15 +394,15 @@ foreach ($rule_list as $rule) {
 
     echo '<td>';
     if ($rule['disabled']) {
-        $enabled_msg = $rule['name'] . " is OFF";
+        $enabled_msg = $rule['name'] . ' is OFF';
     }
     if (! $rule['disabled']) {
-        $enabled_msg = $rule['name'] . " is ON";
+        $enabled_msg = $rule['name'] . ' is ON';
     }
 
     echo "<div id='on-off-checkbox-" . $rule['id'] . "' data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_msg . "' class='btn-group btn-group-sm' role='group'>";
     echo "<input id='" . $rule['id'] . "' type='checkbox' name='alert-rule' data-orig_class='" . $orig_class . "' data-orig_colour='" . $orig_col . "' data-orig_state='" . $orig_ico . "' data-alert_id='" . $rule['id'] . "' data-alert_name='" . $rule['name'] . "' data-alert_status='" . $status_msg . "' " . $alert_checked . " data-size='small' data-toggle='modal'>";
-    echo "</div>";
+    echo '</div>';
     echo '</td>';
 
     // Action

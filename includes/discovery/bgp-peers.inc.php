@@ -106,7 +106,7 @@ if (Config::get('enable_bgp')) {
                             $peer_index = $entry['jnxBgpM2PeerIndex'];
                             try {
                                 $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr']);
-                                d_echo("peerindex for " . $ip->getFamily() . " $ip is $peer_index\n");
+                                d_echo('peerindex for ' . $ip->getFamily() . " $ip is $peer_index\n");
                                 $j_peerIndexes[(string) $ip] = $peer_index;
                             } catch (InvalidIpException $e) {
                                 d_echo("Unable to parse IP for peer $peer_index: " . $entry['jnxBgpM2PeerRemoteAddr'] . PHP_EOL);
@@ -131,7 +131,7 @@ if (Config::get('enable_bgp')) {
                     }
                 }
 
-                $af_query = "SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=? AND context_name=?";
+                $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=? AND context_name=?';
                 foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'], $device['context_name']]) as $entry) {
                     $afi = $entry['afi'];
                     $safi = $entry['safi'];

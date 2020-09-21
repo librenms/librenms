@@ -93,7 +93,7 @@ function rrdtool_escape($string, $length = null)
  * @param string $extension File extension (default is .rrd)
  * @return string the name of the rrd file for $host's $extra component
  */
-function rrd_name($host, $extra, $extension = ".rrd")
+function rrd_name($host, $extra, $extension = '.rrd')
 {
     return Rrd::name($host, $extra, $extension);
 } // rrd_name
@@ -108,7 +108,7 @@ function get_rrd_dir($host)
 {
     $host = str_replace(':', '_', trim($host, '[]'));
 
-    return implode("/", [Config::get('rrd_dir'), $host]);
+    return implode('/', [Config::get('rrd_dir'), $host]);
 } // rrd_dir
 
 /**

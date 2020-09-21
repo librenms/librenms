@@ -61,11 +61,11 @@ foreach ($packetlogic_stats as $index => $port) {
         foreach ($required as $ifEntry => $IfxStat) {
             $procera_port[$ifEntry] = $packetlogic_stats[$index][$cType['type'] . $IfxStat][0];
         }
-        $negotiatedMedia = $packetlogic_stats[$index][$cType['type'] . "NegotiatedMedia"][0];
+        $negotiatedMedia = $packetlogic_stats[$index][$cType['type'] . 'NegotiatedMedia'][0];
         $procera_port['ifName'] = $packetlogic_stats[$index]['channelName'][0] . ' ' . $cType['name'];
         $procera_port['ifDescr'] = $packetlogic_stats[$index]['channelName'][0] . ' ' . $cType['name'];
-        $procera_port['ifConnectorPresent'] = ($negotiatedMedia != '0' ? "true" : "false");
-        $procera_port['ifOperStatus'] = ($packetlogic_stats[$index]['channelActive'][0] == 1 ? "up" : "down");
+        $procera_port['ifConnectorPresent'] = ($negotiatedMedia != '0' ? 'true' : 'false');
+        $procera_port['ifOperStatus'] = ($packetlogic_stats[$index]['channelActive'][0] == 1 ? 'up' : 'down');
         $procera_port['ifSpeed'] = $mediaType[$negotiatedMedia]['ifSpeed'];
         $procera_port['ifDuplex'] = $mediaType[$negotiatedMedia]['ifDuplex'];
         $procera_port['ifType'] = 'ethernetCsmacd';

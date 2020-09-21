@@ -2,11 +2,11 @@
 
 $device_id = mres($vars['device_id']);
 
-$sql = " FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `S`.`storage_deleted`=0";
+$sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `S`.`storage_deleted`=0';
 $param[] = $device_id;
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE ? OR `S`.`storage_descr` LIKE ? OR `S`.`storage_perc` LIKE ? OR `S`.`storage_perc_warn` LIKE ?)";
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `S`.`storage_descr` LIKE ? OR `S`.`storage_perc` LIKE ? OR `S`.`storage_perc_warn` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
@@ -46,7 +46,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         'storage_id' => $drive['storage_id'],
         'hostname' => generate_device_link($drive),
         'storage_descr' => $drive['storage_descr'],
-        'storage_perc' => $perc . "%",
+        'storage_perc' => $perc . '%',
         'storage_perc_warn' => $perc_warn,
         'storage_size' => $size,
     ];

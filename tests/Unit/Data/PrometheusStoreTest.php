@@ -52,7 +52,7 @@ class PrometheusStoreTest extends TestCase
     {
         $stack = HandlerStack::create(new MockHandler([
             new Response(422, [], 'Bad response'),
-            new RequestException("Exception thrown", new Request('POST', 'test')),
+            new RequestException('Exception thrown', new Request('POST', 'test')),
         ]));
 
         $client = new Client(['handler' => $stack]);
@@ -94,7 +94,7 @@ class PrometheusStoreTest extends TestCase
         $request = $container[0]['request'];
 
         $this->assertEquals('POST', $request->getMethod());
-        $this->assertEquals("/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype", $request->getUri()->getPath());
+        $this->assertEquals('/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype', $request->getUri()->getPath());
         $this->assertEquals('fake', $request->getUri()->getHost());
         $this->assertEquals(9999, $request->getUri()->getPort());
         $this->assertEquals("ifIn 234234\nifOut 53453\n", (string) $request->getBody());

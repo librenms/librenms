@@ -158,10 +158,10 @@ if (Config::get('enable_vrfs')) {
             // Type 2 specifies two subfields as a 4-octet administrative field which contains a 4-octet AS number and a 2-octet assigned number subfield.
             // FIXME Hardcoded to Type 0
             $vrf_rd = str_replace(' ', '', $vrf_rd);
-            if ($vrf_rd != "000000000000") {
+            if ($vrf_rd != '000000000000') {
                 $vrf_rd_1 = substr($vrf_rd, 4, 4);
                 $vrf_rd_2 = substr($vrf_rd, 8);
-                $vrf_rd = hexdec($vrf_rd_1) . ":" . hexdec($vrf_rd_2);
+                $vrf_rd = hexdec($vrf_rd_1) . ':' . hexdec($vrf_rd_2);
             } else {
                 $vrf_rd = null;
             }

@@ -46,7 +46,7 @@ if (is_numeric($alert_id) && $alert_id > 0) {
     foreach ($members as $member) {
         $transports[] = [
             'id' => $member['transport_or_group_id'],
-            'text' => ucfirst($member['transport_type']) . ": " . $member['transport_name'],
+            'text' => ucfirst($member['transport_type']) . ': ' . $member['transport_name'],
         ];
     }
 

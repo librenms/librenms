@@ -22,7 +22,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 if (! Auth::user()->hasGlobalAdmin()) {
-    echo "Insufficient Privileges";
+    echo 'Insufficient Privileges';
     exit();
 }
 
@@ -55,7 +55,7 @@ $proc = new \Symfony\Component\Process\Process($cmd);
 $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
 if ($_GET['format'] == 'text') {
-    header("Content-type: text/plain");
+    header('Content-type: text/plain');
     header('X-Accel-Buffering: no');
 
     $proc->run(function ($type, $buffer) {

@@ -6,7 +6,7 @@ $sql .= ' FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ';
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 

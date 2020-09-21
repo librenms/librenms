@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-echo "CiscoSB";
+echo 'CiscoSB';
 
 $multiplier = 1;
 $divisor = 1000000;

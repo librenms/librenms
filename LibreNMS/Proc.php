@@ -62,9 +62,9 @@ class Proc
     public function __construct(
         $cmd,
         $descriptorspec = [
-            0 => ["pipe", "r"],
-            1 => ["pipe", "w"],
-            2 => ["pipe", "w"],
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
         ],
         $cwd = null,
         $env = null,
@@ -222,7 +222,7 @@ class Proc
             proc_close($this->_process);
 
             if (! $killed && $this->isRunning()) {
-                throw new Exception("Terminate failed!");
+                throw new Exception('Terminate failed!');
             }
         }
     }

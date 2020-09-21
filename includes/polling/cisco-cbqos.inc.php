@@ -13,7 +13,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-if ($device['os_group'] == "cisco") {
+if ($device['os_group'] == 'cisco') {
     $tmp_module = 'Cisco-CBQOS';
 
     $component = new LibreNMS\Component();
@@ -51,14 +51,14 @@ if ($device['os_group'] == "cisco") {
 
                 // Let's print some debugging info.
                 d_echo("\n\nComponent: " . $key . "\n");
-                d_echo("    Class-Map: " . $array['label'] . "\n");
-                d_echo("    SPID.SPOBJ: " . $array['sp-id'] . "." . $array['sp-obj'] . "\n");
-                d_echo("    PostBytes:   1.3.6.1.4.1.9.9.166.1.15.1.1.10." . $array['sp-id'] . "." . $array['sp-obj'] . " = " . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$array['sp-id']][$array['sp-obj']] . "\n");
-                d_echo("    BufferDrops: 1.3.6.1.4.1.9.9.166.1.15.1.1.21." . $array['sp-id'] . "." . $array['sp-obj'] . " = " . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.21'][$array['sp-id']][$array['sp-obj']] . "\n");
-                d_echo("    QOSDrops:    1.3.6.1.4.1.9.9.166.1.15.1.1.17." . $array['sp-id'] . "." . $array['sp-obj'] . " = " . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$array['sp-id']][$array['sp-obj']] . "\n");
-                d_echo("    PreBytes:   1.3.6.1.4.1.9.9.166.1.15.1.1.6." . $array['sp-id'] . "." . $array['sp-obj'] . " = " . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.6'][$array['sp-id']][$array['sp-obj']] . "\n");
-                d_echo("    PrePkts:   1.3.6.1.4.1.9.9.166.1.15.1.1.3." . $array['sp-id'] . "." . $array['sp-obj'] . " = " . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.3'][$array['sp-id']][$array['sp-obj']] . "\n");
-                d_echo("    DropPkts:   1.3.6.1.4.1.9.9.166.1.15.1.1.14." . $array['sp-id'] . "." . $array['sp-obj'] . " = " . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.14'][$array['sp-id']][$array['sp-obj']] . "\n");
+                d_echo('    Class-Map: ' . $array['label'] . "\n");
+                d_echo('    SPID.SPOBJ: ' . $array['sp-id'] . '.' . $array['sp-obj'] . "\n");
+                d_echo('    PostBytes:   1.3.6.1.4.1.9.9.166.1.15.1.1.10.' . $array['sp-id'] . '.' . $array['sp-obj'] . ' = ' . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$array['sp-id']][$array['sp-obj']] . "\n");
+                d_echo('    BufferDrops: 1.3.6.1.4.1.9.9.166.1.15.1.1.21.' . $array['sp-id'] . '.' . $array['sp-obj'] . ' = ' . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.21'][$array['sp-id']][$array['sp-obj']] . "\n");
+                d_echo('    QOSDrops:    1.3.6.1.4.1.9.9.166.1.15.1.1.17.' . $array['sp-id'] . '.' . $array['sp-obj'] . ' = ' . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$array['sp-id']][$array['sp-obj']] . "\n");
+                d_echo('    PreBytes:   1.3.6.1.4.1.9.9.166.1.15.1.1.6.' . $array['sp-id'] . '.' . $array['sp-obj'] . ' = ' . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.6'][$array['sp-id']][$array['sp-obj']] . "\n");
+                d_echo('    PrePkts:   1.3.6.1.4.1.9.9.166.1.15.1.1.3.' . $array['sp-id'] . '.' . $array['sp-obj'] . ' = ' . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.3'][$array['sp-id']][$array['sp-obj']] . "\n");
+                d_echo('    DropPkts:   1.3.6.1.4.1.9.9.166.1.15.1.1.14.' . $array['sp-id'] . '.' . $array['sp-obj'] . ' = ' . $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.14'][$array['sp-id']][$array['sp-obj']] . "\n");
 
                 $fields = [
                     'postbits' => $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$array['sp-id']][$array['sp-obj']],

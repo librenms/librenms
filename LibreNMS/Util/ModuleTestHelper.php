@@ -87,9 +87,9 @@ class ModuleTestHelper
         $install_dir = Config::get('install_dir');
         $this->file_name = $os . $variant;
         $this->snmprec_dir = "$install_dir/tests/snmpsim/";
-        $this->snmprec_file = $this->snmprec_dir . $this->file_name . ".snmprec";
+        $this->snmprec_file = $this->snmprec_dir . $this->file_name . '.snmprec';
         $this->json_dir = "$install_dir/tests/data/";
-        $this->json_file = $this->json_dir . $this->file_name . ".json";
+        $this->json_file = $this->json_dir . $this->file_name . '.json';
 
         // never store time series data
         Config::set('rrd.enable', false);
@@ -149,7 +149,7 @@ class ModuleTestHelper
 
         $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
-            $this->qPrint(" " . $oid_data['oid']);
+            $this->qPrint(' ' . $oid_data['oid']);
 
             $snmp_options = ['-OUneb', '-Ih'];
             if ($oid_data['method'] == 'walk') {
@@ -223,7 +223,7 @@ class ModuleTestHelper
             }
         }
 
-        d_echo("OIDs to capture ");
+        d_echo('OIDs to capture ');
         d_echo($snmp_oids);
 
         return $snmp_oids;
@@ -244,7 +244,7 @@ class ModuleTestHelper
     {
         $os_list = [];
 
-        foreach (glob(Config::get('install_dir') . "/tests/data/*.json") as $file) {
+        foreach (glob(Config::get('install_dir') . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
             [$os, $variant] = self::extractVariant($file);
 
@@ -273,7 +273,7 @@ class ModuleTestHelper
                     self::resolveModuleDependencies($valid_modules),
                 ];
             } catch (InvalidModuleException $e) {
-                throw new InvalidModuleException("Invalid module " . $e->getMessage() . " in $os $variant");
+                throw new InvalidModuleException('Invalid module ' . $e->getMessage() . " in $os $variant");
             }
         }
 

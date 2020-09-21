@@ -26,31 +26,31 @@ $transport_id = $vars['transport_id'] ?: null;
 $tmp = [dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location_id from devices order by device_id asc limit 1')];
 $tmp['contacts'] = AlertUtil::getContacts($tmp);
 $obj = [
-    "hostname"  => $tmp[0]['hostname'],
-    "device_id" => $tmp[0]['device_id'],
-    "sysDescr" => $tmp[0]['sysDescr'],
-    "version" => $tmp[0]['version'],
-    "hardware" => $tmp[0]['hardware'],
-    "location" => $tmp[0]['location'],
-    "title" => "Testing transport from " . Config::get('project_name'),
-    "elapsed"   => "11s",
-    "id"        => "000",
-    "faults"    => false,
-    "uid"       => "000",
-    "severity"  => "critical",
-    "rule"      => "macros.device = 1",
-    "name"      => "Test-Rule",
-    "string"      => "#1: test => string;",
-    "timestamp" => date("Y-m-d H:i:s"),
-    "contacts"  => $tmp['contacts'],
-    "state"     => "1",
-    "msg"       => "This is a test alert",
+    'hostname'  => $tmp[0]['hostname'],
+    'device_id' => $tmp[0]['device_id'],
+    'sysDescr' => $tmp[0]['sysDescr'],
+    'version' => $tmp[0]['version'],
+    'hardware' => $tmp[0]['hardware'],
+    'location' => $tmp[0]['location'],
+    'title' => 'Testing transport from ' . Config::get('project_name'),
+    'elapsed'   => '11s',
+    'id'        => '000',
+    'faults'    => false,
+    'uid'       => '000',
+    'severity'  => 'critical',
+    'rule'      => 'macros.device = 1',
+    'name'      => 'Test-Rule',
+    'string'      => '#1: test => string;',
+    'timestamp' => date('Y-m-d H:i:s'),
+    'contacts'  => $tmp['contacts'],
+    'state'     => '1',
+    'msg'       => 'This is a test alert',
 ];
 
 $response = ['status' => 'error'];
 
 if ($transport_id) {
-    $transport = dbFetchCell("SELECT `transport_type` FROM `alert_transports` WHERE `transport_id` = ?", [$transport_id]);
+    $transport = dbFetchCell('SELECT `transport_type` FROM `alert_transports` WHERE `transport_id` = ?', [$transport_id]);
 }
 $class = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
 if (class_exists($class)) {

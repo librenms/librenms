@@ -41,7 +41,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
     }
 
-    $sql = "SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?";
+    $sql = 'SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?';
     $existing_data = dbFetchRows($sql, [$device['device_id'], $context]);
 
     $ipv4_addresses = array_map(function ($data) {

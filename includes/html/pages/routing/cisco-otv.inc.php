@@ -19,10 +19,10 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
             if ($OVERLAY['otvtype'] == 'overlay') {
                 if ($OVERLAY['status'] == 0) {
                     $OVERLAY_STATUS = "<span class='green pull-right'>Normal</span>";
-                    $GLI = "";
+                    $GLI = '';
                 } else {
                     $OVERLAY_STATUS = "<span class='pull-right'>" . $OVERLAY['error'] . " - <span class='red'>Alert</span></span>";
-                    $GLI = "list-group-item-danger";
+                    $GLI = 'list-group-item-danger';
                 } ?>
                 <a class="list-group-item <?php echo $GLI?>" data-toggle="collapse" data-target="#<?php echo $OVERLAY['index']?>" data-parent="#overlays-<?php echo $DEVICE_ID?>"><?php echo $OVERLAY['label']?> - <?php echo $OVERLAY['transport']?> <?php echo $OVERLAY_STATUS?></a>
                 <div id="<?php echo $OVERLAY['index']?>" class="sublinks collapse">
@@ -31,10 +31,10 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
                         if (($ADJACENCY['otvtype'] == 'adjacency') && ($ADJACENCY['index'] == $OVERLAY['index'])) {
                             if ($ADJACENCY['status'] == 0) {
                                 $ADJ_STATUS = "<span class='green pull-right'>Normal</span>";
-                                $GLI = "";
+                                $GLI = '';
                             } else {
                                 $ADJ_STATUS = "<span class='pull-right'>" . $ADJACENCY['error'] . " - <span class='red'>Alert</span></span>";
-                                $GLI = "list-group-item-danger";
+                                $GLI = 'list-group-item-danger';
                             } ?>
                             <a class="list-group-item <?php echo $GLI?> small"><i class="fa fa-chevron-right" aria-hidden="true"></i> <?php echo $ADJACENCY['label']?> - <?php echo $ADJACENCY['endpoint']?> <?php echo $ADJ_STATUS?></a>
                             <?php

@@ -52,8 +52,8 @@ if (Auth::user()->hasGlobalAdmin()) {
             $gitlogs = [];
 
             foreach ($gitlogs_raw as $gl) {
-                [$rev, $ts] = explode(";", $gl);
-                $gitlogs[] = ["rev" => $rev, "date" => $ts];
+                [$rev, $ts] = explode(';', $gl);
+                $gitlogs[] = ['rev' => $rev, 'date' => $ts];
             }
 
             $revlist = [];

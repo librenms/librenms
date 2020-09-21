@@ -45,11 +45,11 @@ class FsSwitch extends OS implements ProcessorDiscovery
 
         foreach ($processors_data as $index => $entry) {
             $processors[] = Processor::discover(
-                "fs-SWITCHMIB",
+                'fs-SWITCHMIB',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.27975.1.2.11.' . $index,
                 $index,
-                "CPU",
+                'CPU',
                 -1,
                 100 - $entry['ssCpuIdle']
             );

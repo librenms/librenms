@@ -20,8 +20,8 @@ function find_child($components, $parent, $level)
             continue;
         }
         if (($array['parent'] == $components[$parent]['sp-obj']) && ($array['sp-id'] == $components[$parent]['sp-id'])) {
-            echo "<ul>";
-            echo "<li>";
+            echo '<ul>';
+            echo '<li>';
             if ($array['qos-type'] == 1) {
                 // Its a policy, we need to make it a link.
                 $linkvars = array_merge($vars, ['policy' => $id]);
@@ -40,8 +40,8 @@ function find_child($components, $parent, $level)
 
             find_child($components, $id, $level + 1);
 
-            echo "</li>";
-            echo "</ul>";
+            echo '</li>';
+            echo '</ul>';
         }
     }
 }
@@ -67,7 +67,7 @@ foreach ($components as $id => $array) {
         echo "<li class='liOpen'>";
         echo '<a href="' . generate_url($vars, ['policy' => $id]) . '">' . $array['label'] . '</a>';
         find_child($components, $id, 1);
-        echo "</li>";
+        echo '</li>';
         $found = true;
     }
 }
@@ -86,7 +86,7 @@ foreach ($components as $id => $array) {
         echo "<li class='liOpen'>";
         echo '<a href="' . generate_url($vars, ['policy' => $id]) . '">' . $array['label'] . '</a>';
         find_child($components, $id, 1);
-        echo "</li>";
+        echo '</li>';
         $found = true;
     }
 }
@@ -106,7 +106,7 @@ foreach ($components as $id => $array) {
         // Display each graph row.
         echo "<div class='col-md-12'>";
 
-        echo "<div class='graphhead'>Traffic by CBQoS Class (pre policy) - " . $components[$vars['policy']]['label'] . "</div>";
+        echo "<div class='graphhead'>Traffic by CBQoS Class (pre policy) - " . $components[$vars['policy']]['label'] . '</div>';
         $graph_array['policy'] = $vars['policy'];
         if (isset($vars['class'])) {
             $graph_array['class'] = $vars['class'];
@@ -114,7 +114,7 @@ foreach ($components as $id => $array) {
         $graph_type = 'port_cbqos_prebits';
         include 'includes/html/print-interface-graphs.inc.php';
 
-        echo "<div class='graphhead'>Traffic by CBQoS Class (post policy) - " . $components[$vars['policy']]['label'] . "</div>";
+        echo "<div class='graphhead'>Traffic by CBQoS Class (post policy) - " . $components[$vars['policy']]['label'] . '</div>';
         $graph_array['policy'] = $vars['policy'];
         if (isset($vars['class'])) {
             $graph_array['class'] = $vars['class'];
@@ -122,7 +122,7 @@ foreach ($components as $id => $array) {
         $graph_type = 'port_cbqos_traffic';
         include 'includes/html/print-interface-graphs.inc.php';
 
-        echo "<div class='graphhead'>Packets by CBQoS Class (pre policy) - " . $components[$vars['policy']]['label'] . "</div>";
+        echo "<div class='graphhead'>Packets by CBQoS Class (pre policy) - " . $components[$vars['policy']]['label'] . '</div>';
         $graph_array['policy'] = $vars['policy'];
         if (isset($vars['class'])) {
             $graph_array['class'] = $vars['class'];
@@ -130,7 +130,7 @@ foreach ($components as $id => $array) {
         $graph_type = 'port_cbqos_prepkts';
         include 'includes/html/print-interface-graphs.inc.php';
 
-        echo "<div class='graphhead'>QoS Drops by CBQoS Class - " . $components[$vars['policy']]['label'] . "</div>";
+        echo "<div class='graphhead'>QoS Drops by CBQoS Class - " . $components[$vars['policy']]['label'] . '</div>';
         $graph_array['policy'] = $vars['policy'];
         if (isset($vars['class'])) {
             $graph_array['class'] = $vars['class'];
@@ -138,7 +138,7 @@ foreach ($components as $id => $array) {
         $graph_type = 'port_cbqos_bufferdrops';
         include 'includes/html/print-interface-graphs.inc.php';
 
-        echo "<div class='graphhead'>Packet Drops by CBQoS Class - " . $components[$vars['policy']]['label'] . "</div>";
+        echo "<div class='graphhead'>Packet Drops by CBQoS Class - " . $components[$vars['policy']]['label'] . '</div>';
         $graph_array['policy'] = $vars['policy'];
         if (isset($vars['class'])) {
             $graph_array['class'] = $vars['class'];
@@ -146,7 +146,7 @@ foreach ($components as $id => $array) {
         $graph_type = 'port_cbqos_droppkts';
         include 'includes/html/print-interface-graphs.inc.php';
 
-        echo "<div class='graphhead'>Buffer Drops by CBQoS Class - " . $components[$vars['policy']]['label'] . "</div>";
+        echo "<div class='graphhead'>Buffer Drops by CBQoS Class - " . $components[$vars['policy']]['label'] . '</div>';
         $graph_array['policy'] = $vars['policy'];
         if (isset($vars['class'])) {
             $graph_array['class'] = $vars['class'];

@@ -102,13 +102,13 @@ class Graphite extends BaseDatastore
         $measurement = preg_replace('/\|/', '.', $measurement);
         $measurement_name = preg_replace('/\./', '_', $tags['rrd_name']);
         if (is_array($measurement_name)) {
-            $ms_name = implode(".", $measurement_name);
+            $ms_name = implode('.', $measurement_name);
         } else {
             $ms_name = $measurement_name;
         }
         // remove the port-id tags from the metric
         if (preg_match('/^port-id\d+/', $ms_name)) {
-            $ms_name = "";
+            $ms_name = '';
         }
 
         foreach ($fields as $k => $v) {
@@ -116,7 +116,7 @@ class Graphite extends BaseDatastore
             if (empty($v)) {
                 $v = 0;
             }
-            $metric = implode(".", array_filter([$this->prefix, $hostname, $measurement, $ms_name, $k]));
+            $metric = implode('.', array_filter([$this->prefix, $hostname, $measurement, $ms_name, $k]));
             $this->writeData($metric, $v, $timestamp);
         }
     }
@@ -134,7 +134,7 @@ class Graphite extends BaseDatastore
             // Further sanitize the full metric before sending, whitespace isn't allowed
             $metric = preg_replace('/\s+/', '_', $metric);
 
-            $line = implode(" ", [$metric, $value, $timestamp]);
+            $line = implode(' ', [$metric, $value, $timestamp]);
             Log::debug("Sending to Graphite: $line\n");
             $this->connection->write("$line\n");
 

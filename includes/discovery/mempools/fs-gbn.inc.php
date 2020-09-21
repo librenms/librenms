@@ -24,9 +24,9 @@ if ($device['os'] == 'fs-gbn') {
             d_echo($index . ' ' . $entry['memorySize'] . ' -> ' . $entry['memoryIdle'] . ' (' . $entry['cpuDescription'] . ")\n");
             $descr = $entry['cpuDescription'];
             if (empty($descr)) {
-                $descr = "Chassis CPU";
+                $descr = 'Chassis CPU';
             }
-            $descr .= " Memory";
+            $descr .= ' Memory';
             $usage = $entry['memoryIdle'];
             discover_mempool($valid_mempool, $device, $index, 'fs-gbn', $descr, '1', null, null);
         } //end if

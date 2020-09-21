@@ -39,26 +39,26 @@ if (isset($vars['template']) && empty(view(['template' => $vars['template']], []
         // Update template
         $create = false;
         $template_id = $vars['template_id'];
-        if (! dbUpdate(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], "alert_templates", "id = ?", [$template_id]) >= 0) {
+        if (! dbUpdate(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates', 'id = ?', [$template_id]) >= 0) {
             $status = 'ok';
         } else {
-            $message = "Failed to update the template";
+            $message = 'Failed to update the template';
         }
     } elseif ($vars['template']) {
         // Create template
         if ($name != 'Default Alert Template') {
-            $template_newid = dbInsert(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], "alert_templates");
+            $template_newid = dbInsert(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates');
             if ($template_newid != false) {
                 $template_id = $template_newid;
                 $status = 'ok';
             } else {
-                $message = "Could not create alert template";
+                $message = 'Could not create alert template';
             }
         } else {
-            $message = "This template name is reserved!";
+            $message = 'This template name is reserved!';
         }
     } else {
-        $message = "We could not work out what you wanted to do!";
+        $message = 'We could not work out what you wanted to do!';
     }
     if ($status == 'ok') {
         $alertRulesOk = true;

@@ -55,7 +55,7 @@ class RrdDefinition
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {
         if (empty($name)) {
-            d_echo("DS must be set to a non-empty string.");
+            d_echo('DS must be set to a non-empty string.');
         }
 
         $name = $this->escapeName($name);

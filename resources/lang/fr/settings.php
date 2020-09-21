@@ -325,8 +325,8 @@ return [
             'description' => 'Version LDAP',
             'help' => 'Version LDAP à utiliser pour parler au serveur, en général v3.',
             'options' => [
-                "2" => "2",
-                "3" => "3",
+                '2' => '2',
+                '3' => '3',
             ],
         ],
         'auth_mechanism' => [
@@ -973,7 +973,7 @@ return [
     ],
     'twofactor' => [
         'description' => 'Activer l\'Autentification à deux facteurs',
-        'help' => "Active le mécanisme interne à deux facteurs. Chaque compte utilisateur doit ensuite être configuré.",
+        'help' => 'Active le mécanisme interne à deux facteurs. Chaque compte utilisateur doit ensuite être configuré.',
     ],
     'units' => [
         'days' => 'jours',

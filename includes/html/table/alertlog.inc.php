@@ -37,17 +37,17 @@ if ($vars['state'] >= 0) {
 }
 
 if (isset($vars['min_severity'])) {
-    $where .= get_sql_filter_min_severity($vars['min_severity'], "R");
+    $where .= get_sql_filter_min_severity($vars['min_severity'], 'R');
 }
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `E`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `E`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $where .= " AND (`D`.`hostname` LIKE ? OR `D`.`sysName` LIKE ? OR `E`.`time_logged` LIKE ? OR `name` LIKE ?)";
+    $where .= ' AND (`D`.`hostname` LIKE ? OR `D`.`sysName` LIKE ? OR `E`.`time_logged` LIKE ? OR `name` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";

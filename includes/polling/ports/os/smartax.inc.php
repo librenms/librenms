@@ -29,35 +29,35 @@ $inupackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.7'
 $outupackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.22', []); //  hwGponOltEthernetStatisticSendUnicastPakts
 
 foreach ($inoctets as $index => $value) {
-    $index = preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
+    $index = preg_replace("/^(.*?)\.([0-9]+)$/", '$2', $index);
     $port_stats[$index]['ifHCInOctets'] = $value['enterprises'];
 }
 foreach ($outoctets as $index => $value) {
-    $index = preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
+    $index = preg_replace("/^(.*?)\.([0-9]+)$/", '$2', $index);
     $port_stats[$index]['ifHCOutOctets'] = $value['enterprises'];
 }
 foreach ($inbpackets as $index => $value) {
-    $index = preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
+    $index = preg_replace("/^(.*?)\.([0-9]+)$/", '$2', $index);
     $port_stats[$index]['ifHCInBroadcastPkts'] = $value['enterprises'];
 }
 foreach ($outbpackets as $index => $value) {
-    $index = preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
+    $index = preg_replace("/^(.*?)\.([0-9]+)$/", '$2', $index);
     $port_stats[$index]['ifHCOutBroadcastPkts'] = $value['enterprises'];
 }
 foreach ($inmpackets as $index => $value) {
-    $index = preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
+    $index = preg_replace("/^(.*?)\.([0-9]+)$/", '$2', $index);
     $port_stats[$index]['ifHCInMulticastPkts'] = $value['enterprises'];
 }
 foreach ($outmpackets as $index => $value) {
-    $index = preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
+    $index = preg_replace("/^(.*?)\.([0-9]+)$/", '$2', $index);
     $port_stats[$index]['ifHCOutMulticastPkts'] = $value['enterprises'];
 }
 foreach ($inupackets as $index => $value) {
-    $index = preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
+    $index = preg_replace("/^(.*?)\.([0-9]+)$/", '$2', $index);
     $port_stats[$index]['ifHCInUcastPkts'] = $value['enterprises'];
 }
 foreach ($outupackets as $index => $value) {
-    $index = preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
+    $index = preg_replace("/^(.*?)\.([0-9]+)$/", '$2', $index);
     $port_stats[$index]['ifHCOutUcastPkts'] = $value['enterprises'];
 }
 

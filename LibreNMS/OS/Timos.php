@@ -100,7 +100,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     private function nokiaEncap($tmnxEncapVal)
     {
         // implement other encapsulation values
-        $map = sprintf("%032b", $tmnxEncapVal);
+        $map = sprintf('%032b', $tmnxEncapVal);
 
         if (substr($map, -32, 20) == '00000000000000000000') { // 12-bit IEEE 802.1Q VLAN ID
             if ($tmnxEncapVal == 4095) {
@@ -378,10 +378,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
             $protection = intval($value['vRtrMplsTunnelARHopProtection'], 16);
 
-            $localLinkProtection = ($protection & $localAvailable) ? "true" : "false";
-            $linkProtectionInUse = ($protection & $localInUse) ? "true" : "false";
-            $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
-            $nextNodeProtection = ($protection & $nodeProtected) ? "true" : "false";
+            $localLinkProtection = ($protection & $localAvailable) ? 'true' : 'false';
+            $linkProtectionInUse = ($protection & $localInUse) ? 'true' : 'false';
+            $bandwidthProtection = ($protection & $bandwidthProtected) ? 'true' : 'false';
+            $nextNodeProtection = ($protection & $nodeProtected) ? 'true' : 'false';
 
             $ARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
             if (isset($value['vRtrMplsTunnelARHopNgRouterId'])) {
@@ -725,10 +725,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
             $protection = intval($value['vRtrMplsTunnelARHopProtection'], 16);
 
-            $localLinkProtection = ($protection & $localAvailable) ? "true" : "false";
-            $linkProtectionInUse = ($protection & $localInUse) ? "true" : "false";
-            $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
-            $nextNodeProtection = ($protection & $nodeProtected) ? "true" : "false";
+            $localLinkProtection = ($protection & $localAvailable) ? 'true' : 'false';
+            $linkProtectionInUse = ($protection & $localInUse) ? 'true' : 'false';
+            $bandwidthProtection = ($protection & $bandwidthProtected) ? 'true' : 'false';
+            $nextNodeProtection = ($protection & $nodeProtected) ? 'true' : 'false';
 
             $ARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
             if (isset($value['vRtrMplsTunnelARHopNgRouterId'])) {

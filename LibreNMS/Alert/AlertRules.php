@@ -84,7 +84,7 @@ class AlertRules
                 $doalert = false;
             }
 
-            $current_state = dbFetchCell("SELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", [$rule['id'], $device_id]);
+            $current_state = dbFetchCell('SELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$rule['id'], $device_id]);
             if ($doalert) {
                 if ($current_state == AlertState::ACKNOWLEDGED) {
                     c_echo('Status: %ySKIP');

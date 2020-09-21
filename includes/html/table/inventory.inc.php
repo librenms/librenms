@@ -5,14 +5,14 @@ $param = [];
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 $sql = " FROM entPhysical AS E, devices AS D WHERE $where AND D.device_id = E.device_id";
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE ? OR `E`.`entPhysicalDescr` LIKE ? OR `E`.`entPhysicalModelName` LIKE ? OR `E`.`entPhysicalSerialNum` LIKE ?)";
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `E`.`entPhysicalDescr` LIKE ? OR `E`.`entPhysicalModelName` LIKE ? OR `E`.`entPhysicalSerialNum` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";

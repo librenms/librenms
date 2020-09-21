@@ -59,7 +59,7 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
                 foreach ($result_options as $option) {
                     echo "<option value='$option'";
                     if ($results == $option) {
-                        echo " selected";
+                        echo ' selected';
                     }
                     echo ">$option</option>";
                 }
@@ -68,22 +68,22 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
         </tr>
 <?php
 
-$count_query = "SELECT COUNT(*) FROM ( ";
-$full_query = "";
+$count_query = 'SELECT COUNT(*) FROM ( ';
+$full_query = '';
 $query = 'SELECT packages.name FROM packages,devices ';
 $param = [];
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 $query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%" . mres($_POST['package']) . "%' $sql_where GROUP BY packages.name";
 
 $where = '';
-$ver = "";
-$opt = "";
+$ver = '';
+$opt = '';
 
 if (! empty($_POST['arch'])) {
     $where .= ' AND packages.arch = ?';
@@ -91,12 +91,12 @@ if (! empty($_POST['arch'])) {
 }
 
 if (is_numeric($_REQUEST['device_id'])) {
-    $where .= " AND packages.device_id = ?";
+    $where .= ' AND packages.device_id = ?';
     $param[] = $_REQUEST['device_id'];
 }
 
-$count_query .= $query . " ) sub";
-$query .= $where . " ORDER BY packages.name, packages.arch, packages.version";
+$count_query .= $query . ' ) sub';
+$query .= $where . ' ORDER BY packages.name, packages.arch, packages.version';
 $count = dbFetchCell($count_query, $param);
 
 if (! isset($_POST['page_number']) && $_POST['page_number'] < 1) {
@@ -119,7 +119,7 @@ $full_query = $full_query . $query . " LIMIT $start,$results";
 
 $ordered = [];
 foreach (dbFetchRows($full_query, $param) as $entry) {
-    $tmp = dbFetchRows("SELECT packages.*,devices.hostname FROM packages,devices WHERE packages.device_id=devices.device_id AND packages.name = ?", [$entry['name']]);
+    $tmp = dbFetchRows('SELECT packages.*,devices.hostname FROM packages,devices WHERE packages.device_id=devices.device_id AND packages.name = ?', [$entry['name']]);
     foreach ($tmp as $entry) {
         if (! is_array($ordered[$entry['name']])) {
             $ordered[$entry['name']] = [$entry];
@@ -130,7 +130,7 @@ foreach (dbFetchRows($full_query, $param) as $entry) {
 }
 
 if (! empty($_POST['version'])) {
-    [$opt, $ver] = explode(" ", $_POST['version']);
+    [$opt, $ver] = explode(' ', $_POST['version']);
 }
 
 foreach ($ordered as $name => $entry) {
@@ -138,7 +138,7 @@ foreach ($ordered as $name => $entry) {
     $arch = [];
     $devs = [];
     foreach ($entry as $variation) {
-        $variation['version'] = str_replace(":", ".", $variation['version']);
+        $variation['version'] = str_replace(':', '.', $variation['version']);
         if (! in_array($variation['version'], $vers) && (empty($ver) || version_compare($variation['version'], $ver, $opt))) {
             $vers[] = $variation['version'];
         }

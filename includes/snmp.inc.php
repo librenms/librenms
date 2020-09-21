@@ -217,7 +217,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     $oid_limit = get_device_oid_limit($device);
 
     if (! is_array($oids)) {
-        $oids = explode(" ", $oids);
+        $oids = explode(' ', $oids);
     }
 
     $data = [];
@@ -392,7 +392,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     $data = str_replace('End of MIB', '', $data);
 
     if (is_string($data) && (preg_match('/No Such (Object|Instance)/i', $data) || preg_match('/Wrong Type(.*)should be/', $data))) {
-        d_echo("Invalid snmp_walk() data = " . print_r($data, true));
+        d_echo('Invalid snmp_walk() data = ' . print_r($data, true));
         $data = false;
     } else {
         if (Str::endsWith($data, '(It is past the end of the MIB tree)')) {
@@ -826,7 +826,7 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
         // False means: No Such Object.
         return false;
     }
-    if ($string == "") {
+    if ($string == '') {
         // Empty means SNMP timeout or some such.
         return null;
     }

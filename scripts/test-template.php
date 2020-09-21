@@ -41,7 +41,7 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
     unset($obj['alert']);
     print_r($obj);
 } else {
-    c_echo("
+    c_echo('
 Usage:
     -t Is the template ID.
     -h Is the device ID or hostname
@@ -54,6 +54,6 @@ Usage:
 Example:
 ./scripts/test-template.php -t 10 -d -h localhost -r 2 -p mail
 
-");
+');
     exit(1);
 }

@@ -9,7 +9,7 @@ chdir($install_dir);
 
 $init_modules = [];
 require $install_dir . '/includes/init.php';
-$options = getopt('dh:e:', ["help"]);
+$options = getopt('dh:e:', ['help']);
 
 Config::set('rrd.enable', false);
 Config::set('influxdb.enable', false);
@@ -35,7 +35,7 @@ $where = '';
 $params = [];
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
-        $where = "AND `device_id` = ?";
+        $where = 'AND `device_id` = ?';
         $params = [$options['h']];
     } elseif (Str::contains($options['h'], ',')) {
         $device_ids = array_map('trim', explode(',', $options['h']));
@@ -43,7 +43,7 @@ if (isset($options['h'])) {
         $where = 'AND `device_id` in ' . dbGenPlaceholders(count($device_ids));
         $params = $device_ids;
     } else {
-        $where = "AND `hostname` LIKE ?";
+        $where = 'AND `hostname` LIKE ?';
         $params = [str_replace('*', '%', mres($options['h']))];
     }
 }
@@ -57,7 +57,7 @@ if (isset($options['e'])) {
     $enable_sel_value = $options['e'];
 }
 
-echo "Full Polling: ";
+echo 'Full Polling: ';
 Config::set('polling.selected_ports', false);
 foreach ($devices as $index => $device) {
     echo $device['device_id'] . ' ';
@@ -73,7 +73,7 @@ foreach ($devices as $index => $device) {
 echo PHP_EOL;
 
 Config::set('polling.selected_ports', true);
-echo "Selective Polling: ";
+echo 'Selective Polling: ';
 foreach ($devices as $index => $device) {
     echo $device['device_id'] . ' ';
     if (! $debug) {
@@ -104,15 +104,15 @@ foreach ($devices as &$device) {
 
     // $enable_sel_value is negative and we want to enable it for all devices with an even lower value.
     // It also has to save more than 1 s, or we might enable it for devices with i.e. 100ms vs 50ms, which isn't needed.
-    $device['set'] = "none";
+    $device['set'] = 'none';
     if (isset($enable_sel_value) && $device['diff_perc'] < ($enable_sel_value * -1) && $device['diff_sec'] < -1) {
-        set_dev_attrib($device, 'selected_ports', "true");
-        $device['set'] = "true";
+        set_dev_attrib($device, 'selected_ports', 'true');
+        $device['set'] = 'true';
         $set_count++;
     }
     if (isset($enable_sel_value) && $device['diff_perc'] > $enable_sel_value && $device['diff_sec'] > 1) {
-        set_dev_attrib($device, 'selected_ports', "false");
-        $device['set'] = "false";
+        set_dev_attrib($device, 'selected_ports', 'false');
+        $device['set'] = 'false';
         $set_count++;
     }
 }

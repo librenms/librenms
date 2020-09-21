@@ -23,7 +23,7 @@ foreach ($domain_list as $label) {
     array_push($cert_name_list, generate_link($label, $link_array, ['cert_name' => $cert_name]));
 }
 
-printf("%s | certificates: %s", generate_link('All Certificates', $link_array), implode(', ', $cert_name_list));
+printf('%s | certificates: %s', generate_link('All Certificates', $link_array), implode(', ', $cert_name_list));
 
 print_optionbar_end();
 

@@ -39,7 +39,7 @@ class Bill extends Model
             return $query;
         }
 
-        return $query->join('bill_perms', 'bill_perms.bill_id', "bills.bill_id")
+        return $query->join('bill_perms', 'bill_perms.bill_id', 'bills.bill_id')
             ->where('bill_perms.user_id', $user->user_id);
     }
 

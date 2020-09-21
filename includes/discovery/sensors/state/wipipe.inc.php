@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-echo "CradlePoint WiPipe";
+echo 'CradlePoint WiPipe';
 
 foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
     // Modem Connection Status
@@ -37,7 +37,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         // Get Modem Model & Phone Number for description
         $modemdesc = $entry['mdmDescr'];
         $modemmdn = $entry['mdmMDN'];
-        $descr = "mdmStatus - " . $modemdesc . " - " . $modemmdn;
+        $descr = 'mdmStatus - ' . $modemdesc . ' - ' . $modemmdn;
         //Discover Sensors
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['mdmStatus'], 'snmp', $index);
         //Create Sensor To State Index
@@ -59,7 +59,7 @@ foreach ($upgradestatus as $index => $entry) {
     ];
     create_state_index($state_name, $states);
 
-    $descr = "Firmware Upgrade Status";
+    $descr = 'Firmware Upgrade Status';
     //Discover Sensors
     discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['devFWUpgradeStatus'], 'snmp', $index);
     //Create Sensor To State Index

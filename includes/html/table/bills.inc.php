@@ -33,7 +33,7 @@ if (! empty($vars['state'])) {
 }
 
 if ($prev) {
-    $select = "SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
+    $select = 'SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ';
     $query = 'FROM `bills`
         INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
         INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
@@ -53,9 +53,9 @@ if (! Auth::user()->hasGlobalRead()) {
 }
 
 if (sizeof($wheres) > 0) {
-    $query .= "WHERE " . implode(' AND ', $wheres) . "\n";
+    $query .= 'WHERE ' . implode(' AND ', $wheres) . "\n";
 }
-$orderby = "ORDER BY bills.bill_name";
+$orderby = 'ORDER BY bills.bill_name';
 
 $total = dbFetchCell("SELECT COUNT(bills.bill_id) $query", $param);
 
@@ -141,9 +141,9 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #${background['left']}; font-weight: bold;'>$overuse_formatted</span>");
 
     $bill_name = "<a href='$url'><span style='font-weight: bold;' class='interface'>${bill['bill_name']}</span></a><br />" .
-                    strftime('%F', strtotime($datefrom)) . " to " . strftime('%F', strtotime($dateto));
+                    strftime('%F', strtotime($datefrom)) . ' to ' . strftime('%F', strtotime($dateto));
     $bar = print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']);
-    $actions = "";
+    $actions = '';
 
     if (! $prev && Auth::user()->hasGlobalAdmin()) {
         $actions .= "<a href='" . generate_url(['page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit']) .

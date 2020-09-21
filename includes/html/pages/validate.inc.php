@@ -60,7 +60,7 @@ foreach ($validator->getAllResults() as $group => $results) {
     } elseif ($group_status == ValidationResult::FAILURE) {
         echo ' <span class="text-danger pull-right">Failure</span>';
     }
-    echo "</a></h4>";
+    echo '</a></h4>';
     echo " </div><div id='${group}Body' class='panel-collapse collapse";
     if ($group_status !== ValidationResult::SUCCESS) {
         echo ' in';
@@ -100,7 +100,7 @@ foreach ($validator->getAllResults() as $group => $results) {
                 $short_size = 10;
 
                 echo "<ul id='shortList$group$rnum' class='list-group' style='margin-bottom: -1px'>";
-                echo "<li class='list-group-item active'>" . $result->getListDescription() . "</li>";
+                echo "<li class='list-group-item active'>" . $result->getListDescription() . '</li>';
 
                 foreach (array_slice($list, 0, $short_size) as $li) {
                     echo "<li class='list-group-item'>$li</li>";

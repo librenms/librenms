@@ -6,13 +6,13 @@ use LibreNMS\RRD\RrdDefinition;
 
 function get_service_status($device = null)
 {
-    $sql_query = "SELECT service_status, count(service_status) as count FROM services WHERE";
+    $sql_query = 'SELECT service_status, count(service_status) as count FROM services WHERE';
     $sql_param = [];
     $add = 0;
 
     if (! is_null($device)) {
         // Add a device filter to the SQL query.
-        $sql_query .= " `device_id` = ?";
+        $sql_query .= ' `device_id` = ?';
         $sql_param[] = $device;
         $add++;
     }
@@ -21,7 +21,7 @@ function get_service_status($device = null)
         // No filters, remove " WHERE" -6
         $sql_query = substr($sql_query, 0, strlen($sql_query) - 6);
     }
-    $sql_query .= " GROUP BY service_status";
+    $sql_query .= ' GROUP BY service_status';
 
     // $service is not null, get only what we want.
     $result = dbFetchRows($sql_query, $sql_param);
@@ -36,7 +36,7 @@ function get_service_status($device = null)
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip = '', $param = "", $ignore = 0, $disabled = 0)
+function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0)
 {
     if (! is_array($device)) {
         $device = device_by_id_cache($device);
@@ -53,20 +53,20 @@ function add_service($device, $type, $desc, $ip = '', $param = "", $ignore = 0, 
 
 function service_get($device = null, $service = null)
 {
-    $sql_query = "SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds` FROM `services` WHERE";
+    $sql_query = 'SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds` FROM `services` WHERE';
     $sql_param = [];
     $add = 0;
 
-    d_echo("SQL Query: " . $sql_query);
+    d_echo('SQL Query: ' . $sql_query);
     if (! is_null($service)) {
         // Add a service filter to the SQL query.
-        $sql_query .= " `service_id` = ? AND";
+        $sql_query .= ' `service_id` = ? AND';
         $sql_param[] = $service;
         $add++;
     }
     if (! is_null($device)) {
         // Add a device filter to the SQL query.
-        $sql_query .= " `device_id` = ? AND";
+        $sql_query .= ' `device_id` = ? AND';
         $sql_param[] = $device;
         $add++;
     }
@@ -78,11 +78,11 @@ function service_get($device = null, $service = null)
         // We have filters, remove " AND" -4
         $sql_query = substr($sql_query, 0, strlen($sql_query) - 4);
     }
-    d_echo("SQL Query: " . $sql_query);
+    d_echo('SQL Query: ' . $sql_query);
 
     // $service is not null, get only what we want.
     $services = dbFetchRows($sql_query, $sql_param);
-    d_echo("Service Array: " . print_r($services, true) . "\n");
+    d_echo('Service Array: ' . print_r($services, true) . "\n");
 
     return $services;
 }
@@ -119,7 +119,7 @@ function poll_service($service)
 {
     $update = [];
     $old_status = $service['service_status'];
-    $check_cmd = "";
+    $check_cmd = '';
 
     // if we have a script for this check, use it.
     $check_script = Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
@@ -128,9 +128,9 @@ function poll_service($service)
     }
 
     // If we do not have a cmd from the check script, build one.
-    if ($check_cmd == "") {
-        $check_cmd = Config::get('nagios_plugins') . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
-        $check_cmd .= " " . $service['service_param'];
+    if ($check_cmd == '') {
+        $check_cmd = Config::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
+        $check_cmd .= ' ' . $service['service_param'];
     }
 
     $service_id = $service['service_id'];
@@ -150,8 +150,8 @@ function poll_service($service)
         foreach ($perf as $k => $v) {
             $DS[$k] = $v['uom'];
         }
-        d_echo("Service DS: " . _json_encode($DS) . "\n");
-        if (($service['service_ds'] == "{}") || ($service['service_ds'] == "")) {
+        d_echo('Service DS: ' . _json_encode($DS) . "\n");
+        if (($service['service_ds'] == '{}') || ($service['service_ds'] == '')) {
             $update['service_ds'] = json_encode($DS);
         }
 
@@ -234,7 +234,7 @@ function check_service($command)
     $response_string = implode("\n", $response_array);
 
     // Split out the response and the performance data.
-    [$response, $perf] = explode("|", $response_string);
+    [$response, $perf] = explode('|', $response_string);
 
     // Split each performance metric
     $perf_arr = explode(' ', $perf);
@@ -264,14 +264,14 @@ function check_service($command)
             }
         }
 
-        if ($ds != "") {
+        if ($ds != '') {
             // Normalize ds for rrd : ds-name must be 1 to 19 characters long in the characters [a-zA-Z0-9_]
             // http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
             $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
             // if ds_name is longer than 19 characters, only use the first 19
             if (strlen($normalized_ds) > 19) {
                 $normalized_ds = substr($normalized_ds, 0, 19);
-                d_echo($ds . " exceeded 19 characters, renaming to " . $normalized_ds . "\n");
+                d_echo($ds . ' exceeded 19 characters, renaming to ' . $normalized_ds . "\n");
             }
             if ($ds != $normalized_ds) {
                 // ds has changed. check if normalized_ds is already in the array
@@ -302,13 +302,13 @@ function check_service($command)
                         }
                     }
                     if ($perf_unique == 0) {
-                        d_echo("could not generate a unique ds-name for " . $ds . "\n");
+                        d_echo('could not generate a unique ds-name for ' . $ds . "\n");
                     }
                 }
                 $ds = $normalized_ds;
             }
             // We have a DS. Add an entry to the array.
-            d_echo("Perf Data - DS: " . $ds . ", Value: " . $value . ", UOM: " . $uom . "\n");
+            d_echo('Perf Data - DS: ' . $ds . ', Value: ' . $value . ', UOM: ' . $uom . "\n");
             $metrics[$ds] = ['value'=>$value, 'uom'=>$uom];
         } else {
             // No DS. Don't add an entry to the array.

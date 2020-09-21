@@ -1,6 +1,6 @@
 <?php
 
-echo "Raisecom";
+echo 'Raisecom';
 
 $multiplier = 1;
 $divisor = 1000;
@@ -23,7 +23,7 @@ foreach ($pre_cache['raisecomOpticalTransceiverDDMTable'] as $index => $data) {
     }
 }
 $descr = 'System Temperature';
-$oid = ".1.3.6.1.4.1.8886.1.1.4.2.1.0"; // raisecomTemperatureValue
+$oid = '.1.3.6.1.4.1.8886.1.1.4.2.1.0'; // raisecomTemperatureValue
 $value = snmp_get($device, $oid, ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
 $low_limit = snmp_get($device, 'raisecomTemperatureThresholdLow.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
 $high_limit = snmp_get($device, 'raisecomTemperatureThresholdHigh.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');

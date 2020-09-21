@@ -26,7 +26,7 @@ $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.10.1.6', [], 'U
 foreach ($port_stats as $index => $afport_stats) {
     if ($afport_stats['ifDescr'] == 'eth0') {
         if (isset($airos_stats[0]['afLTUethConnected'])) {
-            $port_stats[$index]['ifOperStatus'] = ($airos_stats[0]['afLTUethConnected'] == "connected" ? "up" : "down");
+            $port_stats[$index]['ifOperStatus'] = ($airos_stats[0]['afLTUethConnected'] == 'connected' ? 'up' : 'down');
             $port_stats[$index]['ifHCInOctets'] = $airos_stats[0]['afLTUethRxBytes'];
             $port_stats[$index]['ifHCOutOctets'] = $airos_stats[0]['afLTUethTxBytes'];
             $port_stats[$index]['ifHCInUcastPkts'] = $airos_stats[0]['afLTUethRxPps'];

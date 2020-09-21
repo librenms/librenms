@@ -51,7 +51,7 @@ $transports = dbFetchRows($sql, $params);
 
 $more = ($offset + count($transports)) < $total;
 $transports = array_map(function ($transport) {
-    $transport['text'] = ucfirst($transport['type']) . ": " . $transport['text'];
+    $transport['text'] = ucfirst($transport['type']) . ': ' . $transport['text'];
     unset($transport['type']);
 
     return $transport;

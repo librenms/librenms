@@ -114,7 +114,7 @@ if ($phasecount > 1) {
         discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
     // rPDUIdentDeviceLinetoLineVoltage
-    $oids = snmp_get($device, ".1.3.6.1.4.1.318.1.1.12.1.15.0", "-OsqnU");
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.12.1.15.0', '-OsqnU');
     d_echo($oids . "\n");
     if ($oids) {
         echo ' Voltage In ';

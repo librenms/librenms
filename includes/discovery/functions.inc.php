@@ -29,7 +29,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         $ip = $hostname;
         if (! Config::get('discovery_by_ip', false)) {
             d_echo('Discovery by IP disabled, skipping ' . $hostname);
-            log_event("$method discovery of " . $hostname . " failed - Discovery by IP disabled", $device['device_id'], 'discovery', 4);
+            log_event("$method discovery of " . $hostname . ' failed - Discovery by IP disabled', $device['device_id'], 'discovery', 4);
 
             return false;
         }
@@ -44,7 +44,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         $ip = gethostbyname($hostname);
         if ($ip == $hostname) {
             d_echo("name lookup of $hostname failed\n");
-            log_event("$method discovery of " . $hostname . " failed - Check name lookup", $device['device_id'], 'discovery', 5);
+            log_event("$method discovery of " . $hostname . ' failed - Check name lookup', $device['device_id'], 'discovery', 5);
 
             return false;
         }
@@ -149,9 +149,9 @@ function discover_device(&$device, $force_module = false)
 
     foreach ($discovery_devices as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
-        d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
-        d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-        d_echo("Device" . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
+        d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
+        d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
+        d_echo('Device' . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
         if ($force_module === true ||
             $attribs['discover_' . $module] ||
             ($os_module_status && ! isset($attribs['discover_' . $module])) ||
@@ -856,7 +856,7 @@ function check_entity_sensor($string, $device)
     $fringe = array_merge(Config::get('bad_entity_sensor_regex', []), Config::getOsSetting($device['os'], 'bad_entity_sensor_regex', []));
 
     foreach ($fringe as $bad) {
-        if (preg_match($bad . "i", $string)) {
+        if (preg_match($bad . 'i', $string)) {
             d_echo("Ignored entity sensor: $bad : $string");
 
             return false;
@@ -896,7 +896,7 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type == 'frequency') {
-            if (Str::startsWith($device['hardware'], "UPS2000")) {
+            if (Str::startsWith($device['hardware'], 'UPS2000')) {
                 return 10;
             }
 
@@ -1052,7 +1052,7 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
                     // if index is a string, we need to convert it to OID
                     // strlen($index) as first number, and each letter converted to a number, separated by dots
-                    $oid = str_replace('{{ $index_string }}', strlen($index) . '.' . implode(".", unpack("c*", $index)), $oid);
+                    $oid = str_replace('{{ $index_string }}', strlen($index) . '.' . implode('.', unpack('c*', $index)), $oid);
 
                     // process the description
                     $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
@@ -1160,7 +1160,7 @@ function build_bgp_peers($device, $data, $peer2)
         [$peer_ip, $peer_as] = explode(' ', $peer);
         if ($device['os'] === 'junos') {
             $ver = '';
-            $octets = count(explode(".", $peer_ip));
+            $octets = count(explode('.', $peer_ip));
             if ($octets > 11) {
                 // ipv6
                 $peer_ip = (string) IP::parse(snmp2ipv6($peer_ip), true);
@@ -1306,7 +1306,7 @@ function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
     if (! empty($sensor_class) && Config::getCombined($device['os'], "disabled_sensors.$sensor_class", false)) {
         return true;
     }
-    foreach (Config::getCombined($device['os'], "disabled_sensors_regex", []) as $skipRegex) {
+    foreach (Config::getCombined($device['os'], 'disabled_sensors_regex', []) as $skipRegex) {
         if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
             return true;
         }
@@ -1460,13 +1460,13 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
     if ($device_id) {
         if ($description) {
             // order is important here, the standard says this is ifDescr, which some mfg confuse with ifName
-            $statements[] = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifName`=?)";
+            $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifName`=?)';
             $params[] = $device_id;
             $params[] = $description;
             $params[] = $description;
 
             // we check ifAlias last because this is a user editable field, but some bad LLDP implementations use it
-            $statements[] = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?";
+            $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?';
             $params[] = $device_id;
             $params[] = $description;
         }

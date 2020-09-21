@@ -46,7 +46,7 @@ if (count($components > 0)) {
                 if ($tblUCSObjects[$array['statusoid']] != 1) {
                     // Yes, report an error
                     $array['status'] = 2;
-                    $array['error'] = "Error Operability Code: " . $tblUCSObjects[$array['statusoid']] . "\n";
+                    $array['error'] = 'Error Operability Code: ' . $tblUCSObjects[$array['statusoid']] . "\n";
                 } else {
                     // No, unset any errors that may exist.
                     $array['status'] = 0;
@@ -70,7 +70,7 @@ if (count($components > 0)) {
             if ($array['status'] == 0) {
                 d_echo($array['label'] . " - Ok\n");
             } else {
-                d_echo($array['label'] . " - " . $array['error'] . "\n");
+                d_echo($array['label'] . ' - ' . $array['error'] . "\n");
             }
         } // End foreach components
         // Write the Components back to the DB.

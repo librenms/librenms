@@ -41,7 +41,7 @@ class Snmpsim
         $this->ip = $ip;
         $this->port = $port;
         $this->log = $log;
-        $this->snmprec_dir = Config::get('install_dir') . "/tests/snmpsim/";
+        $this->snmprec_dir = Config::get('install_dir') . '/tests/snmpsim/';
     }
 
     /**
@@ -159,7 +159,7 @@ class Snmpsim
         $cmd .= " --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
 
         if (is_null($this->log)) {
-            $cmd .= " --logging-method=null";
+            $cmd .= ' --logging-method=null';
         } elseif ($with_log) {
             $cmd .= " --logging-method=file:{$this->log}";
         }

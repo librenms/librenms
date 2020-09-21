@@ -68,9 +68,9 @@ if ($port_id_file) {
     if ($port_id_file == '-') {
         $fh = STDIN;
     } else {
-        $fh = fopen($port_id_file, "r");
+        $fh = fopen($port_id_file, 'r');
         if (! $fh) {
-            echo "Failed to open port-id list \"" . $port_id_file . "\": \n";
+            echo 'Failed to open port-id list "' . $port_id_file . "\": \n";
             exit(1);
         }
     }

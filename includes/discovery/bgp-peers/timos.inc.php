@@ -30,9 +30,9 @@ if (Config::get('enable_bgp')) {
     if ($device['os'] == 'timos') {
         $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
         foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode(".", $key);
+            $oid = explode('.', $key);
             $vrfInstance = $oid[0];
-            $address = str_replace($oid[0] . "." . $oid[1] . ".", '', $key);
+            $address = str_replace($oid[0] . '.' . $oid[1] . '.', '', $key);
             if (strlen($address) > 15) {
                 $address = IP::fromHexString($address)->compressed();
             }

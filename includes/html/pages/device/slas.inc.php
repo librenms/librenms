@@ -12,7 +12,7 @@ if ($vars['id']) {
     }
 
     if ($sla['opstatus'] == 2) {
-        $danger = "panel-danger";
+        $danger = 'panel-danger';
     } else {
         $danger = '';
     }
@@ -103,7 +103,7 @@ if ($vars['id']) {
         }
 
         $opstatus = ($sla['opstatus'] === 0) ? 'up' : 'down';
-        d_echo("<br>Opstatus :: var: " . $vars['opstatus'] . ", db: " . $sla['opstatus'] . ", name: " . $opstatus . "<br>");
+        d_echo('<br>Opstatus :: var: ' . $vars['opstatus'] . ', db: ' . $sla['opstatus'] . ', name: ' . $opstatus . '<br>');
         if ($vars['opstatus'] != 'all' && $vars['opstatus'] != $opstatus) {
             continue;
         }
@@ -119,14 +119,14 @@ if ($vars['id']) {
 
         // These Types have more graphs. Display a sub-page
         if (($sla['rtt_type'] == 'jitter') || ($sla['rtt_type'] == 'icmpjitter')) {
-            $name = '<a href="' . generate_url($vars, ['tab' => "slas", 'id' => $sla['sla_id']]) . '">' . $name . '</a>';
+            $name = '<a href="' . generate_url($vars, ['tab' => 'slas', 'id' => $sla['sla_id']]) . '">' . $name . '</a>';
         } else {
             $name = htmlentities($name);
         }
 
         // If we have an error highlight the row.
         if ($sla['opstatus'] == 2) {
-            $danger = "panel-danger";
+            $danger = 'panel-danger';
         } else {
             $danger = '';
         }

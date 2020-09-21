@@ -41,7 +41,7 @@ SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmSnmpDyingGaspTrap";
 
         $trap = new Trap($trapText);
 
-        $message = "Dying Gasp received";
+        $message = 'Dying Gasp received';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmSnmpDyingGaspTrap');

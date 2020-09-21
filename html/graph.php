@@ -30,7 +30,7 @@ Datastore::terminate();
 
 if ($debug) {
     echo '<br />';
-    printf("Runtime %.3fs", microtime(true) - $start);
+    printf('Runtime %.3fs', microtime(true) - $start);
     echo '<br />';
     printStats();
 }

@@ -465,7 +465,7 @@ class CiHelper
         }
 
         echo "Running composer install to install developer dependencies.\n";
-        passthru("scripts/composer_wrapper.php install");
+        passthru('scripts/composer_wrapper.php install');
 
         if (is_executable($path)) {
             return $path;
@@ -494,7 +494,7 @@ class CiHelper
         }
 
         // check system
-        $system_path = rtrim(exec("which pylint 2>/dev/null"));
+        $system_path = rtrim(exec('which pylint 2>/dev/null'));
         if (is_executable($system_path)) {
             return $system_path;
         }

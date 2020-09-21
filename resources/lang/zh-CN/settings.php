@@ -286,8 +286,8 @@ return [
             'description' => 'LDAP 版本',
             'help' => '用来与 LDAP Server 进行连接的版本，通常应是 v3',
             'options' => [
-                "2" => "2",
-                "3" => "3",
+                '2' => '2',
+                '3' => '3',
             ],
         ],
         'auth_mechanism' => [
@@ -809,7 +809,7 @@ return [
     ],
     'twofactor' => [
         'description' => '启用双因素验证',
-        'help' => "Enables the built in Two-Factor authentication. You must set up each account to make it active.",
+        'help' => 'Enables the built in Two-Factor authentication. You must set up each account to make it active.',
     ],
     'units' => [
         'days' => '日',

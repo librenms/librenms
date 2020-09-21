@@ -56,7 +56,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', [$port_device_id]) as $interface) {
                                 $interface = cleanPort($interface);
                                 $string = $interface['label'] . ' - ' . display($interface['ifAlias']);
-                                $selected = $interface['port_id'] === $port['port_id'] ? " selected" : "";
+                                $selected = $interface['port_id'] === $port['port_id'] ? ' selected' : '';
                                 echo "<option value='${interface['port_id']}' $selected>$string</option>\n";
                             }
                         } ?>

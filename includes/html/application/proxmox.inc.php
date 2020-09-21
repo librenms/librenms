@@ -23,7 +23,7 @@
  */
 function proxmox_cluster_vms($c)
 {
-    return dbFetchRows("SELECT * FROM proxmox WHERE cluster = ? ORDER BY vmid", [$c]);
+    return dbFetchRows('SELECT * FROM proxmox WHERE cluster = ? ORDER BY vmid', [$c]);
 }
 
 /**
@@ -33,7 +33,7 @@ function proxmox_cluster_vms($c)
  */
 function proxmox_node_vms($n)
 {
-    return dbFetchRows("SELECT * FROM proxmox WHERE device_id = ? ORDER BY vmid", [$n]);
+    return dbFetchRows('SELECT * FROM proxmox WHERE device_id = ? ORDER BY vmid', [$n]);
 }
 
 /**
@@ -44,10 +44,10 @@ function proxmox_node_vms($n)
  */
 function proxmox_vm_info($vmid, $c)
 {
-    $vm = dbFetchRow("SELECT pm.*, d.hostname AS host, d.device_id FROM proxmox pm, devices d WHERE pm.device_id = d.device_id AND pm.vmid = ? AND pm.cluster = ?", [$vmid, $c]);
-    $appid = dbFetchRow("SELECT app_id FROM applications WHERE device_id = ? AND app_type = ?", [$vm['device_id'], 'proxmox']);
+    $vm = dbFetchRow('SELECT pm.*, d.hostname AS host, d.device_id FROM proxmox pm, devices d WHERE pm.device_id = d.device_id AND pm.vmid = ? AND pm.cluster = ?', [$vmid, $c]);
+    $appid = dbFetchRow('SELECT app_id FROM applications WHERE device_id = ? AND app_type = ?', [$vm['device_id'], 'proxmox']);
 
-    $vm['ports'] = dbFetchRows("SELECT * FROM proxmox_ports WHERE vm_id = ?", [$vm['id']]);
+    $vm['ports'] = dbFetchRows('SELECT * FROM proxmox_ports WHERE vm_id = ?', [$vm['id']]);
     $vm['app_id'] = $appid['app_id'];
 
     return $vm;

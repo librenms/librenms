@@ -17,13 +17,13 @@ if (! Auth::user()->hasGlobalAdmin()) {
 } else {
     if (isset($_POST['viewtype'])) {
         if ($_POST['viewtype'] == 'fulllist') {
-            $deps_query = "SELECT a.device_id as id, a.hostname as hostname, a.sysName as sysName, GROUP_CONCAT(b.hostname) as parent, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id = a1.parent_device_id GROUP BY a.device_id, a.hostname, a.sysName";
+            $deps_query = 'SELECT a.device_id as id, a.hostname as hostname, a.sysName as sysName, GROUP_CONCAT(b.hostname) as parent, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id = a1.parent_device_id GROUP BY a.device_id, a.hostname, a.sysName';
 
             if (isset($_POST['searchPhrase']) && ! empty($_POST['searchPhrase'])) {
-                $deps_query .= " HAVING parent LIKE ? OR hostname LIKE ? OR sysName LIKE ? ";
-                $count_query = "SELECT COUNT(*) FROM (" . $deps_query . ") AS rowcount";
+                $deps_query .= ' HAVING parent LIKE ? OR hostname LIKE ? OR sysName LIKE ? ';
+                $count_query = 'SELECT COUNT(*) FROM (' . $deps_query . ') AS rowcount';
             } else {
-                $count_query = "SELECT COUNT(device_id) AS rowcount FROM devices";
+                $count_query = 'SELECT COUNT(device_id) AS rowcount FROM devices';
             }
 
             // if format is set we're trying to pull the Bootgrid table data
@@ -34,18 +34,18 @@ if (! Auth::user()->hasGlobalAdmin()) {
                         $order_by .= " $key $value";
                     }
                 } else {
-                    $order_by = " a.hostname";
+                    $order_by = ' a.hostname';
                 }
 
-                $deps_query .= " ORDER BY " . $order_by;
+                $deps_query .= ' ORDER BY ' . $order_by;
 
                 if (is_numeric($_POST['rowCount']) && is_numeric($_POST['current'])) {
                     $rows = $_POST['rowCount'];
                     $current = $_POST['current'];
-                    $deps_query .= " LIMIT " . $rows * ($current - 1) . ", " . $rows;
+                    $deps_query .= ' LIMIT ' . $rows * ($current - 1) . ', ' . $rows;
                 }
             } else {
-                $deps_query .= " ORDER BY a.hostname";
+                $deps_query .= ' ORDER BY a.hostname';
             }
 
             if (isset($_POST['format']) && ! empty($_POST['searchPhrase'])) {
@@ -69,7 +69,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
                     $hostname = format_hostname($myrow);
                     $sysname = ($hostname == $myrow['sysName']) ? $myrow['hostname'] : $myrow['sysName'];
-                    array_push($res_arr, ["deviceid" => $myrow['id'], "hostname" => $hostname, "sysname" => $sysname, "parent" => $parent, "parentid" => $myrow['parentid']]);
+                    array_push($res_arr, ['deviceid' => $myrow['id'], 'hostname' => $hostname, 'sysname' => $sysname, 'parent' => $parent, 'parentid' => $myrow['parentid']]);
                 }
                 $status = ['current' => $_POST['current'], 'rowCount' => $_POST['rowCount'], 'rows' => $res_arr, 'total' => $rec_count];
             } else {
@@ -82,7 +82,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                     $device_deps = dbFetchRows('SELECT `device_id`,`hostname` from `devices` as a LEFT JOIN `device_relationships` as b ON b.`child_device_id` =  a.`device_id` WHERE b.`child_device_id` is null ORDER BY `hostname`');
                 } else {
                     $parents = implode(',', $_POST['parent_ids']);
-                    $device_deps = dbFetchRows("SELECT  a.device_id as device_id, a.hostname as hostname, GROUP_CONCAT(b.hostname) as parent, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname HAVING parentid = ?", [$parents]);
+                    $device_deps = dbFetchRows('SELECT  a.device_id as device_id, a.hostname as hostname, GROUP_CONCAT(b.hostname) as parent, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname HAVING parentid = ?', [$parents]);
                 }
 
                 $status = ['status' => 0, 'deps' => $device_deps];

@@ -9,5 +9,5 @@
  * the source code distribution for details.
  */
 
-$version = trim(snmp_get($device, ".1.3.6.1.4.1.7262.2.2.1.3.2.1.0", "-Ovq"), '" ');
-$serial = trim(snmp_get($device, ".1.3.6.1.4.1.7262.2.2.1.3.1.1.0", "-Ovq"), '" ');
+$version = trim(snmp_get($device, '.1.3.6.1.4.1.7262.2.2.1.3.2.1.0', '-Ovq'), '" ');
+$serial = trim(snmp_get($device, '.1.3.6.1.4.1.7262.2.2.1.3.1.1.0', '-Ovq'), '" ');

@@ -48,25 +48,25 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
     }
 
     if (! extension_loaded('pdo_mysql')) {
-        throw new DatabaseConnectException("PHP pdo_mysql extension not loaded!");
+        throw new DatabaseConnectException('PHP pdo_mysql extension not loaded!');
     }
 
     try {
         if (! is_null($db_host) || ! empty($db_name)) {
             // legacy connection override
             \Config::set('database.connections.setup', [
-                "driver" => "mysql",
-                "host" => $db_host,
-                "port" => $db_port,
-                "database" => $db_name,
-                "username" => $db_user,
-                "password" => $db_pass,
-                "unix_socket" => $db_socket,
-                "charset" => "utf8",
-                "collation" => "utf8_unicode_ci",
-                "prefix" => "",
-                "strict" => true,
-                "engine" => null,
+                'driver' => 'mysql',
+                'host' => $db_host,
+                'port' => $db_port,
+                'database' => $db_name,
+                'username' => $db_user,
+                'password' => $db_pass,
+                'unix_socket' => $db_socket,
+                'charset' => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+                'prefix' => '',
+                'strict' => true,
+                'engine' => null,
             ]);
             \Config::set('database.default', 'setup');
         }
@@ -467,7 +467,7 @@ function dbHandleException(QueryException $exception)
     $message = $exception->getMessage();
 
     if ($exception->getCode() == 2002) {
-        $message = "Could not connect to database! " . $message;
+        $message = 'Could not connect to database! ' . $message;
     }
 
     // ? bindings should already be replaced, just replace named bindings
@@ -482,7 +482,7 @@ function dbHandleException(QueryException $exception)
     if (Laravel::isBooted()) {
         Log::error($message);
     } else {
-        c_echo("%rSQL Error!%n ");
+        c_echo('%rSQL Error!%n ');
         echo $message . PHP_EOL;
     }
 

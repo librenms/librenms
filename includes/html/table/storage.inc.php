@@ -24,14 +24,14 @@ $sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `S`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `S`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 $sql .= " WHERE $where";
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`hostname` LIKE ? OR `storage_descr` LIKE ?)";
+    $sql .= ' AND (`hostname` LIKE ? OR `storage_descr` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
 }

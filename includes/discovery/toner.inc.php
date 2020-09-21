@@ -104,7 +104,7 @@ if ($device['os_group'] == 'printer') {
 d_echo("\n Checking valid toner ... \n");
 d_echo($valid_toner);
 
-$toners = dbFetchRows("SELECT * FROM toner WHERE device_id = ?", [$device['device_id']]);
+$toners = dbFetchRows('SELECT * FROM toner WHERE device_id = ?', [$device['device_id']]);
 //d_echo($toners);
 foreach ($toners as $test_toner) {
     $toner_oid = $test_toner['toner_oid'];

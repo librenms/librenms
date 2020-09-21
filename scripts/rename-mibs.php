@@ -67,7 +67,7 @@ function rename_mib_file($file)
 function extract_mib_name($file)
 {
     // extract the mib name (tried regex, but was too complex and I had to read the whole file)
-    if ($handle = fopen($file, "r")) {
+    if ($handle = fopen($file, 'r')) {
         $header = '';
         while (($line = fgets($handle)) !== false) {
             $trimmed = trim($line);

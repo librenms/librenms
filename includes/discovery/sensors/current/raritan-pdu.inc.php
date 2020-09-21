@@ -53,7 +53,7 @@ if ($outlet_oids) {
 }
 
 // Check for per-outlet polling PDU2-MIB
-$outlet_oids = snmp_walk($device, ".1.3.6.1.4.1.13742.6.3.5.3.1.2.1", "-Osqn", "PDU2-MIB");
+$outlet_oids = snmp_walk($device, '.1.3.6.1.4.1.13742.6.3.5.3.1.2.1', '-Osqn', 'PDU2-MIB');
 $outlet_oids = trim($outlet_oids);
 if ($outlet_oids) {
     d_echo('PDU2 MIB Outlets');
@@ -114,6 +114,6 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
         $warn_limit = $raritan_data['inletCurrentLowerWarning'] / $divisor;
         $high_limit = $raritan_data['inletCurrentLowerCritical'] / $divisor;
         $current = $pre_cache['raritan_inletPoleTable'][$index][$x]['inletPoleCurrent'] / $divisor;
-        discover_sensor($valid["sensor"], "current", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+        discover_sensor($valid['sensor'], 'current', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
     }
 }

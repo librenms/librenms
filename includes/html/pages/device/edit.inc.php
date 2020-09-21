@@ -7,7 +7,7 @@ $link_array = ['page'    => 'device',
     'tab' => 'edit', ];
 
 if (! Auth::user()->hasGlobalAdmin()) {
-    print_error("Insufficient Privileges");
+    print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';
     $panes['snmp'] = 'SNMP';
@@ -15,7 +15,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $panes['ports'] = 'Port Settings';
     }
 
-    if (dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ? LIMIT 1", [$device['device_id']]) > 0) {
+    if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ? LIMIT 1', [$device['device_id']]) > 0) {
         $panes['routing'] = 'Routing';
     }
 
@@ -72,9 +72,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
         echo generate_link($text, $link_array, ['section'=>$type]);
 
         if ($vars['section'] == $type) {
-            echo "</span>";
+            echo '</span>';
         }
-        $sep = " | ";
+        $sep = ' | ';
     }
 
     print_optionbar_end();
@@ -85,4 +85,4 @@ if (! Auth::user()->hasGlobalAdmin()) {
     }
 }
 
-$pagetitle[] = "Settings";
+$pagetitle[] = 'Settings';

@@ -46,16 +46,16 @@ class AdvaSysAlmTrap implements SnmptrapHandler
     {
         $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
         switch ($alSeverity) {
-            case "critical":
+            case 'critical':
                 $logSeverity = 5;
                 break;
-            case "major":
+            case 'major':
                 $logSeverity = 4;
                 break;
-            case "minor":
+            case 'minor':
                 $logSeverity = 3;
                 break;
-            case "cleared":
+            case 'cleared':
                 $logSeverity = 1;
                 break;
             default:

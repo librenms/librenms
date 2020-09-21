@@ -32,11 +32,11 @@ if (empty($hardware)) {
     $hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:CISCO-PRODUCTS-MIB');
 }
 
-$stats = snmpwalk_cache_oid($device, "bsnAPEntry", $stats, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
-$radios = snmpwalk_cache_oid($device, "bsnAPIfEntry", $radios, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
+$stats = snmpwalk_cache_oid($device, 'bsnAPEntry', $stats, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
+$radios = snmpwalk_cache_oid($device, 'bsnAPIfEntry', $radios, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
 $APstats = snmpwalk_cache_oid($device, 'bsnApIfNoOfUsers', $APstats, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsxb');
-$loadParams = snmpwalk_cache_oid($device, "bsnAPIfLoadChannelUtilization", $loadParams, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
-$interferences = snmpwalk_cache_oid($device, "bsnAPIfInterferencePower", $interferences, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
+$loadParams = snmpwalk_cache_oid($device, 'bsnAPIfLoadChannelUtilization', $loadParams, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
+$interferences = snmpwalk_cache_oid($device, 'bsnAPIfInterferencePower', $interferences, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
 
 $numAccessPoints = count($stats);
 $numClients = 0;

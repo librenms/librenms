@@ -52,8 +52,8 @@ $sql = "SELECT `transport_group_id` AS `id`, `transport_group_name` AS `text` FR
 $groups = dbFetchRows($sql, $params);
 $more = ($offset + count($groups)) < $total;
 $groups = array_map(function ($group) {
-    $group['text'] = "Group: " . $group['text'];
-    $group['id'] = "g" . $group['id'];
+    $group['text'] = 'Group: ' . $group['text'];
+    $group['id'] = 'g' . $group['id'];
 
     return $group;
 }, $groups);

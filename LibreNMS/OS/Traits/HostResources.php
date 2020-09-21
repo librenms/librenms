@@ -36,7 +36,7 @@ trait HostResources
      */
     public function discoverProcessors()
     {
-        echo "Host Resources: ";
+        echo 'Host Resources: ';
         $processors = [];
 
         try {

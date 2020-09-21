@@ -25,6 +25,6 @@ if ($device['os'] == 'dlink') {
     $dlink_mempools = snmpwalk_cache_oid($device, 'dEntityExtMemoryUtilTable', [], 'DLINKSW-ENTITY-EXT-MIB');
     foreach ($dlink_mempools as $tmp_index => $dlink_data) {
         [,$dlink_type] = explode('.', $tmp_index);
-        discover_mempool($valid_mempool, $device, $tmp_index, 'dlink', ucfirst($dlink_type) . " Memory");
+        discover_mempool($valid_mempool, $device, $tmp_index, 'dlink', ucfirst($dlink_type) . ' Memory');
     }
 }

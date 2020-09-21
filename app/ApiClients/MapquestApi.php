@@ -60,7 +60,7 @@ class MapquestApi extends BaseApi implements Geocoder
     {
         $api_key = Config::get('geoloc.api_key');
         if (! $api_key) {
-            throw new Exception("MapQuest API key missing, set geoloc.api_key");
+            throw new Exception('MapQuest API key missing, set geoloc.api_key');
         }
 
         return [

@@ -247,7 +247,7 @@ class Rrd extends BaseDatastore
             ];
         }
         if (count($fields) > 0) {
-            $options = "--maximum " . implode(":$max --maximum ", $fields) . ":$max";
+            $options = '--maximum ' . implode(":$max --maximum ", $fields) . ":$max";
             $this->command('tune', $filename, $options);
         }
 
@@ -301,11 +301,11 @@ class Rrd extends BaseDatastore
         $newrrd = self::name($device['hostname'], $newname);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
-                log_event("Renamed $oldrrd to $newrrd", $device, "poller", 1);
+                log_event("Renamed $oldrrd to $newrrd", $device, 'poller', 1);
 
                 return true;
             } else {
-                log_event("Failed to rename $oldrrd to $newrrd", $device, "poller", 5);
+                log_event("Failed to rename $oldrrd to $newrrd", $device, 'poller', 5);
 
                 return false;
             }
@@ -323,11 +323,11 @@ class Rrd extends BaseDatastore
      * @param string $extension File extension (default is .rrd)
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function name($host, $extra, $extension = ".rrd")
+    public function name($host, $extra, $extension = '.rrd')
     {
-        $filename = self::safeName(is_array($extra) ? implode("-", $extra) : $extra);
+        $filename = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
-        return implode("/", [$this->dirFromHost($host), $filename . $extension]);
+        return implode('/', [$this->dirFromHost($host), $filename . $extension]);
     }
 
     /**
@@ -340,7 +340,7 @@ class Rrd extends BaseDatastore
     {
         $host = str_replace(':', '_', trim($host, '[]'));
 
-        return implode("/", [$this->rrd_dir, $host]);
+        return implode('/', [$this->rrd_dir, $host]);
     }
 
     /**

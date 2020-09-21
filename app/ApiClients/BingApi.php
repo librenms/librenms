@@ -60,7 +60,7 @@ class BingApi extends BaseApi implements Geocoder
     {
         $api_key = Config::get('geoloc.api_key');
         if (! $api_key) {
-            throw new Exception("Bing API key missing, set geoloc.api_key");
+            throw new Exception('Bing API key missing, set geoloc.api_key');
         }
 
         return [

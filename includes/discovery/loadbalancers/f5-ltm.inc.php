@@ -15,13 +15,13 @@
 use LibreNMS\Util\IP;
 
 $error_poolaction = [];
-$error_poolaction[0] = "Unused";
-$error_poolaction[1] = "Reboot";
-$error_poolaction[2] = "Restart";
-$error_poolaction[3] = "Failover";
-$error_poolaction[4] = "Failover and Restart";
-$error_poolaction[5] = "Go Active";
-$error_poolaction[6] = "None";
+$error_poolaction[0] = 'Unused';
+$error_poolaction[1] = 'Reboot';
+$error_poolaction[2] = 'Restart';
+$error_poolaction[3] = 'Failover';
+$error_poolaction[4] = 'Failover and Restart';
+$error_poolaction[5] = 'Go Active';
+$error_poolaction[6] = 'None';
 
 $component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id']);
@@ -172,9 +172,9 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
             // Do we have any results
             if (count($result) > 0) {
                 // Let's log some debugging
-                d_echo("\n\n" . $result['type'] . ": " . $result['label'] . "\n");
-                d_echo("    Status:  " . $result['status'] . "\n");
-                d_echo("    Message: " . $result['error'] . "\n");
+                d_echo("\n\n" . $result['type'] . ': ' . $result['label'] . "\n");
+                d_echo('    Status:  ' . $result['status'] . "\n");
+                d_echo('    Message: ' . $result['error'] . "\n");
 
                 // Add this result to the master array.
                 $tblBigIP[] = $result;
@@ -231,7 +231,7 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
                 if ($result['currentup'] < $result['minup']) {
                     // Danger Will Robinson... We dont have enough Pool Members!
                     $result['status'] = 2;
-                    $result['error'] = "Minimum Pool Members not met. Action taken: " . $error_poolaction[$result['minupaction']];
+                    $result['error'] = 'Minimum Pool Members not met. Action taken: ' . $error_poolaction[$result['minupaction']];
                 } else {
                     // All is good.
                     $result['status'] = 0;
@@ -242,9 +242,9 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
             // Do we have any results
             if (count($result) > 0) {
                 // Let's log some debugging
-                d_echo("\n\n" . $result['type'] . ": " . $result['label'] . "\n");
-                d_echo("    Status:            " . $result['status'] . "\n");
-                d_echo("    Message:           " . $result['error'] . "\n");
+                d_echo("\n\n" . $result['type'] . ': ' . $result['label'] . "\n");
+                d_echo('    Status:            ' . $result['status'] . "\n");
+                d_echo('    Message:           ' . $result['error'] . "\n");
 
                 // Add this result to the master array.
                 $tblBigIP[] = $result;
@@ -285,7 +285,7 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
                 if (($result['available'] == 1) && ($result['state'] == 3)) {
                     // Warning Alarm, the pool member is down.
                     $result['status'] = 1;
-                    $result['error'] = "Pool Member is Down: " . $ltmPoolMemberEntry['errorcode']['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.' . $index];
+                    $result['error'] = 'Pool Member is Down: ' . $ltmPoolMemberEntry['errorcode']['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.' . $index];
                 } else {
                     // All is good.
                     $result['status'] = 0;
@@ -296,9 +296,9 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
             // Do we have any results
             if (count($result) > 0) {
                 // Let's log some debugging
-                d_echo("\n\n" . $result['type'] . ": " . $result['label'] . "\n");
-                d_echo("    Status:   " . $result['status'] . "\n");
-                d_echo("    Message:  " . $result['error'] . "\n");
+                d_echo("\n\n" . $result['type'] . ': ' . $result['label'] . "\n");
+                d_echo('    Status:   ' . $result['status'] . "\n");
+                d_echo('    Message:  ' . $result['error'] . "\n");
 
                 // Add this result to the master array.
                 $tblBigIP[] = $result;
@@ -327,11 +327,11 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
             $new_component = $component->createComponent($device['device_id'], $array['type']);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
-            echo "+";
+            echo '+';
         } else {
             // The component does exist, merge the details in - UPDATE.
             $components[$component_key] = array_merge($components[$component_key], $array);
-            echo ".";
+            echo '.';
         }
     }
 
@@ -351,7 +351,7 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
 
         if ($found === false) {
             // The component has not been found. we should delete it.
-            echo "-";
+            echo '-';
             $component->deleteComponent($key);
         }
     }

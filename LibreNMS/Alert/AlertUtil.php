@@ -40,7 +40,7 @@ class AlertUtil
      */
     private static function getRuleId($alert_id)
     {
-        $query = "SELECT `rule_id` FROM `alerts` WHERE `id`=?";
+        $query = 'SELECT `rule_id` FROM `alerts` WHERE `id`=?';
 
         return dbFetchCell($query, [$alert_id]);
     }
@@ -66,7 +66,7 @@ class AlertUtil
      */
     public static function getDefaultAlertTransports()
     {
-        $query = "SELECT transport_id, transport_type, transport_name FROM alert_transports WHERE is_default=true";
+        $query = 'SELECT transport_id, transport_type, transport_name FROM alert_transports WHERE is_default=true';
 
         return dbFetchRows($query);
     }
@@ -91,30 +91,30 @@ class AlertUtil
         $uids = [];
         foreach ($results as $result) {
             $tmp = null;
-            if (is_numeric($result["bill_id"])) {
-                $tmpa = dbFetchRows("SELECT user_id FROM bill_perms WHERE bill_id = ?", [$result["bill_id"]]);
+            if (is_numeric($result['bill_id'])) {
+                $tmpa = dbFetchRows('SELECT user_id FROM bill_perms WHERE bill_id = ?', [$result['bill_id']]);
                 foreach ($tmpa as $tmp) {
                     $uids[$tmp['user_id']] = $tmp['user_id'];
                 }
             }
-            if (is_numeric($result["port_id"])) {
-                $tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE port_id = ?", [$result["port_id"]]);
+            if (is_numeric($result['port_id'])) {
+                $tmpa = dbFetchRows('SELECT user_id FROM ports_perms WHERE port_id = ?', [$result['port_id']]);
                 foreach ($tmpa as $tmp) {
                     $uids[$tmp['user_id']] = $tmp['user_id'];
                 }
             }
-            if (is_numeric($result["device_id"])) {
+            if (is_numeric($result['device_id'])) {
                 if (Config::get('alert.syscontact') == true) {
-                    if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", [$result["device_id"]])) {
-                        $tmpa = dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_string' AND device_id = ?", [$result["device_id"]]);
+                    if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", [$result['device_id']])) {
+                        $tmpa = dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_string' AND device_id = ?", [$result['device_id']]);
                     } else {
-                        $tmpa = dbFetchCell("SELECT sysContact FROM devices WHERE device_id = ?", [$result["device_id"]]);
+                        $tmpa = dbFetchCell('SELECT sysContact FROM devices WHERE device_id = ?', [$result['device_id']]);
                     }
                     if (! empty($tmpa)) {
                         $contacts[$tmpa] = '';
                     }
                 }
-                $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE device_id = ?", [$result["device_id"]]);
+                $tmpa = dbFetchRows('SELECT user_id FROM devices_perms WHERE device_id = ?', [$result['device_id']]);
                 foreach ($tmpa as $tmp) {
                     $uids[$tmp['user_id']] = $tmp['user_id'];
                 }
@@ -175,7 +175,7 @@ class AlertUtil
 
     public static function getRules($device_id)
     {
-        $query = "SELECT DISTINCT a.* FROM alert_rules a
+        $query = 'SELECT DISTINCT a.* FROM alert_rules a
         LEFT JOIN alert_device_map d ON a.id=d.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND d.device_id = ?)
         LEFT JOIN alert_group_map g ON a.id=g.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
         LEFT JOIN alert_location_map l ON a.id=l.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
@@ -184,7 +184,7 @@ class AlertUtil
             (d.device_id IS NULL AND g.group_id IS NULL)
             OR (a.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
             OR (a.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
-        )";
+        )';
 
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
 
@@ -224,11 +224,11 @@ class AlertUtil
         $macros = Config::get('alert.macros.rule', []) .
         krsort($macros);
         foreach ($macros as $macro => $value) {
-            if (! strstr($macro, " ")) {
+            if (! strstr($macro, ' ')) {
                 $rule = str_replace('%macros.' . $macro, '(' . $value . ')', $rule);
             }
         }
-        if (strstr($rule, "%macros.")) {
+        if (strstr($rule, '%macros.')) {
             if (++$x < 30) {
                 $rule = self::runMacros($rule, $x);
             } else {

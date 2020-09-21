@@ -62,12 +62,12 @@ if (is_array($components) && count($components) > 0) {
 
         // Let's print some debugging info.
         d_echo("\n\nComponent: " . $key . "\n");
-        d_echo("    Index:      " . $array['UID'] . "\n");
-        d_echo("    Peer:       " . $array['peer'] . ":" . $array['port'] . "\n");
-        d_echo("    Stratum:    1.3.6.1.4.1.9.9.168.1.2.1.1.9." . $array['UID'] . "  = " . $rrd['stratum'] . "\n");
-        d_echo("    Offset:     1.3.6.1.4.1.9.9.168.1.2.1.1.23." . $array['UID'] . " = " . $rrd['offset'] . "\n");
-        d_echo("    Delay:      1.3.6.1.4.1.9.9.168.1.2.1.1.24." . $array['UID'] . " = " . $rrd['delay'] . "\n");
-        d_echo("    Dispersion: 1.3.6.1.4.1.9.9.168.1.2.1.1.25." . $array['UID'] . " = " . $rrd['dispersion'] . "\n");
+        d_echo('    Index:      ' . $array['UID'] . "\n");
+        d_echo('    Peer:       ' . $array['peer'] . ':' . $array['port'] . "\n");
+        d_echo('    Stratum:    1.3.6.1.4.1.9.9.168.1.2.1.1.9.' . $array['UID'] . '  = ' . $rrd['stratum'] . "\n");
+        d_echo('    Offset:     1.3.6.1.4.1.9.9.168.1.2.1.1.23.' . $array['UID'] . ' = ' . $rrd['offset'] . "\n");
+        d_echo('    Delay:      1.3.6.1.4.1.9.9.168.1.2.1.1.24.' . $array['UID'] . ' = ' . $rrd['delay'] . "\n");
+        d_echo('    Dispersion: 1.3.6.1.4.1.9.9.168.1.2.1.1.25.' . $array['UID'] . ' = ' . $rrd['dispersion'] . "\n");
 
         // Clean-up after yourself!
         unset($filename, $rrd_filename, $rrd);

@@ -27,5 +27,5 @@ foreach ($processors as $proc) {
             </div>";
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
+    echo '</div></div>';
 }//end foreach

@@ -13,27 +13,27 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Devices";
+$pagetitle[] = 'Devices';
 
 if (! isset($vars['format'])) {
-    $vars['format'] = "list_detail";
+    $vars['format'] = 'list_detail';
 }
 
 $listoptions = '<span class="devices-font-bold">Lists: </span>';
 
 $menu_options = ['basic' => 'Basic', 'detail' => 'Detail'];
 
-$sep = "";
+$sep = '';
 foreach ($menu_options as $option => $text) {
     $listoptions .= $sep;
-    if ($vars['format'] == "list_" . $option) {
+    if ($vars['format'] == 'list_' . $option) {
         $listoptions .= '<span class="pagemenu-selected">';
     }
-    $listoptions .= '<a href="' . generate_url($vars, ['format' => "list_" . $option]) . '">' . $text . '</a>';
-    if ($vars['format'] == "list_" . $option) {
+    $listoptions .= '<a href="' . generate_url($vars, ['format' => 'list_' . $option]) . '">' . $text . '</a>';
+    if ($vars['format'] == 'list_' . $option) {
         $listoptions .= '</span>';
     }
-    $sep = " | ";
+    $sep = ' | ';
 }
 
 $listoptions .= '&nbsp;&nbsp;&nbsp;<span class="devices-font-bold">Graphs: </span>';
@@ -49,7 +49,7 @@ $menu_options = ['bits' => 'Bits',
     'ping_perf' => 'Ping',
     'temperature' => 'Temperature',
 ];
-$sep = "";
+$sep = '';
 foreach ($menu_options as $option => $text) {
     $listoptions .= $sep;
     if ($vars['format'] == 'graph_' . $option) {
@@ -59,7 +59,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_' . $option) {
         $listoptions .= '</span>';
     }
-    $sep = " | ";
+    $sep = ' | ';
 }
 
 $headeroptions = '<select name="type" id="type" onchange="window.open(this.options[this.selectedIndex].value,\'_top\')" class="devices-graphs-select">';
@@ -79,7 +79,7 @@ foreach (get_graph_subtypes($type) as $avail_type) {
 }
 $headeroptions .= '</select>';
 
-if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
+if (isset($vars['searchbar']) && $vars['searchbar'] == 'hide') {
     $headeroptions .= '<a href="' . generate_url($vars, ['searchbar' => '']) . '">Restore Search</a>';
 } else {
     $headeroptions .= '<a href="' . generate_url($vars, ['searchbar' => 'hide']) . '">Remove Search</a>';
@@ -87,17 +87,17 @@ if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
 
 $headeroptions .= ' | ';
 
-if (isset($vars['bare']) && $vars['bare'] == "yes") {
+if (isset($vars['bare']) && $vars['bare'] == 'yes') {
     $headeroptions .= '<a href="' . generate_url($vars, ['bare' => '']) . '">Restore Header</a>';
 } else {
     $headeroptions .= '<a href="' . generate_url($vars, ['bare' => 'yes']) . '">Remove Header</a>';
 }
 
-[$format, $subformat] = explode("_", $vars['format'], 2);
+[$format, $subformat] = explode('_', $vars['format'], 2);
 $detailed = $subformat == 'detail';
-$no_refresh = $format == "list";
+$no_refresh = $format == 'list';
 
-if ($format == "graph") {
+if ($format == 'graph') {
     if (empty($vars['from'])) {
         $graph_array['from'] = \LibreNMS\Config::get('time.day');
     } else {
@@ -136,19 +136,19 @@ if ($format == "graph") {
         $sql_param += array_fill(count($param), 5, '%' . $vars['searchquery'] . '%');
     }
     if (! empty($vars['os'])) {
-        $where .= " AND os = ?";
+        $where .= ' AND os = ?';
         $sql_param[] = $vars['os'];
     }
     if (! empty($vars['version'])) {
-        $where .= " AND version = ?";
+        $where .= ' AND version = ?';
         $sql_param[] = $vars['version'];
     }
     if (! empty($vars['hardware'])) {
-        $where .= " AND hardware = ?";
+        $where .= ' AND hardware = ?';
         $sql_param[] = $vars['hardware'];
     }
     if (! empty($vars['features'])) {
-        $where .= " AND features = ?";
+        $where .= ' AND features = ?';
         $sql_param[] = $vars['features'];
     }
 
@@ -157,55 +157,55 @@ if ($format == "graph") {
             $where .= " AND ( type = ? OR type = '')";
             $sql_param[] = $vars['type'];
         } else {
-            $where .= " AND type = ?";
+            $where .= ' AND type = ?';
             $sql_param[] = $vars['type'];
         }
     }
     if (! empty($vars['state'])) {
-        $where .= " AND status= ?";
+        $where .= ' AND status= ?';
         $sql_param[] = $state;
         $where .= " AND disabled='0' AND `disable_notify`='0'";
         $sql_param[] = '';
     }
     if (! empty($vars['disabled'])) {
-        $where .= " AND disabled= ?";
+        $where .= ' AND disabled= ?';
         $sql_param[] = $vars['disabled'];
     }
     if (! empty($vars['ignore'])) {
-        $where .= " AND `ignore`= ?";
+        $where .= ' AND `ignore`= ?';
         $sql_param[] = $vars['ignore'];
     }
     if (! empty($vars['disable_notify'])) {
-        $where .= " AND `disable_notify`= ?";
+        $where .= ' AND `disable_notify`= ?';
         $sql_param[] = $vars['disable_notify'];
     }
-    if (! empty($vars['location']) && $vars['location'] == "Unset") {
+    if (! empty($vars['location']) && $vars['location'] == 'Unset') {
         $location_filter = '';
     }
     if (! empty($vars['location'])) {
         $location_filter = $vars['location'];
     }
     if (isset($vars['poller_group'])) {
-        $where .= " AND `poller_group`= ?";
+        $where .= ' AND `poller_group`= ?';
         $sql_param[] = $vars['poller_group'];
     }
     if (! empty($vars['group'])) {
-        $where .= " AND ( ";
+        $where .= ' AND ( ';
         foreach (DB::table('device_group_device')->where('device_group_id', $vars['group'])->pluck('device_id') as $dev) {
-            $where .= "device_id = ? OR ";
+            $where .= 'device_id = ? OR ';
             $sql_param[] = $dev;
         }
         $where = substr($where, 0, strlen($where) - 3);
-        $where .= " )";
+        $where .= ' )';
     }
 
-    $query = "SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1";
+    $query = 'SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1';
 
     if (isset($where)) {
         $query .= $where;
     }
 
-    $query .= " ORDER BY hostname";
+    $query .= ' ORDER BY hostname';
 
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
@@ -217,7 +217,7 @@ if ($format == "graph") {
 
         if (device_permitted($device['device_id'])) {
             if (! $location_filter || $device['location'] == $location_filter) {
-                $graph_type = "device_" . $subformat;
+                $graph_type = 'device_' . $subformat;
 
                 if (session('widescreen')) {
                     $width = 270;
@@ -258,8 +258,8 @@ if ($format == "graph") {
 } else {
     $state = isset($vars['state']) ? $vars['state'] : '';
     $state_selection = "<select name='state' id='state' class='form-control'><option value=''>All</option>" .
-        "<option value='up'" . ($state == 'up' ? ' selected' : '') . ">Up</option>" .
-        "<option value='down'" . ($state == 'down' ? ' selected' : '') . ">Down</option><select>";
+        "<option value='up'" . ($state == 'up' ? ' selected' : '') . '>Up</option>' .
+        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option><select>';
 
     $features_selected = isset($vars['features']) ? json_encode(['id' => $vars['features'], 'text' => $vars['features']]) : '""';
     $hardware_selected = isset($vars['hardware']) ? json_encode(['id' => $vars['hardware'], 'text' => $vars['hardware']]) : '""';
@@ -363,7 +363,7 @@ if ($format == "graph") {
         });
 
         <?php
-        if (! isset($vars['searchbar']) && $vars['searchbar'] != "hide") {
+        if (! isset($vars['searchbar']) && $vars['searchbar'] != 'hide') {
             ?>
         $(".devices-headers-table-menu").append(
             "<div class='pull-left'>" +

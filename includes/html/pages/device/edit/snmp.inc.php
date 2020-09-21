@@ -33,7 +33,7 @@ if ($_POST['editing']) {
                 $update['retries'] = ['NULL'];
             }
 
-            if ($snmpver != "v3") {
+            if ($snmpver != 'v3') {
                 $community = $_POST['community'];
                 $update['community'] = $community;
             }
@@ -45,7 +45,7 @@ if ($_POST['editing']) {
             }
 
             $v3 = [];
-            if ($snmpver == "v3") {
+            if ($snmpver == 'v3') {
                 $community = ''; // if v3 works, we don't need a community
 
                 $v3['authalgo'] = $_POST['authalgo'];
@@ -62,7 +62,7 @@ if ($_POST['editing']) {
             $update['features'] = null;
             $update['hardware'] = $_POST['hardware'];
             $update['icon'] = null;
-            $update['os'] = $_POST['os'] ? $_POST['os_id'] : "ping";
+            $update['os'] = $_POST['os'] ? $_POST['os_id'] : 'ping';
             $update['poller_group'] = $poller_group;
             $update['snmp_disable'] = 1;
             $update['sysName'] = $_POST['sysName'] ? $_POST['sysName'] : null;
@@ -100,13 +100,13 @@ if ($_POST['editing']) {
                 $form_value_is_numeric = false; // does not need to be a number greater than zero
 
                 if ($devices_attrib == 'snmp_max_repeaters') {
-                    $feedback_prefix = "SNMP Max Repeaters";
+                    $feedback_prefix = 'SNMP Max Repeaters';
                     $form_value = $max_repeaters;
                     $form_value_is_numeric = true;
                 }
 
                 if ($devices_attrib == 'snmp_max_oid') {
-                    $feedback_prefix = "SNMP Max OID";
+                    $feedback_prefix = 'SNMP Max OID';
                     $form_value = $max_oid;
                     $form_value_is_numeric = true;
                 }
@@ -156,7 +156,7 @@ if ($_POST['editing']) {
         }
 
         if ($snmp_enabled && ($force_save !== true && ! $device_issnmpable)) {
-            $update_failed_message[] = "Could not connect to " . htmlspecialchars($device['hostname']) . " with those SNMP settings.  To save anyway, turn on Force Save.";
+            $update_failed_message[] = 'Could not connect to ' . htmlspecialchars($device['hostname']) . ' with those SNMP settings.  To save anyway, turn on Force Save.';
             $update_message[] = 'SNMP settings reverted';
         }
 
@@ -178,7 +178,7 @@ $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', [$device['
 $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
 
-echo "<h3> SNMP Settings </h3>";
+echo '<h3> SNMP Settings </h3>';
 
 // use Toastr to print normal (success) messages, similar to Device Settings
 if (isset($update_message)) {
@@ -200,9 +200,9 @@ if (isset($update_message)) {
 // use Toastr:error to call attention to the problem; don't let it time out
 if (isset($update_failed_message)) {
     $toastr_options = [];
-    $toastr_options["closeButton"] = true;
-    $toastr_options["extendedTimeOut"] = 0;
-    $toastr_options["timeOut"] = 0;
+    $toastr_options['closeButton'] = true;
+    $toastr_options['extendedTimeOut'] = 0;
+    $toastr_options['timeOut'] = 0;
 
     if (is_array($update_failed_message)) {
         foreach ($update_failed_message as $error) {
@@ -223,10 +223,10 @@ echo "
     <div class='form-group'>
     <label for='hardware' class='col-sm-2 control-label'>SNMP</label>
     <div class='col-sm-4'>
-    <input type='checkbox' id='snmp' name='snmp' data-size='small' onChange='disableSnmp(this);'" . ($device['snmp_disable'] ? "" : " checked") . ">
+    <input type='checkbox' id='snmp' name='snmp' data-size='small' onChange='disableSnmp(this);'" . ($device['snmp_disable'] ? '' : ' checked') . ">
     </div>
     </div>
-    <div id='snmp_override' style='display: " . ($device['snmp_disable'] ? "block" : "none") . ";'>
+    <div id='snmp_override' style='display: " . ($device['snmp_disable'] ? 'block' : 'none') . ";'>
     <div class='form-group'>
     <label for='sysName' class='col-sm-2 control-label'>sysName (optional)</label>
     <div class='col-sm-4'>
@@ -247,7 +247,7 @@ echo "
     </div>
     </div>
     </div>
-    <div id='snmp_conf' style='display: " . ($device['snmp_disable'] ? "none" : "block") . ";'>
+    <div id='snmp_conf' style='display: " . ($device['snmp_disable'] ? 'none' : 'block') . ";'>
     <input type=hidden name='editing' value='yes'>
     <div class='form-group'>
     <label for='snmpver' class='col-sm-2 control-label'>SNMP Details</label>
@@ -259,7 +259,7 @@ echo "
     </select>
     </div>
     <div class='col-sm-2'>
-    <input type='number' name='port' placeholder='port' class='form-control input-sm' value='" . htmlspecialchars($device['port'] == Config::get('snmp.port') ? "" : $device['port']) . "'>
+    <input type='number' name='port' placeholder='port' class='form-control input-sm' value='" . htmlspecialchars($device['port'] == Config::get('snmp.port') ? '' : $device['port']) . "'>
     </div>
     <div class='col-sm-1'>
     <select name='transport' id='transport' class='form-control input-sm'>";
@@ -373,11 +373,11 @@ echo "        </select>
     <div class='col-sm-4'>
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>
     <option value='AES'>AES</option>
-    <option value='DES' " . ($device['cryptoalgo'] === 'DES' ? 'selected' : '') . ">DES</option>
+    <option value='DES' " . ($device['cryptoalgo'] === 'DES' ? 'selected' : '') . '>DES</option>
     </select>
     </div>
     </div>
-    </div>";
+    </div>';
 
 ?>
 

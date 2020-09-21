@@ -139,7 +139,7 @@ function snmp_translate_number($oid, $mib = null, $mibdir = null)
     }
 
     $cmd = "snmptranslate -IR -On '$oid'";
-    $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ":" . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
+    $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ':' . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";
     }
@@ -156,7 +156,7 @@ function snmp_translate_number($oid, $mib = null, $mibdir = null)
 function snmp_translate_type($oid, $mib = null, $mibdir = null)
 {
     $cmd = "snmptranslate -IR -Td $oid";
-    $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ":" . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
+    $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ':' . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";
     }

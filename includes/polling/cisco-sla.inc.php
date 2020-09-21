@@ -114,7 +114,7 @@ if (count($slas) > 0) {
                 break;
         }
 
-        d_echo("The following datasources were collected for #" . $sla['sla_nr'] . ":\n");
+        d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
         d_echo($fields);
 
         // Update the DB if necessary

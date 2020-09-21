@@ -28,9 +28,9 @@ $sql = 'FROM `ports`';
 if (! Auth::user()->hasGlobalRead()) {
     $port_ids = Permissions::portsForUser()->toArray() ?: [0];
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND (`ports`.`port_id` IN " . dbGenPlaceholders(count($port_ids));
-    $where .= " OR `D`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
-    $where .= ")";
+    $where .= ' AND (`ports`.`port_id` IN ' . dbGenPlaceholders(count($port_ids));
+    $where .= ' OR `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
+    $where .= ')';
     $param = array_merge($param, $port_ids, $device_ids);
 }
 
@@ -42,14 +42,14 @@ if (! empty($vars['hostname'])) {
 }
 
 if (! empty($vars['location'])) {
-    $where .= " AND `D`.`location_id` = ?";
+    $where .= ' AND `D`.`location_id` = ?';
     $param[] = $vars['location'];
 }
 
 $sql .= " WHERE $where ";
 
 if (! empty($vars['errors'])) {
-    $sql .= " AND (`ports`.`ifInErrors_delta` > 0 OR `ports`.`ifOutErrors_delta` > 0)";
+    $sql .= ' AND (`ports`.`ifInErrors_delta` > 0 OR `ports`.`ifOutErrors_delta` > 0)';
 }
 
 if (! empty($vars['device_id'])) {
@@ -59,19 +59,19 @@ if (! empty($vars['device_id'])) {
 
 if (! empty($vars['state'])) {
     switch ($vars['state']) {
-        case "down":
-            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `ports`.`ifOperStatus` = ?";
-            $param[] = "up";
-            $param[] = "down";
+        case 'down':
+            $sql .= ' AND `ports`.`ifAdminStatus` = ? AND `ports`.`ifOperStatus` = ?';
+            $param[] = 'up';
+            $param[] = 'down';
             break;
-        case "up":
-            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `ports`.`ifOperStatus` = ?";
-            $param[] = "up";
-            $param[] = "up";
+        case 'up':
+            $sql .= ' AND `ports`.`ifAdminStatus` = ? AND `ports`.`ifOperStatus` = ?';
+            $param[] = 'up';
+            $param[] = 'up';
             break;
-        case "admindown":
-            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `D`.`ignore` = 0";
-            $param[] = "down";
+        case 'admindown':
+            $sql .= ' AND `ports`.`ifAdminStatus` = ? AND `D`.`ignore` = 0';
+            $param[] = 'down';
             break;
     }
 }

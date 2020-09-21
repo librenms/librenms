@@ -25,13 +25,13 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $array = $components[$vars['poolid']];
     // Define some error messages
     $error_poolaction = [];
-    $error_poolaction[0] = "Unused";
-    $error_poolaction[1] = "Reboot";
-    $error_poolaction[2] = "Restart";
-    $error_poolaction[3] = "Failover";
-    $error_poolaction[4] = "Failover and Restart";
-    $error_poolaction[5] = "Go Active";
-    $error_poolaction[6] = "None";
+    $error_poolaction[0] = 'Unused';
+    $error_poolaction[1] = 'Reboot';
+    $error_poolaction[2] = 'Restart';
+    $error_poolaction[3] = 'Failover';
+    $error_poolaction[4] = 'Failover and Restart';
+    $error_poolaction[5] = 'Go Active';
+    $error_poolaction[6] = 'None';
 
     $parent = $array['UID']; ?>
     <div class="row">
@@ -87,7 +87,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                                         continue;
                                     }
 
-                                    $string = $comp['IP'] . ":" . $comp['port'];
+                                    $string = $comp['IP'] . ':' . $comp['port'];
                                     if ($comp['status'] != 0) {
                                         $status = $comp['error'];
                                         $error = 'class="danger"';

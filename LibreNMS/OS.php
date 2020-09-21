@@ -229,7 +229,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
 
         $rf = new \ReflectionClass($this);
         $name = $rf->getShortName();
-        preg_match_all("/[A-Z][a-z]*/", $name, $segments);
+        preg_match_all('/[A-Z][a-z]*/', $name, $segments);
 
         return implode('-', array_map('strtolower', $segments[0]));
     }

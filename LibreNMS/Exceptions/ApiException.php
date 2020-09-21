@@ -28,7 +28,7 @@ class ApiException extends \Exception
 {
     private $output;
 
-    public function __construct($message = "", $output = [])
+    public function __construct($message = '', $output = [])
     {
         parent::__construct($message, 0, null);
         $this->output = $output;

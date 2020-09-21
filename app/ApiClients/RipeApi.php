@@ -80,7 +80,7 @@ class RipeApi extends BaseApi
             if (isset($response_data['status']) && $response_data['status'] == 'ok') {
                 return $response_data;
             } else {
-                throw new ApiException("RIPE API call failed", $response_data);
+                throw new ApiException('RIPE API call failed', $response_data);
             }
         } catch (RequestException $e) {
             $message = 'RIPE API call to ' . $e->getRequest()->getUri() . ' failed: ';

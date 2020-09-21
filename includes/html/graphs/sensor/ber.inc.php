@@ -8,7 +8,7 @@ $rrd_options .= " COMMENT:'                       Min       Last      Max\\n'";
 
 $sensor['sensor_descr_fixed'] = rrdtool_escape($sensor['sensor_descr'], 20);
 
-$rrd_options .= " -o";
+$rrd_options .= ' -o';
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 $rrd_options .= " DEF:sensor_max=$rrd_filename:sensor:MAX";
 $rrd_options .= " DEF:sensor_min=$rrd_filename:sensor:MIN";

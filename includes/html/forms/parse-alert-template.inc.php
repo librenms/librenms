@@ -41,14 +41,14 @@ if ($template_edit) {
     ];
 }
 
-foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules` order by `name`", []) as $rule) {
-    $is_selected = $template_edit ? dbFetchCell("SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ? AND `alert_templates_id` = ?", [$rule['id'], $template_id]) : null;
-    $is_available = dbFetchCell("SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ?", [$rule['id']]);
+foreach (dbFetchRows('SELECT `id`,`rule`,`name` FROM `alert_rules` order by `name`', []) as $rule) {
+    $is_selected = $template_edit ? dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ? AND `alert_templates_id` = ?', [$rule['id'], $template_id]) : null;
+    $is_available = dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ?', [$rule['id']]);
     $rules[] = [
         'id' => $rule['id'],
         'name' => $rule['name'],
         'selected' => isset($is_selected),
-        'used' => isset($is_available) ? dbFetchCell("SELECT `name` FROM `alert_templates` WHERE `id` = ?", [$is_available]) : '',
+        'used' => isset($is_available) ? dbFetchCell('SELECT `name` FROM `alert_templates` WHERE `id` = ?', [$is_available]) : '',
     ];
 }
 $output['rules'] = $rules;

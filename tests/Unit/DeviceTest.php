@@ -40,7 +40,7 @@ class DeviceTest extends DBTestCase
 
         $found = Device::findByHostname($device->hostname);
         $this->assertNotNull($found);
-        $this->assertEquals($device->device_id, $found->device_id, "Did not find the correct device");
+        $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
 
     public function testFindByIpFail()
@@ -76,7 +76,7 @@ class DeviceTest extends DBTestCase
 
         $found = Device::findByIp($device->ip);
         $this->assertNotNull($found);
-        $this->assertEquals($device->device_id, $found->device_id, "Did not find the correct device");
+        $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
 
     public function testFindByIpHostname()
@@ -86,7 +86,7 @@ class DeviceTest extends DBTestCase
 
         $found = Device::findByIp($ip);
         $this->assertNotNull($found);
-        $this->assertEquals($device->device_id, $found->device_id, "Did not find the correct device");
+        $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
 
     public function testFindByIpThroughPort()
@@ -99,6 +99,6 @@ class DeviceTest extends DBTestCase
 
         $found = Device::findByIp($ipv4->ipv4_address);
         $this->assertNotNull($found);
-        $this->assertEquals($device->device_id, $found->device_id, "Did not find the correct device");
+        $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
 }
