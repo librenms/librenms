@@ -17,8 +17,6 @@
  * @author Adam Bishop <adam@omega.org.uk>
  * @copyright 2020 Adam Bishop, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;

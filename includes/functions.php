@@ -5,8 +5,6 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    LibreNMS
- * @subpackage functions
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 

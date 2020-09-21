@@ -17,8 +17,6 @@
  * Alertmanager Transport
  * @copyright 2019 LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;

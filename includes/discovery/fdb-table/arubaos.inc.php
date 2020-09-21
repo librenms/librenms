@@ -18,8 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @subpackage discovery/fdb-table
  * @link       http://librenms.org
  * @copyright  2020 LibreNMS
  * @author     Ken Lui <tmpest1@yahoo.com>

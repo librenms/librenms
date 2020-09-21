@@ -20,7 +20,6 @@
  * Traps when Adva objects are deleted. This includes Remote User Login object,
  * Flow Deletion object, LAG Member Port Removed object, and Lag Deletion object.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>

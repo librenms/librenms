@@ -22,7 +22,6 @@
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */
-use LibreNMS\RRD\RrdDefinition;
 
 $version = $device['sysDescr'];
 $masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CANOPY-SYS-MIB"));

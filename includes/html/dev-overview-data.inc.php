@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Device;
 use App\Models\Location;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;

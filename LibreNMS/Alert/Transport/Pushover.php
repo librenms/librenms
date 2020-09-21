@@ -32,8 +32,6 @@
  * @author neokjames <neokjames@gmail.com>
  * @copyright 2015 neokjames, f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;

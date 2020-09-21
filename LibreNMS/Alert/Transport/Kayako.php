@@ -14,7 +14,6 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
-use LibreNMS\Enum\AlertState;
 
 class Kayako extends Transport
 {

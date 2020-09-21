@@ -21,8 +21,6 @@
  * @author Maximilian Wilhelm <max@sdn.clinic>
  * @copyright 2016-2017 LibreNMS, Barbarossa
  * @license GPL
- * @package LibreNMS
- * @subpackage ?
  */
 
 use App\Models\Port;

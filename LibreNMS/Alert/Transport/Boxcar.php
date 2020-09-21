@@ -32,8 +32,6 @@
  * @author trick77 <jan@trick77.com>
  * @copyright 2015 trick77, neokjames, f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;

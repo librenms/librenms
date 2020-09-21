@@ -10,14 +10,11 @@
  * Twilio API Transport
  * @author Andy Rosen <arosen@arosen.net>
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Twilio extends Transport
 {

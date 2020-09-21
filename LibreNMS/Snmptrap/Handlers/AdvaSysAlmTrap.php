@@ -20,7 +20,6 @@
  * Adva system alarm traps. This handler will log the description and a
  * description of the alarm.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>

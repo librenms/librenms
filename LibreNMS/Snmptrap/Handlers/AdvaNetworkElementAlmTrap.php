@@ -20,7 +20,6 @@
  * Adva network element is in an alarm state. Gets the alarm description
  * and severity assigned by the Adva.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>

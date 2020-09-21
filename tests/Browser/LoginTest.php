@@ -13,7 +13,6 @@ use LibreNMS\Tests\DuskTestCase;
 
 /**
  * Class LoginTest
- * @package LibreNMS\Tests\Browser
  * @group browser
  */
 class LoginTest extends DuskTestCase

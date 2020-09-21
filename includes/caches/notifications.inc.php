@@ -18,8 +18,6 @@
  * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @license GPL
- * @package LibreNMS
- * @subpackage Notifications
  */
 $data['count'] = [
     'query'  => 'select count(notifications.notifications_id) from notifications where not exists( select 1 from notifications_attribs where notifications.notifications_id = notifications_attribs.notifications_id and notifications_attribs.user_id = ?)',

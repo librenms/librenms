@@ -9,7 +9,6 @@ use App\Models\Port;
 use App\Models\Service;
 use App\Models\Syslog;
 use App\Models\UserPref;
-use App\Models\UserWidget;
 use App\Models\Widget;
 use Auth;
 use Illuminate\Http\Request;

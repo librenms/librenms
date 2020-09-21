@@ -19,8 +19,6 @@
  * @author laf <neil@librenms.org>
  * @copyright 2015 f0o, laf, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;

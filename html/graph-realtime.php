@@ -5,8 +5,6 @@
  *
  *   This file is included with LibreNMS. It was originally part of m0n0wall <http://www.m0n0.ch/wall/>
  *
- * @package    librenms
- * @subpackage graphing
  * @author     T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
  * @copyright  2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
  * @license    BSD

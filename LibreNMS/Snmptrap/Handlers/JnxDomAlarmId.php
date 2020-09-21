@@ -21,7 +21,6 @@
  * Used covert alarm ID in the JnxDomAlarm traps from Hex to a
  * descriptive string.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>

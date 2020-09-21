@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link http://librenms.org
  * @copyright  2020 Lars Elgtvedt Susaas
  * @author     Lars Elgtvedt Susaas
@@ -27,7 +26,6 @@ namespace LibreNMS\Tests;
 
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Tests\DBTestCase;
 
 class AddHostCliTest extends DBTestCase
 {

@@ -3,8 +3,6 @@
  * LibreNMS - ADVA device support - Voltage Sensors
  *
  * @category   Network_Monitoring
- * @package    LibreNMS
- * @subpackage ADVA device support
  * @author     Christoph Zilian <czilian@hotmail.com>
  * @license    http://gnu.org/copyleft/gpl.html GNU GPL
  * @link       https://github.com/librenms/librenms/

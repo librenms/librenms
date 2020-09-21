@@ -19,7 +19,6 @@
  *
  * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017-2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -37,7 +36,6 @@ use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Toner;
-use App\Models\User;
 use App\Models\Vrf;
 use Cache;
 

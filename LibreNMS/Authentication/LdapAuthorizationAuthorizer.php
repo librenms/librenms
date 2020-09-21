@@ -19,22 +19,6 @@
  * @author Maximilian Wilhelm <max@rfc2324.org>
  * @copyright 2016 LibreNMS, Barbarossa
  * @license GPL
- * @package LibreNMS
- * @subpackage Authentication
- *
- * This Authentitation / Authorization module provides the ability to let
- * the webserver (e.g. Apache) do the user Authentication (using Kerberos
- * f.e.) and let libreNMS do the Authorization of the already known user.
- * Authorization and setting of libreNMS user level is done by LDAP group
- * names specified in the configuration file. The group configuration is
- * basicly copied from the existing ldap Authentication module.
- *
- * Most of the code is copied from the http-auth and ldap Authentication
- * modules already existing.
- *
- * To save lots of redundant queries to the LDAP server and speed up the
- * libreNMS WebUI, all information is cached within the Laravel Session as
- * long as specified in the 'auth_ldap_cache_ttl' setting (Default: 300s).
  */
 
 namespace LibreNMS\Authentication;

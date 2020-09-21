@@ -20,9 +20,7 @@
  * @author    Daniel Preussker
  * @author    Tony Murray <murraytony@gmail.com>
  * @license   GPL
- * @package   LibreNMS
  * @link      http://librenms.org
- * @subpackage Notifications
  */
 
 /**

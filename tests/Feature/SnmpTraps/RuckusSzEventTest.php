@@ -19,7 +19,6 @@
  *
  * Tests Ruckus Wireless SmartZone Event trap handlers.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
