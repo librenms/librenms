@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -39,10 +38,10 @@ class Foundry extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $processors_data = snmpwalk_cache_triple_oid($this->getDeviceArray(), 'snAgentCpuUtilTable', array(), 'FOUNDRY-SN-AGENT-MIB');
+        $processors_data = snmpwalk_cache_triple_oid($this->getDeviceArray(), 'snAgentCpuUtilTable', [], 'FOUNDRY-SN-AGENT-MIB');
         $module_descriptions = $this->getCacheByIndex('snAgentConfigModuleDescription', 'FOUNDRY-SN-AGENT-MIB');
 
-        $processors = array();
+        $processors = [];
         foreach ($processors_data as $index => $entry) {
             // use the 5 minute readings
             if ($entry['snAgentCpuUtilInterval'] != 300) {

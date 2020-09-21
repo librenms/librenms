@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -51,11 +50,11 @@ class Comware extends OS implements ProcessorDiscovery
     {
         $procdata = $this->getCacheByIndex('hh3cEntityExtCpuUsage', 'HH3C-ENTITY-EXT-MIB');
 
-        if (!empty($procdata)) {
+        if (! empty($procdata)) {
             $entity_data = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
         }
 
-        $processors = array();
+        $processors = [];
 
         foreach ($procdata as $index => $usage) {
             if ($usage != 0) {

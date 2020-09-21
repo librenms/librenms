@@ -12,6 +12,6 @@
  * the source code distribution for details.
  */
 
-$mempool['used']  = snmp_get($device, '.1.3.6.1.4.1.738.1.111.2.1.1.5.0', '-OvQ'); // PRVT-SYS-INFO-MIB::numBytesAlloc.0 = INTEGER: 48993320
-$mempool['free']  = snmp_get($device, '.1.3.6.1.4.1.738.1.111.2.1.1.1.0', '-OvQ'); // PRVT-SYS-INFO-MIB::numBytesFree.0 = INTEGER: 183136616
-$mempool['total']  = ($mempool['free'] + $mempool['used']);
+$mempool['used'] = snmp_get($device, '.1.3.6.1.4.1.738.1.111.2.1.1.5.0', '-OvQ'); // PRVT-SYS-INFO-MIB::numBytesAlloc.0 = INTEGER: 48993320
+$mempool['free'] = snmp_get($device, '.1.3.6.1.4.1.738.1.111.2.1.1.1.0', '-OvQ'); // PRVT-SYS-INFO-MIB::numBytesFree.0 = INTEGER: 183136616
+$mempool['total'] = ($mempool['free'] + $mempool['used']);

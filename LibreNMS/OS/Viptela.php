@@ -54,6 +54,6 @@ class Viptela extends \LibreNMS\OS
             '14' => 'Viptela vEdge-5000',
         ];
 
-        return $hardware[(string)$id] ?? $id;
+        return $hardware[(string) $id] ?? $id;
     }
 }

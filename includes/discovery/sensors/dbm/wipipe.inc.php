@@ -24,7 +24,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         // Get Modem Model & Phone Number for description
         $modemdesc = $entry['mdmDescr'];
         $modemmdn = $entry['mdmMDN'];
-        $descr = "Signal Strength - " . $modemdesc . " - " . $modemmdn;
+        $descr = 'Signal Strength - ' . $modemdesc . ' - ' . $modemmdn;
         $currentsignal = $entry['mdmSignalStrength'];
         // Discover Sensor
         discover_sensor(
@@ -32,7 +32,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
             'dbm',
             $device,
             $oid,
-            'mdmSignalStrength.'.$index,
+            'mdmSignalStrength.' . $index,
             'wipipe',
             $descr,
             $divisor,

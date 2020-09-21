@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -29,7 +28,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Handlers\VmwTrapUtil;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
@@ -48,7 +46,7 @@ class VmwVmPoweredOn implements SnmptrapHandler
         $vmGuestName = VmwTrapUtil::getGuestName($trap);
 
         $vminfo = $device->vminfo()->where('vmwVmDisplayName', $vmGuestName)->first();
-        $vminfo->vmwVmState = "powered on";
+        $vminfo->vmwVmState = 'powered on';
 
         Log::event("Guest $vmGuestName was powered on", $device->device_id, 'trap', 2);
 

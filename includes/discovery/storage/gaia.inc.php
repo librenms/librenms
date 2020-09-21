@@ -22,9 +22,8 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 if ($device['os'] === 'gaia') {
-    $gaia_tmp = snmpwalk_cache_double_oid($device, 'multiDiskTable', array(), 'CHECKPOINT-MIB');
+    $gaia_tmp = snmpwalk_cache_double_oid($device, 'multiDiskTable', [], 'CHECKPOINT-MIB');
 
     $fstype = "dsk";
 

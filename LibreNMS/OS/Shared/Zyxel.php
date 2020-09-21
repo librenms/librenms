@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
@@ -42,8 +41,9 @@ class Zyxel extends OS
         // yaml discovery overrides this
         if ($this->hasYamlDiscovery('os')) {
             $this->discoverYamlOS($device);
+
             return;
-        };
+        }
 
         $oids = [
             '.1.3.6.1.4.1.890.1.15.3.1.11.0', // ZYXEL-ES-COMMON::sysProductModel.0

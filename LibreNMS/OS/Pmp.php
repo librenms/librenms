@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
@@ -58,7 +57,7 @@ class Pmp extends OS implements
         $ptp = [
             'BHUL450' => 'PTP 450',
             'BHUL' => 'PTP 230',
-            'BH20' => 'PTP 100'
+            'BH20' => 'PTP 100',
         ];
 
         foreach ($ptp as $desc => $model) {
@@ -72,10 +71,10 @@ class Pmp extends OS implements
         $pmp = [
             'MU-MIMO OFDM' => 'PMP 450m',
             'MIMO OFDM' => 'PMP 450',
-            'OFDM' => 'PMP 430'
+            'OFDM' => 'PMP 430',
         ];
 
-        if (!isset($hardware)) {
+        if (! isset($hardware)) {
             $hardware = 'PMP 100';
             foreach ($pmp as $desc => $model) {
                 if (Str::contains($device->features, $desc)) {
@@ -83,9 +82,9 @@ class Pmp extends OS implements
                     break;
                 }
             }
-            if (Str::contains($device->sysDescr, "AP")) {
+            if (Str::contains($device->sysDescr, 'AP')) {
                 $hardware .= ' AP';
-            } elseif (Str::contains($device->sysDescr, "SM")) {
+            } elseif (Str::contains($device->sysDescr, 'SM')) {
                 $hardware .= ' SM';
             }
         }
@@ -102,10 +101,10 @@ class Pmp extends OS implements
                 ->addDataset('fecInErrorsCount', 'GAUGE', 0, 100000)
                 ->addDataset('fecOutErrorsCount', 'GAUGE', 0, 100000);
 
-            $fields = array(
+            $fields = [
                 'fecInErrorsCount' => $fec['fecInErrorsCount.0'],
                 'fecOutErrorsCount' => $fec['fecOutErrorsCount.0'],
-            );
+            ];
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'canopy-generic-errorCount', $tags, $fields);
             $this->enableGraph('canopy_generic_errorCount');
@@ -114,15 +113,15 @@ class Pmp extends OS implements
         // Migrated to Wireless Sensor
         if (is_numeric($fec['fecCRCError.0'])) {
             $rrd_def = RrdDefinition::make()->addDataset('crcErrors', 'GAUGE', 0, 100000);
-            $fields = array(
+            $fields = [
                 'crcErrors' => $fec['fecCRCError.0'],
-            );
+            ];
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'canopy-generic-crcErrors', $tags, $fields);
             $this->enableGraph('canopy_generic_crcErrors');
         }
 
-        $jitter = snmp_get($this->getDeviceArray(), "jitter.0", "-Ovqn", "WHISP-SM-MIB");
+        $jitter = snmp_get($this->getDeviceArray(), 'jitter.0', '-Ovqn', 'WHISP-SM-MIB');
         if (is_numeric($jitter)) {
             $rrd_def = RrdDefinition::make()->addDataset('jitter', 'GAUGE', 0, 20);
             $fields = [
@@ -134,10 +133,10 @@ class Pmp extends OS implements
             unset($rrd_filename, $jitter);
         }
 
-        $multi_get_array = snmp_get_multi($this->getDeviceArray(), ['regCount.0', 'regFailureCount.0'], "-OQU", "WHISP-APS-MIB");
+        $multi_get_array = snmp_get_multi($this->getDeviceArray(), ['regCount.0', 'regFailureCount.0'], '-OQU', 'WHISP-APS-MIB');
         d_echo($multi_get_array);
-        $registered = $multi_get_array[0]["WHISP-APS-MIB::regCount"];
-        $failed = $multi_get_array[0]["WHISP-APS-MIB::regFailureCount"];
+        $registered = $multi_get_array[0]['WHISP-APS-MIB::regCount'];
+        $failed = $multi_get_array[0]['WHISP-APS-MIB::regFailureCount'];
 
         if (is_numeric($registered) && is_numeric($failed)) {
             $rrd_def = RrdDefinition::make()
@@ -153,8 +152,8 @@ class Pmp extends OS implements
             unset($rrd_filename, $registered, $failed);
         }
 
-        $visible = str_replace('"', "", snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.161.19.3.4.4.7.0", "-Ovqn", ""));
-        $tracked = str_replace('"', "", snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.161.19.3.4.4.8.0", "-Ovqn", ""));
+        $visible = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.4.4.7.0', '-Ovqn', ''));
+        $tracked = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.4.4.8.0', '-Ovqn', ''));
         if (is_numeric($visible) && is_numeric($tracked)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('visible', 'GAUGE', 0, 1000)
@@ -201,7 +200,7 @@ class Pmp extends OS implements
             $this->enableGraph('canopy_generic_450_linkRadioDbm');
         }
 
-        $lastLevel = str_replace('"', "", snmp_get($this->getDeviceArray(), "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
+        $lastLevel = str_replace('"', '', snmp_get($this->getDeviceArray(), 'lastPowerLevel.2', '-Ovqn', 'WHISP-APS-MIB'));
         if (is_numeric($lastLevel)) {
             $rrd_def = RrdDefinition::make()->addDataset('last', 'GAUGE', -100, 0);
             $fields = [
@@ -212,9 +211,9 @@ class Pmp extends OS implements
             $this->enableGraph('canopy_generic_450_powerlevel');
         }
 
-        $vertical = str_replace('"', "", snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.161.19.3.2.2.117.0", "-Ovqn", ""));
-        $horizontal = str_replace('"', "", snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.161.19.3.2.2.118.0", "-Ovqn", ""));
-        $combined = snmp_get($this->getDeviceArray(), "1.3.6.1.4.1.161.19.3.2.2.21.0", "-Ovqn", "");
+        $vertical = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.2.2.117.0', '-Ovqn', ''));
+        $horizontal = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.2.2.118.0', '-Ovqn', ''));
+        $combined = snmp_get($this->getDeviceArray(), '1.3.6.1.4.1.161.19.3.2.2.21.0', '-Ovqn', '');
         if (is_numeric($vertical) && is_numeric($horizontal) && is_numeric($combined)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('vertical', 'GAUGE', -150, 0)
@@ -231,8 +230,8 @@ class Pmp extends OS implements
             unset($rrd_filename, $vertical, $horizontal, $combined);
         }
 
-        $horizontal = str_replace('"', "", snmp_get($this->getDeviceArray(), "radioDbmHorizontal.0", "-Ovqn", "WHISP-SM-MIB"));
-        $vertical = str_replace('"', "", snmp_get($this->getDeviceArray(), "radioDbmVertical.0", "-Ovqn", "WHISP-SM-MIB"));
+        $horizontal = str_replace('"', '', snmp_get($this->getDeviceArray(), 'radioDbmHorizontal.0', '-Ovqn', 'WHISP-SM-MIB'));
+        $vertical = str_replace('"', '', snmp_get($this->getDeviceArray(), 'radioDbmVertical.0', '-Ovqn', 'WHISP-SM-MIB'));
         if (is_numeric($horizontal) && is_numeric($vertical)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('horizontal', 'GAUGE', -100, 100)
@@ -257,6 +256,7 @@ class Pmp extends OS implements
     public function discoverWirelessRssi()
     {
         $rssi_oid = '.1.3.6.1.4.1.161.19.3.2.2.2.0';
+
         return [
             new WirelessSensor(
                 'rssi',
@@ -266,7 +266,7 @@ class Pmp extends OS implements
                 0,
                 'Cambium RSSI',
                 null
-            )
+            ),
         ];
     }
 
@@ -305,10 +305,9 @@ class Pmp extends OS implements
                 0,
                 'Cambium SNR Vertical',
                 null
-            )
+            ),
         ];
     }
-
 
     /**
      * Discover wireless frequency.  This is in MHz. Type is frequency.
@@ -319,6 +318,7 @@ class Pmp extends OS implements
     public function discoverWirelessFrequency()
     {
         $frequency = '.1.3.6.1.4.1.161.19.3.1.7.37.0'; //WHISP-APS-MIB::currentRadioFreqCarrier
+
         return [
             new WirelessSensor(
                 'frequency',
@@ -330,7 +330,7 @@ class Pmp extends OS implements
                 null,
                 1,
                 $this->freqDivisor()
-            )
+            ),
         ];
     }
 
@@ -342,12 +342,12 @@ class Pmp extends OS implements
      */
     public function discoverWirelessUtilization()
     {
-        $lowdownlink  = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; // WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
-        $lowuplink    = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; // WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
-        $meddownlink  = '.1.3.6.1.4.1.161.19.3.1.12.2.1.0'; // WHISP-APS-MIB::frUtlMedTotalDownlinkUtilization
-        $meduplink    = '.1.3.6.1.4.1.161.19.3.1.12.2.2.0'; // WHISP-APS-MIB::frUtlMedTotalUplinkUtilization
+        $lowdownlink = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; // WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
+        $lowuplink = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; // WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
+        $meddownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.1.0'; // WHISP-APS-MIB::frUtlMedTotalDownlinkUtilization
+        $meduplink = '.1.3.6.1.4.1.161.19.3.1.12.2.2.0'; // WHISP-APS-MIB::frUtlMedTotalUplinkUtilization
         $highdownlink = '.1.3.6.1.4.1.161.19.3.1.12.3.1.0'; // WHISP-APS-MIB::frUtlHighTotalDownlinkUtilization
-        $highuplink   = '.1.3.6.1.4.1.161.19.3.1.12.3.2.0'; // WHISP-APS-MIB::frUtlHighTotalUplinkUtilization
+        $highuplink = '.1.3.6.1.4.1.161.19.3.1.12.3.2.0'; // WHISP-APS-MIB::frUtlHighTotalUplinkUtilization
 
         // 450M Specific Utilizations
         $muSectorDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.29.0'; // WHISP-APS-MIB::frUtlMedMumimoDownlinkSectorUtilization
@@ -435,7 +435,7 @@ class Pmp extends OS implements
                 0,
                 'SU-MIMO Downlink Utilization',
                 null
-            )
+            ),
         ];
     }
 
@@ -452,6 +452,7 @@ class Pmp extends OS implements
         } else {
             $ssr = '.1.3.6.1.4.1.161.19.3.2.2.108.0'; //WHISP-SMSSM-MIB::signalStrengthRatio.0
         }
+
         return [
             new WirelessSensor(
                 'ssr',
@@ -461,18 +462,19 @@ class Pmp extends OS implements
                 0,
                 'Cambium Signal Strength Ratio',
                 null
-            )
+            ),
         ];
     }
 
     /**
      * Private method to declare if device is an AP
      *
-     * @return boolean
+     * @return bool
      */
     private function isAp()
     {
         $device = $this->getDeviceArray();
+
         return Str::contains($device['hardware'], 'AP') || Str::contains($device['hardware'], 'Master');
     }
 
@@ -493,7 +495,7 @@ class Pmp extends OS implements
             '5.2Ghz' => 1,
             '5.7Ghz' => 1,
             '2.4Ghz' => 10,
-            '900Mhz' => 10
+            '900Mhz' => 10,
         ];
 
         $boxType = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
@@ -516,6 +518,7 @@ class Pmp extends OS implements
     public function discoverWirelessClients()
     {
         $registeredSM = '.1.3.6.1.4.1.161.19.3.1.7.1.0'; //WHISP-APS-MIB::regCount.0
+
         return [
             new WirelessSensor(
                 'clients',
@@ -525,7 +528,7 @@ class Pmp extends OS implements
                 0,
                 'Client Count',
                 null
-            )
+            ),
         ];
     }
 
@@ -540,6 +543,7 @@ class Pmp extends OS implements
         $fecInErrorsCount = '.1.3.6.1.4.1.161.19.3.3.1.95.0';
         $fecOutErrorsCount = '.1.3.6.1.4.1.161.19.3.3.1.97.0';
         $fecCRCError = '.1.3.6.1.4.1.161.19.3.3.1.223.0';
+
         return [
             new WirelessSensor(
                 'errors',
@@ -567,7 +571,7 @@ class Pmp extends OS implements
                 0,
                 'In Error Count',
                 null
-            )
+            ),
         ];
     }
 }

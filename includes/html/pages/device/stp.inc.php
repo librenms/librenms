@@ -1,16 +1,16 @@
 <?php
 
-$link_array = array(
-               'page'   => 'device',
-               'device' => $device['device_id'],
-               'tab'    => 'stp',
-              );
+$link_array = [
+    'page'   => 'device',
+    'device' => $device['device_id'],
+    'tab'    => 'stp',
+];
 
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>STP</span> &#187; ";
 
-if (!$vars['view']) {
+if (! $vars['view']) {
     $vars['view'] = 'basic';
 }
 
@@ -23,7 +23,7 @@ foreach ($menu_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $link_array, array('view' => $option));
+    echo generate_link($text, $link_array, ['view' => $option]);
     if ($vars['view'] == $option) {
         echo '</span>';
     }

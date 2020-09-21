@@ -17,19 +17,20 @@ try {
     $f2b = [
         'data' => [
             'total' => array_shift($legacy), // total was first line in legacy app
-            'jails' => []
-        ]
+            'jails' => [],
+        ],
     ];
 
     foreach ($legacy as $jail_data) {
-        list($jail, $banned) = explode(" ", $jail_data);
+        [$jail, $banned] = explode(' ', $jail_data);
         if (isset($jail) && isset($banned)) {
             $f2b['data']['jails'][$jail] = $banned;
         }
     }
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
     return;
 }
 
@@ -37,26 +38,25 @@ $f2b = $f2b['data'];
 
 $metrics = [];
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('banned', 'GAUGE', 0)
     ->addDataset('firewalled', 'GAUGE', 0);
-
 
 $fields = ['banned' => $f2b['total']];
 $metrics['total'] = $fields; // don't include legacy ds in db
 $fields['firewalled'] = 'U'; // legacy ds
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 foreach ($f2b['jails'] as $jail => $banned) {
-    $rrd_name = array('app', $name, $app_id, $jail);
+    $rrd_name = ['app', $name, $app_id, $jail];
     $rrd_def = RrdDefinition::make()->addDataset('banned', 'GAUGE', 0);
-    $fields = array('banned' => $banned);
+    $fields = ['banned' => $banned];
 
     $metrics["jail_$jail"] = $fields;
-    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 
@@ -67,11 +67,11 @@ update_application($app, 'ok', $metrics);
 //
 $device_id = $device['device_id'];
 
-$options=array(
-    'filter' => array(
-        'type' => array('=', 'fail2ban'),
-    ),
-);
+$options = [
+    'filter' => [
+        'type' => ['=', 'fail2ban'],
+    ],
+];
 
 $component = new LibreNMS\Component();
 $f2b_components = $component->getComponents($device_id, $options);

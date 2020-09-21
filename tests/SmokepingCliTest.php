@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://librenms.org
  * @copyright  2020 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
@@ -26,12 +25,10 @@
 namespace LibreNMS\Tests;
 
 use app\Console\Commands\SmokepingGenerateCommand;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Str;
-use Illuminate\Support\arr;
-use Illuminate\Translation\Translator;
-use LibreNMS\Config;
 use App\Models\Device;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\arr;
+use Illuminate\Support\Str;
 
 class SmokepingCliTest extends DBTestCase
 {
@@ -40,46 +37,46 @@ class SmokepingCliTest extends DBTestCase
     protected $groups = [
         'Le23HKVMvN' => [
             'Cl09bZU4sn' => [
-                'transport' => 'udp'
+                'transport' => 'udp',
             ],
             'c559TvthzY' => [
-                'transport' => 'udp6'
+                'transport' => 'udp6',
             ],
             'sNtzSdxdw8' => [
-                'transport' => 'udp6'
+                'transport' => 'udp6',
             ],
             '10.0.0.3' => [
-                'transport' => 'udp'
+                'transport' => 'udp',
             ],
             '2600::' => [
-                'transport' => 'udp'
-            ]
+                'transport' => 'udp',
+            ],
             ],
             'Psv9oZcxdC' => [
                 'oHiPfLzrmU' => [
-                    'transport' => 'udp'
+                    'transport' => 'udp',
                 ],
                 'kEn7hZ7N37' => [
-                    'transport' => 'udp6'
+                    'transport' => 'udp6',
                 ],
                 'PcbZ5FKtS3' => [
-                    'transport' => 'udp6'
+                    'transport' => 'udp6',
                 ],
                 '192.168.1.1' => [
-                    'transport' => 'udp'
+                    'transport' => 'udp',
                 ],
                 'fe80::' => [
-                    'transport' => 'udp'
-                ]
+                    'transport' => 'udp',
+                ],
             ],
             '4diY0pWFik' => [
                 'example.org' => [
-                    'transport' => 'udp'
+                    'transport' => 'udp',
                 ],
                 'host_with_under_score.example.org' => [
-                    'transport' => 'udp6'
+                    'transport' => 'udp6',
                 ],
-            ]
+            ],
         ];
 
     private $instance = null;
@@ -139,14 +136,14 @@ class SmokepingCliTest extends DBTestCase
     public function testBuildProbe()
     {
         $saved = ['+ Pl0JnP2vfE',
-                  '  binary = /usr/bin/G28F3fFeew',
-                  '  blazemode = true',
-                  '++ Xq93BufZAU',
-                  '++ etzY41dSRj0',
-                  '++ etzY41dSRj1',
-                  '++ etzY41dSRj2',
-                  ''
-                ];
+            '  binary = /usr/bin/G28F3fFeew',
+            '  blazemode = true',
+            '++ Xq93BufZAU',
+            '++ etzY41dSRj0',
+            '++ etzY41dSRj1',
+            '++ etzY41dSRj2',
+            '',
+        ];
 
         $output = $this->instance->buildProbes('Pl0JnP2vfE', 'Xq93BufZAU', 'etzY41dSRj', '/usr/bin/G28F3fFeew', 3);
 
@@ -239,7 +236,7 @@ class SmokepingCliTest extends DBTestCase
             '   title = host_with_under_score.example.org',
             '   probe = lnmsFPing6-0',
             '   host = host_with_under_score.example.org',
-            ''
+            '',
         ];
 
         $output = $this->instance->buildTargets($this->groups, 4, false);
@@ -321,7 +318,7 @@ class SmokepingCliTest extends DBTestCase
             '   menu = host_with_under_score.example.org',
             '   title = host_with_under_score.example.org',
             '   host = host_with_under_score.example.org',
-            ''
+            '',
         ];
 
         $output = $this->instance->buildTargets($this->groups, 4, true);

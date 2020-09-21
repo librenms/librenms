@@ -27,22 +27,22 @@ require_once 'includes/html/modal/delete_service.inc.php';
                 <span style="font-weight: bold;">Services</span> &#187;
 
                 <?php
-                $menu_options = array(
+                $menu_options = [
                     'basic' => 'Basic',
-                );
+                ];
 
-                if (!$vars['view']) {
+                if (! $vars['view']) {
                     $vars['view'] = 'basic';
                 }
 
-                $status_options = array(
+                $status_options = [
                     'all' => 'All',
                     'ok' => 'Ok',
                     'warning' => 'Warning',
                     'critical' => 'Critical',
-                );
+                ];
 
-                if (!$vars['state']) {
+                if (! $vars['state']) {
                     $vars['state'] = 'all';
                 }
 
@@ -60,9 +60,9 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo "<span class='pagemenu-selected'>";
                     }
 
-                    echo generate_link($text, $vars, array(
-                        'view' => $option
-                    ));
+                    echo generate_link($text, $vars, [
+                        'view' => $option,
+                    ]);
                     if ($vars['view'] == $option) {
                         echo '</span>';
                     }
@@ -87,9 +87,9 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo "<span class='pagemenu-selected'>";
                     }
 
-                    echo generate_link($text, $vars, array(
-                        'state' => $option
-                    ));
+                    echo generate_link($text, $vars, [
+                        'state' => $option,
+                    ]);
                     if ($vars['state'] == $option) {
                         echo '</span>';
                     }
@@ -103,7 +103,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                 echo '<div style="margin:10px 10px 0px 10px;" id="message"></div>';
                 echo '<div class="panel-body">';
 
-                $sql_param = array();
+                $sql_param = [];
 
                 if (isset($vars['state'])) {
                     if ($vars['state'] == 'ok') {
@@ -120,11 +120,11 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     $sql_param[] = $state;
                 }
 
-                $host_par = array();
+                $host_par = [];
                 $perms_sql = null;
-                if (!Auth::user()->hasGlobalRead()) {
+                if (! Auth::user()->hasGlobalRead()) {
                     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-                    $perms_sql .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+                    $perms_sql .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
                     $host_par = $device_ids;
                 }
 
@@ -135,7 +135,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     $device_id = $device['device_id'];
                     $device_hostname = $device['hostname'];
                     $device_sysName = $device['sysName'];
-                    $devlink = generate_device_link($device, null, array('tab' => 'services'));
+                    $devlink = generate_device_link($device, null, ['tab' => 'services']);
                     if ($shift == 1) {
                         array_unshift($sql_param, $device_id);
                         $shift = 0;

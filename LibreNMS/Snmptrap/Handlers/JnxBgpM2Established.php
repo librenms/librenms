@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Neil Kahle <nkahle@kanren.net>
@@ -43,14 +42,14 @@ class JnxBgpM2Established implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        
         $peerState = $trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'));
         $peerAddr = IP::fromHexString($trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.')));
 
         $bgpPeer = $device->bgppeers()->where('bgpPeerIdentifier', $peerAddr)->first();
 
-        if (!$bgpPeer) {
+        if (! $bgpPeer) {
             Log::error('Unknown bgp peer handling bgpEstablished trap: ' . $peerAddr);
+
             return;
         }
 

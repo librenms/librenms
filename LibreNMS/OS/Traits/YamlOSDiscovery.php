@@ -61,7 +61,7 @@ trait YamlOSDiscovery
         $flags = $numeric ? '-OUQn' : '-OUQ';
         $data = snmp_get_multi_oid($this->getDeviceArray(), $fetch_oids, $flags);
 
-        Log::debug("Yaml OS data:", $data);
+        Log::debug('Yaml OS data:', $data);
 
         foreach ($oids as $field => $oid_list) {
             if ($value = $this->findFirst($data, $oid_list, $numeric)) {
@@ -87,11 +87,12 @@ trait YamlOSDiscovery
     {
         foreach (Arr::wrap($oids) as $oid) {
             // translate all to numeric to make it easier to match
-            $oid = ($numeric && !oid_is_numeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDeviceArray()) : $oid;
-            if (!empty($data[$oid])) {
+            $oid = ($numeric && ! oid_is_numeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDeviceArray()) : $oid;
+            if (! empty($data[$oid])) {
                 return $data[$oid];
             }
         }
+
         return null;
     }
 

@@ -3,11 +3,11 @@
 use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!Str::startsWith($device['os'], array('Snom', 'asa'))) {
+if (! Str::startsWith($device['os'], ['Snom', 'asa'])) {
     echo ' IP-FORWARD';
 
     $oid = 'ipCidrRouteNumber';
-    $fields = array();
+    $fields = [];
     $rrd_def = RrdDefinition::make()->addDataset($oid, 'GAUGE', null, 5000000);
     $data = snmp_get($device, 'IP-FORWARD-MIB::' . $oid . '.0', '-OQv');
     if (is_numeric($data)) {

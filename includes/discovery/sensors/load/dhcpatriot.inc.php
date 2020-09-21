@@ -28,21 +28,21 @@ $standard_dhcp_index = '2';
 $auth_dhcp_networks_descr = snmpwalk_array_num($device, $dhcp_networks_base_oid . '.' . $auth_dhcp_index, 2);
 $standard_dhcp_networks_descr = snmpwalk_array_num($device, $dhcp_networks_base_oid . '.' . $standard_dhcp_index, 2);
 
-if (empty($standard_dhcp_networks_descr) && !empty($auth_dhcp_networks_descr)) {
+if (empty($standard_dhcp_networks_descr) && ! empty($auth_dhcp_networks_descr)) {
     $dhcp_networks = $auth_dhcp_networks_descr;
 }
-if (empty($auth_dhcp_networks_descr) && !empty($standard_dhcp_networks_descr)) {
+if (empty($auth_dhcp_networks_descr) && ! empty($standard_dhcp_networks_descr)) {
     $dhcp_networks = $standard_dhcp_networks_descr;
 }
-if (!empty($auth_dhcp_networks_descr) && !empty($standard_dhcp_networks_descr)) {
+if (! empty($auth_dhcp_networks_descr) && ! empty($standard_dhcp_networks_descr)) {
     $dhcp_networks = array_merge_recursive($auth_dhcp_networks_descr, $standard_dhcp_networks_descr);
 }
 
 $array_index = 0;
 
-if (!empty($dhcp_networks[$dhcp_networks_base_oid])) {
+if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
     foreach ($dhcp_networks[$dhcp_networks_base_oid] as $dhcp_type_index => $ignore_this) {
-        if (!empty($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index])) {
+        if (! empty($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index])) {
             foreach ($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index] as $index => $entry) {
                 $description = (explode('[', $entry));
                 $data_array[$array_index]['index'] = $index;

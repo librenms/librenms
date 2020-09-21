@@ -7,7 +7,7 @@ $app_id = $app['app_id'];
 
 echo "$name, app_id=$app_id ";
 
-if (!empty($agent_data[$name])) {
+if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
 } else {
     $options = '-Oqv';
@@ -17,30 +17,30 @@ if (!empty($agent_data[$name])) {
     $rawdata = snmp_get($device, $oid, $options, $mib);
 }
 
-# Format Data
+// Format Data
 $lines = explode("\n", $rawdata);
 
-$voip = array();
+$voip = [];
 
 foreach ($lines as $line) {
-    list($var,$value) = explode('=', $line);
+    [$var,$value] = explode('=', $line);
     $voip[$var] = $value;
 }
 
 unset($lines);
 
-$rrd_name =  array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('cpu', 'GAUGE', 0, 100)
     ->addDataset('kbyte', 'GAUGE', 0, 125000000000)
     ->addDataset('openfiles', 'GAUGE', 0, 125000000000);
 
-$fields = array(
-    'cpu' => (float)$voip['CPU Load'],
-    'kbyte' => (int)$voip['Used Memory'],
-    'openfiles' => (int)$voip['Open files']
-);
+$fields = [
+    'cpu' => (float) $voip['CPU Load'],
+    'kbyte' => (int) $voip['Used Memory'],
+    'openfiles' => (int) $voip['Open files'],
+];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 

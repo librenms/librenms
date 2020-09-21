@@ -37,9 +37,9 @@ class Pulse extends \LibreNMS\OS implements OSPolling
         if (is_numeric($users)) {
             $rrd_def = RrdDefinition::make()->addDataset('users', 'GAUGE', 0);
 
-            $fields = array(
+            $fields = [
                 'users' => $users,
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'pulse_users', $tags, $fields);

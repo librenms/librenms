@@ -32,20 +32,20 @@ var grid = $("#mac-search").bootgrid({
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
 $param = [];
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " WHERE `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= ' WHERE `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 $sql .= " $where ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
-    echo '"<option value=\"'.$data['device_id'].'\""+';
+    echo '"<option value=\"' . $data['device_id'] . '\""+';
     if ($data['device_id'] == $_POST['device_id']) {
         echo '" selected "+';
     }
 
-    echo '">'.format_hostname($data).'</option>"+';
+    echo '">' . format_hostname($data) . '</option>"+';
 }
 ?>
                "</select>"+
@@ -73,7 +73,7 @@ if ($_POST['interface'] == 'Vlan%') {
                "<div class=\"form-group\">"+
                "<input type=\"text\" name=\"address\" id=\"address\" value=\""+
 <?php
-echo '"'.$_POST['address'].'"+';
+echo '"' . $_POST['address'] . '"+';
 ?>
 
                "\" class=\"form-control input-sm\" placeholder=\"Mac Address\"/>"+

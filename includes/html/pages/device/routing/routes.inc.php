@@ -20,7 +20,7 @@ $no_refresh = true;
         </tr>
     </thead>
 </table>
-<div>Warning: Routing Table is only retrieved during device discovery. Devices are skipped if they have more than <?php echo Config::get('routes_max_number');?> routes.</div>
+<div>Warning: Routing Table is only retrieved during device discovery. Devices are skipped if they have more than <?php echo Config::get('routes_max_number'); ?> routes.</div>
 <script>
 var grid = $("#routes").bootgrid({
     ajax: true,

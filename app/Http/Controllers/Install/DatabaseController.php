@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -40,7 +39,7 @@ class DatabaseController extends InstallationController implements InstallerStep
 
     public function index(Request $request)
     {
-        if (!$this->initInstallStep()) {
+        if (! $this->initInstallStep()) {
             return $this->redirectToIncomplete();
         }
 
@@ -70,7 +69,7 @@ class DatabaseController extends InstallationController implements InstallerStep
         $message = '';
         try {
             $conn = Eloquent::DB('setup');
-            $ok = $conn && !is_null($conn->getPdo());
+            $ok = $conn && ! is_null($conn->getPdo());
         } catch (\Exception $e) {
             $message = $e->getMessage();
         }
@@ -83,7 +82,7 @@ class DatabaseController extends InstallationController implements InstallerStep
 
     public function migrate(Request $request)
     {
-        $response = new StreamedResponse(function () use ($request) {
+        $response = new StreamedResponse(function () {
             try {
                 $this->configureDatabase();
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));
@@ -114,6 +113,7 @@ class DatabaseController extends InstallationController implements InstallerStep
         $this->configureDatabase();
         if (Eloquent::isConnected() && Schema::isCurrent()) {
             $this->markStepComplete();
+
             return true;
         }
 

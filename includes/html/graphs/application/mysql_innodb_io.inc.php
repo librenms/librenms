@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$mysql_rrd = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$mysql_rrd = rrd_name($device['hostname'], ['app', 'mysql', $app['app_id']]);
 
 if (rrdtool_check_rrd_exists($mysql_rrd)) {
     $rrd_filename = $mysql_rrd;

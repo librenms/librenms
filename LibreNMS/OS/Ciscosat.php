@@ -24,6 +24,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
                 'Uncorrected Errors ' . $index
             );
         }
+
         return $sensors;
     }
 
@@ -41,9 +42,9 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
                 'Receive Signal Level ' . $index
             );
         }
+
         return $sensors;
     }
-
 
     public function discoverWirelessSnr()
     {
@@ -76,6 +77,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
                 $entry
             );
         }
+
         return $sensors;
     }
 }

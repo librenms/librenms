@@ -60,7 +60,7 @@ class SmOs extends OS implements
                 }
             }
 
-            if (!empty($totalOids['rx'])) {
+            if (! empty($totalOids['rx'])) {
                 $sensors[] = new WirelessSensor(
                     'rate',
                     $this->getDeviceId(),
@@ -73,7 +73,7 @@ class SmOs extends OS implements
                 );
             }
 
-            if (!empty($totalOids['tx'])) {
+            if (! empty($totalOids['tx'])) {
                 $sensors[] = new WirelessSensor(
                     'rate',
                     $this->getDeviceId(),
@@ -106,6 +106,7 @@ class SmOs extends OS implements
                 $entry['radioPrx']
             );
         }
+
         return $sensors;
     }
 
@@ -127,6 +128,7 @@ class SmOs extends OS implements
                 1000
             );
         }
+
         return $sensors;
     }
 
@@ -146,6 +148,7 @@ class SmOs extends OS implements
                 $entry['radioNormalizedMse']
             );
         }
+
         return $sensors;
     }
 

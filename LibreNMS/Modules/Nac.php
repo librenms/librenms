@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -55,7 +54,7 @@ class Nac implements Module
     {
         if ($os instanceof NacPolling) {
             // discovery output (but don't install it twice (testing can can do this)
-            if (!PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
+            if (! PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
                 PortsNac::observe(new ModuleModelObserver());
             }
 

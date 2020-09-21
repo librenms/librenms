@@ -9,12 +9,12 @@ use LibreNMS\Util\Snmpsim;
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-$init_modules = array('discovery', 'polling');
+$init_modules = ['discovery', 'polling'];
 require $install_dir . '/includes/init.php';
 
 $options = getopt(
     'h:m:no:v:f:d',
-    array(
+    [
         'hostname:',
         'modules:',
         'prefer-new',
@@ -24,7 +24,7 @@ $options = getopt(
         'debug',
         'snmpsim',
         'help',
-    )
+    ]
 );
 
 if (isset($options['snmpsim'])) {
@@ -43,7 +43,7 @@ if (isset($options['h'])) {
 if (isset($hostname)) {
     if (is_numeric($hostname)) {
         $device = device_by_id_cache($hostname);
-    } elseif (!empty($hostname)) {
+    } elseif (! empty($hostname)) {
         $device = device_by_name($hostname);
     }
 
@@ -60,7 +60,7 @@ if (isset($hostname)) {
 }
 
 if (isset($options['help']) || empty($target_os)) {
-    echo "Script to collect snmp data from devices to be used for testing.
+    echo 'Script to collect snmp data from devices to be used for testing.
 Snmp data is saved in tests/snmpsim.
 
 Usage:
@@ -75,7 +75,7 @@ Optional:
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
       --snmpsim      Run snmpsimd.py using the collected data for manual testing.
-";
+';
     exit;
 }
 
@@ -89,7 +89,7 @@ if (isset($options['m'])) {
     $modules = explode(',', $modules_input);
 } else {
     $modules_input = 'all';
-    $modules = array();
+    $modules = [];
 }
 
 $variant = '';
@@ -113,7 +113,6 @@ echo PHP_EOL;
 try {
     $capture = new ModuleTestHelper($modules, $target_os, $variant);
 
-
     if (isset($options['f'])) {
         $capture->setSnmprecSavePath($options['f']);
     } elseif (isset($options['file'])) {
@@ -122,8 +121,7 @@ try {
 
     $prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
 
-
-    echo "Capturing Data: ";
+    echo 'Capturing Data: ';
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
     $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
 } catch (InvalidModuleException $e) {

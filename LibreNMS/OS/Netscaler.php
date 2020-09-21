@@ -30,7 +30,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Netscaler extends \LibreNMS\OS implements OSPolling
 {
-
     public function pollOS()
     {
         echo ' IP';

@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -41,7 +40,7 @@ trait VxworksProcessorUsage
     {
         $usage = $this->parseCpuUsage(snmp_get($this->getDeviceArray(), $oid, '-Ovq'));
         if (is_numeric($usage)) {
-            return array(
+            return [
                 Processor::discover(
                     $this->getName(),
                     $this->getDeviceId(),
@@ -50,11 +49,11 @@ trait VxworksProcessorUsage
                     'Processor',
                     1,
                     $usage
-                )
-            );
+                ),
+            ];
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -65,7 +64,7 @@ trait VxworksProcessorUsage
      */
     public function pollProcessors(array $processors)
     {
-        $data = array();
+        $data = [];
 
         foreach ($processors as $processor) {
             $data[$processor['processor_id']] = $this->parseCpuUsage(
@@ -86,6 +85,7 @@ trait VxworksProcessorUsage
     private function parseCpuUsage($data)
     {
         preg_match('/([0-9]+.[0-9]+)%/', $data, $matches);
+
         return $matches[1];
     }
 }

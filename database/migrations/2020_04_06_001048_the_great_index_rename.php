@@ -59,7 +59,7 @@ class TheGreatIndexRename extends Migration
             $this->renameIndex('entPhysical', 'device_id', 'entphysical_device_id_index', ['device_id']);
             $this->renameIndex('eventlog', 'datetime', 'eventlog_datetime_index', ['datetime']);
             $this->renameIndex('eventlog', 'device_id', 'eventlog_device_id_index', ['device_id']);
-            if (!$this->indexExists('entityState', 'entitystate_device_id_index')) {
+            if (! $this->indexExists('entityState', 'entitystate_device_id_index')) {
                 Schema::table('entityState', function (Blueprint $table) {
                     // must be dropped and re-added because of case insensitivity
                     if ($this->indexExists('entityState', 'entityState_device_id_index')) {
@@ -172,13 +172,14 @@ class TheGreatIndexRename extends Migration
     private function indexExists($table, $name)
     {
         $indexes = Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes($table);
+
         return array_key_exists($name, $indexes);
     }
 
     private function renameIndex($table, $old, $new, array $fields, $unique = false)
     {
         // skip pre-existing new index
-        if (!$this->indexExists($table, $new)) {
+        if (! $this->indexExists($table, $new)) {
             $query = "ALTER TABLE $table ";
 
             // don't try to remove non-existent old index

@@ -11,9 +11,9 @@ if ($device['os'] == 'fiberhome') {
     if ($card1Status == '1') {
         $usage = snmp_get($device, 'mgrCardMemUtil.9', '-Ovq', 'GEPON-OLT-COMMON-MIB');
         discover_mempool($valid_mempool, $device, 9, 'fiberhome', 'Hswa 9 Memory', '100', null, null);
-    };
+    }
     if ($card2Status == '1') {
         $usage = snmp_get($device, 'mgrCardMemUtil.10', '-Ovq', 'GEPON-OLT-COMMON-MIB');
         discover_mempool($valid_mempool, $device, 10, 'fiberhome', 'Hswa 10 Memory', '100', null, null);
-    };
+    }
 }

@@ -17,21 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Jozef Rebjak
  * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
 if ($device['os'] === 'smartax') {
-    $slotindex = snmpwalk_cache_oid($device, 'hwSlotIndex', array(), 'HWMUSA-DEV-MIB', 'huawei');
-    $slotdesc = snmpwalk_cache_oid($device, 'hwMusaBoardSlotDesc', array(), 'HWMUSA-DEV-MIB', 'huawei');
-    $data = snmpwalk_cache_oid($device, 'hwMusaBoardRamUseRate', array(), 'HWMUSA-DEV-MIB', 'huawei');
+    $slotindex = snmpwalk_cache_oid($device, 'hwSlotIndex', [], 'HWMUSA-DEV-MIB', 'huawei');
+    $slotdesc = snmpwalk_cache_oid($device, 'hwMusaBoardSlotDesc', [], 'HWMUSA-DEV-MIB', 'huawei');
+    $data = snmpwalk_cache_oid($device, 'hwMusaBoardRamUseRate', [], 'HWMUSA-DEV-MIB', 'huawei');
     foreach ($data as $index => $item) {
-        if (is_numeric($item['hwMusaBoardRamUseRate'])&&$item['hwMusaBoardRamUseRate']!=-1) {
-            $string = "Slot";
+        if (is_numeric($item['hwMusaBoardRamUseRate']) && $item['hwMusaBoardRamUseRate'] != -1) {
+            $string = 'Slot';
             $number = $slotindex[$index]['hwSlotIndex'];
             $boarddescr = $slotdesc[$index]['hwMusaBoardSlotDesc'];
-            $descr = implode(' ', array($string, $number, $boarddescr));
+            $descr = implode(' ', [$string, $number, $boarddescr]);
             discover_mempool($valid_mempool, $device, $index, 'smartax', $descr, '1');
         }
     }

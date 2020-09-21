@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Vitali Kari
  * @author     Vitali Kari <vitali.kari@gmail.com>
@@ -56,8 +55,9 @@ class Lcos extends OS implements
     private function strToDecOid($index)
     {
         for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-                $dec_index[] = ord($index[$i]);
+            $dec_index[] = ord($index[$i]);
         }
+
         return implode('.', $dec_index);
     }
 
@@ -88,6 +88,7 @@ class Lcos extends OS implements
                 WirelessSensor::channelToFrequency($entry['lcsStatusWlanRadiosEntryRadioChannel'])
             );
         }
+
         return $sensors;
     }
 
@@ -130,6 +131,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryModemLoad']
             );
         }
+
         return $sensors;
     }
 
@@ -160,6 +162,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryNoiseLevel']
             );
         }
+
         return $sensors;
     }
 
@@ -191,6 +194,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryTransmitPower']
             );
         }
+
         return $sensors;
     }
 
@@ -219,10 +223,11 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos',
                 $bssid,
-                "CCQ " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'CCQ ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntryPhySigal']
             );
         }
+
         return $sensors;
     }
 
@@ -251,11 +256,12 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos-tx',
                 $bssid,
-                "TX Rate " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'TX Rate ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntryEffRate'],
                 1000000
             );
         }
+
         return $sensors;
     }
 
@@ -285,10 +291,11 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos',
                 $bssid,
-                "RSSI " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'RSSI ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntrySignalLevel']
             );
         }
+
         return $sensors;
     }
 }

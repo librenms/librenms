@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -58,11 +57,12 @@ class AsuswrtMerlin extends OS implements
     {
         // Need to use PHP_EOL, found newline (\n) not near as reliable / consistent! And this is as PHP says it should be done.
         $interfaces = explode(PHP_EOL, snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
-        $arrIfaces = array();
+        $arrIfaces = [];
         foreach ($interfaces as $interface) {
             [$k, $v] = explode(',', $interface);
             $arrIfaces[$k] = $v;
         }
+
         return $arrIfaces;
     }
 
@@ -79,7 +79,7 @@ class AsuswrtMerlin extends OS implements
     private function getSensorData($type, $query = '', $system = false, $stats = false)
     {
         // Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
-        $sensors = array();
+        $sensors = [];
         $interfaces = $this->getInterfaces();
         $count = 1;
 
@@ -151,6 +151,7 @@ class AsuswrtMerlin extends OS implements
     {
         $txrate = $this->getSensorData('rate', '-tx', false, true);
         $rxrate = $this->getSensorData('rate', '-rx', false, true);
+
         return array_merge($txrate, $rxrate);
     }
 

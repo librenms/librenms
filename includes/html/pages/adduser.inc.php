@@ -4,7 +4,7 @@ use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 } elseif (Auth::user()->isDemo()) {
     demo_account();
@@ -17,7 +17,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
     if (LegacyAuth::get()->canManageUsers()) {
         if ($_POST['action'] == 'add') {
             if ($_POST['new_username']) {
-                if (!LegacyAuth::get()->userExists($_POST['new_username'])) {
+                if (! LegacyAuth::get()->userExists($_POST['new_username'])) {
                     if (isset($_POST['can_modify_passwd'])) {
                         $_POST['can_modify_passwd'] = 1;
                     } else {
@@ -26,7 +26,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 
                     // FIXME: missing email field here on the form
                     if (LegacyAuth::get()->addUser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], $_POST['new_email'], $_POST['new_realname'], $_POST['can_modify_passwd'])) {
-                        echo '<span class=info>User '.$_POST['new_username'].' added!</span>';
+                        echo '<span class=info>User ' . $_POST['new_username'] . ' added!</span>';
                     }
                 } else {
                     echo '<div class="red">User with this name already exists!</div>';
@@ -45,8 +45,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
     </div>
     <div class='col-sm-6'>
     </div>
-  </div>";
-        ?>
+  </div>"; ?>
     <div class='form-group'>
     <label for='new_password' class='col-sm-2 control-label'>Password</label>
     <div class='col-sm-4'>
@@ -57,7 +56,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
     </div>
 
         <?php
-        if ($_POST['action'] == 'add' && !$_POST['new_password']) {
+        if ($_POST['action'] == 'add' && ! $_POST['new_password']) {
             echo '<span class=red>Please enter a password!</span><br />';
         }
 

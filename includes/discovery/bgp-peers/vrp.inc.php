@@ -18,14 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 PipoCanaja
  * @author     PipoCanaja
  */
 
 use LibreNMS\Config;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {
@@ -46,13 +44,13 @@ if (Config::get('enable_bgp')) {
         }
         $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeers', [], 'HUAWEI-BGP-VPN-MIB');
         foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode(".", $key);
+            $oid = explode('.', $key);
             $vrfInstance = $value['hwBgpPeerVrfName'];
             if ($oid[0] == 0) {
                 $vrfInstance = '';
                 $value['hwBgpPeerVrfName'] = '';
             }
-            $address = str_replace($oid[0].".".$oid[1].".".$oid[2].".".$oid[3].".", '', $key);
+            $address = str_replace($oid[0] . '.' . $oid[1] . '.' . $oid[2] . '.' . $oid[3] . '.', '', $key);
             if ($oid[3] == 'ipv6') {
                 $address = IP::fromHexString($address)->compressed();
             } elseif ($oid[3] != 'ipv4') {
@@ -64,7 +62,7 @@ if (Config::get('enable_bgp')) {
             $bgpPeers[$vrfInstance][$address]['vrf_id'] = $map_vrf['byName'][$vrfInstance]['vrf_id'];
             $bgpPeers[$vrfInstance][$address]['afi'] = $oid[1];
             $bgpPeers[$vrfInstance][$address]['safi'] = $oid[2];
-            $bgpPeers[$vrfInstance][$address]['typePeer'] =  $oid[3];
+            $bgpPeers[$vrfInstance][$address]['typePeer'] = $oid[3];
         }
 
         foreach ($bgpPeers as $vrfName => $vrf) {
@@ -98,21 +96,21 @@ if (Config::get('enable_bgp')) {
                         unset($peers['vrf_id']);
                     }
                     dbInsert($peers, 'bgpPeers');
-                    $seenPeer[$address]=1;
+                    $seenPeer[$address] = 1;
 
                     if (Config::get('autodiscovery.bgp')) {
                         $name = gethostbyaddr($address);
                         discover_new_device($name, $device, 'BGP');
                     }
                     echo '+';
-                    $vrp_bgp_peer_count ++;
+                    $vrp_bgp_peer_count++;
                 } else {
                     dbUpdate(['bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-                    $seenPeer[$address]=1;
+                    $seenPeer[$address] = 1;
                     echo '.';
-                    $vrp_bgp_peer_count ++;
+                    $vrp_bgp_peer_count++;
                 }
-                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', array($device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi'])) < 1) {
+                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi']]) < 1) {
                     $device['context_name'] = $vrfName;
                     add_cbgp_peer($device, ['ip' => $value['hwBgpPeerRemoteAddr']], $value['afi'], $value['safi']);
                     unset($device['context_name']);
@@ -135,8 +133,8 @@ if (Config::get('enable_bgp')) {
                 continue; //we just added this peer
             }
             if ((empty($vrfId) && empty($bgpPeers[''][$address])) ||
-                (!empty($vrfId) && !empty($vrfName) && empty($bgpPeers[$vrfName][$address])) ||
-                (!empty($vrfId) && empty($vrfName))) {
+                (! empty($vrfId) && ! empty($vrfName) && empty($bgpPeers[$vrfName][$address])) ||
+                (! empty($vrfId) && empty($vrfName))) {
                 $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]);
 
                 echo str_repeat('-', $deleted);
@@ -144,13 +142,13 @@ if (Config::get('enable_bgp')) {
             }
         }
 
-        $af_query = "SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=?";
+        $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=?';
         foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip']]) as $entry) {
-            $afi  = $entry['afi'];
+            $afi = $entry['afi'];
             $safi = $entry['safi'];
             $vrfName = $entry['context_name'];
-            if (!exist($bgpPeersCache[$vrfName]) ||
-                    !exist($bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']]) ||
+            if (! exist($bgpPeersCache[$vrfName]) ||
+                    ! exist($bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']]) ||
                     $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['afi']] != $afi ||
                     $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['safi']] != $safi) {
                 dbDelete(

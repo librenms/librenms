@@ -36,14 +36,14 @@ class Ucos extends \LibreNMS\OS
         $device->version = snmp_get($this->getDeviceArray(), 'SYSAPPL-MIB::sysApplInstallPkgVersion.1', '-Oqv') ?: null;
 
         $applist = snmp_walk($this->getDeviceArray(), 'SYSAPPL-MIB::sysApplInstallPkgProductName', '-OQv');
-        if (Str::contains($applist, "Cisco Unified CCX Database")) {
-            $device->features = "UCCX";
-        } elseif (Str::contains($applist, "Cisco CallManager")) {
-            $device->features = "CUCM";
-        } elseif (Str::contains($applist, "Cisco Emergency Responder")) {
-            $device->features = "CER";
-        } elseif (Str::contains($applist, "Connection System Agent")) {
-            $device->features = "CUC";
+        if (Str::contains($applist, 'Cisco Unified CCX Database')) {
+            $device->features = 'UCCX';
+        } elseif (Str::contains($applist, 'Cisco CallManager')) {
+            $device->features = 'CUCM';
+        } elseif (Str::contains($applist, 'Cisco Emergency Responder')) {
+            $device->features = 'CER';
+        } elseif (Str::contains($applist, 'Connection System Agent')) {
+            $device->features = 'CUC';
         }
     }
 }
