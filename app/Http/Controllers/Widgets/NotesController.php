@@ -34,6 +34,7 @@ class NotesController extends WidgetController
     protected $title = 'Notes';
     protected $defaults = [
         'title' => null,
+        'refresh' => 60,
         'notes' => null,
     ];
 

@@ -44,6 +44,7 @@ class GraphController extends WidgetController
     protected $title = 'Graph';
     protected $defaults = [
         'title' => null,
+        'refresh' => 60,
         'graph_type' => null,
         'graph_range' => 'oneday',
         'graph_legend' => 'yes',

@@ -96,6 +96,7 @@ abstract class WidgetController extends Controller
             $widget = UserWidget::find($id);
             $this->settings = array_replace($this->defaults, $widget ? (array) $widget->settings : []);
             $this->settings['id'] = $id;
+            $this->settings['refresh'] = $widget->refresh;
 
             if ($settingsView && isset($this->settings['device_group'])) {
                 $this->settings['device_group'] = DeviceGroup::find($this->settings['device_group']);

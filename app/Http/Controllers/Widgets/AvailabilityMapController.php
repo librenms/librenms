@@ -39,6 +39,7 @@ class AvailabilityMapController extends WidgetController
     {
         $this->defaults = [
             'title' => null,
+            'refresh' => 60,
             'type' => (int) Config::get('webui.availability_map_compact', 0),
             'tile_size' => 12,
             'color_only_select' => 0,

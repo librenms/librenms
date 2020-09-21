@@ -33,6 +33,7 @@ class ImageController extends WidgetController
     protected $title = 'Custom Image';
     protected $defaults = [
         'title' => null,
+        'refresh' => 60,
         'image_url' => null,
         'target_url' => null,
     ];

@@ -39,6 +39,7 @@ class WorldMapController extends WidgetController
     {
         $this->defaults = [
             'title' => null,
+            'refresh' => 60,
             'title_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
             'init_lat' => Config::get('leaflet.default_lat', 51.4800),
             'init_lng' => Config::get('leaflet.default_lng', 0),
