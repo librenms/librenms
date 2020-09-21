@@ -22,9 +22,8 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $tmp_eltex = snmp_get($device, 'ltp8xFirmwareRevision.0', '-Ovq', 'ELTEX-LTP8X-STANDALONE');
-list($hardware, $tmp_eltex) = explode(':', $tmp_eltex);
+[$hardware, $tmp_eltex] = explode(':', $tmp_eltex);
 $tmp_eltex = preg_split('/(software version| on)/', $tmp_eltex);
 $version = $tmp_eltex['1'];
 

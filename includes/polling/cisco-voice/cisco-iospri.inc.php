@@ -40,16 +40,16 @@ if ($device['os_group'] == "cisco") {
                 ->addDataset('total', 'GAUGE', 0)
                 ->addDataset('active', 'GAUGE', 0);
 
-            $fields = array(
+            $fields = [
                 'total' => $total,
                 'active' => $active,
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($device, 'cisco-iospri', $tags, $fields);
 
             $os->enableGraph('cisco-iospri');
-            echo(" Cisco IOS PRI ");
+            echo " Cisco IOS PRI ";
         }
         unset($rrd_def, $total, $active, $fields, $tags);
     }

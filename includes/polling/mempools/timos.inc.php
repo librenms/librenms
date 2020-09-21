@@ -22,9 +22,8 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $used = snmp_get($device, '.1.3.6.1.4.1.6527.3.1.2.1.1.2.0', '-OvQ');
 $free = snmp_get($device, '.1.3.6.1.4.1.6527.3.1.2.1.1.3.0', '-OvQ');
 $mempool['total'] = ($free + $used);
-$mempool['free']  = $free;
-$mempool['used']  = $used;
+$mempool['free'] = $free;
+$mempool['used'] = $used;

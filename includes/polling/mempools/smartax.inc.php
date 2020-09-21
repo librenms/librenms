@@ -25,8 +25,8 @@
 $oid = '.1.3.6.1.4.1.2011.2.6.7.1.1.2.1.6.' . $mempool['mempool_index'];
 $used = snmp_get($device, $oid, '-OvQ');
 $mempool['total'] = 100;
-$mempool['free']  = ($mempool['total'] - $used);
-$mempool['used']  = $used;
+$mempool['free'] = ($mempool['total'] - $used);
+$mempool['used'] = $used;
 unset(
     $oid,
     $used

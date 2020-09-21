@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $perc = snmp_get($device, 'swMemUsage.0', '-Ovq', 'SW-MIB');
 
 if (is_numeric($perc)) {

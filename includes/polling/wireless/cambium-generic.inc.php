@@ -17,10 +17,10 @@ if (strstr($hardware, 'CMM') == false) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('fecInErrorsCount', 'GAUGE', 0, 100000)
             ->addDataset('fecOutErrorsCount', 'GAUGE', 0, 100000);
-        $fields = array(
+        $fields = [
             'fecInErrorsCount' => $fecInErrorsCount,
             'fecOutErrorsCount' => $fecOutErrorsCount,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-errorCount', $tags, $fields);
         $os->enableGraph('cambium_generic_errorCount');
@@ -30,9 +30,9 @@ if (strstr($hardware, 'CMM') == false) {
     $crcErrors = snmp_get($device, "fecCRCError.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
     if (is_numeric($crcErrors)) {
         $rrd_def = RrdDefinition::make()->addDataset('crcErrors', 'GAUGE', 0, 100000);
-        $fields = array(
+        $fields = [
             'crcErrors' => $crcErrors,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-crcErrors', $tags, $fields);
         $os->enableGraph('cambium_generic_crcErrors');
@@ -46,11 +46,11 @@ if (strstr($hardware, 'CMM') == false) {
             ->addDataset('vertical', 'GAUGE', -150, 0)
             ->addDataset('horizontal', 'GAUGE', -150, 0)
             ->addDataset('combined', 'GAUGE', -150, 0);
-        $fields = array(
+        $fields = [
             'vertical' => floatval($vertical),
             'horizontal' => floatval($horizontal),
             'combined' => $combined,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-signalHV', $tags, $fields);
         $os->enableGraph('cambium_generic_signalHV');
@@ -60,9 +60,9 @@ if (strstr($hardware, 'CMM') == false) {
     $rssi = snmp_get($device, "1.3.6.1.4.1.161.19.3.2.2.2.0", "-Ovqn", "");
     if (is_numeric($rssi)) {
         $rrd_def = RrdDefinition::make()->addDataset('rssi', 'GAUGE', 0, 5000);
-        $fields = array(
+        $fields = [
             'rssi' => $rssi,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-rssi', $tags, $fields);
         $os->enableGraph('cambium_generic_rssi');
@@ -72,9 +72,9 @@ if (strstr($hardware, 'CMM') == false) {
     $jitter = snmp_get($device, "jitter.0", "-Ovqn", "WHISP-SM-MIB");
     if (is_numeric($jitter)) {
         $rrd_def = RrdDefinition::make()->addDataset('jitter', 'GAUGE', 0, 20);
-        $fields = array(
+        $fields = [
             'jitter' => $jitter,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-jitter', $tags, $fields);
         $os->enableGraph('cambium_generic_jitter');
@@ -87,10 +87,10 @@ if (strstr($hardware, 'CMM') == false) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('horizontal', 'GAUGE', -100, 100)
             ->addDataset('vertical', 'GAUGE', -100, 100);
-        $fields = array(
+        $fields = [
             'horizontal' => $horizontal,
             'vertical' => $vertical,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-slaveHV', $tags, $fields);
         $os->enableGraph('cambium_generic_450_slaveHV');
@@ -100,9 +100,9 @@ if (strstr($hardware, 'CMM') == false) {
     $ssr = str_replace('"', "", snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "WHISP-SM-MIB"));
     if (is_numeric($ssr)) {
         $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
-        $fields = array(
+        $fields = [
             'ssr' => $ssr,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-slaveSSR', $tags, $fields);
         $os->enableGraph('cambium_generic_450_slaveSSR');
@@ -115,10 +115,10 @@ if (strstr($hardware, 'CMM') == false) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('horizontal', 'GAUGE', 0, 100)
             ->addDataset('vertical', 'GAUGE', 0, 100);
-        $fields = array(
+        $fields = [
             'horizontal' => $horizontal,
             'vertical' => $vertical,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-slaveSNR', $tags, $fields);
         $os->enableGraph('cambium_generic_450_slaveSNR');
@@ -137,9 +137,9 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
     }
     if (is_numeric($gpsStatus)) {
         $rrd_def = RrdDefinition::make()->addDataset('whispGPSStats', 'GAUGE', 0, 4);
-        $fields = array(
+        $fields = [
             'whispGPSStats' => $gpsStatus,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-whispGPSStats', $tags, $fields);
         $os->enableGraph('cambium_generic_whispGPSStats');
@@ -152,10 +152,10 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
         $rrd_def = RrdDefinition::make()
             ->addDataset('visible', 'GAUGE', 0, 1000)
             ->addDataset('tracked', 'GAUGE', 0, 1000);
-        $fields = array(
+        $fields = [
             'visible' => floatval($visible),
             'tracked' => floatval($tracked),
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-gpsStats', $tags, $fields);
         $os->enableGraph('cambium_generic_gpsStats');
@@ -166,9 +166,9 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
     $lastLevel = str_replace('"', "", snmp_get($device, "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
 if (is_numeric($lastLevel)) {
     $rrd_def = RrdDefinition::make()->addDataset('last', 'GAUGE', -100, 0);
-    $fields = array(
-    'last' => $lastLevel,
-    );
+    $fields = [
+        'last' => $lastLevel,
+    ];
     $tags = compact('rrd_def');
     data_update($device, 'cambium-generic-450-powerlevel', $tags, $fields);
     $os->enableGraph('cambium_generic_450_powerlevel');
@@ -182,10 +182,10 @@ if (strstr($version, 'AP') == false) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('horizontal', 'GAUGE', -100, 0)
             ->addDataset('vertical', 'GAUGE', -100, 0);
-        $fields = array(
+        $fields = [
             'horizontal' => $horizontal,
             'vertical' => $vertical,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-linkRadioDbm', $tags, $fields);
         $os->enableGraph('cambium_generic_450_linkRadioDbm');
@@ -198,10 +198,10 @@ if (strstr($version, 'AP') == false) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('horizontal', 'GAUGE', 0, 100)
             ->addDataset('vertical', 'GAUGE', 0, 100);
-        $fields = array(
+        $fields = [
             'horizontal' => $horizontal,
             'vertical' => $vertical,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-ptpSNR', $tags, $fields);
         $os->enableGraph('cambium_generic_450_ptpSNR');
@@ -211,9 +211,9 @@ if (strstr($version, 'AP') == false) {
     $ssr = str_replace('"', "", snmp_get($device, "linkSignalStrengthRatio.2", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($ssr)) {
         $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
-        $fields = array(
-        'ssr' => $ssr,
-        );
+        $fields = [
+            'ssr' => $ssr,
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-masterSSR', $tags, $fields);
         $os->enableGraph('cambium_generic_450_masterSSR');
@@ -232,12 +232,12 @@ if (strstr($version, 'AP') == false) {
                 ->addDataset('min', 'GAUGE', -100, 0)
                 ->addDataset('max', 'GAUGE', -100, 0)
                 ->addDataset('avg', 'GAUGE', -100, 0);
-            $fields = array(
+            $fields = [
                 'dbm' => $dbmRadio,
                 'min' => $minRadio,
                 'max' => $maxRadio,
                 'avg' => $avgRadio,
-            );
+            ];
             $tags = compact('rrd_def');
             data_update($device, 'cambium-generic-radioDbm', $tags, $fields);
             $os->enableGraph('cambium_generic_radioDbm');
@@ -254,10 +254,10 @@ if (strstr($version, 'AP')) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('regCount', 'GAUGE', 0, 15000)
             ->addDataset('failed', 'GAUGE', 0, 15000);
-        $fields = array(
+        $fields = [
             'regCount' => $registered,
             'failed' => $failed,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-regCount', $tags, $fields);
         $os->enableGraph('cambium_generic_regCount');
@@ -272,9 +272,9 @@ if (strstr($version, 'AP')) {
         } else {
             $freq = $freq / 10000;
         }
-        $fields = array(
+        $fields = [
             'freq' => $freq,
-        );
+        ];
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-freq', $tags, $fields);
         $os->enableGraph('cambium_generic_freq');

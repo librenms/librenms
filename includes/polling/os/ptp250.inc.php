@@ -13,4 +13,4 @@ use LibreNMS\RRD\RrdDefinition;
 
 $version = $device['sysDescr'];
 $masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CAMBIUM-PTP250-MIB"));
-$hardware = 'PTP 250 '. $masterSlaveMode;
+$hardware = 'PTP 250 ' . $masterSlaveMode;

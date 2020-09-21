@@ -1,8 +1,8 @@
 <?php
 
-# Sorry about the OIDs but there doesn't seem to be a matching MIB available... :-/
+// Sorry about the OIDs but there doesn't seem to be a matching MIB available... :-/
 $response = snmp_get($device, "1.3.6.1.4.1.14125.100.1.8.0", "-OQv");
-if (!empty($response)) {
+if (! empty($response)) {
     $version = "Kernel " . trim(snmp_get($device, "1.3.6.1.4.1.14125.100.1.8.0", "-OQv"), '" ');
     $version .= " / Apps " . trim(snmp_get($device, "1.3.6.1.4.1.14125.100.1.9.0", "-OQv"), '" ');
 } else {
@@ -10,9 +10,9 @@ if (!empty($response)) {
 }
 $serial = trim(snmp_get($device, "1.3.6.1.4.1.14125.100.1.7.0", "-OQv"), '" ');
 
-# There doesn't seem to be a real hardware identification.. sysName will have to do?
+// There doesn't seem to be a real hardware identification.. sysName will have to do?
 $hw_response = snmp_get($device, "1.3.6.1.4.1.14125.100.1.6.0", "-OQv");
-if (!empty($hw_response)) {
+if (! empty($hw_response)) {
     $hardware = str_replace("EnGenius ", "", $device['sysName']) . " v" . trim(snmp_get($device, "1.3.6.1.4.1.14125.100.1.6.0", "-OQv"), '" .');
 } else {
     $hardware = $device['sysName'] . trim(snmp_get($device, "1.3.6.1.4.1.14125.3.1.1.5.0", "-OQv"), '" .');

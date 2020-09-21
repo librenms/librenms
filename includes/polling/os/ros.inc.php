@@ -22,7 +22,6 @@
  * @copyright  2017 Lorenzo Zafra
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
-
 preg_match('~(?\'hardware\'.*?)-(?:.*)~', $device['sysDescr'], $matches);
 
 if ($matches['hardware']) {

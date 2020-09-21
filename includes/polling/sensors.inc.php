@@ -17,7 +17,7 @@ $query = "SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ?";
 $params = [$device['device_id']];
 
 $submodules = Config::get('poller_submodules.sensors', []);
-if (!empty($submodules)) {
+if (! empty($submodules)) {
     $query .= " AND `sensor_class` IN " . dbGenPlaceholders(count($submodules));
     $params = array_merge($params, $submodules);
 }

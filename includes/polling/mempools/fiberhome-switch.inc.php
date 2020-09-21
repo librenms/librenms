@@ -15,9 +15,9 @@
 */
 
 $oid = $mempool['mempool_index'];
-    echo "\nFiberHome-MEMORY-POOL Index: ".$mempool['mempool_index']."\n";
+    echo "\nFiberHome-MEMORY-POOL Index: " . $mempool['mempool_index'] . "\n";
 
-if (!is_array($mempool_cache['fiberhome-switch'])) {
+if (! is_array($mempool_cache['fiberhome-switch'])) {
     echo "\ncaching\n";
     $mempool_cache['fiberhome-switch'] = snmpwalk_group($device, 'memoryPoolTable', 'WRI-MEMORY-MIB');
     d_echo($mempool_cache);
@@ -29,9 +29,9 @@ if ($entry['memoryPoolTotalBytes'] < 0) {
     $entry['memoryPoolTotalBytes'] = ($entry['memoryPoolTotalBytes'] * -1);
 }
 
-$perc             = $entry['memoryPoolCurrUsage'];
+$perc = $entry['memoryPoolCurrUsage'];
 $mempool['total'] = $entry['memoryPoolTotalBytes'];
-$mempool['used']  = $entry['memoryPoolAllocBytesNum'];
-$mempool['free']  = ($entry['memoryPoolTotalBytes'] - $mempool['used']);
+$mempool['used'] = $entry['memoryPoolAllocBytesNum'];
+$mempool['free'] = ($entry['memoryPoolTotalBytes'] - $mempool['used']);
 
 // End of File

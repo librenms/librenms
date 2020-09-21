@@ -22,5 +22,4 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
-list(,$hardware,) = explode(',', $device['sysDescr'], 3);
+[,$hardware,] = explode(',', $device['sysDescr'], 3);

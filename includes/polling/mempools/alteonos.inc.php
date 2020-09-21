@@ -20,7 +20,7 @@ $perc = ($total / $free) * 100;
 $used = ($total - $free);
 if (is_numeric($used) && is_numeric($free) && is_numeric($perc)) {
     $mempool['total'] = $total;
-    $mempool['free']  = $free;
-    $mempool['used']  = $used;
-    $mempool['perc']  = $perc;
+    $mempool['free'] = $free;
+    $mempool['used'] = $used;
+    $mempool['perc'] = $perc;
 }

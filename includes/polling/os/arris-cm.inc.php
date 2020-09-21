@@ -22,7 +22,6 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 preg_match('/<<HW_REV: (.+); VENDOR:.*SW_REV: (.+); MODEL: (.+)>>/', $device['sysDescr'], $matches);
 
 $hardware = $matches[3] . " (Rev: " . $matches[1] . ")";

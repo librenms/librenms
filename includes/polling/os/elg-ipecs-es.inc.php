@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
-list ($hardware, $dump) = explode(' ', $device['sysDescr'], 2);
+[$hardware, $dump] = explode(' ', $device['sysDescr'], 2);
 
 unset($dump);

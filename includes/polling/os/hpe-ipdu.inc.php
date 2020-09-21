@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $hpe_ipdu_data = snmp_get_multi_oid($device, ['mpduFirmwareVersion.0', 'mpduSerialNumber.0', 'mpduModel.0'], '-OUQs', 'CPQPOWER-MIB');
 
 $serial = trim($hpe_ipdu_data['mpduSerialNumber.1'], '"');
