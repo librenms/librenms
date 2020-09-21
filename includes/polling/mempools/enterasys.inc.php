@@ -11,7 +11,7 @@
  */
 
 $free = snmp_get($device, "etsysResourceStorageAvailable.{$mempool['mempool_index']}.ram.{$mempool['entPhysicalIndex']}", '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
-$total  = snmp_get($device, "etsysResourceStorageSize.{$mempool['mempool_index']}.ram.{$mempool['entPhysicalIndex']}", '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
+$total = snmp_get($device, "etsysResourceStorageSize.{$mempool['mempool_index']}.ram.{$mempool['entPhysicalIndex']}", '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
 
 $mempool['used'] = (($total - $free) * 1024);
 $mempool['free'] = ($free * 1024);

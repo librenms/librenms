@@ -30,16 +30,16 @@ if ($device['os_group'] == "cisco") {
             ->addDataset('total', 'GAUGE', 0)
             ->addDataset('active', 'GAUGE', 0);
 
-        $fields = array(
+        $fields = [
             'total'  => $total,
             'active' => $active,
-        );
+        ];
 
         $tags = compact('rrd_def');
         data_update($device, 'cisco-iosmtp', $tags, $fields);
 
         $os->enableGraph('cisco-iosmtp');
-        echo (" Cisco IOS MTP ");
+        echo " Cisco IOS MTP ";
     }
     unset($rrd_def, $total, $active, $available, $fields, $tags);
 }

@@ -29,10 +29,10 @@ if (is_numeric($cambiumGPSNumTrackedSat) && is_numeric($cambiumGPSNumVisibleSat)
     $rrd_def = RrdDefinition::make()
         ->addDataset('numTracked', 'GAUGE', 0, 100000)
         ->addDataset('numVisible', 'GAUGE', 0, 100000);
-    $fields = array(
+    $fields = [
         'numTracked' => $cambiumGPSNumTrackedSat,
-        'numVisible' => $cambiumGPSNumVisibleSat
-    );
+        'numVisible' => $cambiumGPSNumVisibleSat,
+    ];
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-gps', $tags, $fields);
     $os->enableGraph('cambium_epmp_gps');
@@ -44,10 +44,10 @@ if (is_numeric($cambiumSTAUplinkMCSMode) && is_numeric($cambiumSTADownlinkMCSMod
     $rrd_def = RrdDefinition::make()
         ->addDataset('uplinkMCSMode', 'GAUGE', -30, 30)
         ->addDataset('downlinkMCSMode', 'GAUGE', -30, 30);
-    $fields = array(
+    $fields = [
         'uplinkMCSMode' => $cambiumSTAUplinkMCSMode,
-        'downlinkMCSMode' => $cambiumSTADownlinkMCSMode
-    );
+        'downlinkMCSMode' => $cambiumSTADownlinkMCSMode,
+    ];
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-modulation', $tags, $fields);
     $os->enableGraph('cambium_epmp_modulation');
@@ -72,11 +72,11 @@ if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) &
         ->addDataset('entryAttempt', 'GAUGE', 0, 100000)
         ->addDataset('entryAccess', 'GAUGE', 0, 100000)
         ->addDataset('authFailure', 'GAUGE', 0, 100000);
-    $fields = array(
+    $fields = [
         'entryAttempt' => $sysNetworkEntryAttempt,
         'entryAccess' => $sysNetworkEntrySuccess,
-        'authFailure' => $sysNetworkEntryAuthenticationFailure
-    );
+        'authFailure' => $sysNetworkEntryAuthenticationFailure,
+    ];
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-access', $tags, $fields);
     $os->enableGraph('cambium_epmp_access');
@@ -85,9 +85,9 @@ if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) &
 $gpsSync = snmp_get($device, "cambiumEffectiveSyncSource.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($gpsSync)) {
     $rrd_def = RrdDefinition::make()->addDataset('gpsSync', 'GAUGE', 0, 4);
-    $fields = array(
+    $fields = [
         'gpsSync' => $gpsSync,
-    );
+    ];
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-gpsSync', $tags, $fields);
     $os->enableGraph('cambium_epmp_gpsSync');
@@ -112,17 +112,17 @@ $dlWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-
 $dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond"];
 
 if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond)) {
-    $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond/$ulWLanTotalAvailableFrameTimePerSecond)*100), 2);
-    $dlWlanFrameUtilization = round((($dlWLanTotalUsedFrameTimePerSecond/$dlWLanTotalAvailableFrameTimePerSecond)*100), 2);
+    $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond / $ulWLanTotalAvailableFrameTimePerSecond) * 100), 2);
+    $dlWlanFrameUtilization = round((($dlWLanTotalUsedFrameTimePerSecond / $dlWLanTotalAvailableFrameTimePerSecond) * 100), 2);
     d_echo($dlWlanFrameUtilization);
     d_echo($ulWlanFrameUtilization);
     $rrd_def = RrdDefinition::make()
             ->addDataset('ulwlanfrut', 'GAUGE', 0, 100000)
             ->addDataset('dlwlanfrut', 'GAUGE', 0, 100000);
-    $fields = array(
-            'ulwlanframeutilization' => $ulWlanFrameUtilization,
-            'dlwlanframeutilization' => $dlWlanFrameUtilization
-    );
+    $fields = [
+        'ulwlanframeutilization' => $ulWlanFrameUtilization,
+        'dlwlanframeutilization' => $dlWlanFrameUtilization,
+    ];
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-frameUtilization', $tags, $fields);
     $os->enableGraph('cambium-epmp-frameUtilization');

@@ -22,5 +22,4 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
-list($hardware, $version) = preg_split('/ /', preg_replace('/([\\\"]+)/', '', $device['sysDescr']));
+[$hardware, $version] = preg_split('/ /', preg_replace('/([\\\"]+)/', '', $device['sysDescr']));

@@ -83,7 +83,7 @@ if (bill_permitted($bill_id)) {
         }
 
         echo '</div></div>';
-    }//end print_port_list ?>
+    }//end print_port_list?>
 
     <h2><?php   echo "Bill: ${bill_data['bill_name']}"; ?></h2>
 
@@ -197,7 +197,7 @@ if (bill_permitted($bill_id)) {
             </td>
 
         <?php
-        }//end if ?>
+        }//end if?>
     </tr>
     </table>
 </div>

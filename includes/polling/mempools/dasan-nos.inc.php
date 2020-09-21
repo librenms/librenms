@@ -22,7 +22,6 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $mempool['total'] = snmp_get($device, 'dsTotalMem.0', '-OvQU', 'DASAN-SWITCH-MIB');
-$mempool['used']  = snmp_get($device, 'dsUsedMem.0', '-OvQU', 'DASAN-SWITCH-MIB');
-$mempool['free']  = snmp_get($device, 'dsFreeMem.0', '-OvQU', 'DASAN-SWITCH-MIB');
+$mempool['used'] = snmp_get($device, 'dsUsedMem.0', '-OvQU', 'DASAN-SWITCH-MIB');
+$mempool['free'] = snmp_get($device, 'dsFreeMem.0', '-OvQU', 'DASAN-SWITCH-MIB');

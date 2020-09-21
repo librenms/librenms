@@ -22,5 +22,4 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $version = trim(snmp_get($device, 'brzaccVLRunningSoftwareVersion.0', '-Oqv', 'ALVARION-DOT11-WLAN-MIB'), '"');

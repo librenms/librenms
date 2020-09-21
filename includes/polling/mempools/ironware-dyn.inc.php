@@ -4,24 +4,24 @@ use Illuminate\Support\Str;
 
 $oid = $mempool['mempool_index'];
 
-d_echo('Ironware Mempool'."\n");
+d_echo('Ironware Mempool' . "\n");
 
-if (Str::contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
+if (Str::contains($device['sysDescr'], ['NetIron', 'MLX', 'CER']) === false) {
     echo 'Ironware Dynamic: ';
     $mempool['total'] = snmp_get($device, 'snAgGblDynMemTotal.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
     if ($mempool['total'] < 0) {
-        $mempool['total'] =+ 4294967296 ; // signed vs unsigned snmp output
+        $mempool['total'] = +4294967296; // signed vs unsigned snmp output
     }
-    $mempool['free']  = snmp_get($device, 'snAgGblDynMemFree.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
+    $mempool['free'] = snmp_get($device, 'snAgGblDynMemFree.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
     if ($mempool['free'] < 0) {
-        $mempool['free'] =+ 4294967296 ; // signed vs unsigned snmp output
+        $mempool['free'] = +4294967296; // signed vs unsigned snmp output
     }
-    $mempool['used']  = ($mempool['total'] - $mempool['free']);
+    $mempool['used'] = ($mempool['total'] - $mempool['free']);
     d_echo($mempool);
 } else {
     echo 'NetIron: ';
     d_echo('caching');
-    $mempool_cache['ironware-dyn'] = array();
+    $mempool_cache['ironware-dyn'] = [];
     $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryUtil100thPercent', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
     $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryAvailable', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
     $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryTotal', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
@@ -34,6 +34,6 @@ if (Str::contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false
     $memory_available = $entry['snAgentBrdMemoryTotal'];
 
     $mempool['total'] = $memory_available;
-    $mempool['used']  = $memory_available / 10000 * $perc;
-    $mempool['free']  = $memory_available - $mempool['used'];
+    $mempool['used'] = $memory_available / 10000 * $perc;
+    $mempool['free'] = $memory_available - $mempool['used'];
 } //end_else

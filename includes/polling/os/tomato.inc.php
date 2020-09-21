@@ -22,7 +22,6 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
-list($ignore, $version) = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
+[$ignore, $version] = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
 
 unset($ignore);

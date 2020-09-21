@@ -11,7 +11,7 @@ if (strstr($ciscomodel, 'OID')) {
     unset($ciscomodel);
 }
 
-if (!strstr($ciscomodel, ' ') && strlen($ciscomodel) >= '3') {
+if (! strstr($ciscomodel, ' ') && strlen($ciscomodel) >= '3') {
     $hardware = $ciscomodel;
 }
 
@@ -19,5 +19,5 @@ $device['sysDescr'] = str_replace(', Inc.', '', $device['sysDescr']);
 // Make the two formats the same
 $device['sysDescr'] = str_replace("\n", ' ', $device['sysDescr']);
 
-list(,,$hardware,,,,,,,$version,,,$features) = explode(' ', $device['sysDescr']);
-list(,$features) = explode('-', $features);
+[,,$hardware,,,,,,,$version,,,$features] = explode(' ', $device['sysDescr']);
+[,$features] = explode('-', $features);

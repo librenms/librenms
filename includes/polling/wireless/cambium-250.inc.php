@@ -46,10 +46,10 @@ if (is_numeric($txModulation) && is_numeric($rxModulation)) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('txModulation', 'GAUGE', 0, 24)
         ->addDataset('rxModulation', 'GAUGE', 0, 24);
-    $fields = array(
+    $fields = [
         'txModuation' => $txModulation,
         'rxModulation' => $rxModulation,
-    );
+    ];
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-modulationMode', $tags, $fields);
@@ -78,9 +78,9 @@ if (is_numeric($txModulation) && is_numeric($rxModulation)) {
 $ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
 if (is_numeric($ssr)) {
     $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
-    $fields = array(
+    $fields = [
         'ssr' => $ssr,
-    );
+    ];
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-ssr', $tags, $fields);

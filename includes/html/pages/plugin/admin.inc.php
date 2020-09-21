@@ -30,7 +30,7 @@ $.ajax({
 </script>
 ';
         }
-    }//end if ?>
+    }//end if?>
 
 <div class="panel panel-default panel-condensed">
   <div class="panel-heading">

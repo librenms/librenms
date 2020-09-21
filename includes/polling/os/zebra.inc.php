@@ -29,11 +29,11 @@
 use Illuminate\Support\Str;
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.683')) {
-    $oids = array(
+    $oids = [
         'hardware' => '.1.3.6.1.4.1.683.1.4.0',
         'serial' => '.1.3.6.1.4.1.683.1.5.0',
         'version' => '.1.3.6.1.4.1.683.1.9.0',
-    );
+    ];
     $os_data = snmp_get_multi_oid($device, $oids);
     foreach ($oids as $var => $oid) {
         $$var = trim($os_data[$oid], '"');

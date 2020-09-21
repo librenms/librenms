@@ -22,10 +22,9 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $tycon_data = snmp_get_multi_oid($device, ['name.0', 'version.0'], '-OUQs', 'TPDIN2-MIB');
 
 $hardware = $tycon_data['name.0'];
-$version  = $tycon_data['version.0'];
+$version = $tycon_data['version.0'];
 
 unset($tycon_data);

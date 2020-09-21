@@ -33,16 +33,16 @@ if ($device['os_group'] == "cisco") {
                 ->addDataset('total', 'GAUGE', 0)
                 ->addDataset('active', 'GAUGE', 0);
 
-            $fields = array(
+            $fields = [
                 'total' => $total,
                 'active' => $active,
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($device, 'cisco-iosdsp', $tags, $fields);
 
             $os->enableGraph('cisco-iosdsp');
-            echo(" Cisco IOS DSP ");
+            echo " Cisco IOS DSP ";
         }
         unset($rrd_def, $total, $active, $tags, $fields);
     }

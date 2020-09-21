@@ -22,5 +22,4 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $hardware = str_replace(' GigaBit Ethernet Switch', '', $device['sysDescr']);

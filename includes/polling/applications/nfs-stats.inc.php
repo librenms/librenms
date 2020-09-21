@@ -10,7 +10,7 @@ echo ' ' . $name;
 
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('total', 'GAUGE', 0)
     ->addDataset('null', 'GAUGE', 0)
@@ -29,7 +29,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('fsstat', 'GAUGE', 0);
 
 $data = explode("\n", $nfsstats);
-$fields = array(
+$fields = [
     'total' => $data[0],
     'null' => $data[1],
     'getattr' => $data[2],
@@ -45,7 +45,7 @@ $fields = array(
     'rename' => $data[12],
     'readdirplus' => $data[13],
     'fsstat' => $data[14],
-);
+];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);

@@ -7,7 +7,7 @@ $app_id = $app['app_id'];
 
 echo "$name, app_id=$app_id ";
 
-if (!empty($agent_data[$name])) {
+if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
 } else {
     $options = '-Oqv';
@@ -17,22 +17,19 @@ if (!empty($agent_data[$name])) {
     $rawdata = snmp_get($device, $oid, $options, $mib);
 }
 
-
-
-# Format Data
+// Format Data
 $lines = explode("\n", $rawdata);
 
-$opensips = array();
+$opensips = [];
 
 foreach ($lines as $line) {
-    list($var,$value) = explode('=', $line);
+    [$var,$value] = explode('=', $line);
     $opensips[$var] = $value;
 }
 
-
 unset($lines);
 
-$rrd_name =  array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('load', 'GAUGE', 0, 100)
@@ -41,13 +38,13 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('free_memory', 'GAUGE', 0, 125000000000)
     ->addDataset('openfiles', 'GAUGE', 0, 125000000000);
 
-$fields = array(
-    'load' => (float)$opensips['Load Average'],
-    'total_memory' => (int)$opensips['Total Memory'],
-    'used_memory' => (int)$opensips['Used Memory'],
-    'free_memory' => (int)$opensips['Free Memory'],
-    'openfiles' => (int)$opensips['Open files']
-);
+$fields = [
+    'load' => (float) $opensips['Load Average'],
+    'total_memory' => (int) $opensips['Total Memory'],
+    'used_memory' => (int) $opensips['Used Memory'],
+    'free_memory' => (int) $opensips['Free Memory'],
+    'openfiles' => (int) $opensips['Open files'],
+];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 

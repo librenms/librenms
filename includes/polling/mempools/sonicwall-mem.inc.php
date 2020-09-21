@@ -21,7 +21,6 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.8741.6')) {
 
 $perc = str_replace('"', "", $usage);
 
-
 if (is_numeric($perc)) {
     $mempool['perc'] = $perc;
     $mempool['used'] = $perc;

@@ -22,5 +22,4 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $version = snmp_get($device, 'version.0', '-OQv', 'ISM-STORAGE-SVC-MIB');

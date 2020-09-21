@@ -22,9 +22,8 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $tmp_ees = snmp_get_multi($device, ['identControllerFirmwareVersion.0', 'identControllerSerialNumber.0'], '-OQUs', 'EES-POWER-MIB');
 $version = $tmp_ees[0]['identControllerFirmwareVersion'];
-$serial  = $tmp_ees[0]['identControllerSerialNumber'];
+$serial = $tmp_ees[0]['identControllerSerialNumber'];
 
 unset($tmp_ees);

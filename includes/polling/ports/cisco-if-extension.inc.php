@@ -38,7 +38,7 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
     /*
      * Populate data for RRD
      */
-    $rrd_data = array();
+    $rrd_data = [];
     foreach ($cisco_if_extension_oids as $oid) {
         $ds_name = str_replace('cieIf', '', $oid);
         $rrd_data[$ds_name] = $this_port[$oid];

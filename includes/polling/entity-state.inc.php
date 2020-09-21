@@ -22,14 +22,13 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $entityStatesIndexes = dbFetchRows(
     'SELECT S.entity_state_id, S.entStateLastChanged, P.entPhysicalIndex FROM entityState AS S ' .
     'LEFT JOIN entPhysical AS P USING (entPhysical_id) WHERE S.device_id=?',
-    array($device['device_id'])
+    [$device['device_id']]
 );
 
-if (!empty($entityStatesIndexes)) {
+if (! empty($entityStatesIndexes)) {
     echo "\nEntity States: ";
 
     // index by entPhysicalIndex
@@ -40,20 +39,20 @@ if (!empty($entityStatesIndexes)) {
     foreach (current($entLC) as $index => $changed) {
         if ($changed) { // skip empty entries
             try {
-                list($date, $time, $tz) = explode(',', $changed);
+                [$date, $time, $tz] = explode(',', $changed);
                 $lastChanged = new DateTime("$date $time", new DateTimeZone($tz));
                 $dbLastChanged = new DateTime($entityStatesIndexes[$index]['entStateLastChanged']);
                 if ($lastChanged != $dbLastChanged) {
                     // data has changed, fetch it
                     $new_states = snmp_get_multi(
                         $device,
-                        array(
+                        [
                             "entStateAdmin.$index",
                             "entStateOper.$index",
                             "entStateUsage.$index",
                             "entStateAlarm.$index",
-                            "entStateStandby.$index"
-                        ),
+                            "entStateStandby.$index",
+                        ],
                         '-OQUse',
                         'ENTITY-STATE-MIB'
                     );
@@ -69,16 +68,16 @@ if (!empty($entityStatesIndexes)) {
                         $new_states,
                         dbFetchRow(
                             'SELECT * FROM entityState WHERE entity_state_id=?',
-                            array($entityStatesIndexes[$index]['entity_state_id'])
+                            [$entityStatesIndexes[$index]['entity_state_id']]
                         )
                     );
 
-                    if (!empty($update)) {
+                    if (! empty($update)) {
                         dbUpdate(
                             $update,
                             'entityState',
                             'entity_state_id=?',
-                            array($entityStatesIndexes[$index]['entity_state_id'])
+                            [$entityStatesIndexes[$index]['entity_state_id']]
                         );
                         d_echo("Updating $index: ", 'U');
                         d_echo($new_states[$index]);
