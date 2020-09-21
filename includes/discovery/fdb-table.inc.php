@@ -4,14 +4,14 @@
 use LibreNMS\Config;
 
 $vlans_dict = [];
-foreach (dbFetchRows("SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?", [$device['device_id']]) as $vlan_entry) {
+foreach (dbFetchRows('SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?', [$device['device_id']]) as $vlan_entry) {
     $vlans_dict[$vlan_entry['vlan_vlan']] = $vlan_entry['vlan_id'];
 }
 $vlans_by_id = array_flip($vlans_dict);
 
 // Build table of existing vlan/mac table
 $existing_fdbs = [];
-$sql_result = dbFetchRows("SELECT * FROM `ports_fdb` WHERE `device_id` = ?", [$device['device_id']]);
+$sql_result = dbFetchRows('SELECT * FROM `ports_fdb` WHERE `device_id` = ?', [$device['device_id']]);
 foreach ($sql_result as $entry) {
     $existing_fdbs[(int) $entry['vlan_id']][$entry['mac_address']] = $entry;
 }

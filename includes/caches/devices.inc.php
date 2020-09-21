@@ -12,7 +12,7 @@ if (Auth::user()->hasGlobalRead()) {
     $data['disabled'] = ['query' => "SELECT COUNT(*) FROM devices WHERE `disabled` = '1'"];
 } else {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $perms_sql = "`D`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $perms_sql = '`D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
 
     $data['count'] = [
         'query'  => 'SELECT COUNT(*) FROM devices AS D WHERE $perms_sql',

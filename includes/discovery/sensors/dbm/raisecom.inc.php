@@ -1,6 +1,6 @@
 <?php
 
-echo "Raisecom";
+echo 'Raisecom';
 
 $multiplier = 1;
 $divisor = 1000;

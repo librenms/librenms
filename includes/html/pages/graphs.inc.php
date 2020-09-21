@@ -29,32 +29,32 @@ if (is_numeric($vars['device'])) {
     $device = device_by_name($vars['device']);
 }
 
-if (is_file("includes/html/graphs/" . $type . "/auth.inc.php")) {
-    require "includes/html/graphs/" . $type . "/auth.inc.php";
+if (is_file('includes/html/graphs/' . $type . '/auth.inc.php')) {
+    require 'includes/html/graphs/' . $type . '/auth.inc.php';
 }
 
 if (! $auth) {
     require 'includes/html/error-no-perm.inc.php';
 } else {
     if (Config::has("graph_types.$type.$subtype.descr")) {
-        $title .= " :: " . Config::get("graph_types.$type.$subtype.descr");
-    } elseif ($type == "device" && $subtype == "collectd") {
-        $title .= " :: " . nicecase($subtype) . " :: " . $vars['c_plugin'];
+        $title .= ' :: ' . Config::get("graph_types.$type.$subtype.descr");
+    } elseif ($type == 'device' && $subtype == 'collectd') {
+        $title .= ' :: ' . nicecase($subtype) . ' :: ' . $vars['c_plugin'];
         if (isset($vars['c_plugin_instance'])) {
-            $title .= " - " . $vars['c_plugin_instance'];
+            $title .= ' - ' . $vars['c_plugin_instance'];
         }
-        $title .= " - " . $vars['c_type'];
+        $title .= ' - ' . $vars['c_type'];
         if (isset($vars['c_type_instance'])) {
-            $title .= " - " . $vars['c_type_instance'];
+            $title .= ' - ' . $vars['c_type_instance'];
         }
     } else {
-        $title .= " :: " . nicecase($subtype);
+        $title .= ' :: ' . nicecase($subtype);
     }
 
     $graph_array = $vars;
-    $graph_array['height'] = "60";
+    $graph_array['height'] = '60';
     $graph_array['width'] = $thumb_width;
-    $graph_array['legend'] = "no";
+    $graph_array['legend'] = 'no';
     $graph_array['to'] = Config::get('time.now');
 
     print_optionbar_start();
@@ -67,9 +67,9 @@ if (! $auth) {
         echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" >";
 
         foreach (get_graph_subtypes($type, $device) as $avail_type) {
-            echo "<option value='" . generate_url($vars, ['type' => $type . "_" . $avail_type, 'page' => "graphs"]) . "'";
+            echo "<option value='" . generate_url($vars, ['type' => $type . '_' . $avail_type, 'page' => 'graphs']) . "'";
             if ($avail_type == $subtype) {
-                echo " selected";
+                echo ' selected';
             }
             $display_type = nicecase($avail_type);
             echo ">$display_type</option>";
@@ -89,7 +89,7 @@ if (! $auth) {
         $link_array = $vars;
         $link_array['from'] = $graph_array['from'];
         $link_array['to'] = $graph_array['to'];
-        $link_array['page'] = "graphs";
+        $link_array['page'] = 'graphs';
         $link = generate_url($link_array);
 
         echo '<td align=center>';
@@ -122,34 +122,34 @@ if (! $auth) {
         }
     }
 
-    echo "<hr />";
+    echo '<hr />';
 
     include_once 'includes/html/print-date-selector.inc.php';
 
     echo '<div style="padding-top: 5px";></div>';
     echo '<center>';
-    if ($vars['legend'] == "no") {
-        echo generate_link("Show Legend", $vars, ['page' => "graphs", 'legend' => null]);
+    if ($vars['legend'] == 'no') {
+        echo generate_link('Show Legend', $vars, ['page' => 'graphs', 'legend' => null]);
     } else {
-        echo generate_link("Hide Legend", $vars, ['page' => "graphs", 'legend' => "no"]);
+        echo generate_link('Hide Legend', $vars, ['page' => 'graphs', 'legend' => 'no']);
     }
 
     // FIXME : do this properly
     //  if ($type == "port" && $subtype == "bits")
     //  {
     echo ' | ';
-    if ($vars['previous'] == "yes") {
-        echo generate_link("Hide Previous", $vars, ['page' => "graphs", 'previous' => null]);
+    if ($vars['previous'] == 'yes') {
+        echo generate_link('Hide Previous', $vars, ['page' => 'graphs', 'previous' => null]);
     } else {
-        echo generate_link("Show Previous", $vars, ['page' => "graphs", 'previous' => "yes"]);
+        echo generate_link('Show Previous', $vars, ['page' => 'graphs', 'previous' => 'yes']);
     }
     //  }
 
     echo ' | ';
-    if ($vars['showcommand'] == "yes") {
-        echo generate_link("Hide RRD Command", $vars, ['page' => "graphs", 'showcommand' => null]);
+    if ($vars['showcommand'] == 'yes') {
+        echo generate_link('Hide RRD Command', $vars, ['page' => 'graphs', 'showcommand' => null]);
     } else {
-        echo generate_link("Show RRD Command", $vars, ['page' => "graphs", 'showcommand' => "yes"]);
+        echo generate_link('Show RRD Command', $vars, ['page' => 'graphs', 'showcommand' => 'yes']);
     }
 
     if ($vars['type'] == 'port_bits') {
@@ -167,7 +167,7 @@ if (! $auth) {
     } else {
         echo generate_lazy_graph_tag($graph_array);
     }
-    echo "</center></div>";
+    echo '</center></div>';
 
     if (Config::has('graph_descr.' . $vars['type'])) {
         print_optionbar_start();

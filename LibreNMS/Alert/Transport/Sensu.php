@@ -65,7 +65,7 @@ class Sensu extends Transport
         try {
             return $this->contactSensu($obj, $sensu_opts);
         } catch (GuzzleException $e) {
-            return "Sending event to Sensu failed: " . $e->getMessage();
+            return 'Sending event to Sensu failed: ' . $e->getMessage();
         }
     }
 

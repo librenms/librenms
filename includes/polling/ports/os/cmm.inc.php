@@ -43,11 +43,11 @@ foreach ($cmm_stats as $index => $port) {
     foreach ($required as $ifEntry => $IfxStat) {
         $cmm_port[$ifEntry] = $cmm_stats[$index][$IfxStat];
     }
-    $cmm_port['ifName'] = "CMM Port " . $port['portNumber'];
-    $cmm_port['ifDescr'] = "CMM Port " . $port['portNumber'];
+    $cmm_port['ifName'] = 'CMM Port ' . $port['portNumber'];
+    $cmm_port['ifDescr'] = 'CMM Port ' . $port['portNumber'];
     $cmm_port['ifDuplex'] = ($cmm_stats[$index]['duplexStatus'] == 1 ? 'fullDuplex' : 'halfDuplex');
     $cmm_port['ifSpeed'] = ($cmm_stats[$index]['linkSpeed'] == 1 ? '100000000' : '10000000');
-    $cmm_port['ifOperStatus'] = ($cmm_stats[$index]['linkStatus'] == 1 ? "up" : "down");
+    $cmm_port['ifOperStatus'] = ($cmm_stats[$index]['linkStatus'] == 1 ? 'up' : 'down');
     $cmm_port['ifType'] = 'ethernetCsmacd';
     array_push($cmm_ports, $cmm_port);
 }

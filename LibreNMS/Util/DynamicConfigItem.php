@@ -68,7 +68,7 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif ($this->type == 'boolean') {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
         } elseif ($this->type == 'integer') {
-            return (! is_bool($value) && filter_var($value, FILTER_VALIDATE_INT)) || $value === "0" || $value === 0;
+            return (! is_bool($value) && filter_var($value, FILTER_VALIDATE_INT)) || $value === '0' || $value === 0;
         } elseif ($this->type == 'select') {
             return in_array($value, array_keys($this->options));
         } elseif ($this->type == 'email') {
@@ -189,7 +189,7 @@ class DynamicConfigItem implements \ArrayAccess
 
     public function isValid()
     {
-        return ($this->group == "" || $this->type) && ! $this->hidden && ! $this->disabled;
+        return ($this->group == '' || $this->type) && ! $this->hidden && ! $this->disabled;
     }
 
     /**

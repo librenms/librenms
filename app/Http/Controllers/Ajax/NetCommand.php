@@ -74,7 +74,7 @@ class NetCommand extends Controller
                 if (Str::contains($ua, ['Chrome', 'Trident'])) {
                     $char = "\f"; // line feed
                 } else {
-                    $char = "";
+                    $char = '';
                 }
                 echo str_repeat($char, 4096);
                 echo PHP_EOL; // avoid first line mess ups due to line feed

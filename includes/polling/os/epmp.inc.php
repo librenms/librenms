@@ -30,8 +30,8 @@ if ($epmp_ap == 1) {
 
 $version = snmp_get($device, 'cambiumCurrentuImageVersion.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
 
-$cambiumGPSNumTrackedSat = snmp_get($device, "cambiumGPSNumTrackedSat.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-$cambiumGPSNumVisibleSat = snmp_get($device, "cambiumGPSNumVisibleSat.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
+$cambiumGPSNumTrackedSat = snmp_get($device, 'cambiumGPSNumTrackedSat.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
+$cambiumGPSNumVisibleSat = snmp_get($device, 'cambiumGPSNumVisibleSat.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
 if (is_numeric($cambiumGPSNumTrackedSat) && is_numeric($cambiumGPSNumVisibleSat)) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('numTracked', 'GAUGE', 0, 100000)
@@ -45,8 +45,8 @@ if (is_numeric($cambiumGPSNumTrackedSat) && is_numeric($cambiumGPSNumVisibleSat)
     $os->enableGraph('cambium_epmp_gps');
 }
 
-$cambiumSTAUplinkMCSMode = snmp_get($device, "cambiumSTAUplinkMCSMode.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-$cambiumSTADownlinkMCSMode = snmp_get($device, "cambiumSTADownlinkMCSMode.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
+$cambiumSTAUplinkMCSMode = snmp_get($device, 'cambiumSTAUplinkMCSMode.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
+$cambiumSTADownlinkMCSMode = snmp_get($device, 'cambiumSTADownlinkMCSMode.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
 if (is_numeric($cambiumSTAUplinkMCSMode) && is_numeric($cambiumSTADownlinkMCSMode)) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('uplinkMCSMode', 'GAUGE', -30, 30)
@@ -60,9 +60,9 @@ if (is_numeric($cambiumSTAUplinkMCSMode) && is_numeric($cambiumSTADownlinkMCSMod
     $os->enableGraph('cambium_epmp_modulation');
 }
 
-$sysNetworkEntryAttempt = snmp_get($device, "sysNetworkEntryAttempt.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-$sysNetworkEntrySuccess = snmp_get($device, "sysNetworkEntrySuccess.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-$sysNetworkEntryAuthenticationFailure = snmp_get($device, "sysNetworkEntryAuthenticationFailure.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
+$sysNetworkEntryAttempt = snmp_get($device, 'sysNetworkEntryAttempt.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
+$sysNetworkEntrySuccess = snmp_get($device, 'sysNetworkEntrySuccess.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
+$sysNetworkEntryAuthenticationFailure = snmp_get($device, 'sysNetworkEntryAuthenticationFailure.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
 if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) && is_numeric($sysNetworkEntryAuthenticationFailure)) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('entryAttempt', 'GAUGE', 0, 100000)
@@ -78,12 +78,12 @@ if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) &
     $os->enableGraph('cambium_epmp_access');
 }
 
-$multi_get_array = snmp_get_multi($device, ['ulWLanTotalAvailableFrameTimePerSecond.0', 'ulWLanTotalUsedFrameTimePerSecond.0', 'dlWLanTotalAvailableFrameTimePerSecond.0', 'dlWLanTotalUsedFrameTimePerSecond.0'], "-OQU", "CAMBIUM-PMP80211-MIB");
+$multi_get_array = snmp_get_multi($device, ['ulWLanTotalAvailableFrameTimePerSecond.0', 'ulWLanTotalUsedFrameTimePerSecond.0', 'dlWLanTotalAvailableFrameTimePerSecond.0', 'dlWLanTotalUsedFrameTimePerSecond.0'], '-OQU', 'CAMBIUM-PMP80211-MIB');
 
-$ulWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::ulWLanTotalAvailableFrameTimePerSecond"];
-$ulWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::ulWLanTotalUsedFrameTimePerSecond"];
-$dlWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::dlWLanTotalAvailableFrameTimePerSecond"];
-$dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond"];
+$ulWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::ulWLanTotalAvailableFrameTimePerSecond'];
+$ulWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::ulWLanTotalUsedFrameTimePerSecond'];
+$dlWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalAvailableFrameTimePerSecond'];
+$dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond'];
 
 if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond)) {
     $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond / $ulWLanTotalAvailableFrameTimePerSecond) * 100), 2);

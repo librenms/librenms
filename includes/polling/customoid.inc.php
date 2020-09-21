@@ -2,7 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AND `device_id` = ?", [$device['device_id']]) as $customoid) {
+foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AND `device_id` = ?', [$device['device_id']]) as $customoid) {
     d_echo($customoid);
 
     $prev_oid_value = $customoid['customoid_current'];
@@ -10,9 +10,9 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     $rawdata = snmp_get($device, $customoid['customoid_oid'], '-Oqv');
 
     $user_funcs = [
-        "celsius_to_fahrenheit",
-        "fahrenheit_to_celsius",
-        "uw_to_dbm",
+        'celsius_to_fahrenheit',
+        'fahrenheit_to_celsius',
+        'uw_to_dbm',
     ];
 
     if (is_numeric($rawdata)) {
@@ -20,7 +20,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         $oid_value = $rawdata;
     } else {
         $oid_value = 0;
-        $error = "Invalid SNMP reply.";
+        $error = 'Invalid SNMP reply.';
     }
 
     if ($customoid['customoid_divisor'] && $oid_value !== 0) {

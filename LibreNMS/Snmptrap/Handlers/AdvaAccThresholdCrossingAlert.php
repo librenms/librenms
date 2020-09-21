@@ -44,11 +44,11 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval"));
-        $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
+        $interval = $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval'));
+        $ifName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
 
         $thresholdMessage = $this->getThresholdMessage(
-            $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable"))
+            $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable'))
         );
 
         Log::event("$ifName $thresholdMessage threshold exceeded for $interval", $device->device_id, 'trap', 2);

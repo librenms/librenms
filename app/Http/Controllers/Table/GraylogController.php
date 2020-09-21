@@ -127,15 +127,15 @@ class GraylogController extends SimpleTableController
     private function severityLabel($severity)
     {
         $map = [
-            "0" => "label-danger",
-            "1" => "label-danger",
-            "2" => "label-danger",
-            "3" => "label-danger",
-            "4" => "label-warning",
-            "5" => "label-info",
-            "6" => "label-info",
-            "7" => "label-default",
-            ""  => "label-info",
+            '0' => 'label-danger',
+            '1' => 'label-danger',
+            '2' => 'label-danger',
+            '3' => 'label-danger',
+            '4' => 'label-warning',
+            '5' => 'label-info',
+            '6' => 'label-info',
+            '7' => 'label-default',
+            ''  => 'label-info',
         ];
         $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
 

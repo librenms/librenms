@@ -28,7 +28,7 @@ foreach ($tables as $tablevalue) {
 
     if (is_array($temp)) {
         //Create State Index
-        $state_name = "dell." . $tablevalue[2];
+        $state_name = 'dell.' . $tablevalue[2];
         if ($state_name == 'dell.processorDeviceStatusStatus' || $state_name == 'dell.memoryDeviceStatus' || $state_name == 'dell.powerSupplyStatus' || $state_name == 'dell.intrusionStatus') {
             $states = [
                 ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
@@ -111,9 +111,9 @@ foreach ($tables as $tablevalue) {
                 if ($state_name == 'dell.intrusionStatus') {
                     $descr = $tablevalue[3];
                 } elseif ($state_name == 'dell.batteryState') {
-                    $descr = str_replace('"', "", snmp_get($device, "batteryConnectionControllerName." . $index . "", "-Ovqn", $tablevalue[4])) . ' - ' . $temp[$index][$tablevalue[3]];
+                    $descr = str_replace('"', '', snmp_get($device, 'batteryConnectionControllerName.' . $index . '', '-Ovqn', $tablevalue[4])) . ' - ' . $temp[$index][$tablevalue[3]];
                 } elseif ($state_name == 'dell.arrayDiskState') {
-                    $descr = str_replace('"', "", snmp_get($device, "arrayDiskEnclosureConnectionEnclosureName." . $index . "", "-Ovqn", $tablevalue[4])) . ' - ' . $temp[$index][$tablevalue[3]];
+                    $descr = str_replace('"', '', snmp_get($device, 'arrayDiskEnclosureConnectionEnclosureName.' . $index . '', '-Ovqn', $tablevalue[4])) . ' - ' . $temp[$index][$tablevalue[3]];
                 } else {
                     $descr = clean($temp[$index][$tablevalue[3]]); // Use clean as virtualDiskDeviceName is user defined
                 }

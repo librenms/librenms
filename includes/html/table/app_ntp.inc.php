@@ -29,7 +29,7 @@ foreach ($components as $devid => $comp) {
         }
 
         // Let's process some searching..
-        if (($display === true) && ($vars['searchPhrase'] != "")) {
+        if (($display === true) && ($vars['searchPhrase'] != '')) {
             $searchfound = false;
             $searchdata = [$device['hostname'], $array['peer'], $array['stratum'], $array['error']];
             foreach ($searchdata as $value) {
@@ -57,13 +57,13 @@ foreach ($components as $devid => $comp) {
                 $graph_array['height'] = 20;
 
                 // Which graph type do we want?
-                if ($vars['graph'] == "stratum") {
+                if ($vars['graph'] == 'stratum') {
                     $graph_array['type'] = 'device_ntp_stratum';
-                } elseif ($vars['graph'] == "offset") {
+                } elseif ($vars['graph'] == 'offset') {
                     $graph_array['type'] = 'device_ntp_offset';
-                } elseif ($vars['graph'] == "delay") {
+                } elseif ($vars['graph'] == 'delay') {
                     $graph_array['type'] = 'device_ntp_delay';
-                } elseif ($vars['graph'] == "dispersion") {
+                } elseif ($vars['graph'] == 'dispersion') {
                     $graph_array['type'] = 'device_ntp_dispersion';
                 } else {
                     // No Graph

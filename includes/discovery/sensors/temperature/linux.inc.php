@@ -7,12 +7,12 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 
-$sensor_oid = ".1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1";
+$sensor_oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1';
 $value = snmp_get($device, $sensor_oid, '-Oqve');
 $value = trim($value, '"');
 if (is_numeric($value)) {
-    $sensor_type = "raspberry_temp";
-    $descr = "CPU Temp";
+    $sensor_type = 'raspberry_temp';
+    $descr = 'CPU Temp';
     discover_sensor($valid['sensor'], 'temperature', $device, $sensor_oid, 1, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
 }
 
@@ -43,8 +43,8 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
     }
 }
 
-if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
-    $sensor_type = "chip_axp209_temperature";
+if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
+    $sensor_type = 'chip_axp209_temperature';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
     $lowlimit = -40;
     $lowwarnlimit = -35;

@@ -22,7 +22,7 @@ class CreateAlertLogTable extends Migration
         });
 
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            \DB::statement("ALTER TABLE `alert_log` CHANGE `details` `details` longblob NULL ;");
+            \DB::statement('ALTER TABLE `alert_log` CHANGE `details` `details` longblob NULL ;');
         }
     }
 

@@ -54,7 +54,7 @@ if ($_POST['editing']) {
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
             if (Auth::user()->hasGlobalAdmin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
-                if ($result == "") {
+                if ($result == '') {
                     Toastr::success("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
                     echo '
                         <script>
@@ -63,7 +63,7 @@ if ($_POST['editing']) {
                         </script>
                     ';
                 } else {
-                    Toastr::error($result . ".  Does your web server have permission to modify the rrd files?");
+                    Toastr::error($result . '.  Does your web server have permission to modify the rrd files?');
                 }
             } else {
                 Toastr::error('Only administrative users may update the device hostname');
@@ -234,7 +234,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
                     } else {
                         $selected = '';
                     }
-                    echo "<option value=" . $dev['device_id'] . " " . $selected . ">" . $dev['hostname'] . " (" . $dev['sysName'] . ")</option>";
+                    echo '<option value=' . $dev['device_id'] . ' ' . $selected . '>' . $dev['hostname'] . ' (' . $dev['sysName'] . ')</option>';
                 }
                 ?>
             </select>
@@ -251,7 +251,7 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
     <?php
     foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
         echo '<option value="' . $group['id'] . '"' .
-        ($device_model->poller_group == $group['id'] ? " selected" : "") . '>' . $group['group_name'];
+        ($device_model->poller_group == $group['id'] ? ' selected' : '') . '>' . $group['group_name'];
         echo \LibreNMS\Config::get('distributed_poller_group') == $group['id'] ? ' (default Poller)' : '';
         echo '</option>';
     } ?>
@@ -267,7 +267,7 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
           <input name="disabled" type="checkbox" id="disabled" value="1" data-size="small"
                 <?php
                 if ($device_model->disabled) {
-                    echo "checked=checked";
+                    echo 'checked=checked';
                 }
                 ?> />
         </div>
@@ -285,7 +285,7 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
         <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
                 <?php
                 if ($device_model->disable_notify) {
-                    echo "checked=checked";
+                    echo 'checked=checked';
                 }
                 ?> />
       </div>
@@ -298,7 +298,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
            <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                 <?php
                 if ($device_model->ignore) {
-                    echo "checked=checked";
+                    echo 'checked=checked';
                 }
                 ?> />
         </div>
@@ -357,10 +357,10 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 <?php
 print_optionbar_start();
 [$sizeondisk, $numrrds] = foldersize(get_rrd_dir($device['hostname']));
-echo "Size on Disk: <b>" . formatStorage($sizeondisk) . "</b> in <b>" . $numrrds . " RRD files</b>.";
-echo " | Last polled: <b>" . $device['last_polled'] . "</b>";
+echo 'Size on Disk: <b>' . formatStorage($sizeondisk) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
+echo ' | Last polled: <b>' . $device['last_polled'] . '</b>';
 if ($device['last_discovered']) {
-    echo " | Last discovered: <b>" . $device['last_discovered'] . "</b>";
+    echo ' | Last discovered: <b>' . $device['last_discovered'] . '</b>';
 }
 print_optionbar_end();
 ?>

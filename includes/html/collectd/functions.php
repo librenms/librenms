@@ -523,7 +523,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     }
 
     if ($has_avg) {
-        $graph[] = "COMMENT:   Avg\\n";
+        $graph[] = 'COMMENT:   Avg\\n';
     }
 
     reset($rrdinfo['DS']);

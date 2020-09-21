@@ -26,15 +26,15 @@ use LibreNMS\Util\OS;
 function generate_priority_label($priority)
 {
     $map = [
-        "emerg"     => "label-danger",
-        "alert"     => "label-danger",
-        "crit"      => "label-danger",
-        "err"       => "label-danger",
-        "warning"   => "label-warning",
-        "notice"    => "label-info",
-        "info"      => "label-info",
-        "debug"     => "label-default",
-        ""          => "label-info",
+        'emerg'     => 'label-danger',
+        'alert'     => 'label-danger',
+        'crit'      => 'label-danger',
+        'err'       => 'label-danger',
+        'warning'   => 'label-warning',
+        'notice'    => 'label-info',
+        'info'      => 'label-info',
+        'debug'     => 'label-default',
+        ''          => 'label-info',
     ];
 
     $barColor = isset($map[$priority]) ? $map[$priority] : 'label-info';
@@ -45,15 +45,15 @@ function generate_priority_label($priority)
 function generate_priority_status($priority)
 {
     $map = [
-        "emerg"     => 2,
-        "alert"     => 2,
-        "crit"      => 2,
-        "err"       => 2,
-        "warning"   => 1,
-        "notice"    => 0,
-        "info"      => 0,
-        "debug"     => 3,
-        ""          => 0,
+        'emerg'     => 2,
+        'alert'     => 2,
+        'crit'      => 2,
+        'err'       => 2,
+        'warning'   => 1,
+        'notice'    => 0,
+        'info'      => 0,
+        'debug'     => 3,
+        ''          => 0,
     ];
 
     return isset($map[$priority]) ? $map[$priority] : 0;
@@ -62,15 +62,15 @@ function generate_priority_status($priority)
 function graylog_severity_label($severity)
 {
     $map = [
-        "0" => "label-danger",
-        "1" => "label-danger",
-        "2" => "label-danger",
-        "3" => "label-danger",
-        "4" => "label-warning",
-        "5" => "label-info",
-        "6" => "label-info",
-        "7" => "label-default",
-        ""  => "label-info",
+        '0' => 'label-danger',
+        '1' => 'label-danger',
+        '2' => 'label-danger',
+        '3' => 'label-danger',
+        '4' => 'label-warning',
+        '5' => 'label-info',
+        '6' => 'label-info',
+        '7' => 'label-default',
+        ''  => 'label-info',
     ];
     $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
 
@@ -141,7 +141,7 @@ function shorthost($hostname, $len = 12)
     }
     $len = Config::get('shorthost_target_length', $len);
 
-    $parts = explode(".", $hostname);
+    $parts = explode('.', $hostname);
     $shorthost = $parts[0];
     $i = 1;
     while ($i < count($parts) && strlen($shorthost . '.' . $parts[$i]) < $len) {
@@ -164,7 +164,7 @@ function isCli()
 function print_error($text)
 {
     if (isCli()) {
-        c_echo("%r" . $text . "%n\n");
+        c_echo('%r' . $text . "%n\n");
     } else {
         echo '<div class="alert alert-danger"><i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i> ' . $text . '</div>';
     }
@@ -173,7 +173,7 @@ function print_error($text)
 function print_message($text)
 {
     if (isCli()) {
-        c_echo("%g" . $text . "%n\n");
+        c_echo('%g' . $text . "%n\n");
     } else {
         echo '<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> ' . $text . '</div>';
     }
@@ -187,7 +187,7 @@ function get_sensor_rrd($device, $sensor)
 function get_sensor_rrd_name($device, $sensor)
 {
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
-    if (Config::getOsSetting($device['os'], 'sensor_descr') || $sensor['poller_type'] == "ipmi") {
+    if (Config::getOsSetting($device['os'], 'sensor_descr') || $sensor['poller_type'] == 'ipmi') {
         return ['sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_descr']];
     } else {
         return ['sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']];
@@ -220,16 +220,16 @@ function get_port_by_index_cache($device_id, $ifIndex)
 
 function get_port_by_ifIndex($device_id, $ifIndex)
 {
-    return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", [$device_id, $ifIndex]);
+    return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
 }
 
 function table_from_entity_type($type)
 {
     // Fuck you, english pluralisation.
-    if ($type == "storage") {
+    if ($type == 'storage') {
         return $type;
     } else {
-        return $type . "s";
+        return $type . 's';
     }
 }
 
@@ -242,7 +242,7 @@ function get_entity_by_id_cache($type, $id)
     if (is_array($entity_cache[$type][$id])) {
         $entity = $entity_cache[$type][$id];
     } else {
-        $entity = dbFetchRow("SELECT * FROM `" . $table . "` WHERE `" . $type . "_id` = ?", [$id]);
+        $entity = dbFetchRow('SELECT * FROM `' . $table . '` WHERE `' . $type . '_id` = ?', [$id]);
         $entity_cache[$type][$id] = $entity;
     }
 
@@ -252,7 +252,7 @@ function get_entity_by_id_cache($type, $id)
 function get_port_by_id($port_id)
 {
     if (is_numeric($port_id)) {
-        $port = dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", [$port_id]);
+        $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
         if (is_array($port)) {
             return $port;
         } else {
@@ -264,7 +264,7 @@ function get_port_by_id($port_id)
 function get_application_by_id($application_id)
 {
     if (is_numeric($application_id)) {
-        $application = dbFetchRow("SELECT * FROM `applications` WHERE `app_id` = ?", [$application_id]);
+        $application = dbFetchRow('SELECT * FROM `applications` WHERE `app_id` = ?', [$application_id]);
         if (is_array($application)) {
             return $application;
         } else {
@@ -276,7 +276,7 @@ function get_application_by_id($application_id)
 function get_sensor_by_id($sensor_id)
 {
     if (is_numeric($sensor_id)) {
-        $sensor = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_id` = ?", [$sensor_id]);
+        $sensor = dbFetchRow('SELECT * FROM `sensors` WHERE `sensor_id` = ?', [$sensor_id]);
         if (is_array($sensor)) {
             return $sensor;
         } else {
@@ -288,7 +288,7 @@ function get_sensor_by_id($sensor_id)
 function get_device_id_by_port_id($port_id)
 {
     if (is_numeric($port_id)) {
-        $device_id = dbFetchCell("SELECT `device_id` FROM `ports` WHERE `port_id` = ?", [$port_id]);
+        $device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE `port_id` = ?', [$port_id]);
         if (is_numeric($device_id)) {
             return $device_id;
         } else {
@@ -300,7 +300,7 @@ function get_device_id_by_port_id($port_id)
 function get_device_id_by_app_id($app_id)
 {
     if (is_numeric($app_id)) {
-        $device_id = dbFetchCell("SELECT `device_id` FROM `applications` WHERE `app_id` = ?", [$app_id]);
+        $device_id = dbFetchCell('SELECT `device_id` FROM `applications` WHERE `app_id` = ?', [$app_id]);
         if (is_numeric($device_id)) {
             return $device_id;
         } else {
@@ -322,7 +322,7 @@ function device_by_name($name)
 
 function accesspoint_by_id($ap_id, $refresh = '0')
 {
-    $ap = dbFetchRow("SELECT * FROM `access_points` WHERE `accesspoint_id` = ?", [$ap_id]);
+    $ap = dbFetchRow('SELECT * FROM `access_points` WHERE `accesspoint_id` = ?', [$ap_id]);
 
     return $ap;
 }
@@ -367,7 +367,7 @@ function mres($string)
 
 function getifhost($id)
 {
-    return dbFetchCell("SELECT `device_id` from `ports` WHERE `port_id` = ?", [$id]);
+    return dbFetchCell('SELECT `device_id` from `ports` WHERE `port_id` = ?', [$id]);
 }
 
 function gethostbyid($device_id)
@@ -381,7 +381,7 @@ function strgen($length = 16)
         'E', 'f', 'F', 'g', 'G', 'h', 'H', 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n',
         'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R', 's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w',
         'W', 'x', 'X', 'y', 'Y', 'z', 'Z', ];
-    $string = "";
+    $string = '';
 
     for ($i = 0; $i < $length; $i++) {
         $key = mt_rand(0, 61);
@@ -393,22 +393,22 @@ function strgen($length = 16)
 
 function getpeerhost($id)
 {
-    return dbFetchCell("SELECT `device_id` from `bgpPeers` WHERE `bgpPeer_id` = ?", [$id]);
+    return dbFetchCell('SELECT `device_id` from `bgpPeers` WHERE `bgpPeer_id` = ?', [$id]);
 }
 
 function getifindexbyid($id)
 {
-    return dbFetchCell("SELECT `ifIndex` FROM `ports` WHERE `port_id` = ?", [$id]);
+    return dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `port_id` = ?', [$id]);
 }
 
 function getifbyid($id)
 {
-    return dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", [$id]);
+    return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
 }
 
 function getifdescrbyid($id)
 {
-    return dbFetchCell("SELECT `ifDescr` FROM `ports` WHERE `port_id` = ?", [$id]);
+    return dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `port_id` = ?', [$id]);
 }
 
 function getidbyname($hostname)
@@ -449,7 +449,7 @@ function get_dev_attribs($device_id)
 function get_dev_entity_state($device)
 {
     $state = [];
-    foreach (dbFetchRows("SELECT * FROM entPhysical_state WHERE `device_id` = ?", [$device]) as $entity) {
+    foreach (dbFetchRows('SELECT * FROM entPhysical_state WHERE `device_id` = ?', [$device]) as $entity) {
         $state['group'][$entity['group']][$entity['entPhysicalIndex']][$entity['subindex']][$entity['key']] = $entity['value'];
         $state['index'][$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] = $entity['value'];
     }
@@ -469,14 +469,14 @@ function del_dev_attrib($device, $attrib_type)
 
 function formatRates($value, $round = '2', $sf = '3')
 {
-    $value = format_si($value, $round, $sf) . "bps";
+    $value = format_si($value, $round, $sf) . 'bps';
 
     return $value;
 }
 
 function formatStorage($value, $round = '2', $sf = '3')
 {
-    $value = format_bi($value, $round) . "B";
+    $value = format_bi($value, $round) . 'B';
 
     return $value;
 }
@@ -484,12 +484,12 @@ function formatStorage($value, $round = '2', $sf = '3')
 function format_si($value, $round = '2', $sf = '3')
 {
     $neg = 0;
-    if ($value < "0") {
+    if ($value < '0') {
         $neg = 1;
         $value = $value * -1;
     }
 
-    if ($value >= "0.1") {
+    if ($value >= '0.1') {
         $sizes = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
         $ext = $sizes[0];
         for ($i = 1; (($i < count($sizes)) && ($value >= 1000)); $i++) {
@@ -509,12 +509,12 @@ function format_si($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-    return (number_format(round($value, $round), $sf, '.', '') + 0) . " " . $ext;
+    return (number_format(round($value, $round), $sf, '.', '') + 0) . ' ' . $ext;
 }
 
 function format_bi($value, $round = '2', $sf = '3')
 {
-    if ($value < "0") {
+    if ($value < '0') {
         $neg = 1;
         $value = $value * -1;
     }
@@ -529,7 +529,7 @@ function format_bi($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-    return (number_format(round($value, $round), $sf, '.', '') + 0) . " " . $ext;
+    return (number_format(round($value, $round), $sf, '.', '') + 0) . ' ' . $ext;
 }
 
 function format_number($value, $base = '1000', $round = 2, $sf = 3)
@@ -600,7 +600,7 @@ function c_echo($string, $enabled = true)
                 "\e[1;31m",
                 "\e[1;33m",
                 "\e[1;34m",
-                "",
+                '',
             ];
             echo preg_replace($search, $replace, $string);
         }
@@ -646,8 +646,8 @@ function get_graph_subtypes($type, $device = null)
     // find the subtypes defined in files
     if ($handle = opendir(Config::get('install_dir') . "/includes/html/graphs/$type/")) {
         while (false !== ($file = readdir($handle))) {
-            if ($file != "." && $file != ".." && $file != "auth.inc.php" && strstr($file, ".inc.php")) {
-                $types[] = str_replace(".inc.php", "", $file);
+            if ($file != '.' && $file != '..' && $file != 'auth.inc.php' && strstr($file, '.inc.php')) {
+                $types[] = str_replace('.inc.php', '', $file);
             }
         }
         closedir($handle);
@@ -677,7 +677,7 @@ function generate_smokeping_file($device, $file = '')
  */
 function round_Nth($val, $round_to)
 {
-    if (($round_to == "10") || ($round_to == "100") || ($round_to == "1000")) {
+    if (($round_to == '10') || ($round_to == '100') || ($round_to == '1000')) {
         $diff = $val % $round_to;
         if ($diff >= ($round_to / 2)) {
             $ret = $val + ($round_to - $diff);
@@ -727,7 +727,7 @@ function object_is_cached($section, $obj)
  **/
 function can_ping_device($attribs)
 {
-    if (Config::get('icmp_check') && ! (isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] == "true")) {
+    if (Config::get('icmp_check') && ! (isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] == 'true')) {
         return true;
     } else {
         return false;
@@ -766,7 +766,7 @@ function ceph_rrd($gtype)
     global $device;
     global $vars;
 
-    if ($gtype == "osd") {
+    if ($gtype == 'osd') {
         $var = $vars['osd'];
     } else {
         $var = $vars['pool'];
@@ -1107,10 +1107,10 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
         $min_severity_id = $alert_severities[$min_severity];
     }
     if (isset($min_severity_id)) {
-        return " AND `$alert_rules_name`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
+        return " AND `$alert_rules_name`.`severity` " . ($min_severity_id > 3 ? '' : '>') . '= ' . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
 
-    return "";
+    return '';
 }
 
 /**
@@ -1272,7 +1272,7 @@ function get_vm_parent_id($device)
         return false;
     }
 
-    return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", [$device['hostname'], $device['hostname'] . '.' . Config::get('mydomain')]);
+    return dbFetchCell('SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?', [$device['hostname'], $device['hostname'] . '.' . Config::get('mydomain')]);
 }
 
 /**

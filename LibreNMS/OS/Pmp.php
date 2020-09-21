@@ -82,9 +82,9 @@ class Pmp extends OS implements
                     break;
                 }
             }
-            if (Str::contains($device->sysDescr, "AP")) {
+            if (Str::contains($device->sysDescr, 'AP')) {
                 $hardware .= ' AP';
-            } elseif (Str::contains($device->sysDescr, "SM")) {
+            } elseif (Str::contains($device->sysDescr, 'SM')) {
                 $hardware .= ' SM';
             }
         }
@@ -121,7 +121,7 @@ class Pmp extends OS implements
             $this->enableGraph('canopy_generic_crcErrors');
         }
 
-        $jitter = snmp_get($this->getDeviceArray(), "jitter.0", "-Ovqn", "WHISP-SM-MIB");
+        $jitter = snmp_get($this->getDeviceArray(), 'jitter.0', '-Ovqn', 'WHISP-SM-MIB');
         if (is_numeric($jitter)) {
             $rrd_def = RrdDefinition::make()->addDataset('jitter', 'GAUGE', 0, 20);
             $fields = [
@@ -133,10 +133,10 @@ class Pmp extends OS implements
             unset($rrd_filename, $jitter);
         }
 
-        $multi_get_array = snmp_get_multi($this->getDeviceArray(), ['regCount.0', 'regFailureCount.0'], "-OQU", "WHISP-APS-MIB");
+        $multi_get_array = snmp_get_multi($this->getDeviceArray(), ['regCount.0', 'regFailureCount.0'], '-OQU', 'WHISP-APS-MIB');
         d_echo($multi_get_array);
-        $registered = $multi_get_array[0]["WHISP-APS-MIB::regCount"];
-        $failed = $multi_get_array[0]["WHISP-APS-MIB::regFailureCount"];
+        $registered = $multi_get_array[0]['WHISP-APS-MIB::regCount'];
+        $failed = $multi_get_array[0]['WHISP-APS-MIB::regFailureCount'];
 
         if (is_numeric($registered) && is_numeric($failed)) {
             $rrd_def = RrdDefinition::make()
@@ -152,8 +152,8 @@ class Pmp extends OS implements
             unset($rrd_filename, $registered, $failed);
         }
 
-        $visible = str_replace('"', "", snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.161.19.3.4.4.7.0", "-Ovqn", ""));
-        $tracked = str_replace('"', "", snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.161.19.3.4.4.8.0", "-Ovqn", ""));
+        $visible = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.4.4.7.0', '-Ovqn', ''));
+        $tracked = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.4.4.8.0', '-Ovqn', ''));
         if (is_numeric($visible) && is_numeric($tracked)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('visible', 'GAUGE', 0, 1000)
@@ -200,7 +200,7 @@ class Pmp extends OS implements
             $this->enableGraph('canopy_generic_450_linkRadioDbm');
         }
 
-        $lastLevel = str_replace('"', "", snmp_get($this->getDeviceArray(), "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
+        $lastLevel = str_replace('"', '', snmp_get($this->getDeviceArray(), 'lastPowerLevel.2', '-Ovqn', 'WHISP-APS-MIB'));
         if (is_numeric($lastLevel)) {
             $rrd_def = RrdDefinition::make()->addDataset('last', 'GAUGE', -100, 0);
             $fields = [
@@ -211,9 +211,9 @@ class Pmp extends OS implements
             $this->enableGraph('canopy_generic_450_powerlevel');
         }
 
-        $vertical = str_replace('"', "", snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.161.19.3.2.2.117.0", "-Ovqn", ""));
-        $horizontal = str_replace('"', "", snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.161.19.3.2.2.118.0", "-Ovqn", ""));
-        $combined = snmp_get($this->getDeviceArray(), "1.3.6.1.4.1.161.19.3.2.2.21.0", "-Ovqn", "");
+        $vertical = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.2.2.117.0', '-Ovqn', ''));
+        $horizontal = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.2.2.118.0', '-Ovqn', ''));
+        $combined = snmp_get($this->getDeviceArray(), '1.3.6.1.4.1.161.19.3.2.2.21.0', '-Ovqn', '');
         if (is_numeric($vertical) && is_numeric($horizontal) && is_numeric($combined)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('vertical', 'GAUGE', -150, 0)
@@ -230,8 +230,8 @@ class Pmp extends OS implements
             unset($rrd_filename, $vertical, $horizontal, $combined);
         }
 
-        $horizontal = str_replace('"', "", snmp_get($this->getDeviceArray(), "radioDbmHorizontal.0", "-Ovqn", "WHISP-SM-MIB"));
-        $vertical = str_replace('"', "", snmp_get($this->getDeviceArray(), "radioDbmVertical.0", "-Ovqn", "WHISP-SM-MIB"));
+        $horizontal = str_replace('"', '', snmp_get($this->getDeviceArray(), 'radioDbmHorizontal.0', '-Ovqn', 'WHISP-SM-MIB'));
+        $vertical = str_replace('"', '', snmp_get($this->getDeviceArray(), 'radioDbmVertical.0', '-Ovqn', 'WHISP-SM-MIB'));
         if (is_numeric($horizontal) && is_numeric($vertical)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('horizontal', 'GAUGE', -100, 100)

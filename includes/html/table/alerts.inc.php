@@ -32,35 +32,35 @@ if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
 
 if (is_numeric($vars['acknowledged'])) {
     // I assume that if we are searching for acknowleged/not, we aren't interested in recovered
-    $where .= " AND `alerts`.`state`" . ($vars['acknowledged'] ? "=" : "!=") . $alert_states['acknowledged'];
+    $where .= ' AND `alerts`.`state`' . ($vars['acknowledged'] ? '=' : '!=') . $alert_states['acknowledged'];
 }
 
 if (is_numeric($vars['fired'])) {
-    $where .= " AND `alerts`.`alerted`=" . $alert_states['alerted'];
+    $where .= ' AND `alerts`.`alerted`=' . $alert_states['alerted'];
 }
 
 if (is_numeric($vars['state'])) {
-    $where .= " AND `alerts`.`state`=" . $vars['state'];
+    $where .= ' AND `alerts`.`state`=' . $vars['state'];
     if ($vars['state'] == $alert_states['recovered']) {
         $show_recovered = true;
     }
 }
 
 if (isset($vars['min_severity'])) {
-    $where .= get_sql_filter_min_severity($vars['min_severity'], "alert_rules");
+    $where .= get_sql_filter_min_severity($vars['min_severity'], 'alert_rules');
 }
 
 if (is_numeric($vars['group'])) {
-    $where .= " AND devices.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $where .= ' AND devices.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $param[] = $vars['group'];
 }
 
 if (! $show_recovered) {
-    $where .= " AND `alerts`.`state`!=" . $alert_states['recovered'];
+    $where .= ' AND `alerts`.`state`!=' . $alert_states['recovered'];
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $where .= " AND (`timestamp` LIKE ? OR `rule` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)";
+    $where .= ' AND (`timestamp` LIKE ? OR `rule` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
@@ -72,11 +72,11 @@ $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`de
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $where .= ' AND `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
-$sql .= " LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id`";
+$sql .= ' LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id`';
 
 $sql .= "  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE $where";
 
@@ -150,7 +150,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     }
 
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', [$alert['id']]);
-    if (($proc == "") || ($proc == "NULL")) {
+    if (($proc == '') || ($proc == 'NULL')) {
         $has_proc = '';
     } else {
         if (! preg_match('/^http[s]*:\/\//', $proc)) {

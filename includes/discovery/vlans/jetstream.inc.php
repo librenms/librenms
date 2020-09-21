@@ -31,7 +31,7 @@
 // todo: detect LAG ports ??? now parser assume that there is no LAG port
 //
 
-if (! function_exists("jetstreamExpand")) {
+if (! function_exists('jetstreamExpand')) {
     function jetstreamExpand($var)
     {
         $arr = explode(',', trim($var)); //array of x/y/a-z
@@ -45,7 +45,7 @@ if (! function_exists("jetstreamExpand")) {
                 $port_id = trim(array_pop($port_start_array)); // $port_start_array is "[x, y]", $port_id is "a";
 
                 for ($i = $port_id; $i <= $tmp[1]; $i++) {
-                    $result[] = implode("/", array_merge($port_start_array, [$i]));
+                    $result[] = implode('/', array_merge($port_start_array, [$i]));
                 }
             } else {
                 $result[] = $element;
@@ -67,8 +67,8 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     $jet_vlanDb = snmpwalk_cache_oid($device, 'vlanConfigEntry', [], 'TPLINK-DOT1Q-VLAN-MIB');
     $jet_portMapping = snmpwalk_cache_oid($device, 'vlanPortConfigTable', [], 'TPLINK-DOT1Q-VLAN-MIB');
     foreach ($jet_portMapping as $jet_ifindex => $jet_port) {
-        $jet_stringPortMapping[$jet_port["vlanPortNumber"]] = $jet_port;
-        $jet_stringPortMapping[$jet_port["vlanPortNumber"]]["ifindex"] = $jet_ifindex;
+        $jet_stringPortMapping[$jet_port['vlanPortNumber']] = $jet_port;
+        $jet_stringPortMapping[$jet_port['vlanPortNumber']]['ifindex'] = $jet_ifindex;
     }
     foreach ($jet_vlanDb as $jet_vlan_id => $jet_vlan_data) {
         d_echo(" $jet_vlan_id ");
@@ -80,9 +80,9 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 $vlan_upd['vlan_name'] = $jet_vlan_data['dot1qVlanDescription'];
                 dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['jet_vlan_id']]);
                 log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> " . $jet_vlan_data['dot1qVlanDescription'], $device, 'vlan');
-                echo "U";
+                echo 'U';
             } else {
-                echo ".";
+                echo '.';
             }
         } else {
             dbInsert([
@@ -93,20 +93,20 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 'vlan_type' => ['NULL'],
             ], 'vlans');
 
-            log_event("VLAN added: " . $jet_vlan_data['dot1qVlanDescription'] . ", $vlan_id", $device, 'vlan');
-            echo "+";
+            log_event('VLAN added: ' . $jet_vlan_data['dot1qVlanDescription'] . ", $vlan_id", $device, 'vlan');
+            echo '+';
         }
         $device['vlans'][$vtpdomain_id][$jet_vlan_id] = $jet_vlan_id;
 
         foreach (jetstreamExpand($jet_vlan_data['vlanTagPortMemberAdd']) as $port_nr) {
             if (isset($jet_stringPortMapping[$port_nr])) {
-                d_echo("ID: $jet_vlan_id -> PORT: " . $port_nr . ", ifindex: " . $jet_stringPortMapping[$port_nr]['ifindex'] . " \n");
+                d_echo("ID: $jet_vlan_id -> PORT: " . $port_nr . ', ifindex: ' . $jet_stringPortMapping[$port_nr]['ifindex'] . " \n");
                 $per_vlan_data[$jet_vlan_id][$jet_stringPortMapping[$port_nr]['ifindex']]['untagged'] = 0;
             }
         }
         foreach (jetstreamExpand($jet_vlan_data['vlanUntagPortMemberAdd']) as $port_nr) {
             if (isset($jet_stringPortMapping[$port_nr])) {
-                d_echo("ID: $jet_vlan_id -> PORT: " . $port_nr . ", ifindex: " . $jet_stringPortMapping[$port_nr]['ifindex'] . " \n");
+                d_echo("ID: $jet_vlan_id -> PORT: " . $port_nr . ', ifindex: ' . $jet_stringPortMapping[$port_nr]['ifindex'] . " \n");
                 $per_vlan_data[$jet_vlan_id][$jet_stringPortMapping[$port_nr]['ifindex']]['untagged'] = 1;
             }
         }

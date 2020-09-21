@@ -27,7 +27,7 @@ use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
 if (! Auth::user()->hasGlobalAdmin()) {
-    echo "Insufficient Privileges";
+    echo 'Insufficient Privileges';
     exit();
 }
 
@@ -104,7 +104,7 @@ switch ($type) {
 // ---- Output ----
 
 if ($_GET['format'] == 'text') {
-    header("Content-type: text/plain");
+    header('Content-type: text/plain');
     header('X-Accel-Buffering: no');
 
     echo $output;

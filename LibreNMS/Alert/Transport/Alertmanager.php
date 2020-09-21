@@ -47,7 +47,7 @@ class Alertmanager extends Transport
         $curl = curl_init();
         $alertmanager_msg = strip_tags($obj['msg']);
         $data = [[
-            $alertmanager_status => date("c"),
+            $alertmanager_status => date('c'),
             'generatorURL' => $gen_url,
             'annotations' => [
                 'summary' => $obj['name'],

@@ -91,7 +91,7 @@ class Template
         try {
             return view(['template' => $data['title']], $alert)->__toString();
         } catch (\Exception $e) {
-            return $data['title'] ?: view(['template' => "Template " . $data['name']], $alert)->__toString();
+            return $data['title'] ?: view(['template' => 'Template ' . $data['name']], $alert)->__toString();
         }
     }
 

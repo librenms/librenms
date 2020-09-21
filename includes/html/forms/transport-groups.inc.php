@@ -52,7 +52,7 @@ if (empty($name)) {
     if (is_numeric($group_id) && $group_id > 0) {
         dbUpdate([
             'transport_group_name' => $name,
-        ], 'alert_transport_groups', "`transport_group_id`=?", [$group_id]);
+        ], 'alert_transport_groups', '`transport_group_id`=?', [$group_id]);
     } else {
         // Insert into db
         $group_id = dbInsert([
@@ -61,7 +61,7 @@ if (empty($name)) {
     }
 
     if (is_numeric($group_id) && $group_id > 0) {
-        $sql = "SELECT `transport_id` FROM `transport_group_transport` WHERE `transport_group_id`=?";
+        $sql = 'SELECT `transport_id` FROM `transport_group_transport` WHERE `transport_group_id`=?';
         $db_members = dbFetchColumn($sql, [$group_id]);
 
         // Compare arrays to get added and removed transports

@@ -37,7 +37,7 @@ if ($device['os'] === 'boss') {
         $ps_num = 0;
         foreach ($ers_sensors as $index => $entry) {
             //Get unit number
-            $unit_array = explode(".", $index);
+            $unit_array = explode('.', $index);
             $unit = floor($unit_array[1] / 10);
             //Set description with Power Supply number
             if ($unit_array[0] == 4) {

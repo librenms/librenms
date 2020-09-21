@@ -225,7 +225,7 @@ class RunAlerts
 
     public function clearStaleAlerts()
     {
-        $sql = "SELECT `alerts`.`id` AS `alert_id`, `devices`.`hostname` AS `hostname` FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE `alerts`.`state`!=" . AlertState::CLEAR . " AND `devices`.`hostname` IS NULL";
+        $sql = 'SELECT `alerts`.`id` AS `alert_id`, `devices`.`hostname` AS `hostname` FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE `alerts`.`state`!=' . AlertState::CLEAR . ' AND `devices`.`hostname` IS NULL';
         foreach (dbFetchRows($sql) as $alert) {
             if (empty($alert['hostname']) && isset($alert['alert_id'])) {
                 dbDelete('alerts', '`id` = ?', [$alert['alert_id']]);
@@ -544,9 +544,9 @@ class RunAlerts
     public function alertLog($result, $obj, $transport)
     {
         $prefix = [
-            AlertState::RECOVERED => "recovery",
-            AlertState::ACTIVE => $obj['severity'] . " alert",
-            AlertState::ACKNOWLEDGED => "acknowledgment",
+            AlertState::RECOVERED => 'recovery',
+            AlertState::ACTIVE => $obj['severity'] . ' alert',
+            AlertState::ACKNOWLEDGED => 'acknowledgment',
         ];
         $prefix[3] = &$prefix[0];
         $prefix[4] = &$prefix[0];
@@ -581,7 +581,7 @@ class RunAlerts
      */
     public function isParentDown($device)
     {
-        $parent_count = dbFetchCell("SELECT count(*) from `device_relationships` WHERE `child_device_id` = ?", [$device]);
+        $parent_count = dbFetchCell('SELECT count(*) from `device_relationships` WHERE `child_device_id` = ?', [$device]);
         if (! $parent_count) {
             return false;
         }

@@ -89,7 +89,7 @@ if (bill_permitted($bill_id)) {
 
     <?php
     print_optionbar_start();
-    echo "<strong>Bill</strong> &raquo; ";
+    echo '<strong>Bill</strong> &raquo; ';
     $menu_options = [
         'quick' => 'Quick Graphs',
         'accurate' => 'Accurate Graphs',
@@ -233,19 +233,19 @@ if (bill_permitted($bill_id)) {
         } else {
             $bi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
             $bi .= '&amp;from=' . $unixfrom . '&amp;to=' . $unixto;
-            $bi .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=" . $dir_95th . "'>";
+            $bi .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
 
             $li = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
             $li .= '&amp;from=' . $unix_prev_from . '&amp;to=' . $unix_prev_to;
-            $li .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=" . $dir_95th . "'>";
+            $li .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
 
             $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
             $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
-            $di .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=" . $dir_95th . "'>";
+            $di .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
 
             $mi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
             $mi .= '&amp;from=' . $lastmonth . '&amp;to=' . $rightnow;
-            $mi .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=" . $dir_95th . "'>";
+            $mi .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
         }//end if
 
         ?>

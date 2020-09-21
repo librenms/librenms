@@ -35,17 +35,17 @@ if (isset($_POST['sub_type']) && ! empty($_POST['sub_type'])) {
     }
 } else {
     if (! is_numeric($_POST['device_id']) || ! is_numeric($_POST['sensor_id'])) {
-        $message = "Invalid device or sensor id";
+        $message = 'Invalid device or sensor id';
     } else {
         if ($_POST['state'] == 'true') {
             $state = 1;
-            $state_string = "enabled";
+            $state_string = 'enabled';
         } elseif ($_POST['state'] == 'false') {
             $state = 0;
-            $state_string = "disabled";
+            $state_string = 'disabled';
         } else {
             $state = 0;
-            $state_string = "disabled";
+            $state_string = 'disabled';
         }
         if (dbUpdate(['sensor_alert' => $state], 'sensors', '`sensor_id` = ? AND `device_id` = ?', [$_POST['sensor_id'], $_POST['device_id']]) >= 0) {
             $status = ($state == 0) ? 'info' : 'ok';

@@ -223,7 +223,7 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos',
                 $bssid,
-                "CCQ " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'CCQ ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntryPhySigal']
             );
         }
@@ -256,7 +256,7 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos-tx',
                 $bssid,
-                "TX Rate " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'TX Rate ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntryEffRate'],
                 1000000
             );
@@ -291,7 +291,7 @@ class Lcos extends OS implements
                 '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos',
                 $bssid,
-                "RSSI " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'RSSI ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntrySignalLevel']
             );
         }

@@ -5,7 +5,7 @@ $app_id = \App\Models\Application::query()->where('device_id', $device['device_i
 // show only if Puppet Agent Application discovered
 if (count($app_id)) {
     $params = [];
-    $sql = "SELECT `metric`, `value` FROM `application_metrics` WHERE `app_id` =" . $app_id['app_id'];
+    $sql = 'SELECT `metric`, `value` FROM `application_metrics` WHERE `app_id` =' . $app_id['app_id'];
     $metrics = dbFetchKeyValue($sql, $params); ?><div class='row'>
           <div class='col-md-12'>
               <div class='panel panel-default panel-condensed device-overview'>

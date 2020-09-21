@@ -52,7 +52,7 @@ if (isset($vars['id'])) {
             'tab' => 'health',
         ];
         $title = generate_device_link($device);
-        $title .= ' :: ' . generate_link("QFP", $link_array, ['metric' => 'qfp']);
+        $title .= ' :: ' . generate_link('QFP', $link_array, ['metric' => 'qfp']);
         $title .= ' :: ' . $components['name'];
 
         $auth = true;

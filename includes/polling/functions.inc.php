@@ -52,7 +52,7 @@ function poll_sensor($device, $class)
     $misc_sensors = [];
     $all_sensors = [];
 
-    foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?", [$class, $device['device_id']]) as $sensor) {
+    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', [$class, $device['device_id']]) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             // Agent sensors are polled in the unix-agent
         } elseif ($sensor['poller_type'] == 'ipmi') {
@@ -210,7 +210,7 @@ function record_sensor_data($device, $all_sensors)
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
                 dbFetchRows(
-                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN (?,?)",
+                    'SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN (?,?)',
                     [$sensor['sensor_id'], $sensor_value, $prev_sensor_value]
                 ),
                 'state_descr',
@@ -220,7 +220,7 @@ function record_sensor_data($device, $all_sensors)
             log_event("$class sensor {$sensor['sensor_descr']} has changed from {$trans[$prev_sensor_value]} ($prev_sensor_value) to {$trans[$sensor_value]} ($sensor_value)", $device, $class, 3, $sensor['sensor_id']);
         }
         if ($sensor_value != $prev_sensor_value) {
-            dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', "`sensor_class` = ? AND `sensor_id` = ?", [$class, $sensor['sensor_id']]);
+            dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$class, $sensor['sensor_id']]);
         }
     }
 }
@@ -302,9 +302,9 @@ function poll_device($device, $force_module = false)
         printChangedStats(true); // don't count previous stats
         foreach (Config::get('poller_modules') as $module => $module_status) {
             $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
-            d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
-            d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-            d_echo("Device" . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
+            d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
+            d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
+            d_echo('Device' . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
             if ($force_module === true ||
                 $attribs['poll_' . $module] ||
                 ($os_module_status && ! isset($attribs['poll_' . $module])) ||
@@ -392,7 +392,7 @@ function poll_device($device, $force_module = false)
             $update_array['last_polled'] = ['NOW()'];
             $update_array['last_polled_timetaken'] = $device_time;
 
-            echo "Enabling graphs: ";
+            echo 'Enabling graphs: ';
             DeviceGraph::deleted(function ($graph) {
                 echo '-';
             });
@@ -413,7 +413,7 @@ function poll_device($device, $force_module = false)
 
         // check if the poll took to long and log an event
         if ($device_time > Config::get('rrd.step')) {
-            log_event("Polling took longer than " . round(Config::get('rrd.step') / 60, 2) .
+            log_event('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
                 ' minutes!  This will cause gaps in graphs.', $device, 'system', 5);
         }
 
@@ -478,26 +478,26 @@ function update_application($app, $response, $metrics = [], $status = '')
         switch ($data['app_state']) {
             case 'OK':
                 $severity = Alert::OK;
-                $event_msg = "changed to OK";
+                $event_msg = 'changed to OK';
                 break;
             case 'ERROR':
                 $severity = Alert::ERROR;
-                $event_msg = "ends with ERROR";
+                $event_msg = 'ends with ERROR';
                 break;
             case 'LEGACY':
                 $severity = Alert::WARNING;
-                $event_msg = "Client Agent is deprecated";
+                $event_msg = 'Client Agent is deprecated';
                 break;
             case 'UNSUPPORTED':
                 $severity = Alert::ERROR;
-                $event_msg = "Client Agent Version is not supported";
+                $event_msg = 'Client Agent Version is not supported';
                 break;
             default:
                 $severity = Alert::UNKNOWN;
-                $event_msg = "has UNKNOWN state";
+                $event_msg = 'has UNKNOWN state';
                 break;
         }
-        log_event("Application " . $app_name . " " . $event_msg, $device, 'application', $severity);
+        log_event('Application ' . $app_name . ' ' . $event_msg, $device, 'application', $severity);
     }
     dbUpdate($data, 'applications', '`app_id` = ?', [$app['app_id']]);
 
@@ -633,7 +633,7 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // make sure we actually get something back
     if (empty($output)) {
-        throw new JsonAppPollingFailedException("Empty return from snmp_get.", -2);
+        throw new JsonAppPollingFailedException('Empty return from snmp_get.', -2);
     }
 
     //  turn the JSON into a array
@@ -641,17 +641,17 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // improper JSON or something else was returned. Populate the variable with an error.
     if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new JsonAppParsingFailedException("Invalid JSON", $output, -3);
+        throw new JsonAppParsingFailedException('Invalid JSON', $output, -3);
     }
 
     // There no keys in the array, meaning '{}' was was returned
     if (empty($parsed_json)) {
-        throw new JsonAppBlankJsonException("Blank JSON returned.", $output, -4);
+        throw new JsonAppBlankJsonException('Blank JSON returned.', $output, -4);
     }
 
     // It is a legacy JSON app extend, meaning these are not set
     if (! isset($parsed_json['error'], $parsed_json['data'], $parsed_json['errorString'], $parsed_json['version'])) {
-        throw new JsonAppMissingKeysException("Legacy script or extend error, missing one or more required keys.", $output, $parsed_json, -5);
+        throw new JsonAppMissingKeysException('Legacy script or extend error, missing one or more required keys.', $output, $parsed_json, -5);
     }
 
     if ($parsed_json['version'] < $min_version) {

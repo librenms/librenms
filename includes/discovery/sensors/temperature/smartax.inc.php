@@ -31,7 +31,7 @@ $data = reset($data);
 $descr_data = reset($descr_data);
 
 foreach ($data as $index => $value) {
-    if ($value < "999") {
+    if ($value < '999') {
         $tempCurr = $value;
         $temperature_oid = '.' . $temp_oid . '.' . $index;
         $descr = $descr_data[$index];

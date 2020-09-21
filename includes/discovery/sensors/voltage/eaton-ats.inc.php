@@ -19,10 +19,10 @@ echo 'EATON-ATS';
 $oids = snmpwalk_cache_oid($device, 'ats2InputVoltage', [], 'EATON-ATS2-MIB');
 foreach ($oids as $volt_id => $data) {
     //we need to retrieve the numerical value of oid
-    $source_oid = "EATON-ATS2-MIB::ats2InputIndex." . $volt_id;
+    $source_oid = 'EATON-ATS2-MIB::ats2InputIndex.' . $volt_id;
     $num_id = snmp_get($device, $source_oid, '-Oqve');
-    $volt_oid = ".1.3.6.1.4.1.534.10.2.2.2.1.2." . $num_id;
-    $index = ".1.3.6.1.4.1.534.10.2.2.2.1.1." . $num_id;
+    $volt_oid = '.1.3.6.1.4.1.534.10.2.2.2.1.2.' . $num_id;
+    $index = '.1.3.6.1.4.1.534.10.2.2.2.1.1.' . $num_id;
     $descr = 'Input';
     if (count($oids) > 1) {
         $source = snmp_get($device, $source_oid, '-Oqv');

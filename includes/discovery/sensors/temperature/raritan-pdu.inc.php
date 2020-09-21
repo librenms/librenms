@@ -32,7 +32,7 @@ if (is_array($raritan_data) && ! empty($raritan_data)) {
     $warn_limit = $raritan_data['unitTempUpperWarning.0'];
     $high_limit = $raritan_data['unitTempUpperCritical.0'];
     $current = $raritan_data['unitCpuTemp.0'] / $divisor;
-    discover_sensor($valid["sensor"], "temperature", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
 } else {
     $multiplier = '1';
     foreach ($pre_cache['raritan_extSensorConfig'] as $index => $data) {
@@ -57,7 +57,7 @@ if (is_array($raritan_data) && ! empty($raritan_data)) {
                 $current = fahrenheit_to_celsius($current, $raritan_temp_scale);
                 $user_func = 'fahrenheit_to_celsius';
             }
-            if (is_numeric($current) && $current >= 0 && $sensor_available === "true") {
+            if (is_numeric($current) && $current >= 0 && $sensor_available === 'true') {
                 discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'measurementsExternalSensorValue.' . $index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
             }
         }
@@ -65,7 +65,7 @@ if (is_array($raritan_data) && ! empty($raritan_data)) {
 }
 
 //Check for PDU MIB external Sensors
-$oids = snmpwalk_cache_multi_oid($device, "externalSensorTable", [], "PDU-MIB");
+$oids = snmpwalk_cache_multi_oid($device, 'externalSensorTable', [], 'PDU-MIB');
 $offset = 0;
 foreach ($oids as $index => $sensor) {
     if ($sensor['externalSensorType'] == 'temperature') {

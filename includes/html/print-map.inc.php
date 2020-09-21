@@ -17,7 +17,7 @@ use LibreNMS\Config;
 $highlight_node = $vars['highlight_node'] | 0;
 
 //Don't know where this should come from, but it is used later, so I just define it here.
-$row_colour = "#ffffff";
+$row_colour = '#ffffff';
 
 $sql_array = [];
 if (! empty($device['hostname'])) {
@@ -31,8 +31,8 @@ if (! empty($device['hostname'])) {
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $sql .= " AND `D1`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
-    $sql .= " AND `D2`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $sql .= ' AND `D1`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
+    $sql .= ' AND `D2`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $sql_array = array_merge($sql_array, $device_ids, $device_ids);
 }
 
@@ -43,11 +43,11 @@ $device_assoc_seen = [];
 $ports = [];
 $devices = [];
 
-$where = "";
+$where = '';
 if (is_numeric($vars['group'])) {
-    $where .= " AND D1.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $where .= ' AND D1.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $sql_array[] = $vars['group'];
-    $where .= " OR D2.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $where .= ' OR D2.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $sql_array[] = $vars['group'];
 }
 
@@ -319,7 +319,7 @@ foreach ($list as $items) {
                 'from'=>$items['local_device_id'],
                 'to'=>$items['remote_device_id'],
                 'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),
-                'title' => generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=" . $items['local_port_id'] . "&amp;from=" . Config::get('time.day') . "&amp;to=" . Config::get('time.now') . "&amp;width=100&amp;height=20&amp;legend=no&amp;bg=" . str_replace("#", "", $row_colour) . "'>\n", '', 0, 1),
+                'title' => generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=" . $items['local_port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>\n", '', 0, 1),
                 'width'=>$width,
             ],
             $link_style
@@ -396,4 +396,4 @@ $('#highlight_node option[value="<?=$highlight_node?>"]').prop('selected', true)
         print_message("No map to display, this may be because you aren't running autodiscovery or no devices are linked by mac address.");
     }
 
-$pagetitle[] = "Map";
+$pagetitle[] = 'Map';

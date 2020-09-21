@@ -28,7 +28,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 echo ' rrdcached';
 
-$data = "";
+$data = '';
 $name = 'rrdcached';
 $app_id = $app['app_id'];
 
@@ -44,7 +44,7 @@ if ($agent_data['app'][$name]) {
         if (substr($socket, 0, 6) == 'unix:/') {
             $socket_file = substr($socket, 5);
             if (file_exists($socket_file)) {
-                $sock = fsockopen("unix://" . $socket_file);
+                $sock = fsockopen('unix://' . $socket_file);
             }
         }
     }

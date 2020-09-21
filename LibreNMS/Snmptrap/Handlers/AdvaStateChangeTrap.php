@@ -55,7 +55,7 @@ class AdvaStateChangeTrap implements SnmptrapHandler
             $adminState = $trap->getOidData($trap_oid);
             $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmFlowOperationalState'));
             $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmFlowAdminState'), 34);
-            $flowID = str_replace(".", "-", $flowID);
+            $flowID = str_replace('.', '-', $flowID);
             Log::event("Flow state change: $flowID Admin State: $adminState Operational State: $opState", $device->device_id, 'trap', 2);
         } elseif ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAdminState')) {
             $adminState = $trap->getOidData($trap_oid);

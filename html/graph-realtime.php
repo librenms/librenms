@@ -16,14 +16,14 @@ if (is_numeric($_GET['id']) && (Config::get('allow_unauth_graphs') || port_permi
     $port = cleanPort(get_port_by_id($_GET['id']));
     $device = device_by_id_cache($port['device_id']);
     $title = generate_device_link($device);
-    $title .= " :: Port  " . generate_port_link($port);
+    $title .= ' :: Port  ' . generate_port_link($port);
     $auth = true;
 } else {
-    echo "Unauthenticad";
+    echo 'Unauthenticad';
     exit;
 }
 
-header("Content-type: image/svg+xml");
+header('Content-type: image/svg+xml');
 
 /********** HTTP GET Based Conf ***********/
 $ifnum = @$port['ifIndex'];  // BSD / SNMP interface name / number
@@ -35,7 +35,7 @@ if ($_GET['title']) {
 }
 
 /********* Other conf *******/
-$scale_type = "follow";               //Autoscale default setup : "up" = only increase scale; "follow" = increase and decrease scale according to current graphed datas
+$scale_type = 'follow';               //Autoscale default setup : "up" = only increase scale; "follow" = increase and decrease scale according to current graphed datas
 $nb_plot = 240;                   //NB plot in graph
 
 if (is_numeric($_GET['interval'])) {
@@ -44,7 +44,7 @@ if (is_numeric($_GET['interval'])) {
     $time_interval = 1;      //Refresh time Interval
 }
 
-$fetch_link = "data.php?id=" . $_GET['id'];
+$fetch_link = 'data.php?id=' . $_GET['id'];
 
 //SVG attributes
 $attribs['axis'] = 'fill="black" stroke="black"';
@@ -94,7 +94,7 @@ echo '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n"; ?>
     <text id="datetime" x="<?php echo $width * 0.33 ?>" y="5" <?php echo $attribs['legend'] ?>> </text>
     <text id="graphlast" x="<?php echo $width * 0.48 ?>" y="17" <?php echo $attribs['legend'] ?>>Graph shows last <?php echo $time_interval * $nb_plot ?> seconds</text>
     <text id="cachewarning" x="<?php echo $width * 0.48 ?>" y="22" <?php echo $attribs['cachewarning'] ?> visibility="hidden">Caching may be in effect (<tspan id="cacheinterval">?</tspan>s)</text>
-    <polygon id="axis_arrow_x" <?php echo $attribs['axis'] ?> points="<?php echo $width . "," . $height ?> <?php echo($width - 2) . "," . ($height - 2) ?> <?php echo($width - 2) . "," . $height ?>"/>
+    <polygon id="axis_arrow_x" <?php echo $attribs['axis'] ?> points="<?php echo $width . ',' . $height ?> <?php echo($width - 2) . ',' . ($height - 2) ?> <?php echo($width - 2) . ',' . $height ?>"/>
     <text id="error" x="<?php echo $width * 0.5 ?>" y="<?php echo $height * 0.5 ?>"  visibility="hidden" <?php echo $attribs['error'] ?> text-anchor="middle"><?php echo $error_text ?></text>
     <text id="collect_initial" x="<?php echo $width * 0.5 ?>" y="<?php echo $height * 0.5 ?>"  visibility="hidden" <?php echo $attribs['collect_initial'] ?> text-anchor="middle">Collecting initial data, please wait...</text>
   </g>

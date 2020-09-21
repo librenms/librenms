@@ -221,18 +221,18 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $graph_array_zoom = $graph_array;
     $graph_array_zoom['height'] = '150';
     $graph_array_zoom['width'] = '500';
-    $overlib_link = "device/device=" . $peer['device_id'] . "/tab=routing/proto=bgp/";
+    $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
 
     $link_array = $graph_array;
     $link_array['page'] = 'graphs';
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
     $link = generate_url($link_array);
-    $peeraddresslink = "<span class=list-large>" . overlib_link($link, $peer['bgpPeerIdentifier'], generate_graph_tag($graph_array_zoom), null) . "</span>";
+    $peeraddresslink = '<span class=list-large>' . overlib_link($link, $peer['bgpPeerIdentifier'], generate_graph_tag($graph_array_zoom), null) . '</span>';
 
     if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
         $last_error = $peer['bgpPeerLastErrorText'];
     } else {
-        $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']) . "<br/>" . $peer['bgpPeerLastErrorText'];
+        $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']) . '<br/>' . $peer['bgpPeerLastErrorText'];
     }
 
     echo '<tr bgcolor="' . $bg_colour . '"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . '>
@@ -242,11 +242,11 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         <td>' . $peeraddresslink . '<br />' . $peername . "</td>
         <td>$peer_type</td>
         <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . (isset($peer['afi']) ? $peer['afi'] : '') . '</td>
-        <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . "</td>
-        <td>" . $peer['bgpPeerDescr'] . "</td>
-        <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
-        <td>" . $last_error . "</td>
-        <td>" . formatUptime($peer['bgpPeerFsmEstablishedTime']) . "<br />
+        <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
+        <td>' . $peer['bgpPeerDescr'] . "</td>
+        <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
+        <td>' . $last_error . '</td>
+        <td>' . formatUptime($peer['bgpPeerFsmEstablishedTime']) . "<br />
         Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . $peer['bgpPeerInUpdates'] . "
         <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . $peer['bgpPeerOutUpdates'] . '</td>
         </tr>

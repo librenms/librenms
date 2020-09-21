@@ -32,7 +32,7 @@ class MibController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return Config::get("poller_modules.mib") && $device->getAttrib('poll_mib');
+        return Config::get('poller_modules.mib') && $device->getAttrib('poll_mib');
     }
 
     public function slug(): string

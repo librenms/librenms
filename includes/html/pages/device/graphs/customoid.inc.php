@@ -4,9 +4,9 @@ $row = 1;
 
 foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY `customoid_descr`', [$device['device_id']]) as $customoid) {
     if (! is_integer($row / 2)) {
-        $row_colour = Config::get("list_colour.even");
+        $row_colour = Config::get('list_colour.even');
     } else {
-        $row_colour = Config::get("list_colour.odd");
+        $row_colour = Config::get('list_colour.odd');
     }
     $customoid_descr = $customoid['customoid_descr'];
     $customoid_unit = $customoid['customoid_unit'];

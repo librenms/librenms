@@ -6,11 +6,11 @@ $param = [];
 $sql = ' FROM `devices` AS D ';
 
 if (! Auth::user()->hasGlobalAdmin()) {
-    $sql .= ", devices_perms AS P ";
+    $sql .= ', devices_perms AS P ';
 }
 
-$sql .= " LEFT JOIN `locations` as L ON `D`.`location_id`=`L`.`id`";
-$sql .= " LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`";
+$sql .= ' LEFT JOIN `locations` as L ON `D`.`location_id`=`L`.`id`';
+$sql .= ' LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`';
 
 if (! Auth::user()->hasGlobalAdmin()) {
     $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '" . Auth::id() . "' AND D.ignore = '0'";
@@ -19,14 +19,14 @@ if (! Auth::user()->hasGlobalAdmin()) {
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (hostname LIKE ? OR sysName LIKE ? OR last_polled LIKE ? OR last_polled_timetaken LIKE ?)";
+    $sql .= ' AND (hostname LIKE ? OR sysName LIKE ? OR last_polled LIKE ? OR last_polled_timetaken LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
 }
 
-if ($vars['type'] == "unpolled") {
+if ($vars['type'] == 'unpolled') {
     $overdue = (int) (Config::get('rrd.step', 300) * 1.2);
     $sql .= " AND `last_polled` <= DATE_ADD(NOW(), INTERVAL - $overdue SECOND)";
 }

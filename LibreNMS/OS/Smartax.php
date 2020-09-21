@@ -53,7 +53,7 @@ class Smartax extends OS implements ProcessorDiscovery
             if ($value != -1) {
                 $proc_desc = $descr_data[$index];
                 $processors[] = Processor::discover(
-                    "smartax",
+                    'smartax',
                     $this->getDeviceId(),
                     "$proc_oid.$index",
                     $index,

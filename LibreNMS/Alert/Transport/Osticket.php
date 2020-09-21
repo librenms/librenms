@@ -59,7 +59,7 @@ class Osticket extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         if ($code != 201) {
-            var_dump("osTicket returned Error, retry later");
+            var_dump('osTicket returned Error, retry later');
 
             return false;
         }

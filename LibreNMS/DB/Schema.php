@@ -202,10 +202,10 @@ class Schema
     {
         $relationships = $this->getTableRelationships();
 
-        d_echo("Starting Tables: " . json_encode($tables) . PHP_EOL);
+        d_echo('Starting Tables: ' . json_encode($tables) . PHP_EOL);
         if (! empty($history)) {
             $tables = array_diff($tables, $history);
-            d_echo("Filtered Tables: " . json_encode($tables) . PHP_EOL);
+            d_echo('Filtered Tables: ' . json_encode($tables) . PHP_EOL);
         }
 
         foreach ($tables as $table) {

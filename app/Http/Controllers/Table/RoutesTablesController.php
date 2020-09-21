@@ -200,9 +200,9 @@ class RoutesTablesController extends TableController
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);
         if ($device) {
             if ($device->device_id == $route_entry->device_id || in_array($route_entry->inetCidrRouteNextHop, ['127.0.0.1', '::1'])) {
-                $item['inetCidrRouteNextHop'] = Url::deviceLink($device, "localhost");
+                $item['inetCidrRouteNextHop'] = Url::deviceLink($device, 'localhost');
             } else {
-                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . "<br>(" . Url::deviceLink($device) . ")";
+                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . Url::deviceLink($device) . ')';
             }
         }
         if ($route_entry->inetCidrRouteProto && $route_entry::$translateProto[$route_entry->inetCidrRouteProto]) {

@@ -71,8 +71,8 @@ if (! empty(mres($_POST['user_func']))) {
     $user_func = ['NULL'];
 }
 
-if ($action == "test") {
-    $query = "SELECT * FROM `devices` WHERE `device_id` = ? LIMIT 1";
+if ($action == 'test') {
+    $query = 'SELECT * FROM `devices` WHERE `device_id` = ? LIMIT 1';
     $device = dbFetchRow($query, [$device_id]);
 
     $rawdata = snmp_get($device, $oid, '-Oqv');
@@ -114,7 +114,7 @@ if ($action == "test") {
                 'user_func'                => $user_func,
             ],
             'customoids',
-            "`customoid_id` = ?",
+            '`customoid_id` = ?',
             [$id]
         ) >= 0) { //end if condition
             $message = "Edited OID: <i>$name</i>";

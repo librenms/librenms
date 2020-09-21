@@ -64,7 +64,7 @@ class CreateDevicesTable extends Migration
         });
 
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            \DB::statement("ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;");
+            \DB::statement('ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;');
         }
     }
 

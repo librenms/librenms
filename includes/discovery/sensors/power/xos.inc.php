@@ -1,11 +1,11 @@
 <?php
 
-echo " EXTREME-BASE-MIB ";
+echo ' EXTREME-BASE-MIB ';
 // Power Usage
-$descr = "Power Usage";
-$oid = ".1.3.6.1.4.1.1916.1.1.1.40.1.0"; // extremeSystemPowerUsage
+$descr = 'Power Usage';
+$oid = '.1.3.6.1.4.1.1916.1.1.1.40.1.0'; // extremeSystemPowerUsage
 $value = snmp_get($device, $oid, '-Oqv', 'EXTREME-BASE-MIB');
-$divisor = "1000";
+$divisor = '1000';
 
 if (is_numeric($value)) {
     $value = ($value / $divisor); // Nasty hack to divide the first value by 1000 since the divisor only works for polling after the sensor has been added

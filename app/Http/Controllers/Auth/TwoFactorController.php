@@ -82,7 +82,7 @@ class TwoFactorController extends Controller
             if (! $lockout_time) {
                 $errors['lockout'] = __('Too many two-factor failures, please contact administrator.');
             } elseif ((time() - $twoFactorSettings['last']) < $lockout_time) {
-                $errors['lockout'] = __("Too many two-factor failures, please wait :time seconds", ['time' => $lockout_time]);
+                $errors['lockout'] = __('Too many two-factor failures, please wait :time seconds', ['time' => $lockout_time]);
             }
         }
 
@@ -155,7 +155,7 @@ class TwoFactorController extends Controller
     private function checkToken($user, $token)
     {
         if (! $token) {
-            throw new AuthenticationException(__("No Two-Factor Token entered."));
+            throw new AuthenticationException(__('No Two-Factor Token entered.'));
         }
 
         // check if this is new
@@ -173,7 +173,7 @@ class TwoFactorController extends Controller
             }
             $twoFactorSettings['last'] = time();
             UserPref::setPref($user, 'twofactor', $twoFactorSettings);
-            throw new AuthenticationException(__("Wrong Two-Factor Token."));
+            throw new AuthenticationException(__('Wrong Two-Factor Token.'));
         }
 
         // update counter

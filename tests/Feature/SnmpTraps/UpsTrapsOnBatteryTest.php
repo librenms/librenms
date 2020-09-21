@@ -52,7 +52,7 @@ UPS-MIB::upsConfigLowBattTime.0 1 minutes";
         \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
         \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'upsOutputSourceState\' for device: " . $device->hostname);
 
-        $message = "UPS running on battery for 120 seconds. Estimated 100 minutes remaining";
+        $message = 'UPS running on battery for 120 seconds. Estimated 100 minutes remaining';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $trap = new Trap($trapText);

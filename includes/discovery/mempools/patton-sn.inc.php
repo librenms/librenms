@@ -16,7 +16,7 @@ if ($device['os'] == 'patton-sn') {
 
                 //$usage_oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.'.$index;
                 $descr = $entry['memDescr'];
-                $descr .= " Memory";
+                $descr .= ' Memory';
                 $usage = ($entry['memAllocatedBytes'] / ($entry['memAllocatedBytes'] + $entry['memFreeBytes']) * 100);
                 if (! strstr($descr, 'No') && ! strstr($usage, 'No') && $descr != '') {
                     discover_mempool($valid_mempool, $device, $index, 'patton-sn', $descr, '1', null, null);

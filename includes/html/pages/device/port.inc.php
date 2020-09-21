@@ -235,7 +235,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
 }//end if
 
 if (Auth::user()->hasGlobalAdmin() && \LibreNMS\Config::get('enable_billing') == 1) {
-    $bills = dbFetchRows("SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?", [$port['port_id']]);
+    $bills = dbFetchRows('SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?', [$port['port_id']]);
     if (count($bills) === 1) {
         echo "<span style='float: right;'><a href='" . generate_url(['page' => 'bill', 'bill_id' => $bills[0]['bill_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
     } elseif (count($bills) > 1) {

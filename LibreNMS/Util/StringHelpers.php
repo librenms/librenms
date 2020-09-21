@@ -36,7 +36,7 @@ class StringHelpers
     public static function shortenText($string, $max = 30)
     {
         if (strlen($string) > 50) {
-            return substr($string, 0, $max) . "...";
+            return substr($string, 0, $max) . '...';
         }
 
         return $string;

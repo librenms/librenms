@@ -326,19 +326,19 @@ function generate_dynamic_graph_tag($args)
         switch (strtolower($key)) {
             case 'width':
                 $width = $arg;
-                $value = "{{width}}";
+                $value = '{{width}}';
                 break;
             case 'from':
-                $value = "{{start}}";
+                $value = '{{start}}';
                 break;
             case 'to':
-                $value = "{{end}}";
+                $value = '{{end}}';
                 break;
             default:
                 $value = $arg;
                 break;
         }
-        $urlargs[] = $key . "=" . $value;
+        $urlargs[] = $key . '=' . $value;
     }
 
     return '<img style="width:' . $width . 'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
@@ -509,9 +509,9 @@ function generate_sensor_link($args, $text = null, $type = null)
     }
 
     if (! $type) {
-        $args['graph_type'] = "sensor_" . $args['sensor_class'];
+        $args['graph_type'] = 'sensor_' . $args['sensor_class'];
     } else {
-        $args['graph_type'] = "sensor_" . $type;
+        $args['graph_type'] = 'sensor_' . $type;
     }
 
     if (! isset($args['hostname'])) {
@@ -902,20 +902,20 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['sensor_id']) {
-            $details = "Current Value: " . $tmp_alerts['sensor_current'] . " (" . $tmp_alerts['sensor_class'] . ")<br>  ";
+            $details = 'Current Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
             $details_a = [];
 
             if ($tmp_alerts['sensor_limit_low']) {
-                $details_a[] = "low: " . $tmp_alerts['sensor_limit_low'];
+                $details_a[] = 'low: ' . $tmp_alerts['sensor_limit_low'];
             }
             if ($tmp_alerts['sensor_limit_low_warn']) {
-                $details_a[] = "low_warn: " . $tmp_alerts['sensor_limit_low_warn'];
+                $details_a[] = 'low_warn: ' . $tmp_alerts['sensor_limit_low_warn'];
             }
             if ($tmp_alerts['sensor_limit_warn']) {
-                $details_a[] = "high_warn: " . $tmp_alerts['sensor_limit_warn'];
+                $details_a[] = 'high_warn: ' . $tmp_alerts['sensor_limit_warn'];
             }
             if ($tmp_alerts['sensor_limit']) {
-                $details_a[] = "high: " . $tmp_alerts['sensor_limit'];
+                $details_a[] = 'high: ' . $tmp_alerts['sensor_limit'];
             }
             $details .= implode(', ', $details_a);
 
@@ -930,14 +930,14 @@ function alert_details($details)
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'routing',
                     'proto' => 'bgp', ]) .
-                "'>" . $tmp_alerts['bgpPeerIdentifier'] . "</a>";
-            $fault_detail .= ", AS" . $tmp_alerts['bgpPeerRemoteAs'];
-            $fault_detail .= ", State " . $tmp_alerts['bgpPeerState'];
+                "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
+            $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
+            $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
             $fallback = false;
         }
 
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
-            if ($tmp_alerts['error'] == "") {
+            if ($tmp_alerts['error'] == '') {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
             } else {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
@@ -951,9 +951,9 @@ function alert_details($details)
                 'tab' => 'apps',
                 'app' => $tmp_alerts['app_type'], ]) . "'>";
             $fault_detail .= $tmp_alerts['metric'];
-            $fault_detail .= "</a>";
+            $fault_detail .= '</a>';
 
-            $fault_detail .= " => " . $tmp_alerts['value'];
+            $fault_detail .= ' => ' . $tmp_alerts['value'];
             $fallback = false;
         }
 
@@ -1131,17 +1131,17 @@ function eventlog_severity($eventlog_severity)
 {
     switch ($eventlog_severity) {
         case 1:
-            return "label-success"; //OK
+            return 'label-success'; //OK
         case 2:
-            return "label-info"; //Informational
+            return 'label-info'; //Informational
         case 3:
-            return "label-primary"; //Notice
+            return 'label-primary'; //Notice
         case 4:
-            return "label-warning"; //Warning
+            return 'label-warning'; //Warning
         case 5:
-            return "label-danger"; //Critical
+            return 'label-danger'; //Critical
         default:
-            return "label-default"; //Unknown
+            return 'label-default'; //Unknown
     }
 } // end eventlog_severity
 
@@ -1163,7 +1163,7 @@ function get_oxidized_nodes_list()
 {
     $context = stream_context_create([
         'http' => [
-            'header' => "Accept: application/json",
+            'header' => 'Accept: application/json',
         ],
     ]);
 
@@ -1176,16 +1176,16 @@ function get_oxidized_nodes_list()
             continue;
         }
 
-        echo "<tr>
-        <td>" . $device['device_id'] . "</td>
-        <td>" . $object['name'] . "</td>
-        <td>" . $device['sysName'] . "</td>
-        <td>" . $object['status'] . "</td>
-        <td>" . $object['time'] . "</td>
-        <td>" . $object['model'] . "</td>
-        <td>" . $object['group'] . "</td>
+        echo '<tr>
+        <td>' . $device['device_id'] . '</td>
+        <td>' . $object['name'] . '</td>
+        <td>' . $device['sysName'] . '</td>
+        <td>' . $object['status'] . '</td>
+        <td>' . $object['time'] . '</td>
+        <td>' . $object['model'] . '</td>
+        <td>' . $object['group'] . '</td>
         <td></td>
-        </tr>";
+        </tr>';
     }
 }
 
@@ -1408,21 +1408,21 @@ function get_state_label($sensor)
 
     switch ($state_translation['state_generic_value']) {
         case 0:  // OK
-            $state_text = $state_translation['state_descr'] ?: "OK";
-            $state_label = "label-success";
+            $state_text = $state_translation['state_descr'] ?: 'OK';
+            $state_label = 'label-success';
             break;
         case 1:  // Warning
-            $state_text = $state_translation['state_descr'] ?: "Warning";
-            $state_label = "label-warning";
+            $state_text = $state_translation['state_descr'] ?: 'Warning';
+            $state_label = 'label-warning';
             break;
         case 2:  // Critical
-            $state_text = $state_translation['state_descr'] ?: "Critical";
-            $state_label = "label-danger";
+            $state_text = $state_translation['state_descr'] ?: 'Critical';
+            $state_label = 'label-danger';
             break;
         case 3:  // Unknown
         default:
-            $state_text = $state_translation['state_descr'] ?: "Unknown";
-            $state_label = "label-default";
+            $state_text = $state_translation['state_descr'] ?: 'Unknown';
+            $state_label = 'label-default';
     }
 
     return "<span class='label $state_label'>$state_text</span>";
@@ -1436,33 +1436,33 @@ function get_state_label($sensor)
  */
 function get_sensor_label_color($sensor, $type = 'sensors')
 {
-    $label_style = "label-success";
+    $label_style = 'label-success';
     if (is_null($sensor)) {
-        return "label-unknown";
+        return 'label-unknown';
     }
     if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
-        $label_style = "label-warning";
+        $label_style = 'label-warning';
     }
     if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
-        $label_style = "label-warning";
+        $label_style = 'label-warning';
     }
     if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
-        $label_style = "label-danger";
+        $label_style = 'label-danger';
     }
     if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
-        $label_style = "label-danger";
+        $label_style = 'label-danger';
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
     if ($sensor['sensor_class'] == 'runtime') {
         $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
 
-        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . "</span>";
+        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . '</span>';
     }
     if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
-        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . " " . $unit . "</span>";
+        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
     }
 
-    return "<span class='label $label_style'>" . trim(format_si($sensor['sensor_current']) . $unit) . "</span>";
+    return "<span class='label $label_style'>" . trim(format_si($sensor['sensor_current']) . $unit) . '</span>';
 }
 
 /**

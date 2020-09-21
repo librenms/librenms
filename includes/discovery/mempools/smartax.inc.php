@@ -27,7 +27,7 @@ if ($device['os'] === 'smartax') {
     $data = snmpwalk_cache_oid($device, 'hwMusaBoardRamUseRate', [], 'HWMUSA-DEV-MIB', 'huawei');
     foreach ($data as $index => $item) {
         if (is_numeric($item['hwMusaBoardRamUseRate']) && $item['hwMusaBoardRamUseRate'] != -1) {
-            $string = "Slot";
+            $string = 'Slot';
             $number = $slotindex[$index]['hwSlotIndex'];
             $boarddescr = $slotdesc[$index]['hwMusaBoardSlotDesc'];
             $descr = implode(' ', [$string, $number, $boarddescr]);

@@ -47,7 +47,7 @@ if (count($sensors) == 1 && $unit_long == $sensors[0]['sensor_descr']) {
 }
 
 $col_w = 7 + strlen($unit);
-$rrd_options .= " COMMENT:'" . str_pad($unit_long, 35) . str_pad("Cur", $col_w) . str_pad("Min", $col_w) . "Max\\n'";
+$rrd_options .= " COMMENT:'" . str_pad($unit_long, 35) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . "Max\\n'";
 
 foreach ($sensors as $index => $sensor) {
     $sensor_id = $sensor['sensor_id'];

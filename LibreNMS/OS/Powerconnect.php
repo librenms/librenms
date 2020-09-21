@@ -54,7 +54,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
             '.1.3.6.1.4.1.674.10895.3030',
             '.1.3.6.1.4.1.674.10895.3031',
         ])) {
-            d_echo("Dell Powerconnect 55xx");
+            d_echo('Dell Powerconnect 55xx');
 
             return [
                 Processor::discover(

@@ -30,7 +30,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
         $overlib_url = route('device', [$app->device_id, 'apps', "app=$app->app_type"]);
 
         $app_state = \LibreNMS\Util\Html::appStateIcon($app->app_state);
-        $app_state_info = "<font color=\"" . $app_state['color'] . "\"><i title=\"" . $app_state['hover_text'] . "\" class=\"fa " . $app_state['icon'] . " fa-fw fa-lg\" aria-hidden=\"true\"></i></font>";
+        $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
 
         $overlib_link = '<span style="float:left; margin-left: 10px; font-weight: bold;">' . $app_state_info . optional($app->device)->shortDisplayName() . '</span>';
         if (! empty($app->app_instance)) {

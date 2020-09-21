@@ -47,7 +47,7 @@ if (is_null($atNtpAssociationEntry)) {
         $result['port'] = '123'; // awplus only supports default NTP Port.
         $result['stratum'] = $atNtpAssociationEntry[$index]['atNtpAssociationStratum'];
         $result['peerref'] = $atNtpAssociationEntry[$index]['atNtpAssociationRefClkAddr'];
-        $result['label'] = $result['peer'] . ":" . $result['port'];
+        $result['label'] = $result['peer'] . ':' . $result['port'];
 
         // Set the status, 16 = Bad
         if ($result['stratum'] == 16) {
@@ -58,7 +58,7 @@ if (is_null($atNtpAssociationEntry)) {
             $result['error'] = '';
         }
 
-        d_echo("NTP Peer found: ");
+        d_echo('NTP Peer found: ');
         d_echo($result);
         $tblComponents[] = $result;
     }
@@ -84,11 +84,11 @@ if (is_null($atNtpAssociationEntry)) {
             $new_component = $component->createComponent($device['device_id'], $module);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
-            echo "+";
+            echo '+';
         } else {
             // The component does exist, merge the details in - UPDATE.
             $components[$component_key] = array_merge($components[$component_key], $array);
-            echo ".";
+            echo '.';
         }
     }
 
@@ -108,7 +108,7 @@ if (is_null($atNtpAssociationEntry)) {
 
         if ($found === false) {
             // The component has not been found. we should delete it.
-            echo "-";
+            echo '-';
             $component->deleteComponent($key);
         }
     }

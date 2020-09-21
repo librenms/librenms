@@ -40,7 +40,7 @@ class MemcacheLock implements Lock
     private function __construct($lock_name)
     {
         if (! class_exists('Memcached')) {
-            throw new LockException("Missing PHP Memcached extension, this is required for distributed polling.");
+            throw new LockException('Missing PHP Memcached extension, this is required for distributed polling.');
         }
 
         // check all config vars or fallback

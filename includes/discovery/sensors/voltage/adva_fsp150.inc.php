@@ -48,9 +48,9 @@
         foreach ($sensors_adva as $entry) {
             $sensor_name = $entry['sensor_name'];
             if ($pre_cache['adva_fsp150'][$index][$sensor_name]) {
-                $oid = $entry['sensor_oid'] . "." . $index;
-                $rrd_filename = $pre_cache['adva_fsp150'][$index]['slotCardUnitName'] . "-" . $pre_cache['adva_fsp150'][$index]['slotIndex'];
-                $descr = $pre_cache['adva_fsp150'][$index]['slotCardUnitName'] . " [#" . $pre_cache['adva_fsp150'][$index]['slotIndex'] . "]";
+                $oid = $entry['sensor_oid'] . '.' . $index;
+                $rrd_filename = $pre_cache['adva_fsp150'][$index]['slotCardUnitName'] . '-' . $pre_cache['adva_fsp150'][$index]['slotIndex'];
+                $descr = $pre_cache['adva_fsp150'][$index]['slotCardUnitName'] . ' [#' . $pre_cache['adva_fsp150'][$index]['slotIndex'] . ']';
                 $current = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']] / $divisor;
 
                 discover_sensor(

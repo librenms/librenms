@@ -36,7 +36,7 @@ class Beagleboard extends OS implements
     {
         $oids = ['NET-SNMP-EXTEND-MIB::nsExtendOutputFull."distro"', 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."hardware"'];
         $info = snmp_get_multi($this->getDeviceArray(), $oids);
-        $device->version = str_replace("BeagleBoard.org ", "", $info['"distro"']['nsExtendOutputFull']);
+        $device->version = str_replace('BeagleBoard.org ', '', $info['"distro"']['nsExtendOutputFull']);
         $device->hardware = $info['"hardware"']['nsExtendOutputFull'];
     }
 }

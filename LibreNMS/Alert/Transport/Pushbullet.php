@@ -39,12 +39,12 @@ class Pushbullet extends Transport
     {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
 
-        $data = ["type" => "note", "title" => $obj['title'], "body" => $obj['msg']];
+        $data = ['type' => 'note', 'title' => $obj['title'], 'body' => $obj['msg']];
         $data = json_encode($data);
 
         $curl = curl_init('https://api.pushbullet.com/v2/pushes');
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [

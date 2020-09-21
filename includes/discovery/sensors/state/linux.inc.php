@@ -4,30 +4,30 @@
  * requires snmp extend agent script from librenms-agent
  */
 if (! empty($pre_cache['raspberry_pi_sensors'])) {
-    $state_name = "raspberry_codec";
+    $state_name = 'raspberry_codec';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
     for ($codec = 8; $codec < 14; $codec++) {
         switch ($codec) {
-            case "8":
-                $descr = "H264 codec";
+            case '8':
+                $descr = 'H264 codec';
                 break;
-            case "9":
-                $descr = "MPG2 codec";
+            case '9':
+                $descr = 'MPG2 codec';
                 break;
-            case "10":
-                $descr = "WVC1 codec";
+            case '10':
+                $descr = 'WVC1 codec';
                 break;
-            case "11":
-                $descr = "MPG4 codec";
+            case '11':
+                $descr = 'MPG4 codec';
                 break;
-            case "12":
-                $descr = "MJPG codec";
+            case '12':
+                $descr = 'MJPG codec';
                 break;
-            case "13":
-                $descr = "WMV9 codec";
+            case '13':
+                $descr = 'WMV9 codec';
                 break;
         }
-        $value = current($pre_cache['raspberry_pi_sensors']["raspberry." . $codec]);
+        $value = current($pre_cache['raspberry_pi_sensors']['raspberry.' . $codec]);
         if (stripos($value, 'abled') !== false) {
             $states = [
                 ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'enabled'],
@@ -66,9 +66,9 @@ if (! empty($pre_cache['ups_nut_sensors'])) {
     foreach ($sensors as $index => $sensor) {
         $sensor_oid = 9 + $index;
         $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.' . strval($sensor_oid);
-        $value = current($pre_cache['ups_nut_sensors']["ups-nut." . $sensor_oid]);
+        $value = current($pre_cache['ups_nut_sensors']['ups-nut.' . $sensor_oid]);
 
-        if (! empty($value) or $value == "0") {
+        if (! empty($value) or $value == '0') {
             $state_name = $sensor['state_name'];
             $descr = $sensor['descr'];
             $states = [

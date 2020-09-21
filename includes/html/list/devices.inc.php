@@ -27,7 +27,7 @@ $params = [];
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where[] = " `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+    $where[] = ' `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $params = array_merge($params, $device_ids);
 }
 

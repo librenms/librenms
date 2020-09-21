@@ -55,13 +55,13 @@ class Pushover extends Transport
         $data['token'] = $api['appkey'];
         $data['user'] = $api['userkey'];
         switch ($obj['severity']) {
-            case "critical":
+            case 'critical':
                 $data['priority'] = 1;
                 if (! empty($api['options']['sound_critical'])) {
                     $data['sound'] = $api['options']['sound_critical'];
                 }
                 break;
-            case "warning":
+            case 'warning':
                 $data['priority'] = 1;
                 if (! empty($api['options']['sound_warning'])) {
                     $data['sound'] = $api['options']['sound_warning'];
@@ -90,7 +90,7 @@ class Pushover extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("Pushover returned error"); //FIXME: proper debugging
+            var_dump('Pushover returned error'); //FIXME: proper debugging
 
             return 'HTTP Status code ' . $code;
         }

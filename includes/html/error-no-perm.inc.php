@@ -15,4 +15,4 @@ echo "
    </td>
    </tr></table>";
 print_optionbar_end();
-echo "</div>";
+echo '</div>';

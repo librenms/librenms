@@ -59,10 +59,10 @@ trait GeocodingHelper
             if ($this->checkResponse($response, $response_data)) {
                 return $this->parseLatLng($response_data);
             } else {
-                Log::error("Geocoding failed.", ['response' => $response_data]);
+                Log::error('Geocoding failed.', ['response' => $response_data]);
             }
         } catch (Exception $e) {
-            Log::error("Geocoding failed: " . $e->getMessage());
+            Log::error('Geocoding failed: ' . $e->getMessage());
         }
 
         return [];

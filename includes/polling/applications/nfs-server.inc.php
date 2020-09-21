@@ -232,7 +232,7 @@ $default_fields = [];
 $metrics = [];
 
 foreach ($lines as $line) {
-    $line_values = explode(" ", $line);
+    $line_values = explode(' ', $line);
     $line_id = array_shift($line_values);
 
     switch ($line_id) {

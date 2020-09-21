@@ -28,7 +28,7 @@ if (is_numeric($vars['time_interval'])) {
 }
 
 if (isset($vars['min_severity'])) {
-    $where .= get_sql_filter_min_severity($vars['min_severity'], "R");
+    $where .= get_sql_filter_min_severity($vars['min_severity'], 'R');
 }
 
 if (Auth::user()->hasGlobalRead()) {
@@ -39,7 +39,7 @@ if (Auth::user()->hasGlobalRead()) {
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE ? OR `D`.`sysName` LIKE ? OR `E`.`time_logged` LIKE ? OR `name` LIKE ?)";
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `D`.`sysName` LIKE ? OR `E`.`time_logged` LIKE ? OR `name` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
@@ -52,7 +52,7 @@ if (empty($total)) {
     $total = 0;
 }
 
-$sql .= " GROUP BY D.device_id, R.name ORDER BY COUNT(*) DESC";
+$sql .= ' GROUP BY D.device_id, R.name ORDER BY COUNT(*) DESC';
 
 if (isset($current)) {
     $limit_low = (($current * $rowCount) - ($rowCount));

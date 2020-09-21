@@ -38,21 +38,21 @@ class Elasticsearch extends Transport
     {
         $es_host = '127.0.0.1';
         $es_port = 9200;
-        $index = strftime("librenms-%Y.%m.%d");
+        $index = strftime('librenms-%Y.%m.%d');
         $type = 'alert';
         $severity = $obj['severity'];
         $device = device_by_id_cache($obj['device_id']); // for event logging
 
         if (! empty($opts['es_host'])) {
-            if (preg_match("/[a-zA-Z]/", $opts['es_host'])) {
+            if (preg_match('/[a-zA-Z]/', $opts['es_host'])) {
                 $es_host = gethostbyname($opts['es_host']);
                 if ($es_host === $opts['es_host']) {
-                    return "Alphanumeric hostname found but does not resolve to an IP.";
+                    return 'Alphanumeric hostname found but does not resolve to an IP.';
                 }
             } elseif (filter_var($opts['es_host'], FILTER_VALIDATE_IP)) {
                 $es_host = $opts['es_host'];
             } else {
-                return "Elasticsearch host is not a valid IP: " . $opts['es_host'];
+                return 'Elasticsearch host is not a valid IP: ' . $opts['es_host'];
             }
         }
 
@@ -68,40 +68,40 @@ class Elasticsearch extends Transport
 
         switch ($obj['state']) {
             case AlertState::RECOVERED:
-                $state = "ok";
+                $state = 'ok';
                 break;
             case AlertState::ACTIVE:
                 $state = $severity;
                 break;
             case AlertState::ACKNOWLEDGED:
-                $state = "acknowledged";
+                $state = 'acknowledged';
                 break;
             case AlertState::WORSE:
-                $state = "worse";
+                $state = 'worse';
                 break;
             case AlertState::BETTER:
-                $state = "better";
+                $state = 'better';
                 break;
         }
 
         $data = [
             '@timestamp' => date('c'),
-            "host" => gethostname(),
-            "location" => $obj['location'],
-            "title" => $obj['name'],
-            "message" => $obj['string'],
-            "device_id" => $obj['device_id'],
-            "device_name" => $obj['hostname'],
-            "device_hardware" => $obj['hardware'],
-            "device_version" => $obj['version'],
-            "state" => $state,
-            "severity" => $severity,
-            "first_occurrence" => $obj['timestamp'],
-            "entity_type" => "device",
-            "entity_tab" => "overview",
-            "entity_id" => $obj['device_id'],
-            "entity_name" => $obj['hostname'],
-            "entity_descr" => $obj['sysDescr'],
+            'host' => gethostname(),
+            'location' => $obj['location'],
+            'title' => $obj['name'],
+            'message' => $obj['string'],
+            'device_id' => $obj['device_id'],
+            'device_name' => $obj['hostname'],
+            'device_hardware' => $obj['hardware'],
+            'device_version' => $obj['version'],
+            'state' => $state,
+            'severity' => $severity,
+            'first_occurrence' => $obj['timestamp'],
+            'entity_type' => 'device',
+            'entity_tab' => 'overview',
+            'entity_id' => $obj['device_id'],
+            'entity_name' => $obj['hostname'],
+            'entity_descr' => $obj['sysDescr'],
         ];
 
         if (! empty($obj['faults'])) {

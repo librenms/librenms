@@ -9,7 +9,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
         $row_colour = \LibreNMS\Config::get('list_colour.odd');
     }
 
-    if ($sensor['poller_type'] == "ipmi") {
+    if ($sensor['poller_type'] == 'ipmi') {
         $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
     } else {
         $sensor_descr = $sensor['sensor_descr'];
@@ -40,8 +40,8 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
         echo " <span class='label label-default'>high: $sensor_limit</span>";
     }
 
-    echo "</div></h3>
-        </div>";
+    echo '</div></h3>
+        </div>';
     echo "<div class='panel-body'>";
 
     $graph_array['id'] = $sensor['sensor_id'];

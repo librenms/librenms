@@ -5,7 +5,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit;
 }
 
-$pagetitle[] = "Delete device";
+$pagetitle[] = 'Delete device';
 
 if (Auth::user()->isDemo()) {
     demo_account();
@@ -19,7 +19,7 @@ if (Auth::user()->isDemo()) {
             print_message(nl2br(delete_device(mres($_REQUEST['id']))) . "\n");
         } else {
             $device = device_by_id_cache($_REQUEST['id']);
-            print_error("Are you sure you want to delete device " . $device['hostname'] . "?"); ?>
+            print_error('Are you sure you want to delete device ' . $device['hostname'] . '?'); ?>
 <br />
 <center>
   <font color="red"></font><i class="fa fa-exclamation-triangle fa-3x"></i></font>
@@ -60,8 +60,8 @@ if (Auth::user()->isDemo()) {
                     <select name="id" class="form-control" id="id">
                         <option disabled="disabled" selected="selected">Please select</option>
                     <?php
-                    foreach (dbFetchRows("SELECT `device_id`, `hostname` FROM `devices` ORDER BY `hostname`") as $data) {
-                        echo "<option value='" . $data['device_id'] . "'>" . $data['hostname'] . "</option>";
+                    foreach (dbFetchRows('SELECT `device_id`, `hostname` FROM `devices` ORDER BY `hostname`') as $data) {
+                        echo "<option value='" . $data['device_id'] . "'>" . $data['hostname'] . '</option>';
                     } ?>
                     </select>
                   </div>

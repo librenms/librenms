@@ -115,6 +115,6 @@ if ($width <= '300') {
 
 $rrd_options .= ' --font-render-mode normal';
 
-if (isset($_GET['absolute']) && $_GET['absolute'] == "1") {
+if (isset($_GET['absolute']) && $_GET['absolute'] == '1') {
     $rrd_options .= ' --full-size-mode';
 }

@@ -192,7 +192,7 @@ class Sensor implements DiscoveryModule, PollerModule
 
         $sensor = dbFetchRow(
             "SELECT * FROM `$table` " .
-            "WHERE `device_id`=? AND `sensor_class`=? AND `sensor_type`=? AND `sensor_index`=?",
+            'WHERE `device_id`=? AND `sensor_class`=? AND `sensor_type`=? AND `sensor_index`=?',
             [$this->device_id, $this->type, $this->subtype, $this->index]
         );
         $this->sensor_id = $sensor['sensor_id'];
@@ -275,7 +275,7 @@ class Sensor implements DiscoveryModule, PollerModule
 
         $submodules = Config::get('poller_submodules.wireless', []);
         if (! empty($submodules)) {
-            $query .= " AND `sensor_class` IN " . dbGenPlaceholders(count($submodules));
+            $query .= ' AND `sensor_class` IN ' . dbGenPlaceholders(count($submodules));
             $params = array_merge($params, $submodules);
         }
 
@@ -648,7 +648,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 'sensor_current' => $sensor_value,
                 'lastupdate' => ['NOW()'],
             ];
-            dbUpdate($update, static::$table, "`sensor_id` = ?", [$sensor['sensor_id']]);
+            dbUpdate($update, static::$table, '`sensor_id` = ?', [$sensor['sensor_id']]);
         }
     }
 }

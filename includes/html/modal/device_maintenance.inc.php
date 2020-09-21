@@ -90,7 +90,7 @@ foreach ($hour_steps as $hour) {
         var title = '<?=display($device['hostname']); ?>';
         var notes = $('#notes').val();
         var recurring = 0;
-        var start = '<?=date("Y-m-d H:i:00"); ?>';
+        var start = '<?=date('Y-m-d H:i:00'); ?>';
         var duration = $('#duration').val();
         $.ajax({
             type: 'POST',

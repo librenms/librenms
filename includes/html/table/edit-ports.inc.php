@@ -8,7 +8,7 @@ $sql = 'FROM `ports` WHERE `device_id` = ?';
 $param = [$device_id];
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`ifName` LIKE ? OR `ifAlias` LIKE ? OR `ifDescr` LIKE ?)";
+    $sql .= ' AND (`ifName` LIKE ? OR `ifAlias` LIKE ? OR `ifDescr` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
@@ -58,7 +58,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
     $outofsync = $dowecare ? " class='red'" : '';
     $checked = '';
     $device['device_id'] = $device_id;
-    if (get_dev_attrib($device, 'ifName_tune:' . $port['ifName']) == "true") {
+    if (get_dev_attrib($device, 'ifName_tune:' . $port['ifName']) == 'true') {
         $checked = 'checked';
     }
 

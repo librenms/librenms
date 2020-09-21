@@ -8,7 +8,7 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
         $name = trim($pre_cache['sdbDevInName'][$sdbDevIdIndex][$sdbDevInIndex], '"');
         $voltage_oid = ".1.3.6.1.4.1.31034.12.1.1.2.6.1.1.7.$sdbDevIdIndex.$sdbDevInIndex";
         $voltage = $sdbDevInActualVoltage / $divisor;
-        $serial_input = $pre_cache['sdbDevIdSerialNumber'][$sdbDevIdIndex] . "-L" . $sdbDevInIndex;
+        $serial_input = $pre_cache['sdbDevIdSerialNumber'][$sdbDevIdIndex] . '-L' . $sdbDevInIndex;
         $descr = $name ?: "$serial_input Voltage";
 
         // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
@@ -23,7 +23,7 @@ foreach ($pre_cache['sdbDevOutMtActualVoltage'] as $sdbDevOutMtIndex => $sdbDevO
     $name = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
     $voltage_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.7.$unit.$sdbDevOutMtIndex";
     $voltage = $sdbDevOutMtActualVoltage / $divisor;
-    $serial_input = $pre_cache['sdbDevIdSerialNumber'][$unit] . " Outlet " . $sdbDevOutMtIndex;
+    $serial_input = $pre_cache['sdbDevIdSerialNumber'][$unit] . ' Outlet ' . $sdbDevOutMtIndex;
     $descr = $name ?: "$serial_input Voltage";
 
     // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.

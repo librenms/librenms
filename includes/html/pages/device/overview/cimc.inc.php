@@ -18,11 +18,11 @@ if (count($components) > 0) {
     <?php
     foreach ($components as $component => $array) {
         if ($array['status'] == 2) {
-            $class = "danger";
-            $message = "Alert";
+            $class = 'danger';
+            $message = 'Alert';
         } else {
-            $class = "";
-            $message = "Ok";
+            $class = '';
+            $message = 'Ok';
         } ?>
                     <tr class="<?php echo $class ?>">
                         <td><?php echo $array['string']?></td>

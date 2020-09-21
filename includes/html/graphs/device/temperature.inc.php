@@ -1,6 +1,6 @@
 <?php
 
-$rrd_options = " --alt-y-grid";
+$rrd_options = ' --alt-y-grid';
 
 $class = 'temperature';
 $unit = 'C';

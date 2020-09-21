@@ -15,13 +15,13 @@ use LibreNMS\RRD\RrdDefinition;
 
 // Define some error messages
 $error_poolaction = [];
-$error_poolaction[0] = "Unused";
-$error_poolaction[1] = "Reboot";
-$error_poolaction[2] = "Restart";
-$error_poolaction[3] = "Failover";
-$error_poolaction[4] = "Failover and Restart";
-$error_poolaction[5] = "Go Active";
-$error_poolaction[6] = "None";
+$error_poolaction[0] = 'Unused';
+$error_poolaction[1] = 'Reboot';
+$error_poolaction[2] = 'Restart';
+$error_poolaction[3] = 'Failover';
+$error_poolaction[4] = 'Failover and Restart';
+$error_poolaction[5] = 'Go Active';
+$error_poolaction[6] = 'None';
 
 $component = new LibreNMS\Component();
 $options['filter']['disabled'] = ['=', 0];
@@ -100,8 +100,8 @@ if (count($components > 0)) {
 
             // Let's print some debugging info.
             d_echo("\n\nComponent: " . $key . "\n");
-            d_echo("    Type: " . $type . "\n");
-            d_echo("    Label: " . $label . "\n");
+            d_echo('    Type: ' . $type . "\n");
+            d_echo('    Label: ' . $label . "\n");
         } elseif ($type == 'f5-ltm-vs') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
@@ -120,8 +120,8 @@ if (count($components > 0)) {
 
             // Let's print some debugging info.
             d_echo("\n\nComponent: " . $key . "\n");
-            d_echo("    Type: " . $type . "\n");
-            d_echo("    Label: " . $label . "\n");
+            d_echo('    Type: ' . $type . "\n");
+            d_echo('    Label: ' . $label . "\n");
 
             // Let's check the status.
             $array['state'] = $f5_stats['ltmVsStatusEntryState']['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.' . $UID];
@@ -151,14 +151,14 @@ if (count($components > 0)) {
 
             // Let's print some debugging info.
             d_echo("\n\nComponent: " . $key . "\n");
-            d_echo("    Type: " . $type . "\n");
-            d_echo("    Label: " . $label . "\n");
+            d_echo('    Type: ' . $type . "\n");
+            d_echo('    Label: ' . $label . "\n");
 
             // If we have less pool members than the minimum, we should error.
             if ($array['currentup'] < $array['minup']) {
                 // Danger Will Robinson... We dont have enough Pool Members!
                 $array['status'] = 2;
-                $array['error'] = "Minimum Pool Members not met. Action taken: " . $error_poolaction[$array['minupaction']];
+                $array['error'] = 'Minimum Pool Members not met. Action taken: ' . $error_poolaction[$array['minupaction']];
             } else {
                 // All is good.
                 $array['status'] = 0;
@@ -185,22 +185,22 @@ if (count($components > 0)) {
 
             // Let's print some debugging info.
             d_echo("\n\nComponent: " . $key . "\n");
-            d_echo("    Type: " . $type . "\n");
-            d_echo("    Label: " . $label . "\n");
+            d_echo('    Type: ' . $type . "\n");
+            d_echo('    Label: ' . $label . "\n");
 
             // If available and bad state
             // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue
             if (($array['available'] == 1) && ($array['state'] == 3)) {
                 // Warning Alarm, the pool member is down.
                 $array['status'] = 1;
-                $array['error'] = "Pool Member is Down: " . $f5_stats['ltmPoolMbrStatusEntryMsg']['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.' . $UID];
+                $array['error'] = 'Pool Member is Down: ' . $f5_stats['ltmPoolMbrStatusEntryMsg']['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.' . $UID];
             } else {
                 // All is good.
                 $array['status'] = 0;
                 $array['error'] = '';
             }
         } else {
-            d_echo("Type is unknown: " . $type . "\n");
+            d_echo('Type is unknown: ' . $type . "\n");
             continue;
         }
 

@@ -48,10 +48,10 @@ foreach ($mempools as $mempool) {
     } else {
         echo "                <h3 class='panel-title'>$text_descr <div class='pull-right'>$used/$total - $perc% used</div></h3>";
     }
-    echo "            </div>";
+    echo '            </div>';
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
+    echo '</div></div>';
 
     $i++;
 }//end foreach

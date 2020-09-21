@@ -6,7 +6,7 @@ foreach ($pre_cache['aos6_temp_oids'] as $index => $entry) {
         $value = $entry['chasHardwareBoardTemp'];
         $limit = $entry['chasDangerTempThreshold'];
         $warn_limit = $entry['chasTempThreshold'];
-        $descr = "Chassis-" . ($index - 568) . " Temperature";
+        $descr = 'Chassis-' . ($index - 568) . ' Temperature';
 
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'aos6', $descr, 1, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp');
     }

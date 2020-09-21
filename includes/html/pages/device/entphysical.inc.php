@@ -84,7 +84,7 @@ function printEntPhysical($device, $ent, $level, $class)
                 $display = parse_entity_state($state_name, $value);
                 echo " <span class='label label-{$display['color']}' data-toggle='tooltip' title='$state_name ($value)'>";
                 echo $display['text'];
-                echo "</span> ";
+                echo '</span> ';
             }
 
             // ignore none and unavailable alarms
@@ -102,11 +102,11 @@ function printEntPhysical($device, $ent, $level, $class)
         echo "<br /><div class='interface-desc' style='margin-left: 20px;'>" . $ent['entPhysicalDescr'];
 
         if ($ent['entPhysicalAlias'] && $ent['entPhysicalAssetID']) {
-            echo " <br />Alias: " . $ent['entPhysicalAlias'] . " - AssetID: " . $ent['entPhysicalAssetID'];
+            echo ' <br />Alias: ' . $ent['entPhysicalAlias'] . ' - AssetID: ' . $ent['entPhysicalAssetID'];
         } elseif ($ent['entPhysicalAlias']) {
-            echo " <br />Alias: " . $ent['entPhysicalAlias'];
+            echo ' <br />Alias: ' . $ent['entPhysicalAlias'];
         } elseif ($ent['entPhysicalAssetID']) {
-            echo " <br />AssetID: " . $ent['entPhysicalAssetID'];
+            echo ' <br />AssetID: ' . $ent['entPhysicalAssetID'];
         }
 
         if ($ent['entPhysicalSerialNum']) {

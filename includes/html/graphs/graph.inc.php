@@ -39,7 +39,7 @@ $graph_title = format_hostname($device);
 
 if ($auth && is_customoid_graph($type, $subtype)) {
     $unit = $vars['unit'];
-    include Config::get('install_dir') . "/includes/html/graphs/customoid/customoid.inc.php";
+    include Config::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
 } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
     include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
 } else {
@@ -56,7 +56,7 @@ function graph_error($string)
     include 'includes/html/graphs/common.inc.php';
 
     $rrd_options .= ' HRULE:0#555555';
-    $rrd_options .= " --title=" . escapeshellarg($string);
+    $rrd_options .= ' --title=' . escapeshellarg($string);
 
     rrdtool_graph($graphfile, $rrd_options);
 
@@ -97,9 +97,9 @@ if ($error_msg) {
 } else {
     // $rrd_options .= " HRULE:0#999999";
     if ($graph_type === 'svg') {
-        $rrd_options .= " --imgformat=SVG";
+        $rrd_options .= ' --imgformat=SVG';
         if ($width < 350) {
-            $rrd_options .= " -m 0.75 -R light";
+            $rrd_options .= ' -m 0.75 -R light';
         }
     }
 
@@ -113,13 +113,13 @@ if ($error_msg) {
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "<pre class='rrd-pre'>";
-        echo "rrdtool " . Rrd::buildCommand("graph", $graphfile, $rrd_options);
-        echo "</pre>";
+        echo 'rrdtool ' . Rrd::buildCommand('graph', $graphfile, $rrd_options);
+        echo '</pre>';
         $return = rrdtool_graph($graphfile, $rrd_options);
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
         echo "<pre class='rrd-pre'>";
         echo "$return";
-        echo "</pre>";
+        echo '</pre>';
         unlink($graphfile);
         echo '</div>';
     } else {

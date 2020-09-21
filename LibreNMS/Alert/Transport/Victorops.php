@@ -69,7 +69,7 @@ class Victorops extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("VictorOps returned Error, retry later"); //FIXME: propper debuging
+            var_dump('VictorOps returned Error, retry later'); //FIXME: propper debuging
 
             return false;
         }

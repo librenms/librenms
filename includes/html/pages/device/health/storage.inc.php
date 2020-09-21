@@ -35,7 +35,7 @@ foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
             </div>";
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
+    echo '</div></div>';
 
     $row++;
 }//end foreach

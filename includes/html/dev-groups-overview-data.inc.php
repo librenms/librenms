@@ -1,6 +1,6 @@
 <?php
 
-$device_groups = dbFetchRows("SELECT dg.id, dg.name FROM device_group_device AS d, device_groups AS dg WHERE dg.id=d.device_group_id AND d.device_id=? ORDER BY dg.name", [$device['device_id']]);
+$device_groups = dbFetchRows('SELECT dg.id, dg.name FROM device_group_device AS d, device_groups AS dg WHERE dg.id=d.device_group_id AND d.device_id=? ORDER BY dg.name', [$device['device_id']]);
 
 if (count($device_groups)) {
     ?>

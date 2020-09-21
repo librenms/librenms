@@ -39,7 +39,7 @@ $options = getopt($short_opts);
 
 // print the help
 if (isset($options['h'])) {
-    echo "LibreNMS JSON App tool
+    echo 'LibreNMS JSON App tool
   -j      The file containing the JSON to use for the test.
   -s      Print the SNMPrec data.
   -t      Print the JSON test data file.
@@ -61,7 +61,7 @@ if (isset($options['h'])) {
    and how they data is flattned as well for when writing alert rules. -k
    prints it in a slightly neater manner and in a manner and in tested
    order.
-";
+';
     exit();
 }
 
@@ -112,7 +112,7 @@ if ((isset($options['l'])) || (
 $data = $json['data'];
 $metrics = data_flatten($data);
 $metrics_keys = array_keys($metrics);
-usort($metrics_keys, "strcasecmp"); //orders them in the manner in which the test script compares them
+usort($metrics_keys, 'strcasecmp'); //orders them in the manner in which the test script compares them
 //print metrics if needed
 if (isset($options['m'])) {
     if (isset($options['k'])) {
@@ -121,7 +121,7 @@ if (isset($options['m'])) {
         }
     } else {
         foreach ($metrics_keys as $key) {
-            echo $key . "=" . $metrics[$key] . "\n";
+            echo $key . '=' . $metrics[$key] . "\n";
         }
     }
     exit(0);
@@ -149,8 +149,8 @@ if (isset($options['s'])) {
         "1.3.6.1.2.1.1.6.0|4|<private>\n" .
         "1.3.6.1.2.1.25.1.1.0|67|77552962\n" .
         "1.3.6.1.4.1.8072.1.3.2.2.1.21.6.100.105.115.116.114.111|2|1\n" .
-        "1.3.6.1.4.1.8072.1.3.2.2.1.21." . $oid . "|2|1\n" .
-        "1.3.6.1.4.1.8072.1.3.2.3.1.2." . $oid . "|4x|" . bin2hex($raw_json) . "\n";
+        '1.3.6.1.4.1.8072.1.3.2.2.1.21.' . $oid . "|2|1\n" .
+        '1.3.6.1.4.1.8072.1.3.2.3.1.2.' . $oid . '|4x|' . bin2hex($raw_json) . "\n";
     exit(0);
 }
 
@@ -158,36 +158,36 @@ if (isset($options['s'])) {
 if (isset($options['t'])) {
     $test_data = [
         'applications' => [
-            "discovery" => [
-                "applications" => [
-                    "app_type" => $options['a'],
-                    "app_state" => "UNKNOWN",
-                    "discovered" => "1",
-                    "app_state_prev" => null,
-                    "app_status" => "",
-                    "app_instance" => "",
+            'discovery' => [
+                'applications' => [
+                    'app_type' => $options['a'],
+                    'app_state' => 'UNKNOWN',
+                    'discovered' => '1',
+                    'app_state_prev' => null,
+                    'app_status' => '',
+                    'app_instance' => '',
                 ],
-                "application_metrics" => [],
+                'application_metrics' => [],
             ],
-            "poller" => [
-                "applications" => [
-                    "app_type" => $options['a'],
-                    "app_state" => "OK",
-                    "discovered" => "1",
-                    "app_state_prev" => "UNKNOWN",
-                    "app_status" => "",
-                    "app_instance" => "",
+            'poller' => [
+                'applications' => [
+                    'app_type' => $options['a'],
+                    'app_state' => 'OK',
+                    'discovered' => '1',
+                    'app_state_prev' => 'UNKNOWN',
+                    'app_status' => '',
+                    'app_instance' => '',
                 ],
-                "application_metrics" => [],
+                'application_metrics' => [],
             ],
         ],
     ];
     foreach ($metrics_keys as $key) {
         $test_data['applications']['poller']['application_metrics'][] = [
-            "metric" => $key,
-            "value" => $metrics[$key],
-            "value_prev" => null,
-            "app_type" => $options['a'],
+            'metric' => $key,
+            'value' => $metrics[$key],
+            'value_prev' => null,
+            'app_type' => $options['a'],
         ];
     }
     echo json_encode($test_data, JSON_PRETTY_PRINT) . "\n";

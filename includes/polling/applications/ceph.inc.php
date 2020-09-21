@@ -14,7 +14,7 @@ if (! empty($agent_data['app'][$name])) {
         }
         [$section, $data] = explode('>', $section);
 
-        if ($section == "poolstats") {
+        if ($section == 'poolstats') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('ops', 'GAUGE', 0)
                 ->addDataset('wrbytes', 'GAUGE', 0)
@@ -37,7 +37,7 @@ if (! empty($agent_data['app'][$name])) {
                 $tags = compact('name', 'app_id', 'pool', 'rrd_name', 'rrd_def');
                 data_update($device, 'app', $tags, $fields);
             }
-        } elseif ($section == "osdperformance") {
+        } elseif ($section == 'osdperformance') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('apply_ms', 'GAUGE', 0)
                 ->addDataset('commit_ms', 'GAUGE', 0);
@@ -58,7 +58,7 @@ if (! empty($agent_data['app'][$name])) {
                 $tags = compact('name', 'app_id', 'osd', 'rrd_name', 'rrd_def');
                 data_update($device, 'app', $tags, $fields);
             }
-        } elseif ($section == "df") {
+        } elseif ($section == 'df') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('avail', 'GAUGE', 0)
                 ->addDataset('used', 'GAUGE', 0)

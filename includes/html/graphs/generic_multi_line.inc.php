@@ -44,7 +44,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     if (! empty($rrd['area']) && empty($rrd['areacolour'])) {
-        $rrd['areacolour'] = $colour . "20";
+        $rrd['areacolour'] = $colour . '20';
     }
 
     $ds = $rrd['ds'];

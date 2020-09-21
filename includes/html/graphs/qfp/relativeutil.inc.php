@@ -31,4 +31,4 @@ $rrd_options .= ' CDEF:relative=load,total_kpps,/';
 $rrd_options .= ' AREA:relative#' . $colour_area . ':';
 $rrd_options .= " COMMENT:'Load % per 1kpps'\\n";
 $rrd_options .= ' LINE1.25:relative#' . $colour_line . ":'" . $line_text . "'";
-$rrd_options .= " COMMENT:\\n";
+$rrd_options .= ' COMMENT:\\n';

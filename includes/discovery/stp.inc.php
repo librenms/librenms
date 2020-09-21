@@ -75,7 +75,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     $mac_array = explode(':', $mac_raw);
     foreach ($mac_array as &$octet) {
         if (strlen($octet) < 2) {
-            $octet = "0" . $octet; // add suppressed 0
+            $octet = '0' . $octet; // add suppressed 0
         }
     }
     $stp['bridgeAddress'] = implode($mac_array);
@@ -90,9 +90,9 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     d_echo($stp);
 
     if ($stp_raw[0]['version'] == '3') {
-        echo "RSTP ";
+        echo 'RSTP ';
     } else {
-        echo "STP ";
+        echo 'STP ';
     }
 
     if (! $stp_db['bridgeAddress'] && $stp['bridgeAddress']) {

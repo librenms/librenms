@@ -4,10 +4,10 @@ $param = [];
 // Exclude Private and reserved ASN ranges
 // 64512 - 65535
 // 4200000000 - 4294967295
-$sql = " FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 ";
+$sql = ' FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 ';
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`bgpLocalAs` LIKE ?)";
+    $sql .= ' AND (`bgpLocalAs` LIKE ?)';
     $param[] = "%$searchPhrase%";
 }
 

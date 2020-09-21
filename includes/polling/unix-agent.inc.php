@@ -50,17 +50,17 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         $os->enableGraph('agent');
 
         $agentapps = [
-            "apache",
-            "bind",
-            "ceph",
-            "mysql",
-            "nginx",
-            "powerdns",
-            "powerdns-recursor",
-            "proxmox",
-            "rrdcached",
-            "tinydns",
-            "gpsd",
+            'apache',
+            'bind',
+            'ceph',
+            'mysql',
+            'nginx',
+            'powerdns',
+            'powerdns-recursor',
+            'proxmox',
+            'rrdcached',
+            'tinydns',
+            'gpsd',
         ];
 
         foreach (explode('<<<', $agent_raw) as $section) {

@@ -33,7 +33,7 @@ $rrd_def = RrdDefinition::make()
 $sm_total = 0;
 $metrics = [];
 foreach ($gpuArray as $index => $gpu) {
-    $stats = explode(",", $gpu);
+    $stats = explode(',', $gpu);
 
     if (count($stats) == 19) {
         [$gpu, $pwr, $temp, $memtemp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,

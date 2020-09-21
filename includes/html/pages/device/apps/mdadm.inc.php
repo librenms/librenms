@@ -23,7 +23,7 @@ foreach ($mdadm_arrays as $label) {
     array_push($array_list, generate_link($label, $link_array, ['array' => $array]));
 }
 
-printf("%s | arrays: %s", generate_link('All RAID Arrays', $link_array), implode(', ', $array_list));
+printf('%s | arrays: %s', generate_link('All RAID Arrays', $link_array), implode(', ', $array_list));
 
 print_optionbar_end();
 

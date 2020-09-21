@@ -19,7 +19,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $user = User::find($vars['user_id']);
         $user_data = $user->toArray(); // for compatibility with current code
 
-        echo '<p><h2>' . $user_data['realname'] . "</h2></p>";
+        echo '<p><h2>' . $user_data['realname'] . '</h2></p>';
         // Perform actions if requested
         if ($vars['action'] == 'deldevperm') {
             if (dbFetchCell('SELECT COUNT(*) FROM devices_perms WHERE `device_id` = ? AND `user_id` = ?', [$vars['device_id'], $user_data['user_id']])) {
@@ -149,7 +149,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         echo '<h4>Grant access to new Device Group</h4>';
         $allow_dynamic = \LibreNMS\Config::get('permission.device_group.allow_dynamic');
         if (! $allow_dynamic) {
-            echo "<i>Dynamic groups are disabled, set permission.device_group.allow_dynamic to enable.</i>";
+            echo '<i>Dynamic groups are disabled, set permission.device_group.allow_dynamic to enable.</i>';
         }
 
         echo "<form class='form-inline' role='form' method='post' action=''>

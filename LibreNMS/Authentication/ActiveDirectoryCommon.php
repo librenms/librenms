@@ -157,7 +157,7 @@ trait ActiveDirectoryCommon
         foreach ($ldap_groups as $ldap_group) {
             $search_filter = "(&(memberOf:1.2.840.113556.1.4.1941:=$ldap_group)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
             if (Config::get('auth_ad_user_filter')) {
-                $search_filter = "(&" . Config::get('auth_ad_user_filter') . $search_filter . ")";
+                $search_filter = '(&' . Config::get('auth_ad_user_filter') . $search_filter . ')';
             }
             $attributes = ['samaccountname', 'displayname', 'objectsid', 'mail'];
             $search = ldap_search($connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);

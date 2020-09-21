@@ -177,12 +177,12 @@ class AlertSchedule extends Model
                             ->where(function ($query) use ($now) {
                                 $query->where(function ($query) use ($now) {
                                     // normal, inside one day
-                                    $query->whereTime('start', '<', DB::raw("time(`end`)"))
+                                    $query->whereTime('start', '<', DB::raw('time(`end`)'))
                                         ->whereTime('start', '<=', $now->toTimeString())
                                         ->whereTime('end', '>', $now->toTimeString());
                                 })->orWhere(function ($query) use ($now) {
                                     // outside, spans days
-                                    $query->whereTime('start', '>', DB::raw("time(`end`)"))
+                                    $query->whereTime('start', '>', DB::raw('time(`end`)'))
                                         ->where(function ($query) use ($now) {
                                             $query->whereTime('end', '<=', $now->toTimeString())
                                                 ->orWhereTime('start', '>', $now->toTimeString());

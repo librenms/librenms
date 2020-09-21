@@ -150,7 +150,7 @@ class AuthSSOTest extends DBTestCase
         // Retrieve it and validate the update was not persisted
         $dbuser = $a->getUser($a->getUserid($user));
         $this->assertFalse($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
-        $this->assertFalse($dbuser['level'] === "10");
+        $this->assertFalse($dbuser['level'] === '10');
         $this->assertFalse($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
     }
 
@@ -352,7 +352,7 @@ class AuthSSOTest extends DBTestCase
 
         //String
         Config::set('sso.level_attr', 'level');
-        $_SERVER['level'] = "9";
+        $_SERVER['level'] = '9';
         $this->assertTrue($a->authSSOCalculateLevel() === 9);
 
         //Invalid String
@@ -369,7 +369,7 @@ class AuthSSOTest extends DBTestCase
 
         //Unset pointer
         Config::forget('sso.level_attr');
-        $_SERVER['level'] = "9";
+        $_SERVER['level'] = '9';
         $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
 
@@ -391,21 +391,21 @@ class AuthSSOTest extends DBTestCase
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_attr', 'member');
         Config::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5]);
-        $_SERVER['member'] = "librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins";
+        $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Valid options
         $this->assertTrue($a->authSSOParseGroups() === 10);
 
         // No match
-        $_SERVER['member'] = "confluence-admins";
+        $_SERVER['member'] = 'confluence-admins';
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Delimiter only
-        $_SERVER['member'] = ";;;;";
+        $_SERVER['member'] = ';;;;';
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Empty
-        $_SERVER['member'] = "";
+        $_SERVER['member'] = '';
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Null
@@ -416,7 +416,7 @@ class AuthSSOTest extends DBTestCase
         unset($_SERVER['member']);
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
-        $_SERVER['member'] = "librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins";
+        $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Empty
         Config::set('sso.group_level_map', []);
@@ -439,13 +439,13 @@ class AuthSSOTest extends DBTestCase
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Test group filtering by regex
-        Config::set('sso.group_filter', "/confluence-(.*)/i");
+        Config::set('sso.group_filter', '/confluence-(.*)/i');
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5, 'confluence-admins' => 7]);
         $this->assertTrue($a->authSSOParseGroups() === 7);
 
         // Test group filtering by empty regex
-        Config::set('sso.group_filter', "");
+        Config::set('sso.group_filter', '');
         $this->assertTrue($a->authSSOParseGroups() === 10);
 
         // Test group filtering by null regex

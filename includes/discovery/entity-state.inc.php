@@ -63,7 +63,7 @@ if (! empty($entPhysical)) {
                     }
 
                     dbUpdate($update, 'entityState', 'entity_state_id=?', [$db_state['entity_state_id']]);
-                    d_echo("Updating entity state: ", 'U');
+                    d_echo('Updating entity state: ', 'U');
                     d_echo($update);
                 } else {
                     echo '.';
@@ -76,7 +76,7 @@ if (! empty($entPhysical)) {
                 $state_data[$index]['device_id'] = $device['device_id'];
                 $state_data[$index]['entPhysical_id'] = $id;
                 $state_data[$index]['entStateLastChanged'] = $state['entStateLastChanged'];
-                d_echo("Inserting entity state:: ", '+');
+                d_echo('Inserting entity state:: ', '+');
                 d_echo($state);
             }
         }

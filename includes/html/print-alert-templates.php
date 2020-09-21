@@ -17,7 +17,7 @@ require_once 'includes/html/modal/delete_alert_template.inc.php';
       </thead>
       <tbody>
 <?php
-$full_query = dbFetchRows("SELECT id, name, template from alert_templates", $param);
+$full_query = dbFetchRows('SELECT id, name, template from alert_templates', $param);
 foreach ($full_query as $template) {
     if ($template['name'] == 'Default Alert Template') {
         $default_tplid = $template['id'];
@@ -28,7 +28,7 @@ foreach ($full_query as $template) {
 $template_ids = array_column($templates, 'id');
 array_multisort($templates, SORT_ASC, $template_ids);
 foreach ($templates as $template) {
-    $old_template = strpos($template['template'], "{/if}") !== false ? "1" : "";
+    $old_template = strpos($template['template'], '{/if}') !== false ? '1' : '';
     echo '<tr data-row-id="' . $template['id'] . '">
             <td>' . $template['id'] . '</td>
             <td>' . $template['name'] . '</td>

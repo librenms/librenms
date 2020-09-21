@@ -29,11 +29,11 @@ foreach (get_disks($device['device_id']) as $drive) {
         $graph_array = [];
         $graph_array['id'] = $drive['diskio_id'];
         $graph_array['type'] = $graph_type;
-        if ($graph_array['type'] == "diskio_ops") {
-            $graph_type_title = "Ops/sec";
+        if ($graph_array['type'] == 'diskio_ops') {
+            $graph_type_title = 'Ops/sec';
         }
-        if ($graph_array['type'] == "diskio_bits") {
-            $graph_type_title = "bps";
+        if ($graph_array['type'] == 'diskio_bits') {
+            $graph_type_title = 'bps';
         }
         echo "<div class='panel panel-default'>
                 <div class='panel-heading'>

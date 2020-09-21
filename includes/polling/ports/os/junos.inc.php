@@ -43,7 +43,7 @@ foreach ($junos_vcp_stats as $index => $vcp_stats) {
         $nms_index = '100' . $fpc . $pic . $port;
 
         $port_stats[$nms_index]['ifDescr'] = "fpc$index";
-        $port_stats[$nms_index]['ifType'] = "vcp";
+        $port_stats[$nms_index]['ifType'] = 'vcp';
         $port_stats[$nms_index]['ifName'] = "fpc$index";
         $port_stats[$nms_index]['ifHCInOctets'] = $vcp_stats['jnxVirtualChassisPortInOctets'];
         $port_stats[$nms_index]['ifHCOutOctets'] = $vcp_stats['jnxVirtualChassisPortOutOctets'];

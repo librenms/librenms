@@ -79,11 +79,11 @@ discovery:
         }
 
         if ($os === 'generic') {
-            c_echo("Base discovery file created,");
+            c_echo('Base discovery file created,');
         }
     }
 
-    $mib_name = get_user_input("ctrl+c to exit now otherwise please enter the MIB name including path (url is also fine) for us to check for sensors:");
+    $mib_name = get_user_input('ctrl+c to exit now otherwise please enter the MIB name including path (url is also fine) for us to check for sensors:');
 
     if (filter_var($mib_name, FILTER_VALIDATE_URL)) {
         $mib_data = file_get_contents($mib_name);
@@ -163,7 +163,7 @@ modules:
         c_echo($discovery_data);
     }
 } else {
-    c_echo("
+    c_echo('
 Info:
     You can use to build the yaml files for a new OS.
 Usage:
@@ -175,14 +175,14 @@ Usage:
 Example:
 ./scripts/new-os.php -h 44 -o new-eos
 
-");
+');
     exit(1);
 }
 
 function get_user_input($msg)
 {
     c_echo($msg . ' ');
-    $handle = fopen("php://stdin", "r");
+    $handle = fopen('php://stdin', 'r');
     $line = fgets($handle);
 
     return trim($line);

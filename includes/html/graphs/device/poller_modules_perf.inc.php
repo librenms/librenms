@@ -34,9 +34,9 @@ foreach ($modules as $module => $module_status) {
     }
 }
 
-$unit_text = "Seconds";
+$unit_text = 'Seconds';
 $simple_rrd = false;
 $nototal = false;
 $text_orig = true;
 $colours = 'manycolours';
-require "includes/html/graphs/generic_multi_simplex_seperated.inc.php";
+require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

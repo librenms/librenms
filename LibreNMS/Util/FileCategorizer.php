@@ -126,7 +126,7 @@ class FileCategorizer extends Categorizer
      */
     private function osFromClass($class)
     {
-        preg_match_all("/[A-Z][a-z0-9]*/", $class, $segments);
+        preg_match_all('/[A-Z][a-z0-9]*/', $class, $segments);
         $osname = implode('-', array_map('strtolower', $segments[0]));
         $osname = preg_replace(
             ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/'],

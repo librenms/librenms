@@ -16,13 +16,13 @@
 use LibreNMS\Util\IP;
 
 $error_poolaction = [];
-$error_poolaction[0] = "Unused";
-$error_poolaction[1] = "Reboot";
-$error_poolaction[2] = "Restart";
-$error_poolaction[3] = "Failover";
-$error_poolaction[4] = "Failover and Restart";
-$error_poolaction[5] = "Go Active";
-$error_poolaction[6] = "None";
+$error_poolaction[0] = 'Unused';
+$error_poolaction[1] = 'Reboot';
+$error_poolaction[2] = 'Restart';
+$error_poolaction[3] = 'Failover';
+$error_poolaction[4] = 'Failover and Restart';
+$error_poolaction[5] = 'Go Active';
+$error_poolaction[6] = 'None';
 
 $component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id']);
@@ -97,9 +97,9 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
             // Do we have any results
             if (count($result) > 0) {
                 // Let's log some debugging
-                d_echo("\n\n" . $result['type'] . ": " . $result['label'] . "\n");
-                d_echo("    Status:  " . $result['status'] . "\n");
-                d_echo("    Message: " . $result['error'] . "\n");
+                d_echo("\n\n" . $result['type'] . ': ' . $result['label'] . "\n");
+                d_echo('    Status:  ' . $result['status'] . "\n");
+                d_echo('    Message: ' . $result['error'] . "\n");
 
                 // Add this result to the master array.
                 $tblBigIP[] = $result;
@@ -125,7 +125,7 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
             // Do we have any results
             if (count($result) > 0) {
                 // Let's log some debugging
-                d_echo("\n\n" . $result['type'] . ": " . $result['label'] . "\n");
+                d_echo("\n\n" . $result['type'] . ': ' . $result['label'] . "\n");
 
                 // Add this result to the master array.
                 $tblBigIP[] = $result;
@@ -153,11 +153,11 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
             $new_component = $component->createComponent($device['device_id'], $array['type']);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
-            echo "+";
+            echo '+';
         } else {
             // The component does exist, merge the details in - UPDATE.
             $components[$component_key] = array_merge($components[$component_key], $array);
-            echo ".";
+            echo '.';
         }
     }
 
@@ -177,7 +177,7 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
 
         if ($found === false) {
             // The component has not been found. we should delete it.
-            echo "-";
+            echo '-';
             $component->deleteComponent($key);
         }
     }

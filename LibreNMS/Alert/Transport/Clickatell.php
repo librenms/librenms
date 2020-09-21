@@ -40,7 +40,7 @@ class Clickatell extends Transport
 
         $curl = curl_init($url);
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         $ret = curl_exec($curl);

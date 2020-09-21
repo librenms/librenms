@@ -56,7 +56,7 @@ class Hue extends Transport
             $url = $opts['bridge'] . "/api/$hue_user/groups/0/action";
             $curl = curl_init();
             $duration = $opts['duration'];
-            $data = ["alert" => $duration];
+            $data = ['alert' => $duration];
             $datastring = json_encode($data);
 
             set_curl_proxy($curl);
@@ -65,7 +65,7 @@ class Hue extends Transport
 
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_VERBOSE, 1);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $datastring);
@@ -73,11 +73,11 @@ class Hue extends Transport
             $ret = curl_exec($curl);
             $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if ($code == 200) {
-                d_echo("Sent alert to Phillips Hue Bridge " . $opts['host'] . " for " . $device);
+                d_echo('Sent alert to Phillips Hue Bridge ' . $opts['host'] . ' for ' . $device);
 
                 return true;
             } else {
-                d_echo("Hue bridge connection error: " . serialize($ret));
+                d_echo('Hue bridge connection error: ' . serialize($ret));
 
                 return false;
             }

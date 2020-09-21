@@ -38,9 +38,9 @@ if (! empty($ifName) && is_numeric($port_id) && is_numeric($port_id)) {
             log_event("$ifName Port speed set manually: $speed", $device, 'interface', 3, $port_id);
             $port_tune = get_dev_attrib($device, 'ifName_tune:' . $ifName);
             $device_tune = get_dev_attrib($device, 'override_rrdtool_tune');
-            if ($port_tune == "true" ||
-                ($device_tune == "true" && $port_tune != 'false') ||
-                (\LibreNMS\Config::get('rrdtool_tune') == "true" && $port_tune != 'false' && $device_tune != 'false')) {
+            if ($port_tune == 'true' ||
+                ($device_tune == 'true' && $port_tune != 'false') ||
+                (\LibreNMS\Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
                 $rrdfile = get_port_rrdfile_path($device['hostname'], $port_id);
                 Rrd::tune('port', $rrdfile, $speed);
             }

@@ -33,7 +33,7 @@ foreach (explode("\n", $oids) as $data) {
     $split_oid = explode('.', $oid);
     $index = $split_oid[1];
     // Check for sensor type
-    if ($split_oid[0] == "oaPumpBIAS") { // Current - mA
+    if ($split_oid[0] == 'oaPumpBIAS') { // Current - mA
         $divisor = 1000;
         $descr = 'BIAS Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.2.' . $index;
@@ -47,7 +47,7 @@ foreach (explode("\n", $oids) as $data) {
         }
         discover_sensor($valid['sensor'], 'current', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
-    if ($split_oid[0] == "oaPumpTEC" && $index = 1) { // Current - A
+    if ($split_oid[0] == 'oaPumpTEC' && $index = 1) { // Current - A
         $divisor = 100;
         $descr = 'TEC Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.3.' . $index;
@@ -61,7 +61,7 @@ foreach (explode("\n", $oids) as $data) {
         $sensor_index = 'oaPumpTEC' . $index;
         discover_sensor($valid['sensor'], 'current', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
-    if ($split_oid[0] == "oaPumpTemp" && $index = 1) { // Temperature - C
+    if ($split_oid[0] == 'oaPumpTemp' && $index = 1) { // Temperature - C
         $divisor = 10;
         $descr = 'Temperature Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.4.' . $index;
@@ -90,7 +90,7 @@ foreach (explode("\n", $oids) as $data) {
     $split_oid = explode('.', $oid);
     $index = $split_oid[1];
     // Check for sensor type
-    if ($split_oid[0] == "oaDCPowerVoltage") { // Voltage - V
+    if ($split_oid[0] == 'oaDCPowerVoltage') { // Voltage - V
         $divisor = 10;
         $descr = 'DC +5V - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.7.1.2.' . $index;

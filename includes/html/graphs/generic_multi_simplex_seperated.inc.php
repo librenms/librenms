@@ -94,7 +94,7 @@ foreach ($rrd_list as $i => $rrd) {
     $rrd_options .= ' GPRINT:' . $t_defname . $i . 'max:MAX:%5.' . $float_precision . 'lf%s GPRINT:' . $t_defname . $i . ":AVERAGE:'%5." . $float_precision . "lf%s\\n'";
 
     if (! $nototal) {
-        $rrd_options .= ' GPRINT:tot' . $rrd['ds'] . $i . ":%6." . $float_precision . "lf%s'" . rrdtool_escape($total_units) . "'";
+        $rrd_options .= ' GPRINT:tot' . $rrd['ds'] . $i . ':%6.' . $float_precision . "lf%s'" . rrdtool_escape($total_units) . "'";
     }
 
     $rrd_options .= " COMMENT:'\\n'";

@@ -34,6 +34,6 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= " DEF:pollerX=$rrd_filename:poller:AVERAGE:start=$prev_from:end=$from";
     $rrd_options .= " SHIFT:pollerX:$period";
     $rrd_options .= " LINE1.25:pollerX#CCCCCC:'Prev Poller'\t";
-    $rrd_options .= " GPRINT:pollerX:MIN:%6.2lf";
+    $rrd_options .= ' GPRINT:pollerX:MIN:%6.2lf';
     $rrd_options .= " GPRINT:pollerX:MAX:%6.2lf  'GPRINT:pollerX:AVERAGE:%6.2lf\\n'";
 }

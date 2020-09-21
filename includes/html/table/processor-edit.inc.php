@@ -2,11 +2,11 @@
 
 $device_id = mres($vars['device_id']);
 
-$sql = " FROM `processors` AS `P` LEFT JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?";
+$sql = ' FROM `processors` AS `P` LEFT JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?';
 $param[] = $device_id;
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE ? OR `P`.`processor_descr` LIKE ? OR `S`.`processor_usage` LIKE ? OR `P`.`processor_perc_warn` LIKE ?)";
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `P`.`processor_descr` LIKE ? OR `S`.`processor_usage` LIKE ? OR `P`.`processor_perc_warn` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
@@ -44,7 +44,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         'processor_id' => $drive['processor_id'],
         'hostname' => generate_device_link($drive),
         'processor_descr' => $drive['processor_descr'],
-        'processor_perc' => $perc . "%",
+        'processor_perc' => $perc . '%',
         'processor_perc_warn' => $perc_warn, ];
 }
 

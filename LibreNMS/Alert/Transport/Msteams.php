@@ -48,7 +48,7 @@ class Msteams extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("Microsoft Teams returned Error, retry later");
+            var_dump('Microsoft Teams returned Error, retry later');
 
             return false;
         }

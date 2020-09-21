@@ -29,78 +29,78 @@ use LibreNMS\DB\Schema;
 class SchemaTest extends TestCase
 {
     private $mock_schema = [
-        "bills" => [
-            "Columns" => [
-                ["Field" => "bill_id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
+        'bills' => [
+            'Columns' => [
+                ['Field' => 'bill_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => 'auto_increment'],
             ],
-            "Indexes" => ["bill_id" => ["Name" => "bill_id", "Columns" => ["bill_id"], "Unique" => true, "Type" => "BTREE"]],
+            'Indexes' => ['bill_id' => ['Name' => 'bill_id', 'Columns' => ['bill_id'], 'Unique' => true, 'Type' => 'BTREE']],
         ],
-        "bill_ports" => [
-            "Columns" => [
-                ["Field" => "bill_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
-                ["Field" => "port_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
-            ],
-        ],
-        "devices" => [
-            "Columns" => [
-                ["Field" => "device_id", "Type" => "int(11) unsigned", "Null" => false, "Extra" => "auto_increment"],
-                ["Field" => "location_id", "Type" => "int(11)", "Null" => true, "Extra" => ""],
-            ],
-            "Indexes" => [
-                "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["device_id"], "Unique" => true, "Type" => "BTREE"],
+        'bill_ports' => [
+            'Columns' => [
+                ['Field' => 'bill_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => ''],
+                ['Field' => 'port_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => ''],
             ],
         ],
-        "locations" => [
-            "Columns" => [
-                ["Field" => "id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
+        'devices' => [
+            'Columns' => [
+                ['Field' => 'device_id', 'Type' => 'int(11) unsigned', 'Null' => false, 'Extra' => 'auto_increment'],
+                ['Field' => 'location_id', 'Type' => 'int(11)', 'Null' => true, 'Extra' => ''],
             ],
-            "Indexes" => [
-                "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["id"], "Unique" => true, "Type" => "BTREE"],
-            ],
-        ],
-        "ports" => [
-            "Columns" => [
-                ["Field" => "port_id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
-                ["Field" => "device_id", "Type" => "int(11)", "Null" => false, "Extra" => "", "Default" => "0"],
-            ],
-            "Indexes" => [
-                "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["port_id"], "Unique" => true, "Type" => "BTREE"],
+            'Indexes' => [
+                'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['device_id'], 'Unique' => true, 'Type' => 'BTREE'],
             ],
         ],
-        "sensors" => [
-            "Columns" => [
-                ["Field" => "sensor_id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
-                ["Field" => "device_id", "Type" => "int(11) unsigned", "Null" => false, "Extra" => "", "Default" => "0"],
+        'locations' => [
+            'Columns' => [
+                ['Field' => 'id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => 'auto_increment'],
             ],
-            "Indexes" => [
-                "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["sensor_id"], "Unique" => true, "Type" => "BTREE"],
-            ],
-        ],
-        "sensors_to_state_indexes" => [
-            "Columns" => [
-                ["Field" => "sensors_to_state_translations_id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
-                ["Field" => "sensor_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
-                ["Field" => "state_index_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
-            ],
-            "Indexes" => [
-                "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["sensors_to_state_translations_id"], "Unique" => true, "Type" => "BTREE"],
+            'Indexes' => [
+                'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['id'], 'Unique' => true, 'Type' => 'BTREE'],
             ],
         ],
-        "state_indexes" => [
-            "Columns" => [
-                ["Field" => "state_index_id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
+        'ports' => [
+            'Columns' => [
+                ['Field' => 'port_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => 'auto_increment'],
+                ['Field' => 'device_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => '', 'Default' => '0'],
             ],
-            "Indexes" => [
-                "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["state_index_id"], "Unique" => true, "Type" => "BTREE"],
+            'Indexes' => [
+                'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['port_id'], 'Unique' => true, 'Type' => 'BTREE'],
             ],
         ],
-        "state_translations" => [
-            "Columns" => [
-                ["Field" => "state_translation_id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
-                ["Field" => "state_index_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
+        'sensors' => [
+            'Columns' => [
+                ['Field' => 'sensor_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => 'auto_increment'],
+                ['Field' => 'device_id', 'Type' => 'int(11) unsigned', 'Null' => false, 'Extra' => '', 'Default' => '0'],
             ],
-            "Indexes" => [
-                "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["state_translation_id"], "Unique" => true, "Type" => "BTREE"],
+            'Indexes' => [
+                'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['sensor_id'], 'Unique' => true, 'Type' => 'BTREE'],
+            ],
+        ],
+        'sensors_to_state_indexes' => [
+            'Columns' => [
+                ['Field' => 'sensors_to_state_translations_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => 'auto_increment'],
+                ['Field' => 'sensor_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => ''],
+                ['Field' => 'state_index_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => ''],
+            ],
+            'Indexes' => [
+                'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['sensors_to_state_translations_id'], 'Unique' => true, 'Type' => 'BTREE'],
+            ],
+        ],
+        'state_indexes' => [
+            'Columns' => [
+                ['Field' => 'state_index_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => 'auto_increment'],
+            ],
+            'Indexes' => [
+                'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['state_index_id'], 'Unique' => true, 'Type' => 'BTREE'],
+            ],
+        ],
+        'state_translations' => [
+            'Columns' => [
+                ['Field' => 'state_translation_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => 'auto_increment'],
+                ['Field' => 'state_index_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => ''],
+            ],
+            'Indexes' => [
+                'PRIMARY' => ['Name' => 'PRIMARY', 'Columns' => ['state_translation_id'], 'Unique' => true, 'Type' => 'BTREE'],
             ],
         ],
     ];

@@ -6,7 +6,7 @@ use LibreNMS\Device\WirelessSensor;
 $types = WirelessSensor::getTypes();
 
 $sensors = dbFetchColumn(
-    "SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? GROUP BY `sensor_class`",
+    'SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? GROUP BY `sensor_class`',
     [$device['device_id']]
 );
 $datas = array_intersect(array_keys($types), $sensors);

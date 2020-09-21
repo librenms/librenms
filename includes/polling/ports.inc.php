@@ -385,7 +385,7 @@ if (Config::get('enable_ports_poe')) {
         }
         foreach ($port_stats_temp as $key => $value) {
             //remove the group index and only keep the ifIndex
-            [$group_id, $if_id] = explode(".", $key);
+            [$group_id, $if_id] = explode('.', $key);
             $port_stats[$if_id] = array_merge($port_stats[$if_id], $value);
         }
     }
@@ -563,7 +563,7 @@ foreach ($ports as $port) {
         $port['update_extended'] = [];
         $port['state'] = [];
 
-        if ($port_association_mode != "ifIndex") {
+        if ($port_association_mode != 'ifIndex') {
             $port['update']['ifIndex'] = $ifIndex;
         }
 
@@ -671,9 +671,9 @@ foreach ($ports as $port) {
                 // rrdtune if needed
                 $port_tune = $attribs['ifName_tune:' . $port['ifName']];
                 $device_tune = $attribs['override_rrdtool_tune'];
-                if ($port_tune == "true" ||
-                    ($device_tune == "true" && $port_tune != 'false') ||
-                    (Config::get('rrdtool_tune') == "true" && $port_tune != 'false' && $device_tune != 'false')) {
+                if ($port_tune == 'true' ||
+                    ($device_tune == 'true' && $port_tune != 'false') ||
+                    (Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
                     if ($oid == 'ifSpeed') {
                         $tune_port = true;
                     }
@@ -734,7 +734,7 @@ foreach ($ports as $port) {
         if (! empty($port['skipped'])) {
             // We don't care about statistics for skipped selective polling ports
             d_echo("$port_id skipped because selective polling ports is set.");
-        } elseif ($port['ifOperStatus'] == "down" && $port['ifOperStatus_prev'] == "down" && $this_port['ifOperStatus'] == "down" && $this_port['ifLastChange'] == $port['ifLastChange']) {
+        } elseif ($port['ifOperStatus'] == 'down' && $port['ifOperStatus_prev'] == 'down' && $this_port['ifOperStatus'] == 'down' && $this_port['ifLastChange'] == $port['ifLastChange']) {
             // We don't care about statistics for down ports on which states did not change since last polling
             d_echo("$port_id skipped because port is still down since last polling.");
         } else {
@@ -897,7 +897,7 @@ foreach ($ports as $port) {
         // Update Database if $port['update'] is not empty
         // or if previous poll time $port['poll_time'] is different from device globally previous port time $device_global_ports["poll_prev"]
         // This could happen if disabled port was enabled since last polling
-        if (! empty($port['update']) || $device_global_ports["poll_prev"] != $port['poll_time']) {
+        if (! empty($port['update']) || $device_global_ports['poll_prev'] != $port['poll_time']) {
             $port['update']['poll_time'] = $polled;
             $port['update']['poll_prev'] = $port['poll_time'];
             $port['update']['poll_period'] = $polled_period;

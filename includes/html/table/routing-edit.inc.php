@@ -14,11 +14,11 @@
 
 $device_id = $vars['device_id'];
 
-$sql = " FROM `bgpPeers` AS `B` LEFT JOIN `devices` AS `D` ON `B`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?";
+$sql = ' FROM `bgpPeers` AS `B` LEFT JOIN `devices` AS `D` ON `B`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?';
 $param[] = $device_id;
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE ? OR `B`.`bgpPeerRemoteAs` LIKE ? OR `B`.`bgpPeerIdentifier` LIKE ? OR `B`.`bgpPeerDescr` LIKE ?)";
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `B`.`bgpPeerRemoteAs` LIKE ? OR `B`.`bgpPeerIdentifier` LIKE ? OR `B`.`bgpPeerDescr` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";

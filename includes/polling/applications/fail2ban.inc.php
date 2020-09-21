@@ -22,7 +22,7 @@ try {
     ];
 
     foreach ($legacy as $jail_data) {
-        [$jail, $banned] = explode(" ", $jail_data);
+        [$jail, $banned] = explode(' ', $jail_data);
         if (isset($jail) && isset($banned)) {
             $f2b['data']['jails'][$jail] = $banned;
         }

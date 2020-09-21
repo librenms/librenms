@@ -30,7 +30,7 @@ $components = $components[$device['device_id']];
     </thead>
 <?php
 foreach ($components as $peer) {
-    $string = $peer['peer'] . ":" . $peer['port'];
+    $string = $peer['peer'] . ':' . $peer['port'];
     if ($peer['status'] == 2) {
         $status = $peer['error'];
         $error = 'class="danger"';

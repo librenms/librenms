@@ -36,7 +36,7 @@ foreach ($output_current as $index => $data) {
     }
     if (is_array($data['upsOutputCurrent'])) {
         $data['upsOutputCurrent'] = $data['upsOutputCurrent'][0];
-        $oid .= ".0";
+        $oid .= '.0';
     }
 
     discover_sensor(
@@ -67,7 +67,7 @@ foreach ($input_current as $index => $data) {
     }
     if (is_array($data['upsInputCurrent'])) {
         $data['upsInputCurrent'] = $data['upsInputCurrent'][0];
-        $oid .= ".0";
+        $oid .= '.0';
     }
 
     discover_sensor(
@@ -98,7 +98,7 @@ foreach ($bypass_current as $index => $data) {
     }
     if (is_array($data['upsBypassCurrent'])) {
         $data['upsBypassCurrent'] = $data['upsBypassCurrent'][0];
-        $oid .= ".0";
+        $oid .= '.0';
     }
 
     discover_sensor(

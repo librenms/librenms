@@ -11,8 +11,8 @@
 use LibreNMS\RRD\RrdDefinition;
 
 if (strstr($hardware, 'CMM') == false) {
-    $fecInErrorsCount = snmp_get($device, "fecInErrorsCount.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
-    $fecOutErrorsCount = snmp_get($device, "fecOutErrorsCount.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
+    $fecInErrorsCount = snmp_get($device, 'fecInErrorsCount.0', '-Ovqn', 'WHISP-BOX-MIBV2-MIB');
+    $fecOutErrorsCount = snmp_get($device, 'fecOutErrorsCount.0', '-Ovqn', 'WHISP-BOX-MIBV2-MIB');
     if (is_numeric($fecInErrorsCount) && is_numeric($fecOutErrorsCount)) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('fecInErrorsCount', 'GAUGE', 0, 100000)
@@ -28,7 +28,7 @@ if (strstr($hardware, 'CMM') == false) {
         unset($rrd_filename, $fecInErrorsCount, $fecOutErrorsCount);
     }
 
-    $crcErrors = snmp_get($device, "fecCRCError.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
+    $crcErrors = snmp_get($device, 'fecCRCError.0', '-Ovqn', 'WHISP-BOX-MIBV2-MIB');
     if (is_numeric($crcErrors)) {
         $rrd_def = RrdDefinition::make()->addDataset('crcErrors', 'GAUGE', 0, 100000);
         $fields = [
@@ -39,9 +39,9 @@ if (strstr($hardware, 'CMM') == false) {
         $os->enableGraph('canopy_generic_crcErrors');
     }
 
-    $vertical = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.2.2.117.0", "-Ovqn", ""));
-    $horizontal = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.2.2.118.0", "-Ovqn", ""));
-    $combined = snmp_get($device, "1.3.6.1.4.1.161.19.3.2.2.21.0", "-Ovqn", "");
+    $vertical = str_replace('"', '', snmp_get($device, '.1.3.6.1.4.1.161.19.3.2.2.117.0', '-Ovqn', ''));
+    $horizontal = str_replace('"', '', snmp_get($device, '.1.3.6.1.4.1.161.19.3.2.2.118.0', '-Ovqn', ''));
+    $combined = snmp_get($device, '1.3.6.1.4.1.161.19.3.2.2.21.0', '-Ovqn', '');
     if (is_numeric($vertical) && is_numeric($horizontal) && is_numeric($combined)) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('vertical', 'GAUGE', -150, 0)
@@ -71,7 +71,7 @@ if (strstr($hardware, 'CMM') == false) {
     //     unset($rrd_filename, $rssi);
     // }
 
-    $jitter = snmp_get($device, "jitter.0", "-Ovqn", "WHISP-SM-MIB");
+    $jitter = snmp_get($device, 'jitter.0', '-Ovqn', 'WHISP-SM-MIB');
     if (is_numeric($jitter)) {
         $rrd_def = RrdDefinition::make()->addDataset('jitter', 'GAUGE', 0, 20);
         $fields = [
@@ -83,8 +83,8 @@ if (strstr($hardware, 'CMM') == false) {
         unset($rrd_filename, $jitter);
     }
 
-    $horizontal = str_replace('"', "", snmp_get($device, "radioDbmHorizontal.0", "-Ovqn", "WHISP-SM-MIB"));
-    $vertical = str_replace('"', "", snmp_get($device, "radioDbmVertical.0", "-Ovqn", "WHISP-SM-MIB"));
+    $horizontal = str_replace('"', '', snmp_get($device, 'radioDbmHorizontal.0', '-Ovqn', 'WHISP-SM-MIB'));
+    $vertical = str_replace('"', '', snmp_get($device, 'radioDbmVertical.0', '-Ovqn', 'WHISP-SM-MIB'));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('horizontal', 'GAUGE', -100, 100)
@@ -100,7 +100,7 @@ if (strstr($hardware, 'CMM') == false) {
         unset($rrd_filename, $horizontal, $vertical);
     }
 
-    $ssr = str_replace('"', "", snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "WHISP-SM-MIB"));
+    $ssr = str_replace('"', '', snmp_get($device, 'signalStrengthRatio.0', '-Ovqn', 'WHISP-SM-MIB'));
     if (is_numeric($ssr)) {
         $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
         $fields = [
@@ -112,8 +112,8 @@ if (strstr($hardware, 'CMM') == false) {
         unset($rrd_filename, $ssr);
     }
 
-    $horizontal = str_replace('"', "", snmp_get($device, "signalToNoiseRatioSMHorizontal.0", "-Ovqn", "WHISP-SM-MIB"));
-    $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioSMVertical.0", "-Ovqn", "WHISP-SM-MIB"));
+    $horizontal = str_replace('"', '', snmp_get($device, 'signalToNoiseRatioSMHorizontal.0', '-Ovqn', 'WHISP-SM-MIB'));
+    $vertical = str_replace('"', '', snmp_get($device, 'signalToNoiseRatioSMVertical.0', '-Ovqn', 'WHISP-SM-MIB'));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('horizontal', 'GAUGE', 0, 100)
@@ -150,8 +150,8 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
     //     unset($rrd_filename, $gpsStatus);
     // }
 
-    $visible = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.7.0", "-Ovqn", ""));
-    $tracked = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.8.0", "-Ovqn", ""));
+    $visible = str_replace('"', '', snmp_get($device, '.1.3.6.1.4.1.161.19.3.4.4.7.0', '-Ovqn', ''));
+    $tracked = str_replace('"', '', snmp_get($device, '.1.3.6.1.4.1.161.19.3.4.4.8.0', '-Ovqn', ''));
     if (is_numeric($visible) && is_numeric($tracked)) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('visible', 'GAUGE', 0, 1000)
@@ -168,8 +168,8 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
 }
 
 if (strstr($version, 'AP') == false) {
-    $horizontal = str_replace('"', "", snmp_get($device, "linkRadioDbmHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
-    $vertical = str_replace('"', "", snmp_get($device, "linkRadioDbmVertical.2", "-Ovqn", "WHISP-APS-MIB"));
+    $horizontal = str_replace('"', '', snmp_get($device, 'linkRadioDbmHorizontal.2', '-Ovqn', 'WHISP-APS-MIB'));
+    $vertical = str_replace('"', '', snmp_get($device, 'linkRadioDbmVertical.2', '-Ovqn', 'WHISP-APS-MIB'));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('horizontal', 'GAUGE', -100, 0)
@@ -184,7 +184,7 @@ if (strstr($version, 'AP') == false) {
         unset($rrd_filename, $horizontal, $horizontal);
     }
 
-    $lastLevel = str_replace('"', "", snmp_get($device, "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
+    $lastLevel = str_replace('"', '', snmp_get($device, 'lastPowerLevel.2', '-Ovqn', 'WHISP-APS-MIB'));
     if (is_numeric($lastLevel)) {
         $rrd_def = RrdDefinition::make()->addDataset('last', 'GAUGE', -100, 0);
         $fields = [
@@ -213,7 +213,7 @@ if (strstr($version, 'AP') == false) {
     //     unset($rrd_filename, $horizontal, $horizontal);
     // }
 
-    $ssr = str_replace('"', "", snmp_get($device, "linkSignalStrengthRatio.2", "-Ovqn", "WHISP-APS-MIB"));
+    $ssr = str_replace('"', '', snmp_get($device, 'linkSignalStrengthRatio.2', '-Ovqn', 'WHISP-APS-MIB'));
     if (is_numeric($ssr)) {
         $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
         $fields = [
@@ -226,10 +226,10 @@ if (strstr($version, 'AP') == false) {
     }
 
     if (strstr($hardware, 'PTP 230')) {
-        $dbmRadio = str_replace('"', "", snmp_get($device, "radioDbmInt.0", "-Ovqn", "WHISP-SM-MIB"));
-        $minRadio = str_replace('"', "", snmp_get($device, "minRadioDbm.0", "-Ovqn", "WHISP-SM-MIB"));
-        $maxRadio = str_replace('"', "", snmp_get($device, "maxRadioDbm.0", "-Ovqn", "WHISP-SM-MIB"));
-        $avgRadio = str_replace('"', "", snmp_get($device, "radioDbmAvg.0", "-Ovqn", "WHISP-SM-MIB"));
+        $dbmRadio = str_replace('"', '', snmp_get($device, 'radioDbmInt.0', '-Ovqn', 'WHISP-SM-MIB'));
+        $minRadio = str_replace('"', '', snmp_get($device, 'minRadioDbm.0', '-Ovqn', 'WHISP-SM-MIB'));
+        $maxRadio = str_replace('"', '', snmp_get($device, 'maxRadioDbm.0', '-Ovqn', 'WHISP-SM-MIB'));
+        $avgRadio = str_replace('"', '', snmp_get($device, 'radioDbmAvg.0', '-Ovqn', 'WHISP-SM-MIB'));
 
         if (is_numeric($dbmRadio) && is_numeric($minRadio) && is_numeric($maxRadio) && is_numeric($avgRadio)) {
             $rrd_def = RrdDefinition::make()
@@ -254,13 +254,13 @@ if (strstr($version, 'AP') == false) {
 
 //AP Equipment
 if (strstr($version, 'AP')) {
-    $multi_get_array = snmp_get_multi($device, ['regCount.0', 'regFailureCount.0', 'currentRadioFreqCarrier.0', 'frUtlLowTotalDownlinkUtilization.0', 'frUtlLowTotalUplinkUtilization.0'], "-OQU", "WHISP-APS-MIB");
+    $multi_get_array = snmp_get_multi($device, ['regCount.0', 'regFailureCount.0', 'currentRadioFreqCarrier.0', 'frUtlLowTotalDownlinkUtilization.0', 'frUtlLowTotalUplinkUtilization.0'], '-OQU', 'WHISP-APS-MIB');
     d_echo($multi_get_array);
-    $registered = $multi_get_array[0]["WHISP-APS-MIB::regCount"];
-    $failed = $multi_get_array[0]["WHISP-APS-MIB::regFailureCount"];
-    $freq = $multi_get_array[0]["WHISP-APS-MIB::currentRadioFreqCarrier"];
-    $downlinkutilization = $multi_get_array[0]["WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization"];
-    $uplinkutilization = $multi_get_array[0]["WHISP-APS-MIB::frUtlLowTotalUplinkUtilization"];
+    $registered = $multi_get_array[0]['WHISP-APS-MIB::regCount'];
+    $failed = $multi_get_array[0]['WHISP-APS-MIB::regFailureCount'];
+    $freq = $multi_get_array[0]['WHISP-APS-MIB::currentRadioFreqCarrier'];
+    $downlinkutilization = $multi_get_array[0]['WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization'];
+    $uplinkutilization = $multi_get_array[0]['WHISP-APS-MIB::frUtlLowTotalUplinkUtilization'];
 
     if (is_numeric($registered) && is_numeric($failed)) {
         $rrd_def = RrdDefinition::make()

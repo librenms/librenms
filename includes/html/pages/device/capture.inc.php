@@ -22,10 +22,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 $no_refresh = true;
-$pagetitle[] = "Capture";
+$pagetitle[] = 'Capture';
 
 if (! Auth::user()->hasGlobalAdmin()) {
-    print_error("Insufficient Privileges");
+    print_error('Insufficient Privileges');
 } else {
     ?>
     <h2>Capture Debug Information</h2>

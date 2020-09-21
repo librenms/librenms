@@ -23,19 +23,19 @@ $asn = clean($vars['asn']);
 $ixid = clean($vars['ixid']);
 $status = clean($vars['status']);
 
-$sql = " FROM `pdb_ix_peers` AS `P` LEFT JOIN `pdb_ix` ON `P`.`ix_id` = `pdb_ix`.`ix_id` LEFT JOIN `bgpPeers` ON `P`.`remote_ipaddr4` = `bgpPeers`.`bgpPeerIdentifier` WHERE `P`.`ix_id` = ? AND `remote_ipaddr4` IS NOT NULL";
+$sql = ' FROM `pdb_ix_peers` AS `P` LEFT JOIN `pdb_ix` ON `P`.`ix_id` = `pdb_ix`.`ix_id` LEFT JOIN `bgpPeers` ON `P`.`remote_ipaddr4` = `bgpPeers`.`bgpPeerIdentifier` WHERE `P`.`ix_id` = ? AND `remote_ipaddr4` IS NOT NULL';
 $params = [$ixid];
 
 if ($status === 'connected') {
-    $sql .= " AND `remote_ipaddr4` = `bgpPeerIdentifier` ";
+    $sql .= ' AND `remote_ipaddr4` = `bgpPeerIdentifier` ';
 }
 
 if ($status === 'unconnected') {
-    $sql .= " AND `bgpPeerRemoteAs` IS NULL ";
+    $sql .= ' AND `bgpPeerRemoteAs` IS NULL ';
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= " AND (`remote_ipaddr4` LIKE ? OR `remote_asn` LIKE ? OR `P`.`name` LIKE ?)";
+    $sql .= ' AND (`remote_ipaddr4` LIKE ? OR `remote_asn` LIKE ? OR `P`.`name` LIKE ?)';
     $params[] = "%$searchPhrase%";
     $params[] = "%$searchPhrase%";
     $params[] = "%$searchPhrase%";

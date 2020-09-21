@@ -40,7 +40,7 @@ if ($device['os'] == 'hirschmann') {
     ///////////////////////////////
     /// LED Status Power Supply ///
     ///////////////////////////////
-    $temp = snmp_get($device, "hmLEDRSPowerSupply.0", "-Ovqe", "HMPRIV-MGMT-SNMP-MIB");
+    $temp = snmp_get($device, 'hmLEDRSPowerSupply.0', '-Ovqe', 'HMPRIV-MGMT-SNMP-MIB');
     $cur_oid = '.1.3.6.1.4.1.248.14.1.1.35.1.1.0';
     $index = '0';
 
@@ -60,7 +60,7 @@ if ($device['os'] == 'hirschmann') {
     //////////////////////////
     /// LED Status Standby ///
     //////////////////////////
-    $temp = snmp_get($device, "hmLEDRStandby.0", "-Ovqe", "HMPRIV-MGMT-SNMP-MIB");
+    $temp = snmp_get($device, 'hmLEDRStandby.0', '-Ovqe', 'HMPRIV-MGMT-SNMP-MIB');
     $cur_oid = '.1.3.6.1.4.1.248.14.1.1.35.1.2.0';
     $index = '0';
 
@@ -80,7 +80,7 @@ if ($device['os'] == 'hirschmann') {
     /////////////////////////////////////
     /// LED Status Redundancy Manager ///
     /////////////////////////////////////
-    $temp = snmp_get($device, "hmLEDRSRedundancyManager.0", "-Ovqe", "HMPRIV-MGMT-SNMP-MIB");
+    $temp = snmp_get($device, 'hmLEDRSRedundancyManager.0', '-Ovqe', 'HMPRIV-MGMT-SNMP-MIB');
     $cur_oid = '.1.3.6.1.4.1.248.14.1.1.35.1.3.0';
     $index = '0';
 
@@ -100,7 +100,7 @@ if ($device['os'] == 'hirschmann') {
     ////////////////////////
     /// LED Status Fault ///
     ////////////////////////
-    $temp = snmp_get($device, "hmLEDRSFault.0", "-Ovqe", "HMPRIV-MGMT-SNMP-MIB");
+    $temp = snmp_get($device, 'hmLEDRSFault.0', '-Ovqe', 'HMPRIV-MGMT-SNMP-MIB');
     $cur_oid = '.1.3.6.1.4.1.248.14.1.1.35.1.4.0';
     $index = '0';
 

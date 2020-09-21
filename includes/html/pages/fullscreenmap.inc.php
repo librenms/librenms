@@ -70,25 +70,25 @@ if (\LibreNMS\Config::get('map.engine') == 'leaflet') {
 <?php
 $x = 0;
 foreach (dbFetchRows("SELECT `hostname`,`location`,`status`, COUNT(`status`) AS `total`,`lat`,`lng` FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id`=`locations`.`id` WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != '' GROUP BY `status`,`lat`,`lng` ORDER BY `status` ASC, `hostname`") as $map_devices) {
-    $color = "#29FF3B";
+    $color = '#29FF3B';
     $size = 15;
     $status = 'Up';
     if ($map_devices['status'] == 0) {
-        $color = "#FF0000";
+        $color = '#FF0000';
         $size = 30;
         $status = 'Down';
     }
     $data .= "\"$x\": {
-                        value: \"" . $map_devices['total'] . "\",
-                        latitude: " . $map_devices['lat'] . ",
-                        longitude: " . $map_devices['lng'] . ",
-                        size: " . $size . ",
+                        value: \"" . $map_devices['total'] . '",
+                        latitude: ' . $map_devices['lat'] . ',
+                        longitude: ' . $map_devices['lng'] . ',
+                        size: ' . $size . ',
                         attrs: {
-                            fill: \"" . $color . "\",
+                            fill: "' . $color . '",
                             opacity: 0.8
                         },
                         tooltip: {
-                            content: \"Devices " . $status . ": " . $map_devices['total'] . "\"
+                            content: "Devices ' . $status . ': ' . $map_devices['total'] . "\"
                         }
                     },\n";
     $x++;

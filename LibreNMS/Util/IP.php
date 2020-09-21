@@ -85,12 +85,12 @@ abstract class IP
     {
         $snmpOid = str_replace(['.', '"'], ' ', $snmpOid);
         $hex = implode(
-            ":",
+            ':',
             array_map(
                 function ($dec) {
                     return sprintf('%02x', $dec);
                 },
-                explode(" ", (string) $snmpOid)
+                explode(' ', (string) $snmpOid)
             )
         );
 

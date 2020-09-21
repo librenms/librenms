@@ -44,5 +44,5 @@ if (strpos($sysdescr_value, 'IBM Networking Operating System') !== false) {
     $version = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.10.1', '-Ovq'), '" ');
     $serial = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.11.1', '-Ovq'), '" ');
 } elseif (strpos($sysdescr_value, 'IBM Networking OS 1/10Gb Uplink Ethernet Switch Module') !== false) {
-    $hardware = "IBM BladeCenter 1/10Gb Uplink Ethernet Switch Module";
+    $hardware = 'IBM BladeCenter 1/10Gb Uplink Ethernet Switch Module';
 }//end if

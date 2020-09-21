@@ -37,62 +37,62 @@ class Syslog extends Transport
     {
         $syslog_host = '127.0.0.1';
         $syslog_port = 514;
-        $state = "Unknown";
+        $state = 'Unknown';
         $facility = 24; // Default facility is 3 * 8 (daemon)
         $severity = 6; // Default severity is 6 (Informational)
-        $sev_txt = "OK";
+        $sev_txt = 'OK';
         $device = device_by_id_cache($obj['device_id']); // for event logging
 
         if (! empty($opts['syslog_facility']) && preg_match("/^\d+$/", $opts['syslog_facility'])) {
             $facility = (int) $opts['syslog_facility'] * 8;
         } else {
-            log_event("Syslog facility is not an integer: " . $opts['syslog_facility'], $device, 'poller', 5);
+            log_event('Syslog facility is not an integer: ' . $opts['syslog_facility'], $device, 'poller', 5);
         }
         if (! empty($opts['syslog_host'])) {
-            if (preg_match("/[a-zA-Z]/", $opts['syslog_host'])) {
+            if (preg_match('/[a-zA-Z]/', $opts['syslog_host'])) {
                 $syslog_host = gethostbyname($opts['syslog_host']);
                 if ($syslog_host === $opts['syslog_host']) {
-                    log_event("Alphanumeric hostname found but does not resolve to an IP.", $device, 'poller', 5);
+                    log_event('Alphanumeric hostname found but does not resolve to an IP.', $device, 'poller', 5);
 
                     return false;
                 }
             } elseif (filter_var($opts['syslog_host'], FILTER_VALIDATE_IP)) {
                 $syslog_host = $opts['syslog_host'];
             } else {
-                log_event("Syslog host is not a valid IP: " . $opts['syslog_host'], $device, 'poller', 5);
+                log_event('Syslog host is not a valid IP: ' . $opts['syslog_host'], $device, 'poller', 5);
 
                 return false;
             }
         } else {
-            log_event("Syslog host is empty.", $device, 'poller');
+            log_event('Syslog host is empty.', $device, 'poller');
         }
         if (! empty($opts['syslog_port']) && preg_match("/^\d+$/", $opts['syslog_port'])) {
             $syslog_port = $opts['syslog_port'];
         } else {
-            log_event("Syslog port is not an integer.", $device, 'poller', 5);
+            log_event('Syslog port is not an integer.', $device, 'poller', 5);
         }
 
         switch ($obj['severity']) {
-            case "critical":
+            case 'critical':
                 $severity = 2;
-                $sev_txt = "Critical";
+                $sev_txt = 'Critical';
                 break;
-            case "warning":
+            case 'warning':
                 $severity = 4;
-                $sev_txt = "Warning";
+                $sev_txt = 'Warning';
                 break;
         }
 
         switch ($obj['state']) {
             case AlertState::RECOVERED:
-                $state = "OK";
+                $state = 'OK';
                 $severity = 6;
                 break;
             case AlertState::ACTIVE:
                 $state = $sev_txt;
                 break;
             case AlertState::ACKNOWLEDGED:
-                $state = "Acknowledged";
+                $state = 'Acknowledged';
                 $severity = 6;
                 break;
         }
@@ -115,7 +115,7 @@ class Syslog extends Transport
             . $obj['name'];
 
         if (($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) === false) {
-            log_event("socket_create() failed: reason: " . socket_strerror(socket_last_error()), $device, 'poller', 5);
+            log_event('socket_create() failed: reason: ' . socket_strerror(socket_last_error()), $device, 'poller', 5);
 
             return false;
         } else {

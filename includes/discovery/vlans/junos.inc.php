@@ -85,7 +85,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         }
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
 
-        d_echo("");
+        d_echo('');
         if (isset($tagness_by_vlan_index[$vlan_index])) {
             d_echo("JunOS: vlanID $vlan_id, index $vlan_index");
 
@@ -97,7 +97,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = $tag['tag'];
             }
         } else {
-            d_echo("JunOS: No tag/untagged interfaces found for L2 associated" .
+            d_echo('JunOS: No tag/untagged interfaces found for L2 associated' .
                    " with vlanID: $vlan_id - Index $vlan_index");
         }
     }

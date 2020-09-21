@@ -2,7 +2,7 @@
 
 $rpm = [];
 $rpm_oid = '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.11.1'; // alaChasEntPhysFanTable
-$data = snmp_walk($device, 'alaChasEntPhysFanTable', "-OQUn", 'ALCATEL-IND1-CHASSIS-MIB', ':mibs/nokia/aos7:mibs');
+$data = snmp_walk($device, 'alaChasEntPhysFanTable', '-OQUn', 'ALCATEL-IND1-CHASSIS-MIB', ':mibs/nokia/aos7:mibs');
 
 foreach (explode("\n", $data) as $entry) {
     [$oid,$value] = explode('=', $entry, 2);
@@ -20,9 +20,9 @@ foreach (explode("\n", $data) as $entry) {
 foreach ($rpm as $chassis => $entry) {
     foreach ($entry as $index => $data) {
         //$descr = 'Chassis '.($chassis-450). " Fan $index";
-        $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7." . $chassis;
+        $descr_oid = '.1.3.6.1.2.1.47.1.1.1.1.7.' . $chassis;
         $chas_descr = (string) snmp_get($device, $descr_oid, '-Oqv');
-        $descr = "CHASSIS-" . substr($chas_descr, 0, strpos($chas_descr, '/')) . " Fan $index";
+        $descr = 'CHASSIS-' . substr($chas_descr, 0, strpos($chas_descr, '/')) . " Fan $index";
         $value = $data[4];
         $id = "$chassis.$index";
         $oid = "$rpm_oid.4.$chassis.$index";

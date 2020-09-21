@@ -83,8 +83,8 @@ class Ptp650 extends OS implements
         $receive = '.1.3.6.1.4.1.17713.7.20.1.0'; //CAMBIUM-PTP650-MIB::receiveDataRate.0
         $transmit = '.1.3.6.1.4.1.17713.7.20.2.0'; //CAMBIUM-PTP650-MIB::transmitDataRate.0
         $aggregate = '.1.3.6.1.4.1.17713.7.20.3.0'; //CAMBIUM-PTP650-MIB::aggregateDataRate.0
-        $txModulation = ".1.3.6.1.4.1.17713.7.12.15.0";
-        $rxModulation = ".1.3.6.1.4.1.17713.7.12.14.0";
+        $txModulation = '.1.3.6.1.4.1.17713.7.12.15.0';
+        $rxModulation = '.1.3.6.1.4.1.17713.7.12.14.0';
 
         return [
             new WirelessSensor(

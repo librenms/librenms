@@ -39,21 +39,21 @@ $response[] = [
 
 foreach ($COMPONENTS[$device_id] as $ID => $AVP) {
     if ($AVP['status'] == 0) {
-        $class = "green";
-        $status = "Ok";
+        $class = 'green';
+        $status = 'Ok';
     } elseif ($AVP['status'] == 1) {
-        $class = "grey";
-        $status = "Warning";
+        $class = 'grey';
+        $status = 'Warning';
     } else {
         // Critical
-        $class = "red";
-        $status = "Critical";
+        $class = 'red';
+        $status = 'Critical';
     }
     $response[] = [
         'id' => $ID,
         'type' => $AVP['type'],
         'label' => $AVP['label'],
-        'status' => "<span name='status_" . $ID . "' class='" . $class . "'>" . $status . "</span>",
+        'status' => "<span name='status_" . $ID . "' class='" . $class . "'>" . $status . '</span>',
         'disable' => '<input type="checkbox" class="disable-check" name="dis_' . $ID . '"' . ($AVP['disabled'] ? 'checked' : '') . '>',
         'ignore' => '<input type="checkbox" class="ignore-check" name="ign_' . $ID . '"' . ($AVP['ignore'] ? 'checked' : '') . '>',
     ];

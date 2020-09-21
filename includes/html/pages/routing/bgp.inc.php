@@ -279,21 +279,21 @@ if (! Auth::user()->hasGlobalRead()) {
         $graph_array_zoom = $graph_array;
         $graph_array_zoom['height'] = '150';
         $graph_array_zoom['width'] = '500';
-        $overlib_link = "device/device=" . $peer['device_id'] . "/tab=routing/proto=bgp/";
-        $peeraddresslink = "<span class=list-large>" . overlib_link($overlib_link, $peer_ident, generate_graph_tag($graph_array_zoom), null) . "</span>";
+        $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
+        $peeraddresslink = '<span class=list-large>' . overlib_link($overlib_link, $peer_ident, generate_graph_tag($graph_array_zoom), null) . '</span>';
 
         // Local Address
         $graph_array['afi'] = 'ipv4';
         $graph_array['safi'] = 'unicast';
         $graph_array_zoom['afi'] = 'ipv4';
         $graph_array_zoom['safi'] = 'unicast';
-        $overlib_link = "device/device=" . $peer['device_id'] . "/tab=routing/proto=bgp/";
-        $localaddresslink = "<span class=list-large>" . overlib_link($overlib_link, $peer_ip, generate_graph_tag($graph_array_zoom), null) . "</span>";
+        $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
+        $localaddresslink = '<span class=list-large>' . overlib_link($overlib_link, $peer_ip, generate_graph_tag($graph_array_zoom), null) . '</span>';
 
         if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
             $last_error = $peer['bgpPeerLastErrorText'];
         } else {
-            $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']) . "<br/>" . $peer['bgpPeerLastErrorText'];
+            $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']) . '<br/>' . $peer['bgpPeerLastErrorText'];
         }
 
         echo '<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . '>';
@@ -317,11 +317,11 @@ if (! Auth::user()->hasGlobalRead()) {
             <td width=150>' . $peeraddresslink . "</td>
             <td width=50><b>$peer_type</b></td>
             <td width=50>" . $peer['afi'] . '</td>
-            <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . "</td>
-            <td>" . $peer['bgpPeerDescr'] . "</td>
-            <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
-            <td>" . $last_error . "</td>
-            <td>" . formatUptime($peer['bgpPeerFsmEstablishedTime']) . "<br />
+            <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
+            <td>' . $peer['bgpPeerDescr'] . "</td>
+            <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
+            <td>' . $last_error . '</td>
+            <td>' . formatUptime($peer['bgpPeerFsmEstablishedTime']) . "<br />
             Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . format_si($peer['bgpPeerInUpdates']) . "
             <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . format_si($peer['bgpPeerOutUpdates']) . '</td></tr>';
 

@@ -79,7 +79,7 @@ class Pagerduty extends Transport
 
             return $result->getReasonPhrase();
         } catch (GuzzleException $e) {
-            return "Request to PagerDuty API failed. " . $e->getMessage();
+            return 'Request to PagerDuty API failed. ' . $e->getMessage();
         }
     }
 

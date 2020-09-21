@@ -16,8 +16,8 @@ class UpdateUsersWidgetsSettings extends Migration
         foreach ($widgets as $widget) {
             $settings = $widget->settings;
 
-            $settings["device_group"] = $settings["group"];
-            unset($settings["group"]);
+            $settings['device_group'] = $settings['group'];
+            unset($settings['group']);
 
             $widget->settings = $settings;
             $widget->save();
@@ -35,8 +35,8 @@ class UpdateUsersWidgetsSettings extends Migration
         foreach ($widgets as $widget) {
             $settings = $widget->settings;
 
-            $settings["group"] = $settings["device_group"];
-            unset($settings["device_group"]);
+            $settings['group'] = $settings['device_group'];
+            unset($settings['device_group']);
 
             $widget->settings = $settings;
             $widget->save();

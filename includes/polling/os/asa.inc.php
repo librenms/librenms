@@ -40,6 +40,6 @@ if (empty($hardware)) {
 }
 
 if (empty($version)) {
-    $explodeddata = explode(" ", $device['sysDescr']);
+    $explodeddata = explode(' ', $device['sysDescr']);
     $version = $explodeddata['5'];
 }

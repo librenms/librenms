@@ -46,7 +46,7 @@ if (is_string($sdfsinfo)) {
         ->addDataset('actual_savings', 'GAUGE', 0)
         ->addDataset('comp_rate', 'GAUGE', 0);
 
-    [$files, $vol_capacity, $vol_logic_size, $vol_max_load, $dup_data, $blocks_unique, $blocks_compressed, $cluster_copies, $dedup_rate, $actual_savings, $comp_rate] = explode(" ", $sdfsinfo);
+    [$files, $vol_capacity, $vol_logic_size, $vol_max_load, $dup_data, $blocks_unique, $blocks_compressed, $cluster_copies, $dedup_rate, $actual_savings, $comp_rate] = explode(' ', $sdfsinfo);
 
     $fields = [
         'files' => $files,

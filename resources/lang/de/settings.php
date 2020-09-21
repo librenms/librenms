@@ -285,8 +285,8 @@ return [
             'description' => 'LDAP Version',
             'help' => 'LDAP Version zur Kommunikation mit dem Server.  Gewöhnlich sollte es v3 sein',
             'options' => [
-                "2" => "2",
-                "3" => "3",
+                '2' => '2',
+                '3' => '3',
             ],
         ],
         'auth_mechanism' => [
@@ -794,7 +794,7 @@ return [
     ],
     'twofactor' => [
         'description' => 'Aktiviere Zweifaktor Authentifizierung',
-        'help' => "Aktiviert die integrierte Zweifaktor Authentifizierung. Sie müssen jedes Konto konfigurieren um es zu aktivieren.",
+        'help' => 'Aktiviert die integrierte Zweifaktor Authentifizierung. Sie müssen jedes Konto konfigurieren um es zu aktivieren.',
     ],
     'units' => [
         'days' => 'Tage',

@@ -25,7 +25,7 @@ if ($inlet_oids) {
 }
 
 // Check PDU MIB Outlets
-$outlet_oids = snmp_walk($device, "outletIndex", "-Osqn", "PDU-MIB");
+$outlet_oids = snmp_walk($device, 'outletIndex', '-Osqn', 'PDU-MIB');
 $outlet_oids = trim($outlet_oids);
 if ($outlet_oids) {
     d_echo('PDU MIB Outlet');
@@ -48,7 +48,7 @@ if ($outlet_oids) {
 }
 
 // Check PDU2 MIB Outlets
-$outlet_oids = snmp_walk($device, "outletLabel", "-Osqn", "PDU2-MIB");
+$outlet_oids = snmp_walk($device, 'outletLabel', '-Osqn', 'PDU2-MIB');
 $outlet_oids = trim($outlet_oids);
 if ($outlet_oids) {
     d_echo('PDU2 MIB Outlet');

@@ -166,18 +166,18 @@ if (count($hops) > 1 && count($links) > 0) {
         var height = $(window).height() / 2;
         ';
     echo "$('#" . $visualization . "').height(height + 'px');
-        var nodes = " . $nodes . ";
-        var edges = " . $edges . ";
-        ";
+        var nodes = " . $nodes . ';
+        var edges = ' . $edges . ';
+        ';
     echo "var container = document.getElementById('" . $visualization . "');
         ";
-    echo "var data = {
+    echo 'var data = {
             nodes: nodes,
             edges: edges,
             stabilize: true
         };
-        var options =  " . $options . ";
-        ";
+        var options =  ' . $options . ';
+        ';
     echo "var network = new vis.Network(container, data, options);
         network.on('click', function (properties) {
             if (properties.nodes > 0) {
@@ -186,5 +186,5 @@ if (count($hops) > 1 && count($links) > 0) {
         });
         </script>';
 } else {
-    print_message("No Path map to display. Maybe there are no MPLS tunnel hops discovered.");
+    print_message('No Path map to display. Maybe there are no MPLS tunnel hops discovered.');
 }

@@ -4,24 +4,24 @@
  * requires snmp extend agent script from librenms-agent
  */
 if (! empty($pre_cache['raspberry_pi_sensors'])) {
-    $sensor_type = "raspberry_volts";
+    $sensor_type = 'raspberry_volts';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
     for ($volt = 2; $volt < 6; $volt++) {
         switch ($volt) {
-            case "2":
-                $descr = "Core";
+            case '2':
+                $descr = 'Core';
                 break;
-            case "3":
-                $descr = "SDRAMc";
+            case '3':
+                $descr = 'SDRAMc';
                 break;
-            case "4":
-                $descr = "SDRAMi";
+            case '4':
+                $descr = 'SDRAMi';
                 break;
-            case "5":
-                $descr = "SDRAMp";
+            case '5':
+                $descr = 'SDRAMp';
                 break;
         }
-        $value = current($pre_cache['raspberry_pi_sensors']["raspberry." . $volt]);
+        $value = current($pre_cache['raspberry_pi_sensors']['raspberry.' . $volt]);
         if (is_numeric($value)) {
             discover_sensor($valid['sensor'], 'voltage', $device, $oid . $volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
         } else {
@@ -67,8 +67,8 @@ foreach (explode("\n", $oids) as $data) {
     }//end if
 }
 
-if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
-    $sensor_type = "chip_volts";
+if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
+    $sensor_type = 'chip_volts';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
     $lowlimit = 3.8;
     $lowwarnlimit = 3.8;

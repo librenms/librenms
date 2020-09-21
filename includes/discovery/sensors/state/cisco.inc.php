@@ -11,7 +11,7 @@
  */
 
 $role_data = snmpwalk_cache_oid($device, 'cswSwitchRole', [], 'CISCO-STACKWISE-MIB');
-$redundant_data = snmp_get($device, "cswRingRedundant.0", "-OQv", "CISCO-STACKWISE-MIB");
+$redundant_data = snmp_get($device, 'cswRingRedundant.0', '-OQv', 'CISCO-STACKWISE-MIB');
 
 $tables = [
     ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.2.1.7.',       'oid' => 'ciscoEnvMonVoltageStatusTable',        'state_name' => 'ciscoEnvMonVoltageState',      'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonVoltageStatusDescr'],

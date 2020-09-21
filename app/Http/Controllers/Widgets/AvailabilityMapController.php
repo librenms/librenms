@@ -107,12 +107,12 @@ class AvailabilityMapController extends WidgetController
         foreach ($devices as $device) {
             if ($device->disabled) {
                 $totals['disabled']++;
-                $device->stateName = "disabled";
-                $device->labelClass = "blackbg";
+                $device->stateName = 'disabled';
+                $device->labelClass = 'blackbg';
             } elseif ($device->disable_notify) {
                 $totals['ignored']++;
-                $device->stateName = "alert-dis";
-                $device->labelClass = "label-default";
+                $device->stateName = 'alert-dis';
+                $device->labelClass = 'label-default';
             } elseif ($device->status == 1) {
                 if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {
                     $totals['warn']++;
@@ -162,16 +162,16 @@ class AvailabilityMapController extends WidgetController
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0];
         foreach ($services as $service) {
             if ($service->service_status == 0) {
-                $service->labelClass = "label-success";
-                $service->stateName = "up";
+                $service->labelClass = 'label-success';
+                $service->stateName = 'up';
                 $totals['up']++;
             } elseif ($service->service_status == 1) {
-                $service->labelClass = "label-warning";
-                $service->stateName = "warn";
+                $service->labelClass = 'label-warning';
+                $service->stateName = 'warn';
                 $totals['warn']++;
             } else {
-                $service->labelClass = "label-danger";
-                $service->stateName = "down";
+                $service->labelClass = 'label-danger';
+                $service->stateName = 'down';
                 $totals['down']++;
             }
         }

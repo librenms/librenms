@@ -67,8 +67,8 @@ class Slack extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
             var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump("Params: " . $alert_message); //FIXME: propper debuging
-            var_dump("Return: " . $ret); //FIXME: propper debuging
+            var_dump('Params: ' . $alert_message); //FIXME: propper debuging
+            var_dump('Return: ' . $ret); //FIXME: propper debuging
 
             return 'HTTP Status code ' . $code;
         }

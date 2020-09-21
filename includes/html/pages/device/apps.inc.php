@@ -36,7 +36,7 @@ foreach ($app_list as $app) {
 
     $app_state = \LibreNMS\Util\Html::appStateIcon($app['app_state']);
     if (! empty($app_state['icon'])) {
-        $text = "<font color=\"" . $app_state['color'] . "\"><i title=\"" . $app_state['hover_text'] . "\" class=\"fa " . $app_state['icon'] . " fa-fw fa-lg\" aria-hidden=\"true\"></i></font>";
+        $text = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
     } else {
         $text = '';
     }

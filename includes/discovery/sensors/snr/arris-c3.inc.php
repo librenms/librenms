@@ -28,7 +28,7 @@ foreach ($pre_cache['ar-c3_docsIfSignalQualityTable'] as $index => $data) {
         $oid = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
         $divisor = 10;
         $value = $data['docsIfSigQSignalNoise'];
-        if (preg_match("/.0$/", $pre_cache['ar-c3_ifName'][$index]['ifName'])) {
+        if (preg_match('/.0$/', $pre_cache['ar-c3_ifName'][$index]['ifName'])) {
             discover_sensor($valid['sensor'], 'snr', $device, $oid, 'docsIfSigQSignalNoise.' . $index, 'arris-c3', $descr, $divisor, '1', null, null, null, null, $value);
         }
     }

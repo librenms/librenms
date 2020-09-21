@@ -51,14 +51,14 @@ if ($sdbMgmtStsDevices > 1) {
 }
 
 foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
-    $entPhysicalDescr = "Schleifenbauer " . count($sdbDevInNameArray[$sdbDevIdIndex]) . "-phase, " . $sdbDevCfOutletsTotalArray[$sdbDevIdIndex] . "-outlet PDU";
-    $entPhysicalName = "Schleifenbauer PDU - SPDM v" . $sdbDevIdFirmwareVersionArray[$sdbDevIdIndex];
-    $entPhysicalHardwareRev = "SO# " . $sdbDevIdSalesOrderNumberArray[$sdbDevIdIndex];
+    $entPhysicalDescr = 'Schleifenbauer ' . count($sdbDevInNameArray[$sdbDevIdIndex]) . '-phase, ' . $sdbDevCfOutletsTotalArray[$sdbDevIdIndex] . '-outlet PDU';
+    $entPhysicalName = 'Schleifenbauer PDU - SPDM v' . $sdbDevIdFirmwareVersionArray[$sdbDevIdIndex];
+    $entPhysicalHardwareRev = 'SO# ' . $sdbDevIdSalesOrderNumberArray[$sdbDevIdIndex];
 
     // We are determining the $entPhysicalAlias for this PDU based on a few optional user-customizable fields.
     $entPhysicalAlias = null;
     if ($sdbDevIdNameArray[$sdbDevIdIndex] != '') {
-        $entPhysicalAlias = $sdbDevIdLocationArray[$sdbDevIdIndex] != '' ? $sdbDevIdNameArray[$sdbDevIdIndex] . " @ " . $sdbDevIdLocationArray[$sdbDevIdIndex] : $sdbDevIdNameArray[$sdbDevIdIndex];
+        $entPhysicalAlias = $sdbDevIdLocationArray[$sdbDevIdIndex] != '' ? $sdbDevIdNameArray[$sdbDevIdIndex] . ' @ ' . $sdbDevIdLocationArray[$sdbDevIdIndex] : $sdbDevIdNameArray[$sdbDevIdIndex];
     } // end of $entPhysicalAlias if-sequence
 
     discover_entity_physical($valid, $device, $sdbMgmtCtrlDevUnitAddress * 10, $entPhysicalDescr, 'chassis', $entPhysicalName, $sdbDevIdProductIdArray[$sdbDevIdIndex], $sdbDevIdSerialNumberArray[$sdbDevIdIndex], $entPhysicalContainedIn, 'Schleifenbauer Products B.V.', $sdbMgmtCtrlDevUnitAddress, null, $entPhysicalHardwareRev, null, $sdbDevIdFirmwareVersionArray[$sdbDevIdIndex], 'true', $entPhysicalAlias, $sdbDevIdVanityTagArray[$sdbDevIdIndex], null);
@@ -67,8 +67,8 @@ foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDe
     // The maximum sdbMgmtCtrlDevUnitAddress is 255, but multiplying by 1 million for namespace size. Add +100k for every top-level index below a PDU.
     foreach ($sdbDevInNameArray[$sdbDevIdIndex] as $sdbDevInIndex => $sdbDevInName) {
         $inputIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevInIndex * 1000; // +100k for the first top-level namespace. Add 1000 * sdbDevInIndex which goes up to 48. Leave 3 variable digits at the end.
-        $entPhysicalDescr = $sdbDevCfMaximumLoadArray[$sdbDevIdIndex] . "A input phase";
-        $entPhysicalName = "Input L" . $sdbDevInIndex;
+        $entPhysicalDescr = $sdbDevCfMaximumLoadArray[$sdbDevIdIndex] . 'A input phase';
+        $entPhysicalName = 'Input L' . $sdbDevInIndex;
 
         discover_entity_physical($valid, $device, $inputIndex, $entPhysicalDescr, 'powerSupply', $entPhysicalName, null, null, $sdbMgmtCtrlDevUnitAddress * 10, 'Schleifenbauer Products B.V.', $sdbDevInIndex, null, null, null, null, 'false', $sdbDevInName, null, null);
 
@@ -86,13 +86,13 @@ foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDe
         if ($sdbDevOutNameArray[$sdbDevIdIndex] != '') {
             // We found outlets, so let's spawn an Outlet Backplane.
             $outletBackplaneIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000; // +200k for the second top-level index namespace.
-            $entPhysicalDescr = $sdbDevCfOutletsTotalArray[$sdbDevIdIndex] . " outlets";
+            $entPhysicalDescr = $sdbDevCfOutletsTotalArray[$sdbDevIdIndex] . ' outlets';
 
             discover_entity_physical($valid, $device, $outletBackplaneIndex, $entPhysicalDescr, 'backplane', 'Outlets', null, null, $sdbMgmtCtrlDevUnitAddress * 10, 'Schleifenbauer Products B.V.', '-1', null, null, null, null, 'false', null, null, null);
 
             foreach ($sdbDevOutNameArray[$sdbDevIdIndex] as $sdbDevOutIndex => $sdbDevOutName) {
                 $outletIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000 + $sdbDevOutIndex * 1000; // +200k for the second top-level index namespace. Add 1000 * sdbDevOutIndex which goes up to 48. Leave 3 variable digits at the end.
-                $entPhysicalName = "Outlet #" . $sdbDevOutIndex;
+                $entPhysicalName = 'Outlet #' . $sdbDevOutIndex;
 
                 discover_entity_physical($valid, $device, $outletIndex, 'PDU outlet', 'powerSupply', $entPhysicalName, null, null, $outletBackplaneIndex, 'Schleifenbauer Products B.V.', $sdbDevOutIndex, null, null, null, null, 'false', $sdbDevOutName, null, null);
             } // end Outlet discovery foreach sdbDevOutNameArray
@@ -103,22 +103,22 @@ foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDe
     if ($sdbDevSnsTypeArray[$sdbDevIdIndex] != '') {
         // We found at least one sensor connection, so let's spawn a Sensor Container.
         $sensorContainerIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 300000; // +300k for the third top-level index namespace.
-        $entPhysicalDescr = $sdbDevCfSensorsArray[$sdbDevIdIndex] == 1 ? "1 external sensor" : $sdbDevCfSensorsArray[$sdbDevIdIndex] . " external sensors";
+        $entPhysicalDescr = $sdbDevCfSensorsArray[$sdbDevIdIndex] == 1 ? '1 external sensor' : $sdbDevCfSensorsArray[$sdbDevIdIndex] . ' external sensors';
 
         discover_entity_physical($valid, $device, $sensorContainerIndex, $entPhysicalDescr, 'container', 'Sensor Container', null, null, $sdbMgmtCtrlDevUnitAddress * 10, 'Schleifenbauer Products B.V.', '-1', null, null, null, null, 'false', null, null, null);
 
         foreach ($sdbDevSnsNameArray[$sdbDevIdIndex] as $sdbDevSnsIndex => $sdbDevSnsName) {
             $sensorIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 300000 + $sdbDevSnsIndex * 1000; // +300k for the third top-level index namespace. Add 1000 * sdbDevSnsIndex which goes up to 16. Leave 3 variable digits at the end.
-            $entPhysicalName = "External Sensor #" . $sdbDevSnsIndex;
+            $entPhysicalName = 'External Sensor #' . $sdbDevSnsIndex;
             switch ($sdbDevSnsTypeArray[$sdbDevIdIndex][$sdbDevSnsIndex]) {
                 case 'T':
-                    $entPhysicalDescr = "Temperature sensor (°C)";
+                    $entPhysicalDescr = 'Temperature sensor (°C)';
                     break;
                 case 'H':
-                    $entPhysicalDescr = "Humidity sensor (%)";
+                    $entPhysicalDescr = 'Humidity sensor (%)';
                     break;
                 case 'I':
-                    $entPhysicalDescr = "Dry switch contact (binary)";
+                    $entPhysicalDescr = 'Dry switch contact (binary)';
                     break;
             }
 
