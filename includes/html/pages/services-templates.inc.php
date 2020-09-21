@@ -51,7 +51,7 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                     }
 
                     echo generate_link($text, $vars, [
-                        'view' => $option
+                        'view' => $option,
                     ]);
                     if ($vars['view'] == $option) {
                         echo '</span>';

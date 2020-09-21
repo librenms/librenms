@@ -122,7 +122,8 @@ function add_service_template($device_group, $type, $desc, $param = '', $ignore 
 //        $device_group = device_group_by_id_cache($device_group);
 //    }
 
-$insert = ['device_group_id' => $device_group['device_group_id'], 'service_template_ip' => $ip, 'service_template_type' => $type, 'service_template_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled];
+    $insert = ['device_group_id' => $device_group['device_group_id'], 'service_template_ip' => $ip, 'service_template_type' => $type, 'service_template_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled];
+    
     return dbInsert($insert, 'services_template');
 }
 
