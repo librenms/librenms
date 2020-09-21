@@ -1,0 +1,36 @@
+os: ssu2000
+text: 'Symetricomm SSU2000'
+type: appliance
+icon: microsemi
+mib_dir: microsemi
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.601.3.1.1
+discovery_modules:
+    storage: false
+    bgp-peers: false
+    ntp: false
+    stp: false
+    diskio: false
+    vlans: false
+    arp-table: false
+    discovery-protocols: false
+    hr-device: false
+    mempools: false
+    entity-physical: false
+    ports-stack: false
+    ucd-diskio: false
+    processors: false
+    mpls: false
+    wireless: false
+    fdb-table: false
+    services: false
+    cisco-vrf-lite: false
+poller_modules:
+    ospf: false
+    ntp: false
+    services: false
+    storage: false
+    ucd-diskio: false
+    mpls: false

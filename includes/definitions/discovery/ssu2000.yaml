@@ -1,0 +1,47 @@
+mib: SSU2000-MIB:DATUM-MIB
+modules:
+    sensors:
+       state:
+            data:
+                -
+                    oid: staPtPtpTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.16.1.1.3.1.1.{{ $index }}'
+                    value: staPtPtpStatus
+                    descr: 'PTP Status - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                -
+                    oid: staPtNtpTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.15.1.1.3.2.{{ $index }}'
+                    value: staPtNtpStatus
+                    descr: 'NTP Status - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                -
+                    oid: staGpsTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.5.1.1.3.{{ $index }}'
+                    value: staGpsStatus
+                    descr: 'GPS Status - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: selected, graph: 0, value: 2, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                -
+                    oid: staClkTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.2.1.1.3.{{ $index }}'
+                    value: staCkStatus
+                    descr: 'Clock Status - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: selected, graph: 0, value: 2, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: reject, graph: 0, value: 5, generic: 1 }
