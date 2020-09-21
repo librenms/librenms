@@ -37,9 +37,9 @@ class Secureplatform extends \LibreNMS\OS implements OSPolling
         if (is_numeric($connections)) {
             $rrd_def = RrdDefinition::make()->addDataset('NumConn', 'GAUGE', 0);
 
-            $fields = array(
+            $fields = [
                 'NumConn' => $connections,
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'secureplatform_sessions', $tags, $fields);

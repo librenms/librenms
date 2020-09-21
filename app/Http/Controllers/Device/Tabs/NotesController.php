@@ -26,9 +26,9 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\UI\DeviceTab;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
 class NotesController implements DeviceTab
 {

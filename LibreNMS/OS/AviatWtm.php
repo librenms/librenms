@@ -76,7 +76,6 @@ class AviatWtm extends OS implements
      *
      * @return array
      */
-
     public function discoverWirelessRate()
     {
         $sensors = [];

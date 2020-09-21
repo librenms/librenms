@@ -76,7 +76,7 @@ class DeviceController extends TableController
             'hardware' => 'hardware',
             'os' => 'os',
             'uptime' => \DB::raw("IF(`status` = 1, `uptime`, `last_polled` - NOW())"),
-            'location' => 'location'
+            'location' => 'location',
         ];
     }
 
@@ -112,11 +112,11 @@ class DeviceController extends TableController
 
     protected function adjustFilterValue($field, $value)
     {
-        if ($field == 'location' && !is_numeric($value)) {
+        if ($field == 'location' && ! is_numeric($value)) {
             return Location::query()->where('location', $value)->value('id');
         }
 
-        if ($field == 'state' && !is_numeric($value)) {
+        if ($field == 'state' && ! is_numeric($value)) {
             return str_replace(['up', 'down'], [1, 0], $value);
         }
 
@@ -147,7 +147,7 @@ class DeviceController extends TableController
             'metrics' => $this->getMetrics($device),
             'hardware' => Rewrite::ciscoHardware($device),
             'os' => $this->getOsText($device),
-            'uptime' => (!$device->status && !$device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), 'short'),
+            'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), 'short'),
             'location' => $this->getLocation($device),
             'actions' => $this->getActions($device),
         ];
@@ -249,6 +249,7 @@ class DeviceController extends TableController
 
         $glue = $this->isDetailed() ? '<br />' : ' ';
         $metrics_content = implode(count($metrics) == 2 ? $glue : '', $metrics);
+
         return '<div class="device-table-metrics">' . $metrics_content . '</div>';
     }
 
@@ -264,6 +265,7 @@ class DeviceController extends TableController
         $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
         $html .= '<span><i title="' . $tab . '" class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
         $html .= '</span></a> ';
+
         return $html;
     }
 

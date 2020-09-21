@@ -66,7 +66,7 @@ class PollerCluster extends Model
             [
                 'name' => 'poller_enabled',
                 'default' => \LibreNMS\Config::get('service_poller_enabled'),
-                'value' => (bool)($this->poller_enabled ?? \LibreNMS\Config::get('service_poller_enabled')),
+                'value' => (bool) ($this->poller_enabled ?? \LibreNMS\Config::get('service_poller_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -94,7 +94,7 @@ class PollerCluster extends Model
             [
                 'name' => 'discovery_enabled',
                 'default' => \LibreNMS\Config::get('service_discovery_enabled'),
-                'value' => (bool)($this->discovery_enabled ?? \LibreNMS\Config::get('service_discovery_enabled')),
+                'value' => (bool) ($this->discovery_enabled ?? \LibreNMS\Config::get('service_discovery_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -115,7 +115,7 @@ class PollerCluster extends Model
             [
                 'name' => 'services_enabled',
                 'default' => \LibreNMS\Config::get('service_services_enabled'),
-                'value' => (bool)($this->services_enabled ?? \LibreNMS\Config::get('service_services_enabled')),
+                'value' => (bool) ($this->services_enabled ?? \LibreNMS\Config::get('service_services_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -136,7 +136,7 @@ class PollerCluster extends Model
             [
                 'name' => 'billing_enabled',
                 'default' => \LibreNMS\Config::get('service_billing_enabled'),
-                'value' => (bool)($this->billing_enabled ?? \LibreNMS\Config::get('service_billing_enabled')),
+                'value' => (bool) ($this->billing_enabled ?? \LibreNMS\Config::get('service_billing_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -158,7 +158,7 @@ class PollerCluster extends Model
             [
                 'name' => 'alerting_enabled',
                 'default' => \LibreNMS\Config::get('service_alerting_enabled'),
-                'value' => (bool)($this->alerting_enabled ?? \LibreNMS\Config::get('service_alerting_enabled')),
+                'value' => (bool) ($this->alerting_enabled ?? \LibreNMS\Config::get('service_alerting_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -172,7 +172,7 @@ class PollerCluster extends Model
             [
                 'name' => 'ping_enabled',
                 'default' => \LibreNMS\Config::get('service_ping_enabled'),
-                'value' => (bool)($this->ping_enabled ?? \LibreNMS\Config::get('service_ping_enabled')),
+                'value' => (bool) ($this->ping_enabled ?? \LibreNMS\Config::get('service_ping_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -186,7 +186,7 @@ class PollerCluster extends Model
             [
                 'name' => 'update_enabled',
                 'default' => \LibreNMS\Config::get('service_update_enabled'),
-                'value' => (bool)($this->update_enabled ?? \LibreNMS\Config::get('service_update_enabled')),
+                'value' => (bool) ($this->update_enabled ?? \LibreNMS\Config::get('service_update_enabled')),
                 'type' => 'boolean',
                 'advanced' => true,
             ],
@@ -208,13 +208,13 @@ class PollerCluster extends Model
                     'INFO' => 'INFO',
                     'WARNING' => 'WARNING',
                     'ERROR' => 'ERROR',
-                    'CRITICAL' => 'CRITICAL'
+                    'CRITICAL' => 'CRITICAL',
                 ],
             ],
             [
                 'name' => 'watchdog_enabled',
                 'default' => \LibreNMS\Config::get('service_watchdog_enabled'),
-                'value' => (bool)($this->watchdog_enabled ?? \LibreNMS\Config::get('service_watchdog_enabled')),
+                'value' => (bool) ($this->watchdog_enabled ?? \LibreNMS\Config::get('service_watchdog_enabled')),
                 'type' => 'boolean',
             ],
             [

@@ -27,5 +27,4 @@ namespace LibreNMS\Exceptions;
 
 class FileExistsException extends \Exception
 {
-
 }

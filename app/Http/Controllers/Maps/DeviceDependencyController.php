@@ -31,7 +31,6 @@ use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends MapController
 {
-
     protected $isolatedDeviceId = -1;
 
     protected $deviceIdAll = [];
@@ -55,8 +54,9 @@ class DeviceDependencyController extends MapController
                 },
                 'children' => function ($query) use ($request) {
                     $query->hasAccess($request->user());
-                }])
+                }, ])
             ->get();
+
         return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
     }
 
@@ -134,7 +134,7 @@ class DeviceDependencyController extends MapController
                     'to'    => $parent->device_id,
                     'width' => 2,
                 ];
-            };
+            }
         }
 
         // highlight isolated Devices

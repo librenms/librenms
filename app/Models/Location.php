@@ -38,7 +38,6 @@ class Location extends Model
 
     private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
 
-
     /**
      * Set up listeners for this Model
      */
@@ -61,7 +60,7 @@ class Location extends Model
      */
     public function hasCoordinates()
     {
-        return !(is_null($this->lat) || is_null($this->lng));
+        return ! (is_null($this->lat) || is_null($this->lng));
     }
 
     /**
@@ -80,12 +79,12 @@ class Location extends Model
      */
     public function lookupCoordinates()
     {
-        if (!$this->hasCoordinates() && $this->location) {
+        if (! $this->hasCoordinates() && $this->location) {
             $this->parseCoordinates();
 
-            if (!$this->hasCoordinates() &&
+            if (! $this->hasCoordinates() &&
                 \LibreNMS\Config::get('geoloc.latlng', true) &&
-                (!$this->id || $this->timestamp && $this->timestamp->diffInDays() > 2)
+                (! $this->id || $this->timestamp && $this->timestamp->diffInDays() > 2)
             ) {
                 $this->fetchCoordinates();
                 $this->updateTimestamps();
@@ -148,7 +147,6 @@ class Location extends Model
             $query->where('device_groups.id', $deviceGroup);
         });
     }
-
 
     // ---- Define Relationships ----
 

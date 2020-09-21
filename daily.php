@@ -15,7 +15,7 @@ use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\MemcacheLock;
 use LibreNMS\Validations\Php;
 
-$init_modules = array('alerts');
+$init_modules = ['alerts'];
 require __DIR__ . '/includes/init.php';
 include_once __DIR__ . '/includes/notifications.php';
 
@@ -27,7 +27,7 @@ if (isset($options['d'])) {
 }
 
 if ($options['f'] === 'update') {
-    if (!Config::get('update')) {
+    if (! Config::get('update')) {
         exit(0);
     }
 
@@ -51,7 +51,7 @@ if ($options['f'] === 'rrd_purge') {
         if (is_numeric($rrd_purge) && $rrd_purge > 0) {
             $cmd = "find $rrd_dir -type f -mtime +$rrd_purge -print -exec rm -f {} +";
             $purge = `$cmd`;
-            if (!empty($purge)) {
+            if (! empty($purge)) {
                 echo "Purged the following RRD files due to old age (over $rrd_purge days old):\n";
                 echo $purge;
             }
@@ -70,23 +70,23 @@ if ($options['f'] === 'syslog') {
         $syslog_purge = Config::get('syslog_purge');
 
         if (is_numeric($syslog_purge)) {
-            $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
+            $rows = (int) dbFetchCell('SELECT MIN(seq) FROM syslog');
             $initial_rows = $rows;
             while (true) {
-                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
+                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', [$rows]);
                 if (empty($limit)) {
                     break;
                 }
 
-                # Deletes are done in blocks of 1000 to avoid a single very large operation.
-                if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $syslog_purge)) > 0) {
+                // Deletes are done in blocks of 1000 to avoid a single very large operation.
+                if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', [$rows, $limit, $syslog_purge]) > 0) {
                     $rows = $limit;
                 } else {
                     break;
                 }
             }
 
-            dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $syslog_purge));
+            dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', [$rows, $syslog_purge]);
             $final_rows = $rows - $initial_rows;
             echo "Syslog cleared for entries over $syslog_purge days (about $final_rows rows)\n";
         }
@@ -176,10 +176,10 @@ if ($options['f'] === 'handle_notifiable') {
         // if update is not set to false and version is min or newer
         if (Config::get('update') && $options['r']) {
             if ($options['r'] === 'php53') {
-                $phpver   = '5.6.4';
+                $phpver = '5.6.4';
                 $eol_date = 'January 10th, 2018';
             } elseif ($options['r'] === 'php56' || $options['r'] === 'php71') {
-                $phpver   = Php::PHP_MIN_VERSION;
+                $phpver = Php::PHP_MIN_VERSION;
                 $eol_date = Php::PHP_MIN_VERSION_DATE;
             }
             if (isset($phpver)) {
@@ -238,7 +238,7 @@ if ($options['f'] === 'notifications') {
 }
 
 if ($options['f'] === 'bill_data') {
-    # Deletes data older than XX months before the start of the last complete billing period
+    // Deletes data older than XX months before the start of the last complete billing period
     $msg = "Deleting billing data more than %d month before the last completed billing cycle\n";
     $table = 'bill_data';
     $sql = "DELETE bill_data
@@ -267,9 +267,9 @@ if ($options['f'] === 'alert_log') {
                 ";
     lock_and_purge_query($table, $sql, $msg);
 
-    # alert_log older than $config['alert_log_purge'] days match now only the alert_log of active alerts
-    # in case of flapping of an alert, many entries are kept in alert_log
-    # we want only to keep the last alert_log that contains the alert details
+    // alert_log older than $config['alert_log_purge'] days match now only the alert_log of active alerts
+    // in case of flapping of an alert, many entries are kept in alert_log
+    // we want only to keep the last alert_log that contains the alert details
 
     $msg = "Deleting history of active alert_logs more than %d days\n";
     $sql = "DELETE
@@ -289,13 +289,12 @@ if ($options['f'] === 'alert_log') {
                     )
                 ";
     $purge_duration = Config::get('alert_log_purge');
-    if (!(is_numeric($purge_duration) && $purge_duration > 0)) {
+    if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
     $sql = str_replace("?", strval($purge_duration), $sql);
     lock_and_purge_query($table, $sql, $msg);
 }
-
 
 if ($options['f'] === 'purgeusers') {
     try {
@@ -311,7 +310,7 @@ if ($options['f'] === 'purgeusers') {
             $purge = \LibreNMS\Config::get('active_directory.users_purge');
         }
         if ($purge > 0) {
-            foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
+            foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", [$purge]) as $user) {
                 $users[] = $user['user'];
             }
 
@@ -337,8 +336,8 @@ if ($options['f'] === 'refresh_alert_rules') {
             $rule_options = json_decode($rule['extra'], true);
             if ($rule_options['options']['override_query'] !== 'on') {
                 $data['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
-                if (!empty($data['query'])) {
-                    dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
+                if (! empty($data['query'])) {
+                    dbUpdate($data, 'alert_rules', 'id=?', [$rule['id']]);
                     unset($data);
                 }
             }

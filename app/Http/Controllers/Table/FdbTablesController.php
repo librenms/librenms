@@ -161,7 +161,7 @@ class FdbTablesController extends TableController
             'description' => '',
             'dnsname' => $ip_info['dns'],
             'first_seen' => 'unknown',
-            'last_seen' => 'unknown'
+            'last_seen' => 'unknown',
         ];
 
         // diffForHumans and doDateTimeString are not safe
@@ -252,7 +252,7 @@ class FdbTablesController extends TableController
      */
     protected function findIps($mac_address)
     {
-        if (!isset($this->ipCache[$mac_address])) {
+        if (! isset($this->ipCache[$mac_address])) {
             $ips = Ipv4Mac::where('mac_address', $mac_address)
                 ->groupBy('ipv4_address')
                 ->pluck('ipv4_address');
@@ -264,7 +264,7 @@ class FdbTablesController extends TableController
                 // don't try too many dns queries, this is the slowest part
                 foreach ($ips->take(3) as $ip) {
                     $hostname = gethostbyaddr($ip);
-                    if (!IP::isValid($hostname)) {
+                    if (! IP::isValid($hostname)) {
                         $dns = $hostname;
                         break;
                     }
@@ -286,7 +286,7 @@ class FdbTablesController extends TableController
      */
     protected function getMacCount($port)
     {
-        if (!isset($this->macCountCache[$port->port_id])) {
+        if (! isset($this->macCountCache[$port->port_id])) {
             $this->macCountCache[$port->port_id] = $port->fdbEntries()->count();
         }
 

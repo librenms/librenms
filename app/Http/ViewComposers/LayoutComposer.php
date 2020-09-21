@@ -53,7 +53,7 @@ class LayoutComposer
         Checks::postAuth();
 
         $show_menu = auth()->check();
-        if ($show_menu && Config::get('twofactor') && !session('twofactor')) {
+        if ($show_menu && Config::get('twofactor') && ! session('twofactor')) {
             $show_menu = empty(UserPref::getPref(auth()->user(), 'twofactor'));
         }
 

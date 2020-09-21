@@ -39,7 +39,7 @@ class AvailabilityMapController extends WidgetController
     {
         $this->defaults = [
             'title' => null,
-            'type' => (int)Config::get('webui.availability_map_compact', 0),
+            'type' => (int) Config::get('webui.availability_map_compact', 0),
             'tile_size' => 12,
             'color_only_select' => 0,
             'show_disabled_and_ignored' => 0,
@@ -60,10 +60,10 @@ class AvailabilityMapController extends WidgetController
 
         $mode = $data['mode_select'];
         if ($mode == 0 || $mode == 2) {
-            list($devices, $device_totals) = $this->getDevices($request);
+            [$devices, $device_totals] = $this->getDevices($request);
         }
         if ($mode > 0) {
-            list($services, $services_totals) = $this->getServices($request);
+            [$services, $services_totals] = $this->getServices($request);
         }
 
         $data['device'] = Device::first();
@@ -75,8 +75,6 @@ class AvailabilityMapController extends WidgetController
 
         return view('widgets.availability-map', $data);
     }
-
-
 
     public function getSettingsView(Request $request)
     {
@@ -98,7 +96,7 @@ class AvailabilityMapController extends WidgetController
             $device_query = Device::hasAccess($request->user());
         }
 
-        if (!$settings['show_disabled_and_ignored']) {
+        if (! $settings['show_disabled_and_ignored']) {
             $device_query->isNotDisabled();
         }
         $device_query->orderBy($settings['order_by']);
@@ -137,6 +135,7 @@ class AvailabilityMapController extends WidgetController
                 $totals['maintenance']++;
             }
         }
+
         return [$devices, $totals];
     }
 
@@ -177,6 +176,7 @@ class AvailabilityMapController extends WidgetController
                 $totals['down']++;
             }
         }
+
         return [$services, $totals];
     }
 }

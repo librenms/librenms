@@ -38,7 +38,7 @@ class Hpmsm extends OS implements WirelessClientsDiscovery
      */
     public function discoverWirelessClients()
     {
-        return array(
+        return [
             new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
@@ -46,7 +46,7 @@ class Hpmsm extends OS implements WirelessClientsDiscovery
                 'hpmsm',
                 0,
                 'Clients: Total'
-            )
-        );
+            ),
+        ];
     }
 }

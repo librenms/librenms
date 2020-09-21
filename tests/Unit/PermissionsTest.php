@@ -36,20 +36,20 @@ class PermissionsTest extends TestCase
 {
     private function devicePermissionData($user)
     {
-        $user_id = $user instanceof User ? $user->user_id : (is_numeric($user) ? (int)$user : \Auth::id());
+        $user_id = $user instanceof User ? $user->user_id : (is_numeric($user) ? (int) $user : \Auth::id());
 
         $data = null;
 
         switch ($user_id) {
             case 43:
                 $data = [
-                    (object)['user_id' => 43, 'device_id' => 54],
-                    (object)['user_id' => 43, 'device_id' => 32],
+                    (object) ['user_id' => 43, 'device_id' => 54],
+                    (object) ['user_id' => 43, 'device_id' => 32],
                 ];
                 break;
             case 14:
                 $data = [
-                    (object)['user_id' => 14, 'device_id' => 54],
+                    (object) ['user_id' => 14, 'device_id' => 54],
                 ];
                 break;
         }
@@ -88,38 +88,39 @@ class PermissionsTest extends TestCase
             return self::devicePermissionData($user);
         });
 
-        $this->assertEquals(collect([54,32]), $perms->devicesForUser(43));
+        $this->assertEquals(collect([54, 32]), $perms->devicesForUser(43));
         $user = factory(User::class)->make(['user_id' => 43]);
-        $this->assertEquals(collect([54,32]), $perms->devicesForUser($user));
+        $this->assertEquals(collect([54, 32]), $perms->devicesForUser($user));
         $this->assertEmpty($perms->devicesForUser(9));
         $this->assertEquals(collect(), $perms->devicesForUser());
         \Auth::shouldReceive('id')->once()->andReturn(14);
         $this->assertEquals(collect([54]), $perms->devicesForUser());
     }
-/*
-    public function testUsersForDevice()
-    {
-        $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
-        $perms->shouldReceive('getDevicePermissions')->andReturn(collect([
-            (object)['user_id' => 3, 'device_id' => 7],
-            (object)['user_id' => 3, 'device_id' => 2],
-            (object)['user_id' => 4, 'device_id' => 5],
-            (object)['user_id' => 6, 'device_id' => 5],
-        ]));
 
-        $this->assertEquals(collect([4, 6]), $perms->usersForDevice(5));
-        $this->assertEquals(collect([3]), $perms->usersForDevice(factory(Device::class)->make(['device_id' => 7])));
-        $this->assertEquals(collect(), $perms->usersForDevice(6));
-        $this->assertEmpty($perms->usersForDevice(9));
-    }
-*/
+    /*
+        public function testUsersForDevice()
+        {
+            $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
+            $perms->shouldReceive('getDevicePermissions')->andReturn(collect([
+                (object)['user_id' => 3, 'device_id' => 7],
+                (object)['user_id' => 3, 'device_id' => 2],
+                (object)['user_id' => 4, 'device_id' => 5],
+                (object)['user_id' => 6, 'device_id' => 5],
+            ]));
+
+            $this->assertEquals(collect([4, 6]), $perms->usersForDevice(5));
+            $this->assertEquals(collect([3]), $perms->usersForDevice(factory(Device::class)->make(['device_id' => 7])));
+            $this->assertEquals(collect(), $perms->usersForDevice(6));
+            $this->assertEmpty($perms->usersForDevice(9));
+        }
+    */
     public function testUserCanAccessPort()
     {
         $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
         $perms->shouldReceive('getPortPermissions')->andReturn(collect([
-            (object)['user_id' => 43, 'port_id' => 54],
-            (object)['user_id' => 43, 'port_id' => 32],
-            (object)['user_id' => 14, 'port_id' => 54],
+            (object) ['user_id' => 43, 'port_id' => 54],
+            (object) ['user_id' => 43, 'port_id' => 32],
+            (object) ['user_id' => 14, 'port_id' => 54],
         ]));
 
         $port = factory(Port::class)->make(['port_id' => 54]);
@@ -143,14 +144,14 @@ class PermissionsTest extends TestCase
     {
         $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
         $perms->shouldReceive('getPortPermissions')->andReturn(collect([
-            (object)['user_id' => 3, 'port_id' => 7],
-            (object)['user_id' => 3, 'port_id' => 2],
-            (object)['user_id' => 4, 'port_id' => 5],
+            (object) ['user_id' => 3, 'port_id' => 7],
+            (object) ['user_id' => 3, 'port_id' => 2],
+            (object) ['user_id' => 4, 'port_id' => 5],
         ]));
 
-        $this->assertEquals(collect([7,2]), $perms->portsForUser(3));
+        $this->assertEquals(collect([7, 2]), $perms->portsForUser(3));
         $user = factory(User::class)->make(['user_id' => 3]);
-        $this->assertEquals(collect([7,2]), $perms->portsForUser($user));
+        $this->assertEquals(collect([7, 2]), $perms->portsForUser($user));
         $this->assertEmpty($perms->portsForUser(9));
         $this->assertEquals(collect(), $perms->portsForUser());
         \Auth::shouldReceive('id')->once()->andReturn(4);
@@ -161,10 +162,10 @@ class PermissionsTest extends TestCase
     {
         $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
         $perms->shouldReceive('getPortPermissions')->andReturn(collect([
-            (object)['user_id' => 3, 'port_id' => 7],
-            (object)['user_id' => 3, 'port_id' => 2],
-            (object)['user_id' => 4, 'port_id' => 5],
-            (object)['user_id' => 6, 'port_id' => 5],
+            (object) ['user_id' => 3, 'port_id' => 7],
+            (object) ['user_id' => 3, 'port_id' => 2],
+            (object) ['user_id' => 4, 'port_id' => 5],
+            (object) ['user_id' => 6, 'port_id' => 5],
         ]));
 
         $this->assertEquals(collect([4, 6]), $perms->usersForPort(5));
@@ -177,9 +178,9 @@ class PermissionsTest extends TestCase
     {
         $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
         $perms->shouldReceive('getBillPermissions')->andReturn(collect([
-            (object)['user_id' => 43, 'bill_id' => 54],
-            (object)['user_id' => 43, 'bill_id' => 32],
-            (object)['user_id' => 14, 'bill_id' => 54],
+            (object) ['user_id' => 43, 'bill_id' => 54],
+            (object) ['user_id' => 43, 'bill_id' => 32],
+            (object) ['user_id' => 14, 'bill_id' => 54],
         ]));
 
         $bill = factory(Bill::class)->make(['bill_id' => 54]);
@@ -203,14 +204,14 @@ class PermissionsTest extends TestCase
     {
         $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
         $perms->shouldReceive('getBillPermissions')->andReturn(collect([
-            (object)['user_id' => 3, 'bill_id' => 7],
-            (object)['user_id' => 3, 'bill_id' => 2],
-            (object)['user_id' => 4, 'bill_id' => 5],
+            (object) ['user_id' => 3, 'bill_id' => 7],
+            (object) ['user_id' => 3, 'bill_id' => 2],
+            (object) ['user_id' => 4, 'bill_id' => 5],
         ]));
 
-        $this->assertEquals(collect([7,2]), $perms->billsForUser(3));
+        $this->assertEquals(collect([7, 2]), $perms->billsForUser(3));
         $user = factory(User::class)->make(['user_id' => 3]);
-        $this->assertEquals(collect([7,2]), $perms->billsForUser($user));
+        $this->assertEquals(collect([7, 2]), $perms->billsForUser($user));
         $this->assertEmpty($perms->billsForUser(9));
         $this->assertEquals(collect(), $perms->billsForUser());
         \Auth::shouldReceive('id')->once()->andReturn(4);
@@ -221,10 +222,10 @@ class PermissionsTest extends TestCase
     {
         $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
         $perms->shouldReceive('getBillPermissions')->andReturn(collect([
-            (object)['user_id' => 3, 'bill_id' => 7],
-            (object)['user_id' => 3, 'bill_id' => 2],
-            (object)['user_id' => 4, 'bill_id' => 5],
-            (object)['user_id' => 6, 'bill_id' => 5],
+            (object) ['user_id' => 3, 'bill_id' => 7],
+            (object) ['user_id' => 3, 'bill_id' => 2],
+            (object) ['user_id' => 4, 'bill_id' => 5],
+            (object) ['user_id' => 6, 'bill_id' => 5],
         ]));
 
         $this->assertEquals(collect([4, 6]), $perms->usersForBill(5));

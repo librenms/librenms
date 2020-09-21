@@ -47,19 +47,19 @@ class DistributedPoller extends BaseValidation
      */
     public function validate(Validator $validator)
     {
-        if (!Config::get('distributed_poller')) {
+        if (! Config::get('distributed_poller')) {
             $validator->fail('You have not enabled distributed_poller');
+
             return;
         }
 
-
-        if (!Config::get('distributed_poller_memcached_host')) {
+        if (! Config::get('distributed_poller_memcached_host')) {
             $validator->fail('You have not configured $config[\'distributed_poller_memcached_host\']');
-        } elseif (!Config::get('distributed_poller_memcached_port')) {
+        } elseif (! Config::get('distributed_poller_memcached_port')) {
             $validator->fail('You have not configured $config[\'distributed_poller_memcached_port\']');
         } else {
             $connection = @fsockopen(Config::get('distributed_poller_memcached_host'), Config::get('distributed_poller_memcached_port'));
-            if (!is_resource($connection)) {
+            if (! is_resource($connection)) {
                 $validator->fail('We could not get memcached stats, it is possible that we cannot connect to your memcached server, please check');
             } else {
                 fclose($connection);
@@ -67,9 +67,9 @@ class DistributedPoller extends BaseValidation
             }
         }
 
-        if (!Config::get('rrdcached')) {
+        if (! Config::get('rrdcached')) {
             $validator->fail('You have not configured $config[\'rrdcached\']');
-        } elseif (!is_dir(Config::get('rrd_dir'))) {
+        } elseif (! is_dir(Config::get('rrd_dir'))) {
             $validator->fail('You have not configured $config[\'rrd_dir\']');
         } else {
             Rrd::checkRrdcached($validator);

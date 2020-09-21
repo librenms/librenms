@@ -91,7 +91,6 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
             $count++;
         }
 
-
         return $processors;
     }
 }

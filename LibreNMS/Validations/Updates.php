@@ -40,17 +40,20 @@ class Updates extends BaseValidation
     {
         if (EnvHelper::librenmsDocker()) {
             $validator->warn('Updates are managed through the official Docker image');
+
             return;
         }
 
-        if (!Git::repoPresent()) {
+        if (! Git::repoPresent()) {
             $validator->warn('Non-git install, updates are manual or from package');
+
             return;
         }
 
         // if git is not available, we cannot do the other tests
-        if (!Git::binaryExists()) {
+        if (! Git::binaryExists()) {
             $validator->warn('Unable to locate git. This should probably be installed.');
+
             return;
         }
 
@@ -97,7 +100,7 @@ class Updates extends BaseValidation
         // check for modified files
         $modifiedcmd = 'git diff --name-only --exit-code';
         $validator->execAsUser($modifiedcmd, $cmdoutput, $code);
-        if ($code !== 0 && !empty($cmdoutput)) {
+        if ($code !== 0 && ! empty($cmdoutput)) {
             $result = ValidationResult::warn(
                 "Your local git contains modified files, this could prevent automatic updates.",
                 "You can fix this with ./scripts/github-remove"

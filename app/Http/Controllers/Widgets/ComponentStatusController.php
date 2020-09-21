@@ -56,7 +56,7 @@ class ComponentStatusController extends WidgetController
             [
                 'color' => 'text-danger',
                 'text' => __('Critical'),
-            ]
+            ],
         ];
 
         $component_status = Component::query()

@@ -52,8 +52,9 @@ class JnxBgpM2BackwardTransition implements SnmptrapHandler
 
         $bgpPeer = $device->bgppeers()->where('bgpPeerIdentifier', $peerAddr)->first();
 
-        if (!$bgpPeer) {
+        if (! $bgpPeer) {
             Log::error('Unknown bgp peer handling bgpEstablished trap: ' . $peerAddr);
+
             return;
         }
 

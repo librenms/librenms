@@ -32,12 +32,14 @@ class Git
     public static function repoPresent()
     {
         $install_dir = Config::get('install_dir', realpath(__DIR__ . '/../..'));
+
         return file_exists("$install_dir/.git");
     }
 
     public static function binaryExists()
     {
         exec('git > /dev/null 2>&1', $response, $exit_code);
+
         return $exit_code === 1;
     }
 }

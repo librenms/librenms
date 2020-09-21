@@ -27,8 +27,8 @@ namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Snmptrap\Handlers\JnxDomLaneAlarmId;
+use LibreNMS\Snmptrap\Trap;
 use Log;
 
 class JnxDomLaneAlarmSet implements SnmptrapHandler
@@ -49,8 +49,9 @@ class JnxDomLaneAlarmSet implements SnmptrapHandler
 
         $ifIndex = substr(strrchr($trap->findOid('IF-MIB::ifDescr'), '.'), 1);
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
-        if (!$port) {
+        if (! $port) {
             Log::warning("Snmptrap JnxDomLaneAlarmSet: Could not find port at ifIndex $port->ifIndex for device: " . $device->hostname);
+
             return;
         }
 

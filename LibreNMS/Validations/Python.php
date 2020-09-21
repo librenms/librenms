@@ -46,6 +46,7 @@ class Python extends BaseValidation
 
         if (empty($version)) {
             $validator->fail('python3 not found', 'Install Python 3 for your system.');
+
             return; // no need to check anything else
         }
 

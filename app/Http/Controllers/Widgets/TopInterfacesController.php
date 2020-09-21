@@ -73,7 +73,6 @@ class TopInterfacesController extends WidgetController
         return view('widgets.top-interfaces', $data);
     }
 
-
     public function getSettingsView(Request $request)
     {
         return view('widgets.settings.top-interfaces', $this->getSettings(true));

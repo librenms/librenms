@@ -59,6 +59,7 @@ class Version
         if (Eloquent::isConnected()) {
             try {
                 $query = Eloquent::DB()->table('migrations');
+
                 return [
                     'last' => $query->orderBy('id', 'desc')->value('migration'),
                     'total' => $query->count(),

@@ -73,7 +73,7 @@ class RoutingController implements DeviceTab
     public function data(Device $device): array
     {
         return [
-            'routing_tabs' => array_filter($this->tabs)
+            'routing_tabs' => array_filter($this->tabs),
         ];
     }
 }

@@ -36,12 +36,12 @@ class WidgetSettingsController extends Controller
         $this->validate($request, ['settings' => 'array']);
 
         $widget = UserWidget::with('dashboard')->findOrFail($widget_settings);
-        $widget_settings = (array)$request->get('settings', []);
+        $widget_settings = (array) $request->get('settings', []);
 
-        if (!$widget->dashboard->canWrite($request->user())) {
+        if (! $widget->dashboard->canWrite($request->user())) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'ERROR: You have no write-access to this dashboard'
+                'message' => 'ERROR: You have no write-access to this dashboard',
             ]);
         }
 
@@ -49,13 +49,13 @@ class WidgetSettingsController extends Controller
         if ($widget->save()) {
             return response()->json([
                 'status' => 'ok',
-                'message' => 'Updated widget settings'
+                'message' => 'Updated widget settings',
             ]);
         }
 
         return response()->json([
             'status' => 'error',
-            'message' => 'ERROR: Could not update'
+            'message' => 'ERROR: Could not update',
         ]);
     }
 }

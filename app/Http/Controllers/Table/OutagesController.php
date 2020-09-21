@@ -28,10 +28,10 @@ namespace App\Http\Controllers\Table;
 use App\Models\DeviceOutage;
 use App\Models\Eventlog;
 use Carbon\Carbon;
-use LibreNMS\Config;
-use LibreNMS\Util\Url;
-use LibreNMS\Enum\Alert;
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Config;
+use LibreNMS\Enum\Alert;
+use LibreNMS\Util\Url;
 
 class OutagesController extends TableController
 {
@@ -77,7 +77,7 @@ class OutagesController extends TableController
     public function formatItem($outage)
     {
         $start = $this->formatDatetime($outage->going_down);
-        $end =  $outage->up_again ? $this->formatDatetime($outage->up_again) : '-';
+        $end = $outage->up_again ? $this->formatDatetime($outage->up_again) : '-';
         $duration = ($outage->up_again ?: time()) - $outage->going_down;
 
         return [
@@ -93,7 +93,7 @@ class OutagesController extends TableController
     {
         $day_seconds = 86400;
 
-        $duration_days = (int)($duration / $day_seconds);
+        $duration_days = (int) ($duration / $day_seconds);
         $duration_time = $duration % $day_seconds;
 
         $output = "<span style='display:inline;'>";

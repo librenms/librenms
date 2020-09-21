@@ -67,7 +67,6 @@ class LatencyController implements DeviceTab
             ? abs(strtotime($perf->first()->date) - strtotime($perf->last()->date)) * 1000
             : 0;
 
-
         $smokeping = new Smokeping($device);
         $smokeping_tabs = [];
         if ($smokeping->hasInGraph()) {

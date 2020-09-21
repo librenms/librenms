@@ -34,11 +34,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
-use Symfony\Component\Process\Process;
-use LibreNMS\Alert\AlertRules;
 use Log;
+use Symfony\Component\Process\Process;
 
 class PingCheck implements ShouldQueue
 {
@@ -47,18 +47,18 @@ class PingCheck implements ShouldQueue
     private $process;
     private $rrd_tags;
 
-    /** @var \Illuminate\Database\Eloquent\Collection $devices List of devices keyed by hostname */
+    /** @var \Illuminate\Database\Eloquent\Collection List of devices keyed by hostname */
     private $devices;
-    /** @var array $groups List of device group ids to check */
+    /** @var array List of device group ids to check */
     private $groups = [];
 
     // working data for loop
-    /** @var Collection $tiered */
+    /** @var Collection */
     private $tiered;
-    /** @var Collection $current */
+    /** @var Collection */
     private $current;
     private $current_tier;
-    /** @var Collection $deferred */
+    /** @var Collection */
     private $deferred;
 
     /**
@@ -118,7 +118,7 @@ class PingCheck implements ShouldQueue
                 if (preg_match('/^(?<hostname>[^\s]+): (?:Name or service not known|Temporary failure in name resolution)/', $line, $errored)) {
                     $this->recordData([
                         'hostname' => $errored['hostname'],
-                        'status' => 'unreachable'
+                        'status' => 'unreachable',
                     ]);
                 }
                 continue;
@@ -200,7 +200,7 @@ class PingCheck implements ShouldQueue
 
         $this->current_tier++;  // next tier
 
-        if (!$this->tiered->has($this->current_tier)) {
+        if (! $this->tiered->has($this->current_tier)) {
             // out of devices
             return;
         }
@@ -300,7 +300,7 @@ class PingCheck implements ShouldQueue
         if ($this->deferred->has($device->max_depth)) {
             // add this data to the proper tier, unless it already exists...
             $tier = $this->deferred->get($device->max_depth);
-            if (!$tier->has($device->hostname)) {
+            if (! $tier->has($device->hostname)) {
                 $tier->put($device->hostname, $data);
             }
         } else {

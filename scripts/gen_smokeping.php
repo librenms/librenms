@@ -23,14 +23,13 @@
  * @copyright  2020 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
-
 if (php_sapi_name() === 'cli') {
     $init_modules = [];
     require realpath(__DIR__ . '/..') . '/includes/init.php';
 
     $return = \Artisan::call('smokeping:generate --targets --no-header --no-dns --single-process --compat');
     echo \Artisan::Output();
-    
+
     exit($return);
 }
 

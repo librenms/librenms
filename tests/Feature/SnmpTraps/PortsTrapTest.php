@@ -58,7 +58,6 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n";
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle linkDown');
 
-
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifAdminStatus, 'down');
         $this->assertEquals($port->ifOperStatus, 'down');

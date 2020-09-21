@@ -44,7 +44,7 @@ class Checks
                 null,
                 true
             );
-        };
+        }
     }
 
     /**
@@ -52,7 +52,7 @@ class Checks
      */
     public static function postAutoload()
     {
-        if (!class_exists(\Illuminate\Foundation\Application::class)) {
+        if (! class_exists(\Illuminate\Foundation\Application::class)) {
             self::printMessage(
                 'Error: Missing dependencies! Run the following command to fix:',
                 './scripts/composer_wrapper.php install --no-dev',
@@ -79,7 +79,7 @@ class Checks
     public static function postAuth()
     {
         // limit popup messages frequency
-        if (Cache::get('checks_popup_timeout') || !Auth::check()) {
+        if (Cache::get('checks_popup_timeout') || ! Auth::check()) {
             return;
         }
 
@@ -101,14 +101,14 @@ class Checks
 
             // Directory access checks
             $rrd_dir = Config::get('rrd_dir');
-            if (!is_dir($rrd_dir)) {
+            if (! is_dir($rrd_dir)) {
                 Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . ">Validate your install</a>");
             }
 
             $temp_dir = Config::get('temp_dir');
-            if (!is_dir($temp_dir)) {
+            if (! is_dir($temp_dir)) {
                 Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . ">Validate your install</a>");
-            } elseif (!is_writable($temp_dir)) {
+            } elseif (! is_writable($temp_dir)) {
                 Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
             }
         }
@@ -138,7 +138,7 @@ class Checks
 
     private static function printMessage($title, $content, $exit = false)
     {
-        $content = (array)$content;
+        $content = (array) $content;
 
         if (PHP_SAPI == 'cli') {
             $format = "%s\n\n%s\n\n";
@@ -161,14 +161,14 @@ class Checks
     private static function missingPhpExtensions()
     {
         // allow mysqli, but prefer mysqlnd
-        if (!extension_loaded('mysqlnd') && !extension_loaded('mysqli')) {
+        if (! extension_loaded('mysqlnd') && ! extension_loaded('mysqli')) {
             return ['mysqlnd'];
         }
 
         $required_modules = ['mbstring', 'pcre', 'curl', 'xml', 'gd'];
 
         return array_filter($required_modules, function ($module) {
-            return !extension_loaded($module);
+            return ! extension_loaded($module);
         });
     }
 }

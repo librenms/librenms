@@ -44,7 +44,7 @@ class ApiToken extends BaseModel
     {
         $query = self::query()->isEnabled()->where('token_hash', $token);
 
-        if (!is_null($user_id)) {
+        if (! is_null($user_id)) {
             $query->where('user_id', $user_id);
         }
 

@@ -21,11 +21,12 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 class Irc extends Transport
 {
@@ -61,11 +62,11 @@ class Irc extends Transport
                     'descr' => 'Enable IRC alerts',
                     'type'  => 'checkbox',
                     'default' => true,
-                ]
+                ],
             ],
             'validation' => [
-                'irc' => 'required'
-            ]
+                'irc' => 'required',
+            ],
         ];
     }
 }

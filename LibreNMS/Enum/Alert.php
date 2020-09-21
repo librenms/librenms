@@ -35,10 +35,10 @@ abstract class Alert
     const ERROR = 5;
 
     const SEVERITIES = ['unknown' => self::UNKNOWN,
-                        'ok'      => self::OK,
-                        'info'    => self::INFO,
-                        'notice'  => self::NOTICE,
-                        'warning' => self::WARNING,
-                        'error'   => self::ERROR,
-                       ];
+        'ok'      => self::OK,
+        'info'    => self::INFO,
+        'notice'  => self::NOTICE,
+        'warning' => self::WARNING,
+        'error'   => self::ERROR,
+    ];
 }

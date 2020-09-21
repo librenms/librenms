@@ -74,8 +74,8 @@ class DocsTest extends TestCase
     public function testDocExist()
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
-        $dir    = __DIR__ . '/../doc/';
-        $files  = str_replace($dir, '', rtrim(`find $dir -name '*.md'`));
+        $dir = __DIR__ . '/../doc/';
+        $files = str_replace($dir, '', rtrim(`find $dir -name '*.md'`));
 
         // check for missing pages
         collect(explode(PHP_EOL, $files))

@@ -55,7 +55,7 @@ class Nac implements Module
     {
         if ($os instanceof NacPolling) {
             // discovery output (but don't install it twice (testing can can do this)
-            if (!PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
+            if (! PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
                 PortsNac::observe(new ModuleModelObserver());
             }
 

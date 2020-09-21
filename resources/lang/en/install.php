@@ -1,11 +1,12 @@
 <?php
+
 return [
     "checks" => [
         "comment" => "Comment",
         "item" => "Item",
         "php_required" => ":version or higher required",
         "status" => "Status",
-        "title" => "Pre-Install Checks"
+        "title" => "Pre-Install Checks",
     ],
     "database" => [
         "credentials" => "Database Credentials",
@@ -18,7 +19,7 @@ return [
         "socket_empty" => "Leave empty if using Unix-Socket",
         "test" => "Check Credentials",
         "title" => "Configure Database",
-        "username" => "User"
+        "username" => "User",
     ],
     "finish" => [
         "config_exists" => "config.php file exists",
@@ -37,7 +38,7 @@ return [
         "thanks" => "Thank you for setting up LibreNMS.",
         "title" => "Finish Install",
         "validate" => "First, you need to :validate and fix any issues.",
-        "validate_link" => "validate your install"
+        "validate_link" => "validate your install",
     ],
     "install" => "Install",
     "migrate" => [
@@ -46,14 +47,14 @@ return [
         "migrate" => "Build Database",
         "retry" => "Retry",
         "timeout" => "HTTP request timed out, your database structure may be inconsistent.",
-        "wait" => "Please Wait..."
+        "wait" => "Please Wait...",
     ],
     "steps" => [
         "checks" => "Pre-Install Checks",
         "database" => "Database",
         "finish" => "Finish Install",
         "migrate" => "Build Database",
-        "user" => "Create User"
+        "user" => "Create User",
     ],
     "title" => "LibreNMS Install",
     "user" => [
@@ -64,6 +65,6 @@ return [
         "password" => "Password",
         "success" => "Successfully created user",
         "title" => "Create Admin User",
-        "username" => "Username"
-    ]
+        "username" => "Username",
+    ],
 ];

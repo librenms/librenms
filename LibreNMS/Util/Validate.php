@@ -30,7 +30,7 @@ class Validate
     /**
      * Checks if the give string is a valid hostname
      * @param string $hostname
-     * @return boolean
+     * @return bool
      */
     public static function hostname($hostname)
     {
@@ -45,10 +45,9 @@ class Validate
         // such as the underscore character (_), other DNS names may contain the underscore
         // maximum length is 253 characters, maximum segment size is 63
 
-        return (
+        return
             preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*\.?$/i", $hostname) //valid chars check
             && preg_match("/^.{1,253}$/", $hostname) //overall length check
-            && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname)
-        );
+            && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname);
     }
 }

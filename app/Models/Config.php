@@ -35,7 +35,7 @@ class Config extends BaseModel
         'config_value',
     ];
     protected $casts = [
-        'config_default' => 'array'
+        'config_default' => 'array',
     ];
 
     // ---- Accessors/Mutators ----

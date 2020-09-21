@@ -24,18 +24,19 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use GuzzleHttp\Client;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
-use GuzzleHttp\Client;
 
 class Matrix extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $server    = $this->config['matrix-server'];
-        $room      = $this->config['matrix-room'];
+        $server = $this->config['matrix-server'];
+        $room = $this->config['matrix-room'];
         $authtoken = $this->config['matrix-authtoken'];
-        $message   = $this->config['matrix-message'];
+        $message = $this->config['matrix-message'];
+
         return $this->contactMatrix($obj, $server, $room, $authtoken, $message);
     }
 
@@ -46,7 +47,7 @@ class Matrix extends Transport
         $txnid = rand(1111, 9999) . time();
 
         $server = preg_replace('/\/$/', '', $server);
-        $host = $server."/_matrix/client/r0/rooms/".urlencode($room)."/send/m.room.message/".$txnid;
+        $host = $server . "/_matrix/client/r0/rooms/" . urlencode($room) . "/send/m.room.message/" . $txnid;
 
         $request_heads['Authorization'] = "Bearer $authtoken";
         $request_heads['Content-Type'] = "application/json";
@@ -56,7 +57,7 @@ class Matrix extends Transport
             $message = str_replace("{{ $" . $p_key . ' }}', $p_val, $message);
         }
 
-        $body = array('body'=>$message, 'msgtype'=>'m.text');
+        $body = ['body'=>$message, 'msgtype'=>'m.text'];
 
         $client = new \GuzzleHttp\Client();
         $request_opts['proxy'] = get_guzzle_proxy();
@@ -70,9 +71,11 @@ class Matrix extends Transport
             var_dump("Params:");
             var_dump("Response headers:");
             var_dump($res->getHeaders());
-            var_dump("Return: ".$res->getReasonPhrase());
-            return 'HTTP Status code '.$code;
+            var_dump("Return: " . $res->getReasonPhrase());
+
+            return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -103,13 +106,13 @@ class Matrix extends Transport
                     'name' => 'matrix-message',
                     'descr' => 'Enter the message',
                     'type' => 'textarea',
-                ]
+                ],
             ],
             'validation' => [
                 'matrix-server' => 'required',
                 'matrix-room' => 'required',
-                'matrix-authtoken' => 'required'
-            ]
+                'matrix-authtoken' => 'required',
+            ],
         ];
     }
 }

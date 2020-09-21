@@ -43,7 +43,6 @@ class AlertlogStatsController extends WidgetController
         return view('widgets.alertlog_stats', $this->getSettings());
     }
 
-
     public function getSettingsView(Request $request)
     {
         $data = $this->getSettings(true);
@@ -56,6 +55,7 @@ class AlertlogStatsController extends WidgetController
             'warning only' => 5,
             'critical only' => 6,
         ];
+
         return view('widgets.settings.alertlog_stats', $data);
     }
 }

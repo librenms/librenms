@@ -57,7 +57,7 @@ class Dlinkap extends OS implements ProcessorDiscovery
                 0,
                 'Processor',
                 100
-            )
+            ),
         ];
     }
 }

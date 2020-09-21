@@ -49,14 +49,14 @@ class Allied extends OS implements OSDiscovery
         // sysDescr.0 = STRING: "AT-8126XL, AT-S21 version 1.4.2"
         // AtiL2-MIB::atiL2SwProduct.0 = STRING: "AT-8326GB"
         // AtiL2-MIB::atiL2SwVersion.0 = STRING: "AT-S41 v1.1.6 "
-        if (!$hardware && !$version && !$software) {
+        if (! $hardware && ! $version && ! $software) {
             $hardware = snmp_get($this->getDeviceArray(), 'atiL2SwProduct.0', '-OsvQU', 'AtiL2-MIB');
             $version = snmp_get($this->getDeviceArray(), 'atiL2SwVersion.0', '-OsvQU', 'AtiL2-MIB');
         }
 
         //Alliedware Plus 2.x.x.x | Legacy products: 8100S
         //SNMPv2-MIB::sysDescr.0 = STRING: AlliedWare Plus (TM) 2.2.3.0
-        if (!$hardware && !$version) {
+        if (! $hardware && ! $version) {
             $data = snmp_get_multi_oid($this->getDeviceArray(), ['.1.3.6.1.4.1.207.8.17.1.3.1.6.1', '.1.3.6.1.4.1.207.8.17.1.3.1.5.1', '.1.3.6.1.4.1.207.8.17.1.3.1.8.1']);
 
             $hardware = $data['.1.3.6.1.4.1.207.8.17.1.3.1.6.1'];
@@ -74,21 +74,21 @@ class Allied extends OS implements OSDiscovery
           sysDescr.0 = STRING: "Allied Telesis AT-8624T/2M version 2.9.1-13 11-Dec-2007"
         Use sysDescr to get Hardware, SW version, and Serial*/
         [$a, $b, $c, $d, $e, $f] = explode(' ', $this->getDeviceArray()['sysDescr']);
-        if (!$hardware && !$version) {
+        if (! $hardware && ! $version) {
             if ($a == 'Allied' && $d == 'version') {
                 $version = $e;
                 $features = $f;
                 $hardware = $c;
                 $serial = snmp_get($this->getDeviceArray(), 'arBoardSerialNumber.1', '-OsvQU', 'AT-INTERFACES-MIB');
 
-                //  sysDescr.0 = STRING: "CentreCOM 9924Ts, version 3.2.1-04, built 08-Sep-2009"
+            //  sysDescr.0 = STRING: "CentreCOM 9924Ts, version 3.2.1-04, built 08-Sep-2009"
             } elseif ($a == 'CentreCOM' && $c == 'version') {
                 $version = $d;
                 $features = $f;
                 $hardware = snmp_get($this->getDeviceArray(), 'arBoardName.1', '-OsvQU', 'AT-INTERFACES-MIB');
                 $serial = snmp_get($this->getDeviceArray(), 'arBoardSerialNumber.1', '-OsvQU', 'AT-INTERFACES-MIB');
 
-                //AT-GS950/24 Gigabit Ethernet WebSmart Switch
+            //AT-GS950/24 Gigabit Ethernet WebSmart Switch
                 //Also requires system description as no OIDs provide $hardware
             } elseif ($d == 'WebSmart' && $e == 'Switch') {
                 $version = snmp_get($this->getDeviceArray(), 'swhub.167.81.1.3.0', '-OsvQU', 'AtiL2-MIB');

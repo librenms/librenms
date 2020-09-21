@@ -42,7 +42,7 @@ abstract class IP
      */
     public static function fromHexString($hex, $ignore_errors = false)
     {
-        $hex = str_replace(array(' ', '"'), '', $hex);
+        $hex = str_replace([' ', '"'], '', $hex);
 
         try {
             return self::parse($hex);
@@ -50,7 +50,7 @@ abstract class IP
             // ignore
         }
 
-        $hex = str_replace(array(':', '.'), '', $hex);
+        $hex = str_replace([':', '.'], '', $hex);
 
         try {
             if (strlen($hex) == 8) {
@@ -61,12 +61,12 @@ abstract class IP
                 return new IPv6(implode(':', str_split($hex, 4)));
             }
         } catch (InvalidIpException $e) {
-            if (!$ignore_errors) {
+            if (! $ignore_errors) {
                 throw $e;
             }
         }
 
-        if (!$ignore_errors) {
+        if (! $ignore_errors) {
             throw new InvalidIpException("Could not parse into IP: $hex");
         }
 
@@ -91,9 +91,10 @@ abstract class IP
                 function ($dec) {
                     return sprintf('%02x', $dec);
                 },
-                explode(" ", (string)$snmpOid)
+                explode(" ", (string) $snmpOid)
             )
         );
+
         return IP::fromHexString($hex, $ignore_errors);
     }
 
@@ -115,7 +116,7 @@ abstract class IP
         try {
             return new IPv6($ip);
         } catch (InvalidIpException $e) {
-            if (!$ignore_errors) {
+            if (! $ignore_errors) {
                 throw new InvalidIpException("$ip is not a valid IP address");
             }
         }
@@ -170,7 +171,7 @@ abstract class IP
      */
     public function inNetworks($networks)
     {
-        foreach ((array)$networks as $network) {
+        foreach ((array) $networks as $network) {
             if ($this->inNetwork($network)) {
                 return true;
             }
@@ -195,7 +196,7 @@ abstract class IP
      */
     public function compressed()
     {
-        return (string)$this->ip;
+        return (string) $this->ip;
     }
 
     /**
@@ -205,7 +206,7 @@ abstract class IP
      */
     public function uncompressed()
     {
-        return (string)$this->ip;
+        return (string) $this->ip;
     }
 
     /**
@@ -215,7 +216,7 @@ abstract class IP
      */
     public function packed()
     {
-        return inet_pton((string)$this->ip);
+        return inet_pton((string) $this->ip);
     }
 
     /**
@@ -230,7 +231,7 @@ abstract class IP
     public function __toString()
     {
         if ($this->cidr == $this->host_bits) {
-            return (string)$this->ip;
+            return (string) $this->ip;
         }
 
         return $this->ip . "/{$this->cidr}";

@@ -39,7 +39,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             'panSessionActiveICMP.0',
             'panSessionActiveSslProxy.0',
             'panSessionSslProxyUtilization.0',
-            'panGPGWUtilizationActiveTunnels.0'
+            'panGPGWUtilizationActiveTunnels.0',
         ], '-OQUs', 'PAN-COMMON-MIB');
 
         if (is_numeric($data[0]['panSessionActive'])) {

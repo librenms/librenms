@@ -60,7 +60,7 @@ class BingApi extends BaseApi implements Geocoder
     protected function buildGeocodingOptions($address)
     {
         $api_key = Config::get('geoloc.api_key');
-        if (!$api_key) {
+        if (! $api_key) {
             throw new Exception("Bing API key missing, set geoloc.api_key");
         }
 
@@ -68,7 +68,7 @@ class BingApi extends BaseApi implements Geocoder
             'query' => [
                 'key' => $api_key,
                 'addressLine' => $address,
-            ]
+            ],
         ];
     }
 
@@ -81,6 +81,6 @@ class BingApi extends BaseApi implements Geocoder
      */
     protected function checkResponse($response, $data)
     {
-        return $response->getStatusCode() == 200 && !empty($data['resourceSets'][0]['resources']);
+        return $response->getStatusCode() == 200 && ! empty($data['resourceSets'][0]['resources']);
     }
 }

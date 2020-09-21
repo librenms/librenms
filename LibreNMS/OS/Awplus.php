@@ -56,7 +56,7 @@ class Awplus extends OS implements OSDiscovery
             $serial = $data_array['5.6']['rscBoardSerialNumber'];
 
             // If bay 1.5 is empty, set to Controller card 1.6
-            if (!$features && !$serial) {
+            if (! $features && ! $serial) {
                 $features = $data_array['6.6']['rscBoardName'];
                 $serial = $data_array['6.6']['rscBoardSerialNumber'];
             }

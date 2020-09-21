@@ -58,7 +58,7 @@ class MeasurementCollection extends Collection
     {
         $type = $measurement->getType();
 
-        if (!$this->has($type)) {
+        if (! $this->has($type)) {
             $this->put($type, new MeasurementSummary($type));
         }
 
@@ -69,6 +69,7 @@ class MeasurementCollection extends Collection
     {
         return $this->reduce(function ($sum, $measurement) use ($function) {
             $sum += $measurement->$function();
+
             return $sum;
         }, 0);
     }

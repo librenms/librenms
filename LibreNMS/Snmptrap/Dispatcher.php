@@ -25,21 +25,21 @@
 
 namespace LibreNMS\Snmptrap;
 
+use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\Snmptrap\Handlers\Fallback;
-use LibreNMS\Alert\AlertRules;
 use Log;
 
 class Dispatcher
 {
     /**
      * Instantiate the correct handler for this trap and call it's handle method
-     *
      */
     public static function handle(Trap $trap)
     {
         if (empty($trap->getDevice())) {
             Log::warning("Could not find device for trap", ['trap_text' => $trap->getRaw()]);
+
             return false;
         }
 
@@ -58,6 +58,6 @@ class Dispatcher
             $rules->runRules($trap->getDevice()->device_id);
         }
 
-        return !$fallback;
+        return ! $fallback;
     }
 }

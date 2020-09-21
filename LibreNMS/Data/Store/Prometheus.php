@@ -27,10 +27,10 @@
 namespace LibreNMS\Data\Store;
 
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use Log;
-use Illuminate\Support\Str;
 
 class Prometheus extends BaseDatastore
 {
@@ -72,7 +72,7 @@ class Prometheus extends BaseDatastore
     {
         $stat = Measurement::start('put');
         // skip if needed
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return;
         }
 
@@ -88,7 +88,7 @@ class Prometheus extends BaseDatastore
 
             foreach ($tags as $t => $v) {
                 if ($v !== null) {
-                    $promtags .= (Str::contains($v, "/") ? "/$t@base64/". base64_encode($v) : "/$t/$v");
+                    $promtags .= (Str::contains($v, "/") ? "/$t@base64/" . base64_encode($v) : "/$t/$v");
                 }
             }
             $options = $this->getDefaultOptions();
@@ -127,7 +127,7 @@ class Prometheus extends BaseDatastore
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
-     * @return boolean
+     * @return bool
      */
     public function wantsRrdTags()
     {

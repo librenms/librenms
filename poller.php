@@ -21,20 +21,20 @@
  * @package    LibreNMS
  * @subpackage poller
  * @copyright  (C) 2006 - 2012 Adam Armstrong
-
+ *
  * Modified 4/17/19
  * @author Heath Barnhart <hbarnhart@kanren.net>
  */
 
-use LibreNMS\Config;
 use LibreNMS\Alert\AlertRules;
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);
-echo Config::get('project_name')." Poller\n";
+echo Config::get('project_name') . " Poller\n";
 
 $options = getopt('h:m:i:n:r::d::v::a::f::q');
 
@@ -73,8 +73,8 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
             WHERE `disabled` = 0
             ORDER BY `device_id` ASC
         ) temp
-        WHERE MOD(temp.rownum, '.mres($options['i']).') = '.mres($options['n']).';';
-    $doing = $options['n'].'/'.$options['i'];
+        WHERE MOD(temp.rownum, ' . mres($options['i']) . ') = ' . mres($options['n']) . ';';
+    $doing = $options['n'] . '/' . $options['i'];
 }
 
 if (empty($where)) {
@@ -127,7 +127,7 @@ $datastore = Datastore::init($options);
 echo "Starting polling run:\n\n";
 $polled_devices = 0;
 $unreachable_devices = 0;
-if (!isset($query)) {
+if (! isset($query)) {
     $query = "SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
 }
 
@@ -139,7 +139,7 @@ foreach (dbFetch($query) as $device) {
         $device['vrf_lite_cisco'] = '';
     }
 
-    if (!poll_device($device, $module_override)) {
+    if (! poll_device($device, $module_override)) {
         $unreachable_devices++;
     }
 
@@ -158,25 +158,25 @@ foreach (dbFetch($query) as $device) {
     $polled_devices++;
 }
 
-$poller_end  = microtime(true);
-$poller_run  = ($poller_end - $poller_start);
+$poller_end = microtime(true);
+$poller_run = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
 if ($polled_devices) {
-    dbInsert(array(
+    dbInsert([
         'type' => 'poll',
         'doing' => $doing,
         'start' => $poller_start,
         'duration' => $poller_time,
         'devices' => $polled_devices,
-        'poller' => Config::get('base_url')
-    ), 'perf_times');
+        'poller' => Config::get('base_url'),
+    ], 'perf_times');
 }
 
 $string = $argv[0] . " $doing " . date(Config::get('dateformat.compact')) . " - $polled_devices devices polled in $poller_time secs";
 d_echo("$string\n");
 
-if (!isset($options['q'])) {
+if (! isset($options['q'])) {
     printStats();
 }
 

@@ -84,7 +84,6 @@ class Time
         return $result;
     }
 
-
     /*
      * @param integer seconds of a time period
      * @return string human readably time period

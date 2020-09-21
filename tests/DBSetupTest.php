@@ -44,7 +44,7 @@ class DBSetupTest extends DBTestCase
         $result = Artisan::call('migrate:fresh', [
             '--seed' => true,
             '--env' => 'testing',
-            '--database' => $this->connection
+            '--database' => $this->connection,
         ]);
 
         $this->assertSame(0, $result, "Errors loading DB Schema: " . Artisan::output());

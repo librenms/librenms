@@ -49,7 +49,6 @@ class WorldMapController extends WidgetController
         ];
     }
 
-
     public function getView(Request $request)
     {
         $settings = $this->getSettings();
@@ -67,7 +66,7 @@ class WorldMapController extends WidgetController
             ->get()
             ->filter(function ($device) use ($status) {
                 /** @var Device $device */
-                if (!($device->location_id && $device->location && $device->location->coordinatesValid())) {
+                if (! ($device->location_id && $device->location && $device->location->coordinatesValid())) {
                     return false;
                 }
 

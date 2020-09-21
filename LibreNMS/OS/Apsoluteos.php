@@ -42,7 +42,7 @@ class Apsoluteos extends OS implements OSDiscovery
         $device->version = $data[0]['rndApsoluteOSVersion'] ?? null;
         $device->hardware = $data[0]['genGroupHWVersion'] ?? null;
         if (isset($data[0]['rdwrDevicePortsConfig'])) {
-            $device->features = 'Ver. '.$data[0]['rdwrDevicePortsConfig'];
+            $device->features = 'Ver. ' . $data[0]['rdwrDevicePortsConfig'];
         }
     }
 }

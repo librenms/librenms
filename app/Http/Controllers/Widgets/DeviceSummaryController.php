@@ -40,8 +40,8 @@ abstract class DeviceSummaryController extends WidgetController
     {
         // init defaults we need to check config, so do it in construct
         $this->defaults = [
-            'show_services' => (int)Config::get('show_services', 1),
-            'summary_errors' => (int)Config::get('summary_errors', 0)
+            'show_services' => (int) Config::get('show_services', 1),
+            'summary_errors' => (int) Config::get('summary_errors', 0),
         ];
     }
 

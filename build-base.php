@@ -23,8 +23,7 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-if (!isset($init_modules)) {
+if (! isset($init_modules)) {
     $opts = getopt('ldh:u:p:n:t:s:');
 
     $map = [

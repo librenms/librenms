@@ -70,7 +70,7 @@ class AlertRule extends BaseModel
             return $query;
         }
 
-        if (!$this->isJoined($query, 'alerts')) {
+        if (! $this->isJoined($query, 'alerts')) {
             $query->join('alerts', 'alerts.rule_id', 'alert_rules.id');
         }
 

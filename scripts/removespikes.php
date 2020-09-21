@@ -25,8 +25,8 @@
 */
 
 /* do NOT run this script through a web browser */
-if (!isset($_SERVER["argv"][0]) || isset($_SERVER['REQUEST_METHOD'])  || isset($_SERVER['REMOTE_ADDR'])) {
-    die("<br><strong>This script is only meant to run at the command line.</strong>");
+if (! isset($_SERVER["argv"][0]) || isset($_SERVER['REQUEST_METHOD']) || isset($_SERVER['REMOTE_ADDR'])) {
+    exit("<br><strong>This script is only meant to run at the command line.</strong>");
 }
 
 /* We are not talking to the browser */
@@ -42,25 +42,25 @@ if (strpos($dir, 'spikekill') !== false) {
 $using_cacti = false;
 
 /* setup defaults */
-$debug     = false;
-$dryrun    = false;
-$avgnan    = 'avg';
-$rrdfile   = "";
+$debug = false;
+$dryrun = false;
+$avgnan = 'avg';
+$rrdfile = "";
 $std_kills = true;
 $var_kills = true;
-$html      = false;
+$html = false;
 
 if ($using_cacti) {
-    $method   = read_config_option("spikekill_method");
+    $method = read_config_option("spikekill_method");
     $numspike = read_config_option("spikekill_number");
-    $stddev   = read_config_option("spikekill_deviations");
-    $percent  = read_config_option("spikekill_percent");
+    $stddev = read_config_option("spikekill_deviations");
+    $percent = read_config_option("spikekill_percent");
     $outliers = read_config_option("spikekill_outliers");
 } else {
-    $method   = 1; // Standard Deviation
+    $method = 1; // Standard Deviation
     $numspike = 10;
-    $stddev   = 10;
-    $percent  = 500;
+    $stddev = 10;
+    $percent = 500;
     $outliers = 5;
 }
 
@@ -69,7 +69,7 @@ $parms = $_SERVER["argv"];
 array_shift($parms);
 
 foreach ($parms as $parameter) {
-    @list($arg, $value) = @explode("=", $parameter);
+    @[$arg, $value] = @explode("=", $parameter);
 
     switch ($arg) {
         case "--method":
@@ -79,9 +79,9 @@ foreach ($parms as $parameter) {
             } elseif ($value == "stddev") {
                 $method = 1;
             } else {
-                    echo "FATAL: You must specify either 'stddev' or 'variance' as methods.\n\n";
-                    display_help();
-                    exit;
+                echo "FATAL: You must specify either 'stddev' or 'variance' as methods.\n\n";
+                display_help();
+                exit;
             }
 
             break;
@@ -102,12 +102,12 @@ foreach ($parms as $parameter) {
         case "-R":
             $rrdfile = $value;
 
-            if (!file_exists($rrdfile)) {
+            if (! file_exists($rrdfile)) {
                 echo "FATAL: File '$rrdfile' does not exist.\n";
                 exit;
             }
 
-            if (!is_writable($rrdfile)) {
+            if (! is_writable($rrdfile)) {
                 echo "FATAL: File '$rrdfile' is not writable by this account.\n";
                 exit;
             }
@@ -117,7 +117,7 @@ foreach ($parms as $parameter) {
         case "-S":
             $stddev = $value;
 
-            if (!is_numeric($stddev) || ($stddev < 1)) {
+            if (! is_numeric($stddev) || ($stddev < 1)) {
                 echo "FATAL: Standard Deviation must be a positive integer.\n\n";
                 display_help();
                 exit;
@@ -128,7 +128,7 @@ foreach ($parms as $parameter) {
         case "-O":
             $outliers = $value;
 
-            if (!is_numeric($outliers) || ($outliers < 1)) {
+            if (! is_numeric($outliers) || ($outliers < 1)) {
                 echo "FATAL: The number of outliers to exlude must be a positive integer.\n\n";
                 display_help();
                 exit;
@@ -137,9 +137,9 @@ foreach ($parms as $parameter) {
             break;
         case "--percent":
         case "-P":
-            $percent = $value/100;
+            $percent = $value / 100;
 
-            if (!is_numeric($percent) || ($percent <= 0)) {
+            if (! is_numeric($percent) || ($percent <= 0)) {
                 echo "FATAL: Percent deviation must be a positive floating point number.\n\n";
                 display_help();
                 exit;
@@ -164,7 +164,7 @@ foreach ($parms as $parameter) {
         case "-n":
             $numspike = $value;
 
-            if (!is_numeric($numspike) || ($numspike < 1)) {
+            if (! is_numeric($numspike) || ($numspike < 1)) {
                 echo "FATAL: Number of spikes to remove must be a positive integer\n\n";
                 display_help();
                 exit;
@@ -195,7 +195,7 @@ if ($rrdfile == "") {
 /* determine the temporary file name */
 $seed = mt_rand();
 if ($config["cacti_server_os"] == "win32") {
-    $tempdir  = getenv("TEMP");
+    $tempdir = getenv("TEMP");
     $xmlfile = $tempdir . "/" . str_replace(".rrd", "", basename($rrdfile)) . ".dump." . $seed;
 } else {
     $tempdir = "/tmp";
@@ -211,7 +211,7 @@ if ($using_cacti) {
 }
 
 /* execute the dump command */
-echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "NOTE: Creating XML file '$xmlfile' from '$rrdfile'" . ($html ? "</td></tr>\n":"\n");
+echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "NOTE: Creating XML file '$xmlfile' from '$rrdfile'" . ($html ? "</td></tr>\n" : "\n");
 
 if ($using_cacti) {
     shell_exec(read_config_option("path_rrdtool") . " dump $rrdfile > $xmlfile");
@@ -227,9 +227,9 @@ if (file_exists($xmlfile)) {
     unlink($xmlfile);
 } else {
     if ($using_cacti) {
-        echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "FATAL: RRDtool Command Failed.  Please verify that the RRDtool path is valid in Settings->Paths!" . ($html ? "</td></tr>\n":"\n");
+        echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "FATAL: RRDtool Command Failed.  Please verify that the RRDtool path is valid in Settings->Paths!" . ($html ? "</td></tr>\n" : "\n");
     } else {
-        echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "FATAL: RRDtool Command Failed.  Please insure RRDtool is in your path!" . ($html ? "</td></tr>\n":"\n");
+        echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "FATAL: RRDtool Command Failed.  Please insure RRDtool is in your path!" . ($html ? "</td></tr>\n" : "\n");
     }
     exit;
 }
@@ -270,17 +270,17 @@ $output = removeComments($output);
    The we don't need to know the type of rra, only it's number for this analysis
    the same applies for the ds' as well.
 */
-$rra     = array();
-$rra_cf  = array();
-$rra_pdp = array();
+$rra = [];
+$rra_cf = [];
+$rra_pdp = [];
 $rra_num = 0;
-$ds_num  = 0;
+$ds_num = 0;
 $total_kills = 0;
-$in_rra  = false;
-$in_db   = false;
-$ds_min  = array();
-$ds_max  = array();
-$ds_name = array();
+$in_rra = false;
+$in_db = false;
+$ds_min = [];
+$ds_max = [];
+$ds_name = [];
 
 /* perform a first pass on the array and do the following:
    1) Get the number of good samples per ds
@@ -300,25 +300,25 @@ if (sizeof($output)) {
                 /* peel off garbage */
                 $dsvalue = trim(str_replace("</row>", "", str_replace("</v>", "", $dsvalue)));
                 if (strtolower($dsvalue) != "nan") {
-                    if (!isset($rra[$rra_num][$ds_num]["numsamples"])) {
+                    if (! isset($rra[$rra_num][$ds_num]["numsamples"])) {
                         $rra[$rra_num][$ds_num]["numsamples"] = 1;
                     } else {
                         $rra[$rra_num][$ds_num]["numsamples"]++;
                     }
 
-                    if (!isset($rra[$rra_num][$ds_num]["sumofsamples"])) {
+                    if (! isset($rra[$rra_num][$ds_num]["sumofsamples"])) {
                         $rra[$rra_num][$ds_num]["sumofsamples"] = $dsvalue;
                     } else {
                         $rra[$rra_num][$ds_num]["sumofsamples"] += $dsvalue;
                     }
 
-                    if (!isset($rra[$rra_num][$ds_num]["max_value"])) {
+                    if (! isset($rra[$rra_num][$ds_num]["max_value"])) {
                         $rra[$rra_num][$ds_num]["max_value"] = $dsvalue;
                     } elseif ($dsvalue > $rra[$rra_num][$ds_num]["max_value"]) {
                         $rra[$rra_num][$ds_num]["max_value"] = $dsvalue;
                     }
 
-                    if (!isset($rra[$rra_num][$ds_num]["min_value"])) {
+                    if (! isset($rra[$rra_num][$ds_num]["min_value"])) {
                         $rra[$rra_num][$ds_num]["min_value"] = $dsvalue;
                     } elseif ($dsvalue < $rra[$rra_num][$ds_num]["min_value"]) {
                         $rra[$rra_num][$ds_num]["min_value"] = $dsvalue;
@@ -328,7 +328,7 @@ if (sizeof($output)) {
                     $samples[$rra_num][$ds_num][] = $dsvalue;
                 }
 
-                if (!isset($rra[$rra_num][$ds_num]["totalsamples"])) {
+                if (! isset($rra[$rra_num][$ds_num]["totalsamples"])) {
                     $rra[$rra_num][$ds_num]["totalsamples"] = 1;
                 } else {
                     $rra[$rra_num][$ds_num]["totalsamples"]++;
@@ -366,7 +366,7 @@ calculateVarianceAverages($rra, $samples);
    3) The max and min cutoffs of all samples
    4) The number of kills in each ds based upon the thresholds
 */
-echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "NOTE: Searching for Spikes in XML file '$xmlfile'" . ($html ? "</td></tr>\n":"\n");
+echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "NOTE: Searching for Spikes in XML file '$xmlfile'" . ($html ? "</td></tr>\n" : "\n");
 calculateOverallStatistics($rra, $samples);
 
 /* debugging and/or status report */
@@ -378,38 +378,38 @@ if ($debug || $dryrun) {
 if ($method == 1) {
     /* standard deviation subroutine */
     if ($std_kills) {
-        if (!$dryrun) {
+        if (! $dryrun) {
             $new_output = updateXML($output, $rra);
         }
     } else {
-        echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "NOTE: NO Standard Deviation Spikes found in '$rrdfile'" . ($html ? "</td></tr>\n":"\n");
+        echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "NOTE: NO Standard Deviation Spikes found in '$rrdfile'" . ($html ? "</td></tr>\n" : "\n");
     }
 } else {
     /* variance subroutine */
     if ($var_kills) {
-        if (!$dryrun) {
+        if (! $dryrun) {
             $new_output = updateXML($output, $rra);
         }
     } else {
-        echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "NOTE: NO Variance Spikes found in '$rrdfile'" . ($html ? "</td></tr>\n":"\n");
+        echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "NOTE: NO Variance Spikes found in '$rrdfile'" . ($html ? "</td></tr>\n" : "\n");
     }
 }
 
 /* finally update the file XML file and Reprocess the RRDfile */
-if (!$dryrun) {
+if (! $dryrun) {
     if ($total_kills) {
         if (writeXMLFile($new_output, $xmlfile)) {
             if (backupRRDFile($rrdfile)) {
                 createRRDFileFromXML($xmlfile, $rrdfile);
             } else {
-                echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "FATAL: Unable to backup '$rrdfile'" . ($html ? "</td></tr>\n":"\n");
+                echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "FATAL: Unable to backup '$rrdfile'" . ($html ? "</td></tr>\n" : "\n");
             }
         } else {
-            echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "FATAL: Unable to write XML file '$xmlfile'" . ($html ? "</td></tr>\n":"\n");
+            echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "FATAL: Unable to write XML file '$xmlfile'" . ($html ? "</td></tr>\n" : "\n");
         }
     }
 } else {
-    echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "NOTE: Dryrun requested.  No updates performed" . ($html ? "</td></tr>\n":"\n");
+    echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "NOTE: Dryrun requested.  No updates performed" . ($html ? "</td></tr>\n" : "\n");
 }
 
 if ($html) {
@@ -422,14 +422,14 @@ function createRRDFileFromXML($xmlfile, $rrdfile)
     global $using_cacti, $html;
 
     /* execute the dump command */
-    echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "NOTE: Re-Importing '$xmlfile' to '$rrdfile'" . ($html ? "</td></tr>\n":"\n");
+    echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "NOTE: Re-Importing '$xmlfile' to '$rrdfile'" . ($html ? "</td></tr>\n" : "\n");
     if ($using_cacti) {
         $response = shell_exec(read_config_option("path_rrdtool") . " restore -f -r $xmlfile $rrdfile");
     } else {
         $response = shell_exec("rrdtool restore -f -r $xmlfile $rrdfile");
     }
     if (strlen($response)) {
-        echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . $response . ($html ? "</td></tr>\n":"\n");
+        echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . $response . ($html ? "</td></tr>\n" : "\n");
     }
 }
 
@@ -458,7 +458,7 @@ function backupRRDFile($rrdfile)
         $newfile = basename($rrdfile);
     }
 
-    echo ($html ? "<tr><td colspan='20' class='spikekill_note'>":"") . "NOTE: Backing Up '$rrdfile' to '" . $backupdir . "/" .  $newfile . "'" . ($html ? "</td></tr>\n":"\n");
+    echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : "") . "NOTE: Backing Up '$rrdfile' to '" . $backupdir . "/" . $newfile . "'" . ($html ? "</td></tr>\n" : "\n");
 
     return copy($rrdfile, $backupdir . "/" . $newfile);
 }
@@ -504,7 +504,7 @@ function calculateOverallStatistics(&$rra, &$samples)
                         if ($rra[$rra_num][$ds_num]["standard_deviation"] == "NAN") {
                             $rra[$rra_num][$ds_num]["standard_deviation"] = 0;
                         }
-                        $rra[$rra_num][$ds_num]["average"]    = $rra[$rra_num][$ds_num]["sumofsamples"] / $rra[$rra_num][$ds_num]["numsamples"];
+                        $rra[$rra_num][$ds_num]["average"] = $rra[$rra_num][$ds_num]["sumofsamples"] / $rra[$rra_num][$ds_num]["numsamples"];
 
                         $rra[$rra_num][$ds_num]["min_cutoff"] = $rra[$rra_num][$ds_num]["average"] - ($stddev * $rra[$rra_num][$ds_num]["standard_deviation"]);
                         if ($rra[$rra_num][$ds_num]["min_cutoff"] < $ds_min[$ds_num]) {
@@ -521,14 +521,14 @@ function calculateOverallStatistics(&$rra, &$samples)
                         $rra[$rra_num][$ds_num]["avgnksamples"] = 0;
 
                         /* go through values and find cutoffs */
-                        $rra[$rra_num][$ds_num]["stddev_killed"]    = 0;
-                        $rra[$rra_num][$ds_num]["variance_killed"]  = 0;
+                        $rra[$rra_num][$ds_num]["stddev_killed"] = 0;
+                        $rra[$rra_num][$ds_num]["variance_killed"] = 0;
 
                         if (sizeof($samples[$rra_num][$ds_num])) {
                             foreach ($samples[$rra_num][$ds_num] as $sample) {
                                 if (($sample > $rra[$rra_num][$ds_num]["max_cutoff"]) ||
                                     ($sample < $rra[$rra_num][$ds_num]["min_cutoff"])) {
-                                    debug(sprintf("Std Kill: Value '%.4e', StandardDev '%.4e', StdDevLimit '%.4e'", $sample, $rra[$rra_num][$ds_num]["standard_deviation"], ($rra[$rra_num][$ds_num]["max_cutoff"] * (1+$percent))));
+                                    debug(sprintf("Std Kill: Value '%.4e', StandardDev '%.4e', StdDevLimit '%.4e'", $sample, $rra[$rra_num][$ds_num]["standard_deviation"], ($rra[$rra_num][$ds_num]["max_cutoff"] * (1 + $percent))));
                                     $rra[$rra_num][$ds_num]["stddev_killed"]++;
                                     $std_kills = true;
                                 } else {
@@ -538,9 +538,9 @@ function calculateOverallStatistics(&$rra, &$samples)
 
                                 if ($rra[$rra_num][$ds_num]["variance_avg"] == "NAN") {
                                     /* not enought samples to calculate */
-                                } elseif ($sample > ($rra[$rra_num][$ds_num]["variance_avg"] * (1+$percent))) {
+                                } elseif ($sample > ($rra[$rra_num][$ds_num]["variance_avg"] * (1 + $percent))) {
                                     /* kill based upon variance */
-                                    debug(sprintf("Var Kill: Value '%.4e', VarianceDev '%.4e', VarianceLimit '%.4e'", $sample, $rra[$rra_num][$ds_num]["variance_avg"], ($rra[$rra_num][$ds_num]["variance_avg"] * (1+$percent))));
+                                    debug(sprintf("Var Kill: Value '%.4e', VarianceDev '%.4e', VarianceLimit '%.4e'", $sample, $rra[$rra_num][$ds_num]["variance_avg"], ($rra[$rra_num][$ds_num]["variance_avg"] * (1 + $percent))));
                                     $rra[$rra_num][$ds_num]["variance_killed"]++;
                                     $var_kills = true;
                                 }
@@ -552,22 +552,22 @@ function calculateOverallStatistics(&$rra, &$samples)
                         }
                     } else {
                         $rra[$rra_num][$ds_num]["standard_deviation"] = "N/A";
-                        $rra[$rra_num][$ds_num]["average"]            = "N/A";
-                        $rra[$rra_num][$ds_num]["min_cutoff"]         = "N/A";
-                        $rra[$rra_num][$ds_num]["max_cutoff"]         = "N/A";
-                        $rra[$rra_num][$ds_num]["numnksamples"]       = "N/A";
-                        $rra[$rra_num][$ds_num]["sumnksamples"]       = "N/A";
-                        $rra[$rra_num][$ds_num]["avgnksamples"]       = "N/A";
-                        $rra[$rra_num][$ds_num]["stddev_killed"]      = "N/A";
-                        $rra[$rra_num][$ds_num]["variance_killed"]    = "N/A";
-                        $rra[$rra_num][$ds_num]["stddev_killed"]      = "N/A";
-                        $rra[$rra_num][$ds_num]["numnksamples"]       = "N/A";
-                        $rra[$rra_num][$ds_num]["sumnksamples"]       = "N/A";
-                        $rra[$rra_num][$ds_num]["variance_killed"]    = "N/A";
-                        $rra[$rra_num][$ds_num]["avgnksamples"]       = "N/A";
+                        $rra[$rra_num][$ds_num]["average"] = "N/A";
+                        $rra[$rra_num][$ds_num]["min_cutoff"] = "N/A";
+                        $rra[$rra_num][$ds_num]["max_cutoff"] = "N/A";
+                        $rra[$rra_num][$ds_num]["numnksamples"] = "N/A";
+                        $rra[$rra_num][$ds_num]["sumnksamples"] = "N/A";
+                        $rra[$rra_num][$ds_num]["avgnksamples"] = "N/A";
+                        $rra[$rra_num][$ds_num]["stddev_killed"] = "N/A";
+                        $rra[$rra_num][$ds_num]["variance_killed"] = "N/A";
+                        $rra[$rra_num][$ds_num]["stddev_killed"] = "N/A";
+                        $rra[$rra_num][$ds_num]["numnksamples"] = "N/A";
+                        $rra[$rra_num][$ds_num]["sumnksamples"] = "N/A";
+                        $rra[$rra_num][$ds_num]["variance_killed"] = "N/A";
+                        $rra[$rra_num][$ds_num]["avgnksamples"] = "N/A";
                     }
 
-                        $ds_num++;
+                    $ds_num++;
                 }
             }
 
@@ -581,7 +581,7 @@ function outputStatistics($rra)
     global $rra_cf, $rra_name, $ds_name, $rra_pdp, $html;
 
     if (sizeof($rra)) {
-        if (!$html) {
+        if (! $html) {
             echo "\n";
             printf(
                 "%10s %16s %10s %7s %7s %10s %10s %10s %10s %10s %10s %10s %10s %10s %10s\n",
@@ -624,15 +624,15 @@ function outputStatistics($rra)
                     foreach ($dses as $dskey => $ds) {
                         printf(
                             "%10s %16s %10s %7s %7s " .
-                            ($ds["average"] < 1E6 ? "%10s ":"%10.4e ") .
-                            ($ds["standard_deviation"] < 1E6 ? "%10s ":"%10.4e ") .
-                            (isset($ds["max_value"]) ? ($ds["max_value"] < 1E6 ? "%10s ":"%10.4e ") : "%10s ") .
-                            (isset($ds["min_value"]) ? ($ds["min_value"] < 1E6 ? "%10s ":"%10.4e ") : "%10s ") .
-                            (isset($ds["max_cutoff"]) ? ($ds["max_cutoff"] < 1E6 ? "%10s ":"%10.4e ") : "%10s ") .
-                            (isset($ds["min_cutoff"]) ? ($ds["min_cutoff"] < 1E6 ? "%10s ":"%10.4e ") : "%10s ") .
+                            ($ds["average"] < 1E6 ? "%10s " : "%10.4e ") .
+                            ($ds["standard_deviation"] < 1E6 ? "%10s " : "%10.4e ") .
+                            (isset($ds["max_value"]) ? ($ds["max_value"] < 1E6 ? "%10s " : "%10.4e ") : "%10s ") .
+                            (isset($ds["min_value"]) ? ($ds["min_value"] < 1E6 ? "%10s " : "%10.4e ") : "%10s ") .
+                            (isset($ds["max_cutoff"]) ? ($ds["max_cutoff"] < 1E6 ? "%10s " : "%10.4e ") : "%10s ") .
+                            (isset($ds["min_cutoff"]) ? ($ds["min_cutoff"] < 1E6 ? "%10s " : "%10.4e ") : "%10s ") .
                             "%10s %10s " .
-                            (isset($ds["avgnksampled"]) ? ($ds["avgnksamples"] < 1E6 ? "%10s ":"%10.4e ") : "%10s ") .
-                            (isset($ds["variance_avg"]) ? ($ds["variance_avg"] < 1E6 ? "%10s ":"%10.4e ") : "%10s ") . "\n",
+                            (isset($ds["avgnksampled"]) ? ($ds["avgnksamples"] < 1E6 ? "%10s " : "%10.4e ") : "%10s ") .
+                            (isset($ds["variance_avg"]) ? ($ds["variance_avg"] < 1E6 ? "%10s " : "%10.4e ") : "%10s ") . "\n",
                             displayTime($rra_pdp[$rra_key]),
                             $ds_name[$dskey],
                             $rra_cf[$rra_key],
@@ -678,15 +678,15 @@ function outputStatistics($rra)
                     foreach ($dses as $dskey => $ds) {
                         printf(
                             "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>" .
-                            ($ds["average"] < 1E6 ? "%s</td><td>":"%.4e</td><td>") .
-                            ($ds["standard_deviation"] < 1E6 ? "%s</td><td>":"%.4e</td><td>") .
-                            (isset($ds["max_value"]) ? ($ds["max_value"] < 1E6 ? "%s</td><td>":"%.4e</td><td>") : "%s</td><td>") .
-                            (isset($ds["min_value"]) ? ($ds["min_value"] < 1E6 ? "%s</td><td>":"%.4e</td><td>") : "%s</td><td>") .
-                            (isset($ds["max_cutoff"]) ? ($ds["max_cutoff"] < 1E6 ? "%s</td><td>":"%.4e</td><td>") : "%s</td><td>") .
-                            (isset($ds["min_cutoff"]) ? ($ds["min_cutoff"] < 1E6 ? "%s</td><td>":"%.4e</td><td>") : "%s</td><td>") .
+                            ($ds["average"] < 1E6 ? "%s</td><td>" : "%.4e</td><td>") .
+                            ($ds["standard_deviation"] < 1E6 ? "%s</td><td>" : "%.4e</td><td>") .
+                            (isset($ds["max_value"]) ? ($ds["max_value"] < 1E6 ? "%s</td><td>" : "%.4e</td><td>") : "%s</td><td>") .
+                            (isset($ds["min_value"]) ? ($ds["min_value"] < 1E6 ? "%s</td><td>" : "%.4e</td><td>") : "%s</td><td>") .
+                            (isset($ds["max_cutoff"]) ? ($ds["max_cutoff"] < 1E6 ? "%s</td><td>" : "%.4e</td><td>") : "%s</td><td>") .
+                            (isset($ds["min_cutoff"]) ? ($ds["min_cutoff"] < 1E6 ? "%s</td><td>" : "%.4e</td><td>") : "%s</td><td>") .
                             "%s</td><td>%s</td><td>" .
-                            (isset($ds["avgnksampled"]) ? ($ds["avgnksamples"] < 1E6 ? "%s</td><td>":"%.4e</td><td>") : "%s</td><td>") .
-                            (isset($ds["variance_avg"]) ? ($ds["variance_avg"] < 1E6 ? "%s</td></tr>\n":"%.4e</td></tr>\n") : "%s</td></tr>\n") . "\n",
+                            (isset($ds["avgnksampled"]) ? ($ds["avgnksamples"] < 1E6 ? "%s</td><td>" : "%.4e</td><td>") : "%s</td><td>") .
+                            (isset($ds["variance_avg"]) ? ($ds["variance_avg"] < 1E6 ? "%s</td></tr>\n" : "%.4e</td></tr>\n") : "%s</td></tr>\n") . "\n",
                             displayTime($rra_pdp[$rra_key]),
                             $ds_name[$dskey],
                             $rra_cf[$rra_key],
@@ -713,12 +713,12 @@ function outputStatistics($rra)
 function updateXML(&$output, &$rra)
 {
     global $numspike, $percent, $avgnan, $method, $total_kills;
-        $new_array = array();
+    $new_array = [];
 
     /* variance subroutine */
     $rra_num = 0;
-    $ds_num  = 0;
-    $kills   = 0;
+    $ds_num = 0;
+    $kills = 0;
 
     if (sizeof($output)) {
         foreach ($output as $line) {
@@ -728,7 +728,7 @@ function updateXML(&$output, &$rra)
                 array_shift($linearray);
 
                 /* initialize variables */
-                $ds_num  = 0;
+                $ds_num = 0;
                 $out_row = "<row>";
                 foreach ($linearray as $dsvalue) {
                     /* peel off garbage */
@@ -737,7 +737,7 @@ function updateXML(&$output, &$rra)
                         /* do nothing, it's a NaN */
                     } else {
                         if ($method == 2) {
-                            if ($dsvalue > (1+$percent)*$rra[$rra_num][$ds_num]["variance_avg"]) {
+                            if ($dsvalue > (1 + $percent) * $rra[$rra_num][$ds_num]["variance_avg"]) {
                                 if ($kills < $numspike) {
                                     if ($avgnan == "avg") {
                                         $dsvalue = $rra[$rra_num][$ds_num]["variance_avg"];
@@ -773,7 +773,7 @@ function updateXML(&$output, &$rra)
                 $new_array[] = $out_row;
             } else {
                 if (substr_count($line, "</rra>")) {
-                    $ds_minmax = array();
+                    $ds_minmax = [];
                     $rra_num++;
                     $kills = 0;
                 } elseif (substr_count($line, "</database>")) {
@@ -791,7 +791,7 @@ function updateXML(&$output, &$rra)
 
 function removeComments(&$output)
 {
-    $new_array = array();
+    $new_array = [];
     if (sizeof($output)) {
         foreach ($output as $line) {
             $line = trim($line);
@@ -805,9 +805,9 @@ function removeComments(&$output)
                 } else {
                     $comment_end = strpos($line, "-->");
                     if ($comment_start == 0) {
-                        $line = trim(substr($line, $comment_end+3));
+                        $line = trim(substr($line, $comment_end + 3));
                     } else {
-                        $line = trim(substr($line, 0, $comment_start-1) . substr($line, $comment_end+3));
+                        $line = trim(substr($line, 0, $comment_start - 1) . substr($line, $comment_end + 3));
                     }
                 }
 
@@ -860,9 +860,9 @@ function debug($string)
 function standard_deviation($samples)
 {
     $sample_count = count($samples);
-        $sample_square = array();
+    $sample_square = [];
 
-    for ($current_sample = 0; $sample_count > $current_sample; ++$current_sample) {
+    for ($current_sample = 0; $sample_count > $current_sample; $current_sample++) {
         $sample_square[$current_sample] = pow($samples[$current_sample], 2);
     }
 

@@ -49,7 +49,7 @@ abstract class BaseValidation implements ValidationGroup
      */
     public function isCompleted()
     {
-        return $this->completed ;
+        return $this->completed;
     }
 
     /**

@@ -27,5 +27,4 @@ namespace LibreNMS\OS;
 
 class Xos extends Shared\Extreme
 {
-
 }

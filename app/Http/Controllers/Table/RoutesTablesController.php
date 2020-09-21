@@ -25,19 +25,19 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Ipv4Network;
 use App\Models\Ipv6Address;
-use App\Models\Route;
 use App\Models\Port;
-use App\Models\Device;
+use App\Models\Route;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
-use LibreNMS\Exceptions\InvalidIpException;
 
 class RoutesTablesController extends TableController
 {
@@ -48,7 +48,7 @@ class RoutesTablesController extends TableController
         return [
             'device_id' => 'nullable|integer',
             'searchby' => 'in:inetCidrRouteNextHop,inetCidrRouteDest',
-            ];
+        ];
     }
 
     protected function filterFields($request)
@@ -56,7 +56,7 @@ class RoutesTablesController extends TableController
         return [
             'route.context_name' => 'context_name',
             'route.inetCidrRouteProto' => 'proto',
-            ];
+        ];
     }
 
     protected function sortFields($request)
@@ -90,12 +90,12 @@ class RoutesTablesController extends TableController
         $showAllRoutes = trim(\Request::get('showAllRoutes'));
         $showProtocols = trim(\Request::get('showProtocols'));
         if ($showProtocols == 'all') {
-            $protocols = array('ipv4', 'ipv6');
+            $protocols = ['ipv4', 'ipv6'];
         } else {
-            $protocols = array($showProtocols);
+            $protocols = [$showProtocols];
         }
         if ($request->device_id && $showAllRoutes == 'false') {
-            $query=Route::hasAccess($request->user())
+            $query = Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
                 ->where('route.device_id', $request->device_id)
                 ->whereIn('route.inetCidrRouteDestType', $protocols)
@@ -103,15 +103,18 @@ class RoutesTablesController extends TableController
                     ->where('route.device_id', $request->device_id)
                     ->select('updated_at')
                     ->max('updated_at'));
+
             return $query;
         }
         if ($request->device_id && $showAllRoutes == 'true') {
-            $query=Route::hasAccess($request->user())
+            $query = Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
                 ->where('route.device_id', $request->device_id)
                 ->whereIn('route.inetCidrRouteDestType', $protocols);
+
             return $query;
         }
+
         return Route::hasAccess($request->user())
             ->leftJoin('ports', $join);
     }
@@ -126,11 +129,13 @@ class RoutesTablesController extends TableController
     {
         if ($search = trim(\Request::get('searchPhrase'))) {
             $searchLike = '%' . $search . '%';
+
             return $query->where(function ($query) use ($searchLike) {
                 return $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
                     ->orWhere('route.inetCidrRouteDest', 'like', $searchLike);
             });
         }
+
         return $query;
     }
 
@@ -156,13 +161,14 @@ class RoutesTablesController extends TableController
             'updated_at',
             'created_at',
             'context_name',
-            'inetCidrRouteDest'
+            'inetCidrRouteDest',
         ];
         foreach ($s_fields as $s_field) {
             if (isset($sort[$s_field])) {
                 $query->orderBy($s_field, $sort[$s_field]);
             }
         }
+
         return $query;
     }
 
@@ -182,7 +188,7 @@ class RoutesTablesController extends TableController
         if ($route_entry->inetCidrRouteNextHop) {
             try {
                 $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
-                $item['inetCidrRouteNextHop'] =  $obj_inetCidrRouteNextHop->compressed();
+                $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
             } catch (Exception $e) {
                 $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
             }
@@ -190,7 +196,7 @@ class RoutesTablesController extends TableController
         if ($route_entry->inetCidrRouteDest) {
             try {
                 $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
-                $item['inetCidrRouteDest'] =  $obj_inetCidrRouteDest->compressed();
+                $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
             } catch (Exception $e) {
                 $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
             }
@@ -215,8 +221,9 @@ class RoutesTablesController extends TableController
         }
         $item['context_name'] = '[global]';
         if ($route_entry->context_name != '') {
-            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . htmlspecialchars($route_entry->context_name) . '</a>' ;
+            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . htmlspecialchars($route_entry->context_name) . '</a>';
         }
+
         return $item;
     }
 }

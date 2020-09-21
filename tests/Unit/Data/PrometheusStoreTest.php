@@ -41,7 +41,7 @@ use LibreNMS\Tests\TestCase;
  */
 class PrometheusStoreTest extends TestCase
 {
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,7 +53,7 @@ class PrometheusStoreTest extends TestCase
     {
         $stack = HandlerStack::create(new MockHandler([
             new Response(422, [], 'Bad response'),
-            new RequestException("Exception thrown", new Request('POST', 'test'))
+            new RequestException("Exception thrown", new Request('POST', 'test')),
         ]));
 
         $client = new Client(['handler' => $stack]);
@@ -79,7 +79,6 @@ class PrometheusStoreTest extends TestCase
         $client = new Client(['handler' => $stack]);
         $prometheus = new Prometheus($client);
 
-
         $device = ['hostname' => 'testhost'];
         $measurement = 'testmeasure';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
@@ -95,11 +94,10 @@ class PrometheusStoreTest extends TestCase
         /** @var Request $request */
         $request = $container[0]['request'];
 
-
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals("/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype", $request->getUri()->getPath());
         $this->assertEquals('fake', $request->getUri()->getHost());
         $this->assertEquals(9999, $request->getUri()->getPort());
-        $this->assertEquals("ifIn 234234\nifOut 53453\n", (string)$request->getBody());
+        $this->assertEquals("ifIn 234234\nifOut 53453\n", (string) $request->getBody());
     }
 }

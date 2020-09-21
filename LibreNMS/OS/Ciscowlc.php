@@ -45,8 +45,8 @@ class Ciscowlc extends Cisco implements
         $ssids = $this->getCacheByIndex('bsnDot11EssSsid', 'AIRESPACE-WIRELESS-MIB');
         $counts = $this->getCacheByIndex('bsnDot11EssNumberOfMobileStations', 'AIRESPACE-WIRELESS-MIB');
 
-        $sensors = array();
-        $total_oids = array();
+        $sensors = [];
+        $total_oids = [];
         $total = 0;
         foreach ($counts as $index => $count) {
             $oid = '.1.3.6.1.4.1.14179.2.1.1.1.38.' . $index;
@@ -64,7 +64,7 @@ class Ciscowlc extends Cisco implements
             );
         }
 
-        if (!empty($counts)) {
+        if (! empty($counts)) {
             $sensors[] = new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
@@ -87,14 +87,14 @@ class Ciscowlc extends Cisco implements
      */
     public function discoverWirelessApCount()
     {
-        $oids = array(
+        $oids = [
             'CISCO-LWAPP-SYS-MIB::clsSysApConnectCount.0',
             'AIRESPACE-SWITCHING-MIB::agentInventoryMaxNumberOfAPsSupported.0',
-        );
+        ];
         $data = snmp_get_multi($this->getDeviceArray(), $oids);
 
         if (isset($data[0]['clsSysApConnectCount'])) {
-            return array(
+            return [
                 new WirelessSensor(
                     'ap-count',
                     $this->getDeviceId(),
@@ -110,9 +110,9 @@ class Ciscowlc extends Cisco implements
                     $data[0]['agentInventoryMaxNumberOfAPsSupported'],
                     0
                 ),
-            );
+            ];
         }
 
-        return array();
+        return [];
     }
 }

@@ -34,6 +34,7 @@ trait CompletesConfigArgument
     {
         if ($name == 'setting') {
             $config = new DynamicConfig();
+
             return $config->all()->keys()->filter(function ($setting) use ($value) {
                 return Str::startsWith($setting, $value);
             })->toArray();

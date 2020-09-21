@@ -30,7 +30,6 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 
 class SlasController implements DeviceTab
 {
-
     public function visible(Device $device): bool
     {
         return $device->slas()->exists();

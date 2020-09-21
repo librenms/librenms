@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateAlertLogTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

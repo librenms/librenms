@@ -36,12 +36,12 @@ trait LdapSessionCache
         $ttl = Config::get('auth_ldap_cache_ttl', 300);
 
         // no session, don't cache
-        if (!class_exists('Session')) {
+        if (! class_exists('Session')) {
             return null;
         }
 
         // auth_ldap cache present in this session?
-        if (!Session::has('auth_ldap')) {
+        if (! Session::has('auth_ldap')) {
             return null;
         }
 
@@ -59,7 +59,6 @@ trait LdapSessionCache
 
         return $cache[$attr]['value'];
     }
-
 
     protected function authLdapSessionCacheSet($attr, $value)
     {

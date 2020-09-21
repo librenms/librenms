@@ -29,7 +29,6 @@ use App\Models\MuninPlugin;
 
 class MuninPluginController extends SelectController
 {
-
     /**
      * Defines the base query for this resource
      *
@@ -49,7 +48,7 @@ class MuninPluginController extends SelectController
     {
         return [
             'id' => $munin_plugin->mplug_id,
-            'text' => $munin_plugin->device->shortDisplayName() . ' - ' . $munin_plugin->mplug_type
+            'text' => $munin_plugin->device->shortDisplayName() . ' - ' . $munin_plugin->mplug_type,
         ];
     }
 }

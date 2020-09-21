@@ -20,11 +20,12 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 class Alertmanager extends Transport
 {
@@ -43,11 +44,11 @@ class Alertmanager extends Transport
         } else {
             $alertmanager_status = 'startsAt';
         }
-        $gen_url          = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
-        $host             = ($api['url'] . '/api/v2/alerts');
-        $curl             = curl_init();
+        $gen_url = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
+        $host = ($api['url'] . '/api/v2/alerts');
+        $curl = curl_init();
         $alertmanager_msg = strip_tags($obj['msg']);
-        $data             = [[
+        $data = [[
             $alertmanager_status => date("c"),
             'generatorURL' => $gen_url,
             'annotations' => [
@@ -56,16 +57,16 @@ class Alertmanager extends Transport
                 'description' => $alertmanager_msg,
             ],
             'labels' => [
-                    'alertname' => $obj['name'],
-                    'severity' => $obj['severity'],
-                    'instance' => $obj['hostname'],
-                ],
+                'alertname' => $obj['name'],
+                'severity' => $obj['severity'],
+                'instance' => $obj['hostname'],
+            ],
         ]];
 
         unset($api['url']);
         foreach ($api as $label => $value) {
             $data[0]['labels'][$label] = $value;
-        };
+        }
 
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
@@ -75,11 +76,12 @@ class Alertmanager extends Transport
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
 
-        $ret  = curl_exec($curl);
+        $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
             return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -98,11 +100,11 @@ class Alertmanager extends Transport
                     'name' => 'alertmanager-options',
                     'descr' => 'Alertmanager Options',
                     'type' => 'textarea',
-                ]
+                ],
             ],
             'validation' => [
                 'alertmanager-url' => 'required|url',
-            ]
+            ],
         ];
     }
 }

@@ -99,9 +99,11 @@ class OSModulesTest extends DBTestCase
             $results = $helper->generateTestData($this->getSnmpsim(), true);
         } catch (FileNotFoundException $e) {
             $this->fail($e->getMessage());
+
             return;
         } catch (InvalidModuleException $e) {
             $this->fail($e->getMessage());
+
             return;
         }
 
@@ -150,7 +152,7 @@ class OSModulesTest extends DBTestCase
 
     public function dumpedDataProvider()
     {
-        $modules = array();
+        $modules = [];
 
         if (getenv('TEST_MODULES')) {
             $modules = explode(',', getenv('TEST_MODULES'));

@@ -36,7 +36,6 @@ class JnxCmCfgChangeTest extends SnmpTrapTestCase
 {
     public function testConfigChangeTrap()
     {
-
         $device = factory(Device::class)->create();
 
         $trapText = "$device->hostname

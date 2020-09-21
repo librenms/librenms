@@ -38,6 +38,7 @@ class ThreeCom extends OS implements OSDiscovery
             $device->hardware = str_replace("3Com ", '', substr($device->sysDescr, 0, strpos($device->sysDescr, 'Software')));
             // Version is the last word in the sysDescr's first line
             [$device->version] = explode("\n", substr($device->sysDescr, (strpos($device->sysDescr, 'Version') + 8)));
+
             return;
         }
 

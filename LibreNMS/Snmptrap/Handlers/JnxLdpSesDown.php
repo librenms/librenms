@@ -42,14 +42,14 @@ class JnxLdpSesDown implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        
         $state = $trap->getOidData($trap->findOid('JUNIPER-MPLS-LDP-MIB::jnxMplsLdpSesState'));
         $reason = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpSesDownReason'));
         $ifIndex = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpSesDownIf'));
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
-        if (!$port) {
+        if (! $port) {
             Log::warning("Snmptrap LdpSesDown: Could not find port at ifIndex $port->ifIndex for device: " . $device->hostname);
+
             return;
         }
 

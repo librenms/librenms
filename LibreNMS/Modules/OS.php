@@ -74,7 +74,7 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
-            if (!empty($location)) {
+            if (! empty($location)) {
                 $deviceModel->setLocation($location);
             }
         }
@@ -109,7 +109,7 @@ class OS implements Module
         }
 
         // make sure the location has coordinates
-        if (Config::get('geoloc.latlng', true) && $device->location && !$device->location->hasCoordinates()) {
+        if (Config::get('geoloc.latlng', true) && $device->location && ! $device->location->hasCoordinates()) {
             $device->location->lookupCoordinates();
             $device->location->save();
         }

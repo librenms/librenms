@@ -34,13 +34,13 @@ class SchemaTest extends TestCase
             "Columns" => [
                 ["Field" => "bill_id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
             ],
-            "Indexes" => ["bill_id" => ["Name" => "bill_id", "Columns" => ["bill_id"], "Unique" => true, "Type" => "BTREE"]]
+            "Indexes" => ["bill_id" => ["Name" => "bill_id", "Columns" => ["bill_id"], "Unique" => true, "Type" => "BTREE"]],
         ],
         "bill_ports" => [
             "Columns" => [
                 ["Field" => "bill_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
                 ["Field" => "port_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
-            ]
+            ],
         ],
         "devices" => [
             "Columns" => [
@@ -49,7 +49,7 @@ class SchemaTest extends TestCase
             ],
             "Indexes" => [
                 "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["device_id"], "Unique" => true, "Type" => "BTREE"],
-            ]
+            ],
         ],
         "locations" => [
             "Columns" => [
@@ -57,7 +57,7 @@ class SchemaTest extends TestCase
             ],
             "Indexes" => [
                 "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["id"], "Unique" => true, "Type" => "BTREE"],
-            ]
+            ],
         ],
         "ports" => [
             "Columns" => [
@@ -66,7 +66,7 @@ class SchemaTest extends TestCase
             ],
             "Indexes" => [
                 "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["port_id"], "Unique" => true, "Type" => "BTREE"],
-            ]
+            ],
         ],
         "sensors" => [
             "Columns" => [
@@ -75,17 +75,17 @@ class SchemaTest extends TestCase
             ],
             "Indexes" => [
                 "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["sensor_id"], "Unique" => true, "Type" => "BTREE"],
-            ]
+            ],
         ],
         "sensors_to_state_indexes" => [
             "Columns" => [
                 ["Field" => "sensors_to_state_translations_id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
                 ["Field" => "sensor_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
-                ["Field" => "state_index_id", "Type" => "int(11)", "Null" => false, "Extra" => ""]
+                ["Field" => "state_index_id", "Type" => "int(11)", "Null" => false, "Extra" => ""],
             ],
             "Indexes" => [
                 "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["sensors_to_state_translations_id"], "Unique" => true, "Type" => "BTREE"],
-            ]
+            ],
         ],
         "state_indexes" => [
             "Columns" => [
@@ -93,7 +93,7 @@ class SchemaTest extends TestCase
             ],
             "Indexes" => [
                 "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["state_index_id"], "Unique" => true, "Type" => "BTREE"],
-            ]
+            ],
         ],
         "state_translations" => [
             "Columns" => [
@@ -102,8 +102,8 @@ class SchemaTest extends TestCase
             ],
             "Indexes" => [
                 "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["state_translation_id"], "Unique" => true, "Type" => "BTREE"],
-            ]
-        ]
+            ],
+        ],
     ];
 
     /**
@@ -122,7 +122,6 @@ class SchemaTest extends TestCase
         /** @var $schema Schema Mock of Schema */
         return $schema;
     }
-
 
     public function testTableRelationships()
     {

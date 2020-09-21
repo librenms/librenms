@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMplsLspPathsTable extends Migration
 {
@@ -18,14 +18,14 @@ class CreateMplsLspPathsTable extends Migration
             $table->unsignedInteger('lsp_id');
             $table->unsignedInteger('path_oid');
             $table->unsignedInteger('device_id')->index();
-            $table->enum('mplsLspPathRowStatus', array('active','notInService','notReady','createAndGo','createAndWait','destroy'));
+            $table->enum('mplsLspPathRowStatus', ['active', 'notInService', 'notReady', 'createAndGo', 'createAndWait', 'destroy']);
             $table->bigInteger('mplsLspPathLastChange');
-            $table->enum('mplsLspPathType', array('other', 'primary', 'standby', 'secondary'));
+            $table->enum('mplsLspPathType', ['other', 'primary', 'standby', 'secondary']);
             $table->unsignedInteger('mplsLspPathBandwidth');
             $table->unsignedInteger('mplsLspPathOperBandwidth');
-            $table->enum('mplsLspPathAdminState', array('noop', 'inService', 'outOfService'));
-            $table->enum('mplsLspPathOperState', array('unknown','inService','outOfService','transition'));
-            $table->enum('mplsLspPathState', array('unknown', 'active', 'inactive'));
+            $table->enum('mplsLspPathAdminState', ['noop', 'inService', 'outOfService']);
+            $table->enum('mplsLspPathOperState', ['unknown', 'inService', 'outOfService', 'transition']);
+            $table->enum('mplsLspPathState', ['unknown', 'active', 'inactive']);
             $table->string('mplsLspPathFailCode', 64);
             $table->string('mplsLspPathFailNodeAddr', 32);
             $table->unsignedInteger('mplsLspPathMetric');

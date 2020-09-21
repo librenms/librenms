@@ -34,7 +34,6 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
         return false;
     }
 
-
     public function getUserlevel($username)
     {
         $user_level = parent::getUserlevel($username);
@@ -49,7 +48,6 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
 
         return 0;
     }
-
 
     public function getUserid($username)
     {

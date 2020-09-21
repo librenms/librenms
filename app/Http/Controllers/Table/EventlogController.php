@@ -28,8 +28,8 @@ namespace App\Http\Controllers\Table;
 use App\Models\Eventlog;
 use Carbon\Carbon;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 use LibreNMS\Enum\Alert;
+use LibreNMS\Util\Url;
 
 class EventlogController extends TableController
 {
@@ -138,5 +138,7 @@ class EventlogController extends TableController
             default:
                 return "label-default"; //Unknown
         }
-    } // end eventlog_severity
+    }
+
+    // end eventlog_severity
 }

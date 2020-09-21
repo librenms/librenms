@@ -42,12 +42,14 @@ class Dependencies extends BaseValidation
     {
         if (EnvHelper::librenmsDocker()) {
             $validator->ok("Installed from the official Docker image; no Composer required");
+
             return;
         }
 
-        # if git is not installed, do not assume composer is either
-        if (!Git::repoPresent()) {
+        // if git is not installed, do not assume composer is either
+        if (! Git::repoPresent()) {
             $validator->ok("Installed from package; no Composer required");
+
             return;
         }
 
@@ -58,8 +60,9 @@ class Dependencies extends BaseValidation
             $matches
         );
 
-        if (!$found) {
+        if (! $found) {
             $validator->fail("No composer available, please install composer", "https://getcomposer.org/");
+
             return;
         } else {
             $validator->ok("Composer Version: " . $matches[1]);
@@ -67,13 +70,13 @@ class Dependencies extends BaseValidation
 
         $dep_check = shell_exec($validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev --dry-run');
         preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
-        if (!empty($dep_missing[0])) {
+        if (! empty($dep_missing[0])) {
             $result = ValidationResult::fail("Missing dependencies!", $validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev');
             $result->setList("Dependencies", $dep_missing[1]);
             $validator->result($result);
         }
         preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
-        if (!empty($dep_outdated[0])) {
+        if (! empty($dep_outdated[0])) {
             $result = ValidationResult::fail("Outdated dependencies", $validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev');
             $result->setList("Dependencies", $dep_outdated[1]);
         }

@@ -78,12 +78,12 @@ class ChecksController extends InstallationController implements InstallerStep
             return true;
         }
 
-        if (!$this->checkPhpVersion()) {
+        if (! $this->checkPhpVersion()) {
             return false;
         }
 
         foreach (self::MODULES as $module) {
-            if (!extension_loaded($module)) {
+            if (! extension_loaded($module)) {
                 return false;
             }
         }

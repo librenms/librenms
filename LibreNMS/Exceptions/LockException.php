@@ -23,7 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-
 namespace LibreNMS\Exceptions;
 
 class LockException extends \Exception

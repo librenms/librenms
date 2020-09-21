@@ -29,5 +29,4 @@ use LibreNMS\OS;
 
 class Generic extends OS
 {
-
 }

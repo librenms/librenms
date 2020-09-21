@@ -81,7 +81,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
      */
     public function getDeviceId()
     {
-        return (int)$this->device['device_id'];
+        return (int) $this->device['device_id'];
     }
 
     /**
@@ -140,10 +140,11 @@ class OS implements ProcessorDiscovery, OSDiscovery
     {
         if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
+
             return null;
         }
 
-        if (!isset($this->cache['cache_oid'][$oid])) {
+        if (! isset($this->cache['cache_oid'][$oid])) {
             $data = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], $mib, null, $snmpflags);
             $this->cache['cache_oid'][$oid] = array_map('current', $data);
         }
@@ -165,10 +166,11 @@ class OS implements ProcessorDiscovery, OSDiscovery
     {
         if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
+
             return null;
         }
 
-        if (!isset($this->cache['group'][$depth][$oid])) {
+        if (! isset($this->cache['group'][$depth][$oid])) {
             $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDeviceArray(), $oid, $mib, $depth);
         }
 
@@ -200,6 +202,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
         d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
         if (class_exists($class)) {
             d_echo("OS initialized: $class\n");
+
             return new $class($device);
         }
 
@@ -209,11 +212,13 @@ class OS implements ProcessorDiscovery, OSDiscovery
             d_echo('Attempting to initialize OS: ' . $device['os_group'] . PHP_EOL);
             if (class_exists($class)) {
                 d_echo("OS initialized: $class\n");
+
                 return new $class($device);
             }
         }
 
         d_echo("OS initialized as Generic\n");
+
         return new Generic($device);
     }
 
@@ -283,7 +288,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
 
     public function getDiscovery()
     {
-        if (!array_key_exists('dynamic_discovery', $this->device)) {
+        if (! array_key_exists('dynamic_discovery', $this->device)) {
             $file = base_path('/includes/definitions/discovery/' . $this->getName() . '.yaml');
             if (file_exists($file)) {
                 $this->device['dynamic_discovery'] = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
@@ -295,6 +300,6 @@ class OS implements ProcessorDiscovery, OSDiscovery
 
     public function hasYamlDiscovery(string $module = null)
     {
-        return $module ? isset($this->getDiscovery()['modules'][$module]) : !empty($this->getDiscovery());
+        return $module ? isset($this->getDiscovery()['modules'][$module]) : ! empty($this->getDiscovery());
     }
 }

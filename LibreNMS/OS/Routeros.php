@@ -65,7 +65,7 @@ class Routeros extends OS implements
     public function discoverWirelessCcq()
     {
         $data = $this->fetchData();
-        $sensors = array();
+        $sensors = [];
         foreach ($data as $index => $entry) {
             // skip sensors with no data (nv2 should report 1 client, but doesn't report ccq)
             if ($entry['mtxrWlApClientCount'] > 0 && $entry['mtxrWlApOverallTxCCQ'] == 0) {
@@ -82,8 +82,10 @@ class Routeros extends OS implements
                 $entry['mtxrWlApOverallTxCCQ']
             );
         }
+
         return $sensors;
     }
+
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -97,6 +99,7 @@ class Routeros extends OS implements
             '.1.3.6.1.4.1.14988.1.1.1.3.1.6.'
         );
     }
+
     /**
      * Discover wireless frequency.  This is in MHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -107,7 +110,7 @@ class Routeros extends OS implements
     {
         $data = $this->fetchData();
 
-        $sensors = array();
+        $sensors = [];
         foreach ($data as $index => $entry) {
             if ($entry['mtxrWlApFreq'] == null) {
                 return $this->discoverSensor(
@@ -124,6 +127,7 @@ class Routeros extends OS implements
             }
         }
     }
+
     /**
      * Discover wireless Rssi.  This is in Dbm. Type is Dbm.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -138,6 +142,7 @@ class Routeros extends OS implements
             '.1.3.6.1.4.1.14988.1.1.1.8.1.12.'
         );
     }
+
     /**
      * Discover wireless Quality.  This is in Dbm. Type is Dbm.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -152,6 +157,7 @@ class Routeros extends OS implements
             '.1.3.6.1.4.1.14988.1.1.1.8.1.8.'
         );
     }
+
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -165,6 +171,7 @@ class Routeros extends OS implements
             '.1.3.6.1.4.1.14988.1.1.1.3.1.9.'
         );
     }
+
     /**
      * Discover wireless rate. This is in bps. Type is rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -174,7 +181,7 @@ class Routeros extends OS implements
     public function discoverWirelessRate()
     {
         $data = $this->fetchData();
-        $sensors = array();
+        $sensors = [];
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rate',
@@ -205,23 +212,27 @@ class Routeros extends OS implements
                 $multiplier = 1000000
             );
         }
+
         return $sensors;
     }
+
     private function fetchData()
     {
         if (is_null($this->data)) {
-            $wl60 = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
-            $wlap = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
-            $wl60sta = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GStaTable', array(), 'MIKROTIK-MIB');
-            $this->data = $wl60+$wlap;
-            $this->data = $this->data+$wl60sta;
+            $wl60 = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GTable', [], 'MIKROTIK-MIB');
+            $wlap = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWlApTable', [], 'MIKROTIK-MIB');
+            $wl60sta = snmpwalk_cache_oid($this->getDeviceArray(), 'mtxrWl60GStaTable', [], 'MIKROTIK-MIB');
+            $this->data = $wl60 + $wlap;
+            $this->data = $this->data + $wl60sta;
         }
+
         return $this->data;
     }
+
     public function discoverWirelessDistance()
     {
         $data = $this->fetchData();
-        $sensors = array();
+        $sensors = [];
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'distance',
@@ -235,12 +246,14 @@ class Routeros extends OS implements
                 100000
             );
         }
+
         return $sensors;
     }
+
     private function discoverSensor($type, $oid, $num_oid_base)
     {
         $data = $this->fetchData();
-        $sensors = array();
+        $sensors = [];
         foreach ($data as $index => $entry) {
             if (($entry['mtxrWlApSsid'] !== null)) {
                 $sensors[] = new WirelessSensor(
@@ -264,12 +277,15 @@ class Routeros extends OS implements
                 );
             }
         }
+
         return $sensors;
     }
+
     public function discoverWirelessRsrq()
     {
         $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.3.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRQ
-        return array(
+
+        return [
             new WirelessSensor(
                 'rsrq',
                 $this->getDeviceId(),
@@ -278,13 +294,15 @@ class Routeros extends OS implements
                 0,
                 'Signal RSRQ',
                 null
-            )
-        );
+            ),
+        ];
     }
+
     public function discoverWirelessRsrp()
     {
         $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.4.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRP
-        return array(
+
+        return [
             new WirelessSensor(
                 'rsrp',
                 $this->getDeviceId(),
@@ -293,13 +311,15 @@ class Routeros extends OS implements
                 0,
                 'Signal RSRP',
                 null
-            )
-        );
+            ),
+        ];
     }
+
     public function discoverWirelessSinr()
     {
         $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.7.1'; //MIKROTIK-MIB::mtxrLTEModemSignalSINR
-        return array(
+
+        return [
             new WirelessSensor(
                 'sinr',
                 $this->getDeviceId(),
@@ -308,8 +328,8 @@ class Routeros extends OS implements
                 0,
                 'Signal SINR',
                 null
-            )
-        );
+            ),
+        ];
     }
 
     public function pollOS()
@@ -319,9 +339,9 @@ class Routeros extends OS implements
         if (is_numeric($leases)) {
             $rrd_def = RrdDefinition::make()->addDataset('leases', 'GAUGE', 0);
 
-            $fields = array(
+            $fields = [
                 'leases' => $leases,
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'routeros_leases', $tags, $fields);
@@ -333,9 +353,9 @@ class Routeros extends OS implements
         if (is_numeric($pppoe_sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('pppoe_sessions', 'GAUGE', 0);
 
-            $fields = array(
+            $fields = [
                 'pppoe_sessions' => $pppoe_sessions,
-            );
+            ];
 
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);

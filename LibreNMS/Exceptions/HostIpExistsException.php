@@ -27,5 +27,4 @@ namespace LibreNMS\Exceptions;
 
 class HostIpExistsException extends HostExistsException
 {
-
 }

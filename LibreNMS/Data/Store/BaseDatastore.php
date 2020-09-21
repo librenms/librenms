@@ -41,7 +41,7 @@ abstract class BaseDatastore implements DatastoreContract
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
-     * @return boolean
+     * @return bool
      */
     public function wantsRrdTags()
     {

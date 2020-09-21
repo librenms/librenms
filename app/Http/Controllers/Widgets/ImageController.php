@@ -70,7 +70,7 @@ class ImageController extends WidgetController
     {
         if (is_null($this->settings)) {
             parent::getSettings();
-            if (!empty($this->settings['image_title'])) {
+            if (! empty($this->settings['image_title'])) {
                 $this->settings['title'] = $this->settings['image_title'];
             }
         }

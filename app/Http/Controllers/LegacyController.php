@@ -33,7 +33,7 @@ class LegacyController extends Controller
             $session->forget('widescreen');
         }
 
-        # Load the settings for Multi-Tenancy.
+        // Load the settings for Multi-Tenancy.
         if (Config::has('branding') && is_array(Config::get('branding'))) {
             $branding = Arr::dot(Config::get('branding.' . $request->server('SERVER_NAME'), Config::get('branding.default')));
             foreach ($branding as $key => $value) {
@@ -41,11 +41,10 @@ class LegacyController extends Controller
             }
         }
 
-        # page_title_prefix is displayed, unless page_title is set FIXME: NEEDED?
+        // page_title_prefix is displayed, unless page_title is set FIXME: NEEDED?
         if (Config::has('page_title')) {
             Config::set('page_title_prefix', Config::get('page_title'));
         }
-
 
         // render page
         ob_start();
@@ -60,17 +59,17 @@ class LegacyController extends Controller
         ob_end_clean();
 
         if (isset($pagetitle) && is_array($pagetitle)) {
-            # if prefix is set, put it in front
+            // if prefix is set, put it in front
             if (Config::get('page_title_prefix')) {
                 array_unshift($pagetitle, Config::get('page_title_prefix'));
             }
 
-            # if suffix is set, put it in the back
+            // if suffix is set, put it in the back
             if (Config::get('page_title_suffix')) {
                 $pagetitle[] = Config::get('page_title_suffix');
             }
 
-            # create and set the title
+            // create and set the title
             $title = join(" - ", $pagetitle);
             $html .= "<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>";
         }

@@ -27,5 +27,4 @@ namespace LibreNMS\OS;
 
 class Extremeware extends Shared\Extreme
 {
-
 }

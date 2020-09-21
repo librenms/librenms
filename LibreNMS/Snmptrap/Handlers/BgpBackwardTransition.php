@@ -47,8 +47,9 @@ class BgpBackwardTransition implements SnmptrapHandler
 
         $bgpPeer = $device->bgppeers()->where('bgpPeerIdentifier', $bgpPeerIp)->first();
 
-        if (!$bgpPeer) {
+        if (! $bgpPeer) {
             Log::error('Unknown bgp peer handling bgpBackwardTransition trap: ' . $bgpPeerIp);
+
             return;
         }
 

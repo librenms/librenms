@@ -41,6 +41,7 @@ class DynamicConfig
 
         $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) use ($config) {
             $item['overridden'] = Arr::has($config, $key);
+
             return new DynamicConfigItem($key, $item);
         });
     }
@@ -49,7 +50,7 @@ class DynamicConfig
      * Check if a setting is valid
      *
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public function isValidSetting($name)
     {
@@ -86,6 +87,7 @@ class DynamicConfig
             return $key;
         });
         $sections->prepend($sections->pull('', []), 'global'); // rename '' to global
+
         return $sections;
     }
 
@@ -104,6 +106,7 @@ class DynamicConfig
             });
         });
         $grouped->prepend($grouped->pull(''), 'global'); // rename '' to global
+
         return $grouped;
     }
 

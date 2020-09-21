@@ -11,15 +11,15 @@
 
 ini_set('allow_url_fopen', 0);
 
-$init_modules = array('web', 'auth');
+$init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-$urlargs = array(
+$urlargs = [
     'type'          => 'bill_historicbits',
     'id'            => $_GET['bill_id'],
     'width'         => $_GET['x'],
-    'height'        => $_GET['y']
-);
+    'height'        => $_GET['y'],
+];
 if (isset($_GET['bill_hist_id'])) {
     $urlargs['bill_hist_id'] = $_GET['bill_hist_id'];
 } else {

@@ -45,7 +45,7 @@ class Pbn extends OS implements ProcessorDiscovery
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.11606.10.9.109.1.1.1.1.5.1', // NMS-PROCESS-MIB::nmspmCPUTotal5min
                 0
-            )
+            ),
         ];
     }
 }

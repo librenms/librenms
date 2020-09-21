@@ -27,5 +27,4 @@ namespace LibreNMS\Exceptions;
 
 class SnmpVersionUnsupportedException extends \Exception
 {
-
 }

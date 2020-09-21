@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use GuzzleHttp\Client;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
-use GuzzleHttp\Client;
 
 class Api extends Transport
 {
@@ -39,6 +39,7 @@ class Api extends Transport
         $body = $this->config['api-body'];
         $method = $this->config['api-method'];
         $auth = [$this->config['api-auth-username'], $this->config['api-auth-password']];
+
         return $this->contactAPI($obj, $url, $options, $method, $auth, $headers, $body);
     }
 
@@ -53,7 +54,7 @@ class Api extends Transport
 
         //get each line of key-values and process the variables for Headers;
         foreach (preg_split("/\\r\\n|\\r|\\n/", $headers, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
-            list($u_key, $u_val) = explode('=', $current_line, 2);
+            [$u_key, $u_val] = explode('=', $current_line, 2);
             foreach ($obj as $p_key => $p_val) {
                 $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
             }
@@ -62,7 +63,7 @@ class Api extends Transport
         }
         //get each line of key-values and process the variables for Options;
         foreach (preg_split("/\\r\\n|\\r|\\n/", $options, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
-            list($u_key, $u_val) = explode('=', $current_line, 2);
+            [$u_key, $u_val] = explode('=', $current_line, 2);
             // Replace the values
             foreach ($obj as $p_key => $p_val) {
                 $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
@@ -73,7 +74,7 @@ class Api extends Transport
 
         $client = new \GuzzleHttp\Client();
         $request_opts['proxy'] = get_guzzle_proxy();
-        if (isset($auth) && !empty($auth[0])) {
+        if (isset($auth) && ! empty($auth[0])) {
             $request_opts['auth'] = $auth;
         }
         if (count($request_heads) > 0) {
@@ -98,9 +99,11 @@ class Api extends Transport
             var_dump($query);
             var_dump("Response headers:");
             var_dump($res->getHeaders());
-            var_dump("Return: ".$res->getReasonPhrase());
-            return 'HTTP Status code '.$code;
+            var_dump("Return: " . $res->getReasonPhrase());
+
+            return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -116,8 +119,8 @@ class Api extends Transport
                     'options' => [
                         'GET' => 'GET',
                         'POST' => 'POST',
-                        'PUT' => 'PUT'
-                    ]
+                        'PUT' => 'PUT',
+                    ],
                 ],
                 [
                     'title' => 'API URL',
@@ -154,12 +157,12 @@ class Api extends Transport
                     'name' => 'api-auth-password',
                     'descr' => 'Auth Password',
                     'type' => 'password',
-                ]
+                ],
             ],
             'validation' => [
                 'api-method' => 'in:GET,POST,PUT',
-                'api-url' => 'required|url'
-            ]
+                'api-url' => 'required|url',
+            ],
         ];
     }
 }

@@ -4,9 +4,9 @@
 $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/../includes/init.php';
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Alert\Template;
-use LibreNMS\Alert\AlertData;
 
 $options = getopt('t:h:r:p:s:d::');
 
@@ -16,11 +16,11 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
 
     $template_id = $options['t'];
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
-    $rule_id = (int)$options['r'];
+    $rule_id = (int) $options['r'];
 
     $where = 'alerts.device_id=' . $device_id . ' && alerts.rule_id=' . $rule_id;
     if (isset($options['s'])) {
-        $where .= ' alerts.state=' . (int)$options['s'];
+        $where .= ' alerts.state=' . (int) $options['s'];
     }
 
     $alerts = $runAlerts->loadAlerts($where);
@@ -33,10 +33,10 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
     if (isset($options['p'])) {
         $obj['transport'] = $options['p'];
     }
-    $type  = new Template;
-    $obj['alert']     = new AlertData($obj);
-    $obj['title']     = $type->getTitle($obj);
-    $obj['msg']       = $type->getBody($obj);
+    $type = new Template;
+    $obj['alert'] = new AlertData($obj);
+    $obj['title'] = $type->getTitle($obj);
+    $obj['msg'] = $type->getBody($obj);
     unset($obj['template']);
     unset($obj['alert']);
     print_r($obj);

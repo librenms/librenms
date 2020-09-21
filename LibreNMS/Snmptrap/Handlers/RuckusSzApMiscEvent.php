@@ -30,8 +30,8 @@ namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Snmptrap\Handlers\RuckusSzSeverity;
+use LibreNMS\Snmptrap\Trap;
 use Log;
 
 class RuckusSzApMiscEvent implements SnmptrapHandler

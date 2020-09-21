@@ -92,11 +92,11 @@ class QueryBuilderFilter implements \JsonSerializable
         $db_schema = $this->schema->getSchema();
         $valid_tables = array_diff(array_keys($this->schema->getAllRelationshipPaths()), self::$table_blacklist);
 
-        foreach ((array)$db_schema as $table => $data) {
+        foreach ((array) $db_schema as $table => $data) {
             $columns = array_column($data['Columns'], 'Type', 'Field');
 
             // only allow tables with a direct association to device_id
-            if (!in_array($table, $valid_tables)) {
+            if (! in_array($table, $valid_tables)) {
                 continue;
             }
 
@@ -143,7 +143,6 @@ class QueryBuilderFilter implements \JsonSerializable
         }
     }
 
-
     private function getColumnType($type)
     {
         if (Str::startsWith($type, ['varchar', 'text', 'double', 'float'])) {
@@ -172,6 +171,7 @@ class QueryBuilderFilter implements \JsonSerializable
     {
         $filter = $this->filter;
         asort($filter);
+
         return array_values($filter);
     }
 

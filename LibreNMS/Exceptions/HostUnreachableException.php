@@ -27,7 +27,7 @@ namespace LibreNMS\Exceptions;
 
 class HostUnreachableException extends \Exception
 {
-    protected $reasons = array();
+    protected $reasons = [];
 
     public function __toString()
     {
@@ -35,6 +35,7 @@ class HostUnreachableException extends \Exception
         foreach ($this->reasons as $reason) {
             $string .= "  $reason\n";
         }
+
         return $string;
     }
 

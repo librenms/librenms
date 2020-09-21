@@ -132,5 +132,7 @@ class SyslogController extends TableController
             case "emerg":
                 return "label-danger"; //Emergency
         }
-    } // end syslog_priority
+    }
+
+    // end syslog_priority
 }

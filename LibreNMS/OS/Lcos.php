@@ -56,8 +56,9 @@ class Lcos extends OS implements
     private function strToDecOid($index)
     {
         for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-                $dec_index[] = ord($index[$i]);
+            $dec_index[] = ord($index[$i]);
         }
+
         return implode('.', $dec_index);
     }
 
@@ -88,6 +89,7 @@ class Lcos extends OS implements
                 WirelessSensor::channelToFrequency($entry['lcsStatusWlanRadiosEntryRadioChannel'])
             );
         }
+
         return $sensors;
     }
 
@@ -130,6 +132,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryModemLoad']
             );
         }
+
         return $sensors;
     }
 
@@ -160,6 +163,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryNoiseLevel']
             );
         }
+
         return $sensors;
     }
 
@@ -191,6 +195,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryTransmitPower']
             );
         }
+
         return $sensors;
     }
 
@@ -223,6 +228,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanCompetingNetworksEntryPhySigal']
             );
         }
+
         return $sensors;
     }
 
@@ -256,6 +262,7 @@ class Lcos extends OS implements
                 1000000
             );
         }
+
         return $sensors;
     }
 
@@ -289,6 +296,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanCompetingNetworksEntrySignalLevel']
             );
         }
+
         return $sensors;
     }
 }

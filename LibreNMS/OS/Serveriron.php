@@ -29,5 +29,4 @@ use LibreNMS\OS\Shared\Foundry;
 
 class Serveriron extends Foundry
 {
-
 }

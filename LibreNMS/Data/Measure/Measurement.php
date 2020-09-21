@@ -56,6 +56,7 @@ class Measurement
     public function end()
     {
         $this->duration = microtime(true) - $this->start;
+
         return $this;
     }
 
