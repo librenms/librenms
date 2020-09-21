@@ -47,12 +47,12 @@ $sensors = [
 ];
 
 foreach ($sensors as $sensor) {
-    $temp = snmp_get($device, $sensor['state_name'].'.0', "-Ovqe", "ExaltComProducts");
+    $temp = snmp_get($device, $sensor['state_name'] . '.0', "-Ovqe", "ExaltComProducts");
     $cur_oid = $sensor['num_oid'];
 
     if (is_numeric($temp)) {
         $state_name = $sensor['state_name'];
-        $index      = $state_name;
+        $index = $state_name;
         create_state_index($state_name, $states);
 
         $descr = $sensor['descr'];

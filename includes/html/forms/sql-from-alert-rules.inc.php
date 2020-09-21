@@ -28,8 +28,8 @@ use LibreNMS\Config;
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die(json_encode([
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need to be admin',
     ]));
@@ -38,7 +38,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $rule_id = $vars['rule_id'];
 
 if (is_numeric($rule_id)) {
-    $rule = dbFetchRow('SELECT * FROM alert_rules where id=?', array($rule_id));
+    $rule = dbFetchRow('SELECT * FROM alert_rules where id=?', [$rule_id]);
 
     $default_extra = [
         'mute' => Config::get('alert_rule.mute_alerts'),
@@ -52,15 +52,15 @@ if (is_numeric($rule_id)) {
         'status' => 'ok',
         'name' => $rule['name'] . ' - Copy',
         'builder' => QueryBuilderParser::fromJson($rule['builder']),
-        'extra' => array_replace($default_extra, (array)json_decode($rule['extra'])),
+        'extra' => array_replace($default_extra, (array) json_decode($rule['extra'])),
         'severity' => $rule['severity'] ?: Config::get('alert_rule.severity'),
         'invert_map' => $rule['invert_map'],
     ];
 } else {
     $output = [
         'status' => 'error',
-        'message' => 'Invalid template'
+        'message' => 'Invalid template',
     ];
 }
 
-die(json_encode($output));
+exit(json_encode($output));

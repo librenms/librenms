@@ -22,7 +22,6 @@
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
  */
-
 $temp_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.10.0';
 $descr_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0';
 

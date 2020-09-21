@@ -8,7 +8,7 @@
  * @author     Christoph Zilian <czilian@hotmail.com>
  * @license    http://gnu.org/copyleft/gpl.html GNU GPL
  * @link       https://github.com/librenms/librenms/
-
+ *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -97,7 +97,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex = $entry['cmEthernetNetPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]);
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'temperature',
@@ -127,7 +127,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex = $entry['cmEthernetAccPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetAccPortIfIndex'], $device['device_id']]);
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'temperature',
@@ -157,7 +157,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex = $entry['cmEthernetTrafficPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]);
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'temperature',

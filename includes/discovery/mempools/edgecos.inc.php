@@ -29,14 +29,14 @@ if ($device['os'] == 'edgecos') {
         $temp_mibs = 'ECS3510-MIB';
     } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.43.')) { //ECS2100
         $temp_mibs = 'ECS2100-MIB';
-    };
+    }
 
-    $temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0','memoryAllocated.0'], '-OUQs', $temp_mibs);
+    $temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0', 'memoryAllocated.0'], '-OUQs', $temp_mibs);
     $total = $temp_data['memoryTotal.0'];
     $avail = $temp_data['memoryFreed.0'];
     $used = $temp_data['memoryAllocated.0'] ?? ($total - $avail);
 
-    if ((is_numeric($total)) && (is_numeric($avail)) && (is_numeric($used) )) {
+    if ((is_numeric($total)) && (is_numeric($avail)) && (is_numeric($used))) {
         discover_mempool($valid_mempool, $device, 0, 'edgecos', 'Memory', '1', null, null);
     }
     unset($temp_id, $temp_data, $tmep_mibs);

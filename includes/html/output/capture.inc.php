@@ -22,9 +22,8 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-if (!Auth::user()->hasGlobalAdmin()) {
-    echo("Insufficient Privileges");
+if (! Auth::user()->hasGlobalAdmin()) {
+    echo "Insufficient Privileges";
     exit();
 }
 

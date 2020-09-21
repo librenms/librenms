@@ -18,8 +18,8 @@ $components = $component->getComponents($device['device_id']);
 $components = $components[$device['device_id']];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
-$keep = array();
-$types = array('f5-ltm-pool', 'f5-ltm-poolmember');
+$keep = [];
+$types = ['f5-ltm-pool', 'f5-ltm-poolmember'];
 foreach ($components as $k => $v) {
     foreach ($types as $type) {
         if ($v['type'] == $type) {
@@ -45,13 +45,13 @@ if ($components[$vars['id']]['type'] == 'f5-ltm-pool') {
         if ($comp['type'] != 'f5-ltm-poolmember') {
             continue;
         }
-        if (!strstr($comp['UID'], $parent)) {
+        if (! strstr($comp['UID'], $parent)) {
             continue;
         }
 
         $label = $comp['label'];
         $hash = $comp['hash'];
-        $rrd_filename = rrd_name($device['hostname'], array($comp['type'], $label, $hash));
+        $rrd_filename = rrd_name($device['hostname'], [$comp['type'], $label, $hash]);
         if (rrdtool_check_rrd_exists($rrd_filename)) {
             d_echo("\n  Adding PM: " . $label . "\t+ added to the graph");
 

@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 echo 'inletTable ';
 $pre_cache['raritan_inletTable'] = snmpwalk_group($device, 'inletTable', 'PDU-MIB');
 

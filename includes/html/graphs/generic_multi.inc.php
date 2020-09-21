@@ -30,7 +30,7 @@ if ($nototal) {
 
 if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "Now      Min      Max     Avg\l'";
-    if (!$nototal) {
+    if (! $nototal) {
         $rrd_options .= " COMMENT:'Total      '";
     }
 
@@ -41,13 +41,13 @@ if ($width > '500') {
 
 $i = 0;
 $iter = 0;
-$ids = array();
+$ids = [];
 
 foreach ($rrd_list as $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (!\LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
             $iter = 0;
         }
         $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");

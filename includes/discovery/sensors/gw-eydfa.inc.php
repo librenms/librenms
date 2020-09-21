@@ -22,16 +22,15 @@
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
  */
-
 $oids = snmp_walk($device, 'oaPumpTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB');
-d_echo($oids."\n");
+d_echo($oids . "\n");
 
 if ($oids) {
     echo 'GW EYDFA PUMP ';
 }
 
 foreach (explode("\n", $oids) as $data) {
-    list($oid, $value) = explode(' ', $data);
+    [$oid, $value] = explode(' ', $data);
     $split_oid = explode('.', $oid);
     $index = $split_oid[1];
     // Check for sensor type
@@ -80,17 +79,15 @@ foreach (explode("\n", $oids) as $data) {
     unset($oids, $split_oid, $index, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 }
 
-
-
 $oids = snmp_walk($device, 'oaDCPowerTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB');
-d_echo($oids."\n");
+d_echo($oids . "\n");
 
 if ($oids) {
     echo 'GW EYDFA DC POWER ';
 }
 
 foreach (explode("\n", $oids) as $data) {
-    list($oid, $value) = explode(' ', $data);
+    [$oid, $value] = explode(' ', $data);
     $split_oid = explode('.', $oid);
     $index = $split_oid[1];
     // Check for sensor type
@@ -104,7 +101,7 @@ foreach (explode("\n", $oids) as $data) {
             $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
-        $sensor_index = 'oaDCPowerVoltage'.$index;
+        $sensor_index = 'oaDCPowerVoltage' . $index;
         $value = $value / $divisor;
         discover_sensor($valid['sensor'], 'voltage', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }

@@ -11,15 +11,15 @@
  * the source code distribution for details.
  */
 // Pages
-$subtypes = array();
+$subtypes = [];
 $subtypes['ltm_bwc_det'] = 'Bandwidth Controller Details';
 
-if (!$vars['subtype']) {
+if (! $vars['subtype']) {
     $vars['subtype'] = 'ltm_bwc_det';
 }
 
 // Determine a policy to show.
-if (!isset($vars['bwcid'])) {
+if (! isset($vars['bwcid'])) {
     foreach ($components as $id => $array) {
         if ($array['type'] != 'f5-ltm-bwc') {
             continue;

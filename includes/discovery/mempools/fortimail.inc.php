@@ -1,4 +1,5 @@
 <?php
+
 if ($device['os'] == 'fortimail') {
     echo 'FORTIMAIL-MEMORY-POOL: ';
     $usage = str_replace('"', "", snmp_get($device, 'FORTINET-FORTIMAIL-MIB::fmlSysMemUsage.0', '-OvQ'));

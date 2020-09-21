@@ -7,4 +7,4 @@ if ($service['service_ip']) {
 } else {
     $check_cmd .= $service['server'];
 }
-$check_cmd .= " ".$service['service_param'];
+$check_cmd .= " " . $service['service_param'];

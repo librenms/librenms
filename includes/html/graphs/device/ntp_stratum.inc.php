@@ -12,8 +12,8 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','ntp');
+$options = [];
+$options['filter']['type'] = ['=', 'ntp'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -26,7 +26,7 @@ $rrd_additions = "";
 
 $count = 0;
 foreach ($components as $id => $array) {
-    $rrd_filename = rrd_name($device['hostname'], array('ntp', $array['peer']));
+    $rrd_filename = rrd_name($device['hostname'], ['ntp', $array['peer']]);
 
     if (rrdtool_check_rrd_exists($rrd_filename)) {
         // Grab a color from the array.

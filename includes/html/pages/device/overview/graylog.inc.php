@@ -8,7 +8,7 @@ if (Config::get('graylog.server')) {
             <div class="col-md-12">
                 <div class="panel panel-default panel-condensed">
                     <div class="panel-heading">
-                        <a href="device/device='.$device['device_id'].'/tab=logs/section=graylog/">
+                        <a href="device/device=' . $device['device_id'] . '/tab=logs/section=graylog/">
                             <i class="fa fa-clone fa-lg icon-theme" 
                             aria-hidden="true"></i> 
                             <strong>Recent Graylog</strong>
@@ -40,8 +40,8 @@ if (Config::get('graylog.server')) {
             type: "post",
             data: {
                 device: "' . (isset($filter_device) ? $filter_device : '') . '",
-                '. ($rowCount? 'rowCount: '.$rowCount .',' : '') .'
-                '. ($loglevel? 'loglevel: '.$loglevel .',' : '') .'
+                ' . ($rowCount ? 'rowCount: ' . $rowCount . ',' : '') . '
+                ' . ($loglevel ? 'loglevel: ' . $loglevel . ',' : '') . '
             },
             url: "' . url('/ajax/table/graylog') . '",
             success: function(data){

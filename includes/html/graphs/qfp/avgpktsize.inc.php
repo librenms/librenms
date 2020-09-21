@@ -12,7 +12,6 @@
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
-
 $colour_area_in = 'AA66AA';
 $colour_line_in = '330033';
 
@@ -30,11 +29,11 @@ $stacked = generate_stacked_graphs();
 
 $length = '10';
 
-if (!isset($out_text)) {
+if (! isset($out_text)) {
     $out_text = 'Out';
 }
 
-if (!isset($in_text)) {
+if (! isset($in_text)) {
     $in_text = 'In';
 }
 
@@ -53,7 +52,6 @@ $rrd_options .= ' CDEF:out_throughput=out_bits,8,/';
 $rrd_options .= ' CDEF:in_avg=in_throughput,in_packets,/';
 $rrd_options .= ' CDEF:out_avg_tmp=out_throughput,out_packets,/';
 $rrd_options .= ' CDEF:out_avg=out_avg_tmp,-1,*';
-
 
 $rrd_options .= ' AREA:in_avg#' . $colour_area_in . $stacked['transparency'] . ':';
 $rrd_options .= " COMMENT:'Average packet size\\n'";

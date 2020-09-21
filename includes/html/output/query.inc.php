@@ -27,8 +27,8 @@ use LibreNMS\Alert\AlertDB;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    echo("Insufficient Privileges");
+if (! Auth::user()->hasGlobalAdmin()) {
+    echo "Insufficient Privileges";
     exit();
 }
 
@@ -42,13 +42,13 @@ switch ($type) {
         $device = device_by_id_cache($device_id);
         $rules = AlertUtil::getRules($device_id);
         $output = '';
-        $results = array();
+        $results = [];
         foreach ($rules as $rule) {
             if (empty($rule['query'])) {
                 $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
             }
             $sql = $rule['query'];
-            $qry = dbFetchRow($sql, array($device_id));
+            $qry = dbFetchRow($sql, [$device_id]);
             if (is_array($qry)) {
                 $results[] = $qry;
                 $response = 'matches';
@@ -92,7 +92,7 @@ switch ($type) {
                 $x++;
             }
         }
-        if (!empty($transports)) {
+        if (! empty($transports)) {
             $output .= 'Found ' . $x . ' transports to send alerts to.' . PHP_EOL;
             $output .= $transports;
         }

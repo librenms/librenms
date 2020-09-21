@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 echo 'st4HumidSensorConfigTable ';
 $pre_cache['sentry4_humid'] = snmpwalk_cache_oid($device, 'st4HumidSensorConfigTable', [], 'Sentry4-MIB');
 

@@ -1,6 +1,6 @@
 <?php
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     require 'includes/html/error-no-perm.inc.php';
     exit;
 }
@@ -11,16 +11,15 @@ if (Auth::user()->isDemo()) {
     demo_account();
 } else {
     if (is_numeric($_REQUEST['id'])) {
-        echo('
+        echo '
             <div class="row">
             <div class="col-sm-offset-2 col-sm-7">
-            ');
+            ';
         if ($_REQUEST['confirm']) {
-            print_message(nl2br(delete_device(mres($_REQUEST['id'])))."\n");
+            print_message(nl2br(delete_device(mres($_REQUEST['id']))) . "\n");
         } else {
             $device = device_by_id_cache($_REQUEST['id']);
-            print_error("Are you sure you want to delete device " . $device['hostname'] . "?");
-            ?>
+            print_error("Are you sure you want to delete device " . $device['hostname'] . "?"); ?>
 <br />
 <center>
   <font color="red"></font><i class="fa fa-exclamation-triangle fa-3x"></i></font>
@@ -37,9 +36,9 @@ if (Auth::user()->isDemo()) {
 </center>
             <?php
         }
-        echo('
+        echo '
     </div>
-  </div>');
+  </div>';
     } else {
         ?>
 
@@ -62,10 +61,8 @@ if (Auth::user()->isDemo()) {
                         <option disabled="disabled" selected="selected">Please select</option>
                     <?php
                     foreach (dbFetchRows("SELECT `device_id`, `hostname` FROM `devices` ORDER BY `hostname`") as $data) {
-                        echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
-                    }
-
-                    ?>
+                        echo "<option value='" . $data['device_id'] . "'>" . $data['hostname'] . "</option>";
+                    } ?>
                     </select>
                   </div>
                 </div>

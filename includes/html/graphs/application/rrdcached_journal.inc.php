@@ -22,22 +22,21 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 include 'rrdcached.inc.php';
 
 $colours = 'pinks';
 
-$rrd_list = array(
-    array(
+$rrd_list = [
+    [
         'ds' => 'journal_rotate',
         'filename' => $rrd_filename,
         'descr' => 'Journal Rotated',
-    ),
-    array(
+    ],
+    [
         'ds' => 'journal_bytes',
         'filename' => $rrd_filename,
         'descr' => 'Journal Bytes Written',
-    )
-);
+    ],
+];
 
 require 'includes/html/graphs/generic_multi.inc.php';

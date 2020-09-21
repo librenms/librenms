@@ -22,5 +22,4 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $pre_cache['serverscheck_control'] = snmpwalk_group($device, 'control', 'SERVERSCHECK-MIB');

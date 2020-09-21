@@ -1,4 +1,5 @@
 <?php
+
 if ($device['os'] == 'hirschmann') {
     $mem_allocated = snmp_get($device, 'HMPRIV-MGMT-SNMP-MIB::hmMemoryAllocated.0', '-OvQ');
     $mem_free = snmp_get($device, 'HMPRIV-MGMT-SNMP-MIB::hmMemoryFree.0', '-OvQ');

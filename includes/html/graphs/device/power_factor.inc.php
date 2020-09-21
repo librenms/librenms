@@ -1,7 +1,7 @@
 <?php
 
-$class     = 'power_factor';
-$unit      = '';
+$class = 'power_factor';
+$unit = '';
 $unit_long = '';
 
 $rrd_options .= " -o";

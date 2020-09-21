@@ -23,7 +23,6 @@
  * @author     TheGreatDoc
  * Based on Neil Lathwood Cisco EPC files
  */
-
 echo 'ifName ';
 $pre_cache['ar-c3_ifName'] = snmpwalk_cache_oid($device, 'ifName', [], 'DOCS-IF-MIB');
 

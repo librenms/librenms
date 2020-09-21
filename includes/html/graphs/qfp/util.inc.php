@@ -12,14 +12,13 @@
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
-
 $scale_min = '0';
 $scale_max = '100';
 
 $ds = 'ProcessingLoad';
 
-$colour_line   = 'cc0000';
-$colour_area   = 'FFBBBB';
+$colour_line = 'cc0000';
+$colour_area = 'FFBBBB';
 $colour_minmax = 'c5c5c5';
 
 $graph_max = 1;

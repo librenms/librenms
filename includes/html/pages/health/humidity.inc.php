@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_humidity';
-$unit       = '%';
-$class      = 'humidity';
+$unit = '%';
+$class = 'humidity';
 
 require 'includes/html/pages/health/sensors.inc.php';

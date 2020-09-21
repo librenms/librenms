@@ -22,7 +22,6 @@
  * @copyright  2020 Jozef Rebjak
  * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
-
 $power1 = snmp_get($device, "power1State.0", "-Ovqe", "OAP-NMU");
 $power2 = snmp_get($device, "power2State.0", "-Ovqe", "OAP-NMU");
 $fan = snmp_get($device, "fanState.0", "-Ovqe", "OAP-NMU");

@@ -3,7 +3,7 @@
 use Illuminate\Support\Str;
 
 if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware') {
-    if (Str::contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
+    if (Str::contains($device['sysDescr'], ['NetIron', 'MLX', 'CER']) === false) {
         echo 'Ironware Dynamic: ';
 
         $percent = snmp_get($device, 'snAgGblDynMemUtil.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
@@ -23,12 +23,12 @@ if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware') {
 
         if (is_array($ni_mempools_array)) {
             foreach ($ni_mempools_array as $index => $entry) {
-                d_echo($index.' '.$entry['snAgentBrdMainBrdDescription'].' -> '.$entry['snAgentBrdMemoryUtil100thPercent']."\n");
+                d_echo($index . ' ' . $entry['snAgentBrdMainBrdDescription'] . ' -> ' . $entry['snAgentBrdMemoryUtil100thPercent'] . "\n");
 
-                $usage_oid = '.1.3.6.1.4.1.1991.1.1.2.2.1.1.28.'.$index;
-                $descr     = $entry['snAgentBrdMainBrdDescription'];
-                $usage     = ($entry['snAgentBrdMemoryUtil100thPercent'] / 100);
-                if (!strstr($descr, 'No') && !strstr($usage, 'No') && $descr != '') {
+                $usage_oid = '.1.3.6.1.4.1.1991.1.1.2.2.1.1.28.' . $index;
+                $descr = $entry['snAgentBrdMainBrdDescription'];
+                $usage = ($entry['snAgentBrdMemoryUtil100thPercent'] / 100);
+                if (! strstr($descr, 'No') && ! strstr($usage, 'No') && $descr != '') {
                     discover_mempool($valid_mempool, $device, $index, 'ironware-dyn', $descr, '1', null, null);
                 } //end_if
             } //end_foreach

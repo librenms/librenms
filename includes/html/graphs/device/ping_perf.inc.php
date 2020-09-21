@@ -20,7 +20,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = rrd_name($device['hostname'], 'ping-perf');
 
-$rrd_options .= ' DEF:ping='.$rrd_filename.':ping:AVERAGE';
+$rrd_options .= ' DEF:ping=' . $rrd_filename . ':ping:AVERAGE';
 $rrd_options .= " 'COMMENT:Milliseconds      Cur      Min     Max     Avg\\n'";
 if (Config::get('applied_site_style') == 'dark') {
     $rrd_options .= ' LINE1.25:ping#63636d:Ping';

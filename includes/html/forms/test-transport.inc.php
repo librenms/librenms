@@ -15,17 +15,17 @@
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
-    die('ERROR: You need to be admin');
+    exit('ERROR: You need to be admin');
 }
 
 $transport = $vars['transport'] ?: null;
 $transport_id = $vars['transport_id'] ?: null;
 
-$tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location_id from devices order by device_id asc limit 1'));
+$tmp = [dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location_id from devices order by device_id asc limit 1')];
 $tmp['contacts'] = AlertUtil::getContacts($tmp);
-$obj = array(
+$obj = [
     "hostname"  => $tmp[0]['hostname'],
     "device_id" => $tmp[0]['device_id'],
     "sysDescr" => $tmp[0]['sysDescr'],
@@ -45,14 +45,14 @@ $obj = array(
     "contacts"  => $tmp['contacts'],
     "state"     => "1",
     "msg"       => "This is a test alert",
-);
+];
 
 $response = ['status' => 'error'];
 
 if ($transport_id) {
     $transport = dbFetchCell("SELECT `transport_type` FROM `alert_transports` WHERE `transport_id` = ?", [$transport_id]);
 }
-$class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
+$class = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
 if (class_exists($class)) {
     $opts = Config::get("alert.transports.$transport");
     $instance = new $class($transport_id);

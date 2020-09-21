@@ -1,5 +1,5 @@
 <?php
-if (!isset($var['section'])) {
+if (! isset($var['section'])) {
     $vars['section'] = "tnmsne";
 }
 $pagetitle[] = 'Hardware';

@@ -12,7 +12,7 @@
  */
 
 $component = new LibreNMS\Component();
-$options['filter']['type'] = array('=','Cisco-OTV');
+$options['filter']['type'] = ['=', 'Cisco-OTV'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -26,7 +26,7 @@ $rrd_additions = "";
 $count = 0;
 foreach ($components as $id => $array) {
     if ($array['otvtype'] == 'overlay') {
-        $rrd_filename = rrd_name($device['hostname'], array('cisco', 'otv', $array['label'], 'vlan'));
+        $rrd_filename = rrd_name($device['hostname'], ['cisco', 'otv', $array['label'], 'vlan']);
 
         if (rrdtool_check_rrd_exists($rrd_filename)) {
             // Stack the area on the second and subsequent DS's

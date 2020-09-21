@@ -212,7 +212,7 @@ foreach ($cienaCesChassisFanTrayEntry as $index => $contents) {
         default:
             $modeString = "";
     }
-    
+
     $entity_array[] = [
         'entPhysicalIndex'        => "53$index",
         'entPhysicalClass'        => 'sensor',
@@ -232,7 +232,7 @@ foreach ($cienaCesChassisFanEntry as $index => $contents) {
     $indexArr = explode(".", $index);
     $fanTray = $indexArr[0];
     $fanIndex = $indexArr[1];
-    
+
     $entity_array[] = [
         'entPhysicalIndex'        => "51$fanIndex",
         'entPhysicalClass'        => 'sensor',
@@ -250,7 +250,7 @@ foreach ($cienaCesChassisFanTempEntry as $index => $contents) {
     $indexArr = explode(".", $index);
     $fanTray = $indexArr[0];
     $sensorIndex = $indexArr[1];
-    
+
     $entity_array[] = [
         'entPhysicalIndex'        => "52$sensorIndex",
         'entPhysicalClass'        => 'sensor',
@@ -268,7 +268,7 @@ foreach ($module_array as $index => $contents) {
     $chassisIndex = $indexArr[0];
     $shelfIndex = $indexArr[1];
     $slotIndex = $indexArr[2];
-    
+
     $entity_array[] = [
         'entPhysicalIndex'        => "55$slotIndex",
         'entPhysicalDescr'        => $contents['cienaCesModuleDescription'] . ", " . $contents['cienaCesModuleSwRunningRelease'],
@@ -325,23 +325,23 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
     discover_entity_physical(
         $valid,
         $device,
-        array_key_exists('entPhysicalIndex', $entry)        ? $entry['entPhysicalIndex']        : '',
-        array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '',
-        array_key_exists('entPhysicalClass', $entry)        ? $entry['entPhysicalClass']        : '',
-        array_key_exists('entPhysicalName', $entry)         ? $entry['entPhysicalName']         : '',
-        array_key_exists('entPhysicalModelName', $entry)    ? $entry['entPhysicalModelName']    : '',
-        array_key_exists('entPhysicalSerialNum', $entry)    ? $entry['entPhysicalSerialNum']    : '',
-        array_key_exists('entPhysicalContainedIn', $entry)  ? $entry['entPhysicalContainedIn']  : '',
-        array_key_exists('entPhysicalMfgName', $entry)      ? $entry['entPhysicalMfgName']      : '',
+        array_key_exists('entPhysicalIndex', $entry) ? $entry['entPhysicalIndex'] : '',
+        array_key_exists('entPhysicalDescr', $entry) ? $entry['entPhysicalDescr'] : '',
+        array_key_exists('entPhysicalClass', $entry) ? $entry['entPhysicalClass'] : '',
+        array_key_exists('entPhysicalName', $entry) ? $entry['entPhysicalName'] : '',
+        array_key_exists('entPhysicalModelName', $entry) ? $entry['entPhysicalModelName'] : '',
+        array_key_exists('entPhysicalSerialNum', $entry) ? $entry['entPhysicalSerialNum'] : '',
+        array_key_exists('entPhysicalContainedIn', $entry) ? $entry['entPhysicalContainedIn'] : '',
+        array_key_exists('entPhysicalMfgName', $entry) ? $entry['entPhysicalMfgName'] : '',
         array_key_exists('entPhysicalParentRelPos', $entry) ? $entry['entPhysicalParentRelPos'] : '',
-        array_key_exists('entPhysicalVendorType', $entry)   ? $entry['entPhysicalVendorType']   : '',
-        array_key_exists('entPhysicalHardwareRev', $entry)  ? $entry['entPhysicalHardwareRev']  : '',
-        array_key_exists('entPhysicalFirmwareRev', $entry)  ? $entry['entPhysicalFirmwareRev']  : '',
-        array_key_exists('entPhysicalSoftwareRev', $entry)  ? $entry['entPhysicalSoftwareRev']  : '',
-        array_key_exists('entPhysicalIsFRU', $entry)        ? $entry['entPhysicalIsFRU']        : '',
-        array_key_exists('entPhysicalAlias', $entry)        ? $entry['entPhysicalAlias']        : '',
-        array_key_exists('entPhysicalAssetID', $entry)      ? $entry['entPhysicalAssetID']      : '',
-        array_key_exists('ifIndex', $entry)                 ? $entry['ifIndex']                 : ''
+        array_key_exists('entPhysicalVendorType', $entry) ? $entry['entPhysicalVendorType'] : '',
+        array_key_exists('entPhysicalHardwareRev', $entry) ? $entry['entPhysicalHardwareRev'] : '',
+        array_key_exists('entPhysicalFirmwareRev', $entry) ? $entry['entPhysicalFirmwareRev'] : '',
+        array_key_exists('entPhysicalSoftwareRev', $entry) ? $entry['entPhysicalSoftwareRev'] : '',
+        array_key_exists('entPhysicalIsFRU', $entry) ? $entry['entPhysicalIsFRU'] : '',
+        array_key_exists('entPhysicalAlias', $entry) ? $entry['entPhysicalAlias'] : '',
+        array_key_exists('entPhysicalAssetID', $entry) ? $entry['entPhysicalAssetID'] : '',
+        array_key_exists('ifIndex', $entry) ? $entry['ifIndex'] : ''
     );
 }
 

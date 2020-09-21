@@ -12,7 +12,7 @@ $check_cmd = \LibreNMS\Config::get('nagios_plugins') . "/check_mysql -H " . $ser
 $check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"}';
 
 // Build the graph data
-$check_graph = array();
+$check_graph = [];
 $mixed_colours = \LibreNMS\Config::get('graph_colours.mixed');
 
 $check_graph['mysqlqueries'] = " DEF:DS0=" . $rrd_filename . ":Queries:AVERAGE ";
@@ -25,7 +25,6 @@ $check_graph['mysqlqueries'] .= " LINE1.25:DS1#" . $mixed_colours[2] . ":'" . st
 $check_graph['mysqlqueries'] .= " GPRINT:DS1:LAST:%0.0lf ";
 $check_graph['mysqlqueries'] .= " GPRINT:DS1:AVERAGE:%0.0lf ";
 $check_graph['mysqlqueries'] .= " GPRINT:DS1:MAX:%0.0lf\\l ";
-
 
 $check_graph['mysql'] = " DEF:DS0=" . $rrd_filename . ":Connections:AVERAGE ";
 $check_graph['mysql'] .= " LINE1.25:DS0#" . $mixed_colours[0] . ":'" . str_pad(substr("Connections", 0, 19), 19) . "' ";

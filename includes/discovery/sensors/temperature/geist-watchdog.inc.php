@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $value = snmp_get($device, 'climateTempC', '-Oqv', 'GEIST-MIB-V3');
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.2.2.1.5.1';

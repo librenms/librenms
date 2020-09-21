@@ -2,13 +2,13 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', array($vars['id']));
+$sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
 
 if ($sla['owner']) {
-    $name .= ' (Owner: '.$sla['owner'].')';
+    $name .= ' (Owner: ' . $sla['owner'] . ')';
 }
 
-$rrd_filename = rrd_name($device['hostname'], array('sla', $sla['sla_nr']));
+$rrd_filename = rrd_name($device['hostname'], ['sla', $sla['sla_nr']]);
 
 $rrd_options .= " -l 0 ";
 

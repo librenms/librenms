@@ -32,7 +32,7 @@ $serverscheck_oids = [
     'sensor4Value.0' => '.1.3.6.1.4.1.17095.3.14.0',
     'sensor5Value.0' => '.1.3.6.1.4.1.17095.3.18.0',
 ];
- 
+
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
     if ((Str::contains($oid_name, 'name')) && (Str::contains($oid_value, ['Flooding', 'Leckage']))) {
         preg_match("/(\d+)/", $oid_name, $temp_x);
@@ -48,7 +48,7 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
                 ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'WET'],
             ];
             create_state_index($state_name, $states);
-            
+
             discover_sensor($valid['sensor'], 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state_name, $descr, 1, 1, null, null, null, null, 1);
             create_sensor_to_state_index($device, $state_name, $index);
         }

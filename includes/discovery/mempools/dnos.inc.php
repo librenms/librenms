@@ -22,7 +22,6 @@
  * @copyright  2019 Spencer Butler
  * @author     Spencer Butler <github@crooked.app>
  */
-
 $mem_data = snmpwalk_cache_oid($device, 'dellNetCpuUtilTable', [], 'DELL-NETWORKING-CHASSIS-MIB', 'dell', '-OUseQ');
 $mem_data = snmpwalk_cache_oid($device, 'DellNetProcessorEntry', $mem_data, 'DELL-NETWORKING-CHASSIS-MIB', 'dell', '-OUseQ');
 

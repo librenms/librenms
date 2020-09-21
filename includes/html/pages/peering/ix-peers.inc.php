@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * LibreNMS PeeringDB Integration
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,9 +20,8 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
-$asn    = $vars['asn'];
-$ixid   = $vars['ixid'];
+$asn = $vars['asn'];
+$ixid = $vars['ixid'];
 $status = $vars['status'];
 
 ?>

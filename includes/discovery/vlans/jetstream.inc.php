@@ -24,15 +24,15 @@
  * @author     PipoCanaja
  */
 
-# first release by (peca.nesovanovic@sattrakt.com) # 2020/05/25
-# jetstreamExpand function by Molnar Tamas (mtammasss@gmail.com) # 2020/05/25
-#
-# tested on: T1600G-28TS 3.0; T2600G-18TS 2.0;
-#
-# todo: detect LAG ports ??? now parser assume that there is no LAG port
-#
+// first release by (peca.nesovanovic@sattrakt.com) # 2020/05/25
+// jetstreamExpand function by Molnar Tamas (mtammasss@gmail.com) # 2020/05/25
+//
+// tested on: T1600G-28TS 3.0; T2600G-18TS 2.0;
+//
+// todo: detect LAG ports ??? now parser assume that there is no LAG port
+//
 
-if (!function_exists("jetstreamExpand")) {
+if (! function_exists("jetstreamExpand")) {
     function jetstreamExpand($var)
     {
         $arr = explode(',', trim($var)); //array of x/y/a-z
@@ -52,6 +52,7 @@ if (!function_exists("jetstreamExpand")) {
                 $result[] = $element;
             }
         }
+
         return $result;
     }
 }
@@ -78,7 +79,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
             if ($vlan_data['vlan_name'] != $jet_vlan_data['dot1qVlanDescription']) {
                 $vlan_upd['vlan_name'] = $jet_vlan_data['dot1qVlanDescription'];
-                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', array($vlan_data['jet_vlan_id']));
+                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['jet_vlan_id']]);
                 log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> " . $jet_vlan_data['dot1qVlanDescription'], $device, 'vlan');
                 echo "U";
             } else {
@@ -90,8 +91,8 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $jet_vlan_id,
                 'vlan_name' => $jet_vlan_data['dot1qVlanDescription'],
-                'vlan_type' => array('NULL')
-                ], 'vlans');
+                'vlan_type' => ['NULL'],
+            ], 'vlans');
 
             log_event("VLAN added: " . $jet_vlan_data['dot1qVlanDescription'] . ", $vlan_id", $device, 'vlan');
             echo "+";
@@ -100,14 +101,14 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
         foreach (jetstreamExpand($jet_vlan_data['vlanTagPortMemberAdd']) as $port_nr) {
             if (isset($jet_stringPortMapping[$port_nr])) {
-                d_echo("ID: $jet_vlan_id -> PORT: ".$port_nr.", ifindex: ".$jet_stringPortMapping[$port_nr]['ifindex']." \n");
-                $per_vlan_data[$jet_vlan_id][$jet_stringPortMapping[$port_nr]['ifindex']]['untagged']=0;
+                d_echo("ID: $jet_vlan_id -> PORT: " . $port_nr . ", ifindex: " . $jet_stringPortMapping[$port_nr]['ifindex'] . " \n");
+                $per_vlan_data[$jet_vlan_id][$jet_stringPortMapping[$port_nr]['ifindex']]['untagged'] = 0;
             }
         }
         foreach (jetstreamExpand($jet_vlan_data['vlanUntagPortMemberAdd']) as $port_nr) {
             if (isset($jet_stringPortMapping[$port_nr])) {
-                d_echo("ID: $jet_vlan_id -> PORT: ".$port_nr.", ifindex: ".$jet_stringPortMapping[$port_nr]['ifindex']." \n");
-                $per_vlan_data[$jet_vlan_id][$jet_stringPortMapping[$port_nr]['ifindex']]['untagged']=1;
+                d_echo("ID: $jet_vlan_id -> PORT: " . $port_nr . ", ifindex: " . $jet_stringPortMapping[$port_nr]['ifindex'] . " \n");
+                $per_vlan_data[$jet_vlan_id][$jet_stringPortMapping[$port_nr]['ifindex']]['untagged'] = 1;
             }
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 echo 'FORTISANDBOX-MEMORY-POOL: ';
 $usage = str_replace('"', "", snmp_get($device, 'FORTINET-FORTISANDBOX-MIB::fsaSysMemUsage.0', '-OvQ'));
 if (is_numeric($usage)) {

@@ -22,7 +22,6 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 echo 'Netonix: ';
 
 $power_oid = '.1.3.6.1.4.1.46242.6.0'; // NETONIX-SWITCH-MIB::totalPowerConsumption

@@ -22,11 +22,10 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $charge_oid = '.1.3.6.1.4.1.13891.101.2.4.0';
 $charge = snmp_get($device, $charge_oid, '-Osqnv');
 
-if (!empty($charge)) {
+if (! empty($charge)) {
     $type = 'sinetica';
     $index = 0;
     $limit = 100;

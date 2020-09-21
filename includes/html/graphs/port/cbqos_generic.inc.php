@@ -12,17 +12,17 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','Cisco-CBQOS');
+$options = [];
+$options['filter']['type'] = ['=', 'Cisco-CBQOS'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
 // Determine a policy to show.
-if (!isset($vars['policy'])) {
+if (! isset($vars['policy'])) {
     foreach ($components as $id => $array) {
-        if (($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex'])  && ($array['parent'] == 0)) {
+        if (($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['parent'] == 0)) {
             // Found the first policy
             $vars['policy'] = $id;
             continue;
@@ -38,8 +38,8 @@ $rrd_additions = "";
 $colours = array_merge(\LibreNMS\Config::get('graph_colours.mixed'), \LibreNMS\Config::get('graph_colours.manycolours'), \LibreNMS\Config::get('graph_colours.manycolours'));
 $count = 0;
 
-d_echo("<pre>Policy: ".$vars['policy']);
-d_echo("\nSP-OBJ: ".$components[$vars['policy']]['sp-obj']);
+d_echo("<pre>Policy: " . $vars['policy']);
+d_echo("\nSP-OBJ: " . $components[$vars['policy']]['sp-obj']);
 foreach ($components as $id => $array) {
     $addtograph = false;
 
@@ -58,8 +58,8 @@ foreach ($components as $id => $array) {
 
         // Add the class map to the graph
         if ($addtograph === true) {
-            d_echo("\n  Class: ".$components[$id]['label']."\t+ added to the graph");
-            $rrd_filename = rrd_name($device['hostname'], array('port', $array['ifindex'], 'cbqos', $array['sp-id'], $array['sp-obj']));
+            d_echo("\n  Class: " . $components[$id]['label'] . "\t+ added to the graph");
+            $rrd_filename = rrd_name($device['hostname'], ['port', $array['ifindex'], 'cbqos', $array['sp-id'], $array['sp-obj']]);
 
             if (rrdtool_check_rrd_exists($rrd_filename)) {
                 // Stack the area on the second and subsequent DS's
@@ -72,7 +72,7 @@ foreach ($components as $id => $array) {
                 if (isset($colours[$count])) {
                     $colour = $colours[$count];
                 } else {
-                    d_echo("\nError: Out of colours. Have: ".(count($colours)-1).", Requesting:".$count);
+                    d_echo("\nError: Out of colours. Have: " . (count($colours) - 1) . ", Requesting:" . $count);
                 }
 
                 $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":" . $cbqos_parameter_name . ":AVERAGE ";
@@ -85,7 +85,7 @@ foreach ($components as $id => $array) {
                 $count++;
             } // End if file exists
         } else {
-            d_echo("\n  Class: ".$components[$id]['label']."\t- NOT added to the graph");
+            d_echo("\n  Class: " . $components[$id]['label'] . "\t- NOT added to the graph");
         } // End if addtograph
     }
 }

@@ -17,7 +17,7 @@
 
 $no_refresh = true;
 
-$datas = ['mempool','processor','storage'];
+$datas = ['mempool', 'processor', 'storage'];
 
 $used_sensors = \LibreNMS\Util\ObjectCache::sensors();
 foreach ($used_sensors as $group => $types) {
@@ -63,7 +63,7 @@ $type_text = [
 
 $active_metric = basename($vars['metric'] ?? 'processor');
 
-if (!$vars['view']) {
+if (! $vars['view']) {
     $vars['view'] = "detail";
 }
 
@@ -77,7 +77,7 @@ foreach ($datas as $texttype) {
     if ($active_metric == $metric) {
         $navbar .= '<span class="pagemenu-selected">';
     }
-    $navbar .= generate_link($type_text[$metric], $link_array, array('metric'=> $metric, 'view' => $vars['view']));
+    $navbar .= generate_link($type_text[$metric], $link_array, ['metric'=> $metric, 'view' => $vars['view']]);
     if ($active_metric == $metric) {
         $navbar .= '</span>';
     }
@@ -108,7 +108,7 @@ if ($vars['view'] != "graphs") {
 }
 
 if (in_array($active_metric, $datas)) {
-    include("includes/html/pages/health/$active_metric.inc.php");
+    include "includes/html/pages/health/$active_metric.inc.php";
 } else {
-    echo("No sensors of type $active_metric found.");
+    echo "No sensors of type $active_metric found.";
 }

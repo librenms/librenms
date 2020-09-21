@@ -29,11 +29,11 @@ $template_ids = array_column($templates, 'id');
 array_multisort($templates, SORT_ASC, $template_ids);
 foreach ($templates as $template) {
     $old_template = strpos($template['template'], "{/if}") !== false ? "1" : "";
-    echo '<tr data-row-id="'.$template['id'].'">
-            <td>'.$template['id'].'</td>
-            <td>'.$template['name'].'</td>
+    echo '<tr data-row-id="' . $template['id'] . '">
+            <td>' . $template['id'] . '</td>
+            <td>' . $template['name'] . '</td>
             <td></td>
-            <td>'.$old_template.'</td>
+            <td>' . $old_template . '</td>
           </tr>';
 }
 

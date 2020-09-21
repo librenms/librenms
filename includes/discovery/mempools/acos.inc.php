@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 if ($device['os'] === 'acos') {
     echo 'ACOS: ';
     $usage = snmp_get($device, 'axSysMemoryUsage.0', '-Ovq', 'A10-AX-MIB');

@@ -2,14 +2,14 @@
 
 print_optionbar_start();
 
-$link_array = array(
+$link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
     'tab'    => 'routing',
     'proto'  => 'mpls',
-);
+];
 
-if (!isset($vars['view'])) {
+if (! isset($vars['view'])) {
     $vars['view'] = 'lsp';
 }
 
@@ -19,7 +19,7 @@ if ($vars['view'] == 'lsp') {
     echo "<span class='pagemenu-selected'>";
 }
 
-echo generate_link('LSPs', $link_array, array('view' => 'lsp'));
+echo generate_link('LSPs', $link_array, ['view' => 'lsp']);
 if ($vars['view'] == 'lsp') {
     echo '</span>';
 }
@@ -30,7 +30,7 @@ if ($vars['view'] == 'paths') {
     echo "<span class='pagemenu-selected'>";
 }
 
-echo generate_link('Paths', $link_array, array('view' => 'paths'));
+echo generate_link('Paths', $link_array, ['view' => 'paths']);
 if ($vars['view'] == 'paths') {
     echo '</span>';
 }
@@ -41,7 +41,7 @@ if ($vars['view'] == 'sdps') {
     echo "<span class='pagemenu-selected'>";
 }
 
-echo generate_link('SDPs', $link_array, array('view' => 'sdps'));
+echo generate_link('SDPs', $link_array, ['view' => 'sdps']);
 if ($vars['view'] == 'sdps') {
     echo '</span>';
 }
@@ -52,7 +52,7 @@ if ($vars['view'] == 'sdpbinds') {
     echo "<span class='pagemenu-selected'>";
 }
 
-echo generate_link('SDP binds', $link_array, array('view' => 'sdpbinds'));
+echo generate_link('SDP binds', $link_array, ['view' => 'sdpbinds']);
 if ($vars['view'] == 'sdpbinds') {
     echo '</span>';
 }
@@ -63,7 +63,7 @@ if ($vars['view'] == 'services') {
     echo "<span class='pagemenu-selected'>";
 }
 
-echo generate_link('Services', $link_array, array('view' => 'services'));
+echo generate_link('Services', $link_array, ['view' => 'services']);
 if ($vars['view'] == 'services') {
     echo '</span>';
 }
@@ -74,7 +74,7 @@ if ($vars['view'] == 'saps') {
     echo "<span class='pagemenu-selected'>";
 }
 
-echo generate_link('SAPs', $link_array, array('view' => 'saps'));
+echo generate_link('SAPs', $link_array, ['view' => 'saps']);
 if ($vars['view'] == 'saps') {
     echo '</span>';
 }
@@ -100,8 +100,8 @@ if ($vars['view'] == 'lsp') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT *, `vrf_name` FROM `mpls_lsps` AS l, `vrfs` AS v WHERE `l`.`vrf_oid` = `v`.`vrf_oid` AND `l`.`device_id` = `v`.`device_id` AND `l`.`device_id` = ?  ORDER BY `l`.`mplsLspName`', array($device['device_id'])) as $lsp) {
-        if (!is_integer($i / 2)) {
+    foreach (dbFetchRows('SELECT *, `vrf_name` FROM `mpls_lsps` AS l, `vrfs` AS v WHERE `l`.`vrf_oid` = `v`.`vrf_oid` AND `l`.`device_id` = `v`.`device_id` AND `l`.`device_id` = ?  ORDER BY `l`.`mplsLspName`', [$device['device_id']]) as $lsp) {
+        if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
             $bg_colour = \LibreNMS\Config::get('list_colour.odd');
@@ -130,7 +130,7 @@ if ($vars['view'] == 'lsp') {
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$lsp['mplsLspToAddr']]);
         $destination = $lsp['mplsLspToAddr'];
         if (is_array($host)) {
-            $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls', 'view' => 'lsp'));
+            $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'lsp']);
         }
 
         echo "<tr bgcolor=$bg_colour>
@@ -173,8 +173,8 @@ if ($vars['view'] == 'paths') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT *, `mplsLspName` FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` WHERE `p`.`lsp_id` = `l`.`lsp_id` AND `p`.`device_id` = ?  ORDER BY `l`.`mplsLspName`', array($device['device_id'])) as $path) {
-        if (!is_integer($i / 2)) {
+    foreach (dbFetchRows('SELECT *, `mplsLspName` FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` WHERE `p`.`lsp_id` = `l`.`lsp_id` AND `p`.`device_id` = ?  ORDER BY `l`.`mplsLspName`', [$device['device_id']]) as $path) {
+        if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
             $bg_colour = \LibreNMS\Config::get('list_colour.odd');
@@ -194,13 +194,13 @@ if ($vars['view'] == 'paths') {
         } elseif ($path['mplsLspPathAdminState'] == 'inService' && $path['mplsLspPathOperState'] == 'outOfService') {
             $operstate_status_color = 'danger';
         }
-       
+
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$path['mplsLspPathFailNodeAddr']]);
         $destination = $path['mplsLspPathFailNodeAddr'];
         if (is_array($host)) {
-            $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls'));
+            $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
         }
-        echo '<tr data-toggle="collapse" data-target="#path-map' . $i . '" class="accordion-toggle" bgcolor="' . $bg_colour .'">
+        echo '<tr data-toggle="collapse" data-target="#path-map' . $i . '" class="accordion-toggle" bgcolor="' . $bg_colour . '">
             <td><button class="btn btn-default btn-xs"><span class="fa fa-plus"></span></button></td>
             <td>' . $path['mplsLspName'] . '</td>
             <td>' . $path['path_oid'] . '</td>
@@ -246,8 +246,8 @@ if ($vars['view'] == 'sdps') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT * FROM `mpls_sdps` WHERE `device_id` = ? ORDER BY `sdp_oid`', array($device['device_id'])) as $sdp) {
-        if (!is_integer($i / 2)) {
+    foreach (dbFetchRows('SELECT * FROM `mpls_sdps` WHERE `device_id` = ? ORDER BY `sdp_oid`', [$device['device_id']]) as $sdp) {
+        if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
             $bg_colour = \LibreNMS\Config::get('list_colour.odd');
@@ -268,7 +268,7 @@ if ($vars['view'] == 'sdps') {
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$sdp['sdpFarEndInetAddress']]);
         $destination = $sdp['sdpFarEndInetAddress'];
         if (is_array($host)) {
-            $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdps'));
+            $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdps']);
         }
         echo "<tr bgcolor=$bg_colour>
             <td>" . $sdp['sdp_oid'] . '</td>
@@ -316,8 +316,8 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT b.*, s.svc_oid AS svcId FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id` WHERE `b`.`device_id` = ? ORDER BY `sdp_oid`, `svc_oid`', array($device['device_id'])) as $sdpbind) {
-        if (!is_integer($i / 2)) {
+    foreach (dbFetchRows('SELECT b.*, s.svc_oid AS svcId FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id` WHERE `b`.`device_id` = ? ORDER BY `sdp_oid`, `svc_oid`', [$device['device_id']]) as $sdpbind) {
+        if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
             $bg_colour = \LibreNMS\Config::get('list_colour.odd');
@@ -381,8 +381,8 @@ vprn services are up when the service is administratively up however routing fun
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT s.*, v.vrf_name FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` WHERE `s`.`device_id` = ? ORDER BY `svc_oid`', array($device['device_id'])) as $svc) {
-        if (!is_integer($i / 2)) {
+    foreach (dbFetchRows('SELECT s.*, v.vrf_name FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` WHERE `s`.`device_id` = ? ORDER BY `svc_oid`', [$device['device_id']]) as $svc) {
+        if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
             $bg_colour = \LibreNMS\Config::get('list_colour.odd');
@@ -447,11 +447,11 @@ if ($vars['view'] == 'saps') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT * FROM `mpls_saps` WHERE `device_id` = ? ORDER BY `device_id`, `svc_oid`, `sapPortId`, `sapEncapValue`', array($device['device_id'])) as $sap) {
+    foreach (dbFetchRows('SELECT * FROM `mpls_saps` WHERE `device_id` = ? ORDER BY `device_id`, `svc_oid`, `sapPortId`, `sapEncapValue`', [$device['device_id']]) as $sap) {
         $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifName` = ?', [$sap['device_id'], $sap['ifName']]);
         $port = cleanPort($port);
 
-        if (!is_integer($i / 2)) {
+        if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
             $bg_colour = \LibreNMS\Config::get('list_colour.odd');

@@ -17,13 +17,13 @@ use LibreNMS\Alert\AlertUtil;
 
 $pagetitle[] = "Devices";
 
-if (!isset($vars['format'])) {
+if (! isset($vars['format'])) {
     $vars['format'] = "list_detail";
 }
 
 $listoptions = '<span class="devices-font-bold">Lists: </span>';
 
-$menu_options = array('basic' => 'Basic', 'detail' => 'Detail');
+$menu_options = ['basic' => 'Basic', 'detail' => 'Detail'];
 
 $sep = "";
 foreach ($menu_options as $option => $text) {
@@ -31,7 +31,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == "list_" . $option) {
         $listoptions .= '<span class="pagemenu-selected">';
     }
-    $listoptions .= '<a href="' . generate_url($vars, array('format' => "list_" . $option)) . '">' . $text . '</a>';
+    $listoptions .= '<a href="' . generate_url($vars, ['format' => "list_" . $option]) . '">' . $text . '</a>';
     if ($vars['format'] == "list_" . $option) {
         $listoptions .= '</span>';
     }
@@ -40,7 +40,7 @@ foreach ($menu_options as $option => $text) {
 
 $listoptions .= '&nbsp;&nbsp;&nbsp;<span class="devices-font-bold">Graphs: </span>';
 
-$menu_options = array('bits' => 'Bits',
+$menu_options = ['bits' => 'Bits',
     'processor' => 'CPU',
     'ucd_load' => 'Load',
     'mempool' => 'Memory',
@@ -49,15 +49,15 @@ $menu_options = array('bits' => 'Bits',
     'diskio' => 'Disk I/O',
     'poller_perf' => 'Poller',
     'ping_perf' => 'Ping',
-    'temperature' => 'Temperature'
-);
+    'temperature' => 'Temperature',
+];
 $sep = "";
 foreach ($menu_options as $option => $text) {
     $listoptions .= $sep;
     if ($vars['format'] == 'graph_' . $option) {
         $listoptions .= '<span class="pagemenu-selected">';
     }
-    $listoptions .= '<a href="' . generate_url($vars, array('format' => 'graph_' . $option, 'from' => '-24hour', 'to' => 'now')) . '">' . $text . '</a>';
+    $listoptions .= '<a href="' . generate_url($vars, ['format' => 'graph_' . $option, 'from' => '-24hour', 'to' => 'now']) . '">' . $text . '</a>';
     if ($vars['format'] == 'graph_' . $option) {
         $listoptions .= '</span>';
     }
@@ -74,31 +74,30 @@ foreach (get_graph_subtypes($type) as $avail_type) {
         $is_selected = '';
     }
     $headeroptions .= '<option value="' . generate_url($vars, [
-            'format' => 'graph_' . $avail_type,
-            'from' => $vars['from'] ?: \LibreNMS\Config::get('time.day'),
-            'to' => $vars['to'] ?: \LibreNMS\Config::get('time.now')
-        ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
+        'format' => 'graph_' . $avail_type,
+        'from' => $vars['from'] ?: \LibreNMS\Config::get('time.day'),
+        'to' => $vars['to'] ?: \LibreNMS\Config::get('time.now'),
+    ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
 }
 $headeroptions .= '</select>';
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
-    $headeroptions .= '<a href="' . generate_url($vars, array('searchbar' => '')) . '">Restore Search</a>';
+    $headeroptions .= '<a href="' . generate_url($vars, ['searchbar' => '']) . '">Restore Search</a>';
 } else {
-    $headeroptions .= '<a href="' . generate_url($vars, array('searchbar' => 'hide')) . '">Remove Search</a>';
+    $headeroptions .= '<a href="' . generate_url($vars, ['searchbar' => 'hide']) . '">Remove Search</a>';
 }
 
 $headeroptions .= ' | ';
 
 if (isset($vars['bare']) && $vars['bare'] == "yes") {
-    $headeroptions .= '<a href="' . generate_url($vars, array('bare' => '')) . '">Restore Header</a>';
+    $headeroptions .= '<a href="' . generate_url($vars, ['bare' => '']) . '">Restore Header</a>';
 } else {
-    $headeroptions .= '<a href="' . generate_url($vars, array('bare' => 'yes')) . '">Remove Header</a>';
+    $headeroptions .= '<a href="' . generate_url($vars, ['bare' => 'yes']) . '">Remove Header</a>';
 }
 
-list($format, $subformat) = explode("_", $vars['format'], 2);
+[$format, $subformat] = explode("_", $vars['format'], 2);
 $detailed = $subformat == 'detail';
 $no_refresh = $format == "list";
-
 
 if ($format == "graph") {
     if (empty($vars['from'])) {
@@ -124,7 +123,7 @@ if ($format == "graph") {
     echo '</div>';
     echo '<div class="panel-body">';
 
-    $sql_param = array();
+    $sql_param = [];
 
     if (isset($vars['state'])) {
         if ($vars['state'] == 'up') {
@@ -134,28 +133,28 @@ if ($format == "graph") {
         }
     }
 
-    if (!empty($vars['searchquery'])) {
+    if (! empty($vars['searchquery'])) {
         $where .= ' AND (sysName LIKE ? OR hostname LIKE ? OR hardware LIKE ? OR os LIKE ? OR location LIKE ?)';
         $sql_param += array_fill(count($param), 5, '%' . $vars['searchquery'] . '%');
     }
-    if (!empty($vars['os'])) {
+    if (! empty($vars['os'])) {
         $where .= " AND os = ?";
         $sql_param[] = $vars['os'];
     }
-    if (!empty($vars['version'])) {
+    if (! empty($vars['version'])) {
         $where .= " AND version = ?";
         $sql_param[] = $vars['version'];
     }
-    if (!empty($vars['hardware'])) {
+    if (! empty($vars['hardware'])) {
         $where .= " AND hardware = ?";
         $sql_param[] = $vars['hardware'];
     }
-    if (!empty($vars['features'])) {
+    if (! empty($vars['features'])) {
         $where .= " AND features = ?";
         $sql_param[] = $vars['features'];
     }
 
-    if (!empty($vars['type'])) {
+    if (! empty($vars['type'])) {
         if ($vars['type'] == 'generic') {
             $where .= " AND ( type = ? OR type = '')";
             $sql_param[] = $vars['type'];
@@ -164,35 +163,35 @@ if ($format == "graph") {
             $sql_param[] = $vars['type'];
         }
     }
-    if (!empty($vars['state'])) {
+    if (! empty($vars['state'])) {
         $where .= " AND status= ?";
         $sql_param[] = $state;
         $where .= " AND disabled='0' AND `disable_notify`='0'";
         $sql_param[] = '';
     }
-    if (!empty($vars['disabled'])) {
+    if (! empty($vars['disabled'])) {
         $where .= " AND disabled= ?";
         $sql_param[] = $vars['disabled'];
     }
-    if (!empty($vars['ignore'])) {
+    if (! empty($vars['ignore'])) {
         $where .= " AND `ignore`= ?";
         $sql_param[] = $vars['ignore'];
     }
-    if (!empty($vars['disable_notify'])) {
+    if (! empty($vars['disable_notify'])) {
         $where .= " AND `disable_notify`= ?";
         $sql_param[] = $vars['disable_notify'];
     }
-    if (!empty($vars['location']) && $vars['location'] == "Unset") {
+    if (! empty($vars['location']) && $vars['location'] == "Unset") {
         $location_filter = '';
     }
-    if (!empty($vars['location'])) {
+    if (! empty($vars['location'])) {
         $location_filter = $vars['location'];
     }
     if (isset($vars['poller_group'])) {
         $where .= " AND `poller_group`= ?";
         $sql_param[] = $vars['poller_group'];
     }
-    if (!empty($vars['group'])) {
+    if (! empty($vars['group'])) {
         $where .= " AND ( ";
         foreach (DB::table('device_group_device')->where('device_group_id', $vars['group'])->pluck('device_id') as $dev) {
             $where .= "device_id = ? OR ";
@@ -219,7 +218,7 @@ if ($format == "graph") {
         }
 
         if (device_permitted($device['device_id'])) {
-            if (!$location_filter || $device['location'] == $location_filter) {
+            if (! $location_filter || $device['location'] == $location_filter) {
                 $graph_type = "device_" . $subformat;
 
                 if (session('widescreen')) {
@@ -228,7 +227,7 @@ if ($format == "graph") {
                     $width = 315;
                 }
 
-                $graph_array_new = array();
+                $graph_array_new = [];
                 $graph_array_new['type'] = $graph_type;
                 $graph_array_new['device'] = $device['device_id'];
                 $graph_array_new['height'] = '110';
@@ -282,9 +281,7 @@ if ($format == "graph") {
             $location_text = \App\Models\Location::where('id', $vars['location'])->value('location') ?: $vars['location'];
         }
         $location_selected = json_encode(['id' => $vars['location'], 'text' => $location_text]);
-    }
-
-    ?>
+    } ?>
     <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
         <div class="row" style="padding: 0px 10px 0px 10px;">
@@ -297,14 +294,14 @@ if ($format == "graph") {
             <thead>
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>
-                    <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Vendor</th>
-                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>"></th>
+                    <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Vendor</th>
+                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"></th>
                     <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
-                    <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Metrics</th>
+                    <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Metrics</th>
                     <th data-column-id="hardware">Platform</th>
                     <th data-column-id="os">Operating System</th>
                     <th data-column-id="uptime" data-formatter="uptime">Up/Down Time</th>
-                    <th data-column-id="location" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Location</th>
+                    <th data-column-id="location" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Location</th>
                     <th data-column-id="actions" data-width="<?php echo $detailed ? '90px' : '200px'; ?>" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
                 </tr>
             </thead>
@@ -368,7 +365,7 @@ if ($format == "graph") {
         });
 
         <?php
-        if (!isset($vars['searchbar']) && $vars['searchbar'] != "hide") {
+        if (! isset($vars['searchbar']) && $vars['searchbar'] != "hide") {
             ?>
         $(".devices-headers-table-menu").append(
             "<div class='pull-left'>" +
@@ -386,13 +383,12 @@ if ($format == "graph") {
             "<div class='form-group'><select name='type' id='device-type' class='form-control'></select></div>" +
             "<input type='submit' class='btn btn-info' value='Search'>" +
             "<a href='<?php echo generate_url(array_diff_key($vars, ['_token' => 1])) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
-            "<a href='<?php echo generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
+            "<a href='<?php echo generate_url(['page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']]) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
             "</form>" +
             "</div>"
         );
             <?php
-        }
-        ?>
+        } ?>
 
         init_select2("#features", "device-field", {field: 'features'}, <?php echo $features_selected ?>, 'All Featuresets');
         init_select2("#hardware", "device-field", {field: 'hardware'}, <?php echo $hardware_selected ?>, 'All Platforms');

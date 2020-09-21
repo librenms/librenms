@@ -28,36 +28,36 @@ $colours = 'mixed';
 $unit_text = 'Packets/sec';
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    $rrd_list = array(
-        array(
+    $rrd_list = [
+        [
             'filename' => $rrd_filename,
             'ds' => 'cache-hits',
             'descr' => 'Query Cache Hits',
             'colour' => '297159',
             'area' => true,
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'cache-misses',
             'descr' => 'Query Cache Misses',
             'colour' => '73AC61',
             'area' => true,
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'packetcache-hits',
             'descr' => 'Packet Cache Hits',
             'colour' => 'BC7049',
             'area' => true,
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'packetcache-misses',
             'descr' => 'Packet Cache Misses',
             'colour' => 'C98F45',
             'area' => true,
-        )
-    );
+        ],
+    ];
 } else {
     echo "file missing: $rrd_filename";
 }

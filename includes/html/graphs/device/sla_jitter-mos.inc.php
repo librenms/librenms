@@ -11,11 +11,11 @@
  * the source code distribution for details.
  */
 
-$sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', array($vars['id']));
+$sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
 
 require 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
-$rrd_filename = rrd_name($device['hostname'], array('sla', $sla['sla_nr'], 'jitter'));
+$rrd_filename = rrd_name($device['hostname'], ['sla', $sla['sla_nr'], 'jitter']);
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                           Cur   Min   Max   Avg\\n'";

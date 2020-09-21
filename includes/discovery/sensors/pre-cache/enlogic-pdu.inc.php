@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 echo 'pduUnitStatusTable ';
 $pre_cache['enlogic_pdu_status'] = snmpwalk_cache_oid($device, 'pduUnitStatusTable', [], 'ENLOGIC-PDU-MIB');
 

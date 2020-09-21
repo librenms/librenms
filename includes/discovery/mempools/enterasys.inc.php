@@ -12,7 +12,7 @@
  */
 
 if ($device['os'] == 'enterasys' || $device['os'] == 'ewc') {
-    $enterasys_mem = snmpwalk_cache_threepart_oid($device, 'etsysResourceStorageTable', array(), 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
+    $enterasys_mem = snmpwalk_cache_threepart_oid($device, 'etsysResourceStorageTable', [], 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
     foreach ($enterasys_mem as $index => $mem_data) {
         foreach ($mem_data['ram'] as $mem_id => $ram) {
             $free = $ram['etsysResourceStorageAvailable'];

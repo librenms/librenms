@@ -27,26 +27,26 @@ use LibreNMS\Config;
 
 header('Content-type: application/json');
 
-$alert_id    = $vars['alert_id'];
-$state       = $vars['state'];
-$ack_msg     = $vars['ack_msg'];
+$alert_id = $vars['alert_id'];
+$state = $vars['state'];
+$ack_msg = $vars['ack_msg'];
 $until_clear = $vars['ack_until_clear'];
 
 $status = 'error';
 
-if (!is_numeric($alert_id)) {
+if (! is_numeric($alert_id)) {
     $message = 'No alert selected';
-} elseif (!is_numeric($state)) {
+} elseif (! is_numeric($state)) {
     $message = 'No state passed';
 } else {
     if ($state == 2) {
         $state = 1;
         $state_descr = 'UnAck';
-        $open  = 1;
+        $open = 1;
     } elseif ($state >= 1) {
         $state = 2;
         $state_descr = 'Ack';
-        $open  = 1;
+        $open = 1;
     }
 
     if ($until_clear === 'true') {
@@ -67,7 +67,7 @@ if (!is_numeric($alert_id)) {
     ];
 
     $note = dbFetchCell('SELECT note FROM alerts WHERE id=?', [$alert_id]);
-    if (!empty($note)) {
+    if (! empty($note)) {
         $note .= PHP_EOL;
     }
     $data['note'] = $note . date(Config::get('dateformat.long')) . " - $state_descr ($username) $ack_msg";
@@ -78,13 +78,13 @@ if (!is_numeric($alert_id)) {
             log_event("$username acknowledged alert {$alert_info['name']} note: $ack_msg", $alert_info['device_id'], 'alert', 2, $alert_id);
         }
         $message = 'Alert acknowledged status changed.';
-        $status  = 'ok';
+        $status = 'ok';
     } else {
         $message = 'Alert has not been acknowledged.';
     }
 }//end if
 
-die(json_encode([
+exit(json_encode([
     'status'       => $status,
     'message'      => $message,
 ]));

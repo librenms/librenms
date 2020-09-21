@@ -19,7 +19,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = rrd_name($device['hostname'], 'poller-perf');
 
-$rrd_options .= ' DEF:poller='.$rrd_filename.':poller:AVERAGE';
+$rrd_options .= ' DEF:poller=' . $rrd_filename . ':poller:AVERAGE';
 $rrd_options .= " 'COMMENT:Seconds      Cur     Min     Max     Avg\\n'";
 if (Config::get('applied_site_style') == 'dark') {
     $rrd_options .= ' LINE1.25:poller#63636d:Poller';

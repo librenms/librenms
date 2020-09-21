@@ -19,7 +19,7 @@ foreach ($output_power as $index => $data) {
         'power',
         $device,
         $pwr_oid,
-        300+$index,
+        300 + $index,
         "rfc1628",
         $descr,
         1,
@@ -31,7 +31,6 @@ foreach ($output_power as $index => $data) {
         $data['upsOutputPower']
     );
 }
-
 
 $input_power = snmpwalk_group($device, 'upsInputTruePower', 'UPS-MIB');
 foreach ($input_power as $index => $data) {
@@ -50,7 +49,7 @@ foreach ($input_power as $index => $data) {
         'power',
         $device,
         $pwr_oid,
-        100+$index,
+        100 + $index,
         "rfc1628",
         $descr,
         1,
@@ -80,7 +79,7 @@ foreach ($bypass_power as $index => $data) {
         'power',
         $device,
         $pwr_oid,
-        200+$index,
+        200 + $index,
         "rfc1628",
         $descr,
         1,

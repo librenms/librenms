@@ -22,6 +22,5 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 echo 'TPDIN2-MIB::monitor ';
 $pre_cache['tpdin_monitor'] = snmpwalk_cache_oid($device, 'monitor', [], 'TPDIN2-MIB');

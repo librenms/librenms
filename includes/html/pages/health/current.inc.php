@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_current';
-$class      = 'current';
-$unit       = 'A';
+$class = 'current';
+$unit = 'A';
 
 require 'includes/html/pages/health/sensors.inc.php';

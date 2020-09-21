@@ -22,7 +22,6 @@
  * @copyright  2019 Spencer Butler
  * @author     Spencer Butler <github@crooked.app>
  */
-
 if ($device['os'] === 'hikvision-nvr') {
     echo 'hikvision-nvr:';
 

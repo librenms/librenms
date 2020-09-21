@@ -22,7 +22,6 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 if ($device['os'] == 'netonix') {
     echo 'NETONIX : ';
 

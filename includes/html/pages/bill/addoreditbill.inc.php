@@ -45,7 +45,7 @@
        <input type="radio" name="dir_95th" id="dir_95th_inout" value="in"
             <?php
             if ($bill_data['dir_95th'] == 'in' || $bill_data['dir_95th'] == 'out') {
-                 echo "checked";
+                echo "checked";
             }
             ?> /> Max In/Out
        </label>
@@ -53,7 +53,7 @@
        <input type="radio" name="dir_95th" id="dir_95th_agg" value="agg"
             <?php
             if ($bill_data['dir_95th'] == 'agg') {
-                 echo "checked";
+                echo "checked";
             }
             ?> /> Aggregate
        </label>

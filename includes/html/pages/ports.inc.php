@@ -20,14 +20,14 @@ $pagetitle[] = "Ports";
 
 // Set Defaults here
 
-if (!isset($vars['format'])) {
+if (! isset($vars['format'])) {
     $vars['format'] = "list_basic";
 }
 
 $displayLists = '';
 $displayLists .= '<span style="font-weight: bold;">Ports lists</span> &#187; ';
 
-$menu_options = array('basic' => 'Basic', 'detail' => 'Detail');
+$menu_options = ['basic' => 'Basic', 'detail' => 'Detail'];
 
 $sep = "";
 foreach ($menu_options as $option => $text) {
@@ -35,7 +35,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == "list_" . $option) {
         $displayLists .= '<span class="pagemenu-selected">';
     }
-    $displayLists .= '<a href="' . generate_url($vars, array('format' => "list_" . $option)) . '">' . $text . '</a>';
+    $displayLists .= '<a href="' . generate_url($vars, ['format' => "list_" . $option]) . '">' . $text . '</a>';
     if ($vars['format'] == "list_" . $option) {
         $displayLists .= '</span>';
     }
@@ -43,10 +43,10 @@ foreach ($menu_options as $option => $text) {
 }
 $displayLists .= '&nbsp;&nbsp;<span style="font-weight: bold;">Graphs</span> &#187;&nbsp;';
 
-$menu_options = array('bits' => 'Bits',
+$menu_options = ['bits' => 'Bits',
     'upkts' => 'Unicast Packets',
     'nupkts' => 'Non-Unicast Packets',
-    'errors' => 'Errors');
+    'errors' => 'Errors', ];
 
 $sep = "";
 foreach ($menu_options as $option => $text) {
@@ -54,7 +54,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_' . $option) {
         $displayLists .= '<span class="pagemenu-selected">';
     }
-    $displayLists .= '<a href="' . generate_url($vars, array('format' => 'graph_' . $option)) . '">' . $text . '</a>';
+    $displayLists .= '<a href="' . generate_url($vars, ['format' => 'graph_' . $option]) . '">' . $text . '</a>';
     if ($vars['format'] == 'graph_' . $option) {
         $displayLists .= '</span>';
     }
@@ -62,20 +62,20 @@ foreach ($menu_options as $option => $text) {
 }
 
 $displayLists .= '<div style="float: right;">';
-$displayLists .= '<a href="csv.php/report=' . generate_url($vars, array('format' => '')) . '" title="Export as CSV" target="_blank" rel="noopener">Export CSV</a> | <a href="' . generate_url($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a> | ';
+$displayLists .= '<a href="csv.php/report=' . generate_url($vars, ['format' => '']) . '" title="Export as CSV" target="_blank" rel="noopener">Export CSV</a> | <a href="' . generate_url($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a> | ';
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
-    $displayLists .= '<a href="' . generate_url($vars, array('searchbar' => '')) . '">Search</a>';
+    $displayLists .= '<a href="' . generate_url($vars, ['searchbar' => '']) . '">Search</a>';
 } else {
-    $displayLists .= '<a href="' . generate_url($vars, array('searchbar' => 'hide')) . '">Search</a>';
+    $displayLists .= '<a href="' . generate_url($vars, ['searchbar' => 'hide']) . '">Search</a>';
 }
 
 $displayLists .= ' | ';
 
 if (isset($vars['bare']) && $vars['bare'] == "yes") {
-    $displayLists .= '<a href="' . generate_url($vars, array('bare' => '')) . '">Header</a>';
+    $displayLists .= '<a href="' . generate_url($vars, ['bare' => '']) . '">Header</a>';
 } else {
-    $displayLists .= '<a href="' . generate_url($vars, array('bare' => 'yes')) . '">Header</a>';
+    $displayLists .= '<a href="' . generate_url($vars, ['bare' => 'yes']) . '">Header</a>';
 }
 
 $displayLists .= ' | ';
@@ -85,7 +85,7 @@ $displayLists .= '<a href="ports/deleted=yes/purge=all" title="Delete ports"> Pu
 
 $displayLists .= '</div>';
 
-if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars['searchbar'])) {
+if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || ! isset($vars['searchbar'])) {
     $output = "<div class='pull-left'>";
     $output .= "<form method='post' action='' class='form-inline' role='form'>";
     $output .= addslashes(csrf_field());
@@ -97,7 +97,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     if (Auth::user()->hasGlobalRead()) {
         $results = dbFetchRows("SELECT `device_id`,`hostname`, `sysName` FROM `devices` ORDER BY `hostname`");
     } else {
-        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array(Auth::id()));
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", [Auth::id()]);
     }
     foreach ($results as $data) {
         if ($data['device_id'] == $vars['device_id']) {
@@ -109,10 +109,10 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . $ui_device . "</option>";
     }
 
-    if (!Auth::user()->hasGlobalRead()) {
-        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array(Auth::id()));
+    if (! Auth::user()->hasGlobalRead()) {
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", [Auth::id()]);
     } else {
-        $results = array();
+        $results = [];
     }
 
     foreach ($results as $data) {
@@ -213,7 +213,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         $sql = "SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
     } else {
         $sql = "SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
-        $param[] = array(Auth::id(), Auth::id());
+        $param[] = [Auth::id(), Auth::id()];
     }
     $port_descr_type = Port::select('port_descr_type')
         ->hasAccess(Auth::user())
@@ -291,7 +291,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<input type='checkbox' id='deleted' name='deleted' value='1' " . $deletedcheck . ">&nbsp;";
 
     $output .= "<button type='submit' class='btn btn-default btn-sm'>Search</button>&nbsp;";
-    $output .= "<a class='btn btn-default btn-sm' href='" . generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare'])) . "' title='Reset critera to default.'>Reset</a>";
+    $output .= "<a class='btn btn-default btn-sm' href='" . generate_url(['page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare']]) . "' title='Reset critera to default.'>Reset</a>";
 
     $output .= "</div>";
 
@@ -299,15 +299,15 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "</div>";
 }
 
-$param = array();
+$param = [];
 
-if (!isset($vars['ignore'])) {
+if (! isset($vars['ignore'])) {
     $vars['ignore'] = "0";
 }
-if (!isset($vars['disabled'])) {
+if (! isset($vars['disabled'])) {
     $vars['disabled'] = "0";
 }
-if (!isset($vars['deleted'])) {
+if (! isset($vars['deleted'])) {
     $vars['deleted'] = "0";
 }
 
@@ -415,7 +415,7 @@ if ($ignore_filter == 0 && $disabled_filter == 0) {
 $query = "SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id" . $where . " " . $query_sort;
 $row = 1;
 
-list($format, $subformat) = explode('_', basename($vars['format']));
+[$format, $subformat] = explode('_', basename($vars['format']));
 
 // only grab list of ports for graph pages, table uses ajax
 $ports = $format == 'graph' ? dbFetchRows($query, $param) : [];

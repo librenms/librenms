@@ -1,21 +1,21 @@
 <?php
 
 $main_oid = ".1.3.6.1.4.1.789.1.21.1.2.1";
-$oids = snmp_walk($device, $main_oid.'.25', "-Osqn");
-d_echo($oids."\n");
+$oids = snmp_walk($device, $main_oid . '.25', "-Osqn");
+d_echo($oids . "\n");
 $oids = trim($oids);
 if ($oids) {
     echo "NetApp ";
     foreach (explode("\n", $oids) as $data) {
-        list($oid,$descr) = explode(" ", $data, 2);
+        [$oid,$descr] = explode(" ", $data, 2);
         $split_oid = explode('.', $oid);
-        $temperature_id = $split_oid[count($split_oid)-1];
-        $x=1;
+        $temperature_id = $split_oid[count($split_oid) - 1];
+        $x = 1;
         preg_match_all("/([0-9]+C)+/", $descr, $temps);
-        preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid.'.26.'.$temperature_id, "-Ovq"), $over_fail);
-        preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid.'.27.'.$temperature_id, "-Ovq"), $over_warn);
-        preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid.'.28.'.$temperature_id, "-Ovq"), $under_fail);
-        preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid.'.29.'.$temperature_id, "-Ovq"), $under_warn);
+        preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid . '.26.' . $temperature_id, "-Ovq"), $over_fail);
+        preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid . '.27.' . $temperature_id, "-Ovq"), $over_warn);
+        preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid . '.28.' . $temperature_id, "-Ovq"), $under_fail);
+        preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid . '.29.' . $temperature_id, "-Ovq"), $under_warn);
         $x = 0;
         foreach ($temps[0] as $temperature) {
             $low_limit = str_replace("C", "", $under_fail[0][$x]);

@@ -44,7 +44,6 @@ $no_refresh = true;
 
 <?php
 
-
 $validator = new Validator();
 $validator->validate();
 
@@ -72,7 +71,6 @@ foreach ($validator->getAllResults() as $group => $results) {
 
     foreach ($results as $rnum => $result) {
         /** @var ValidationResult $result */
-
         echo '<div class="panel';
         if ($result->getStatus() == ValidationResult::SUCCESS) {
             echo ' panel-success"><div class="panel-heading bg-success"> Ok: ';
@@ -89,7 +87,7 @@ foreach ($validator->getAllResults() as $group => $results) {
             echo '<div class="panel-body">';
             if ($result->hasFix()) {
                 echo 'Fix: <code>';
-                foreach ((array)$result->getFix() as $fix) {
+                foreach ((array) $result->getFix() as $fix) {
                     echo '<br />' . linkify($fix) . PHP_EOL;
                 }
                 echo '</code>';
@@ -101,7 +99,6 @@ foreach ($validator->getAllResults() as $group => $results) {
             if ($result->hasList()) {
                 $list = $result->getList();
                 $short_size = 10;
-
 
                 echo "<ul id='shortList$group$rnum' class='list-group' style='margin-bottom: -1px'>";
                 echo "<li class='list-group-item active'>" . $result->getListDescription() . "</li>";
@@ -129,8 +126,6 @@ foreach ($validator->getAllResults() as $group => $results) {
     }
     echo '</div></div></div></div>';
 }
-
-
 
 ?>
         </div>
