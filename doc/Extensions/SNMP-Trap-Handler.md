@@ -163,7 +163,9 @@ an event of the type trap for received traps. These events can be used for alert
 By default, only the TrapOID is logged. Buf you can enable the "detailed" variant,
 and all the data received with the trap will be logged.
 
-In config.php
+The parameter can be found in General Settings / External / SNMP Traps Integration.
+
+It can also be configured in ```config.php```
 
 ```php
 $config['snmptraps']['eventlog'] = 'unhandled'; //default value
