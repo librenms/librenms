@@ -53,6 +53,10 @@ if ($device['os'] == 'fabos') {
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
 
+    if ($device['os'] == 'vmware' && preg_match('/Device ([a-z0-9]+) at .*/', $snmp_data['ifDescr'], $matches)) {
+        $snmp_data['ifDescr'] = $matches[1];
+    }
+
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
 
