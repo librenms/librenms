@@ -12,8 +12,8 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','ntp');
+$options = [];
+$options['filter']['type'] = ['=', 'ntp'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -27,7 +27,7 @@ $rrd_additions = "";
 
 $count = 0;
 foreach ($components as $id => $array) {
-    $rrd_filename = rrd_name($device['hostname'], array('ntp', $array['peer']));
+    $rrd_filename = rrd_name($device['hostname'], ['ntp', $array['peer']]);
 
     if (rrdtool_check_rrd_exists($rrd_filename)) {
         // Grab a color from the array.
@@ -36,7 +36,7 @@ foreach ($components as $id => $array) {
         $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":offset:AVERAGE ";
         $rrd_additions .= " LINE1.25:DS" . $count . "#" . $color . ":'" . str_pad(substr($array['peer'], 0, 15), 15) . "'" . $stack;
         $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%7.2lf ";
-        $rrd_additions .= " GPRINT:DS" . $count .    ":MIN:%7.2lf ";
+        $rrd_additions .= " GPRINT:DS" . $count . ":MIN:%7.2lf ";
         $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%7.2lf\\l ";
         $count++;
     }

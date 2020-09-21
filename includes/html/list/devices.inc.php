@@ -22,25 +22,24 @@
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $query = '';
 $where = [];
 $params = [];
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where[] = " `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where[] = " `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
     $params = array_merge($params, $device_ids);
 }
 
-if (!empty($_REQUEST['search'])) {
+if (! empty($_REQUEST['search'])) {
     $where[] = '(`hostname` LIKE ? OR `sysName` LIKE ?)';
     $search = '%' . mres($_REQUEST['search']) . '%';
     $params[] = $search;
     $params[] = $search;
 }
 
-if (!empty($where)) {
+if (! empty($where)) {
     $query .= ' WHERE ';
     $query .= implode(' AND ', $where);
 }
@@ -48,7 +47,7 @@ if (!empty($where)) {
 $total = dbFetchCell("SELECT COUNT(*) FROM `devices` $query", $params);
 $more = false;
 
-if (!empty($_REQUEST['limit'])) {
+if (! empty($_REQUEST['limit'])) {
     $limit = (int) $_REQUEST['limit'];
     $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
     $offset = ($page - 1) * $limit;

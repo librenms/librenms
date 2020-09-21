@@ -27,7 +27,7 @@
 // SNMPv2-SMI::enterprises.39145.11.6.0 = STRING: "120" -- inputVoltage
 
 $inputVoltage = trim(snmp_get($device, 'inputVoltage.0', '-Oqv', 'ICT-DIGITAL-SERIES-MIB'), '" ');
-if (!empty($inputVoltage)) {
+if (! empty($inputVoltage)) {
     $divisor = 1;
     $index = 0;
     $oid = '.1.3.6.1.4.1.39145.11.6.0';
@@ -42,7 +42,7 @@ if (!empty($inputVoltage)) {
 // SNMPv2-SMI::enterprises.39145.11.7.0 = STRING: "55.2" -- outputVoltage
 
 $outputVoltage = trim(snmp_get($device, 'outputVoltage.0', '-Oqv', 'ICT-DIGITAL-SERIES-MIB'), '" ');
-if (!empty($outputVoltage)) {
+if (! empty($outputVoltage)) {
     $divisor = 1;
     $index = 1;
     $oid = '.1.3.6.1.4.1.39145.11.7.0';

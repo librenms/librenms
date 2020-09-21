@@ -2,9 +2,9 @@
 
 // provide some sane default
 if ($service['service_param']) {
-    $nsquery  = $service['service_param'];
+    $nsquery = $service['service_param'];
 } else {
-    $nsquery  = "localhost";
+    $nsquery = "localhost";
 }
 if ($service['service_ip']) {
     $resolver = $service['service_ip'];

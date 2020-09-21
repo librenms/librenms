@@ -1,4 +1,5 @@
 <?php
+
 echo 'FORTIAUTHENTICATOR-MEMORY-POOL: ';
 $usage = str_replace('"', "", snmp_get($device, 'FORTINET-FORTIAUTHENTICATOR-MIB::facSysMemUsage.0', '-OvQ'));
 if (is_numeric($usage)) {

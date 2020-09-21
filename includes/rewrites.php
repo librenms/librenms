@@ -8,12 +8,10 @@ function rewrite_location($location)
     return \LibreNMS\Util\Rewrite::location($location);
 }
 
-
 function formatMac($mac)
 {
     return \LibreNMS\Util\Rewrite::readableMac($mac);
 }
-
 
 function rewrite_entity_descr($descr)
 {
@@ -41,7 +39,6 @@ function rewrite_entity_descr($descr)
     return $descr;
 }
 
-
 /**
  * Clean port values for html display
  * Add label to the port array (usually one of ifAlias, ifName, ifDescr)
@@ -53,10 +50,10 @@ function rewrite_entity_descr($descr)
 function cleanPort($interface, $device = null)
 {
     $interface['ifAlias'] = display($interface['ifAlias']);
-    $interface['ifName']  = display($interface['ifName']);
+    $interface['ifName'] = display($interface['ifName']);
     $interface['ifDescr'] = display($interface['ifDescr']);
 
-    if (!$device) {
+    if (! $device) {
         $device = device_by_id_cache($interface['device_id']);
     }
 
@@ -73,7 +70,7 @@ function cleanPort($interface, $device = null)
     } else {
         $interface['label'] = $interface['ifDescr'];
         if (Config::get("os.$os.ifindex")) {
-            $interface['label'] = $interface['label'].' '.$interface['ifIndex'];
+            $interface['label'] = $interface['label'] . ' ' . $interface['ifIndex'];
         }
     }
 
@@ -91,8 +88,8 @@ function cleanPort($interface, $device = null)
 
     if (is_array(Config::get('rewrite_if_regexp'))) {
         foreach (Config::get('rewrite_if_regexp') as $reg => $val) {
-            if (preg_match($reg.'i', $interface['label'])) {
-                $interface['label'] = preg_replace($reg.'i', $val, $interface['label']);
+            if (preg_match($reg . 'i', $interface['label'])) {
+                $interface['label'] = preg_replace($reg . 'i', $val, $interface['label']);
             }
         }
     }
@@ -102,7 +99,7 @@ function cleanPort($interface, $device = null)
 
 function translate_ifOperStatus($ifOperStatus)
 {
-    $translate_ifOperStatus = array(
+    $translate_ifOperStatus = [
         '1' => 'up',
         '2' => 'down',
         '3' => 'testing',
@@ -110,7 +107,7 @@ function translate_ifOperStatus($ifOperStatus)
         '5' => 'dormant',
         '6' => 'notPresent',
         '7' => 'lowerLayerDown',
-    );
+    ];
 
     if (isset($translate_ifOperStatus[$ifOperStatus])) {
         $ifOperStatus = $translate_ifOperStatus[$ifOperStatus];
@@ -119,14 +116,13 @@ function translate_ifOperStatus($ifOperStatus)
     return $ifOperStatus;
 }
 
-
 function translate_ifAdminStatus($ifAdminStatus)
 {
-    $translate_ifAdminStatus = array(
+    $translate_ifAdminStatus = [
         '1' => 'up',
         '2' => 'down',
         '3' => 'testing',
-    );
+    ];
 
     if (isset($translate_ifAdminStatus[$ifAdminStatus])) {
         $ifAdminStatus = $translate_ifAdminStatus[$ifAdminStatus];
@@ -135,12 +131,11 @@ function translate_ifAdminStatus($ifAdminStatus)
     return $ifAdminStatus;
 }
 
-
 // Specific rewrite functions
 
 function makeshortif($if)
 {
-    $rewrite_shortif = array(
+    $rewrite_shortif = [
         'tengigabitethernet'  => 'Te',
         'ten-gigabitethernet' => 'Te',
         'tengige'             => 'Te',
@@ -159,18 +154,18 @@ function makeshortif($if)
         'serviceinstance'     => 'SI',
         'dwdm'                => 'DWDM',
         'bundle-ether'        => 'BE',
-    );
+    ];
 
     $if = fixifName($if);
     $if = strtolower($if);
     $if = array_str_replace($rewrite_shortif, $if);
+
     return $if;
 }
 
-
 function rewrite_ios_features($features)
 {
-    $rewrite_ios_features = array(
+    $rewrite_ios_features = [
         'PK9S'                => 'IP w/SSH LAN Only',
         'LANBASEK9'           => 'Lan Base Crypto',
         'LANBASE'             => 'Lan Base',
@@ -200,17 +195,16 @@ function rewrite_ios_features($features)
         'I6K2L2Q4'            => 'Layer 2 Crypto',
         'C3H2S'               => 'Layer 2 SI/EI',
         '_WAN'                => ' + WAN',
-    );
+    ];
 
     $type = array_preg_replace($rewrite_ios_features, $features);
 
-    return ($features);
+    return $features;
 }
-
 
 function rewrite_junose_hardware($hardware)
 {
-    $rewrite_junose_hardware = array(
+    $rewrite_junose_hardware = [
         'juniErx1400' => 'ERX-1400',
         'juniErx700'  => 'ERX-700',
         'juniErx1440' => 'ERX-1440',
@@ -221,22 +215,21 @@ function rewrite_junose_hardware($hardware)
         'juniSsx1400' => 'SSX-1400',
         'juniSsx700'  => 'SSX-700',
         'juniSsx1440' => 'SSX-1440',
-    );
-
+    ];
 
     $hardware = array_str_replace($rewrite_junose_hardware, $hardware);
 
-    return ($hardware);
+    return $hardware;
 }
-
 
 function rewrite_generic_hardware($hardware)
 {
-    $rewrite_GenericHW = array(
+    $rewrite_GenericHW = [
         ' Computer Corporation' => '',
         ' Corporation'          => '',
         ' Inc.'                 => '',
-    );
+    ];
+
     return array_str_replace($rewrite_GenericHW, $hardware);
 }
 
@@ -245,23 +238,21 @@ function fixiftype($type)
     return Rewrite::normalizeIfType($type);
 }
 
-
 function fixifName($inf)
 {
     return Rewrite::normalizeIfName($inf);
 }
 
-
 function short_hrDeviceDescr($dev)
 {
-    $rewrite_hrDevice = array(
+    $rewrite_hrDevice = [
         'GenuineIntel:' => '',
         'AuthenticAMD:' => '',
         'Intel(R)'      => '',
         'CPU'           => '',
         '(R)'           => '',
         '  '            => ' ',
-    );
+    ];
 
     $dev = array_str_replace($rewrite_hrDevice, $dev);
     $dev = preg_replace('/\ +/', ' ', $dev);
@@ -270,7 +261,6 @@ function short_hrDeviceDescr($dev)
     return $dev;
 }
 
-
 function short_port_descr($desc)
 {
     [$desc] = explode('(', $desc);
@@ -278,11 +268,10 @@ function short_port_descr($desc)
     [$desc] = explode('{', $desc);
     [$desc] = explode('|', $desc);
     [$desc] = explode('<', $desc);
-    $desc       = trim($desc);
+    $desc = trim($desc);
 
     return $desc;
 }
-
 
 // Underlying rewrite functions
 function array_str_replace($array, $string)
@@ -294,7 +283,6 @@ function array_str_replace($array, $string)
     return $string;
 }
 
-
 function array_preg_replace($array, $string)
 {
     foreach ($array as $search => $replace) {
@@ -304,16 +292,15 @@ function array_preg_replace($array, $string)
     return $string;
 }
 
-
 function rewrite_adslLineType($adslLineType)
 {
-    $adslLineTypes = array(
+    $adslLineTypes = [
         'noChannel'          => 'No Channel',
         'fastOnly'           => 'Fastpath',
         'interleavedOnly'    => 'Interleaved',
         'fastOrInterleaved'  => 'Fast/Interleaved',
         'fastAndInterleaved' => 'Fast+Interleaved',
-    );
+    ];
 
     foreach ($adslLineTypes as $type => $text) {
         if ($adslLineType == $type) {
@@ -321,13 +308,13 @@ function rewrite_adslLineType($adslLineType)
         }
     }
 
-    return ($adslLineType);
+    return $adslLineType;
 }
 
 function ipmiSensorName($hardwareId, $sensorIpmi)
 {
-    $ipmiSensorsNames = array(
-        "HP ProLiant BL460c G6" => array(
+    $ipmiSensorsNames = [
+        "HP ProLiant BL460c G6" => [
             "Temp 1" => "Ambient zone",
             "Temp 2" => "CPU 1",
             "Temp 3" => "CPU 2",
@@ -339,8 +326,8 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
             "Temp 9" => "System zone",
             "Temp 10" => "Storage zone",
             "Power Meter" => "Power usage",
-        ),
-        "HP ProLiant BL460c G1" => array(
+        ],
+        "HP ProLiant BL460c G1" => [
             "Temp 1" => "System zone",
             "Temp 2" => "CPU 1 zone",
             "Temp 3" => "CPU 1",
@@ -351,12 +338,13 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
             "Temp 8" => "Memory zone",
             "Temp 9" => "Ambient zone",
             "Power Meter" => "Power usage",
-        ),
-    );
+        ],
+    ];
 
     if (isset($ipmiSensorsNames[$hardwareId], $ipmiSensorsNames[$hardwareId][$sensorIpmi])) {
         return $ipmiSensorsNames[$hardwareId][$sensorIpmi];
     }
+
     return $sensorIpmi;
 }
 
@@ -412,62 +400,64 @@ function apc_relay_state($state)
 function return_number($value)
 {
     preg_match('/[\d\.\-]+/', $value, $temp_response);
-    if (!empty($temp_response[0])) {
+    if (! empty($temp_response[0])) {
         $value = $temp_response[0];
     }
+
     return $value;
 }
 
 function parse_entity_state($state, $value)
 {
-    $data = array(
-        'entStateOper' => array(
-            1 => array('text' => 'unavailable', 'color' => 'default'),
-            2 => array('text' => 'disabled', 'color' => 'danger'),
-            3 => array('text' => 'enabled', 'color' => 'success'),
-            4 => array('text' => 'testing', 'color' => 'warning'),
-        ),
-        'entStateUsage' => array(
-            1 => array('text' => 'unavailable', 'color' => 'default'),
-            2 => array('text' => 'idle', 'color' => 'info'),
-            3 => array('text' => 'active', 'color' => 'success'),
-            4 => array('text' => 'busy', 'color' => 'success'),
-        ),
-        'entStateStandby' => array(
-            1 => array('text' => 'unavailable', 'color' => 'default'),
-            2 => array('text' => 'hotStandby', 'color' => 'info'),
-            3 => array('text' => 'coldStandby', 'color' => 'info'),
-            4 => array('text' => 'providingService', 'color' => 'success'),
-        ),
-        'entStateAdmin' => array(
-            1 => array('text' => 'unknown', 'color' => 'default'),
-            2 => array('text' => 'locked', 'color' => 'info'),
-            3 => array('text' => 'shuttingDown', 'color' => 'warning'),
-            4 => array('text' => 'unlocked', 'color' => 'success'),
-        ),
-    );
+    $data = [
+        'entStateOper' => [
+            1 => ['text' => 'unavailable', 'color' => 'default'],
+            2 => ['text' => 'disabled', 'color' => 'danger'],
+            3 => ['text' => 'enabled', 'color' => 'success'],
+            4 => ['text' => 'testing', 'color' => 'warning'],
+        ],
+        'entStateUsage' => [
+            1 => ['text' => 'unavailable', 'color' => 'default'],
+            2 => ['text' => 'idle', 'color' => 'info'],
+            3 => ['text' => 'active', 'color' => 'success'],
+            4 => ['text' => 'busy', 'color' => 'success'],
+        ],
+        'entStateStandby' => [
+            1 => ['text' => 'unavailable', 'color' => 'default'],
+            2 => ['text' => 'hotStandby', 'color' => 'info'],
+            3 => ['text' => 'coldStandby', 'color' => 'info'],
+            4 => ['text' => 'providingService', 'color' => 'success'],
+        ],
+        'entStateAdmin' => [
+            1 => ['text' => 'unknown', 'color' => 'default'],
+            2 => ['text' => 'locked', 'color' => 'info'],
+            3 => ['text' => 'shuttingDown', 'color' => 'warning'],
+            4 => ['text' => 'unlocked', 'color' => 'success'],
+        ],
+    ];
 
     if (isset($data[$state][$value])) {
         return $data[$state][$value];
     }
 
-    return array('text'=>'na', 'color'=>'default');
+    return ['text'=>'na', 'color'=>'default'];
 }
 
 function parse_entity_state_alarm($bits)
 {
     // not sure if this is correct
-    $data = array(
-        0 => array('text' => 'unavailable', 'color' => 'default'),
-        1 => array('text' => 'underRepair', 'color' => 'warning'),
-        2 => array('text' => 'critical', 'color' => 'danger'),
-        3 => array('text' => 'major', 'color' => 'danger'),
-        4 => array('text' => 'minor', 'color' => 'info'),
-        5 => array('text' => 'warning', 'color' => 'warning'),
-        6 => array('text' => 'indeterminate', 'color' => 'default'),
-    );
+    $data = [
+        0 => ['text' => 'unavailable', 'color' => 'default'],
+        1 => ['text' => 'underRepair', 'color' => 'warning'],
+        2 => ['text' => 'critical', 'color' => 'danger'],
+        3 => ['text' => 'major', 'color' => 'danger'],
+        4 => ['text' => 'minor', 'color' => 'info'],
+        5 => ['text' => 'warning', 'color' => 'warning'],
+        6 => ['text' => 'indeterminate', 'color' => 'default'],
+    ];
 
     $alarms = str_split(base_convert($bits, 16, 2));
     $active_alarms = array_filter($alarms);
+
     return array_intersect_key($data, $active_alarms);
 }

@@ -22,8 +22,7 @@
  * @copyright  2020 Denny Friebe
  * @author     Denny Friebe <denny.friebe@icera-network.de>
  */
-
-$oids = snmpwalk_cache_oid($device, 'afLTUStaTxRate', array(), 'UBNT-AFLTU-MIB', null, '-OteQUsb'); //UBNT-AFLTU-MIB::afLTUStaTxRate
+$oids = snmpwalk_cache_oid($device, 'afLTUStaTxRate', [], 'UBNT-AFLTU-MIB', null, '-OteQUsb'); //UBNT-AFLTU-MIB::afLTUStaTxRate
 $oids = snmpwalk_cache_oid($device, 'afLTUStaRxRate', $oids, 'UBNT-AFLTU-MIB', null, '-OteQUsb'); //UBNT-AFLTU-MIB::afLTUStaRxRate
 
 foreach ($oids as $index => $entry) {

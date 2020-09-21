@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 if (is_numeric($pre_cache['websensor_valuesInt']['humInt.0'])) {
     $humidity_oid = '.1.3.6.1.4.1.22626.1.2.3.2.0';
     $humidity_index = 'humInt.0';

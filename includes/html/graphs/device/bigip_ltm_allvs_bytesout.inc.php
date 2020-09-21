@@ -12,8 +12,8 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','f5-ltm-vs');
+$options = [];
+$options['filter']['type'] = ['=', 'f5-ltm-vs'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -30,7 +30,7 @@ $count = 0;
 foreach ($components as $compid => $comp) {
     $label = $comp['label'];
     $hash = $comp['hash'];
-    $rrd_filename = rrd_name($device['hostname'], array($comp['type'], $label, $hash));
+    $rrd_filename = rrd_name($device['hostname'], [$comp['type'], $label, $hash]);
     if (rrdtool_check_rrd_exists($rrd_filename)) {
         // Grab a colour from the array.
         if (isset($colours[$colcount])) {

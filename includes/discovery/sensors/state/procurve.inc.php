@@ -22,13 +22,12 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 foreach ($pre_cache['procurve_hpicfSensorTable'] as $index => $data) {
-    $state_name    = $data['hpicfSensorObjectId'];
-    $state_oid     = '.1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.';
-    $state_descr   = $data['hpicfSensorDescr'];
-    $state          = $data['hpicfSensorStatus'];
-    $state_index      = $state_name . '.' . $index;
+    $state_name = $data['hpicfSensorObjectId'];
+    $state_oid = '.1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.';
+    $state_descr = $data['hpicfSensorDescr'];
+    $state = $data['hpicfSensorStatus'];
+    $state_index = $state_name . '.' . $index;
 
     $states = [
         ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],

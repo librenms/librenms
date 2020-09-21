@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
     if (is_array($data)) {
         $oid = '.1.3.6.1.4.1.38446.1.3.4.1.5.' . $index;

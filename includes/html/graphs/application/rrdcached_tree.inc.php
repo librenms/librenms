@@ -22,22 +22,21 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 include 'rrdcached.inc.php';
 
 $colours = 'blues';
 
-$rrd_list = array(
-    array(
+$rrd_list = [
+    [
         'ds' => 'tree_depth',
         'filename' => $rrd_filename,
         'descr' => 'Tree Depth',
-    ),
-    array(
+    ],
+    [
         'ds' => 'tree_nodes_number',
         'filename' => $rrd_filename,
         'descr' => 'Tree Nodes',
-    )
-);
+    ],
+];
 
 require 'includes/html/graphs/generic_multi.inc.php';

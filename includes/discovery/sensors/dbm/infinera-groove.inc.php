@@ -22,12 +22,11 @@
  * @copyright  2019 Nick Hilliard
  * @author     Nick Hilliard <nick@foobar.org>
  */
-
 foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
     if (is_numeric($data['portRxOpticalPower']) && $data['portRxOpticalPower'] != -99) {
-        $descr   = $data['portAlias'].' Receive Power';
-        $oid     = '.1.3.6.1.4.1.42229.1.2.3.6.1.1.4.' . $index;
-        $value   = $data['portRxOpticalPower'];
-        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'portRxOpticalPower.'.$index, 'infinera-groove', $descr, null, '1', null, null, null, null, $value);
+        $descr = $data['portAlias'] . ' Receive Power';
+        $oid = '.1.3.6.1.4.1.42229.1.2.3.6.1.1.4.' . $index;
+        $value = $data['portRxOpticalPower'];
+        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'portRxOpticalPower.' . $index, 'infinera-groove', $descr, null, '1', null, null, null, null, $value);
     }
 }

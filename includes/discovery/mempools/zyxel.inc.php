@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 if ($device['os_group'] == 'zyxel') {
     d_echo('Zyxel');
     $usage = snmp_get($device, "sysMgmtMemUsage.0", '-OvQ', 'ZYXEL-ES-COMMON');

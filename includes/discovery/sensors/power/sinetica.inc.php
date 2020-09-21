@@ -22,7 +22,6 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.4.4.1.4', []);
 
 foreach ($oids as $oid => $data) {

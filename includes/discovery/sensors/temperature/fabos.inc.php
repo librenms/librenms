@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 foreach ($pre_cache['fabos_sensors'] as $data) {
     if ($data['swSensorType'] === 'temperature') {
         if (is_numeric($data['swSensorValue']) && $data['swSensorValue'] !== '-2147483648') {

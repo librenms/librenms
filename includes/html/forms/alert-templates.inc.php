@@ -21,13 +21,12 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
-
 $status = 'error';
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-Type: application/json');
-    $response = array('status' => $status, 'message' => 'You need to be admin');
-    die(json_encode($response));
+    $response = ['status' => $status, 'message' => 'You need to be admin'];
+    exit(json_encode($response));
 }
 
 $template_id = 0;
@@ -37,12 +36,12 @@ $create = true;
 $name = mres($vars['name']);
 if (isset($vars['template']) && empty(view(['template' => $vars['template']], [])->__toString())) {
     $message = 'Template failed to be parsed, please check the syntax';
-} elseif (!empty($name)) {
+} elseif (! empty($name)) {
     if ($vars['template'] && is_numeric($vars['template_id'])) {
         // Update template
         $create = false;
         $template_id = $vars['template_id'];
-        if (!dbUpdate(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']), "alert_templates", "id = ?", array($template_id)) >= 0) {
+        if (! dbUpdate(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], "alert_templates", "id = ?", [$template_id]) >= 0) {
             $status = 'ok';
         } else {
             $message = "Failed to update the template";
@@ -50,7 +49,7 @@ if (isset($vars['template']) && empty(view(['template' => $vars['template']], []
     } elseif ($vars['template']) {
         // Create template
         if ($name != 'Default Alert Template') {
-            $template_newid = dbInsert(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']), "alert_templates");
+            $template_newid = dbInsert(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], "alert_templates");
             if ($template_newid != false) {
                 $template_id = $template_newid;
                 $status = 'ok';
@@ -65,11 +64,11 @@ if (isset($vars['template']) && empty(view(['template' => $vars['template']], []
     }
     if ($status == 'ok') {
         $alertRulesOk = true;
-        dbDelete('alert_template_map', 'alert_templates_id = ?', array($template_id));
+        dbDelete('alert_template_map', 'alert_templates_id = ?', [$template_id]);
         $rules = explode(',', $vars['rules']);
         if ($rules !== false) {
             foreach ($rules as $rule_id) {
-                if (!dbInsert(array('alert_rule_id' => $rule_id, 'alert_templates_id' => $template_id), 'alert_template_map')) {
+                if (! dbInsert(['alert_rule_id' => $rule_id, 'alert_templates_id' => $template_id], 'alert_template_map')) {
                     $alertRulesOk = false;
                 }
             }
@@ -86,6 +85,6 @@ if (isset($vars['template']) && empty(view(['template' => $vars['template']], []
     $message = "You haven't given name to your template";
 }
 
-$response = array('status' => $status, 'message' => $message, 'newid' => $template_newid);
+$response = ['status' => $status, 'message' => $message, 'newid' => $template_newid];
 
 echo _json_encode($response);

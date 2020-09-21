@@ -1,7 +1,7 @@
 <?php
 
 $class = "humidity";
-$unit  = "%";
+$unit = "%";
 $graph_type = "sensor_humidity";
 
 require 'sensors.inc.php';

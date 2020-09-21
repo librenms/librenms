@@ -22,27 +22,26 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 include 'powerdns-recursor.inc.php';
 
 $colours = 'purples';
 $unit_text = 'Entries';
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    $rrd_list = array(
-        array(
+    $rrd_list = [
+        [
             'filename' => $rrd_filename,
             'ds' => 'cache-entries',
             'descr' => 'Query Cache',
             'colour' => '202048',
-        ),
-        array(
+        ],
+        [
             'filename' => $rrd_filename,
             'ds' => 'packetcache-entries',
             'descr' => 'Packet Cache',
             'colour' => 'CC7CCC',
-        )
-    );
+        ],
+    ];
 } else {
     echo "file missing: $rrd_filename";
 }

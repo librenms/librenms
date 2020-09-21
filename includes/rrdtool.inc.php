@@ -32,13 +32,12 @@ use LibreNMS\Config;
  *
  * @param string $graph_file
  * @param string $options
- * @return integer
+ * @return int
  */
 function rrdtool_graph($graph_file, $options)
 {
     return Rrd::graph($graph_file, $options);
 }
-
 
 /**
  * Checks if the rrd file exists on the server
@@ -52,28 +51,27 @@ function rrdtool_check_rrd_exists($filename)
     return Rrd::checkRrdExists($filename);
 }
 
-
 /**
  * Escapes strings for RRDtool
  *
  * @param string $string the string to escape
- * @param integer $length if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
+ * @param int $length if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
  * @return string
  */
 function rrdtool_escape($string, $length = null)
 {
     $result = shorten_interface_type($string);
-    $result = str_replace("'", '', $result);            # remove quotes
+    $result = str_replace("'", '', $result);            // remove quotes
 
     if (is_numeric($length)) {
-        # preserve original $length for str_pad()
+        // preserve original $length for str_pad()
 
-        # determine correct strlen() for substr_count()
-        $string_length=strlen($string);
-        $substr_count_length=$length;
+        // determine correct strlen() for substr_count()
+        $string_length = strlen($string);
+        $substr_count_length = $length;
 
         if ($length > $string_length) {
-            $substr_count_length=$string_length; # If $length is greater than the haystack length, then substr_count() will produce a warning; fix warnings.
+            $substr_count_length = $string_length; // If $length is greater than the haystack length, then substr_count() will produce a warning; fix warnings.
         }
 
         $extra = substr_count($string, ':', 0, $substr_count_length);
@@ -83,11 +81,10 @@ function rrdtool_escape($string, $length = null)
         }
     }
 
-    $result = str_replace(':', '\:', $result);          # escape colons
+    $result = str_replace(':', '\:', $result);          // escape colons
 
-    return $result.' ';
+    return $result . ' ';
 } // rrdtool_escape
-
 
 /**
  * Generates a filename based on the hostname (or IP) and some extra items
@@ -111,6 +108,7 @@ function rrd_name($host, $extra, $extension = ".rrd")
 function get_rrd_dir($host)
 {
     $host = str_replace(':', '_', trim($host, '[]'));
+
     return implode("/", [Config::get('rrd_dir'), $host]);
 } // rrd_dir
 

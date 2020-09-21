@@ -12,7 +12,7 @@
  */
 
 $component = new LibreNMS\Component();
-$options['filter']['type'] = array('=','Cisco-OTV');
+$options['filter']['type'] = ['=', 'Cisco-OTV'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -26,7 +26,7 @@ $rrd_additions = "";
 $count = 0;
 foreach ($components as $id => $array) {
     if ($array['otvtype'] == 'endpoint') {
-        $rrd_filename = rrd_name($device['hostname'], array('cisco', 'otv', $array['endpoint'], 'mac'));
+        $rrd_filename = rrd_name($device['hostname'], ['cisco', 'otv', $array['endpoint'], 'mac']);
 
         if (rrdtool_check_rrd_exists($rrd_filename)) {
             // Stack the area on the second and subsequent DS's
@@ -41,7 +41,7 @@ foreach ($components as $id => $array) {
             $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":count:AVERAGE ";
             $rrd_additions .= " AREA:DS" . $count . "#" . $color . ":'" . str_pad(substr($components[$id]['endpoint'], 0, 15), 15) . "'" . $stack;
             $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%4.0lf%s ";
-            $rrd_additions .= " GPRINT:DS" . $count .    ":MIN:%4.0lf%s ";
+            $rrd_additions .= " GPRINT:DS" . $count . ":MIN:%4.0lf%s ";
             $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%4.0lf%s\\\l ";
             $count++;
         }

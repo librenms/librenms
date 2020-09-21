@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 if ($device['os'] === 'fabos') {
     $usage = snmp_get($device, 'swMemUsage.0', '-Ovq', 'SW-MIB');
     discover_mempool($valid_mempool, $device, 0, 'fabos', 'Memory', '1');

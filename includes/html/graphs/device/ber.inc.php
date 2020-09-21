@@ -1,7 +1,7 @@
 <?php
 
-$class     = 'er';
-$unit      = '';
+$class = 'er';
+$unit = '';
 $unit_long = '';
 
 $rrd_options .= " -o";

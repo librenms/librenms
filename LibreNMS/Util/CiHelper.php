@@ -208,6 +208,7 @@ class CiHelper
 
         // Disabled in favor of styleci
         echo "Style check disabled.\n";
+
         return 0;
 
         $cs_cmd = [

@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $oid = '.1.3.6.1.4.1.30966.10.3.2.1.0';
 $voltage = snmp_get($device, $oid, '-Oqv');
 if ($voltage > 0) {

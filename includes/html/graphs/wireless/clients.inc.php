@@ -22,7 +22,6 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $scale_min = '0';
 //$scale_max = '40';
 

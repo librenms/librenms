@@ -25,7 +25,6 @@ if (is_numeric($battery_volts)) {
     );
 }
 
-
 $output_volts = snmpwalk_group($device, 'upsOutputVoltage', 'UPS-MIB');
 foreach ($output_volts as $index => $data) {
     $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.$index";
@@ -68,9 +67,9 @@ foreach ($input_volts as $index => $data) {
     if (count($input_volts) > 1) {
         $descr .= " Phase $index";
     }
-    
+
     $upsInputVoltage_value = $data['upsInputVoltage'];
-    
+
     if (is_array($data['upsInputVoltage'])) {
         $upsInputVoltage_value = $data['upsInputVoltage'][0];
         $volt_oid .= ".0";

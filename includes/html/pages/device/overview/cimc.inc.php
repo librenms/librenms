@@ -1,7 +1,7 @@
 <?php
 
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], array('type'=>'Cisco-CIMC'));
+$components = $component->getComponents($device['device_id'], ['type'=>'Cisco-CIMC']);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
@@ -23,8 +23,7 @@ if (count($components) > 0) {
         } else {
             $class = "";
             $message = "Ok";
-        }
-        ?>
+        } ?>
                     <tr class="<?php echo $class ?>">
                         <td><?php echo $array['string']?></td>
                     </tr>
@@ -37,8 +36,7 @@ if (count($components) > 0) {
                     </tr>
             <?php
         }
-    }
-    ?>
+    } ?>
                     </table>
                 </div>
             </div>

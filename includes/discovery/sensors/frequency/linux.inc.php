@@ -3,7 +3,7 @@
  * raspberry pi frequencies
  * requires snmp extend agent script from librenms-agent
  */
-if (!empty($pre_cache['raspberry_pi_sensors'])) {
+if (! empty($pre_cache['raspberry_pi_sensors'])) {
     $sensor_type = "raspberry_freq";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
 

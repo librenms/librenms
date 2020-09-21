@@ -16,13 +16,13 @@ use LibreNMS\Util\IP;
 $module = 'ntp';
 
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], array('type'=>$module));
+$components = $component->getComponents($device['device_id'], ['type'=>$module]);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
 // Begin our master array, all other values will be processed into this array.
-$tblComponents = array();
+$tblComponents = [];
 
 // Let's gather some data..
 // For Reference:
@@ -43,13 +43,13 @@ if (is_null($atNtpAssociationEntry)) {
 
     // Let's grab the index for each NTP peer
     foreach ($atNtpAssociationEntry as $index => $value) {
-        $result = array();
-        $result['UID'] = (string)$index;    // This is cast as a string so it can be compared with the database value.
+        $result = [];
+        $result['UID'] = (string) $index;    // This is cast as a string so it can be compared with the database value.
         $result['peer'] = $atNtpAssociationEntry[$index]['atNtpAssociationPeerAddr'];
         $result['port'] = '123'; // awplus only supports default NTP Port.
         $result['stratum'] = $atNtpAssociationEntry[$index]['atNtpAssociationStratum'];
         $result['peerref'] = $atNtpAssociationEntry[$index]['atNtpAssociationRefClkAddr'];
-        $result['label'] = $result['peer'].":".$result['port'];
+        $result['label'] = $result['peer'] . ":" . $result['port'];
 
         // Set the status, 16 = Bad
         if ($result['stratum'] == 16) {
@@ -81,7 +81,7 @@ if (is_null($atNtpAssociationEntry)) {
             }
         }
 
-        if (!$component_key) {
+        if (! $component_key) {
             // The component doesn't exist, we need to ADD it - ADD.
             $new_component = $component->createComponent($device['device_id'], $module);
             $component_key = key($new_component);
@@ -122,9 +122,9 @@ if (is_null($atNtpAssociationEntry)) {
 
 $module = strtolower($module);
 if (count($components) > 0) {
-    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], $module)) == '0') {
-        dbInsert(array('device_id' => $device['device_id'], 'app_type' => $module, 'app_status' => '', 'app_instance' => ''), 'applications');
+    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', [$device['device_id'], $module]) == '0') {
+        dbInsert(['device_id' => $device['device_id'], 'app_type' => $module, 'app_status' => '', 'app_instance' => ''], 'applications');
     }
 } else {
-    dbDelete('applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], $module));
+    dbDelete('applications', '`device_id` = ? AND `app_type` = ?', [$device['device_id'], $module]);
 }

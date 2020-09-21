@@ -1,7 +1,7 @@
 <?php
 
-$class     = 'count';
-$unit      = '';
+$class = 'count';
+$unit = '';
 $unit_long = '';
 
 $rrd_options .= " -o";

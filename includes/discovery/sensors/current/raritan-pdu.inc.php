@@ -1,7 +1,7 @@
 <?php
 
-$divisor        = '1000';
-$multiplier     = '1';
+$divisor = '1000';
+$multiplier = '1';
 
 // Check Inlets PDU2 MIB
 $inlet_oids = snmp_walk($device, 'inletLabel', '-Osqn', 'PDU2-MIB');
@@ -11,9 +11,9 @@ if ($inlet_oids) {
     foreach (explode("\n", $inlet_oids) as $inlet_data) {
         $inlet_data = trim($inlet_data);
         if ($inlet_data) {
-            list($inlet_oid,$inlet_descr) = explode(' ', $inlet_data, 2);
+            [$inlet_oid,$inlet_descr] = explode(' ', $inlet_data, 2);
             $inlet_split_oid = explode('.', $inlet_oid);
-            $inlet_index = $inlet_split_oid[(count($inlet_split_oid) - 2)].'.'.$inlet_split_oid[(count($inlet_split_oid) - 1)];
+            $inlet_index = $inlet_split_oid[(count($inlet_split_oid) - 2)] . '.' . $inlet_split_oid[(count($inlet_split_oid) - 1)];
             $inlet_oid = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.$inlet_index.1";
             $inlet_divisor = pow(10, snmp_get($device, "inletSensorDecimalDigits.$inlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB'));
             $inlet_current = (snmp_get($device, "measurementsInletSensorValue.$inlet_index.1", '-Ovq', 'PDU2-MIB') / $inlet_divisor);
@@ -32,7 +32,7 @@ if ($outlet_oids) {
     foreach (explode("\n", $outlet_oids) as $outlet_data) {
         $outlet_data = trim($outlet_data);
         if ($outlet_data) {
-            list($outlet_oid,$outlet_descr) = explode(' ', $outlet_data, 2);
+            [$outlet_oid,$outlet_descr] = explode(' ', $outlet_data, 2);
             $outlet_split_oid = explode('.', $outlet_oid);
             $outlet_index = $outlet_split_oid[(count($outlet_split_oid) - 1)];
             $outletsuffix = "$outlet_index";
@@ -60,7 +60,7 @@ if ($outlet_oids) {
     foreach (explode("\n", $outlet_oids) as $outlet_data) {
         $outlet_data = trim($outlet_data);
         if ($outlet_data) {
-            list($outlet_oid,$outlet_descr) = explode(' ', $outlet_data, 2);
+            [$outlet_oid,$outlet_descr] = explode(' ', $outlet_data, 2);
             $outlet_split_oid = explode('.', $outlet_oid);
             $outlet_index = $outlet_split_oid[(count($outlet_split_oid) - 1)];
             $outletsuffix = "$outlet_index";
@@ -103,12 +103,11 @@ if ($outlet_oids) {
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
-    for ($x=1; $x<=$raritan_data['inletPoleCount']; $x++) {
+    for ($x = 1; $x <= $raritan_data['inletPoleCount']; $x++) {
         $tmp_index = "$index.$x";
         $new_index = "inletPoleCurrent.$tmp_index";
-        $oid = '.1.3.6.1.4.1.13742.4.1.21.2.1.3.'. $tmp_index;
+        $oid = '.1.3.6.1.4.1.13742.4.1.21.2.1.3.' . $tmp_index;
         $descr = 'Inlet ' . $pre_cache['raritan_inletPoleTable'][$index][$x]['inletPoleLabel'];
         $divisor = 1000;
         $low_limit = $raritan_data['inletCurrentUpperCritical'] / $divisor;

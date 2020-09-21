@@ -25,8 +25,8 @@
 
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -62,7 +62,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                             echo "
                                 <tr>
                                     <td>{$rule['name']}</td>
-                                    <td><i>".htmlentities($rule_display)."</i></td>
+                                    <td><i>" . htmlentities($rule_display) . "</i></td>
                                     <td>{$rule['severity']}</td>
                                     <td>{$rule['id']}</td>
                                 </tr>

@@ -22,8 +22,7 @@
  * @copyright  2020 Denny Friebe
  * @author     Denny Friebe <denny.friebe@icera-network.de>
  */
-
-$airos_eth_stat = snmpwalk_cache_oid($device, 'afLTUethConnected', array(), 'UBNT-AFLTU-MIB', null, '-OteQUsb');
+$airos_eth_stat = snmpwalk_cache_oid($device, 'afLTUethConnected', [], 'UBNT-AFLTU-MIB', null, '-OteQUsb');
 
 foreach ($port_stats as $index => $afport_stats) {
     if ($afport_stats['ifDescr'] == 'eth0') {
@@ -36,7 +35,6 @@ foreach ($port_stats as $index => $afport_stats) {
              * Because "IF-MIB" reads wrong information we remove the existing entry for "eth0" if "afLTUethConnected"
              * could not be read to prevent wrong information from being stored.
              */
-
             unset($port_stats[$index]);
         }
         break;

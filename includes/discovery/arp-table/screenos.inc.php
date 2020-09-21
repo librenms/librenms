@@ -27,7 +27,7 @@
 // collect arp data
 $nsIpArpTable = snmpwalk_group($device, 'nsIpArpTable', 'NETSCREEN-IP-ARP-MIB');
 
-if (!empty($nsIpArpTable)) {
+if (! empty($nsIpArpTable)) {
     // get internal id to ifIndex map
     $nsIfInfo = snmpwalk_group($device, 'nsIfInfo', 'NETSCREEN-INTERFACE-MIB', 0);
     $nsIfInfo = array_flip($nsIfInfo['nsIfInfo']);

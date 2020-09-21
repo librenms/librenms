@@ -12,23 +12,23 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
-    die('ERROR: You need to be admin');
+    exit('ERROR: You need to be admin');
 }
 
 $template_id = $vars['template_id'];
 $template_edit = is_numeric($template_id) && $template_id > 0;
 
 $rules = [];
-$output = array(
+$output = [
     'template'  => '',
     'name'      => '',
     'title'     => '',
     'title_rec' => '',
     'type'      => '',
     'rules'     => $rules,
-);
+];
 
 if ($template_edit) {
     $template = dbFetchRow('SELECT * FROM `alert_templates` WHERE `id` = ? LIMIT 1', [$template_id]);
@@ -37,7 +37,7 @@ if ($template_edit) {
         'name'      => $template['name'],
         'title'     => $template['title'],
         'title_rec' => $template['title_rec'],
-        'type'      => $template['type']
+        'type'      => $template['type'],
     ];
 }
 

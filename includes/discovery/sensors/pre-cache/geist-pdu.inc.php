@@ -22,6 +22,5 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 echo 'ctrl3ChIECTable ';
 $pre_cache['geist_pdu_iec'] = snmpwalk_cache_oid($device, 'ctrl3ChIECTable', [], 'GEIST-MIB-V3');

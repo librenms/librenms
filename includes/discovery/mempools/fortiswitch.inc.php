@@ -22,7 +22,6 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 if ($device['os'] === 'fortiswitch') {
     echo 'Fortiswitch Mempool: ';
     discover_mempool($valid_mempool, $device, 0, 'fortiswitch', 'Main Memory', '1024', null, null);

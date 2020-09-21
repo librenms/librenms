@@ -30,11 +30,11 @@ if ($device['os'] === 'aruba-instant') {
     $mempool_data = snmpwalk_group($device, 'aiAPMemoryFree', 'AI-AP-MIB', 1, $mempool_data);
     $mempool_data = snmpwalk_group($device, 'aiAPName', 'AI-AP-MIB', 1, $mempool_data);
 
-    d_echo('$mempool_data:'.PHP_EOL);
+    d_echo('$mempool_data:' . PHP_EOL);
     d_echo($mempool_data);
 
     foreach ($mempool_data as $index => $entry) {
-        d_echo($entry['aiAPSerialNum'].' '.$entry['aiAPTotalMemory'].' / '.$entry['aiAPMemoryFree'].PHP_EOL);
+        d_echo($entry['aiAPSerialNum'] . ' ' . $entry['aiAPTotalMemory'] . ' / ' . $entry['aiAPMemoryFree'] . PHP_EOL);
 
         $oid_index = implode('.', array_map('hexdec', explode(':', $index)));
 
@@ -42,12 +42,12 @@ if ($device['os'] === 'aruba-instant') {
 
         $usage_oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
 
-        $index     = $entry['aiAPSerialNum'];
-        $descr     = $entry['aiAPName'] . ' [' . $entry['aiAPSerialNum'] . ']';
-        $total     = $entry['aiAPTotalMemory'];
-        $free      = $entry['aiAPMemoryFree'];
-        $used      = $total - $free;
-        $perc      = ($used / $total * 100);
+        $index = $entry['aiAPSerialNum'];
+        $descr = $entry['aiAPName'] . ' [' . $entry['aiAPSerialNum'] . ']';
+        $total = $entry['aiAPTotalMemory'];
+        $free = $entry['aiAPMemoryFree'];
+        $used = $total - $free;
+        $perc = ($used / $total * 100);
 
         discover_mempool($valid_mempool, $device, $index, 'aruba-instant', $descr, '1', null, null);
     } //end foreach

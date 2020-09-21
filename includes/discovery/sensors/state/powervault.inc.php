@@ -11,7 +11,7 @@
  */
 
 $state = snmp_get($device, "DELL-SHADOW-MIB::shadowStatusGlobalStatus.0", '-Oqne');
-list($oid, $value) = explode(' ', $state);
+[$oid, $value] = explode(' ', $state);
 
 if (is_numeric($value)) {
     $descr = "Global Status";

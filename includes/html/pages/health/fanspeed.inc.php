@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_fanspeed';
-$class      = 'fanspeed';
-$unit       = 'rpm';
+$class = 'fanspeed';
+$unit = 'rpm';
 
 require 'includes/html/pages/health/sensors.inc.php';

@@ -22,7 +22,6 @@
  * @copyright  2019 Paul Parsons
  * @author     Paul Parsons <paul@cppmonkey.net>
  */
-
 $batteryAutonomy = snmp_get($device, 'es1dc1DataBatCalculatedAutonomy.0', '-Ovqe', 'SITE-MONITORING-MIB');
 $curOID = '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.92.0';
 $index = 0;

@@ -22,7 +22,6 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 include 'powerdns-recursor.inc.php';
 
 $colours = 'oranges';
@@ -30,33 +29,33 @@ $unit_text = 'Answers/sec';
 $print_total = true;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    $rrd_list = array(
-        array(
+    $rrd_list = [
+        [
             'ds' => 'answers0-1',
             'filename' => $rrd_filename,
             'descr' => '0-1ms',
-        ),
-        array(
+        ],
+        [
             'ds' => 'answers1-10',
             'filename' => $rrd_filename,
             'descr' => '1-10ms',
-        ),
-        array(
+        ],
+        [
             'ds' => 'answers10-100',
             'filename' => $rrd_filename,
             'descr' => '10-100ms',
-        ),
-        array(
+        ],
+        [
             'ds' => 'answers100-1000',
             'filename' => $rrd_filename,
             'descr' => '100-1000ms',
-        ),
-        array(
+        ],
+        [
             'ds' => 'answers-slow',
             'filename' => $rrd_filename,
             'descr' => '>1s',
-        ),
-    );
+        ],
+    ];
 } else {
     echo "file missing: $rrd_filename";
 }

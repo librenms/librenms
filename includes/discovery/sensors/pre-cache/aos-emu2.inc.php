@@ -22,7 +22,6 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 echo 'emsStatusSysTempUnits ';
 $pre_cache['emu2_temp_scale'] = snmp_get($device, 'emsStatusSysTempUnits.0', '-OQv', 'PowerNet-MIB');
 

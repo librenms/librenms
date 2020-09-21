@@ -17,16 +17,16 @@
  * Get module's components for a device
  */
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], array('type' => 'cisco-qfp'));
+$components = $component->getComponents($device['device_id'], ['type' => 'cisco-qfp']);
 $components = $components[$device['device_id']];
 
 foreach ($components as $component_id => $tmp_component) {
-    $default_graph_array = array(
+    $default_graph_array = [
         'from' => \LibreNMS\Config::get('time.day'),
         'to' => \LibreNMS\Config::get('time.now'),
         'id' => $component_id,
-        'page' => 'graphs'
-    );
+        'page' => 'graphs',
+    ];
 
     /*
      * Main container for QFP component
@@ -81,8 +81,6 @@ foreach ($components as $component_id => $tmp_component) {
                 Last system load at <b>{$tmp_component['system_last_load']}</b>
             </div>";
     echo "<div class='panel-body'>";
-
-
 
     /*
      * QFP Utilization (Load)
@@ -144,7 +142,6 @@ foreach ($components as $component_id => $tmp_component) {
     include 'includes/html/print-graphrow.inc.php';
     echo "</div></div>";
 
-
     /*
      * QFP Throughput In/Out
      */
@@ -188,7 +185,7 @@ foreach ($components as $component_id => $tmp_component) {
     /*
      * QFP Memory resources
      */
-    $mem_prec = $tmp_component['memory_used']*100/$tmp_component['memory_total'];
+    $mem_prec = $tmp_component['memory_used'] * 100 / $tmp_component['memory_total'];
     if ($mem_prec < 75) {
         $mem_label = 'label-success';
     } elseif ($mem_prec < 90) {

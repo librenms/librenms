@@ -23,7 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-
 // table name => regex (first group is index, second group is id)
 $virtual_tables = [
     'ra32-analog' => '/\.1\.3\.6\.1\.4\.1\.20916\.1\.8\.1\.1\.5\.((\d+)\.0)/',
@@ -35,7 +34,7 @@ $virtual_tables = [
 
 $data = snmp_walk($device, '.1.3.6.1.4.1.20916.1', '-OQn');
 foreach (explode(PHP_EOL, $data) as $line) {
-    list($oid, $value) = explode(' = ', $line);
+    [$oid, $value] = explode(' = ', $line);
 
     $processed = false;
     foreach ($virtual_tables as $vt_name => $vt_regex) {
@@ -50,7 +49,7 @@ foreach (explode(PHP_EOL, $data) as $line) {
         }
     }
 
-    if (!$processed) {
+    if (! $processed) {
         $pre_cache[$oid] = [[$oid => $value]];
     }
 }

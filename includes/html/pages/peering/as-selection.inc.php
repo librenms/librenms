@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * LibreNMS PeeringDB Integration
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +20,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $cache_date = dbFetchCell("SELECT FROM_UNIXTIME(`timestamp`) FROM `pdb_ix` ORDER BY `timestamp` ASC LIMIT 1");
 
 echo "<div class='alert alert-info' role='alert'>Cached date: $cache_date</div>";

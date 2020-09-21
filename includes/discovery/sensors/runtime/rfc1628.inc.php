@@ -26,7 +26,6 @@ if (is_numeric($secs_on_battery)) {
     );
 }
 
-
 // UPS-MIB::upsEstimatedMinutesRemaining
 $est_battery_time_oid = ".1.3.6.1.2.1.33.1.2.3.0";
 $est_battery_time = snmp_get($device, $est_battery_time_oid, '-Ovq');

@@ -12,8 +12,8 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','f5-ltm-bwc');
+$options = [];
+$options['filter']['type'] = ['=', 'f5-ltm-bwc'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -28,7 +28,7 @@ if (isset($components[$vars['id']])) {
     $rrd_options .= " -l 0 -E ";
     $rrd_options .= " COMMENT:'Bits           Now      Ave      Max\\n'";
 
-    $rrd_filename = rrd_name($device['hostname'], array('f5-ltm-bwc', $label, $hash));
+    $rrd_filename = rrd_name($device['hostname'], ['f5-ltm-bwc', $label, $hash]);
     if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_options .= " DEF:INBYTES=" . $rrd_filename . ":bytesin:AVERAGE ";
         $rrd_options .= " CDEF:INBITS=INBYTES,8,* ";

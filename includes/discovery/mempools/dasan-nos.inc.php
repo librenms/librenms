@@ -22,13 +22,12 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 if ($device['os'] === 'dasan-nos') {
     echo 'Dasan NOS: ';
 
     $total = snmp_get($device, 'dsTotalMem.0', '-OvQU', 'DASAN-SWITCH-MIB', 'dasan');
-    $used  = snmp_get($device, 'dsUsedMem.0', '-OvQU', 'DASAN-SWITCH-MIB', 'dasan');
-    $free  = snmp_get($device, 'dsFreeMem.0', '-OvQU', 'DASAN-SWITCH-MIB', 'dasan');
+    $used = snmp_get($device, 'dsUsedMem.0', '-OvQU', 'DASAN-SWITCH-MIB', 'dasan');
+    $free = snmp_get($device, 'dsFreeMem.0', '-OvQU', 'DASAN-SWITCH-MIB', 'dasan');
     if (is_numeric($total) && is_numeric($used) && is_numeric($free)) {
         discover_mempool($valid_mempool, $device, 0, 'dasan-nos', 'Memory Utilization', '1', null, null);
     }

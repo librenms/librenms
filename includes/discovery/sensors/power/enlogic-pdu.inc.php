@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 foreach ($pre_cache['enlogic_pdu_status'] as $index => $data) {
     if (is_array($data)) {
         $current = $data['pduUnitStatusActivePower'];

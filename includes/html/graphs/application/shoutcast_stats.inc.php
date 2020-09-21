@@ -1,17 +1,17 @@
 <?php
 
-$hostname     = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unkown');
-$rrd_filename = rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], $hostname));
+$hostname = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unkown');
+$rrd_filename = rrd_name($device['hostname'], ['app', 'shoutcast', $app['app_id'], $hostname]);
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_options .= ' DEF:cur='.$rrd_filename.':current:AVERAGE';
-$rrd_options .= ' DEF:max='.$rrd_filename.':max:MAX';
+$rrd_options .= ' DEF:cur=' . $rrd_filename . ':current:AVERAGE';
+$rrd_options .= ' DEF:max=' . $rrd_filename . ':max:MAX';
 // $rrd_options .= " DEF:bit=".$rrd_filename.":bitrate:LAST";
-$rrd_options .= ' DEF:bit='.$rrd_filename.':bitrate:MAX';
-$rrd_options .= ' DEF:peak='.$rrd_filename.':peak:MAX';
-$rrd_options .= ' DEF:unique='.$rrd_filename.':unique:AVERAGE';
-$rrd_options .= ' DEF:status='.$rrd_filename.':status:AVERAGE';
+$rrd_options .= ' DEF:bit=' . $rrd_filename . ':bitrate:MAX';
+$rrd_options .= ' DEF:peak=' . $rrd_filename . ':peak:MAX';
+$rrd_options .= ' DEF:unique=' . $rrd_filename . ':unique:AVERAGE';
+$rrd_options .= ' DEF:status=' . $rrd_filename . ':status:AVERAGE';
 $rrd_options .= ' CDEF:peakm=peak,1,-';
 $rrd_options .= ' VDEF:avg=cur,AVERAGE';
 $rrd_options .= ' VDEF:peakh=peakm,MAXIMUM';

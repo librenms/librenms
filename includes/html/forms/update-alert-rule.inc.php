@@ -14,11 +14,11 @@
 
 header('Content-type: text/plain');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
-if (!is_numeric($_POST['alert_id'])) {
+if (! is_numeric($_POST['alert_id'])) {
     echo 'ERROR: No alert selected';
     exit;
 } else {
@@ -30,8 +30,8 @@ if (!is_numeric($_POST['alert_id'])) {
         $state = 1;
     }
 
-    $update = dbUpdate(array('disabled' => $state), 'alert_rules', '`id`=?', array($_POST['alert_id']));
-    if (!empty($update) || $update == '0') {
+    $update = dbUpdate(['disabled' => $state], 'alert_rules', '`id`=?', [$_POST['alert_id']]);
+    if (! empty($update) || $update == '0') {
         echo 'Alert rule has been updated.';
         exit;
     } else {

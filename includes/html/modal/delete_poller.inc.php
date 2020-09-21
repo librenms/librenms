@@ -22,7 +22,6 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 if (Auth::user()->hasGlobalAdmin()) {
     ?>
 

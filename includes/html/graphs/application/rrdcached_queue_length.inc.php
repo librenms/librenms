@@ -22,11 +22,10 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 require 'rrdcached.inc.php';
 require 'includes/html/graphs/common.inc.php';
 
-$ds  = 'queue_length';
+$ds = 'queue_length';
 
 $colour_area = 'F37900';
 $colour_line = 'FFA700';

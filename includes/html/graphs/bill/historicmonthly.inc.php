@@ -98,7 +98,7 @@ $lineplot_allow->SetLegend('Traffic Allowed');
 $lineplot_allow->SetColor('black');
 $lineplot_allow->SetWeight(1);
 
-$gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out, $barplot_over));
+$gbplot = new GroupBarPlot([$barplot_in, $barplot_tot, $barplot_out, $barplot_over]);
 
 $graph->Add($gbplot);
 $graph->Add($lineplot_allow);

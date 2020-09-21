@@ -25,7 +25,7 @@ $entPhysicalIndex_measured = null;
 $user_func = null;
 $group = null;
 
-if (!empty($current) && is_numeric($current)) {
+if (! empty($current) && is_numeric($current)) {
     discover_sensor(
         $valid['sensor'],
         $class,

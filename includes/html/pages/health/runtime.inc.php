@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_runtime';
-$class      = 'runtime';
-$unit       = 'Min';
+$class = 'runtime';
+$unit = 'Min';
 
 require 'includes/html/pages/health/sensors.inc.php';

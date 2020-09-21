@@ -22,7 +22,6 @@
  * @copyright  2020 Jozef Rebjak
  * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
-
 echo 'FS NMU Signals';
 
 // SLOT A

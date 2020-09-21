@@ -15,16 +15,16 @@
 
 /* FIXME: is there a central place we can put this? */
 
-$alert_states = array(
+$alert_states = [
     // divined from librenms/alerts.php
     'recovered' => 0,
     'alerted' => 1,
     'acknowledged' => 2,
     'worse' => 3,
     'better' => 4,
-);
+];
 
-$alert_severities = array(
+$alert_severities = [
     // alert_rules.status is enum('ok','warning','critical')
     'ok' => 1,
     'warning' => 2,
@@ -32,12 +32,12 @@ $alert_severities = array(
     'ok only' => 4,
     'warning only' => 5,
     'critical only' => 6,
-);
+];
 
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
 if (defined('SHOW_SETTINGS')) {
     $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
-    $current_fired =  isset($widget_settings['fired']) ? $widget_settings['fired'] : '';
+    $current_fired = isset($widget_settings['fired']) ? $widget_settings['fired'] : '';
     $current_severity = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
     $current_state = isset($widget_settings['state']) ? $widget_settings['state'] : '';
     $current_group = isset($widget_settings['group']) ? $widget_settings['group'] : '';
@@ -193,7 +193,7 @@ if (defined('SHOW_SETTINGS')) {
     }
 
     if (is_numeric($group)) {
-        $group_row = dbFetchRow("SELECT * FROM device_groups WHERE id = ?", array($group));
+        $group_row = dbFetchRow("SELECT * FROM device_groups WHERE id = ?", [$group]);
         if ($group_row) {
             $title = "$title for " . $group_row['name'];
         }
@@ -207,7 +207,7 @@ if (defined('SHOW_SETTINGS')) {
         }
     }
 
-    if (!empty($sort)) {
+    if (! empty($sort)) {
         $title = "$title " . "sorted by severity (higher first)";
     }
 

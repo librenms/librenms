@@ -22,24 +22,22 @@
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
-
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     return [];
 }
 
 $query = '';
 $params = [];
 
-if (!empty($_REQUEST['search'])) {
+if (! empty($_REQUEST['search'])) {
     $query .= ' WHERE `location` LIKE ?';
     $params[] = '%' . mres($_REQUEST['search']) . '%';
 }
 
-
 $total = dbFetchCell("SELECT COUNT(*) FROM `locations` $query", $params);
 $more = false;
 
-if (!empty($_REQUEST['limit'])) {
+if (! empty($_REQUEST['limit'])) {
     $limit = (int) $_REQUEST['limit'];
     $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
     $offset = ($page - 1) * $limit;
@@ -48,7 +46,6 @@ if (!empty($_REQUEST['limit'])) {
 } else {
     $offset = 0;
 }
-
 
 $sql = "SELECT `id`, `location` AS `text` FROM `locations` $query order by `location`";
 $locations = dbFetchRows($sql, $params);

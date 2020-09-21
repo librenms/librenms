@@ -22,11 +22,10 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $temp = snmpwalk_cache_multi_oid($device, 'voltageProbeTable', [], 'MIB-Dell-10892');
 $cur_oid = '.1.3.6.1.4.1.674.10892.1.600.20.1.6.';
 
-foreach ((array)$temp as $index => $entry) {
+foreach ((array) $temp as $index => $entry) {
     $descr = $entry['voltageProbeLocationName'];
     if ($entry['voltageProbeType'] != 'voltageProbeTypeIsDiscrete') {
         $divisor = 1000;
