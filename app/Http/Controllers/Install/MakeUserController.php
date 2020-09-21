@@ -64,8 +64,7 @@ class MakeUserController extends InstallationController implements InstallerStep
             'password' => 'required',
         ]);
 
-        // $message might never be initialized, resulting in 500 error
-        $message = "";
+        $message = trans('install.user.failure')
         
         try {
             // only allow the first admin to be created
@@ -76,7 +75,6 @@ class MakeUserController extends InstallationController implements InstallerStep
                 $user->setPassword($request->get('password'));
                 $res = $user->save();
 
-                $message = trans('install.user.failure');
                 if ($res) {
                     $message = trans('install.user.success');
                     $this->markStepComplete();
