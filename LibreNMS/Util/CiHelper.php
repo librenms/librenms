@@ -491,13 +491,15 @@ class CiHelper
         }
 
         echo "Running pip3 install to install developer dependencies.\n";
-        passthru("pip3 install $exec"); // probably wrong in other cases...
+        passthru("pip3 install --user $exec"); // probably wrong in other cases...
 
         if (is_executable($path)) {
             return $path;
         }
 
-        echo "\nRunning installing deps with pip3 failed.\n You should try running 'pip3 install -r requirements.txt' by hand\n";
+        echo "\nRunning installing deps with pip3 failed.\n You should try running 'pip3 install --user ";
+        echo $exec;
+        echo "' by hand\n";
         echo "You can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
         exit(1);
     }

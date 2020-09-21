@@ -12,7 +12,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
 {
     public function discoverWirelessErrors()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'satSignalUncorErrCnt', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-Ob');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'satSignalUncorErrCnt', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-Ob');
         $sensors = [];
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
@@ -29,7 +29,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
 
     public function discoverWirelessRssi()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'satSignalLevel', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-Ob');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'satSignalLevel', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-Ob');
         $sensors = [];
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
@@ -50,7 +50,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
         $sensors = [];
 
         // snr - Discover C/N Link Margin
-        $cnmargin = snmpwalk_cache_oid($this->getDevice(), 'satSignalCnMargin', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-OQUsb');
+        $cnmargin = snmpwalk_cache_oid($this->getDeviceArray(), 'satSignalCnMargin', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-OQUsb');
         foreach ($cnmargin as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'snr',
@@ -64,7 +64,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
         }
 
         // snr - Discover C/N Ratio
-        $cnratio = snmpwalk_cache_oid($this->getDevice(), 'satSignalCndisp', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-OQUsb');
+        $cnratio = snmpwalk_cache_oid($this->getDeviceArray(), 'satSignalCndisp', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-OQUsb');
         foreach ($cnratio as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'snr',

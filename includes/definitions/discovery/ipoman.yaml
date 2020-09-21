@@ -1,0 +1,6 @@
+modules:
+    os:
+        serial: IPOMANII-MIB::ipmIdentAgentSoftwareVersion.0
+        serial_regex: '/\(SN (?<serial>\S+)\)/'
+        version: IPOMANII-MIB::ipmIdentAgentSoftwareVersion.0
+        version_regex: '/v(?<version>\S+)/'

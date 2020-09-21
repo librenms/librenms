@@ -26,14 +26,44 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 
 class Rutos2xx extends OS implements
+    OSPolling,
     WirelessSnrDiscovery,
     WirelessRssiDiscovery
 {
+    public function pollOS()
+    {
+        # Mobile Data Usage
+        $usage = snmp_get_multi_oid($this->getDeviceArray(), [
+            '.1.3.6.1.4.1.48690.2.11.0',
+            '.1.3.6.1.4.1.48690.2.10.0',
+        ]);
+
+        $usage_sent = $usage['.1.3.6.1.4.1.48690.2.11.0'];
+        $usage_received = $usage['.1.3.6.1.4.1.48690.2.10.0'];
+
+        if ($usage_sent >= 0 && $usage_received >= 0) {
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('usage_sent', 'GAUGE', 0)
+                ->addDataset('usage_received', 'GAUGE', 0);
+
+            $fields = [
+                'usage_sent' => $usage_sent,
+                'usage_received' => $usage_received,
+            ];
+
+            $tags = compact('rrd_def');
+            data_update($this->getDeviceArray(), 'rutos_2xx_mobileDataUsage', $tags, $fields);
+            $this->enableGraph('rutos_2xx_mobileDataUsage');
+        }
+    }
+
     public function discoverWirelessSnr()
     {
         $oid = '.1.3.6.1.4.1.48690.2.22.0'; // TELTONIKA-MIB::SINR.0

@@ -14,7 +14,7 @@
                     "type": "wireless",
                     "serial": null,
                     "icon": "ericsson.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

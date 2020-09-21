@@ -1,13 +1,16 @@
 <?php
 namespace LibreNMS\OS;
 
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
-use LibreNMS\Device\WirelessSensor;
 use LibreNMS\OS;
 
-class ArrisDsr4410md extends OS implements WirelessRssiDiscovery, WirelessSnrDiscovery, WirelessQualityDiscovery
+class ArrisDsr4410md extends OS implements
+    WirelessRssiDiscovery,
+    WirelessSnrDiscovery,
+    WirelessQualityDiscovery
 {
     public function discoverWirelessRssi()
     {
@@ -43,6 +46,7 @@ class ArrisDsr4410md extends OS implements WirelessRssiDiscovery, WirelessSnrDis
             )
         );
     }
+
     public function discoverWirelessQuality()
     {
         $oid = '.1.3.6.1.4.1.1166.1.621.11.8.0';

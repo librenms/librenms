@@ -38,15 +38,15 @@ class RoutingController implements DeviceTab
     {
         $device = DeviceCache::getPrimary();
         $this->tabs = [
-            'ospf' => $device->ospfInstances()->exists(),
-            'bgp' => $device->bgppeers()->exists(),
-            'vrf' => $device->vrfs()->exists(),
-            'cef' => $device->cefSwitching()->exists(),
-            'mpls' => $device->mplsLsps()->exists(),
-            'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->exists(),
-            'loadbalancer_rservers' => $device->rServers()->exists(),
-            'ipsec_tunnels' => $device->ipsecTunnels()->exists(),
-            'routes' => $device->routes()->exists(),
+            'ospf' => $device->ospfInstances()->count(),
+            'bgp' => $device->bgppeers()->count(),
+            'vrf' => $device->vrfs()->count(),
+            'cef' => $device->cefSwitching()->count(),
+            'mpls' => $device->mplsLsps()->count(),
+            'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->count(),
+            'loadbalancer_rservers' => $device->rServers()->count(),
+            'ipsec_tunnels' => $device->ipsecTunnels()->count(),
+            'routes' => $device->routes()->count(),
         ];
     }
 
@@ -73,7 +73,7 @@ class RoutingController implements DeviceTab
     public function data(Device $device): array
     {
         return [
-            'routing_tabs' => array_keys(array_filter($this->tabs))
+            'routing_tabs' => array_filter($this->tabs)
         ];
     }
 }

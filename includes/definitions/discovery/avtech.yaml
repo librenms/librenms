@@ -1,4 +1,6 @@
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>.*) v(?<version>[\d.]+)/'
     sensors:
         temperature:
             options:

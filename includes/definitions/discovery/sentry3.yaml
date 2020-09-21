@@ -1,0 +1,6 @@
+modules:
+    os:
+        hardware: Sentry3-MIB::towerModelNumber.1
+        serial: Sentry3-MIB::towerProductSN.1
+        version: Sentry3-MIB::systemVersion.0
+        version_regex: '/Version (?<version>\S+)/'

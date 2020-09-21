@@ -1,0 +1,6 @@
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>(Power[Cc]onnect |Dell Networking |Dell EMC Networking )?[A-Z]?\d{2,}[A-Z\-]*)(, (?<version>\d+\.[\d.]+))?/'
+        features: Dell-Vendor-MIB::productIdentificationDescription.0
+        hardware: Dell-Vendor-MIB::productIdentificationDisplayName.0
+        version: Dell-Vendor-MIB::productIdentificationVersion.0

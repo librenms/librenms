@@ -67,14 +67,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.890.1.15",
                     "sysDescr": "XGS4600-32F",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "V4.50(ABBI.1)",
+                    "hardware": "XGS4600-32F",
                     "features": null,
                     "os": "zynos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "S999999999999",
                     "icon": "zyxel.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

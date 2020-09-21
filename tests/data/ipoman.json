@@ -5,16 +5,16 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2468.1.4.2.1",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": null,
-                    "version": null,
+                    "version": "1.05",
                     "hardware": null,
                     "features": null,
                     "os": "ipoman",
                     "type": "power",
-                    "serial": null,
+                    "serial": "1113016920004",
                     "icon": "ingrasys.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -23,7 +23,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2468.1.4.2.1",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "1.05",
                     "hardware": null,

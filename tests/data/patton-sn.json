@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.1768.100.4.23.11",
                     "sysDescr": "SN4971/1E15VHardware Release 3 Version 1, Software R6.10 2017-09-08_RFE2645 H323 RBS SIP.",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "R6.10 2017-09-08_RFE2645 H323 RBS SIP",
+                    "hardware": "SN4971/1E15V, HwRel: 3, HwVer: 1",
                     "features": null,
                     "os": "patton-sn",
                     "type": "network",
-                    "serial": null,
+                    "serial": "00A0BA0BD1EC",
                     "icon": "generic.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

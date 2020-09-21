@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -33,12 +34,12 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
 class AirosAf extends OS implements
+    OSDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessDistanceDiscovery,
     WirelessRateDiscovery
 {
-
     /**
      * Discover wireless distance.  This is in Kilometers. Type is distance.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered

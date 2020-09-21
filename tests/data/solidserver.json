@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.2440",
                     "sysDescr": "EfficientIP SOLIDserver",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "6.0.2.P0a",
+                    "hardware": "SOLIDserver-260",
                     "features": null,
                     "os": "solidserver",
                     "type": "server",
-                    "serial": null,
+                    "serial": "FXLQ3K2",
                     "icon": "eip.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

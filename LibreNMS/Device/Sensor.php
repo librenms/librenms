@@ -306,7 +306,7 @@ class Sensor implements DiscoveryModule, PollerModule
 
         // pre-fetch all standard sensors
         $standard_sensors = collect($sensors)->flatten(1)->all();
-        $pre_fetch = self::fetchSnmpData($os->getDevice(), $standard_sensors);
+        $pre_fetch = self::fetchSnmpData($os->getDeviceArray(), $standard_sensors);
 
         // poll standard sensors
         foreach ($sensors as $type => $type_sensors) {
@@ -642,7 +642,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 'rrd_name' => $rrd_name,
                 'rrd_def' => $rrd_def
             );
-            data_update($os->getDevice(), static::$data_name, $tags, $fields);
+            data_update($os->getDeviceArray(), static::$data_name, $tags, $fields);
 
             $update = array(
                 'sensor_prev' => $sensor['sensor_current'],

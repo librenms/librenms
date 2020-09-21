@@ -1,5 +1,8 @@
 mib: MIMOSA-NETWORKS-BFIVE-MIB
 modules:
+    os:
+        serial: MIMOSA-NETWORKS-BFIVE-MIB::mimosaSerialNumber.0
+        version: MIMOSA-NETWORKS-BFIVE-MIB::mimosaFirmwareVersion.0
     sensors:
         state:
             data:

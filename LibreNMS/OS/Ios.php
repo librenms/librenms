@@ -43,15 +43,15 @@ class Ios extends Cisco implements
      */
     public function discoverWirelessClients()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
         if (!Str::startsWith($device['hardware'], 'AIR-') && !Str::contains($device['hardware'], 'ciscoAIR')) {
             // unsupported IOS hardware
-            return array();
+            return [];
         }
 
-        $data = snmpwalk_cache_oid($device, 'cDot11ActiveWirelessClients', array(), 'CISCO-DOT11-ASSOCIATION-MIB');
-        $entPhys = snmpwalk_cache_oid($device, 'entPhysicalDescr', array(), 'ENTITY-MIB');
+        $data = snmpwalk_cache_oid($device, 'cDot11ActiveWirelessClients', [], 'CISCO-DOT11-ASSOCIATION-MIB');
+        $entPhys = snmpwalk_cache_oid($device, 'entPhysicalDescr', [], 'ENTITY-MIB');
 
         // fixup incorrect/missing entPhysicalIndex mapping
         foreach ($data as $index => $_unused) {
@@ -68,7 +68,7 @@ class Ios extends Cisco implements
             }
         }
 
-        $sensors = array();
+        $sensors = [];
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'clients',

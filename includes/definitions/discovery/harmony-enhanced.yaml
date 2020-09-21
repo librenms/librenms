@@ -1,5 +1,8 @@
 mib:  MWR-ETHERNET-MIB:MWR-RADIO-MC-MIB
 modules:
+    os:
+        version: MWR-ETHERNET-MIB::mwrSwInvOmniRelease.bankA
+        serial: MWR-ETHERNET-MIB::mwrUnitSerialNo.0
     sensors:
         temperature:
             data:

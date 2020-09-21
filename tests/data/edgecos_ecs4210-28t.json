@@ -74,7 +74,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "edge-core.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -85,7 +85,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.259.10.1.42.101",
                     "sysDescr": "ECS4210-28T",
                     "sysContact": "<private>",
-                    "version": " ",
+                    "version": null,
                     "hardware": null,
                     "features": null,
                     "os": "edgecos",

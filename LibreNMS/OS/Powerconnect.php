@@ -48,7 +48,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
         if (Str::startsWith($device['sysObjectID'], [
             '.1.3.6.1.4.1.674.10895.3020',
             '.1.3.6.1.4.1.674.10895.3021',
@@ -101,7 +101,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
 
         foreach ($processors as $processor) {
             if ($processor['processor_type'] == 'powerconnect-nv') {
-                $data[$processor['processor_id']] = snmp_get($this->getDevice(), $processor['processor_oid'], '-Oqv');
+                $data[$processor['processor_id']] = snmp_get($this->getDeviceArray(), $processor['processor_oid'], '-Oqv');
             } else {
                 $data += $this->pollVxworksProcessors(array($processor));
             }

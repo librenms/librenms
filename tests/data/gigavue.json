@@ -8,13 +8,13 @@
                     "sysDescr": "Gigamon GigaVUE-2404 v8.6.07",
                     "sysContact": null,
                     "version": "v8.6.07",
-                    "hardware": "Gigamon GigaVUE-2404 v8.6.07",
+                    "hardware": "GigaVUE-2404",
                     "features": null,
                     "os": "gigavue",
                     "type": "network",
                     "serial": "21327",
                     "icon": "gigamon.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "Gigamon GigaVUE-2404 v8.6.07",
                     "sysContact": "<private>",
                     "version": "v8.6.07",
-                    "hardware": "Gigamon GigaVUE-2404 v8.6.07",
+                    "hardware": "GigaVUE-2404",
                     "features": null,
                     "os": "gigavue",
                     "type": "network",

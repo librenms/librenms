@@ -1,5 +1,7 @@
 mib: ARUBA-MIB:WLSX-SYSTEMEXT-MIB
 modules:
+    os:
+        sysDescr_regex: '/(\(MODEL: (?<hardware>.+)\),)? Version (?<version>\S+)/'
     processors:
         data:
             -

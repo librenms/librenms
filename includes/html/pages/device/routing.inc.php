@@ -31,7 +31,7 @@ $pagetitle[] = 'Routing';
 echo "<span style='font-weight: bold;'>Routing</span> &#187; ";
 
 unset($sep);
-foreach ($routing_tabs as $type) {
+foreach ($routing_tabs as $type => $type_count) {
     if (!$vars['proto']) {
         $vars['proto'] = $type;
     }
@@ -42,7 +42,7 @@ foreach ($routing_tabs as $type) {
         echo '<span class="pagemenu-selected">';
     }
 
-    echo generate_link($type_text[$type].' ('.$device_routing_count[$type].')', $link_array, array('proto' => $type));
+    echo generate_link($type_text[$type].' ('.$type_count.')', $link_array, array('proto' => $type));
     if ($vars['proto'] == $type) {
         echo '</span>';
     }
@@ -56,7 +56,7 @@ $protocol = basename($vars['proto']);
 if (is_file("includes/html/pages/device/routing/$protocol.inc.php")) {
     include "includes/html/pages/device/routing/$protocol.inc.php";
 } else {
-    foreach ($routing_tabs as $type) {
+    foreach ($routing_tabs as $type => $type_count) {
         if ($type != 'overview') {
             if (is_file("includes/html/pages/device/routing/overview/$type.inc.php")) {
                 $g_i++;
