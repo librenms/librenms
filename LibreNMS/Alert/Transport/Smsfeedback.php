@@ -18,14 +18,11 @@
  * @author Barry O'Donovan <barry@lightnet.ie>
  * @copyright 2017 Barry O'Donovan, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Smsfeedback extends Transport
 {

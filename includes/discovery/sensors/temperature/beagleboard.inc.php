@@ -4,9 +4,6 @@
  * Requires snmp extend agent script from librenms-agent
  */
 
-use Illuminate\Support\Str;
-use LibreNMS\Config;
-
 $type = "beagleboardTemp";
 
 // $oid = 'NET-SNMP-EXTEND-MIB::nsExtendOutLine."beagleboard"';

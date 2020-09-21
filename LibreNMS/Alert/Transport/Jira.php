@@ -18,14 +18,11 @@
  * @author  Aldemir Akpinar <aldemir.akpinar@gmail.com>
  * @copyright 2017 Aldemir Akpinar, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Jira extends Transport
 {

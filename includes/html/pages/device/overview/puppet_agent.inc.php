@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\Util\StringHelpers;
-
 $app_id = \App\Models\Application::query()->where('device_id', $device['device_id'])->where('app_type', 'puppet-agent')->get('app_id')[0];
 
 // show only if Puppet Agent Application discovered

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS\Authentication
  * @link       https://librenms.org
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
@@ -25,7 +24,6 @@
 
 namespace LibreNMS\Authentication;
 
-use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\InvalidIpException;

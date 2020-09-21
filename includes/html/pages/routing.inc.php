@@ -1,11 +1,5 @@
 <?php
 
-use App\Models\BgpPeer;
-use App\Models\CefSwitching;
-use App\Models\Component;
-use App\Models\OspfInstance;
-use App\Models\Vrf;
-
 $pagetitle[] = 'Routing';
 
 if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {

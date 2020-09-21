@@ -13,8 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Alert\AlertUtil;
-
 $pagetitle[] = "Devices";
 
 if (! isset($vars['format'])) {

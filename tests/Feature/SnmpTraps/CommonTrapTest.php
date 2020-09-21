@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,7 +25,6 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Port;
 use LibreNMS\Snmptrap\Dispatcher;

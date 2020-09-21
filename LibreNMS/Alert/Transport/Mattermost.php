@@ -18,14 +18,11 @@
  * @author George Pantazis <gpant@eservices-greece.com>
  * @copyright 2019 George Pantazis, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Mattermost extends Transport
 {

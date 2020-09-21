@@ -11,7 +11,6 @@
  * the source code distribution for details.
  */
 
-use Illuminate\Support\Collection;
 use LibreNMS\Config;
 
 $hops = [];

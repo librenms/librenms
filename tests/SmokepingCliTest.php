@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://librenms.org
  * @copyright  2020 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
@@ -30,8 +29,6 @@ use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\arr;
 use Illuminate\Support\Str;
-use Illuminate\Translation\Translator;
-use LibreNMS\Config;
 
 class SmokepingCliTest extends DBTestCase
 {

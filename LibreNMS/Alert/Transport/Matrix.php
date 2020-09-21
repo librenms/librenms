@@ -18,15 +18,11 @@
  * @author Raphael Dannecker (github.com/raphael247)
  * @copyright 2020 , LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
-use GuzzleHttp\Client;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Matrix extends Transport
 {

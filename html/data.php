@@ -5,8 +5,6 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    librenms
- * @subpackage webinterface
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 $init_modules = ['web', 'auth'];

@@ -24,7 +24,6 @@
  * @license GPL
  *
  * Modified by:
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -32,8 +31,6 @@
 
 namespace LibreNMS\Alert;
 
-use App\Models\Device;
-use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
 class AlertDB

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
@@ -26,11 +25,8 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\DeviceOutage;
-use App\Models\Eventlog;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
 use LibreNMS\Util\Url;
 
 class OutagesController extends TableController

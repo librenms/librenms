@@ -11,8 +11,6 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Util\IP;
-
 $module = 'ntp';
 
 $component = new LibreNMS\Component();

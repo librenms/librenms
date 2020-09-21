@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
-use App\Models\Port;
 use App\Models\Vminfo;
 use Auth;
 use Carbon\Carbon;

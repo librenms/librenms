@@ -18,8 +18,6 @@
  * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @license GPL
- * @package LibreNMS
- * @subpackage Notifications
  */
 header('Content-type: application/json');
 

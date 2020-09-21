@@ -22,7 +22,6 @@
  * CM-SYSTEM-MIB::cmStateChangeTrap. This handler creates log entries based
  * on the unit that sent the trap.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>

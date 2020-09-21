@@ -11,7 +11,6 @@
  * See COPYING for more details.
  */
 
-use App\Models\Location;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Time;

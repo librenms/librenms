@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\OS;
 
 $valid['sensor'] = [];

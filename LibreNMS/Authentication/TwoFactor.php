@@ -18,19 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @license GPL
- * @package LibreNMS
  * @link       http://librenms.org
- * @subpackage Authentication
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @copyright  2017 Tony Murray
  */
 
 namespace LibreNMS\Authentication;
-
-use LibreNMS\Config;
-use LibreNMS\Exceptions\AuthenticationException;
-use Session;
 
 class TwoFactor
 {

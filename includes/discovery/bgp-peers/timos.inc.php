@@ -18,14 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 LibreNMS Contributors
  * @author     LibreNMS Contributors
  */
 
 use LibreNMS\Config;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {

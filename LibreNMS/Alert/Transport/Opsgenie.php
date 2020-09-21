@@ -18,14 +18,11 @@
  * @author Celal Emre CICEK <celal.emre@opsgenie.com>
  * @copyright 2017 Celal Emre CICEK
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Opsgenie extends Transport
 {

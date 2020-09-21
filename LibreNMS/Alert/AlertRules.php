@@ -21,11 +21,6 @@
  * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
- *
- * Modeified by:
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -33,10 +28,7 @@
 
 namespace LibreNMS\Alert;
 
-use App\Models\Device;
 use Carbon\Carbon;
-use LibreNMS\Alert\AlertDB;
-use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Enum\AlertState;
 
 class AlertRules

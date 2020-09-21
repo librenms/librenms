@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -34,11 +33,6 @@ use SplFileInfo;
 
 /**
  * Class MibTest
- * @package LibreNMS\Tests
- *
- * Tests mib files for errors.
- * Will not be run by default, use --group=mibs to test.
- * You may test specific directories or files by specifying them with filter. Example: --filter=@RFC1284-MIB
  */
 class MibTest extends TestCase
 {

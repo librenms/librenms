@@ -18,14 +18,11 @@
  * @author f0o <f0o@librenms.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Pushbullet extends Transport
 {

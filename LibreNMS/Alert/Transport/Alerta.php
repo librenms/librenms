@@ -10,8 +10,6 @@
  * @author GitStoph <https://github.com/GitStoph>
  * @copyright 2019 GitStoph
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;

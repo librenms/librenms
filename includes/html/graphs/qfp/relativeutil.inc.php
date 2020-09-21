@@ -8,8 +8,6 @@
  *
  * Display relative QFP utilization (in %) to kpps processed
  *
- * @package    LibreNMS
- * @subpackage webui
  * @link       http://librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
