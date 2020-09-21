@@ -65,7 +65,7 @@ class MakeUserController extends InstallationController implements InstallerStep
         ]);
 
         $message = trans('install.user.failure');
-        
+
         try {
             // only allow the first admin to be created
             if (!$this->complete()) {
