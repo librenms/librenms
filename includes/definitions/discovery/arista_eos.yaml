@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/.+ version (?<version>.+) running on .+ (?<hardware>\S+)$/'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1

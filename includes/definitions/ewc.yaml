@@ -12,5 +12,4 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.4329.15.1.1.
-mib_dir:
-    - enterasys
+mib_dir: enterasys

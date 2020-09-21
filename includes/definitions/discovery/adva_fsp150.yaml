@@ -1,0 +1,8 @@
+modules:
+    os:
+        hardware:
+            - ENTITY-MIB::entPhysicalName.1
+            - ENTITY-MIB::entPhysicalHardwareRev.1
+        hardware_template: '{{ ENTITY-MIB::entPhysicalName.1 }} {{ ENTITY-MIB::entPhysicalHardwareRev.1 }}'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        version: ENTITY-MIB::entPhysicalSoftwareRev.1

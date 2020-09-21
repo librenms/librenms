@@ -28,9 +28,9 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) { //EC
     $temp_mibs = 'ES3510MA-MIB';
 } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.43.')) { //ECS2100
     $temp_mibs = 'ECS2100-MIB';
-};
+}
 
-$temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0','memoryAllocated.0'], '-OUQs', $temp_mibs);
+$temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0', 'memoryAllocated.0'], '-OUQs', $temp_mibs);
 $mempool['total'] = $temp_data['memoryTotal.0'];
 $mempool['free'] = $temp_data['memoryFreed.0'];
 $mempool['used'] = $temp_data['memoryAllocated.0'] ?? ($mempool['total'] - $mempool['free']);

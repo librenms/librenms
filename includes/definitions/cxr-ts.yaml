@@ -4,8 +4,7 @@ type: network
 icon: cxr-networks
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-mib_dir:
-    - cxr-networks
+mib_dir: cxr-networks
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.1425.

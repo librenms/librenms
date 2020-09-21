@@ -1,5 +1,7 @@
 mib: RITTAL-CMC-TC-MIB
 modules:
+    os:
+        sysDescr_regex: '/SN (?<serial>\S+) HW V(?<hardware>\S+) - SW V(?<version>\S+)/'
     sensors:
         temperature:
             data:

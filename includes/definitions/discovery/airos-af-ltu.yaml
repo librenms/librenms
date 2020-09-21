@@ -1,5 +1,8 @@
 mib: UBNT-AFLTU-MIB
 modules:
+    os:
+        hardware: UBNT-AFLTU-MIB::afLTUDevModel.0
+        version: UBNT-AFLTU-MIB::afLTUFirmwareVersion.0
     processors:
         data:
             -

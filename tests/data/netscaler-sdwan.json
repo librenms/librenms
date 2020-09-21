@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.3845.31.4",
                     "sysDescr": "Citrix Virtual WAN Appliance",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "OS: 4.6, SW: 9.3.4.29.662777",
+                    "hardware": "PRIVATESTRING01-CB410",
                     "features": null,
                     "os": "netscaler-sdwan",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "FXPA6CSPG9",
                     "icon": "citrix.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

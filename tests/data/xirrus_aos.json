@@ -14,7 +14,7 @@
                     "type": "wireless",
                     "serial": null,
                     "icon": "xirrus.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

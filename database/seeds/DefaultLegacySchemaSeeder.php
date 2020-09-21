@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,7 +35,7 @@ class DefaultLegacySchemaSeeder extends Seeder
     {
         // insert version 1000 to prevent legacy schema code from running.
         // additionally prevents seeder from being run again by build-base.php / includes/sql-schema/update.php.
-        if (!\DB::table('dbSchema')->exists()) {
+        if (! \DB::table('dbSchema')->exists()) {
             \DB::table('dbSchema')->insert(['version' => 1000]);
         }
     }

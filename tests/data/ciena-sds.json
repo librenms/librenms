@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "M9123456",
                     "icon": "ciena.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

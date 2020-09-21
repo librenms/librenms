@@ -17,15 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-$total = snmp_get($device, "UCD-SNMP-MIB::memTotalReal.0", "-OvQU") * 1024;
-$free = snmp_get($device, "UCD-SNMP-MIB::memAvailReal.0", "-OvQU") * 1024;
+$total = snmp_get($device, 'UCD-SNMP-MIB::memTotalReal.0', '-OvQU') * 1024;
+$free = snmp_get($device, 'UCD-SNMP-MIB::memAvailReal.0', '-OvQU') * 1024;
 
 $mempool['total'] = $total;
-$mempool['free']  = $free;
-$mempool['used']  = $total - $free;
+$mempool['free'] = $free;
+$mempool['used'] = $total - $free;

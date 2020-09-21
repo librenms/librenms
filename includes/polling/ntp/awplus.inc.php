@@ -16,10 +16,10 @@ use LibreNMS\RRD\RrdDefinition;
 $tmp_module = 'ntp';
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=',$tmp_module);
-$options['filter']['disabled'] = array('=',0);
-$options['filter']['ignore'] = array('=',0);
+$options = [];
+$options['filter']['type'] = ['=', $tmp_module];
+$options['filter']['disabled'] = ['=', 0];
+$options['filter']['ignore'] = ['=', 0];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -35,7 +35,7 @@ if (count($components > 0)) {
         $peer = $array['peer'];
 
         // Let's make sure the rrd is setup for this class.
-        $rrd_name = array('ntp', $peer);
+        $rrd_name = ['ntp', $peer];
         $rrd_def = RrdDefinition::make()
             ->addDataset('stratum', 'GAUGE', 0, 16)
             ->addDataset('offset', 'GAUGE', -1000)
@@ -58,20 +58,20 @@ if (count($components > 0)) {
         $rrd['offset'] = str_replace(' milliseconds', '', $rrd['offset']);
         $rrd['offset'] = $rrd['offset'] / 1000; // Convert to seconds
         $rrd['delay'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDelay'];
-        $rrd['delay'] =  str_replace(' milliseconds', '', $rrd['delay']);
+        $rrd['delay'] = str_replace(' milliseconds', '', $rrd['delay']);
         $rrd['delay'] = $rrd['delay'] / 1000; // Convert to seconds
         $rrd['dispersion'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDisp'];
         $tags = compact('ntp', 'rrd_name', 'rrd_def', 'peer');
         data_update($device, 'ntp', $tags, $rrd);
 
         // Let's print some debugging info.
-        d_echo("\n\nComponent: ".$key."\n");
-        d_echo("    Index:      ".$array['UID']."\n");
-        d_echo("    Peer:       ".$array['peer'].":".$array['port']."\n");
-        d_echo("    Stratum:    atNtpAssociationStratum.".$array['UID']."  = ".$rrd['stratum']."\n");
-        d_echo("    Offset:     atNtpAssociationOffset.".$array['UID']." = ".$rrd['offset']."\n");
-        d_echo("    Delay:      atNtpAssociationDelay.".$array['UID']." = ".$rrd['delay']."\n");
-        d_echo("    Dispersion: atNtpAssociationDisp.".$array['UID']." = ".$rrd['dispersion']."\n");
+        d_echo("\n\nComponent: " . $key . "\n");
+        d_echo('    Index:      ' . $array['UID'] . "\n");
+        d_echo('    Peer:       ' . $array['peer'] . ':' . $array['port'] . "\n");
+        d_echo('    Stratum:    atNtpAssociationStratum.' . $array['UID'] . '  = ' . $rrd['stratum'] . "\n");
+        d_echo('    Offset:     atNtpAssociationOffset.' . $array['UID'] . ' = ' . $rrd['offset'] . "\n");
+        d_echo('    Delay:      atNtpAssociationDelay.' . $array['UID'] . ' = ' . $rrd['delay'] . "\n");
+        d_echo('    Dispersion: atNtpAssociationDisp.' . $array['UID'] . ' = ' . $rrd['dispersion'] . "\n");
 
         // Clean-up after yourself!
         unset($filename, $rrd_filename, $rrd);

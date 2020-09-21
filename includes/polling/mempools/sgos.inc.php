@@ -2,10 +2,10 @@
 
 // Simple hard-coded poller for ProxySG
 
-echo 'ProxySG MemPool'.'\n';
+echo 'ProxySG MemPool' . '\n';
 
-$used = str_replace('"', "", snmp_get($device, "BLUECOAT-SG-PROXY-MIB::sgProxyMemSysUsage.0", '-OUvQ'));
-$total = str_replace('"', "", snmp_get($device, "BLUECOAT-SG-PROXY-MIB::sgProxyMemAvailable.0", '-OUvQ'));
+$used = str_replace('"', '', snmp_get($device, 'BLUECOAT-SG-PROXY-MIB::sgProxyMemSysUsage.0', '-OUvQ'));
+$total = str_replace('"', '', snmp_get($device, 'BLUECOAT-SG-PROXY-MIB::sgProxyMemAvailable.0', '-OUvQ'));
 $free = ($total - $used);
 $percent = ($used / $total * 100);
 

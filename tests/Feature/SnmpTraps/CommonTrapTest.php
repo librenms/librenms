@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,7 +25,6 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Port;
 use LibreNMS\Snmptrap\Dispatcher;
@@ -78,7 +76,7 @@ UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
 
-        Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', [ 'device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
+        Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
         Log::shouldReceive('event')->once()->withArgs(function ($e_message, $e_device, $e_type) use ($device) {
             return $e_message == 'SNMP trap received: SNMPv2-MIB::someOid' &&
                 $device->is($e_device) &&

@@ -1,5 +1,7 @@
 mib: EXTREME-SOFTWARE-MONITOR-MIB
 modules:
+    os:
+        sysDescr_regex: '/(\((?<hardware>[^)]+)\))? version (?<version>[\d.]+) (?<features>\S+)/'
     processors:
         data:
             -

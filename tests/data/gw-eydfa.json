@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.17409.1.11",
                     "sysDescr": "GW-6420-WDM",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "V3.1.0",
+                    "hardware": "GW-6420-WDM",
                     "features": null,
                     "os": "gw-eydfa",
                     "type": "network",
-                    "serial": null,
+                    "serial": "180619085787",
                     "icon": "glassway.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

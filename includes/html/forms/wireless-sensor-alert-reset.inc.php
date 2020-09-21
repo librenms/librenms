@@ -17,19 +17,19 @@ header('Content-type: text/plain');
 
 // FUA
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 for ($x = 0; $x < count($_POST['sensor_id']); $x++) {
     dbUpdate(
-        array(
-            'sensor_limit' => set_null($_POST['sensor_limit'][$x], array('NULL')),
-            'sensor_limit_low' => set_null($_POST['sensor_limit_low'][$x], array('NULL')),
-            'sensor_alert' => set_null($_POST['sensor_alert'][$x], array('NULL'))
-        ),
+        [
+            'sensor_limit' => set_null($_POST['sensor_limit'][$x], ['NULL']),
+            'sensor_limit_low' => set_null($_POST['sensor_limit_low'][$x], ['NULL']),
+            'sensor_alert' => set_null($_POST['sensor_alert'][$x], ['NULL']),
+        ],
         'wireless_sensors',
         '`sensor_id` = ?',
-        array($_POST['sensor_id'][$x])
+        [$_POST['sensor_id'][$x]]
     );
 }

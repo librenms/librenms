@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.674.11000.5000.100.2.1.7",
                     "sysDescr": "Dell EMC Networking OS10 Enterprise.",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "version": "A03",
+                    "hardware": "s4128Fon",
+                    "features": "CWTQXC2/281 062 707 86",
                     "os": "dell-os10",
                     "type": "network",
                     "serial": null,
                     "icon": "dell.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

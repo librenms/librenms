@@ -1,0 +1,3 @@
+modules:
+    os:
+        sysDescr_regex: '/Application Software Version: (?<version>[\d.]+\d)/'

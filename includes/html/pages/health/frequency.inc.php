@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_frequency';
-$class      = 'frequency';
-$unit       = 'Hz';
+$class = 'frequency';
+$unit = 'Hz';
 
 require 'includes/html/pages/health/sensors.inc.php';

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateApplicationsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -27,7 +26,7 @@ class CreateApplicationsTable extends Migration
                 $table->timestamp('timestamp')->useCurrent();
             }
             $table->string('app_instance');
-            $table->unique(['device_id','app_type']);
+            $table->unique(['device_id', 'app_type']);
         });
     }
 

@@ -2,8 +2,7 @@ os: ntron
 text: 'Redlion N-Tron'
 type: network
 icon: redlion
-mib_dir:
-    - redlion
+mib_dir: redlion
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

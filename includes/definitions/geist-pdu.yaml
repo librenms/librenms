@@ -9,7 +9,6 @@ discovery:
             - .1.3.6.1.4.1.21239.2
         sysDescr:
             - RCM-O
-mib_dir:
-    - geist
+mib_dir: geist
 over:
     - { graph: device_bits, text: 'Device Traffic' }

@@ -1,6 +1,6 @@
 <?php
 
-$ds_in  = 'TunInOctets';
+$ds_in = 'TunInOctets';
 $ds_out = 'TunOutOctets';
 
 $format = 'octets';

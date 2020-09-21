@@ -12,19 +12,17 @@
  * the source code distribution for details.
 */
 
-
 /*
 / ADTRAN-AOSCPU::adGenAOSMemPool.0 = Gauge32: 67108863
 / ADTRAN-AOSCPU::adGenAOSHeapSize.0 = Gauge32: 39853040
 / ADTRAN-AOSCPU::adGenAOSHeapFree.0 = Gauge32: 25979888
 */
 
-
 if ($device['os'] == 'adtran-aos') {
     echo 'Adtran AOS: ';
 
-    $used  = snmp_get($device, 'adGenAOSHeapSize.0', '-OvQ', 'ADTRAN-AOSCPU');
-    $total  = snmp_get($device, 'adGenAOSMemPool.0', '-OvQ', 'ADTRAN-AOSCPU');
+    $used = snmp_get($device, 'adGenAOSHeapSize.0', '-OvQ', 'ADTRAN-AOSCPU');
+    $total = snmp_get($device, 'adGenAOSMemPool.0', '-OvQ', 'ADTRAN-AOSCPU');
     $percent = ($used / $total * 100);
 
     if (is_numeric($total) && is_numeric($used)) {

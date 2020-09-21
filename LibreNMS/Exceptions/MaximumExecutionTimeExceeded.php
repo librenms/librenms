@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,8 +24,8 @@
 
 namespace LibreNMS\Exceptions;
 
-use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 
 class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableException

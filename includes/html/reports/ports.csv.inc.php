@@ -1,16 +1,16 @@
 <?php
 
-$param = array();
+$param = [];
 
-if (!isset($vars['ignore'])) {
+if (! isset($vars['ignore'])) {
     $vars['ignore'] = '0';
 }
 
-if (!isset($vars['disabled'])) {
+if (! isset($vars['disabled'])) {
     $vars['disabled'] = '0';
 }
 
-if (!isset($vars['deleted'])) {
+if (! isset($vars['deleted'])) {
     $vars['deleted'] = '0';
 }
 
@@ -20,17 +20,17 @@ foreach ($vars as $var => $value) {
     if ($value != '') {
         switch ($var) {
             case 'hostname':
-                $where  .= ' AND D.hostname LIKE ?';
-                $param[] = '%'.$value.'%';
+                $where .= ' AND D.hostname LIKE ?';
+                $param[] = '%' . $value . '%';
                 break;
 
             case 'location':
-                $where  .= ' AND D.location LIKE ?';
-                $param[] = '%'.$value.'%';
+                $where .= ' AND D.location LIKE ?';
+                $param[] = '%' . $value . '%';
                 break;
 
             case 'device_id':
-                $where  .= ' AND D.device_id = ?';
+                $where .= ' AND D.device_id = ?';
                 $param[] = $value;
                 break;
 
@@ -44,20 +44,20 @@ foreach ($vars as $var => $value) {
             case 'disable':
             case 'ifSpeed':
                 if (is_numeric($value)) {
-                    $where  .= " AND I.$var = ?";
+                    $where .= " AND I.$var = ?";
                     $param[] = $value;
                 }
                 break;
 
             case 'ifType':
-                $where  .= " AND I.$var = ?";
+                $where .= " AND I.$var = ?";
                 $param[] = $value;
                 break;
 
             case 'ifAlias':
             case 'port_descr_type':
-                $where  .= " AND I.$var LIKE ?";
-                $param[] = '%'.$value.'%';
+                $where .= " AND I.$var LIKE ?";
+                $param[] = '%' . $value . '%';
                 break;
 
             case 'errors':
@@ -68,15 +68,15 @@ foreach ($vars as $var => $value) {
 
             case 'state':
                 if ($value == 'down') {
-                    $where  .= 'AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
+                    $where .= 'AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
                     $param[] = 'up';
                     $param[] = 'down';
                 } elseif ($value == 'up') {
-                    $where  .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = '0' AND D.ignore='0' AND I.deleted='0'";
+                    $where .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = '0' AND D.ignore='0' AND I.deleted='0'";
                     $param[] = 'up';
                     $param[] = 'up';
                 } elseif ($value == 'admindown') {
-                    $where  .= 'AND I.ifAdminStatus = ? AND D.ignore = 0';
+                    $where .= 'AND I.ifAdminStatus = ? AND D.ignore = 0';
                     $param[] = 'down';
                 }
                 break;
@@ -84,11 +84,11 @@ foreach ($vars as $var => $value) {
     }//end if
 }//end foreach
 
-$query = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id '.$where.' '.$query_sort;
+$query = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ' . $where . ' ' . $query_sort;
 
 $row = 1;
 
-list($format, $subformat) = explode('_', $vars['format']);
+[$format, $subformat] = explode('_', $vars['format']);
 
 $ports = dbFetchRows($query, $param);
 
@@ -142,7 +142,7 @@ switch ($vars['sort']) {
         $ports = array_sort_by_column($ports, 'hostname', SORT_ASC);
 }//end switch
 
-$csv[] = array(
+$csv[] = [
     'Device',
     'Port',
     'Speed',
@@ -150,15 +150,15 @@ $csv[] = array(
     'Up',
     'Media',
     'Description',
-);
+];
 foreach ($ports as $port) {
     if (port_permitted($port['port_id'], $port['device_id'])) {
-        $speed            = humanspeed($port['ifSpeed']);
-        $type             = humanmedia($port['ifType']);
-        $port['in_rate']  = formatRates(($port['ifInOctets_rate'] * 8));
+        $speed = humanspeed($port['ifSpeed']);
+        $type = humanmedia($port['ifType']);
+        $port['in_rate'] = formatRates(($port['ifInOctets_rate'] * 8));
         $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
-        $port             = cleanPort($port, $device);
-        $csv[]            = array(
+        $port = cleanPort($port, $device);
+        $csv[] = [
             format_hostname($port, $port['hostname']),
             fixIfName($port['label']),
             $speed,
@@ -166,6 +166,6 @@ foreach ($ports as $port) {
             $port['out_rate'],
             $type,
             display($port['ifAlias']),
-        );
+        ];
     }
 }

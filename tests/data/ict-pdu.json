@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.39145.10",
                     "sysDescr": "ICT Distribution Panel",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "2.08",
+                    "hardware": "ICT180S-12BRCP",
                     "features": null,
                     "os": "ict-pdu",
                     "type": "power",
                     "serial": null,
                     "icon": "ict.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -25,7 +25,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.39145.10",
                     "sysDescr": "ICT Distribution Panel",
                     "sysContact": "<private>",
-                    "version": "v2.08",
+                    "version": "2.08",
                     "hardware": "ICT180S-12BRCP",
                     "features": null,
                     "os": "ict-pdu",

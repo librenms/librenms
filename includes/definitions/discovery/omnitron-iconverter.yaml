@@ -1,5 +1,8 @@
 mib: OMNITRON-MIB:OMNITRON-POE-MIB
 modules:
+    os:
+        sysDescr_regex: '/Omnitron iConverter (?<hardware>.+) v(?<version>\S+) s\/n (?<serial>\S+)/'
+        serial: OMNITRON-MIB::serialnum.1.1
     sensors:
         state:
             data:

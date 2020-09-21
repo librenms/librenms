@@ -24,7 +24,7 @@ class CreateServicesTemplateTable extends Migration
             $table->tinyInteger('service_template_status')->default(0);
             $table->unsignedInteger('service_template_changed')->default(0);
             $table->boolean('service_template_disabled')->default(0);
-            #$table->index(['services_template_device_group_id_index','device_group_id']);
+            //$table->index(['services_template_device_group_id_index','device_group_id']);
         });
         Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id');
@@ -41,7 +41,7 @@ class CreateServicesTemplateTable extends Migration
         Schema::drop('services_template');
         Schema::table('services', function (Blueprint $table) {
             $table->dropColumn([
-                'service_template_id'
+                'service_template_id',
             ]);
         });
     }

@@ -1,0 +1,197 @@
+PACKETLOGIC-NIC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	packetlogic2 FROM PACKETLOGIC-MIB
+	hw FROM PACKETLOGIC-HW-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+nic MODULE-IDENTITY
+	LAST-UPDATED "201909121500Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "MIB for PacketLogic2 Network Interface Modules"
+	REVISION "201909121500Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={hw 2}
+
+SlotEntry ::= SEQUENCE {
+	slotLabel DisplayString,
+	slotState DisplayString,
+	slotBypass DisplayString,
+	slotChannels DisplayString,
+	slotInterface DisplayString,
+	slotPartNo DisplayString,
+	slotPorts DisplayString,
+	slotSpeed DisplayString,
+	slotEntryIndex Integer32
+}
+
+slots	OBJECT-TYPE
+	SYNTAX SEQUENCE OF SlotEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {nic 1}
+
+slotEntry	OBJECT-TYPE
+	SYNTAX SlotEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { slotEntryIndex }
+	::= {slots 1}
+
+slotEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={slotEntry 999}
+
+
+
+
+
+
+
+
+
+
+ChannelEntry ::= SEQUENCE {
+	channelLocation DisplayString,
+	channelLabel DisplayString,
+	channelSlot DisplayString,
+	channelEntryIndex Integer32
+}
+
+channels	OBJECT-TYPE
+	SYNTAX SEQUENCE OF ChannelEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {nic 2}
+
+channelEntry	OBJECT-TYPE
+	SYNTAX ChannelEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { channelEntryIndex }
+	::= {channels 1}
+
+channelEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={channelEntry 999}
+
+
+
+
+
+
+slotLabel	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot Label"
+
+	::={slotEntry 1}
+
+slotState	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot State"
+
+	::={slotEntry 2}
+
+slotBypass	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot Bypass Support"
+
+	::={slotEntry 3}
+
+slotChannels	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot Channels"
+
+	::={slotEntry 4}
+
+slotInterface	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot Interface Type"
+
+	::={slotEntry 5}
+
+slotPartNo	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot Part Number"
+
+	::={slotEntry 6}
+
+slotPorts	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot Ports"
+
+	::={slotEntry 7}
+
+slotSpeed	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot Speed"
+
+	::={slotEntry 8}
+
+channelLocation	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Channel Location"
+
+	::={channelEntry 1}
+
+channelLabel	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Channel Label"
+
+	::={channelEntry 2}
+
+channelSlot	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Slot Label"
+
+	::={channelEntry 3}
+
+totalThroughput	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Total potential throughput based on capacity of installed NICs (Gb/s)"
+
+	::={nic 3}
+
+
+
+END

@@ -397,7 +397,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "moxa.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

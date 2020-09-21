@@ -12,9 +12,9 @@ require 'includes/html/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-access');
 if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value                Now     \\n'";
-    $rrd_options .= ' DEF:entryAttempt='.$rrdfilename.':entryAttempt:AVERAGE ';
-    $rrd_options .= ' DEF:entryAccess='.$rrdfilename.':entryAccess:AVERAGE ';
-    $rrd_options .= ' DEF:authFailure='.$rrdfilename.':authFailure:AVERAGE ';
+    $rrd_options .= ' DEF:entryAttempt=' . $rrdfilename . ':entryAttempt:AVERAGE ';
+    $rrd_options .= ' DEF:entryAccess=' . $rrdfilename . ':entryAccess:AVERAGE ';
+    $rrd_options .= ' DEF:authFailure=' . $rrdfilename . ':authFailure:AVERAGE ';
     $rrd_options .= " LINE2:entryAttempt#FFF000:'Entry Attempts       ' ";
     $rrd_options .= ' GPRINT:entryAttempt:LAST:%0.2lf%s\\\l ';
     $rrd_options .= " LINE2:entryAccess#00FF00:'Entry Access       ' ";

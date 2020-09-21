@@ -2,8 +2,7 @@ os: e3meterdc
 text: 'E3 Meter DataConcentrator'
 type: power
 icon: riedo
-mib_dir:
-    - riedo
+mib_dir: riedo
 over:
     - { graph: device_power, text: Power }
     - { graph: device_temperature, text: Temperature }

@@ -11,5 +11,5 @@
  */
 
 $mempool['total'] = snmp_get($device, 'coUsInfoRamTotal.0', '-OvQU', 'COLUBRIS-USAGE-INFORMATION-MIB');
-$mempool['free']  = snmp_get($device, 'coUsInfoRamFree.0', '-OvQU', 'COLUBRIS-USAGE-INFORMATION-MIB');
-$mempool['used']  = $mempool['total'] - $mempool['free'];
+$mempool['free'] = snmp_get($device, 'coUsInfoRamFree.0', '-OvQU', 'COLUBRIS-USAGE-INFORMATION-MIB');
+$mempool['used'] = $mempool['total'] - $mempool['free'];

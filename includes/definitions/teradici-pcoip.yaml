@@ -2,8 +2,7 @@ os: teradici-pcoip
 text: 'Teradici PCoIP'
 type: workstation
 icon: teradici
-mib_dir:
-    - teradici
+mib_dir: teradici
 over:
     - { graph: device_bits, text: 'Device Bits' }
 discovery:

@@ -1,5 +1,9 @@
 mib: DASAN-SWITCH-MIB
 modules:
+    os:
+        sysDescr_regex: '#(?<hardware>.+) NOS (?<version>[^/]+)#'
+        serial: DASAN-SWITCH-MIB::dsSerialNumber.0
+        version: DASAN-SWITCH-MIB::dsFirmwareVersion.0
     processors:
         data:
             -

@@ -17,19 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 echo 'OneFS: ';
 $oids = snmpwalk_cache_multi_oid($device, 'tempSensorTable', [], 'ISILON-MIB');
 
 foreach ($oids as $index => $entry) {
     if (is_numeric($entry['tempSensorValue']) && is_numeric($index)) {
-        $descr   = $entry['tempSensorDescription'];
-        $oid     = '.1.3.6.1.4.1.12124.2.54.1.4.'.$index;
+        $descr = $entry['tempSensorDescription'];
+        $oid = '.1.3.6.1.4.1.12124.2.54.1.4.' . $index;
         $current = $entry['tempSensorValue'];
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'onefs', $descr, '1', '1', null, null, null, null, $current);
     }

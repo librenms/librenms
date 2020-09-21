@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == "juniper-mss") {
+if ($device['os'] == 'juniper-mss') {
     d_echo('Juniper MSS : ');
 
     $memory_pool = snmp_get_multi_oid($device, ['trpzSysCpuMemoryInstantUsage.0', 'trpzSysCpuMemorySize.0'], '-OQUs', 'TRAPEZE-NETWORKS-SYSTEM-MIB');
@@ -21,7 +21,7 @@ if ($device['os'] == "juniper-mss") {
     $percent = (($used / $total) * 100);
     $descr = 'Memory';
     if (is_numeric($used)) {
-        discover_mempool($valid_mempool, $device, '0', "juniper-mss", $descr, "1", null, null);
+        discover_mempool($valid_mempool, $device, '0', 'juniper-mss', $descr, '1', null, null);
     }
 }
 

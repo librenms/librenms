@@ -25,18 +25,18 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array = array(
-    'received' => array('descr' => 'Received', 'colour' => '75a832',),
-    'delivered' => array('descr' => 'Delivered', 'colour' => '00d644',),
-    'forwarded' => array('descr' => 'Forwarded', 'colour' => 'ccff99',),
-    'deferred' => array('descr' => 'Deferred', 'colour' => 'ffcc66',),
-    'bounced' => array('descr' => 'Bounced', 'colour' => 'cc6600',),
-    'rejected' => array('descr' => 'Rejected', 'colour' => 'cc0000',),
-    'held' => array('descr' => 'Held', 'colour' => '3366cc',),
-    'discarded' => array('descr' => 'Discarded', 'colour' => '1a1a1a',),
-);
+$array = [
+    'received' => ['descr' => 'Received', 'colour' => '75a832'],
+    'delivered' => ['descr' => 'Delivered', 'colour' => '00d644'],
+    'forwarded' => ['descr' => 'Forwarded', 'colour' => 'ccff99'],
+    'deferred' => ['descr' => 'Deferred', 'colour' => 'ffcc66'],
+    'bounced' => ['descr' => 'Bounced', 'colour' => 'cc6600'],
+    'rejected' => ['descr' => 'Rejected', 'colour' => 'cc0000'],
+    'held' => ['descr' => 'Held', 'colour' => '3366cc'],
+    'discarded' => ['descr' => 'Discarded', 'colour' => '1a1a1a'],
+];
 
 $i = 0;
 

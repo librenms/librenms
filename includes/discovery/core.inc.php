@@ -24,7 +24,7 @@ if ($deviceModel->isDirty('os')) {
     Log::event('Device OS changed: ' . $deviceModel->getOriginal('os') . ' -> ' . $deviceModel->os, $deviceModel, 'system', 3);
     $device['os'] = $deviceModel->os;
 
-    echo "Changed ";
+    echo 'Changed ';
 }
 
 $deviceModel->save();
@@ -32,6 +32,6 @@ load_os($device);
 load_discovery($device);
 $os = OS::make($device);
 
-echo "OS: " . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";
+echo 'OS: ' . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";
 
 unset($snmpdata, $attribute, $value, $deviceModel);

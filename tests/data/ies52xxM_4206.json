@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.890.1.5.13.15",
                     "sysDescr": "MSC1240QA",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "V1.08(ABGX.0)",
+                    "hardware": "IES5206 MSC",
                     "features": null,
                     "os": "ies52xxM",
                     "type": "network",
-                    "serial": null,
+                    "serial": "S170Z34010399",
                     "icon": "zyxel.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

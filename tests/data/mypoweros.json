@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.5651.1.102.21",
                     "sysDescr": "MyPower (R) Operating System Software\nMyPower S3220 version 6.6.4.1.3(R)(integrity), compiled on Jul 25 2014, 20:23:14 Copyright (C) 2013 Maipu Communication Technology Co.,Ltd.All Rights Reserved.",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "6.6.4.1.3",
+                    "hardware": "S3220",
                     "features": null,
                     "os": "mypoweros",
                     "type": "network",
                     "serial": null,
                     "icon": "maipu.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -25,8 +25,8 @@
                     "sysObjectID": ".1.3.6.1.4.1.5651.1.102.21",
                     "sysDescr": "MyPower (R) Operating System Software\nMyPower S3220 version 6.6.4.1.3(R)(integrity), compiled on Jul 25 2014, 20:23:14 Copyright (C) 2013 Maipu Communication Technology Co.,Ltd.All Rights Reserved.",
                     "sysContact": "<private>",
-                    "version": "compiled",
-                    "hardware": "version",
+                    "version": "6.6.4.1.3",
+                    "hardware": "S3220",
                     "features": null,
                     "os": "mypoweros",
                     "type": "network",

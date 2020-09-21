@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Daniel Baeza
  * @author     Daniel Baeza <doctoruve@gmail.com>
@@ -25,17 +24,16 @@
 
 namespace LibreNMS\OS;
 
-use Illuminate\Support\Str;
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
 class Qnap extends OS implements OSDiscovery
 {
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
-        $info = snmp_getnext_multi($this->getDevice(), 'enclosureModel enclosureSerialNum entPhysicalFirmwareRev', '-OQUs', 'NAS-MIB:ENTITY-MIB');
-        $device->version = Str::replaceFirst('\"', '', $info['entPhysicalFirmwareRev']);
+        $info = snmp_getnext_multi($this->getDeviceArray(), ['enclosureModel', 'enclosureSerialNum', 'entPhysicalFirmwareRev'], '-OQUs', 'NAS-MIB:ENTITY-MIB');
+        $device->version = trim($info['entPhysicalFirmwareRev'], '\"');
         $device->hardware = $info['enclosureModel'];
         $device->serial = $info['enclosureSerialNum'];
     }

@@ -2,8 +2,7 @@ os: dcn-software
 text: 'Digital China Networks'
 type: network
 icon: dcn
-mib_dir:
-    - dcn
+mib_dir: dcn
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }

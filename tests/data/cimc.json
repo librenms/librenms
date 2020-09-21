@@ -351,14 +351,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.1.2178",
                     "sysDescr": "Cisco Integrated Management Controller(Cisco IMC) [UCS C220 M4S\n], Firmware Version 3.0(3a) Copyright (c) 2008-2016, Cisco Systems, Inc.",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "3.0(3a)",
+                    "hardware": "UCSC-C220-M4S",
                     "features": null,
                     "os": "cimc",
                     "type": "server",
-                    "serial": null,
+                    "serial": "FCH2126720R",
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

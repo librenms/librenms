@@ -17,24 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-if (!Auth::user()->hasGlobalAdmin()) {
-    $status = array('status' =>1, 'message' => 'ERROR: You need to be admin to delete poller entries');
+if (! Auth::user()->hasGlobalAdmin()) {
+    $status = ['status' =>1, 'message' => 'ERROR: You need to be admin to delete poller entries'];
 } else {
     $id = $vars['id'];
-    if (!is_numeric($id)) {
-        $status = array('status' =>1, 'message' => 'No poller has been selected');
+    if (! is_numeric($id)) {
+        $status = ['status' =>1, 'message' => 'No poller has been selected'];
     } else {
-        $poller_name = dbFetchCell('SELECT `poller_name` FROM `pollers` WHERE `id`=?', array($id));
-        if (dbDelete('poller_cluster', 'id=?', array($id)) && dbDelete('poller_cluster_stats', 'parent_poller=?', array($id))) {
-            $status = array('status' => 0, 'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>");
+        $poller_name = dbFetchCell('SELECT `poller_name` FROM `pollers` WHERE `id`=?', [$id]);
+        if (dbDelete('poller_cluster', 'id=?', [$id]) && dbDelete('poller_cluster_stats', 'parent_poller=?', [$id])) {
+            $status = ['status' => 0, 'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>"];
         } else {
-            $status = array('status' => 1, 'message' => "Poller: <i>$poller_name ($id), has NOT been deleted.</i>");
+            $status = ['status' => 1, 'message' => "Poller: <i>$poller_name ($id), has NOT been deleted.</i>"];
         }
     }
 }

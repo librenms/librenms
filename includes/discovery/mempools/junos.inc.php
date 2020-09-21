@@ -16,12 +16,12 @@ if ($device['os'] == 'junos') {
                     continue;
                 }
 
-                d_echo($index.' '.$entry['jnxOperatingDescr'].' -> '.$entry['jnxOperatingBuffer'].' -> '.$entry['jnxOperatingDRAMSize']."\n");
+                d_echo($index . ' ' . $entry['jnxOperatingDescr'] . ' -> ' . $entry['jnxOperatingBuffer'] . ' -> ' . $entry['jnxOperatingDRAMSize'] . "\n");
 
-                $usage_oid = '.1.3.6.1.4.1.2636.3.1.13.1.8.'.$index;
-                $descr     = $entry['jnxOperatingDescr'];
-                $usage     = $entry['jnxOperatingBuffer'];
-                if (!strstr($descr, 'No') && !strstr($usage, 'No') && $descr != '') {
+                $usage_oid = '.1.3.6.1.4.1.2636.3.1.13.1.8.' . $index;
+                $descr = $entry['jnxOperatingDescr'];
+                $usage = $entry['jnxOperatingBuffer'];
+                if (! strstr($descr, 'No') && ! strstr($usage, 'No') && $descr != '') {
                     discover_mempool($valid_mempool, $device, $index, 'junos', $descr, '1', null, null);
                 }
             } //end if
@@ -32,8 +32,8 @@ if ($device['os'] == 'junos') {
         if (is_array($srx_mempools_array)) {
             foreach ($srx_mempools_array as $index => $entry) {
                 if ($index) {
-                    $usage_oid = '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.5.'.$index;
-                    $descr     = 'Memory';
+                    $usage_oid = '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.5.' . $index;
+                    $descr = 'Memory';
                     // No description in the table?
                     $usage = $entry['jnxJsSPUMonitoringMemoryUsage'];
 

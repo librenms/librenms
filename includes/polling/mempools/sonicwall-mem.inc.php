@@ -19,8 +19,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.8741.6')) {
     $usage = snmp_get($device, 'SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentRAMUtil.0', '-Ovq');
 }
 
-$perc = str_replace('"', "", $usage);
-
+$perc = str_replace('"', '', $usage);
 
 if (is_numeric($perc)) {
     $mempool['perc'] = $perc;

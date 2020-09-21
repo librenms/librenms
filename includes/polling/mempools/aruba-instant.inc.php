@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Timothy Willey
  * @author     Timothy Willey <developer@timothywilley.net>
@@ -28,19 +27,19 @@ $mempool_data = snmpwalk_group($device, 'aiAPSerialNum', 'AI-AP-MIB');
 $mempool_data = snmpwalk_group($device, 'aiAPTotalMemory', 'AI-AP-MIB', 1, $mempool_data);
 $mempool_data = snmpwalk_group($device, 'aiAPMemoryFree', 'AI-AP-MIB', 1, $mempool_data);
 
-d_echo('$mempool_data:'.PHP_EOL);
+d_echo('$mempool_data:' . PHP_EOL);
 d_echo($mempool_data);
 
 foreach ($mempool_data as $index => $entry) {
-    d_echo($entry['aiAPSerialNum'].' '.$entry['aiAPTotalMemory'].' / '.$entry['aiAPMemoryFree'].PHP_EOL);
+    d_echo($entry['aiAPSerialNum'] . ' ' . $entry['aiAPTotalMemory'] . ' / ' . $entry['aiAPMemoryFree'] . PHP_EOL);
 
-    $total     = $entry['aiAPTotalMemory'];
-    $free      = $entry['aiAPMemoryFree'];
-    $used      = $total - $free;
-    $perc      = ($used / $total * 100);
+    $total = $entry['aiAPTotalMemory'];
+    $free = $entry['aiAPMemoryFree'];
+    $used = $total - $free;
+    $perc = ($used / $total * 100);
 
     $mempool['total'] = $total;
-    $mempool['used']  = $used;
-    $mempool['free']  = $free;
-    $mempool['perc']  = $perc;
+    $mempool['used'] = $used;
+    $mempool['free'] = $free;
+    $mempool['perc'] = $perc;
 } //end foreach

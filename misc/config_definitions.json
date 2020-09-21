@@ -4900,6 +4900,10 @@
             "type": "integer",
             "units": "pings"
         },
+        "smokeping.probes": {
+            "default": 2,
+            "type": "integer"
+        },
         "snmp.community": {
             "group": "poller",
             "section": "snmp",

@@ -18,38 +18,35 @@
  * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @license GPL
- * @package LibreNMS
- * @subpackage Dashboards
  */
-
 header('Content-type: application/json');
 
-if (!Auth::check()) {
-    $response = array(
+if (! Auth::check()) {
+    $response = [
         'status'  => 'error',
         'message' => 'Unauthenticated',
-    );
+    ];
     echo _json_encode($response);
     exit;
 }
 
-$status    = 'error';
-$message   = 'unknown error';
+$status = 'error';
+$message = 'unknown error';
 
 $dashboard_name = trim($_REQUEST['dashboard_name']);
 
-if (!empty($dashboard_name) && ($dash_id = dbInsert(['dashboard_name' => $dashboard_name, 'user_id' => Auth::id()], 'dashboards'))) {
-    $status  = 'ok';
+if (! empty($dashboard_name) && ($dash_id = dbInsert(['dashboard_name' => $dashboard_name, 'user_id' => Auth::id()], 'dashboards'))) {
+    $status = 'ok';
     $message = 'Dashboard ' . $dashboard_name . ' created';
 } else {
-    $status  = 'error';
+    $status = 'error';
     $message = 'ERROR: Could not create';
 }
 
-$response = array(
+$response = [
     'status'        => $status,
     'message'       => $message,
-    'dashboard_id' => $dash_id
-);
+    'dashboard_id' => $dash_id,
+];
 
 echo _json_encode($response);

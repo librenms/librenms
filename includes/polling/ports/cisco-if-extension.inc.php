@@ -6,8 +6,6 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  *
- * @package    LibreNMS
- * @subpackage polling
  * @link       http://librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
@@ -38,7 +36,7 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
     /*
      * Populate data for RRD
      */
-    $rrd_data = array();
+    $rrd_data = [];
     foreach ($cisco_if_extension_oids as $oid) {
         $ds_name = str_replace('cieIf', '', $oid);
         $rrd_data[$ds_name] = $this_port[$oid];

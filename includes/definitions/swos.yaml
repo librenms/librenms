@@ -3,8 +3,7 @@ text: 'Mikrotik SwOS'
 icon: mikrotik
 type: network
 nobulk: true
-mib_dir:
-    - mikrotik
+mib_dir: mikrotik
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

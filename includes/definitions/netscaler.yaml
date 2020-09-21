@@ -5,8 +5,7 @@ icon: citrix
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
-mib_dir:
-    - citrix
+mib_dir: citrix
 poller_modules:
     netscaler-vsvr: false
 discovery:

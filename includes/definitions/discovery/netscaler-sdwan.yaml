@@ -1,5 +1,12 @@
 mib: CITRIX-NetScaler-SD-WAN-MIB
 modules:
+    os:
+        hardware: CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceName
+        serial: CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceSerialNumber
+        version:
+            - CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceOSVersion
+            - CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceSoftwareVersion
+        version_template: 'OS: {{ CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceOSVersion }}, SW: {{ CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceSoftwareVersion }}'
     sensors:
         state:
             data:

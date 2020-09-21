@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.17409",
                     "sysDescr": "zaporojskoe-olt",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "4.2.7.58",
+                    "hardware": "V4.0",
                     "features": null,
                     "os": "cdata",
                     "type": "network",
-                    "serial": null,
+                    "serial": "AF2101-1901000029",
                     "icon": "cdata.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

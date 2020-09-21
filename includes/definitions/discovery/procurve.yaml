@@ -1,5 +1,11 @@
 mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB
 modules:
+    os:
+        sysDescr_regex: '/( (?<hardware>\d{4,}\S*)[^,]*)?, revision (?<version>[^ ,]+)/'
+        version:
+            - NETSWITCH-MIB::hpSwitchOsVersion.0
+            - HP-SN-AGENT-MIB::snAgImgVer.0
+        serial: SEMI-MIB::hpHttpMgSerialNumber.0
     processors:
         data:
             -

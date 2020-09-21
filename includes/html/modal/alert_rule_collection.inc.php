@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
@@ -25,8 +24,8 @@
 
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -56,7 +55,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                                 <tr>
                                     <td>{$rule['name']}</td>
                                     <td>";
-                            echo !empty($rule['builder']) ? QueryBuilderParser::fromJson($rule['builder'])->toSql(false) : $rule['rule'];
+                            echo ! empty($rule['builder']) ? QueryBuilderParser::fromJson($rule['builder'])->toSql(false) : $rule['rule'];
                             echo "  </td>
                                     <td>{$rule['rule_id']}</td>
                                 </tr>

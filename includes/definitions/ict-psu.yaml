@@ -3,8 +3,7 @@ text: 'ICT Digital Series Power Supply'
 type: power
 icon: ict
 nobulk: true
-mib_dir:
-    - ict
+mib_dir: ict
 over:
     - { graph: device_voltage, text: Voltage }
     - { graph: device_current, text: Current }

@@ -1,5 +1,9 @@
 mib: CELLULAR:DEVICE:PEPVPN-SPEEDFUSION:WAN:WLC
 modules:
+    os:
+        hardware: DEVICE::deviceModel.0
+        serial: DEVICE::deviceSerialNumber.0
+        version: DEVICE::deviceFirmwareVersion.0
     sensors:
         pre-cache:
             data:

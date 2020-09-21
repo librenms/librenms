@@ -12,8 +12,8 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 $service_id = $vars['service_id'];
@@ -28,19 +28,19 @@ $service_template_id = $vars['service_template_id'];
 
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
-    $update = array('service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param, 'service_ignore' => $ignore, 'service_disabled' => $disabled, 'service_template_id' => $service_template_id);
+    $update = ['service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param, 'service_ignore' => $ignore, 'service_disabled' => $disabled, 'service_template_id' => $service_template_id];
     if (is_numeric(edit_service($update, $service_id))) {
-        $status = array('status' =>0, 'message' => 'Modified Service: <i>'.$service_id.': '.$type.'</i>');
+        $status = ['status' =>0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $type . '</i>'];
     } else {
-        $status = array('status' =>1, 'message' => 'ERROR: Failed to modify service: <i>'.$service_id.'</i>');
+        $status = ['status' =>1, 'message' => 'ERROR: Failed to modify service: <i>' . $service_id . '</i>'];
     }
 } else {
     // Need to add.
     $service_id = add_service($device_id, $type, $desc, $ip, $param, $ignore, $disabled, $service_template_id);
     if ($service_id == false) {
-        $status = array('status' =>1, 'message' => 'ERROR: Failed to add Service: <i>'.$type.'</i>');
+        $status = ['status' =>1, 'message' => 'ERROR: Failed to add Service: <i>' . $type . '</i>'];
     } else {
-        $status = array('status' =>0, 'message' => 'Added Service: <i>'.$service_id.': '.$type.'</i>');
+        $status = ['status' =>0, 'message' => 'Added Service: <i>' . $service_id . ': ' . $type . '</i>'];
     }
 }
 header('Content-Type: application/json');
