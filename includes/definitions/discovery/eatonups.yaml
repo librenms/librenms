@@ -1,0 +1,10 @@
+modules:
+    os:
+        hardware: XUPS-MIB::xupsIdentModel.0
+        version: XUPS-MIB::xupsIdentSoftwareVersion.0
+        serial: XUPS-MIB::xupsIdentSerialNumber.0
+        features:
+            - XUPS-MIB::xupsAgentModel.0
+            - XUPS-MIB::xupsAgentSoftwareVersion.0
+        features_template: '{{ XUPS-MIB::xupsAgentModel.0 }} {{ XUPS-MIB::xupsAgentSoftwareVersion.0 }}'
+
