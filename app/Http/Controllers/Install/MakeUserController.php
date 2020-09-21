@@ -64,6 +64,9 @@ class MakeUserController extends InstallationController implements InstallerStep
             'password' => 'required',
         ]);
 
+        // $message might never be initialized, resulting in 500 error
+        $message = "";
+        
         try {
             // only allow the first admin to be created
             if (!$this->complete()) {
