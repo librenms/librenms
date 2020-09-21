@@ -7,12 +7,12 @@
                     "sysObjectID": ".1.3.6.1.4.1.601.3.1.1",
                     "sysDescr": "SSU-2000, Synchronization Supply Unit",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": "Comm Processor ",
+                    "version": "23413012-000-0",
+                    "hardware": "Comm Processor 14313012-003-5",
                     "features": null,
                     "os": "ssu2000",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "R04334",
                     "icon": "microsemi.png",
                     "location": "<private>"
                 }
@@ -25,12 +25,12 @@
                     "sysObjectID": ".1.3.6.1.4.1.601.3.1.1",
                     "sysDescr": "SSU-2000, Synchronization Supply Unit",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": "Comm Processor ",
+                    "version": "23413012-000-0",
+                    "hardware": "Comm Processor 14313012-003-5",
                     "features": null,
                     "os": "ssu2000",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "R04334",
                     "icon": "microsemi.png",
                     "location": "<private>"
                 }

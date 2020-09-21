@@ -32,7 +32,7 @@ class Ssu2000 extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $info = snmp_getnext_multi($this->getDevice(), 'inSerial.1.1 inHwPart.1.1 inSwPart.1.1', '-OQUs', 'SSU2000-MIB');
+        $info = snmp_getnext_multi($this->getDeviceArray(), ['inSerial.1.1','inSwPart.1.1','inHwPart.1.1'], '-OQUs', 'SSU2000-MIB');
 
         $device->version = $info['inHwPart'];
         $device->hardware = 'Comm Processor ' . $info['inSwPart'];
