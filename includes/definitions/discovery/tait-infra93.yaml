@@ -1,5 +1,9 @@
 mib: TAIT-INFRA93SERIES-MIB
 modules:
+    os:
+        sysDescr_regex: '/Tait Communications, (?<hardware>[^,]+),/'
+        version: TAIT-INFRA93SERIES-MIB::rctInfoFirmwareVersion.0
+        serial: TAIT-INFRA93SERIES-MIB::rctInfoSerialNumber.0
     sensors:
         state:
             data:
