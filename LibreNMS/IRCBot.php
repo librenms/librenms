@@ -1009,6 +1009,6 @@ class IRCBot
 
         return $string;
     }
-    
+
     // end _html2irc
 }//end class
