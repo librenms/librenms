@@ -85,20 +85,10 @@ class IRCBot
             $this->nick = $this->config['irc_nick'];
         }
 
-        if ($this->config['irc_chan']) {
-            if (is_array($this->config['irc_chan'])) {
-                $this->chan = $this->config['irc_chan'];
-            } elseif (strstr($this->config['irc_chan'], ',')) {
-                $this->chan = explode(',', $this->config['irc_chan']);
-            } else {
-                $this->chan = [$this->config['irc_chan']];
-            }
-        }
-
         if ($this->config['irc_alert_chan']) {
             if (strstr($this->config['irc_alert_chan'], ',')) {
                 $this->config['irc_alert_chan'] = explode(',', $this->config['irc_alert_chan']);
-            } else {
+            } elseif (! is_array($this->config['irc_alert_chan'])) {
                 $this->config['irc_alert_chan'] = [$this->config['irc_alert_chan']];
             }
         }
