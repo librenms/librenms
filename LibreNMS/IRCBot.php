@@ -267,13 +267,13 @@ class IRCBot
                         $this->log('Alert sent ' . $alert['title']);
                         $this->log('Alert chan ' . $chan);
                     }
-                    _sendAlert($chan, $severity, $alert);
+                    sendAlert($chan, $severity, $alert);
                     $this->ircRaw('BOTFLOODCHECK');
                 }
             } else {
                 foreach ($this->authd as $nick => $data) {
                     if ($data['expire'] >= time()) {
-                        _sendAlert($nick, $severity, $alert);
+                        sendAlert($nick, $severity, $alert);
                     }
                 }
             }
@@ -282,38 +282,43 @@ class IRCBot
 
     //end alertData()
 
-    private function _sendAlert($to, $severity, $alert)
+    private function sendAlert($sendto, $severity, $alert)
     {
-        $this->ircRaw('PRIVMSG ' . $to . ' :' . $severity . trim($alert['title']));
-        if (! $this->config['irc_alert_short']) { // Only send the title if set to short
-            foreach (explode("\n", $alert['msg']) as $line) {
-                $line = trim($line);
-                if (strlen($line) < 1) {
-                    continue;
+        $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim($alert['title']));
+        if ($this->config['irc_alert_short']) {
+            // Only send the title if set to short
+
+            return;
+        }
+
+        foreach (explode("\n", $alert['msg']) as $line) {
+            $line = trim($line);
+            if (strlen($line) < 1) {
+                continue;
+            }
+            $line = $this->_html2irc($line);
+            $line = strip_tags($line);
+
+            // We don't need to repeat the title
+            if (trim($line) != trim($alert['title'])) {
+                $this->log("Sending alert $line");
+                if ($this->config['irc_floodlimit'] > 100) {
+                    $this->floodcount += strlen($line);
+                } elseif ($this->config['irc_floodlimit'] > 1) {
+                    $this->floodcount += 1;
                 }
-                $line = $this->_html2irc($line);
-                $line = strip_tags($line);
-                // We don't need to repeat the title
-                if (trim($line) != trim($alert['title'])) {
-                    $this->log("Sending alert $line");
-                    if ($this->config['irc_floodlimit'] > 100) {
-                        $this->floodcount += strlen($line);
-                    } elseif ($this->config['irc_floodlimit'] > 1) {
-                        $this->floodcount += 1;
-                    }
-                    if (($this->config['irc_floodlimit'] > 0) && ($this->floodcount > $this->config['irc_floodlimit'])) {
-                        $this->log('Reached floodlimit ' . $this->floodcount);
-                        $this->ircRaw('BOTFLOODCHECK');
-                        sleep(2);
-                        $this->floodcount = 0;
-                    }
-                    $this->ircRaw('PRIVMSG ' . $to . ' :' . $line);
+                if (($this->config['irc_floodlimit'] > 0) && ($this->floodcount > $this->config['irc_floodlimit'])) {
+                    $this->log('Reached floodlimit ' . $this->floodcount);
+                    $this->ircRaw('BOTFLOODCHECK');
+                    sleep(2);
+                    $this->floodcount = 0;
                 }
+                $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $line);
             }
         }
     }
 
-    //end _sendAlert()
+    //end sendAlert()
 
     private function getData()
     {
