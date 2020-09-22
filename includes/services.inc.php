@@ -129,6 +129,7 @@ function add_service_template($device_group, $type, $desc, $param = '', $ignore 
 
 function service_template_get($service_template = null)
 {
+    /* NOT SURE THIS IS REQUIRED
     $sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE';
     $sql_param = [];
     $add = 0;
@@ -157,7 +158,9 @@ function service_template_get($service_template = null)
     d_echo('SQL Query: ' . $sql_query);
 
     // $service is not null, get only what we want.
-    $services_template = dbFetchRows($sql_query, $sql_param);
+    */
+    $sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE `service_template_id` = ?';
+    $services_template = dbFetchRows($sql_query, [$service_template]);
     d_echo('Service Template Array: ' . print_r($services_template, true) . "\n");
 
     return $services_template;
