@@ -488,7 +488,7 @@
               '</span>'+
               '</header>'+
               '<div class="widget_body" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
-              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+data.refresh+',\''+data.widget+'\');\<\/script\>'+
+              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+data.settings.refresh+',\''+data.widget+'\');\<\/script\>'+
               '</li>';
 
         if (data.hasOwnProperty('col') && data.hasOwnProperty('row')) {
