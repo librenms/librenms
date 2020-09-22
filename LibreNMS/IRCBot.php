@@ -213,7 +213,7 @@ class IRCBot
 
     private function read($buff)
     {
-        $r = fread($this->socket[$buff], 64);
+        $r = fread($this->socket[$buff], 8192);
         $this->buff[$buff] .= $r;
         $r = strlen($r);
         if (strstr($this->buff[$buff], "\n")) {
