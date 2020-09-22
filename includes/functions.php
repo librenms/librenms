@@ -798,7 +798,7 @@ function createHost(
     if ($force_add !== true) {
         $device['os'] = getHostOS($device);
 
-        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+        $snmphost = snmp_get($device, 'sysName.0', '-Oqv', 'SNMPv2-MIB');
         if (host_exists($host, $snmphost, $within_poller_groups)) {
             throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
         }
@@ -1489,7 +1489,7 @@ function fix_integer_value($value)
  * @param array $within_poller_groups
  * @return \App\Models\Device|false
  */
-function device_has_ip($ip, $within_poller_groups = array())
+function device_has_ip($ip, $within_poller_groups = [])
 {
     if (IPv6::isValid($ip)) {
         $ip_address = \App\Models\Ipv6Address::query()
@@ -1550,7 +1550,7 @@ function snmpTransportToAddressFamily($transport)
  */
 function host_exists($hostname, $sysName = null, $within_poller_groups = [])
 {
-    $query = "SELECT COUNT(*) FROM `devices` WHERE (`hostname`=? OR `overwrite_ip`=?)";
+    $query = 'SELECT COUNT(*) FROM `devices` WHERE (`hostname`=? OR `overwrite_ip`=?)';
     $params = [$hostname, $hostname];
 
     if (! empty($sysName) && ! Config::get('allow_duplicate_sysName')) {
@@ -1563,8 +1563,8 @@ function host_exists($hostname, $sysName = null, $within_poller_groups = [])
             $params[] = $full_sysname;
         }
     }
-    if (!empty($within_poller_groups)) {
-        $placeholders = implode(",", array_fill(1, count($within_poller_groups), '?'));
+    if (! empty($within_poller_groups)) {
+        $placeholders = implode(',', array_fill(1, count($within_poller_groups), '?'));
         $query .= " AND `poller_group` IN ($placeholders)";
         $params = array_merge($params, $within_poller_groups);
     }

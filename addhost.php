@@ -29,12 +29,12 @@ if (isset($options['g']) && $options['g'] >= 0) {
     $poller_group = 0;
 }
 
-if (isset($options['G']) && !empty(strval($options['G']))) {
+if (isset($options['G']) && ! empty(strval($options['G']))) {
     $cmd = array_shift($argv);
     array_shift($argv);
     array_shift($argv);
     array_unshift($argv, $cmd);
-    $within_poller_groups = explode(",", strval($options['G']));
+    $within_poller_groups = explode(',', strval($options['G']));
 }
 
 if (isset($options['f']) && $options['f'] == 0) {
