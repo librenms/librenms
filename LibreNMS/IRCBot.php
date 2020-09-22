@@ -75,7 +75,6 @@ class IRCBot
 
     private $floodcount = 0;
 
-
     public function __construct()
     {
         $this->log('Setting up IRC-Bot..');
@@ -662,6 +661,7 @@ class IRCBot
         if ($this->user['level'] == 10) {
             if ($params == 'external') {
                 $this->respond('Reloading external scripts.');
+
                 return $this->loadExternal();
             }
             $new_config = Config::load();
@@ -704,7 +704,7 @@ class IRCBot
     {
         $msg = join(', ', $this->commands);
         if (count($this->external) > 0) {
-            $msg .= ', '. join(', ', array_keys($this->external));
+            $msg .= ', ' . join(', ', array_keys($this->external));
         }
 
         return $this->respond("Available commands: $msg");
