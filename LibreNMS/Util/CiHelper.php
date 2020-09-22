@@ -210,7 +210,7 @@ class CiHelper
             '-v',
         ];
 
-        $files = $this->flags['full'] ? ['./'] : $this->changed['php'];
+        $files = $this->flags['full'] ? [] : $this->changed['php'];
         $cs_cmd = array_merge($cs_cmd, $files);
 
         return $this->execute('style', $cs_cmd);
