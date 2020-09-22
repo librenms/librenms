@@ -35,7 +35,6 @@
  * @copyright  2020 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
-
 foreach ($port_stats as $index => $port) {
     /*
      * Split up ifName and drop the EKIPS/Chassis

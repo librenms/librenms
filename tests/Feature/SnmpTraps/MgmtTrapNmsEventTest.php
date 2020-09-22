@@ -35,7 +35,6 @@ use LibreNMS\Snmptrap\Trap;
 
 class MgmtTrapNmsEventTest extends SnmpTrapTestCase
 {
-
     public function testEvent()
     {
         $device = factory(Device::class)->create();
