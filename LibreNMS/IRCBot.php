@@ -267,13 +267,13 @@ class IRCBot
                         $this->log('Alert sent ' . $alert['title']);
                         $this->log('Alert chan ' . $chan);
                     }
-                    sendAlert($chan, $severity, $alert);
+                    $this->sendAlert($chan, $severity, $alert);
                     $this->ircRaw('BOTFLOODCHECK');
                 }
             } else {
                 foreach ($this->authd as $nick => $data) {
                     if ($data['expire'] >= time()) {
-                        sendAlert($nick, $severity, $alert);
+                        $this->sendAlert($nick, $severity, $alert);
                     }
                 }
             }
