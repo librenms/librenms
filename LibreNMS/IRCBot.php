@@ -657,10 +657,14 @@ class IRCBot
 
     //end _auth()
 
-    private function _reload()
+    private function _reload($params)
     {
         if ($this->user['level'] == 10) {
-            $new_config = Config::reload();
+            if ($params == 'external') {
+                $this->respond('Reloading external scripts.');
+                return $this->loadExternal();
+            }
+            $new_config = Config::load();
             $this->respond('Reloading configuration & defaults');
             if ($new_config != $this->config) {
                 return $this->__construct();
@@ -698,11 +702,10 @@ class IRCBot
 
     private function _help($params)
     {
-        foreach ($this->commands as $cmd) {
-            $msg .= ', ' . $cmd;
+        $msg = join(', ', $this->commands);
+        if (count($this->external) > 0) {
+            $msg .= ', '. join(', ', array_keys($this->external));
         }
-
-        $msg = substr($msg, 2);
 
         return $this->respond("Available commands: $msg");
     }
