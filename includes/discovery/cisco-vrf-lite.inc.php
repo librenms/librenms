@@ -67,7 +67,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
             }
 
             $tmpVrf = dbFetchRow('SELECT * FROM vrf_lite_cisco WHERE device_id = ? and context_name=?', [
-                $device ['device_id'],
+                $device['device_id'],
                 $context,
             ]);
             if (! empty($tmpVrf)) {
@@ -86,7 +86,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
                 }
             } else {
                 $id = dbInsert([
-                    'device_id' => $device ['device_id'],
+                    'device_id' => $device['device_id'],
                     'context_name' => $context,
                     'intance_name' => $vrf['intance_name'],
                     'vrf_name' => $vrf['vrf_name'],
@@ -99,7 +99,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
 
     //get all vrf_lite_cisco, this will used where the value depend of the context, be careful with the order that you call this module, if the module is disabled the context search will not work
     $tmpVrfC = dbFetchRows('SELECT * FROM vrf_lite_cisco WHERE device_id = ? ', [
-        $device ['device_id'], ]);
+        $device['device_id'], ]);
     $device['vrf_lite_cisco'] = $tmpVrfC;
 
     //Delete all vrf that chaged

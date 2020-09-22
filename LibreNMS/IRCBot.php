@@ -26,7 +26,7 @@ use LibreNMS\Enum\AlertState;
 
 class IRCBot
 {
-    private $last_activity = '';
+    private $last_activity = 0;
 
     private $data = '';
 
@@ -43,6 +43,8 @@ class IRCBot
     private $pass = '';
 
     private $nick = 'LibreNMS';
+
+    private $tempnick = null;
 
     private $chan = [];
 
@@ -61,9 +63,17 @@ class IRCBot
         'join',
     ];
 
+    private $command = '';
+
     private $external = [];
 
     private $tick = 62500;
+
+    private $j = 0;
+
+    private $socket = [];
+
+    private $floodcount = 0;
 
     public function __construct()
     {
@@ -85,20 +95,10 @@ class IRCBot
             $this->nick = $this->config['irc_nick'];
         }
 
-        if ($this->config['irc_chan']) {
-            if (is_array($this->config['irc_chan'])) {
-                $this->chan = $this->config['irc_chan'];
-            } elseif (strstr($this->config['irc_chan'], ',')) {
-                $this->chan = explode(',', $this->config['irc_chan']);
-            } else {
-                $this->chan = [$this->config['irc_chan']];
-            }
-        }
-
         if ($this->config['irc_alert_chan']) {
             if (strstr($this->config['irc_alert_chan'], ',')) {
                 $this->config['irc_alert_chan'] = explode(',', $this->config['irc_alert_chan']);
-            } else {
+            } elseif (! is_array($this->config['irc_alert_chan'])) {
                 $this->config['irc_alert_chan'] = [$this->config['irc_alert_chan']];
             }
         }
@@ -212,7 +212,7 @@ class IRCBot
 
     private function read($buff)
     {
-        $r = fread($this->socket[$buff], 64);
+        $r = fread($this->socket[$buff], 8192);
         $this->buff[$buff] .= $r;
         $r = strlen($r);
         if (strstr($this->buff[$buff], "\n")) {
@@ -656,10 +656,15 @@ class IRCBot
 
     //end _auth()
 
-    private function _reload()
+    private function _reload($params)
     {
         if ($this->user['level'] == 10) {
-            $new_config = Config::reload();
+            if ($params == 'external') {
+                $this->respond('Reloading external scripts.');
+
+                return $this->loadExternal();
+            }
+            $new_config = Config::load();
             $this->respond('Reloading configuration & defaults');
             if ($new_config != $this->config) {
                 return $this->__construct();
@@ -697,11 +702,10 @@ class IRCBot
 
     private function _help($params)
     {
-        foreach ($this->commands as $cmd) {
-            $msg .= ', ' . $cmd;
+        $msg = join(', ', $this->commands);
+        if (count($this->external) > 0) {
+            $msg .= ', ' . join(', ', array_keys($this->external));
         }
-
-        $msg = substr($msg, 2);
 
         return $this->respond("Available commands: $msg");
     }

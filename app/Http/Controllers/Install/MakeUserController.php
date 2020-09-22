@@ -64,6 +64,8 @@ class MakeUserController extends InstallationController implements InstallerStep
             'password' => 'required',
         ]);
 
+        $message = trans('install.user.failure');
+
         try {
             // only allow the first admin to be created
             if (! $this->complete()) {
@@ -73,7 +75,6 @@ class MakeUserController extends InstallationController implements InstallerStep
                 $user->setPassword($request->get('password'));
                 $res = $user->save();
 
-                $message = trans('install.user.failure');
                 if ($res) {
                     $message = trans('install.user.success');
                     $this->markStepComplete();

@@ -18,7 +18,7 @@ if (is_array($aix_filesystem)) {
 
     foreach ($aix_filesystem as $aix_fs) {
         if (isset($aix_fs['aixFsMountPoint'])) {
-            if ($aix_fs['aixFsType'] == "jfs" || $aix_fs['aixFsType'] == "jfs2") { // Only JFS or JFS2
+            if ($aix_fs['aixFsType'] == 'jfs' || $aix_fs['aixFsType'] == 'jfs2') { // Only JFS or JFS2
                 if (! in_array($aix_fs['aixFsMountPoint'], $tmp_storage)) {
                     $aix_fs['aixFsSize'] = $aix_fs['aixFsSize'] * 1024 * 1024;
                     $aix_fs['aixFsFree'] = $aix_fs['aixFsFree'] * 1024 * 1024;
