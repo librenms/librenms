@@ -271,7 +271,7 @@ class IRCBot
                         }
                     }
                 }
-                return
+                return;
             }//end if
 
             foreach ($this->authd as $nick => $data) {
