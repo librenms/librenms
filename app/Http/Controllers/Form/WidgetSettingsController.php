@@ -45,10 +45,7 @@ class WidgetSettingsController extends Controller
             ]);
         }
 
-        $refresh=(!is_numeric($widget_settings["refresh"]) || (int)$widget_settings["refresh"] < 0 || (int)$widget_settings["refresh"] > 32767 ? 60 : $widget_settings["refresh"]);
-        unset($widget_settings["refresh"]);
         $widget->settings = $widget_settings;
-        $widget->refresh = $refresh;
         if ($widget->save()) {
             return response()->json([
                 'status' => 'ok',
