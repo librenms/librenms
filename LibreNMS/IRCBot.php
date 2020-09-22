@@ -153,6 +153,7 @@ class IRCBot
         }
 
         $this->doAuth();
+        $this->nickwait = 0;
         while (true) {
             foreach ($this->socket as $n => $socket) {
                 if (! is_resource($socket) || feof($socket)) {
@@ -162,6 +163,11 @@ class IRCBot
             }
 
             if (isset($this->tempnick)) {
+                if ($this->nickwait > 100) {
+                    $this->ircRaw('NICK ' .$this->nick);
+                    $this->nickwait = 0;
+                }
+                $this->nickwait += 1;
                 $this->ircRaw('NICK ' . $this->nick);
             }
 
