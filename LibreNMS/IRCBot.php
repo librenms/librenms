@@ -276,17 +276,21 @@ class IRCBot
 
     //end alertData()
 
-    private function _sendAlert($to, $severity, $alert)
+    private function _sendAlert($sendto, $severity, $alert)
     {
-        $this->ircRaw('PRIVMSG ' . $to . ' :' . $severity . trim($alert['title']));
-        if (! $this->config['irc_alert_short']) { // Only send the title if set to short
-            foreach (explode("\n", $alert['msg']) as $line) {
-                // We don't need to repeat the title
-                $line = $this->_html2irc($line);
-                $line = strip_tags($line);
-                if (trim($line) != trim($alert['title'])) {
-                    $this->ircRaw('PRIVMSG ' . $to . ' :' . $line);
-                }
+        $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim($alert['title']));
+        if ($this->config['irc_alert_short']) {
+            // Only send the title if set to short
+
+            return
+        }
+
+        foreach (explode("\n", $alert['msg']) as $line) {
+            // We don't need to repeat the title
+            $line = $this->_html2irc($line);
+            $line = strip_tags($line);
+            if (trim($line) != trim($alert['title'])) {
+                $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $line);
             }
         }
     }
