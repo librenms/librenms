@@ -282,7 +282,7 @@ class IRCBot
         if ($this->config['irc_alert_short']) {
             // Only send the title if set to short
 
-            return
+            return;
         }
 
         foreach (explode("\n", $alert['msg']) as $line) {
