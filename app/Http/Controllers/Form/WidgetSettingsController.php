@@ -33,7 +33,10 @@ class WidgetSettingsController extends Controller
 {
     public function update(Request $request, $widget_settings)
     {
-        $this->validate($request, ['settings' => 'array']);
+        $this->validate($request, [
+            'settings' => 'array',
+            'settings.refresh' => 'int|min:0|max:86400'
+        ]);
 
         $widget = UserWidget::with('dashboard')->findOrFail($widget_settings);
         $widget_settings = (array) $request->get('settings', []);
