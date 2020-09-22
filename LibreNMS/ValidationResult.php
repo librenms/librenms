@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -101,7 +100,7 @@ class ValidationResult
 
     public function hasList()
     {
-        return !empty($this->list);
+        return ! empty($this->list);
     }
 
     public function getList()
@@ -119,12 +118,13 @@ class ValidationResult
 
         $this->list_description = $description;
         $this->list = $list;
+
         return $this;
     }
 
     public function hasFix()
     {
-        return !empty($this->fix);
+        return ! empty($this->fix);
     }
 
     public function getFix()
@@ -142,6 +142,7 @@ class ValidationResult
     public function setFix($fix)
     {
         $this->fix = $fix;
+
         return $this;
     }
 
@@ -154,12 +155,12 @@ class ValidationResult
 
         if (isset($this->fix)) {
             c_echo("\t[%BFIX%n]: \n");
-            foreach ((array)$this->fix as $fix) {
+            foreach ((array) $this->fix as $fix) {
                 c_echo("\t%B$fix%n\n");
             }
         }
 
-        if (!empty($this->list)) {
+        if (! empty($this->list)) {
             echo "\t" . $this->getListDescription() . ":\n";
             $this->printList();
         }
@@ -179,6 +180,7 @@ class ValidationResult
         } elseif ($status === self::FAILURE) {
             return '%RFAIL%n';
         }
+
         return 'Unknown';
     }
 

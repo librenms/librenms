@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -66,7 +65,6 @@ class ModuleTestHelper
         'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
     ];
 
-
     /**
      * ModuleTester constructor.
      * @param array|string $modules
@@ -78,7 +76,7 @@ class ModuleTestHelper
     {
         global $influxdb;
 
-        $this->modules = self::resolveModuleDependencies((array)$modules);
+        $this->modules = self::resolveModuleDependencies((array) $modules);
         $this->os = strtolower($os);
         $this->variant = strtolower($variant);
 
@@ -89,9 +87,9 @@ class ModuleTestHelper
         $install_dir = Config::get('install_dir');
         $this->file_name = $os . $variant;
         $this->snmprec_dir = "$install_dir/tests/snmpsim/";
-        $this->snmprec_file = $this->snmprec_dir . $this->file_name . ".snmprec";
+        $this->snmprec_file = $this->snmprec_dir . $this->file_name . '.snmprec';
         $this->json_dir = "$install_dir/tests/data/";
-        $this->json_file = $this->json_dir . $this->file_name . ".json";
+        $this->json_file = $this->json_dir . $this->file_name . '.json';
 
         // never store time series data
         Config::set('rrd.enable', false);
@@ -151,7 +149,7 @@ class ModuleTestHelper
 
         $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
-            $this->qPrint(" " . $oid_data['oid']);
+            $this->qPrint(' ' . $oid_data['oid']);
 
             $snmp_options = ['-OUneb', '-Ih'];
             if ($oid_data['method'] == 'walk') {
@@ -225,7 +223,7 @@ class ModuleTestHelper
             }
         }
 
-        d_echo("OIDs to capture ");
+        d_echo('OIDs to capture ');
         d_echo($snmp_oids);
 
         return $snmp_oids;
@@ -246,7 +244,7 @@ class ModuleTestHelper
     {
         $os_list = [];
 
-        foreach (glob(Config::get('install_dir') . "/tests/data/*.json") as $file) {
+        foreach (glob(Config::get('install_dir') . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
             [$os, $variant] = self::extractVariant($file);
 
@@ -275,7 +273,7 @@ class ModuleTestHelper
                     self::resolveModuleDependencies($valid_modules),
                 ];
             } catch (InvalidModuleException $e) {
-                throw new InvalidModuleException("Invalid module " . $e->getMessage() . " in $os $variant");
+                throw new InvalidModuleException('Invalid module ' . $e->getMessage() . " in $os $variant");
             }
         }
 
@@ -292,12 +290,13 @@ class ModuleTestHelper
     {
         $full_name = basename($os_file, '.json');
 
-        if (!Str::contains($full_name, '_')) {
+        if (! Str::contains($full_name, '_')) {
             return [$full_name, ''];
         } elseif (is_file(Config::get('install_dir') . "/includes/definitions/$full_name.yaml")) {
             return [$full_name, ''];
         } else {
             [$rvar, $ros] = explode('_', strrev($full_name), 2);
+
             return [strrev($ros), strrev($rvar)];
         }
     }
@@ -316,7 +315,7 @@ class ModuleTestHelper
         $full_list = [];
         foreach ($modules as $module) {
             // only allow valid modules
-            if (!(Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
+            if (! (Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
                 throw new InvalidModuleException("Invalid module name: $module");
             }
 
@@ -415,7 +414,7 @@ class ModuleTestHelper
             'Timeticks' => '67',
             'INTEGER' => '2',
             'OCTET STRING' => '4',
-            'BITS' => '4', # not sure if this is right
+            'BITS' => '4', // not sure if this is right
             'Integer32' => '2',
             'NULL' => '5',
             'OBJECT IDENTIFIER' => '6',
@@ -424,7 +423,7 @@ class ModuleTestHelper
             'Gauge32' => '66',
             'Opaque' => '68',
             'Counter64' => '70',
-            'Network Address' => '4'
+            'Network Address' => '4',
         ];
 
         return $snmpTypes[$text];
@@ -471,7 +470,7 @@ class ModuleTestHelper
         $result = [];
 
         foreach ($snmprec_data as $line) {
-            if (!empty($line)) {
+            if (! empty($line)) {
                 [$oid,] = explode('|', $line, 2);
                 $result[$oid] = $line;
             }
@@ -511,7 +510,7 @@ class ModuleTestHelper
         global $device, $debug, $vdebug;
         Config::set('rrd.enable', false); // disable rrd
 
-        if (!is_file($this->snmprec_file)) {
+        if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
         }
 
@@ -531,6 +530,7 @@ class ModuleTestHelper
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
             echo $this->file_name . ': ' . $e->getMessage() . PHP_EOL;
+
             return null;
         }
 
@@ -602,8 +602,7 @@ class ModuleTestHelper
             delete_device($device['device_id']);
         }
 
-
-        if (!$no_save) {
+        if (! $no_save) {
             d_echo($data);
 
             // Save the data to the default test data location (or elsewhere if specified)
@@ -713,7 +712,7 @@ class ModuleTestHelper
                     }
 
                     // build selects
-                    $select = array_merge($select, isset($join_info['select']) ? (array)$join_info['select'] : $default_select);
+                    $select = array_merge($select, isset($join_info['select']) ? (array) $join_info['select'] : $default_select);
                 }
 
                 if (isset($info['order_by'])) {
@@ -800,7 +799,6 @@ class ModuleTestHelper
         return $this->poller_output;
     }
 
-
     /**
      * Get a list of all modules that support capturing data
      *
@@ -832,6 +830,7 @@ class ModuleTestHelper
         if ($short) {
             return ltrim(str_replace(Config::get('install_dir'), '', $this->json_file), '/');
         }
+
         return $this->json_file;
     }
 
@@ -839,13 +838,14 @@ class ModuleTestHelper
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
         $components = Arr::sort($components, 'label');
+
         return array_values($components);
     }
 
     private function dataIsEmpty($data)
     {
         foreach ($data as $table_data) {
-            if (!empty($table_data)) {
+            if (! empty($table_data)) {
                 return false;
             }
         }

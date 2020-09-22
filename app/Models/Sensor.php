@@ -47,6 +47,7 @@ class Sensor extends DeviceRelatedModel
             'eer' => 'EER',
             'snr' => 'SNR',
         ]);
+
         return $nice->get($this->sensor_class, ucwords(str_replace('_', ' ', $this->sensor_class)));
     }
 

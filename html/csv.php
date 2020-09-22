@@ -17,8 +17,8 @@ use LibreNMS\Config;
 $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!Auth::check()) {
-    die('Unauthorized');
+if (! Auth::check()) {
+    exit('Unauthorized');
 }
 
 set_debug(strpos($_SERVER['PATH_INFO'], 'debug'));
@@ -27,13 +27,13 @@ $report = basename($vars['report']);
 if ($report && file_exists(Config::get('install_dir') . "/includes/html/reports/$report.csv.inc.php")) {
     if ($debug === false) {
         header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="'.$report.'-'.date('Ymd').'.csv"');
+        header('Content-Disposition: attachment; filename="' . $report . '-' . date('Ymd') . '.csv"');
     }
 
     $csv = [];
     require Config::get('install_dir') . "/includes/html/reports/$report.csv.inc.php";
     foreach ($csv as $line) {
-        echo implode(',', $line)."\n";
+        echo implode(',', $line) . "\n";
     }
 } else {
     echo "Report not found.\n";

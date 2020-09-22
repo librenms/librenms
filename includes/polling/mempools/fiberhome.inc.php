@@ -2,9 +2,9 @@
 /**
  * Memory percent
  */
-$cardIndex = 'mgrCardMemUtil.'.$mempool['mempool_index'];
-$usage     = snmp_get($device, $cardIndex, '-Ovq', 'GEPON-OLT-COMMON-MIB');
-$perc      = round($usage / 100);
+$cardIndex = 'mgrCardMemUtil.' . $mempool['mempool_index'];
+$usage = snmp_get($device, $cardIndex, '-Ovq', 'GEPON-OLT-COMMON-MIB');
+$perc = round($usage / 100);
 /*
  * Manual memory 256Mb on each board
  */

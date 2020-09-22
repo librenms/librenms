@@ -1,14 +1,14 @@
 <?php
 
 if (in_array($device['os'], ['windows', 'hpe-ilo']) || $device['os_group'] == 'unix') {
-    $ilo_storage = snmpwalk_group($device, 'cpqHoFileSysEntry', 'CPQHOST-MIB', 1, array(), 'hp');
+    $ilo_storage = snmpwalk_group($device, 'cpqHoFileSysEntry', 'CPQHOST-MIB', 1, [], 'hp');
     $units = 1024 * 1024;
 
     if (is_array($ilo_storage)) {
         echo 'HPE ILO4 ';
         foreach ($ilo_storage as $index => $storage) {
             $type = $storage['cpqHoFileSysDesc'];
-            preg_match_all("/\\[:(.*?)\\]/", $type, $matches);
+            preg_match_all('/\\[:(.*?)\\]/', $type, $matches);
             $fstype = $matches[1][0];
             $descr = $storage['cpqHoFileSysDesc'];
             $size = $storage['cpqHoFileSysSpaceTotal'];

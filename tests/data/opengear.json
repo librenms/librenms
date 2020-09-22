@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.25049.1.81",
                     "sysDescr": "Linux TS-LAB-1 3.10.0-uc0 #1 Mon Nov 14 16:53:28 EST 2016 armv4tl",
                     "sysContact": null,
-                    "version": null,
+                    "version": "4.3.0",
                     "hardware": null,
                     "features": null,
                     "os": "opengear",
                     "type": "OOB Management",
-                    "serial": null,
+                    "serial": "70081804019547",
                     "icon": "opengear.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

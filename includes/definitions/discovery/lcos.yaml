@@ -1,5 +1,9 @@
 mib: LCOS-MIB
 modules:
+    os:
+        hardware: LCOS-MIB::lcsFirmwareVersionTableEntryModule.eIfc
+        serial: LCOS-MIB::lcsFirmwareVersionTableEntrySerialNumber.eIfc
+        version: LCOS-MIB::lcsFirmwareVersionTableEntryVersion.eIfc
     sensors:
         pre-cache:
             data:

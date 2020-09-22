@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @copyright  2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
@@ -27,10 +26,10 @@
 namespace LibreNMS\Data\Store;
 
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use Log;
-use Illuminate\Support\Str;
 
 class Prometheus extends BaseDatastore
 {
@@ -72,13 +71,13 @@ class Prometheus extends BaseDatastore
     {
         $stat = Measurement::start('put');
         // skip if needed
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return;
         }
 
         try {
-            $vals = "";
-            $promtags = "/measurement/" . $measurement;
+            $vals = '';
+            $promtags = '/measurement/' . $measurement;
 
             foreach ($fields as $k => $v) {
                 if ($v !== null) {
@@ -88,7 +87,7 @@ class Prometheus extends BaseDatastore
 
             foreach ($tags as $t => $v) {
                 if ($v !== null) {
-                    $promtags .= (Str::contains($v, "/") ? "/$t@base64/". base64_encode($v) : "/$t/$v");
+                    $promtags .= (Str::contains($v, '/') ? "/$t@base64/" . base64_encode($v) : "/$t/$v");
                 }
             }
             $options = $this->getDefaultOptions();
@@ -98,7 +97,7 @@ class Prometheus extends BaseDatastore
             if (Config::get('prometheus.attach_sysname', false)) {
                 $promurl .= '/sysName/' . $device['sysName'];
             }
-            $promurl = str_replace(" ", "-", $promurl); // Prometheus doesn't handle tags with spaces in url
+            $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url
 
             Log::debug("Prometheus put $promurl: ", [
                 'measurement' => $measurement,
@@ -115,7 +114,7 @@ class Prometheus extends BaseDatastore
                 Log::error('Prometheus Error: ' . $result->getReasonPhrase());
             }
         } catch (GuzzleException $e) {
-            Log::error("Prometheus Exception: " . $e->getMessage());
+            Log::error('Prometheus Exception: ' . $e->getMessage());
         }
     }
 
@@ -127,7 +126,7 @@ class Prometheus extends BaseDatastore
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
-     * @return boolean
+     * @return bool
      */
     public function wantsRrdTags()
     {

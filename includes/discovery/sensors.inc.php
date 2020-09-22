@@ -1,10 +1,9 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\OS;
 
-$valid['sensor'] = array();
+$valid['sensor'] = [];
 
 /** @var OS $os */
 $pre_cache = $os->preCache();
@@ -42,7 +41,7 @@ if ($device['os_group'] == 'printer') {
     include 'includes/discovery/sensors/state/printer.inc.php';
 }
 
-$run_sensors = array(
+$run_sensors = [
     'airflow',
     'current',
     'charge',
@@ -71,7 +70,7 @@ $run_sensors = array(
     'eer',
     'waterflow',
     'percent'
-);
+];
 
 // filter submodules
 $run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));

@@ -1,5 +1,8 @@
 mib: ICT-MODULAR-POWER-SYSTEM-MIB
 modules:
+    os:
+        hardware: ICT-MODULAR-POWER-SYSTEM-MIB::deviceHardware.0
+        version: ICT-MODULAR-POWER-SYSTEM-MIB::deviceFirmware.0
     sensors:
         current:
             data:

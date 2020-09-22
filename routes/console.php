@@ -51,23 +51,23 @@ Artisan::command('device:add
 ', function () {
     /** @var \Illuminate\Console\Command $this */
     // Value Checks
-    if (!in_array($this->option('port-association-mode'), ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
+    if (! in_array($this->option('port-association-mode'), ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
         $this->error(__('Invalid port association mode'));
     }
 
-    if (!in_array($this->option('transport'), ['udp', 'udp6', 'tcp', 'tcp6'])) {
+    if (! in_array($this->option('transport'), ['udp', 'udp6', 'tcp', 'tcp6'])) {
         $this->error(__('Invalid SNMP transport'));
     }
 
-    if (!in_array($this->option('auth-protocol'), ['md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224'])) {
+    if (! in_array($this->option('auth-protocol'), ['md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224'])) {
         $this->error(__('Invalid authentication protocol'));
     }
 
-    if (!in_array($this->option('privacy-protocol'), ['des', 'aes'])) {
+    if (! in_array($this->option('privacy-protocol'), ['des', 'aes'])) {
         $this->error(__('Invalid privacy protocol'));
     }
 
-    $port = (int)$this->option('port');
+    $port = (int) $this->option('port');
     if ($port < 1 || $port > 65535) {
         $this->error(__('Port should be 1-65535'));
     }
@@ -104,7 +104,7 @@ Artisan::command('device:add
 
     try {
         $init_modules = [];
-        include(base_path('includes/init.php'));
+        include base_path('includes/init.php');
 
         if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
             set_debug();
@@ -126,12 +126,15 @@ Artisan::command('device:add
         );
         $hostname = Device::where('device_id', $device_id)->value('hostname');
         $this->info("Added device $hostname ($device_id)");
+
         return 0;
     } catch (HostUnreachableException $e) {
         $this->error($e->getMessage() . PHP_EOL . implode(PHP_EOL, $e->getReasons()));
+
         return 1;
     } catch (Exception $e) {
         $this->error($e->getMessage());
+
         return 3;
     }
 })->describe('Add a new device');
@@ -293,8 +296,9 @@ Artisan::command('scan
     /** @var \Illuminate\Console\Command $this */
     $command = [base_path('snmp-scan.py')];
 
-    if (empty($this->argument('network')) && !Config::has('nets')) {
+    if (empty($this->argument('network')) && ! Config::has('nets')) {
         $this->error(__('Network is required if \'nets\' is not set in the config'));
+
         return 1;
     }
 

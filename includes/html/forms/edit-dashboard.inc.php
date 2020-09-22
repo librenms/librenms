@@ -18,33 +18,30 @@
  * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @license GPL
- * @package LibreNMS
- * @subpackage Dashboards
  */
-
 header('Content-type: application/json');
 
-$status    = 'error';
-$message   = 'unknown error';
+$status = 'error';
+$message = 'unknown error';
 
-$dashboard_id = (int)$_REQUEST['dashboard_id'];
+$dashboard_id = (int) $_REQUEST['dashboard_id'];
 $dashboard_name = display($_REQUEST['dashboard_name']);
 $access = $_REQUEST['access'];
 
 if (isset($dashboard_id) && isset($dashboard_name) && isset($access)) {
-    if (dbUpdate(['dashboard_name'=> $dashboard_name,'access'=> $access], 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', [Auth::id(), $dashboard_id]) >= 0) {
-        $status  = 'ok';
+    if (dbUpdate(['dashboard_name'=> $dashboard_name, 'access'=> $access], 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', [Auth::id(), $dashboard_id]) >= 0) {
+        $status = 'ok';
         $message = 'Dashboard ' . $dashboard_name . ' updated';
     } else {
-        $message = 'ERROR: Could not update dashboard '. $dashboard_name;
+        $message = 'ERROR: Could not update dashboard ' . $dashboard_name;
     }
 } else {
     $message = 'ERROR: Not enough params';
 }
 
-$response = array(
+$response = [
     'status'        => $status,
-    'message'       => $message
-);
+    'message'       => $message,
+];
 
 echo _json_encode($response);

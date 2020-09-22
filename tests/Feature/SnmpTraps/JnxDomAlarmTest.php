@@ -19,7 +19,6 @@
  *
  * Tests JnxDomAlertSet and JnxDomAlertCleared traps from Juniper devices.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -31,7 +30,6 @@ use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class JnxDomAlarmTest extends SnmpTrapTestCase
 {

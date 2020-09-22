@@ -15,7 +15,7 @@ if ($device['os'] == 'powerconnect') {
     $series = $get_series[0];
     if ($series == 'f10SSeriesProducts') {
         $total = snmp_get($device, 'chSysProcessorMemSize.1', '-OvQU', 'F10-S-SERIES-CHASSIS-MIB');
-        $used = $mempool['total'] * (snmp_get($device, 'F10-S-SERIES-CHASSIS-MIB::chStackUnitMemUsageUtil.1', '-OvQU')/ 100);
+        $used = $mempool['total'] * (snmp_get($device, 'F10-S-SERIES-CHASSIS-MIB::chStackUnitMemUsageUtil.1', '-OvQU') / 100);
         $free = ($mempool['total'] - $mempool['used']);
         if (is_numeric($total) && is_numeric($used)) {
             discover_mempool($valid_mempool, $device, 0, 'dnos-mem', 'Memory Utilization', '1', null, null);

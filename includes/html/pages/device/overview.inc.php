@@ -2,7 +2,7 @@
 
 $overview = 1;
 
-echo('
+echo '
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
@@ -11,7 +11,7 @@ echo('
   </div>
   <div class="row">
     <div class="col-md-6">
-');
+';
 require 'includes/html/dev-overview-data.inc.php';
 require 'includes/html/dev-groups-overview-data.inc.php';
 require 'overview/puppet_agent.inc.php';
@@ -25,10 +25,10 @@ if ($device['os'] == 'cimc') {
     require 'overview/cimc.inc.php';
 }
 
-echo('
+echo '
     </div>
     <div class="col-md-6">
-');
+';
 // Right Pane
 require 'overview/processors.inc.php';
 require 'overview/mempools.inc.php';
@@ -71,6 +71,6 @@ require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';
 require 'overview/graylog.inc.php';
-echo('</div></div></div>');
+echo '</div></div></div>';
 
-#require 'overview/current.inc.php");
+//require 'overview/current.inc.php");

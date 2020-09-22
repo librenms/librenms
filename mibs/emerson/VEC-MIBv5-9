@@ -1,0 +1,1132 @@
+-- *****************************************************************************
+-- FILE NAME      : mca.mib
+-- DATE           : December 20, 2004
+-- AUTHOR         : Greg Saltis 
+-- PROJECT        : Vortex Ethernet Card
+-- PUBLIC         :
+-- PRIVATE        :
+-- COPYRIGHT      : Copyright (C) 2004 by Emerson Network Power
+-- ******************************************************************************
+
+-- ******************************************************************************
+-- MODIFICATION HISTORY
+-- 
+-- v1.0.0.0   09-06-04 grs    New File.
+-- v1.0.0.1   12-20-04 grs    Add Modification history
+--			      Add
+-- 				vecMCAInformation
+-- 				vecMCAMessageRequests
+-- 				vecMCAMessageTransmissions
+-- 				vecMCAMessageTransmissions
+-- 				vecMCAMessageBadCRCs
+-- 				vecMCAMessageLinkErrors
+-- 				vecMCAMessagePartialResponses
+-- 				vecMCAMessageWrongPackets
+-- v1.0.0.2	   01-29-05 gp
+--				  Add
+--				vecMCAMessageErrorReplies	
+--				  Remove
+--				vecAlarmLVDAlarm
+--				vecAlarmPCUFailAlarm
+--				vecAlarmAudibleAlarmsAreQuiet
+--				vecAlarmACFail
+--				vecAlarmPasswordHasBeenViewed
+--				vecAlarmAudibleRelayDeEnergized
+-- v1.0.0.3	   07-05-05 gp
+--			    Add vecAnalogBatteryReserveHours
+-- 	
+-- v2.0.0.3	   07-12-05 gp
+--				Add 
+--				  vecAlarmBatteryPoorHealth
+--				  vecAlarmBatteryReserveLow
+--
+--				Grouped all battery related traps together.
+--
+-- v2.0.0.4	   10-05-05 gp
+--			   	Add versioning mechanism to MIB.  Version information is
+--				added to DEFINITIONS statement as follows:
+--				  VEC-MIBvX DEFINITIONS ::=
+-- 
+-- v3.0		 	10-31-05 gp
+--				Add
+--				  vecHVSActive
+--				  vecRemoteHVSActive
+--				  vecRemoteEstopActive
+--
+-- v4.0			12-13-05 gp
+--				Changed company name
+--				Revamped to highlight power system information.	
+--
+--				12-15-05 gp
+--				Corrected incorrect labeling for PCU Total current.
+--
+-- v5.0			12-16-05 gp
+--				VEC no longer issues traps for the following MCA alarm conditions:
+--				general LVD No Reply alarm
+--				general LVD Board Fail alarm
+--				general Temperature Sensor Hi or Lo alarm
+--				general Temperature Sensor High alarm
+--				general Temperature Sensor Low alarm
+--				general Temperature Sensor No Reply alarm
+--				general Shunt Type alarm
+--				general Shunt No Reply alarm
+--
+-- v5.1			8-04-08 jws
+--				Update IMPORTS
+--				Added module identity
+--				Removed SIZE clause
+--
+-- v5.4			9-22-08 jws
+--				Changed trap object tables to NOTIFICATION-TYPE
+--				
+-- v5.5			9-23-08 jws
+--				Typo correction on psAlarmSysInfoString2
+--				
+-- v5.6			10-01-08 gp
+--				Corrected vecMIB OID. Replaced references to vec OID with vecMIB. 
+--		
+-- v5.7			02-11-11 gp
+--				Add
+--					psAlarm
+--					psHighestSeverityLevel
+--					psTemperatureAlarmStatus
+--					psLVDCircuitAAlarmStatus
+--					psLVDCircuitBAlarmStatus
+--					psShuntAlarmStatus
+--
+--
+-- v5.7			08-28-12 jws
+--				Corrected Syntax error invalues of INTEGER
+--				spaces removed
+-- ******************************************************************************
+
+VEC-MIBv5-9 DEFINITIONS ::= 
+BEGIN
+
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Counter32, enterprises
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime
+        FROM SNMPv2-TC;
+
+vecMIB MODULE-IDENTITY
+    LAST-UPDATED "201401140823Z"
+    ORGANIZATION "
+        Emerson Energy Systems North America (ESNA)"
+    CONTACT-INFO "
+        Emerson Energy Systems North America
+        1510 Kansas Ave.
+        Lorain, OH 44052
+        USA "
+    DESCRIPTION "
+        Emerson Energy Systems North America(ESNA) VEC MIB. revision 5.9"
+
+    ::= { enterprises 885 3 }
+
+--  OBJECTS
+    emersonESNA                 OBJECT IDENTIFIER ::= { enterprises 885 }
+
+    vecInformation              OBJECT IDENTIFIER ::= { vecMIB 1 }
+    vecMessageStats             OBJECT IDENTIFIER ::= { vecInformation 2 }
+    psStatus                    OBJECT IDENTIFIER ::= { vecMIB 2 }
+    psMeasurement               OBJECT IDENTIFIER ::= { psStatus 1 }
+    psTraps                    	OBJECT IDENTIFIER ::= { vecMIB 3 }
+    psAlarmsGeneral1           	OBJECT IDENTIFIER ::= { psTraps 1 }
+    psAlarmsGeneral2           	OBJECT IDENTIFIER ::= { psTraps 2 }
+    psAlarmsBattery				OBJECT IDENTIFIER ::= { psTraps 3 }
+
+--  ENTRIES
+
+    vecFirmwareVersion		 	OBJECT-TYPE
+    SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "VEC System Firmware Version."
+    ::= { vecInformation 1}
+
+    vecMessageRequests	OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of message requests."
+    ::= { vecMessageStats 1 }
+
+    vecMessageTransmissions		OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of messages transmitted."
+    ::= { vecMessageStats 2 }
+
+    vecMessageNoResponses		OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of no responses."
+    ::= { vecMessageStats 3 }
+
+    vecMessageBadCRCs		OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of bad CRC checks."
+    ::= { vecMessageStats 4 }
+
+    vecMessageLinkErrors		OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of link errors."
+    ::= { vecMessageStats 5 }
+
+    vecMessagePartialResponses	OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of partial responses received."
+    ::= { vecMessageStats 6 }
+
+    vecMessageWrongPackets		OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of wrong packet numbers detected."
+    ::= { vecMessageStats 7 }
+
+    vecMessageErrorReplies		OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of error responses received."
+    ::= { vecMessageStats 8 }
+
+    psSystemVoltage OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "System Voltage."
+    ::= { psMeasurement 1}
+
+    psSystemCurrent      OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "System Current."
+    ::= { psMeasurement 2}
+
+    psSubsystemVoltage   OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Sub System Voltage."
+    ::= { psMeasurement 3}
+
+    psSubsystemCurrent   OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Sub System Current."
+    ::= { psMeasurement 4}
+
+    psSenseVoltage  OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Sense Voltage."
+    ::= { psMeasurement 5}
+
+    psPCUTotalCurrent    OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total PCU Current."
+    ::= { psMeasurement 6}
+
+    psBatteryCurrent     OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total Battery Current."
+    ::= { psMeasurement 7}
+
+    psBatteryReserveHours	 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Battery Reserve Time."
+    ::= { psMeasurement 8}
+
+    psAlarm 				OBJECT-TYPE
+        SYNTAX                  INTEGER {
+          false(0),
+          true(1)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "A Power System Alarm Is Active."
+    ::= { psMeasurement 9 }
+
+    psHighestSeverityLevel	OBJECT-TYPE
+    SYNTAX                 INTEGER {
+        normal(0),
+        minor(1),
+        major(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The severity level is the highest active alarm level.
+                Values: 0 = Normal, 1 = Minor, 2 = Major"
+    ::= { psMeasurement 10}
+
+    psNumberOfPCUsInstalled	 OBJECT-TYPE
+        SYNTAX Integer32(0..80)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of PCUs installed"
+    ::= { psMeasurement 11}
+
+    psNumberOfPCUsCommunicating	 OBJECT-TYPE
+        SYNTAX Integer32(0..80)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of PCUs communicating"
+    ::= { psMeasurement 12}
+
+    psTemperatureTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PSTemperatureEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "Temperature Measurement Table."
+    ::= { psStatus 2 }
+    
+    psTemperatureEntry OBJECT-TYPE
+        SYNTAX PSTemperatureEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Temperature Measurement Table Entry."
+        INDEX { psTemperatureIndex }
+    ::= { psTemperatureTable 1 }
+
+    PSTemperatureEntry ::= SEQUENCE {
+        psTemperatureIndex               Integer32,
+        psTemperatureMeasurement         DisplayString,
+		psTemperatureAlarmStatus		 Integer32
+    }
+
+    psTemperatureIndex OBJECT-TYPE
+        SYNTAX					Integer32(1..8)
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Temperature Probe Number "
+    ::= { psTemperatureEntry 1 }
+
+    psTemperatureMeasurement OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Temperature Value In Centigrade."
+    ::= { psTemperatureEntry 2 }
+
+    psTemperatureAlarmStatus OBJECT-TYPE
+        SYNTAX					INTEGER { 
+        high(0), 
+        low(1), 
+        noreply(2), 
+        none(3) 
+        }
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Temperature Probe Alarm Status "
+    ::= { psTemperatureEntry 3 }
+
+    psLVDTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PSLVDEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "Low Voltage Disconnect Table."
+    ::= { psStatus 3 }
+    
+    psLVDEntry OBJECT-TYPE
+        SYNTAX PSLVDEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Low Voltage Disconnect Table Entry."
+        INDEX { psLVDIndex }
+    ::= { psLVDTable 1 }
+
+    PSLVDEntry ::= SEQUENCE {
+        psLVDIndex               Integer32,
+        psLVDCircuitA            DisplayString,
+        psLVDCircuitB            DisplayString,
+		psLVDCircuitAAlarmStatus Integer32,
+		psLVDCircuitBAlarmStatus Integer32
+    }
+
+    psLVDIndex OBJECT-TYPE
+        SYNTAX					Integer32
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "LVD Number "
+    ::= { psLVDEntry 1 }
+
+    psLVDCircuitA OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "LVD Circuit A Disconnect Voltage "
+    ::= { psLVDEntry 2 }
+
+    psLVDCircuitB OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "LVD Circuit B Disconnect Voltage "
+    ::= { psLVDEntry 3 }
+
+    psLVDCircuitAAlarmStatus OBJECT-TYPE
+        SYNTAX					INTEGER { 
+        disconnected(0), 
+        noreply(1), 
+        boardfail(2), 
+        none(3) 
+        }
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "LVD Circuit A Alarm Status "
+    ::= { psLVDEntry 4 }
+
+    psLVDCircuitBAlarmStatus OBJECT-TYPE
+        SYNTAX					INTEGER { 
+        disconnected(0), 
+        noreply(1), 
+        boardfail(2), 
+        none(3) 
+        }
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "LVD Circuit B Alarm Status "
+    ::= { psLVDEntry 5 }
+
+    psDistributionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PSShuntEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "Shunt Pod Table"
+    ::= { psStatus 4 }
+    
+    psShuntEntry OBJECT-TYPE
+        SYNTAX PSShuntEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Shunt Pod Table Entry."
+        INDEX { psShuntIndex }
+    ::= { psDistributionTable 1 }
+
+    PSShuntEntry ::= SEQUENCE {
+        psShuntIndex               		Integer32,
+        psShuntCurrent             		DisplayString,
+		psShuntAlarmStatus				Integer32,
+        psShuntType                               Integer32 
+    }
+
+    psShuntIndex OBJECT-TYPE
+        SYNTAX					Integer32(1..16)
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Shunt Pod Number."
+    ::= { psShuntEntry 1 }
+
+    psShuntCurrent OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Shunt POD Current."
+    ::= { psShuntEntry 2 }
+
+    psShuntAlarmStatus OBJECT-TYPE
+        SYNTAX					INTEGER { 
+        type(0), 
+        noreply(1), 
+        none(2) 
+        }
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Shunt POD Alarm Status.
+                 Values: 0 = Type, 1 = No Reply, 2 = No Alarm"
+    ::= { psShuntEntry 3 }
+
+    psShuntType OBJECT-TYPE
+        SYNTAX					INTEGER { 
+        system(1), 
+        subsystem(2), 
+        battery(3) 
+        }
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Shunt POD Alarm Status.
+                 Values: 0 = System, 1 = Subsystem, 2 = Battery"
+    ::= { psShuntEntry 4 }
+
+    psPCUTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PSPCUEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "PCU Table."
+    ::= { psStatus 5 }
+    
+    psPCUEntry OBJECT-TYPE
+        SYNTAX PSPCUEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "PCU Table Entry."
+        INDEX { psPCUIndex }
+    ::= { psPCUTable 1 }
+
+    PSPCUEntry ::= SEQUENCE {
+        psPCUIndex              Integer32,
+        psPCUFail				Integer32,
+        psPCUCurrent			Integer32,
+        psPCUFerroGateway       Integer32,
+        psPCUProductNumber DisplayString,
+        psPCUSWVersion DisplayString,
+        psPCUSerialNumber DisplayString,
+        psPCUCapacity	DisplayString
+    }
+
+    psPCUIndex           OBJECT-TYPE
+        SYNTAX                  Integer32(1..80)
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "PCU Number."
+    ::= { psPCUEntry 1 }
+
+    psPCUFail		OBJECT-TYPE
+        SYNTAX			INTEGER {
+      false(0),
+      true(1)
+ 	}
+    MAX-ACCESS			read-only
+    STATUS			current
+    DESCRIPTION
+        "PCU Fail Alarm"
+    ::= { psPCUEntry 2 }
+
+    psPCUCurrent		OBJECT-TYPE
+        SYNTAX			Integer32
+    MAX-ACCESS			read-only
+    STATUS			current
+    DESCRIPTION
+        "PCU Current"
+    ::= { psPCUEntry 3 }
+
+    psPCUFerroGateway    OBJECT-TYPE
+        SYNTAX                  INTEGER {
+          false(0),
+          true(1)
+        }
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "PCU is a Ferro Gateway Rectifier."
+    ::= { psPCUEntry 4 }
+
+    psPCUProductNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Product Number."
+    ::= { psPCUEntry 5}
+
+    psPCUSWVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Software Revision."
+    ::= { psPCUEntry 6}
+
+    psPCUSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Serial Number."
+    ::= { psPCUEntry 7}
+
+    psPCUCapacity		OBJECT-TYPE
+        SYNTAX			DisplayString
+    MAX-ACCESS			read-only
+    STATUS			current
+    DESCRIPTION
+        "Rectifier Rated Current"
+    ::= { psPCUEntry 8 }
+
+    psEmergencyStop             NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Emergency Stop Alarm."
+    ::= { psAlarmsGeneral1 1 }
+
+    psAlarmVeryLowVoltage       NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "50 Percent Battery On Discharge Alarm."
+    ::= { psAlarmsGeneral1 2 }
+
+    psAlarmLowVoltage           NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Battery On Discharge Alarm."
+    ::= { psAlarmsGeneral1 3 }
+
+    psAlarmSystemHighVoltage1  NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "High Voltage 1 Alarm."
+    ::= { psAlarmsGeneral1 4 }
+
+    psAlarmSystemHighVoltage2  NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "High Voltage 2 Alarm."
+    ::= { psAlarmsGeneral1 5 }
+
+    psAlarmSubsystemLowVoltage NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Subsystem Low Voltage Alarm."
+    ::= { psAlarmsGeneral1 6 }
+
+    psAlarmSubsystemHighVoltage NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Subsystem High Voltage Alarm."
+    ::= { psAlarmsGeneral1 7 }
+
+    psAlarmSystemFuse          NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "System Fuse Alarm."
+    ::= { psAlarmsGeneral1 8 }
+
+    psAlarmSubsystemFuse       NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Subsystem Fuse Alarm."
+    ::= { psAlarmsGeneral1 9 }
+
+    psAlarmAllACOff            NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "All AC Off Alarm."
+    ::= { psAlarmsGeneral1 10 }
+
+    psAlarmSystemOverCurrent   NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "System Over Current Alarm."
+    ::= { psAlarmsGeneral1 11 }
+
+    psAlarmSubsystemOverCurrent NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Subsystem Over Current Alarm."
+    ::= { psAlarmsGeneral1 12 }
+
+    psAlarmLVDsAreInhibited    NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVDs Are Inhibited Alarm."
+    ::= { psAlarmsGeneral1 13 }
+
+    psAlarmTestEqualizeMode    NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Test/Equalize Mode Active."
+    ::= { psAlarmsGeneral1 14 }
+
+    psAlarmMinor               NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "System Minor Alarm."
+    ::= { psAlarmsGeneral1 15 }
+
+    psAlarmMajor               NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "System Major Alarm."
+    ::= { psAlarmsGeneral1 16 }
+
+    psAlarmSenseVoltageFuse    NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Sense Voltage Fuse Alarm."
+    ::= { psAlarmsGeneral1 17 }
+
+    psAlarmSystemVoltageFuse   NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "System Voltage Fuse Alarm."
+    ::= { psAlarmsGeneral1 18 }
+
+    psAlarmNoSystemVoltage     NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "No System Voltage Alarm."
+    ::= { psAlarmsGeneral1 19 }
+
+    psAlarmNoSubsystemVoltage  NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "No Subsystem Voltage Alarm."
+    ::= { psAlarmsGeneral1 20 }
+
+    psAlarmNoSenseVoltage      NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "No Sense Voltage Alarm."
+    ::= { psAlarmsGeneral1 21 }
+
+    psAlarmDisplayNoReply      NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Display Communications Alarm."
+    ::= { psAlarmsGeneral1 22 }
+
+    psAlarmSubsystemMajor      NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Subsystem Major Alarm."
+    ::= { psAlarmsGeneral1 23 }
+
+    psAlarmSubsystemMinor      NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Subsystem Minor Alarm."
+    ::= { psAlarmsGeneral1 24 }
+
+    psAlarmHighACLine          NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                " High AC Line Alarm."
+    ::= { psAlarmsGeneral1 25 }
+
+    psAlarmSenseVoltageError   NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Sense Voltage Error Alarm."
+    ::= { psAlarmsGeneral1 26 }
+
+    psTestEqualizeHardwareInput        NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "The MCA Test Equalize Hardware Input Active."
+    ::= { psAlarmsGeneral2 1 }
+
+    psPCUFailMajor             NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Fail Major Alarm."
+    ::= { psAlarmsGeneral2 2 }
+
+    psPCUFailMinor             NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Fail Minor Alarm."
+    ::= { psAlarmsGeneral2 3 }
+
+    psLVDAlarmMajor            NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVD Major Alarm."
+    ::= { psAlarmsGeneral2 4 }
+
+    psLVDAlarmMinor            NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVD Minor Alarm."
+    ::= { psAlarmsGeneral2 5 }
+
+    psPCULoadShare             NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Load Share Alarm."
+    ::= { psAlarmsGeneral2 6 }
+
+    psACFailMajor              NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "AC Fail Major Alarm."
+    ::= { psAlarmsGeneral2 7 }
+
+    psACFailMinor              NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "AC Fail Minor Alarm."
+    ::= { psAlarmsGeneral2 8 }
+
+    psMCACommFail             	NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "MCA Communications Failure Alarm."
+    ::= { psAlarmsGeneral2 9 }
+
+    psHVSActive             	NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "High Voltage Shutdown Active."
+    ::= { psAlarmsGeneral2 10 }
+
+    psRemoteHVSActive         	NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Remote High Voltage Shutdown Active."
+    ::= { psAlarmsGeneral2 11 }
+
+    psRemoteEstopActive     	NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Remote Emergency Stop Active."
+    ::= { psAlarmsGeneral2 12 }
+
+    psAlarmBatteryChargeOverCurrent    NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Battery Charge Over Current Alarm."
+    ::= { psAlarmsBattery 1 }
+
+    psBatteryCurrentLimitInhibited     NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Battery Current Limit Inhibited Alarm."
+    ::= { psAlarmsBattery 2 }
+
+    psAlarmBatteryPoorHealth    NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Battery Poor Health Alarm."
+    ::= { psAlarmsBattery 3 }
+
+    psAlarmBatteryReserveLow    NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Battery Reserve Low Alarm."
+    ::= { psAlarmsBattery 4 }
+
+psPCUSummaryTypeTraps    OBJECT IDENTIFIER ::= { psTraps 4 }
+psPCUSummaryTraps            OBJECT IDENTIFIER ::= { psPCUSummaryTypeTraps 1 }
+
+    psAlarmPCUSummary NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Alarm Active."
+    ::= { psPCUSummaryTraps 2 }
+
+psPCUNodeTypeTraps    OBJECT IDENTIFIER ::= { psTraps 5 }
+psPCUTraps            OBJECT IDENTIFIER ::= { psPCUNodeTypeTraps 1 }
+
+    psAlarmPCUId 				OBJECT-TYPE
+        SYNTAX                  Integer32
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "PCU Number."
+    ::= { psPCUTraps 1 }
+
+    psAlarmPCUHighACLine NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU High AC Line Alarm."
+    ::= { psPCUTraps 2 }
+
+    psAlarmPCUControllerFailure NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Controller Failure Alarm."
+    ::= { psPCUTraps 3 }
+
+    psAlarmPCUFanSlowOrStopped NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Fan Slow Or Stopped Alarm."
+    ::= { psPCUTraps 4 }
+
+    psAlarmPCUTurnedOffByMca NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Turned Off By MCA."
+    ::= { psPCUTraps 5 }
+
+    psAlarmPCUCircuitBreakerOff NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Circuit Breaker Off Alarm."
+    ::= { psPCUTraps 6 }
+
+    psAlarmPCUDCorACConvertFail NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Converter Fail Alarm."
+    ::= { psPCUTraps 7 }
+
+    psAlarmPCUThermalAlarmorCurrentLimit NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Thermal Current Limit Alarm."
+    ::= { psPCUTraps 8 }
+
+    psAlarmPCUEmergencyStop NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Emergency Stop Alarm."
+    ::= { psPCUTraps 9 }
+
+    psAlarmPCUInputSwitchOff NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Input Switch Off Alarm."
+    ::= { psPCUTraps 10 }
+
+    psAlarmPCUHighVoltageShutdown NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU High Voltage Shutdown Alarm."
+    ::= { psPCUTraps 11 }
+
+    psAlarmPCUACInputIsOffOrLow NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU AC Input Is Off Or Low Alarm."
+    ::= { psPCUTraps 12 }
+
+    psAlarmPCUCommunicationFailureWithMCA NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Communication Failure Alarm."
+    ::= { psPCUTraps 13 }
+
+    psAlarmPCUSenseLeadOpen NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "PCU Sense Lead Open Alarm."
+    ::= { psPCUTraps 14 }
+
+psShuntTypeTraps      OBJECT IDENTIFIER ::= { psTraps 6 }
+psShuntTraps          OBJECT IDENTIFIER ::= { psShuntTypeTraps 1 }
+
+    psAlarmShuntId              OBJECT-TYPE
+        SYNTAX                  Integer32
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Shunt POD Number."
+    ::= { psShuntTraps 1 }
+
+    psAlarmShuntType NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Shunt POD Type Alarm."
+    ::= { psShuntTraps 2 }
+
+    psAlarmShuntNoReply NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Shunt POD Communications Alarm."
+    ::= { psShuntTraps 3 }
+
+
+psLVDTypeTraps        OBJECT IDENTIFIER ::= { psTraps 7 }
+psLVDTraps            OBJECT IDENTIFIER ::= { psLVDTypeTraps 1 }
+
+    psAlarmLVDId                OBJECT-TYPE
+        SYNTAX					Integer32
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "The Analog LVD Number "
+    ::= { psLVDTraps 1 }
+
+    psAlarmLVDDisconnectedA    NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVD Circuit A Disconnected Alarm."
+    ::= { psLVDTraps 2 }
+
+    psAlarmLVDNoReplyA         NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVD Circuit A Communications Alarm."
+    ::= { psLVDTraps 3 }
+
+    psAlarmLVDBoardFailA       NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVD Board Circuit A Fail Alarm."
+    ::= { psLVDTraps 4 }
+
+    psAlarmLVDDisconnectedB    NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVD Circuit B Disconnected Alarm."
+    ::= { psLVDTraps 5 }
+
+    psAlarmLVDNoReplyB         NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVD Circuit B No Communications Alarm."
+    ::= { psLVDTraps 6 }
+
+    psAlarmLVDBoardFailB       NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "LVD Board Circuit B Fail Alarm."
+    ::= { psLVDTraps 7 }
+
+psTemperatureTypeTraps    OBJECT IDENTIFIER ::= { psTraps 8 }
+psTemperatureTraps            OBJECT IDENTIFIER ::= { psTemperatureTypeTraps 1 }
+
+    psAlarmTemperatureId        OBJECT-TYPE
+        SYNTAX                  Integer32
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Temperature Probe Number."
+    ::= { psTemperatureTraps 1 }
+
+    psAlarmTemperatureHigh     NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Temperature High Alarm."
+    ::= { psTemperatureTraps 2 }
+
+    psAlarmTemperatureLow      NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Temperature Low Alarm."
+    ::= { psTemperatureTraps 3 }
+
+    psAlarmTemperatureNoReply  NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Temperature Communications Alarm."
+    ::= { psTemperatureTraps 4 }
+
+psSysInfoTypeTraps        OBJECT IDENTIFIER ::= { psTraps 9 }
+psSysInfoTraps            OBJECT IDENTIFIER ::= { psSysInfoTypeTraps 1 }
+
+    psAlarmSysInfoError1 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo Error 1."
+    ::= { psSysInfoTraps 1 }
+
+    psAlarmSysInfoError2 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo Error 2."
+    ::= { psSysInfoTraps 2 }
+
+    psAlarmSysInfoString1 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 1."
+    ::= { psSysInfoTraps 3 }
+
+    psAlarmSysInfoString2 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 2."
+    ::= { psSysInfoTraps 4 }
+
+    psAlarmSysInfoString3 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 3."
+    ::= { psSysInfoTraps 5 }
+
+    psAlarmSysInfoString4 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 4."
+    ::= { psSysInfoTraps 6 }
+
+    psAlarmSysInfoString5 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 5."
+    ::= { psSysInfoTraps 7 }
+
+    psAlarmSysInfoString6 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 6."
+    ::= { psSysInfoTraps 8 }
+
+    psAlarmSysInfoString7 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 7."
+    ::= { psSysInfoTraps 9 }
+
+    psAlarmSysInfoString8 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 8."
+    ::= { psSysInfoTraps 10 }
+
+    psAlarmSysInfoString9 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 9."
+    ::= { psSysInfoTraps 11 }
+
+    psAlarmSysInfoString10 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+          "SysInfo String 10."
+    ::= { psSysInfoTraps 12 }
+END

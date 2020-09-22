@@ -7,8 +7,8 @@ $rrdfilename = rrd_name($device['hostname'], 'ubnt-airfiber-mib');
 
 if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'mbps                   Now      Min       Max\\n'";
-    $rrd_options .= ' DEF:rxCapacity='.$rrdfilename.':rxCapacity:AVERAGE ';
-    $rrd_options .= ' DEF:txCapacity='.$rrdfilename.':txCapacity:AVERAGE ';
+    $rrd_options .= ' DEF:rxCapacity=' . $rrdfilename . ':rxCapacity:AVERAGE ';
+    $rrd_options .= ' DEF:txCapacity=' . $rrdfilename . ':txCapacity:AVERAGE ';
     $rrd_options .= ' CDEF:rxCapacityC=rxCapacity,1000000,/ ';
     $rrd_options .= ' CDEF:txCapacityC=txCapacity,1000000,/ ';
     $rrd_options .= " LINE1:rxCapacityC#00FF00:'Rx Rate         ' ";

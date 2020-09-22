@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.40310",
                     "sysDescr": "Cumulus Linux 3.5.3 (Linux Kernel 4.1.33-1+cl3u12)",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "3.5.3 (Linux Kernel 4.1.33-1+cl3u12)",
+                    "hardware": "Cumulus Networks arm-accton_as4610_54-r0 4610-54P-O-AC-F Chassis",
                     "features": null,
                     "os": "cumulus",
                     "type": "network",
-                    "serial": null,
+                    "serial": "EC1713000000",
                     "icon": "cumulus.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

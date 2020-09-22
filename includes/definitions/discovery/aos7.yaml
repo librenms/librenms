@@ -1,5 +1,7 @@
 mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>OS\S+)? ?(?<version>\d+\.\d+\.\S+)/'
     processors:
         data:
             -

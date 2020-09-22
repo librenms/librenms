@@ -1,5 +1,9 @@
 mib: RADLAN-rndMng:RADLAN-HWENVIROMENT
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>OmniStack \S+ \S+|OS\S+)? ?(?<version>\d+\.\d+\.\S+)?/'
+        hardware: .1.3.6.1.4.1.89.53.4.1.6.1 # RADLAN-Physicaldescription-MIB::rlPhdStackProductID
+        version: .1.3.6.1.4.1.89.53.14.1.2.1 # RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion
     sensors:
         state:
             data:

@@ -13,8 +13,8 @@
  * @subpackage polling
  * @link       http://librenms.org
  */
- 
+
 $mempool['total'] = intval(preg_replace('/[^0-9]+/', '', snmp_get($device, 'memTotalReal.0', '-OQUs', 'UCD-SNMP-MIB')), 10);
 $mempool['free'] = intval(preg_replace('/[^0-9]+/', '', snmp_get($device, 'memTotalFree.0', '-OQUs', 'UCD-SNMP-MIB')), 10);
-$mempool['used']  = ($mempool['total'] - $mempool['free']);
-$mempool['perc']  = ($mempool['used'] / $mempool['total']) * 100;
+$mempool['used'] = ($mempool['total'] - $mempool['free']);
+$mempool['perc'] = ($mempool['used'] / $mempool['total']) * 100;

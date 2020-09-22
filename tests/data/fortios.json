@@ -5,16 +5,16 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.103",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": null,
-                    "version": null,
+                    "version": "v5.6.0-build1557 170727 (GA)",
                     "hardware": null,
-                    "features": null,
+                    "features": "with Analyzer features",
                     "os": "fortios",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "FMG-VM0000000000",
                     "icon": "fortinet.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -23,7 +23,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.103",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "v5.6.0-build1557 170727 (GA)",
                     "hardware": null,

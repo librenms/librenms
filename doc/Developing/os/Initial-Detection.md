@@ -140,34 +140,49 @@ So, considering the example:
 - `sysObjectID: bar, sysDescr: exodar` matches
 - `sysObjectID: bar, sysDescr: snafu` matches
 
-#### Discovery helpers
-
-Within the discovery code base if you are using php then the following helpers are available:
-
-- `$device['sysObjectID]`: This will contain the full numerical
-  sysObjectID for this device.
-- `$device['sysDescr']`: This will contain the full sysDescr for this device.
-
 #### OS discovery
 
-OS discovery is done within `LibreNMS/OS/$os.php` and is where we detect certain values.
+OS discovery collects additional standardized data about the OS.  These are specified in
+the discovery yaml `includes/definitions/discovery/<os>.yaml` or `LibreNMS/OS/<os>.php` if
+more complex collection is required.
+
+- `version` The version of the OS running on the device.
+- `hardware` The hardware version for the device. For example: 'WS-C3560X-24T-S'
+- `features` Features for the device, for example a list of enabled software features.
+- `serial` The main serial number of the device.
+
+##### Yaml based OS discovery
+
+- `sysDescr_regex` apply a regex or list of regexes to the sysDescr to extract named groups, this data has the lowest precedence
+- `<field>` specify an oid or list of oids to attempt to pull the data from, the first non-empty response will be used
+- `<field>_regex` parse the value out of the returned oid data, must use a named group
+- `<field>_template` combine multiple oid results together to create a final string value.  The result is trimmed.
+
+```yaml
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>MSM\S+) .* Serial number (?<serial>\S+) - Firmware version (?<version>\S+)/'
+        features: UPS-MIB::upsIdentAttachedDevices.0
+        hardware:
+            - ENTITY-MIB::entPhysicalName.1
+            - ENTITY-MIB::entPhysicalHardwareRev.1
+        hardware_template: '{{ ENTITY-MIB::entPhysicalName.1 }} {{ ENTITY-MIB::entPhysicalHardwareRev.1 }}'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        version: ENTITY-MIB::entPhysicalSoftwareRev.1
+        version_regex: '/V(?<version>.*)/'
+```
+
+##### PHP based OS discovery
 
 ```php
-public function discoverOS(): void
+public function discoverOS(\App\Models\Device $device): void
 {
-    $device = $this->getDeviceModel();
-    $info = snmp_getnext_multi($this->getDevice(), 'enclosureModel enclosureSerialNum entPhysicalFirmwareRev', '-OQUs', 'NAS-MIB:ENTITY-MIB');
-    $device->version = Str::replaceFirst('\"', '', $info['entPhysicalFirmwareRev']);
+    $info = snmp_getnext_multi($this->getDeviceArray(), ['enclosureModel', 'enclosureSerialNum', 'entPhysicalFirmwareRev'], '-OQUs', 'NAS-MIB:ENTITY-MIB');
+    $device->version = $info['entPhysicalFirmwareRev'];
     $device->hardware = $info['enclosureModel'];
     $device->serial = $info['enclosureSerialNum'];
 }
 ```
-
-- `$device->version` The version of the OS running on the device.
-- `$device->hardware` The hardware version for the device. For example: 'WS-C3560X-24T-S'
-- `$device->features` Features for the device, for example a list of cards in the slots of a modular chassis.
-- `$device->serial` The main serial number of the device.
-- `$device->icon` The icon of the device.
 
 ### MIBs
 

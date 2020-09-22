@@ -9,11 +9,11 @@ IMPORTS
 	CounterBasedGauge64 FROM HCNUM-TC;
 
 hw MODULE-IDENTITY
-	LAST-UPDATED "201212131322Z"
+	LAST-UPDATED "201909121500Z"
 	ORGANIZATION "Procera Networks, Inc."
 	CONTACT-INFO "support@proceranetworks.com"
 	DESCRIPTION "MIB for PacketLogic2 Hardware"
-	REVISION "201212131322Z"
+	REVISION "201909121500Z"
 	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
 
 	::={packetlogic2 30}

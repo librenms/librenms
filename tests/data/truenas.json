@@ -14,7 +14,7 @@
                     "type": "storage",
                     "serial": null,
                     "icon": "truenas.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

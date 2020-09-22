@@ -1,4 +1,5 @@
 <?php
+
 // private::enterprises.236.11.5.11.53.31.1.4.0 = STRING: "CLX-3170 Series"
 $hardware = trim(snmp_get($device, '1.3.6.1.4.1.236.11.5.11.53.31.1.4.0', '-OQv', '', ''), '" ');
 // mgnt::mib-2.43.5.1.1.17.1 = STRING: "QUV960066FJ124"

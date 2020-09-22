@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Toner";
+$pagetitle[] = 'Health :: Toner';
 ?>
 <div class="panel panel-default panel-condensed">
     <div class="panel-heading">

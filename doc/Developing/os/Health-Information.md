@@ -63,7 +63,7 @@ modules:
     sensors:
         airflow:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: airFlowSensorTable

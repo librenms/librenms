@@ -7,7 +7,7 @@ $graph_type = 'toner_usage';
 $supplies = \App\Models\Toner::query()->where('device_id', $device['device_id'])->get()->groupBy('toner_type');
 
 foreach ($supplies as $type => $supply) {
-    if (!empty($supply)) {
+    if (! empty($supply)) {
         echo '
           <div class="row">
           <div class="col-md-12">

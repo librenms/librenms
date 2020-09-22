@@ -1,16 +1,16 @@
 <?php
 
-echo(" FOUNDRY-SN-AGENT-MIB");
+echo ' FOUNDRY-SN-AGENT-MIB';
 
 // Chassis temperature (default)
-$high_limit         = 110;
-$high_warn_limit    = 95;
+$high_limit = 110;
+$high_warn_limit = 95;
 
-$descr    = "Chassis Temperature";
-$oid      = ".1.3.6.1.4.1.1991.1.1.1.1.18.0"; // snChasActualTemperature
-$warn_oid = ".1.3.6.1.4.1.1991.1.1.1.1.19.0"; // snChasWarningTemperature
-$high_oid = ".1.3.6.1.4.1.1991.1.1.1.1.20.0"; // snChasShutdownTemperature
-$value    = snmp_get($device, $oid, '-Oqv');
+$descr = 'Chassis Temperature';
+$oid = '.1.3.6.1.4.1.1991.1.1.1.1.18.0'; // snChasActualTemperature
+$warn_oid = '.1.3.6.1.4.1.1991.1.1.1.1.19.0'; // snChasWarningTemperature
+$high_oid = '.1.3.6.1.4.1.1991.1.1.1.1.20.0'; // snChasShutdownTemperature
+$value = snmp_get($device, $oid, '-Oqv');
 
 $value_warn = snmp_get($device, $warn_oid, '-Oqv');
 if (is_numeric($value_warn)) {

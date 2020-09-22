@@ -14,7 +14,7 @@
                     "type": "sensor",
                     "serial": null,
                     "icon": "sensatronics.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

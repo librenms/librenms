@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateStateTranslationsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,7 +24,7 @@ class CreateStateTranslationsTable extends Migration
             } else {
                 $table->timestamp('state_lastupdated')->useCurrent();
             }
-            $table->unique(['state_index_id','state_value']);
+            $table->unique(['state_index_id', 'state_value']);
         });
     }
 

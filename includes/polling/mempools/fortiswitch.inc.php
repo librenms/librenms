@@ -17,17 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 echo 'Fortigate MemPool';
 
-$mempool['used']  = snmp_get($device, 'fsSysMemUsage.0', '-OvQ', 'FORTINET-FORTISWITCH-MIB');
+$mempool['used'] = snmp_get($device, 'fsSysMemUsage.0', '-OvQ', 'FORTINET-FORTISWITCH-MIB');
 $mempool['total'] = snmp_get($device, 'fsSysMemCapacity.0', '-OvQ', 'FORTINET-FORTISWITCH-MIB');
-$mempool['free']  = ($mempool['total'] - $mempool['used']);
+$mempool['free'] = ($mempool['total'] - $mempool['used']);
 $mempool['perc'] = $mempool['total'] / $mempool['used'];
 
-echo '(U: '.$mempool['used'].' T: '.$mempool['total'].' F: '.$mempool['free'].') ';
+echo '(U: ' . $mempool['used'] . ' T: ' . $mempool['total'] . ' F: ' . $mempool['free'] . ') ';

@@ -14,11 +14,11 @@
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    $response = array(
+if (! Auth::user()->hasGlobalAdmin()) {
+    $response = [
         'status'  => 'error',
         'message' => 'Need to be admin',
-    );
+    ];
     echo _json_encode($response);
     exit;
 }
@@ -41,8 +41,8 @@ if (empty($device['device_id'])) {
     $message = 'Config has been updated';
 }
 
-$response = array(
+$response = [
     'status'        => $status,
     'message'       => $message,
-);
+];
 echo _json_encode($response);

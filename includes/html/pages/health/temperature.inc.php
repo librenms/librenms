@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_temperature';
-$unit       = '&deg;C';
-$class      = 'temperature';
+$unit = '&deg;C';
+$class = 'temperature';
 
 require 'includes/html/pages/health/sensors.inc.php';

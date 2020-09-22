@@ -20,7 +20,6 @@
  * FortiAnalyzer will send this trap when the received log rate
  * exceeds the suggested rate for the daily rate license.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
