@@ -8,7 +8,7 @@
                     "sysDescr": "ZyWALL 2X",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "ZyWALL 2X",
                     "features": null,
                     "os": "zywall",
                     "type": "firewall",

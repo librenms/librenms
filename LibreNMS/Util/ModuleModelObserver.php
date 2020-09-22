@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -39,21 +38,21 @@ class ModuleModelObserver
     {
         $model = Str::start($model, '\\');
         // discovery output (but don't install it twice (testing can can do this)
-        if (!$model::getEventDispatcher()->hasListeners('eloquent.created: ' . ltrim('\\', $model))) {
+        if (! $model::getEventDispatcher()->hasListeners('eloquent.created: ' . ltrim('\\', $model))) {
             $model::observe(new ModuleModelObserver());
         }
     }
 
     public function saving(Eloquent $model)
     {
-        if (!$model->isDirty()) {
+        if (! $model->isDirty()) {
             echo '.';
         }
     }
 
     public function updated(Eloquent $model)
     {
-        d_echo("Updated data:", 'U');
+        d_echo('Updated data:', 'U');
         d_echo($model->getDirty());
     }
 

@@ -1,5 +1,10 @@
 mib: BRIDGE-MIB:CIENA-SMI:CIENA-CES-CHASSIS-MIB:CIENA-CES-FEATURE-LICENSE-MIB:CIENA-CES-PORT-MIB:CIENA-CES-PORT-XCVR-MIB:WWP-PRODUCTS-MIB:WWP-LEOS-PORT-XCVR-MIB:WWP-LEOS-SYSTEM-CONFIG-MIB
 modules:
+    os:
+        features: CIENA-CES-MODULE-MIB::cienaCesModuleDescription.1.1
+        hardware: CIENA-CES-CHASSIS-MIB::cienaCesChassisPartNumber.0
+        serial: CIENA-CES-CHASSIS-MIB::cienaCesChassisSerialNumber.0
+        version: CIENA-CES-MODULE-MIB::cienaCesModuleSwRunningRelease.1.1.31
     processors:
         data:
             -

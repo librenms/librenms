@@ -19,7 +19,6 @@
  *
  * Tests Ruckus Wireless SmartZone Event trap handlers.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -105,7 +104,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription.0 \"Test AP event has occured\"";
 
         $trap = new Trap($trapText);
 
-        $message = "AP event: Test AP event has occured";
+        $message = 'AP event: Test AP event has occured';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusSZAPMiscEventTrap');

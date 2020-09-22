@@ -12,19 +12,18 @@
  * the source code distribution for details.
  */
 
-
 $oids = ['entPhysicalSoftwareRev.22', 'entPhysicalName.149', 'entPhysicalSerialNum.10'];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
 
-if (isset($data[22]['entPhysicalSoftwareRev']) && !empty($data[22]['entPhysicalSoftwareRev'])) {
+if (isset($data[22]['entPhysicalSoftwareRev']) && ! empty($data[22]['entPhysicalSoftwareRev'])) {
     $version = $data[22]['entPhysicalSoftwareRev'];
 }
 
-if (isset($data[149]['entPhysicalName']) && !empty($data[149]['entPhysicalName'])) {
+if (isset($data[149]['entPhysicalName']) && ! empty($data[149]['entPhysicalName'])) {
     $hardware = str_replace(' Chassis', '', $data[149]['entPhysicalName']);
 }
 
-if (isset($data[10]) && !empty($data[10]['entPhysicalSerialNum'])) {
+if (isset($data[10]) && ! empty($data[10]['entPhysicalSerialNum'])) {
     $serial = $data[10]['entPhysicalSerialNum'];
 }

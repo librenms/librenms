@@ -4,13 +4,13 @@ $no_refresh = true;
 
 $pagetitle[] = 'Search';
 
-$sections = array(
+$sections = [
     'ipv4' => 'IPv4 Address',
     'ipv6' => 'IPv6 Address',
     'mac'  => 'MAC Address',
     'arp'  => 'ARP Table',
-    'fdb'  => 'FDB Table'
-);
+    'fdb'  => 'FDB Table',
+];
 
 if (dbFetchCell('SELECT 1 from `packages` LIMIT 1')) {
     $sections['packages'] = 'Packages';
@@ -30,7 +30,7 @@ foreach ($sections as $type => $texttype) {
     }
 
     // echo('<a href="search/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $texttype .'</a>');
-    echo generate_link($texttype, array('page' => 'search', 'search' => $type));
+    echo generate_link($texttype, ['page' => 'search', 'search' => $type]);
 
     if ($vars['search'] == $type) {
         echo '</span>';

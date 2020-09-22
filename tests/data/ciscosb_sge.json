@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.6.1.72.2010.2",
                     "sysDescr": "48-port 10/100/1000 Ethernet Switch",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "Software 3.0.0.18, Firmware 2.0.0.03",
+                    "hardware": "SGE2010-48 00.00.01",
                     "features": null,
                     "os": "ciscosb",
                     "type": "network",
-                    "serial": null,
+                    "serial": "DNI1446B72Z",
                     "icon": "cisco.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

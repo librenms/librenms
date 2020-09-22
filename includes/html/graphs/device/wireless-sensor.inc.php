@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 require 'includes/html/graphs/common.inc.php';
 
 // escape % characters
@@ -41,16 +39,15 @@ if ($unit === '') {
 
 $sensors = dbFetchRows(
     'SELECT * FROM `wireless_sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`',
-    array($class, $device['device_id'])
+    [$class, $device['device_id']]
 );
-
 
 if (count($sensors) == 1 && $unit_long == $sensors[0]['sensor_descr']) {
     $unit_long = '';
 }
 
 $col_w = 7 + strlen($unit);
-$rrd_options .= " COMMENT:'". str_pad($unit_long, 35) . str_pad("Cur", $col_w). str_pad("Min", $col_w) . "Max\\n'";
+$rrd_options .= " COMMENT:'" . str_pad($unit_long, 35) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . "Max\\n'";
 
 foreach ($sensors as $index => $sensor) {
     $sensor_id = $sensor['sensor_id'];
@@ -58,7 +55,7 @@ foreach ($sensors as $index => $sensor) {
     $colour = \LibreNMS\Config::get("graph_colours.mixed.$colour_index");
 
     $sensor_descr_fixed = rrdtool_escape($sensor['sensor_descr'], 28);
-    $rrd_file = rrd_name($device['hostname'], array('wireless-sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']));
+    $rrd_file = rrd_name($device['hostname'], ['wireless-sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']]);
     $rrd_options .= " DEF:sensor$sensor_id=$rrd_file:sensor:AVERAGE";
 
     if ($unit == 'Hz') {

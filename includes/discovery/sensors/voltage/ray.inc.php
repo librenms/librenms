@@ -10,9 +10,8 @@
  * the source code distribution for details.
  */
 
-
 d_echo('RAY');
-$oid = ".1.3.6.1.4.1.33555.1.1.4.3";
+$oid = '.1.3.6.1.4.1.33555.1.1.4.3';
 $index = 0;
 $sensor_type = 'voltageUnit';
 $descr = 'Voltage';

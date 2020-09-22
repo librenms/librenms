@@ -7,12 +7,12 @@
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "000292",
+                    "hardware": "DSR-4410MD",
                     "features": null,
                     "os": "arris-dsr4410md",
                     "type": "network",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "arris.svg",
                     "location": null
                 }

@@ -4,7 +4,7 @@ use LibreNMS\Config;
 
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$cust_descrs = (array)Config::get('customers_descr', ['cust']);
+$cust_descrs = (array) Config::get('customers_descr', ['cust']);
 
 $sql = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_descr` = ? AND D.device_id = I.device_id AND `port_descr_type` IN ' . dbGenPlaceholders(count($cust_descrs));
 $param = $cust_descrs;
@@ -23,15 +23,15 @@ foreach (dbFetchRows($sql, $param) as $port) {
     }
 }
 
-$units       = 'bps';
+$units = 'bps';
 $total_units = 'B';
-$colours_in  = 'greens';
-$multiplier  = '8';
+$colours_in = 'greens';
+$multiplier = '8';
 $colours_out = 'blues';
 
 $nototal = 1;
 
-$ds_in  = 'INOCTETS';
+$ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
 require 'includes/html/graphs/generic_multi_bits_separated.inc.php';

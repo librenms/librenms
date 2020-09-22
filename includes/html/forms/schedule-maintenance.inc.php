@@ -15,9 +15,9 @@ use Illuminate\Support\Str;
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
-    die('ERROR: You need to be admin');
+    exit('ERROR: You need to be admin');
 }
 
 $sub_type = $_POST['sub_type'];
@@ -41,20 +41,20 @@ if ($sub_type == 'new-maintenance') {
     $start_recurring_hr = mres($_POST['start_recurring_hr']);
     $end_recurring_hr = mres($_POST['end_recurring_hr']);
     $recurring_day = mres($_POST['recurring_day']);
-    $start    = mres($_POST['start']);
+    $start = mres($_POST['start']);
     [$duration_hour, $duration_min] = explode(':', mres($_POST['duration']));
-    $end      = mres($_POST['end']);
-    $maps     = mres($_POST['maps']);
+    $end = mres($_POST['end']);
+    $maps = mres($_POST['maps']);
 
     if (isset($duration_hour) && isset($duration_min)) {
-        $end = date('Y-m-d H:i:00', strtotime('+'.intval($duration_hour).' hour '.intval($duration_min).' minute', strtotime($start)));
+        $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
     }
 
     if (empty($title)) {
         $message = 'Missing title<br />';
     }
 
-    if (!in_array($recurring, array(0,1))) {
+    if (! in_array($recurring, [0, 1])) {
         $message .= 'Missing recurring choice<br />';
     }
 
@@ -66,14 +66,14 @@ if ($sub_type == 'new-maintenance') {
         } else {
             // check if date is correct
             [$ysrd, $msrd, $dsrd] = explode('-', $start_recurring_dt);
-            if (!checkdate($msrd, $dsrd, $ysrd)) {
+            if (! checkdate($msrd, $dsrd, $ysrd)) {
                 $message .= 'Please check start recurring date<br />';
             }
         }
         // end recurring dt not mandatory.. but if set, check if correct
-        if (!empty($end_recurring_dt) && $end_recurring_dt != '0000-00-00' && $end_recurring_dt != '') {
+        if (! empty($end_recurring_dt) && $end_recurring_dt != '0000-00-00' && $end_recurring_dt != '') {
             [$yerd, $merd, $derd] = explode('-', $end_recurring_dt);
-            if (!checkdate($merd, $derd, $yerd)) {
+            if (! checkdate($merd, $derd, $yerd)) {
                 $message .= 'Please check end recurring date<br />';
             }
         } else {
@@ -88,7 +88,7 @@ if ($sub_type == 'new-maintenance') {
             $message .= 'Missing end recurring hour<br />';
         }
 
-        if (isset($_POST['recurring_day']) && is_array($_POST['recurring_day']) && !empty($_POST['recurring_day'])) {
+        if (isset($_POST['recurring_day']) && is_array($_POST['recurring_day']) && ! empty($_POST['recurring_day'])) {
             $recurring_day = $_POST['recurring_day'];
         }
 
@@ -111,7 +111,7 @@ if ($sub_type == 'new-maintenance') {
         $end_recurring_hr = '00:00:00';
     }
 
-    if (!is_array($_POST['maps'])) {
+    if (! is_array($_POST['maps'])) {
         $message .= 'Not mapped to any groups or devices<br />';
     }
 
@@ -133,8 +133,8 @@ if ($sub_type == 'new-maintenance') {
         $alert_schedule->save();
 
         if ($alert_schedule->schedule_id > 0) {
-            $items = array();
-            $fail  = 0;
+            $items = [];
+            $fail = 0;
 
             if ($update == 1) {
                 dbDelete('alert_schedulables', '`schedule_id`=?', [$alert_schedule->schedule_id]);
@@ -153,7 +153,7 @@ if ($sub_type == 'new-maintenance') {
                 $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
                 if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
                     $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
-                    $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
+                    $device_notes .= ((empty($device_notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
                     dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);
                 }
                 if ($item > 0) {
@@ -165,13 +165,13 @@ if ($sub_type == 'new-maintenance') {
 
             if ($fail == 1 && $update == 0) {
                 foreach ($items as $item) {
-                    dbDelete('alert_schedulables', '`item_id`=?', array($item));
+                    dbDelete('alert_schedulables', '`item_id`=?', [$item]);
                 }
 
                 dbDelete('alert_schedule', '`schedule_id`=?', [$alert_schedule->schedule_id]);
                 $message = 'Issue scheduling maintenance';
             } else {
-                $status  = 'ok';
+                $status = 'ok';
                 $message = 'Scheduling maintenance ok';
             }
         } else {
@@ -179,10 +179,10 @@ if ($sub_type == 'new-maintenance') {
         }//end if
     }//end if
 
-    $response = array(
+    $response = [
         'status'  => $status,
         'message' => $message,
-    );
+    ];
 } elseif ($sub_type == 'parse-maintenance') {
     $alert_schedule = \App\Models\AlertSchedule::findOrFail($_POST['schedule_id']);
     $items = [];
@@ -209,14 +209,14 @@ if ($sub_type == 'new-maintenance') {
     $response['targets'] = $items;
 } elseif ($sub_type == 'del-maintenance') {
     $schedule_id = mres($_POST['del_schedule_id']);
-    dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
-    dbDelete('alert_schedulables', '`schedule_id`=?', array($schedule_id));
-    $status   = 'ok';
-    $message  = 'Maintenance schedule has been removed';
-    $response = array(
+    dbDelete('alert_schedule', '`schedule_id`=?', [$schedule_id]);
+    dbDelete('alert_schedulables', '`schedule_id`=?', [$schedule_id]);
+    $status = 'ok';
+    $message = 'Maintenance schedule has been removed';
+    $response = [
         'status'  => $status,
         'message' => $message,
-    );
+    ];
 }//end if
 header('Content-type: application/json');
 echo _json_encode($response);

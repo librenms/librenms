@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,9 +25,9 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\UI\DeviceTab;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
 class NotesController implements DeviceTab
 {

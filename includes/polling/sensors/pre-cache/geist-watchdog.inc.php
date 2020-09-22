@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 if ($type == 'temperature') {
     $sensor_cache['geist_temp_unit'] = snmp_get($device, 'temperatureUnits.0', '-Oqv', 'GEIST-V4-MIB');
 }

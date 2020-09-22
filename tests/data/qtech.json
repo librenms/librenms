@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.27514.1.1.2.7",
                     "sysDescr": "QSW-3500-24-AC Device, Compiled Feb 22 10:28:35 2011\n SoftWare Version QSW-3500-24-AC_6.0.220.41\n BootRom Version QSW-3500-24-AC_2.0.2\n HardWare Version R01\n Copyright (C) 2010 by QTECH LLC\n All rights reserved",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "6.0.220.41",
+                    "hardware": "QSW-3500-24-AC",
                     "features": null,
                     "os": "qtech",
                     "type": "network",
                     "serial": null,
                     "icon": "qtech.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

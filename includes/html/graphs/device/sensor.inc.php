@@ -3,9 +3,9 @@
 require 'includes/html/graphs/common.inc.php';
 
 $col_w = 7 + strlen($unit);
-$rrd_options .= " COMMENT:'". str_pad($unit_long, 19) . str_pad("Cur", $col_w). str_pad("Min", $col_w) . "Max\\n'";
+$rrd_options .= " COMMENT:'" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . "Max\\n'";
 
-foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`', array($class, $device['device_id'])) as $index => $sensor) {
+foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`', [$class, $device['device_id']]) as $index => $sensor) {
     // FIXME generic colour function
     switch ($index % 7) {
         case 0:

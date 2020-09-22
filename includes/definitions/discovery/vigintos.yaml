@@ -1,5 +1,7 @@
 mib: VEL-HOST2-MIB
 modules:
+    os:
+        version: VEL-HOST2-MIB::host2Version.0
     sensors:
         pre-cache:
             data:

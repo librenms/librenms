@@ -8,7 +8,7 @@ if ($oids) {
     foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
         if ($data) {
-            list($oid, $type) = explode(' ', $data);
+            [$oid, $type] = explode(' ', $data);
             $oid_ex = explode('.', $oid);
             $index = $oid_ex[(count($oid_ex) - 1)];
             if ($type == 2) {
@@ -24,7 +24,7 @@ if ($oids) {
                 $monitor = snmp_get($device, $monitor_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB');
                 if ($monitor == 'true') {
                     $descr = trim(str_ireplace('temperature', '', $descr));
-                    discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, trim($index, '.'), 'supermicro', $descr, (int)$divisor, '1', null, null, null, $limit, $temperature);
+                    discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, trim($index, '.'), 'supermicro', $descr, (int) $divisor, '1', null, null, null, $limit, $temperature);
                 }
             }
         }

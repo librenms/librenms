@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "asuswrt-merlin.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

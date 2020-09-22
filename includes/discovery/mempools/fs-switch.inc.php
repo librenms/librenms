@@ -1,4 +1,5 @@
 <?php
+
 //
 // Discovery for FS-switch devices.
 //
@@ -11,10 +12,10 @@ if ($device['os'] == 'fs-switch') {
     d_echo($mempools_array);
     foreach ($mempools_array as $index => $entry) {
         if ($entry['memTotalReal'] > 0) {
-            d_echo($index.' '.$entry['memTotalReal'].' -> '.$entry['memTotalFree']."\n");
-            $descr     = "Chassis";
-            $descr    .= " Memory";
-            $usage     = $entry['memTotalFree'];
+            d_echo($index . ' ' . $entry['memTotalReal'] . ' -> ' . $entry['memTotalFree'] . "\n");
+            $descr = 'Chassis';
+            $descr .= ' Memory';
+            $usage = $entry['memTotalFree'];
             discover_mempool($valid_mempool, $device, $index, 'fs-switch', $descr, '1', null, null);
         } //end if
     } //end foreach

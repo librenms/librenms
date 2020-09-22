@@ -1,5 +1,10 @@
 mib: 'HILLSTONE-FAN-MIB'
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+)$/'
+        serial: HILLSTONE-SYSTEM-MIB::sysSerialNumber.0
+        version: HILLSTONE-SYSTEM-MIB::sysSoftware.0
+        version_regex: '/Version (?<version>\S+)/'
     processors:
         data:
             -

@@ -12,7 +12,7 @@
  */
 
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], array('type'=>'Cisco-CIMC'));
+$components = $component->getComponents($device['device_id'], ['type'=>'Cisco-CIMC']);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
@@ -25,13 +25,13 @@ if (count($components > 0)) {
     // Make sure we have an array of data before we try to iterate over it
     if (is_array($tblUCSObjects)) {
         // First, let's extract any active faults, we will use them later.
-        $faults = array();
+        $faults = [];
         foreach ($tblUCSObjects as $oid => $data) {
             if (strstr($oid, '1.3.6.1.4.1.9.9.719.1.1.1.1.5.')) {
                 $id = substr($oid, 30);
-                $fobj = $tblUCSObjects['1.3.6.1.4.1.9.9.719.1.1.1.1.5.'.$id];
+                $fobj = $tblUCSObjects['1.3.6.1.4.1.9.9.719.1.1.1.1.5.' . $id];
                 $fobj = preg_replace('/^sys/', '/sys', $fobj);
-                $faults[$fobj] = $tblUCSObjects['1.3.6.1.4.1.9.9.719.1.1.1.1.11.'.$id];
+                $faults[$fobj] = $tblUCSObjects['1.3.6.1.4.1.9.9.719.1.1.1.1.11.' . $id];
             }
         }
 
@@ -46,7 +46,7 @@ if (count($components > 0)) {
                 if ($tblUCSObjects[$array['statusoid']] != 1) {
                     // Yes, report an error
                     $array['status'] = 2;
-                    $array['error'] = "Error Operability Code: ".$tblUCSObjects[$array['statusoid']]."\n";
+                    $array['error'] = 'Error Operability Code: ' . $tblUCSObjects[$array['statusoid']] . "\n";
                 } else {
                     // No, unset any errors that may exist.
                     $array['status'] = 0;
@@ -61,16 +61,16 @@ if (count($components > 0)) {
                     if (strstr($key, $array['label'])) {
                         // The fault is on this chassis.
                         $array['status'] = 2;
-                        $array['error'] .= $value."\n";
+                        $array['error'] .= $value . "\n";
                     }
                 }
             }
 
             // Print some debugging
             if ($array['status'] == 0) {
-                d_echo($array['label']." - Ok\n");
+                d_echo($array['label'] . " - Ok\n");
             } else {
-                d_echo($array['label']." - ".$array['error']."\n");
+                d_echo($array['label'] . ' - ' . $array['error'] . "\n");
             }
         } // End foreach components
         // Write the Components back to the DB.

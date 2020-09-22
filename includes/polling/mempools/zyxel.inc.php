@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 d_echo('Zyxel: ');
 $perc = snmp_get($device, 'sysMgmtMemUsage.0', '-OvQ', 'ZYXEL-ES-COMMON');
 if (is_numeric($perc)) {

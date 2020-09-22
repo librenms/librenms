@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.259.10.1.39.103",
                     "sysDescr": "ECS4110-28T",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "R01 1.1.2.0",
+                    "hardware": "ECS4110-28T",
                     "features": null,
                     "os": "edgecos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "EC1549000075",
                     "icon": "edge-core.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

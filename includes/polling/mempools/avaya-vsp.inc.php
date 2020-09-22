@@ -15,13 +15,13 @@
 // rcKhiSlotMemFree 1.3.6.1.4.1.2272.1.85.10.1.1.7.1
 // rcKhiSlotMemUtil 1.3.6.1.4.1.2272.1.85.10.1.1.8.1
 
-$used = (snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.6.1", '-OvQ') * 1000);
-$free = (snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.7.1", '-OvQ') * 1000);
-$perc = snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.8.1", '-OvQ');
+$used = (snmp_get($device, '1.3.6.1.4.1.2272.1.85.10.1.1.6.1', '-OvQ') * 1000);
+$free = (snmp_get($device, '1.3.6.1.4.1.2272.1.85.10.1.1.7.1', '-OvQ') * 1000);
+$perc = snmp_get($device, '1.3.6.1.4.1.2272.1.85.10.1.1.8.1', '-OvQ');
 $total = ($used + $free);
 if (is_numeric($used) && is_numeric($free) && is_numeric($perc)) {
     $mempool['total'] = $total;
-    $mempool['free']  = $free;
-    $mempool['used']  = $used;
-    $mempool['perc']  = $perc;
+    $mempool['free'] = $free;
+    $mempool['used'] = $used;
+    $mempool['perc'] = $perc;
 }

@@ -26,13 +26,11 @@
  * Traps when Adva objects are created. This includes Remote User Login object,
  * Flow Creation object, and LAG Creation object.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
-
-echo "Adva FSP-150 dBm";
+echo 'Adva FSP-150 dBm';
 
 $multiplier = 1;
 $divisor = 1;
@@ -49,7 +47,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex = $entry['cmEthernetNetPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]) . ' Rx Power';
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
@@ -72,7 +70,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 
             //Disover transmit power level
             $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]) . ' Tx Power';
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
@@ -95,7 +93,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         }
     }
 
-//Adva Access Ports dBm
+    //Adva Access Ports dBm
     if ($entry['cmEthernetAccPortMediaType'] == 'fiber') {
         //Discover receive power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.34.' . $index . '.3';
@@ -106,7 +104,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex = $entry['cmEthernetAccPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetAccPortIfIndex'], $device['device_id']]) . ' Rx Power';
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
@@ -162,7 +160,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex = $entry['cmEthernetTrafficPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Rx Power';
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
@@ -184,7 +182,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             );
 
             $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Tx Power';
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'dbm',

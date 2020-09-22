@@ -1,9 +1,9 @@
 <?php
 
-if (!$auth) {
+if (! $auth) {
     foreach (explode(',', $vars['id']) as $ifid) {
         $auth = port_permitted($ifid);
-        if (!$auth) {
+        if (! $auth) {
             break;
         }
     }

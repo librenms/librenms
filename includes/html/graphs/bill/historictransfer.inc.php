@@ -68,7 +68,6 @@ $graph->yaxis->SetLabelFormatCallback('YCallback');
 
 $graph->ygrid->SetFill(true, '#EFEFEF@0.5', '#FFFFFF@0.5');
 
-
 // Create the bar plots
 $barplot_tot = new BarPlot($graph_data['tot_data']);
 $barplot_tot->SetLegend('Traffic total');
@@ -95,7 +94,7 @@ $lineplot_allow->SetLegend('Average');
 $lineplot_allow->SetColor('black');
 $lineplot_allow->SetWeight(1);
 
-$gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out));
+$gbplot = new GroupBarPlot([$barplot_in, $barplot_tot, $barplot_out]);
 
 $graph->Add($gbplot);
 $graph->Add($lineplot_allow);

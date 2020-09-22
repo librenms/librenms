@@ -8,13 +8,13 @@
                     "sysDescr": "TEG-S80ES",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "TEG-S80ES",
                     "features": null,
                     "os": "trendnet",
                     "type": "network",
                     "serial": null,
                     "icon": "trendnet.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -8,13 +8,13 @@
                     "sysDescr": "GS-4012F",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "GS-4012F",
                     "features": null,
                     "os": "zynos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "0Z0724031894",
                     "icon": "zyxel.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

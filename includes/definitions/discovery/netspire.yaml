@@ -1,5 +1,8 @@
 mib: OACOMMON-MIB
 modules:
+    os:
+        hardware: OACOMMON-MIB::netspireDeviceModelName.0
+        serial: OACOMMON-MIB::netSpireDeviceDeviceSerialNo.0
     processors:
         data:
             -

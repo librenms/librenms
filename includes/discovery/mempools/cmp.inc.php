@@ -1,7 +1,7 @@
 <?php
 
 // Ignore this discovery module if we have already discovered things in CISCO-ENHANCED-MEMPOOL-MIB. Dirty duplication.
-$cemp_count = dbFetchCell("SELECT COUNT(*) FROM `mempools` WHERE `device_id` = ? AND `mempool_type` = 'cemp'", array($device['device_id']));
+$cemp_count = dbFetchCell("SELECT COUNT(*) FROM `mempools` WHERE `device_id` = ? AND `mempool_type` = 'cemp'", [$device['device_id']]);
 
 if (($device['os_group'] == 'cisco') && $cemp_count == '0') {
     echo 'OLD-CISCO-MEMORY-POOL: ';

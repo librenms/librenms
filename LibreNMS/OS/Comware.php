@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,12 +24,22 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
 class Comware extends OS implements ProcessorDiscovery
 {
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml
+
+        // serial
+        $serial_nums = explode("\n", snmp_walk($this->getDeviceArray(), 'hh3cEntityExtManuSerialNum', '-Osqv', 'HH3C-ENTITY-EXT-MIB'));
+        $this->getDevice()->serial = $serial_nums[0]; // use the first s/n
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -41,11 +50,11 @@ class Comware extends OS implements ProcessorDiscovery
     {
         $procdata = $this->getCacheByIndex('hh3cEntityExtCpuUsage', 'HH3C-ENTITY-EXT-MIB');
 
-        if (!empty($procdata)) {
+        if (! empty($procdata)) {
             $entity_data = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
         }
 
-        $processors = array();
+        $processors = [];
 
         foreach ($procdata as $index => $usage) {
             if ($usage != 0) {

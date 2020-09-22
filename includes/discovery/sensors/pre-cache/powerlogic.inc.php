@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 echo 'loadCurrentTable ';
 $pre_cache['powerlogic_loadCurrentTable'] = snmpwalk_cache_index($device, 'loadCurrentTable', [], 'PM8ECCMIB');
 

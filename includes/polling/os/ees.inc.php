@@ -17,14 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $tmp_ees = snmp_get_multi($device, ['identControllerFirmwareVersion.0', 'identControllerSerialNumber.0'], '-OQUs', 'EES-POWER-MIB');
 $version = $tmp_ees[0]['identControllerFirmwareVersion'];
-$serial  = $tmp_ees[0]['identControllerSerialNumber'];
+$serial = $tmp_ees[0]['identControllerSerialNumber'];
 
 unset($tmp_ees);

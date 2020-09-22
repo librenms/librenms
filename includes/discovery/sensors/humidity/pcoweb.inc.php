@@ -39,7 +39,7 @@ foreach ($humidities as $humidity) {
     $current = (snmp_get($device, $humidity['mib'], '-OqvU') / $humidity['precision']);
 
     $high_limit = null;
-    $low_limit  = null;
+    $low_limit = null;
 
     if (is_numeric($current) && $current != 0) {
         $index = implode('.', array_slice(explode('.', $humidity['oid']), -5));

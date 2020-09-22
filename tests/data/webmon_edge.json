@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.994.3.4",
                     "sysDescr": "WebMon Edge",
                     "sysContact": null,
-                    "version": null,
+                    "version": "1.19.0",
                     "hardware": null,
                     "features": null,
                     "os": "webmon",
                     "type": "environment",
                     "serial": null,
                     "icon": "dantel.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

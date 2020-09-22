@@ -1,5 +1,8 @@
 mib: UBNT-EdgeMAX-MIB
 modules:
+    os:
+        hardware: UBNT-EdgeMAX-MIB::ubntModel.0
+        version: UBNT-EdgeMAX-MIB::ubntVersion.0
     processors:
         data:
             -

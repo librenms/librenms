@@ -12,14 +12,12 @@
  * the source code distribution for details.
 */
 
-
 /*
 / F5-BIGIP-SYSTEM-MIB::sysStatMemoryTotal.0 = Counter64: 28638707712
 / F5-BIGIP-SYSTEM-MIB::sysStatMemoryUsed.0 = Counter64: 1794195576
 */
 
-
-$mempool['used']  = snmp_get($device, 'sysGlobalStat.sysStatMemoryUsed.0', '-OvQ', 'F5-BIGIP-SYSTEM-MIB');
+$mempool['used'] = snmp_get($device, 'sysGlobalStat.sysStatMemoryUsed.0', '-OvQ', 'F5-BIGIP-SYSTEM-MIB');
 $mempool['total'] = snmp_get($device, 'sysGlobalStat.sysStatMemoryTotal.0', '-OvQ', 'F5-BIGIP-SYSTEM-MIB');
-$mempool['free']  = ($mempool['total'] - $mempool['used']);
-$mempool['perc']  = ($mempool['used'] / $mempool['total']) * 100;
+$mempool['free'] = ($mempool['total'] - $mempool['used']);
+$mempool['perc'] = ($mempool['used'] / $mempool['total']) * 100;

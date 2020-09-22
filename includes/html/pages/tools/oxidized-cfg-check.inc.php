@@ -32,7 +32,7 @@ if (isset($_POST['config'])) {
 
 function validate_oxidized_cfg($tree, $wanted_leaf = false)
 {
-    $valid_config = array(
+    $valid_config = [
         'username' => 'string',
         'password' => 'string',
         'model' => 'string',
@@ -45,84 +45,84 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
         'retries' => 'int',
         'prompt' => 'string',
         'models' => 'array',
-        'vars' => array(
+        'vars' => [
             'enable' => 'boolean',
             'ssh_no_exec' => 'boolean',
             'remove_secret' => 'boolean',
-        ),
+        ],
         'groups' => 'array',
         'rest' => 'string',
         'pid' => 'string',
-        'input' => array(
+        'input' => [
             'default' => 'string',
             'debug' => 'boolean',
-            'ssh' => array(
+            'ssh' => [
                 'secure' => 'boolean',
-            ),
-        ),
-        'output' => array(
+            ],
+        ],
+        'output' => [
             'default' => 'string',
-            'git' => array(
+            'git' => [
                 'user' => 'string',
                 'email' => 'string',
                 'repo' => 'string',
-            ),
-        ),
-        'source' => array(
+            ],
+        ],
+        'source' => [
             'default' => 'string',
-            'csv' => array(
+            'csv' => [
                 'file' => 'string',
                 'delimiter' => 'string',
-                'map' => array(
+                'map' => [
                     'name' => 'string',
                     'model' => 'string',
                     'username' => 'string',
                     'password' => 'string',
                     'group' => 'group',
-                ),
-                'vars_map' => array(
+                ],
+                'vars_map' => [
                     'enable' => 'string',
-                ),
-            ),
-            'http' => array(
+                ],
+            ],
+            'http' => [
                 'url' => 'string',
                 'scheme' => 'string',
                 'secure' => 'boolean',
                 'delimiter' => 'string',
                 'user' => 'string',
                 'pass' => 'string',
-                'map' => array(
+                'map' => [
                     'name' => 'string',
                     'model' => 'string',
                     'username' => 'string',
                     'password' => 'string',
                     'group' => 'group',
-                ),
+                ],
                 'vars_map' => 'array',
-                'headers' => array(
+                'headers' => [
                     'X-Auth-Token' => 'string',
-                ),
-            ),
-            'mysql' => array(
+                ],
+            ],
+            'mysql' => [
                 'adapter' => 'string',
                 'database' => 'string',
                 'table' => 'string',
                 'user' => 'string',
                 'password' => 'password',
-                'map' => array(
+                'map' => [
                     'name' => 'string',
                     'model' => 'string',
                     'username' => 'string',
                     'password' => 'string',
                     'group' => 'group',
-                ),
+                ],
                 'vars_map' => 'array',
-            ),
-        ),
+            ],
+        ],
         'model_map' => 'array',
         'next_adds_job' => 'boolean',
         'hooks' => 'array',
-    );
+    ];
 
     if ($wanted_leaf !== false) {
         $valid_config_tmp = $wanted_leaf;
@@ -130,7 +130,7 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
         $valid_config_tmp = $valid_config;
     }
 
-    $output = array();
+    $output = [];
     foreach ($tree as $leaf => $value) {
         if (is_array($tree[$leaf]) && ($valid_config_tmp !== 'array' && $valid_config_tmp[$leaf] !== 'array')) {
             $tmp_output = validate_oxidized_cfg($tree[$leaf], $valid_config_tmp[$leaf]);
@@ -138,12 +138,12 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
                 $output = array_merge($output, $tmp_output);
             }
         } else {
-            if (!isset($valid_config_tmp[$leaf]) && ($valid_config_tmp !== 'array' && $valid_config_tmp[$leaf] !== 'array')) {
+            if (! isset($valid_config_tmp[$leaf]) && ($valid_config_tmp !== 'array' && $valid_config_tmp[$leaf] !== 'array')) {
                 $output[] = "$leaf - is not valid";
             }
         }
     }
-    if (!empty($output)) {
+    if (! empty($output)) {
         return $output;
     }
 }
