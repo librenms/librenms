@@ -247,7 +247,7 @@ class IRCBot
                 $this->log("Alert received ".$alert['title']);
                 $this->log("Alert state ".$alert['state']);
                 $this->log("Alert severity ".$alert['severity']);
-                $this->log("Alert channels ".print_r($this->config['irc_alert_chan'], TRUE));
+                $this->log("Alert channels ".print_r($this->config['irc_alert_chan'], true));
             }
 
             switch ($alert['state']) {
@@ -394,11 +394,11 @@ class IRCBot
         $this->command = str_replace(':.', '', $this->command);
         $tmp = explode(':.' . $this->command . ' ', $this->data);
         $this->user = $this->getAuthdUser();
-        $this->log("isAuthd-1? " . $this->isAuthd() );
+        $this->log("isAuthd-1? " . $this->isAuthd());
         if (! $this->isAuthd() && (isset($this->config['irc_auth']))) {
             $this->hostAuth();
         }
-        $this->log("isAuthd-2? " . $this->isAuthd() );
+        $this->log("isAuthd-2? " . $this->isAuthd());
         if ($this->isAuthd() || trim($this->command) == 'auth') {
             $this->proceedCommand(str_replace("\n", '', trim($this->command)), trim($tmp[1]));
         }
