@@ -168,7 +168,6 @@ class IRCBot
                     $this->nickwait = 0;
                 }
                 $this->nickwait += 1;
-                $this->ircRaw('NICK ' . $this->nick);
             }
 
             $this->getData();
