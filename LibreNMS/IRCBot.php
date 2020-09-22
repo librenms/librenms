@@ -26,7 +26,7 @@ use LibreNMS\Enum\AlertState;
 
 class IRCBot
 {
-    private $last_activity = '';
+    private $last_activity = 0;
 
     private $data = '';
 
@@ -43,6 +43,8 @@ class IRCBot
     private $pass = '';
 
     private $nick = 'LibreNMS';
+
+    private $tempnick = null;
 
     private $chan = [];
 
@@ -61,9 +63,18 @@ class IRCBot
         'join',
     ];
 
+    private $command = '';
+
     private $external = [];
 
     private $tick = 62500;
+
+    private $j = 0;
+
+    private $socket = [];
+
+    private $floodcount = 0;
+
 
     public function __construct()
     {
