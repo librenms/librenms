@@ -115,7 +115,7 @@ function discover_service($device, $service)
     echo "$service ";
 }
 
-function add_service_template($device_group, $type, $desc, $param = '', $ignore = 0, $disabled = 0)
+function add_service_template($device_group, $type, $desc, $ip, $param = '', $ignore = 0, $disabled = 0)
 {
 
 //    if (!is_array($device_group)) {
