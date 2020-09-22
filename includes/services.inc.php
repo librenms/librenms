@@ -190,7 +190,7 @@ function discover_service_template($device_group, $service_template)
         $service = service_template_get($service_template);
         $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?', [$device_group]);
         foreach ($device_ids as $device) {
-            add_service($device,$service['device'], $service['type'], $service['descr'], $service['ip'], $service['params'], $service['service_template_id'], 0);
+            add_service($device, $service['device'], $service['type'], $service['descr'], $service['ip'], $service['params'], $service['service_template_id'], 0);
         }
         log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
         echo '+';
