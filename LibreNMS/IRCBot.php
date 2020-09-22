@@ -260,7 +260,7 @@ class IRCBot
 
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
-                    sendAlert($chan, $severity, $alert);
+                    $this->sendAlert($chan, $severity, $alert);
                 }
 
                 return;
@@ -268,7 +268,7 @@ class IRCBot
 
             foreach ($this->authd as $nick => $data) {
                 if ($data['expire'] >= time()) {
-                    sendAlert($nick, $severity, $alert);
+                    $this->sendAlert($nick, $severity, $alert);
                 }
             }
         }
