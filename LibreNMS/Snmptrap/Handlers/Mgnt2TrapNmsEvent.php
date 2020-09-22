@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -53,7 +52,7 @@ class Mgnt2TrapNmsEvent implements SnmptrapHandler
         $logAdd = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText'));
 
         // Adding additional info if it exists.
-        if (!empty($logAdd)) {
+        if (! empty($logAdd)) {
             $logReason = "$logReason Additional info: $logAdd";
         }
 

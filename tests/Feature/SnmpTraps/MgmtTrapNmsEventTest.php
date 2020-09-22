@@ -22,7 +22,6 @@
  *
  * Tests JnxVpnPwDown and JnxVpnPwUp traps from Juniper devices.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -33,14 +32,12 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class MgmtTrapNmsEventTest extends SnmpTrapTestCase
 {
 
     public function testEvent()
     {
-
         $device = factory(Device::class)->create();
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
@@ -77,7 +74,6 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
     //Test alarm with addtional text supplied.
     public function testEventAddText()
     {
-
         $device = factory(Device::class)->create();
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
@@ -115,7 +111,6 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
     //Event trap on a specific port
     public function testEventPort()
     {
-
         $device = factory(Device::class)->create();
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];

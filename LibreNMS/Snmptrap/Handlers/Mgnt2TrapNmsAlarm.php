@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -55,7 +54,7 @@ class Mgnt2TrapNmsAlarm implements SnmptrapHandler
         $alarmSeverity = $trap->getOidData($trap->findOid('EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogSeverity'));
 
         // Adding additional info if it exists.
-        if (!empty($probAdd)) {
+        if (! empty($probAdd)) {
             $probSpecific = "$probSpecific Additional info: $probAdd";
         }
 

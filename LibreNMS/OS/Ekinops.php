@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  KanREN, Inc 2020
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -33,14 +32,13 @@ class Ekinops extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        
         $sysDescr = $device->sysDescr;
-        $info = explode(",", $sysDescr);
+        $info = explode(',', $sysDescr);
 
         $device->hardware = $info[1];
         $device->version = $info[2];
 
-        $mgmtCard = snmp_get($this->getDeviceArray(), "mgnt2RinvHwPlatform.0", "-OQv", "EKINOPS-MGNT2-MIB");
+        $mgmtCard = snmp_get($this->getDeviceArray(), 'mgnt2RinvHwPlatform.0', '-OQv', 'EKINOPS-MGNT2-MIB');
         $mgmtInfo = self::ekinopsInfo($mgmtCard);
         $device->serial = $mgmtInfo['Serial Number'];
     }
@@ -56,11 +54,12 @@ class Ekinops extends OS implements OSDiscovery
         unset($info[0]);
         $inv = [];
         foreach ($info as $line) {
-            list($attr, $value) = explode(":", $line);
+            [$attr, $value] = explode(':', $line);
             $attr = trim($attr);
             $value = trim($value);
             $inv[$attr] = $value;
         }
+
         return $inv;
     }
 }
