@@ -35,8 +35,8 @@ class Ekinops extends OS implements OSDiscovery
         $sysDescr = $device->sysDescr;
         $info = explode(',', $sysDescr);
 
-        $device->hardware = $info[1];
-        $device->version = $info[2];
+        $device->hardware = trim($info[1]);
+        $device->version = trim($info[2]);
 
         $mgmtCard = snmp_get($this->getDeviceArray(), 'mgnt2RinvHwPlatform.0', '-OQv', 'EKINOPS-MGNT2-MIB');
         $mgmtInfo = self::ekinopsInfo($mgmtCard);
