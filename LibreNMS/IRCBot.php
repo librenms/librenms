@@ -164,7 +164,7 @@ class IRCBot
 
             if (isset($this->tempnick)) {
                 if ($this->nickwait > 100) {
-                    $this->ircRaw('NICK ' .$this->nick);
+                    $this->ircRaw('NICK ' . $this->nick);
                     $this->nickwait = 0;
                 }
                 $this->nickwait += 1;
