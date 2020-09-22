@@ -271,24 +271,25 @@ class IRCBot
                         }
                     }
                 }
-            } else {
-                foreach ($this->authd as $nick => $data) {
-                    if ($data['expire'] >= time()) {
-                        $this->ircRaw('PRIVMSG ' . $nick . ' :' . $severity . trim($alert['title']));
-                        if (! $this->config['irc_alert_short']) { // Only send the title if set to short
-                            foreach (explode("\n", $alert['msg']) as $line) {
-                                // We don't need to repeat the title
-                                $line = $this->_html2irc($line);
-                                $line = strip_tags($line);
-                                if (trim($line) != trim($alert['title'])) {
-                                    $this->ircRaw('PRIVMSG ' . $nick . ' :' . $line);
-                                }
+                return
+            }//end if
+
+            foreach ($this->authd as $nick => $data) {
+                if ($data['expire'] >= time()) {
+                    $this->ircRaw('PRIVMSG ' . $nick . ' :' . $severity . trim($alert['title']));
+                    if (! $this->config['irc_alert_short']) { // Only send the title if set to short
+                        foreach (explode("\n", $alert['msg']) as $line) {
+                            // We don't need to repeat the title
+                            $line = $this->_html2irc($line);
+                            $line = strip_tags($line);
+                            if (trim($line) != trim($alert['title'])) {
+                                $this->ircRaw('PRIVMSG ' . $nick . ' :' . $line);
                             }
                         }
                     }
                 }
             }
-        }//end if
+        }
     }
 
     //end alertData()
@@ -971,7 +972,8 @@ class IRCBot
 
     // end _color
 
-    function _html2irc($string) {
+    private function _html2irc($string) 
+    {
         $string = urldecode($string);
         $string = preg_replace("#<b>#i", chr(2), $string);
         $string = preg_replace("#</b>#i", chr(2), $string);
@@ -997,13 +999,13 @@ class IRCBot
             'pink'      => "13",
             'grey'      => "14",
             'lightgrey' => "15",
-	];
+        ];
 
         foreach ($colors as $color => $code) {
             $string = preg_replace("#<$color>#i", chr(3).$code, $string);
             $string = preg_replace("#</$color>#i", chr(3), $string);
-	}
-	return $string;
+        }
+        return $string;
     }
     
     // end _html2irc
