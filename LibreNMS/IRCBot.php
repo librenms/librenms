@@ -291,7 +291,7 @@ class IRCBot
         }
     }
 
-    //end alertData()
+    //end _sendAlert()
 
     private function getData()
     {
