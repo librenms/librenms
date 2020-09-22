@@ -473,6 +473,7 @@
     }
 
     function widget_dom(data) {
+        r=data.settings.refresh || 60;
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
               '</span>'+
@@ -488,7 +489,7 @@
               '</span>'+
               '</header>'+
               '<div class="widget_body" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
-              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+data.settings.refresh+',\''+data.widget+'\');\<\/script\>'+
+              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+r+',\''+data.widget+'\');\<\/script\>'+
               '</li>';
 
         if (data.hasOwnProperty('col') && data.hasOwnProperty('row')) {
