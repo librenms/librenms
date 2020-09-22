@@ -30,7 +30,7 @@ $colour_area_max = 'FFCCCC';
 $graph_max = 0;
 $unit_text = 'Mode';
 
-$gpsd  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
+$gpsd = rrd_name($device['hostname'], ['app', 'gpsd', $app['app_id']]);
 if (rrdtool_check_rrd_exists($gpsd)) {
     $rrd_filename = $gpsd;
 } else {

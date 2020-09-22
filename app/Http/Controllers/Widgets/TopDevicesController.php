@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -56,6 +55,7 @@ class TopDevicesController extends WidgetController
     public function title()
     {
         $settings = $this->getSettings();
+
         return isset($settings['title']) ? $settings['title'] : $this->title;
     }
 
@@ -110,7 +110,7 @@ class TopDevicesController extends WidgetController
     private function formatData($headers, $rows)
     {
         return [
-            'headers' => (array)$headers,
+            'headers' => (array) $headers,
             'rows' => $rows,
         ];
     }
@@ -319,9 +319,9 @@ class TopDevicesController extends WidgetController
                 StringHelpers::shortenText($storage->storage_descr, 50),
                 Url::overlibLink(
                     $link,
-                    Html::percentageBar(150, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']),
+                    Html::percentageBar(150, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']),
                     $overlib_content
-                )
+                ),
             ];
         });
 

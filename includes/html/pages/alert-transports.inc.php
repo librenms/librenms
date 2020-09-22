@@ -9,7 +9,7 @@ if ($request->has('oauthtransport')) {
 
     if ($validator->passes()) {
         $transport_name = $request->get('oauthtransport');
-        $class = 'LibreNMS\\Alert\\Transport\\'.$transport_name;
+        $class = 'LibreNMS\\Alert\\Transport\\' . $transport_name;
         if (class_exists($class)) {
             $transport = app($class);
             if ($transport->handleOauth($request)) {

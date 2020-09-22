@@ -8,13 +8,13 @@
                     "sysDescr": "V1.29_May 24 2016_11:26:12",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "HA5837A-1x016",
                     "features": null,
                     "os": "edfa",
                     "type": "network",
-                    "serial": null,
+                    "serial": "S26-PYA346",
                     "icon": "generic.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

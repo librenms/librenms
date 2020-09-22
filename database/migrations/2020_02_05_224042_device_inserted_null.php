@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class DeviceInsertedNull extends Migration
 {
@@ -15,7 +15,7 @@ class DeviceInsertedNull extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-                \DB::statement("ALTER TABLE `devices` CHANGE `inserted` `inserted` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;");
+                \DB::statement('ALTER TABLE `devices` CHANGE `inserted` `inserted` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;');
             } else {
                 $table->dateTime('inserted')->nullable()->useCurrent()->change();
             }

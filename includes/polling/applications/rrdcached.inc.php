@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -29,7 +28,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 echo ' rrdcached';
 
-$data = "";
+$data = '';
 $name = 'rrdcached';
 $app_id = $app['app_id'];
 
@@ -40,12 +39,12 @@ if ($agent_data['app'][$name]) {
 
     $sock = fsockopen($device['hostname'], 42217, $errno, $errstr, 5);
 
-    if (!$sock) {
+    if (! $sock) {
         $socket = \LibreNMS\Config::get('rrdcached');
         if (substr($socket, 0, 6) == 'unix:/') {
             $socket_file = substr($socket, 5);
             if (file_exists($socket_file)) {
-                $sock = fsockopen("unix://" . $socket_file);
+                $sock = fsockopen('unix://' . $socket_file);
             }
         }
     }
@@ -57,7 +56,7 @@ if ($agent_data['app'][$name]) {
             $data .= fgets($sock, 128);
             if ($max == -1) {
                 $tmp_max = explode(' ', $data);
-                $max     = $tmp_max[0]+1;
+                $max = $tmp_max[0] + 1;
             }
             $count++;
         }
@@ -67,7 +66,7 @@ if ($agent_data['app'][$name]) {
     }
 }
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('queue_length', 'GAUGE', 0)
     ->addDataset('updates_received', 'COUNTER', 0)
@@ -79,7 +78,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('journal_bytes', 'COUNTER', 0)
     ->addDataset('journal_rotate', 'COUNTER', 0);
 
-$fields = array();
+$fields = [];
 foreach (explode("\n", $data) as $line) {
     $split = explode(': ', $line);
     if (count($split) == 2) {

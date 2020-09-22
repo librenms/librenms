@@ -8,13 +8,13 @@
                     "sysDescr": "CPEFibre-G4G-PVN-001 : Commutateur Ethernet 4 ports 1000BASE-T / 1 port 1000BASE-X",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "CPEFibre-G4G-PVN-001",
                     "features": null,
                     "os": "ifotec",
                     "type": "network",
                     "serial": null,
                     "icon": "ifotec.png",
-                    "location": null
+                    "location": "N/A"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "CPEFibre-G4G-PVN-001 : Commutateur Ethernet 4 ports 1000BASE-T / 1 port 1000BASE-X",
                     "sysContact": "contact@ifotec.com",
                     "version": null,
-                    "hardware": null,
+                    "hardware": "CPEFibre-G4G-PVN-001",
                     "features": null,
                     "os": "ifotec",
                     "type": "network",

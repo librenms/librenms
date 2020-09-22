@@ -20,13 +20,13 @@
 */
 require 'includes/html/graphs/common.inc.php';
 $scale_min = 0;
-$ds        = 'time_remaining';
-$colour_area     = 'FF000011';
-$colour_line     = 'FF0000';
+$ds = 'time_remaining';
+$colour_area = 'FF000011';
+$colour_line = 'FF0000';
 $colour_area_max = 'FFEE99';
-$graph_max       = 0;
-$unit_text       = 'Minutes';
-$ups_apcups  = rrd_name($device['hostname'], array('app', 'ups-apcups', $app['app_id']));
+$graph_max = 0;
+$unit_text = 'Minutes';
+$ups_apcups = rrd_name($device['hostname'], ['app', 'ups-apcups', $app['app_id']]);
 if (rrdtool_check_rrd_exists($ups_apcups)) {
     $rrd_filename = $ups_apcups;
 }

@@ -1,5 +1,11 @@
 mib: CPQHLTH-MIB:CPQIDA-MIB:CPQSTDEQ-MIB:CPQHOST-MIB
 modules:
+    os:
+        sysDescr_regex: '/Integrated Lights-Out \d (?<version>[\d.]+)/'
+        hardware: CPQSINFO-MIB::cpqSiProductName.0
+        serial: CPQSINFO-MIB::cpqSiSysSerialNum.0
+        version: CPQHOST-MIB::cpqHoFwVerVersion.0
+        version_regex: '/(?<version>[\d.]+)/'
     sensors:
         power:
             data:

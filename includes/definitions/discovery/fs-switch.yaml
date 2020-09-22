@@ -1,5 +1,15 @@
 mib: FS-MIB
 modules:
+    os:
+        hardware:
+            - SWITCH::lswSlotCurrentType.1.1
+            - FS-MIB::swProdName.0
+        version:
+            - SWITCH::version.0
+            - FS-MIB::swOpCodeVer.1
+        serial:
+            - SWITCH::lswSlotSerialNo.1.1
+            - FS-MIB::swSerialNumber.1
     processors:
         data:
             -

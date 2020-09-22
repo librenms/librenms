@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Lorenzo Zafra
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
-
 preg_match('~(?\'hardware\'.*?)-(?:.*)~', $device['sysDescr'], $matches);
 
 if ($matches['hardware']) {

@@ -9,7 +9,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
     $graph_type = 'port_bits';
 
     echo '<div class="panel-body">';
-        include 'includes/html/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
     echo '<div class="panel panel-default">
@@ -19,7 +19,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
     $graph_type = 'port_upkts';
 
     echo '<div class="panel-body">';
-        include 'includes/html/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
     echo '<div class="panel panel-default">
@@ -29,7 +29,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
 
     $graph_type = 'port_nupkts';
     echo '<div class="panel-body">';
-        include 'includes/html/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
     echo '<div class="panel panel-default">
@@ -40,7 +40,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
     $graph_type = 'port_errors';
 
     echo '<div class="panel-body">';
-        include 'includes/html/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
     if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'poe'))) {
@@ -51,7 +51,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
         $graph_type = 'port_poe';
 
         echo '<div class="panel-body">';
-            include 'includes/html/print-interface-graphs.inc.php';
+        include 'includes/html/print-interface-graphs.inc.php';
         echo '</div></div>';
     }
 
@@ -63,7 +63,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
         $graph_type = 'port_etherlike';
 
         echo '<div class="panel-body">';
-            include 'includes/html/print-interface-graphs.inc.php';
+        include 'includes/html/print-interface-graphs.inc.php';
         echo '</div></div>';
     }
 

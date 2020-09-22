@@ -1,0 +1,5 @@
+modules:
+    os:
+        hardware: OAP-C1-OEO::vDeviceType.0
+        serial: OAP-C1-OEO::vSerialNumber.0
+        version: OAP-C1-OEO::vSoftwareVerion.0

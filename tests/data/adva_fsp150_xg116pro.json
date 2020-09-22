@@ -8,13 +8,13 @@
                     "sysDescr": "FSP150CC-XG116PRO",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "XG116Pro",
                     "features": null,
                     "os": "adva_fsp150",
                     "type": "network",
                     "serial": null,
                     "icon": "adva.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "FSP150CC-XG116PRO",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "XG116Pro V",
+                    "hardware": "XG116Pro",
                     "features": null,
                     "os": "adva_fsp150",
                     "type": "network",

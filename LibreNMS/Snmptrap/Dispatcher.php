@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,21 +24,21 @@
 
 namespace LibreNMS\Snmptrap;
 
+use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\Snmptrap\Handlers\Fallback;
-use LibreNMS\Alert\AlertRules;
 use Log;
 
 class Dispatcher
 {
     /**
      * Instantiate the correct handler for this trap and call it's handle method
-     *
      */
     public static function handle(Trap $trap)
     {
         if (empty($trap->getDevice())) {
-            Log::warning("Could not find device for trap", ['trap_text' => $trap->getRaw()]);
+            Log::warning('Could not find device for trap', ['trap_text' => $trap->getRaw()]);
+
             return false;
         }
 
@@ -52,12 +51,12 @@ class Dispatcher
         $fallback = $handler instanceof Fallback;
         $logging = Config::get('snmptraps.eventlog', 'unhandled');
         if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
-            Log::event("SNMP trap received: " . $trap->getTrapOid(), $trap->getDevice(), 'trap');
+            Log::event('SNMP trap received: ' . $trap->getTrapOid(), $trap->getDevice(), 'trap');
         } else {
             $rules = new AlertRules;
             $rules->runRules($trap->getDevice()->device_id);
         }
 
-        return !$fallback;
+        return ! $fallback;
     }
 }

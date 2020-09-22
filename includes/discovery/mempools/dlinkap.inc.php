@@ -16,7 +16,7 @@
 
 if ($device['os'] == 'dlinkap') {
     d_echo('Dlink AP');
-    $memory_oid = $device['sysObjectID'].'.5.1.4.0';
+    $memory_oid = $device['sysObjectID'] . '.5.1.4.0';
     $usage = snmp_get($device, $memory_oid, '-Ovq');
     if (is_numeric($usage)) {
         discover_mempool($valid_mempool, $device, '0', 'dlinkap', 'Memory', '1', null, null);

@@ -9,7 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
- 
+
 if ($device['os'] == 'dcn-software') {
     $usage = snmp_get($device, 'switchMemoryUsage.0', '-OvQ', 'DCN-MIB');
     if (is_numeric($usage)) {

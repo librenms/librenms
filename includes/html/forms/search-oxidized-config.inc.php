@@ -11,20 +11,20 @@
  */
 header('Content-type: application/json');
 
-$status    = 'error';
-$message   = 'unknown error';
+$status = 'error';
+$message = 'unknown error';
 $parameters = clean($_POST['search_in_conf_textbox']);
 if (isset($parameters)) {
     $message = 'Queried';
     if ($output = search_oxidized_config($parameters)) {
-        $status  = 'ok';
+        $status = 'ok';
     }
 } else {
     $message = 'ERROR: Could not query';
 }
-echo display(_json_encode(array(
-     'status'                   => $status,
-     'message'                  => $message,
-     'search_in_conf_textbox'   => $parameters,
-     'output'                   => $output
-)));
+echo display(_json_encode([
+    'status'                   => $status,
+    'message'                  => $message,
+    'search_in_conf_textbox'   => $parameters,
+    'output'                   => $output,
+]));

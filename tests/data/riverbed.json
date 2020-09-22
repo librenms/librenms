@@ -32,7 +32,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "riverbed.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux SERVERNAME 4.19.0-6-amd64 #1 SMP Debian 4.19.67-2 (2019-08-28) x86_64",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "4.19.0-6-amd64",
+                    "hardware": "Generic x86 64-bit",
                     "features": null,
                     "os": "linux",
                     "type": "server",
                     "serial": null,
                     "icon": "linux.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -119,7 +119,7 @@
                 },
                 {
                     "metric": "test_user_1_acc_trashed_libraries",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "seafile"
                 },
@@ -143,7 +143,7 @@
                 },
                 {
                     "metric": "test_user_2_acc_trashed_libraries",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "seafile"
                 },
@@ -167,7 +167,7 @@
                 },
                 {
                     "metric": "test_user_3_acc_trashed_libraries",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "seafile"
                 }

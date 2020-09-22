@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -23,6 +22,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
@@ -32,12 +32,11 @@ class Beagleboard extends OS implements
     /**
      * Retrieve basic information about the OS / device
      */
-    public function discoverOS(): void
+    public function discoverOS(Device $device): void
     {
-        $device = $this->getDeviceModel();
         $oids = ['NET-SNMP-EXTEND-MIB::nsExtendOutputFull."distro"', 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."hardware"'];
-        $info = snmp_get_multi($this->getDevice(), $oids);
-        $device->version = str_replace("BeagleBoard.org ", "", $info['"distro"']['nsExtendOutputFull']);
+        $info = snmp_get_multi($this->getDeviceArray(), $oids);
+        $device->version = str_replace('BeagleBoard.org ', '', $info['"distro"']['nsExtendOutputFull']);
         $device->hardware = $info['"hardware"']['nsExtendOutputFull'];
     }
 }

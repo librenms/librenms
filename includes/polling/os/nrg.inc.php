@@ -8,7 +8,7 @@ $descr = trim($device['sysDescr'], '" ');
 $ninfo = trim(substr($descr, 0, strpos($descr, '/')));
 
 $hardware = trim(substr($ninfo, 0, strrpos($ninfo, ' ')));
-$version  = trim(substr($ninfo, strrpos($ninfo, ' ')));
+$version = trim(substr($ninfo, strrpos($ninfo, ' ')));
 
 // SNMPv2-SMI::enterprises.367.3.2.1.2.1.4.0 = STRING: "M6394300657"
 // $serial = trim(snmp_get($device, "1.3.6.1.4.1.367.3.2.1.2.1.4.0", "-OQv", "", ""),'" ');

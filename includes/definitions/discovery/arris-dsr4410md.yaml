@@ -1,5 +1,9 @@
 mib: DSR4410MD-MIB
 modules:
+    os:
+        hardware: DSR4410MD-MIB::identUnitModel.0
+        serial: DSR4410MD-MIB::unitAddress.0
+        version: DSR4410MD-MIB::firmwareVersion.0
     sensors:
         state:
             data:

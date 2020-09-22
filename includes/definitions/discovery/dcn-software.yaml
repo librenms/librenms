@@ -1,5 +1,13 @@
 mib: DCN-MIB
 modules:
+    os:
+        hardware:
+            - DCN-MIB::ntpEntSoftwareName.0
+            - DCN-MIB::sysHardwareVersion.0
+        version:
+            - DCN-MIB::ntpEntSoftwareVersion.0
+            - DCN-MIB::sysSoftwareVersion.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
     processors:
         data:
             -

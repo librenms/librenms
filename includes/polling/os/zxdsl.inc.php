@@ -13,10 +13,10 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.3902.')) {
     $sysObjectIdSplit = explode('.', $sysObjectId);
 
     if (count($sysObjectIdSplit) >= 1) {
-        $hardware = "ZXDSL ".$sysObjectIdSplit[0];
+        $hardware = 'ZXDSL ' . $sysObjectIdSplit[0];
         if (count($sysObjectIdSplit) >= 2) {
             for ($i = 1; $i < count($sysObjectIdSplit); $i++) {
-                $hardware .= chr(64+$sysObjectIdSplit[$i]);
+                $hardware .= chr(64 + $sysObjectIdSplit[$i]);
             }
         }
     }

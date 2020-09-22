@@ -17,11 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 echo 'TPDIN2-MIB::monitor ';
 $pre_cache['tpdin_monitor'] = snmpwalk_cache_oid($device, 'monitor', [], 'TPDIN2-MIB');
