@@ -2,18 +2,18 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo('SMART');
+echo 'SMART';
 
 $name = 'smart';
 $app_id = $app['app_id'];
 
-$options      = '-Oqv';
-$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.115.109.97.114.116';
+$options = '-Oqv';
+$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.115.109.97.114.116';
 $output = snmp_walk($device, $oid, $options);
 
 $lines = explode("\n", $output);
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('id5', 'GAUGE', 0)
     ->addDataset('id10', 'GAUGE', 0)
@@ -40,14 +40,14 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('conveyance', 'GAUGE', 0)
     ->addDataset('selective', 'GAUGE', 0);
 
-$int=0;
-$metrics = array();
+$int = 0;
+$metrics = [];
 while (isset($lines[$int])) {
-    list($disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
+    [$disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
         $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
-        $unknown_failure, $extended, $short, $conveyance, $selective)=explode(",", $lines[$int]);
+        $unknown_failure, $extended, $short, $conveyance, $selective] = explode(',', $lines[$int]);
 
-    $rrd_name = array('app', $name, $app_id, $disk);
+    $rrd_name = ['app', $name, $app_id, $disk];
 
     $fields = [
         'id5' => is_numeric($id5) ? $id5 : null,
@@ -73,32 +73,31 @@ while (isset($lines[$int])) {
         'extended' => is_numeric($extended) ? $extended : null,
         'short' => is_numeric($short) ? $short : null,
         'conveyance' => is_numeric($conveyance) ? $conveyance : null,
-        'selective' => is_numeric($selective) ? $selective : null
+        'selective' => is_numeric($selective) ? $selective : null,
     ];
 
     $metrics[$disk] = $fields;
-    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $int++;
 }
 
-
-# smart enhancement id9
-$rrd_name = array('app', $name, $app_id);
+// smart enhancement id9
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('id9', 'GAUGE', 0);
 
-$int=0;
+$int = 0;
 while (isset($lines[$int])) {
-    list($disk, , , , , , , , , , , , , , , , , , , , , , , , , $id9)=explode(",", $lines[$int]);
+    [$disk, , , , , , , , , , , , , , , , , , , , , , , , , $id9] = explode(',', $lines[$int]);
 
-    $rrd_name = array('app', $name.'_id9', $app_id, $disk);
+    $rrd_name = ['app', $name . '_id9', $app_id, $disk];
 
     $fields = ['id9' => $id9];
     $metrics[$disk]['id9'] = $id9;
 
-    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $int++;

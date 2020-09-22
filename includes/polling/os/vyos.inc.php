@@ -4,6 +4,6 @@
 $device['sysDescr'] = str_replace('Vyatta ', '', $device['sysDescr']);
 
 // Version is second remaining word in sysDescr
-list(,$version) = explode(' ', $device['sysDescr']);
+[,$version] = explode(' ', $device['sysDescr']);
 
 $features = '';

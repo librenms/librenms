@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -47,6 +46,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
         // yaml discovery overrides this
         if ($this->hasYamlDiscovery('os')) {
             $this->discoverYamlOS($device);
+
             return;
         }
 
@@ -61,13 +61,13 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
             $device->version = $regexp_result[2];
         } elseif (preg_match('/^Cisco IOS Software \[([^\]]+)\],.+Software \(([^\)]+)\), Version ([^, ]+)/', $device->sysDescr, $regexp_result)) {
             $device->features = $regexp_result[1];
-            $device->version = $regexp_result[2] . " " . $regexp_result[3];
+            $device->version = $regexp_result[2] . ' ' . $regexp_result[3];
         } elseif (preg_match('/^Cisco IOS Software.*?, .+? Software(\, )?([\s\w\d]+)? \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $device->sysDescr, $regexp_result)) {
             $device->features = $regexp_result[3];
-            $device->version  = $regexp_result[4];
+            $device->version = $regexp_result[4];
             $hardware = $regexp_result[2];
-            $tmp = preg_split("/\\r\\n|\\r|\\n/", $device->version);
-            if (!empty($tmp[0])) {
+            $tmp = preg_split('/\\r\\n|\\r|\\n/', $device->version);
+            if (! empty($tmp[0])) {
                 $device->version = $tmp[0];
             }
         }
@@ -86,24 +86,24 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
         $data = snmp_get_multi($this->getDeviceArray(), $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 
         if (isset($data[1]['entPhysicalContainedIn']) && $data[1]['entPhysicalContainedIn'] == '0') {
-            if (!empty($data[1]['entPhysicalSoftwareRev'])) {
+            if (! empty($data[1]['entPhysicalSoftwareRev'])) {
                 $device->version = $data[1]['entPhysicalSoftwareRev'];
             }
-            if (!empty($data[1]['entPhysicalName'])) {
+            if (! empty($data[1]['entPhysicalName'])) {
                 $hardware = $data[1]['entPhysicalName'];
             }
-            if (!empty($data[1]['entPhysicalModelName'])) {
+            if (! empty($data[1]['entPhysicalModelName'])) {
                 $hardware = $data[1]['entPhysicalModelName'];
             }
         }
 
-        if (empty($hardware) && !empty($data[1000]['entPhysicalModelName'])) {
+        if (empty($hardware) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
-        } elseif (empty($hardware) && !empty($data[1000]['entPhysicalContainedIn'])) {
+        } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
-        } elseif ((preg_match('/stack/i', $hardware) || empty($hardware)) && !empty($data[1001]['entPhysicalModelName'])) {
+        } elseif ((preg_match('/stack/i', $hardware) || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
             $hardware = $data[1001]['entPhysicalModelName'];
-        } elseif (empty($hardware) && !empty($data[1001]['entPhysicalContainedIn'])) {
+        } elseif (empty($hardware) && ! empty($data[1001]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
         }
 
@@ -236,10 +236,11 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
         $nac = collect();
 
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
-        if (!empty($portAuthSessionEntry)) {
+        if (! empty($portAuthSessionEntry)) {
             $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
                 $key_parts = explode('.', $key);
                 $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
+
                 return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
             });
 
@@ -258,7 +259,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
                     'auth_id' => $auth_id,
                     'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
                     'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
-                    'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
+                    'ip_address' => (string) IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
                     'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
                     'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
                     'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],
@@ -279,11 +280,11 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
         $serial_output = snmp_get_multi($this->getDeviceArray(), ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 //        $serial_output = snmp_getnext($this->getDevice(), 'entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 
-        if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
+        if (! empty($serial_output[1]['entPhysicalSerialNum'])) {
             return $serial_output[1]['entPhysicalSerialNum'];
-        } elseif (!empty($serial_output[1000]['entPhysicalSerialNum'])) {
+        } elseif (! empty($serial_output[1000]['entPhysicalSerialNum'])) {
             return $serial_output[1000]['entPhysicalSerialNum'];
-        } elseif (!empty($serial_output[1001]['entPhysicalSerialNum'])) {
+        } elseif (! empty($serial_output[1001]['entPhysicalSerialNum'])) {
             return $serial_output[1001]['entPhysicalSerialNum'];
         }
 

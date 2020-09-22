@@ -3,7 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 // Gather our SLA's from the DB.
-$slas = dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 0', array($device['device_id']));
+$slas = dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 0', [$device['device_id']]);
 
 if (count($slas) > 0) {
     // We have SLA's, lets go!!!
@@ -12,7 +12,7 @@ if (count($slas) > 0) {
     $rttMonLatestRttOperTable = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.42.1.2.10.1', 1);
     $rttMonLatestOper = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.42.1.5', 1);
 
-    $uptime      = snmp_get($device, 'sysUpTime.0', '-Otv');
+    $uptime = snmp_get($device, 'sysUpTime.0', '-Otv');
     $time_offset = (time() - intval($uptime) / 100);
 
     foreach ($slas as $sla) {
@@ -21,8 +21,8 @@ if (count($slas) > 0) {
 
         // Lets process each SLA
         $unixtime = intval(($rttMonLatestRttOperTable['1.3.6.1.4.1.9.9.42.1.2.10.1.5'][$sla_nr] / 100 + $time_offset));
-        $time  = strftime('%Y-%m-%d %H:%M:%S', $unixtime);
-        $update = array();
+        $time = strftime('%Y-%m-%d %H:%M:%S', $unixtime);
+        $update = [];
 
         // Use Nagios Status codes.
         $opstatus = $rttMonLatestRttOperTable['1.3.6.1.4.1.9.9.42.1.2.10.1.2'][$sla_nr];
@@ -38,14 +38,14 @@ if (count($slas) > 0) {
         }
 
         $rtt = $rttMonLatestRttOperTable['1.3.6.1.4.1.9.9.42.1.2.10.1.1'][$sla_nr];
-        echo 'SLA '.$sla_nr.': '.$rtt_type.' '.$sla['owner'].' '.$sla['tag'].'... '.$rtt.'ms at '.$time.'\n';
+        echo 'SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $rtt . 'ms at ' . $time . '\n';
 
-        $fields = array(
+        $fields = [
             'rtt' => $rtt,
-        );
+        ];
 
         // The base RRD
-        $rrd_name = array('sla', $sla_nr);
+        $rrd_name = ['sla', $sla_nr];
         $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
         $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
         data_update($device, 'sla', $tags, $fields);
@@ -53,20 +53,20 @@ if (count($slas) > 0) {
         // Let's gather some per-type fields.
         switch ($rtt_type) {
             case 'jitter':
-                $jitter = array(
+                $jitter = [
                     'PacketLossSD' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.26'][$sla_nr],
                     'PacketLossDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.27'][$sla_nr],
                     'PacketOutOfSequence' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.28'][$sla_nr],
                     'PacketMIA' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.29'][$sla_nr],
                     'PacketLateArrival' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.30'][$sla_nr],
-                    'MOS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.42'][$sla_nr]/100,
+                    'MOS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.42'][$sla_nr] / 100,
                     'ICPIF' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.43'][$sla_nr],
                     'OWAvgSD' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.49'][$sla_nr],
                     'OWAvgDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.50'][$sla_nr],
                     'AvgSDJ' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.47'][$sla_nr],
                     'AvgDSJ' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.48'][$sla_nr],
-                );
-                $rrd_name = array('sla', $sla_nr, $rtt_type);
+                ];
+                $rrd_name = ['sla', $sla_nr, $rtt_type];
                 $rrd_def = RrdDefinition::make()
                     ->addDataset('PacketLossSD', 'GAUGE', 0)
                     ->addDataset('PacketLossDS', 'GAUGE', 0)
@@ -84,7 +84,7 @@ if (count($slas) > 0) {
                 $fields = array_merge($fields, $jitter);
                 break;
             case 'icmpjitter':
-                $icmpjitter = array(
+                $icmpjitter = [
                     'PacketLoss' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.26'][$sla_nr],
                     'PacketOosSD' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.28'][$sla_nr],
                     'PacketOosDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.29'][$sla_nr],
@@ -95,8 +95,8 @@ if (count($slas) > 0) {
                     'LatencyOWAvgDS' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.48'][$sla_nr],
                     'JitterIAJOut' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.49'][$sla_nr],
                     'JitterIAJIn' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.50'][$sla_nr],
-                );
-                $rrd_name = array('sla', $sla_nr, $rtt_type);
+                ];
+                $rrd_name = ['sla', $sla_nr, $rtt_type];
                 $rrd_def = RrdDefinition::make()
                     ->addDataset('PacketLoss', 'GAUGE', 0)
                     ->addDataset('PacketOosSD', 'GAUGE', 0)
@@ -114,12 +114,12 @@ if (count($slas) > 0) {
                 break;
         }
 
-        d_echo("The following datasources were collected for #".$sla['sla_nr'].":\n");
+        d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
         d_echo($fields);
 
         // Update the DB if necessary
         if (count($update) > 0) {
-            $updated = dbUpdate($update, 'slas', '`sla_id` = ?', array($sla['sla_id']));
+            $updated = dbUpdate($update, 'slas', '`sla_id` = ?', [$sla['sla_id']]);
         }
     }
 }

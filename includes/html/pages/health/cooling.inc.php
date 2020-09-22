@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_cooling';
-$class      = 'cooling';
-$unit       = 'w';
+$class = 'cooling';
+$unit = 'w';
 
 require 'includes/html/pages/health/sensors.inc.php';

@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 if (Str::contains($device['sysDescr'], 'AMD64')) {
     $hardware = 'AMD x64';
-} elseif (Str::contains($device['sysDescr'], array('EM64', 'Intel64'))) {
+} elseif (Str::contains($device['sysDescr'], ['EM64', 'Intel64'])) {
     $hardware = 'Intel x64';
 } elseif (Str::contains($device['sysDescr'], 'x86')) {
     $hardware = 'Generic x86';
@@ -117,14 +117,14 @@ if (Str::contains($device['sysDescr'], 'Multiprocessor')) {
 // Detect Dell hardware via OpenManage SNMP
 $hw = snmp_get($device, '.1.3.6.1.4.1.674.10892.1.300.10.1.9.1', '-Oqv', 'MIB-Dell-10892');
 $hw = trim(str_replace('"', '', $hw));
-if (!empty($hw)) {
+if (! empty($hw)) {
     $hardware = 'Dell ' . $hw;
 
     $serial = snmp_get($device, '.1.3.6.1.4.1.674.10892.1.300.10.1.11.1', '-Oqv', 'MIB-Dell-10892');
     $serial = trim(str_replace('"', '', $serial));
 } else {
     $hw = trim(snmp_get($device, 'cpqSiProductName.0', '-Oqv', 'CPQSINFO-MIB', 'hp'), '"');
-    if (!empty($hw)) {
+    if (! empty($hw)) {
         $hardware = $hw;
     }
 }

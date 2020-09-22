@@ -17,8 +17,8 @@ $colour_line = '36393D';
 
 $colour_area_max = 'FFEE99';
 
-$graph_max         = 1;
-$multiplier        = 1000;
+$graph_max = 1;
+$multiplier = 1000;
 $multiplier_action = '/';
 
 $unit_text = 'Seconds';

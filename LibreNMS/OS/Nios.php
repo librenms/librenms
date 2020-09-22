@@ -32,9 +32,9 @@ class Nios extends \LibreNMS\OS implements OSPolling
 {
     public function pollOS()
     {
-        ##############
-        # Create ddns update rrd
-        ##############
+        //#############
+        // Create ddns update rrd
+        //#############
         $mibs = 'IB-DNSONE-MIB';
         $oids = [
             'ibDDNSUpdateSuccess.0',
@@ -58,15 +58,13 @@ class Nios extends \LibreNMS\OS implements OSPolling
             'prereq_reject' => $data[0]['ibDDNSUpdatePrerequisiteReject'],
         ];
 
-
         $tags = compact('rrd_def');
         data_update($this->getDeviceArray(), 'ib_dns_dyn_updates', $tags, $fields);
         $this->enableGraph('ib_dns_dyn_updates');
 
-
-        ##################
-        # Create dns performance graph (latency)
-        ##################
+        //#################
+        // Create dns performance graph (latency)
+        //#################
         $mibs = 'IB-PLATFORMONE-MIB';
         $oids = [
             'ibNetworkMonitorDNSNonAAT1AvgLatency.0',
@@ -88,9 +86,9 @@ class Nios extends \LibreNMS\OS implements OSPolling
         data_update($this->getDeviceArray(), 'ib_dns_performance', $tags, $fields);
         $this->enableGraph('ib_dns_performance');
 
-        ##################
-        # Create dns request return code graph
-        ##################
+        //#################
+        // Create dns request return code graph
+        //#################
         $mibs = 'IB-DNSONE-MIB';
         $oids = [
             'ibBindZoneFailure."summary"',
@@ -118,10 +116,9 @@ class Nios extends \LibreNMS\OS implements OSPolling
         data_update($this->getDeviceArray(), 'ib_dns_request_return_codes', $tags, $fields);
         $this->enableGraph('ib_dns_request_return_codes');
 
-
-        ##################
-        # Create dhcp messages graph
-        ##################
+        //#################
+        // Create dhcp messages graph
+        //#################
         $mibs = 'IB-DHCPONE-MIB';
         $oids = [
             'ibDhcpTotalNoOfAcks.0',

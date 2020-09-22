@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -463,6 +462,7 @@ class Ironware extends Foundry
         ];
 
         $hardware = snmp_translate($this->getDevice()->sysObjectID, 'FOUNDRY-SN-ROOT-MIB', null, null, $this->getDeviceArray());
+
         return array_str_replace($rewrite_ironware_hardware, $hardware);
     }
 }

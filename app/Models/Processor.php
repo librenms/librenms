@@ -16,14 +16,14 @@ class Processor extends DeviceRelatedModel
      */
     public function getFormattedDescription()
     {
-        $bad_descr = array(
+        $bad_descr = [
             'GenuineIntel:',
             'AuthenticAMD:',
             'Intel(R)',
             'CPU',
             '(R)',
             '(tm)',
-        );
+        ];
 
         $descr = str_replace($bad_descr, '', $this->processor_descr);
 

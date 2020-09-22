@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePortsStatisticsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

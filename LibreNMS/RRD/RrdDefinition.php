@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -56,7 +55,7 @@ class RrdDefinition
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {
         if (empty($name)) {
-            d_echo("DS must be set to a non-empty string.");
+            d_echo('DS must be set to a non-empty string.');
         }
 
         $name = $this->escapeName($name);
@@ -103,6 +102,7 @@ class RrdDefinition
     public function disableNameChecking()
     {
         $this->skipNameCheck = true;
+
         return $this;
     }
 
@@ -115,10 +115,11 @@ class RrdDefinition
      */
     private function checkType($type)
     {
-        if (!in_array($type, self::$types)) {
+        if (! in_array($type, self::$types)) {
             $msg = "$type is not valid, must be: " . implode(' | ', self::$types);
             throw new InvalidRrdTypeException($msg);
         }
+
         return $type;
     }
 
@@ -131,6 +132,7 @@ class RrdDefinition
     private function escapeName($name)
     {
         $name = preg_replace('/[^a-zA-Z0-9_\-]/', '', $name);
+
         return substr($name, 0, 19);
     }
 }

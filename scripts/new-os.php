@@ -3,7 +3,7 @@
 
 use LibreNMS\Config;
 
-$init_modules = array('');
+$init_modules = [''];
 require __DIR__ . '/../includes/init.php';
 
 $options = getopt('h:o:t:v:d::');
@@ -39,7 +39,7 @@ sysObjectID: $full_sysObjectID
             $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");
         }
 
-        if (!str_i_contains($continue, 'y')) {
+        if (! str_i_contains($continue, 'y')) {
             $descr = get_user_input('Enter the description for this OS, i.e Cisco IOS:');
             $icon = get_user_input('Enter the logo to use, this can be the name of an existing one (i.e: cisco) or the url to retrieve one:');
 
@@ -79,11 +79,11 @@ discovery:
         }
 
         if ($os === 'generic') {
-            c_echo("Base discovery file created,");
+            c_echo('Base discovery file created,');
         }
     }
 
-    $mib_name = get_user_input("ctrl+c to exit now otherwise please enter the MIB name including path (url is also fine) for us to check for sensors:");
+    $mib_name = get_user_input('ctrl+c to exit now otherwise please enter the MIB name including path (url is also fine) for us to check for sensors:');
 
     if (filter_var($mib_name, FILTER_VALIDATE_URL)) {
         $mib_data = file_get_contents($mib_name);
@@ -94,7 +94,7 @@ discovery:
             exit(1);
         }
         preg_match('/(.* DEFINITIONS ::)/', $mib_data, $matches);
-        list($mib_name,) = explode(' ', $matches[0], 2);
+        [$mib_name,] = explode(' ', $matches[0], 2);
         if (file_exists(Config::get('install_dir') . "/mibs/$vendor/") == false) {
             mkdir(Config::get('install_dir') . "/mibs/$vendor/");
         }
@@ -163,7 +163,7 @@ modules:
         c_echo($discovery_data);
     }
 } else {
-    c_echo("
+    c_echo('
 Info:
     You can use to build the yaml files for a new OS.
 Usage:
@@ -175,14 +175,15 @@ Usage:
 Example:
 ./scripts/new-os.php -h 44 -o new-eos
 
-");
+');
     exit(1);
 }
 
 function get_user_input($msg)
 {
     c_echo($msg . ' ');
-    $handle = fopen("php://stdin", "r");
+    $handle = fopen('php://stdin', 'r');
     $line = fgets($handle);
+
     return trim($line);
 }

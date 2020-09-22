@@ -1,7 +1,7 @@
 <?php
 
-if (!(Auth::user()->hasGlobalAdmin())) {
-    die('ERROR: You need to be admin');
+if (! (Auth::user()->hasGlobalAdmin())) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>

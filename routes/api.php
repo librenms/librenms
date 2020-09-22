@@ -11,8 +11,6 @@
 |
 */
 
-
-
 Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function () {
     Route::get('system', 'LegacyApiController@server_info')->name('server_info');
     Route::get(null, 'LegacyApiController@show_endpoints');
@@ -144,7 +142,6 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
 
     Route::get('inventory/{hostname}', 'LegacyApiController@get_inventory')->name('get_inventory');
     Route::get('inventory/{hostname}/all', 'LegacyApiController@get_inventory_for_device')->name('get_inventory_for_device');
-
 
     // Route not found
     Route::any('/{path?}', 'LegacyApiController@api_not_found')->where('path', '.*');

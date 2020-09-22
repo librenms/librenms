@@ -3,12 +3,10 @@
  * LibreNMS - ADVA device support - Current
  *
  * @category   Network_Monitoring
- * @package    LibreNMS
- * @subpackage ADVA device support
  * @author     Christoph Zilian <czilian@hotmail.com>
  * @license    http://gnu.org/copyleft/gpl.html GNU GPL
  * @link       https://github.com/librenms/librenms/
-
+ *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -35,8 +33,8 @@ foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
     foreach ($sensors_adva as $entry) {
         $sensor_name = $entry['sensor_name'];
         if ($pre_cache['adva_fsp150'][$index][$sensor_name]) {
-            $oid = $entry['sensor_oid'] . "." . $index;
-            $descr = $pre_cache['adva_fsp150'][$index]['slotCardUnitName'] . " [#" . $pre_cache['adva_fsp150'][$index]['slotIndex'] . "]";
+            $oid = $entry['sensor_oid'] . '.' . $index;
+            $descr = $pre_cache['adva_fsp150'][$index]['slotCardUnitName'] . ' [#' . $pre_cache['adva_fsp150'][$index]['slotIndex'] . ']';
             $current = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']] / $divisor;
 
             discover_sensor(

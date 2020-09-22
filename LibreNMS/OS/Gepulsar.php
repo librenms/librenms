@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @author     Craig Harris
  */
@@ -32,7 +31,7 @@ class Gepulsar extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $info = snmp_getnext_multi($this->getDeviceArray(), ['ne843Ps1Sn','ne843Ps1Verw','ne843Ps1Brc'], '-OQUs', 'NE843-MIB');
+        $info = snmp_getnext_multi($this->getDeviceArray(), ['ne843Ps1Sn', 'ne843Ps1Verw', 'ne843Ps1Brc'], '-OQUs', 'NE843-MIB');
         $device->version = $info['ne843Ps1Verw'];
         $device->hardware = $info['ne843Ps1Brc'];
         $device->serial = $info['ne843Ps1Sn'];

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -109,10 +108,10 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         ];
 
         $mk_dirs = array_filter($mkdirs, function ($file) {
-            return !file_exists($file);
+            return ! file_exists($file);
         });
 
-        if (!empty($mk_dirs)) {
+        if (! empty($mk_dirs)) {
             $commands[] = 'sudo mkdir -p ' . implode(' ', $mk_dirs);
         }
 
@@ -123,19 +122,19 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
 
         // check if webserver is in the librenms group
         $current_groups = explode(' ', trim(exec('groups')));
-        if (!in_array($group, $current_groups)) {
+        if (! in_array($group, $current_groups)) {
             $current_user = trim(exec('whoami'));
             $commands[] = "usermod -a -G $group $current_user";
         }
 
         // check for invalid log setting
-        if (!is_file($log_file) || !is_writable($log_file)) {
+        if (! is_file($log_file) || ! is_writable($log_file)) {
             // override for proper error output
             $dirs = [$log_file];
             $install_dir = $log_file;
             $commands = [
                 '<h3>Cannot write to log file: &quot;' . $log_file . '&quot;</h3>',
-                'Make sure it exists and is writable, or change your LOG_DIR setting.'
+                'Make sure it exists and is writable, or change your LOG_DIR setting.',
             ];
         }
 
@@ -145,6 +144,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
             $commands[] = "semanage fcontext -a -t httpd_sys_rw_content_t '$dir(/.*)?'";
         }
         $commands[] = "restorecon -RFv $install_dir";
+
         return $commands;
     }
 }

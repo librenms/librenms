@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -42,7 +41,7 @@ class Edgecos extends OS implements ProcessorDiscovery
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.24.')) {  //ECS4510
             $tmp_mib = 'ECS4510-MIB';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.39.')) {  //ECS4110
-            $tmp_mib  = 'ECS4110-MIB';
+            $tmp_mib = 'ECS4110-MIB';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.42.')) {  //ECS4210
             $tmp_mib = 'ECS4210-MIB';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.27.')) {  //ECS3510
@@ -59,9 +58,9 @@ class Edgecos extends OS implements ProcessorDiscovery
 
         $data = snmp_get_multi($this->getDeviceArray(), ['swOpCodeVer.1', 'swProdName.0', 'swSerialNumber.1', 'swHardwareVer.1'], '-OQUs', $tmp_mib);
 
-        $device->version  = trim($data[1]['swHardwareVer'] . ' ' . $data[1]['swOpCodeVer']) ?: null;
+        $device->version = trim($data[1]['swHardwareVer'] . ' ' . $data[1]['swOpCodeVer']) ?: null;
         $device->hardware = $data[0]['swProdName'] ?? null;
-        $device->serial   = $data[1]['swSerialNumber'] ?? null;
+        $device->serial = $data[1]['swSerialNumber'] ?? null;
     }
 
     /**
@@ -88,19 +87,19 @@ class Edgecos extends OS implements ProcessorDiscovery
             $oid = '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.8.1.11.')) { //ES3510MA
             $oid = '.1.3.6.1.4.1.259.8.1.11.1.39.2.1.0';
-        };
+        }
 
         if (isset($oid)) {
-            return array(
+            return [
                 Processor::discover(
                     $this->getName(),
                     $this->getDeviceId(),
                     $oid,
                     0
-                )
-            );
+                ),
+            ];
         }
 
-        return array();
+        return [];
     }
 }

@@ -12,35 +12,35 @@
 */
 header('Content-type: application/json');
 
-$status  = 'error';
+$status = 'error';
 
 $speed = mres($_POST['speed']);
 $device_id = mres($_POST['device_id']);
 $ifName = mres($_POST['ifName']);
 $port_id = mres($_POST['port_id']);
 
-if (!empty($ifName) && is_numeric($port_id) && is_numeric($port_id)) {
+if (! empty($ifName) && is_numeric($port_id) && is_numeric($port_id)) {
     // We have ifName and  port id so update ifAlias
     if (empty($speed)) {
-        $speed = array('NULL');
-        $high_speed = array('NULL');
-        // Set to 999999 so we avoid using ifDescr on port poll
+        $speed = ['NULL'];
+        $high_speed = ['NULL'];
+    // Set to 999999 so we avoid using ifDescr on port poll
     } else {
         $high_speed = $speed / 1000000;
     }
-    if (dbUpdate(array('ifSpeed'=>$speed, 'ifHighSpeed'=>$high_speed), 'ports', '`port_id`=?', array($port_id)) > 0) {
+    if (dbUpdate(['ifSpeed'=>$speed, 'ifHighSpeed'=>$high_speed], 'ports', '`port_id`=?', [$port_id]) > 0) {
         $device = device_by_id_cache($device_id);
         if (is_array($speed)) {
-            del_dev_attrib($device, 'ifSpeed:'.$ifName);
+            del_dev_attrib($device, 'ifSpeed:' . $ifName);
             log_event("$ifName Port speed cleared manually", $device, 'interface', 3, $port_id);
         } else {
-            set_dev_attrib($device, 'ifSpeed:'.$ifName, 1);
+            set_dev_attrib($device, 'ifSpeed:' . $ifName, 1);
             log_event("$ifName Port speed set manually: $speed", $device, 'interface', 3, $port_id);
-            $port_tune = get_dev_attrib($device, 'ifName_tune:'.$ifName);
+            $port_tune = get_dev_attrib($device, 'ifName_tune:' . $ifName);
             $device_tune = get_dev_attrib($device, 'override_rrdtool_tune');
-            if ($port_tune == "true" ||
-                ($device_tune == "true" && $port_tune != 'false') ||
-                (\LibreNMS\Config::get('rrdtool_tune') == "true" && $port_tune != 'false' && $device_tune != 'false')) {
+            if ($port_tune == 'true' ||
+                ($device_tune == 'true' && $port_tune != 'false') ||
+                (\LibreNMS\Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
                 $rrdfile = get_port_rrdfile_path($device['hostname'], $port_id);
                 Rrd::tune('port', $rrdfile, $speed);
             }
@@ -51,7 +51,7 @@ if (!empty($ifName) && is_numeric($port_id) && is_numeric($port_id)) {
     }
 }
 
-$response = array(
+$response = [
     'status'        => $status,
-);
+];
 echo _json_encode($response);

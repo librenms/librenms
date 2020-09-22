@@ -17,7 +17,7 @@ return [
             'value' => 'value to set, unset setting if this is omitted',
         ],
         'options' => [
-            'ignore-checks' => 'Ignore all safety checks'
+            'ignore-checks' => 'Ignore all safety checks',
         ],
         'confirm' => 'Reset :setting to the default?',
         'errors' => [
@@ -25,7 +25,7 @@ return [
             'invalid' => 'This is not a valid setting. Please check your spelling',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
-        ]
+        ],
     ],
     'dev:check' => [
         'description' => 'LibreNMS code checks. Running with no options runs all checks',
@@ -80,5 +80,5 @@ return [
         'password-request' => "Please enter the user's password",
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
-    ]
+    ],
 ];

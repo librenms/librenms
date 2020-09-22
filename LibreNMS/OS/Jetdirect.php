@@ -36,7 +36,7 @@ class Jetdirect extends \LibreNMS\OS\Shared\Printer
 
         $info = $this->parseDeviceId(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.11.2.3.9.1.1.7.0', '-OQv'));
         $hardware = $info['MDL'] ?? $info['MODEL'] ?? $info['DES'] ?? $info['DESCRIPTION'];
-        if (!empty($hardware)) {
+        if (! empty($hardware)) {
             $hardware = str_ireplace([
                 'HP ',
                 'Hewlett-Packard ',

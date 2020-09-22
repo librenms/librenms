@@ -16,9 +16,9 @@ for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
 
         if (date('m', $start) == date('m', $end) && date('d', $start == 1)) {
             // Calendar months, omit the date and the end!
-            $graph_data['ticklabels'][$i] = strftime("%b %Y", $start);
+            $graph_data['ticklabels'][$i] = strftime('%b %Y', $start);
         } else {
-            $graph_data['ticklabels'][$i] = strftime("%e %b %Y", $start) . "\n" . strftime("%e %b %Y", $end);
+            $graph_data['ticklabels'][$i] = strftime('%e %b %Y', $start) . "\n" . strftime('%e %b %Y', $end);
         }
     }
 }
@@ -98,7 +98,7 @@ $lineplot_allow->SetLegend('Traffic Allowed');
 $lineplot_allow->SetColor('black');
 $lineplot_allow->SetWeight(1);
 
-$gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out, $barplot_over));
+$gbplot = new GroupBarPlot([$barplot_in, $barplot_tot, $barplot_out, $barplot_over]);
 
 $graph->Add($gbplot);
 $graph->Add($lineplot_allow);

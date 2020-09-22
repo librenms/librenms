@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -51,13 +50,12 @@ IF-MIB::ifDescr.$port->ifIndex GigabitEthernet0/5
 IF-MIB::ifType.$port->ifIndex ethernetCsmacd
 OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n";
 
-        Log::shouldReceive('event')->once()->with("SNMP Trap: linkDown down/down " . $port->ifDescr, $device->device_id, 'interface', 5, $port->port_id);
+        Log::shouldReceive('event')->once()->with('SNMP Trap: linkDown down/down ' . $port->ifDescr, $device->device_id, 'interface', 5, $port->port_id);
         Log::shouldReceive('event')->once()->with("Interface Disabled : $port->ifDescr (TRAP)", $device->device_id, 'interface', 3, $port->port_id);
         Log::shouldReceive('event')->once()->with("Interface went Down : $port->ifDescr (TRAP)", $device->device_id, 'interface', 5, $port->port_id);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle linkDown');
-
 
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifAdminStatus, 'down');
@@ -82,7 +80,7 @@ IF-MIB::ifDescr.$port->ifIndex GigabitEthernet0/5
 IF-MIB::ifType.$port->ifIndex ethernetCsmacd
 OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"up\"\n";
 
-        Log::shouldReceive('event')->once()->with("SNMP Trap: linkUp up/up " . $port->ifDescr, $device->device_id, 'interface', 1, $port->port_id);
+        Log::shouldReceive('event')->once()->with('SNMP Trap: linkUp up/up ' . $port->ifDescr, $device->device_id, 'interface', 1, $port->port_id);
         Log::shouldReceive('event')->once()->with("Interface Enabled : $port->ifDescr (TRAP)", $device->device_id, 'interface', 3, $port->port_id);
         Log::shouldReceive('event')->once()->with("Interface went Up : $port->ifDescr (TRAP)", $device->device_id, 'interface', 1, $port->port_id);
 

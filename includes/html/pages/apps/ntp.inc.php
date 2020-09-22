@@ -12,29 +12,29 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['ignore'] = array('=',0);
+$options = [];
+$options['filter']['ignore'] = ['=', 0];
 $options['type'] = 'ntp';
 $components = $component->getComponents(null, $options);
 
 print_optionbar_start();
 
-$view_options = array(
+$view_options = [
     'all'       => 'All',
     'error'     => 'Error',
-);
-if (!$vars['view']) {
+];
+if (! $vars['view']) {
     $vars['view'] = 'all';
 }
 
-$graph_options = array(
+$graph_options = [
     'none'          => 'No Graphs',
     'stratum'       => 'Stratum',
     'offset'        => 'Offset',
     'delay'         => 'Delay',
     'dispersion'    => 'Dispersion',
-);
-if (!$vars['graph']) {
+];
+if (! $vars['graph']) {
     $vars['graph'] = 'none';
 }
 
@@ -50,7 +50,7 @@ foreach ($view_options as $option => $text) {
     if ($vars['view'] == $option) {
         echo "<span class='pagemenu-selected'>";
     }
-    echo generate_link($text, $vars, array('view' => $option));
+    echo generate_link($text, $vars, ['view' => $option]);
     if ($vars['view'] == $option) {
         echo '</span>';
     }
@@ -69,7 +69,7 @@ foreach ($graph_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $vars, array('graph' => $option));
+    echo generate_link($text, $vars, ['graph' => $option]);
     if ($vars['graph'] == $option) {
         echo '</span>';
     }

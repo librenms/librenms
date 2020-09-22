@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,7 +35,7 @@ class Exa extends OS implements OSDiscovery
         $info = snmp_getnext_multi($this->getDeviceArray(), ['e7CardSoftwareVersion', 'e7CardSerialNumber'], '-OQUs', 'E7-Calix-MIB');
         $device->version = $info['e7CardSoftwareVersion'];
         $device->serial = $info['e7CardSerialNumber'];
-        $device->hardware = "Calix " . $device->sysDescr;
+        $device->hardware = 'Calix ' . $device->sysDescr;
 
         $cards = explode("\n", snmp_walk($this->getDeviceArray(), 'e7CardProvType', '-OQv', 'E7-Calix-MIB'));
         $card_count = [];

@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Timothy Willey
  * @author     Timothy Willey <developer@timothywilley.net>
@@ -70,7 +69,7 @@ class ArubaInstant extends OS implements
      */
     public function discoverProcessors()
     {
-        $processors = array();
+        $processors = [];
         $ai_mib = 'AI-AP-MIB';
         $ai_ap_data = $this->getCacheTable('aiAccessPointEntry', $ai_mib);
 
@@ -93,7 +92,7 @@ class ArubaInstant extends OS implements
      */
     public function discoverWirelessClients()
     {
-        $sensors = array();
+        $sensors = [];
         $device = $this->getDeviceArray();
         $ai_mib = 'AI-AP-MIB';
 
@@ -106,7 +105,7 @@ class ArubaInstant extends OS implements
                 $this->getCacheTable('aiRadioClientNum', $ai_mib)
             );
 
-            $oids = array();
+            $oids = [];
             $total_clients = 0;
 
             // Clients Per SSID
@@ -156,7 +155,7 @@ class ArubaInstant extends OS implements
      */
     public function discoverWirelessApCount()
     {
-        $sensors = array();
+        $sensors = [];
         $ai_mib = 'AI-AP-MIB';
         $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
 
@@ -203,7 +202,7 @@ class ArubaInstant extends OS implements
     public function discoverWirelessPower()
     {
         // instant
-        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', "%s Radio %s: Tx Power");
+        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', '%s Radio %s: Tx Power');
     }
 
     /**
@@ -219,10 +218,10 @@ class ArubaInstant extends OS implements
     }
 
     /**
-    * Aruba Instant Radio Discovery
-    *
-    * @return array Sensors
-    */
+     * Aruba Instant Radio Discovery
+     *
+     * @return array Sensors
+     */
     private function discoverInstantRadio($type, $mib, $desc = '%s Radio %s')
     {
         $ai_mib = 'AI-AP-MIB';
@@ -234,7 +233,7 @@ class ArubaInstant extends OS implements
             $this->getCacheTable('aiRadioUtilization64', $ai_mib)
         );
 
-        $sensors = array();
+        $sensors = [];
 
         foreach ($ai_sg_data as $ai_ap => $ai_ap_oid) {
             if (isset($ai_ap_oid[$mib])) {
@@ -258,6 +257,7 @@ class ArubaInstant extends OS implements
                 } // end foreach
             } // end if
         } // end foreach
+
         return $sensors;
     }
 
@@ -287,13 +287,13 @@ class ArubaInstant extends OS implements
      */
     public function pollWirelessClients(array $sensors)
     {
-        $data = array();
-        if (!empty($sensors)) {
+        $data = [];
+        if (! empty($sensors)) {
             $device = $this->getDeviceArray();
 
             if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
                 // version is at least 8.4.0.0
-                $oids = array();
+                $oids = [];
 
                 foreach ($sensors as $sensor) {
                     $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
@@ -302,11 +302,11 @@ class ArubaInstant extends OS implements
                 $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
 
                 foreach ($oids as $id => $oid) {
-                      $data[$id] = $snmp_data[$oid];
+                    $data[$id] = $snmp_data[$oid];
                 }
             } else {
                 // version is lower than 8.4.0.0
-                if (!empty($sensors) && sizeof($sensors) == 1) {
+                if (! empty($sensors) && sizeof($sensors) == 1) {
                     $ai_mib = 'AI-AP-MIB';
                     $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
 
@@ -333,14 +333,14 @@ class ArubaInstant extends OS implements
      */
     public function pollWirelessApCount(array $sensors)
     {
-        $data = array();
-        if (!empty($sensors) && sizeof($sensors) == 1) {
+        $data = [];
+        if (! empty($sensors) && sizeof($sensors) == 1) {
             $ai_mib = 'AI-AP-MIB';
             $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
 
             $total_aps = 0;
 
-            if (!empty($ap_data)) {
+            if (! empty($ap_data)) {
                 $total_aps = sizeof($ap_data);
             }
 

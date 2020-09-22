@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 if ($device['os'] === 'acos') {
     echo 'ACOS: ';
     $mempool['used'] = snmp_get($device, 'axSysMemoryUsage.0', '-Ovq', 'A10-AX-MIB');

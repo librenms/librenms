@@ -10,7 +10,6 @@ if ($device['os'] == 'hpe-ilo') {
     $page_free = $memory_pool['cpqHoPagingMemoryFree.0'];
     $page_capacity = $memory_pool['cpqHoPagingMemorySize.0'];
 
-
     if ((is_numeric($mem_free)) && (is_numeric($mem_capacity))) {
         discover_mempool($valid_mempool, $device, 0, 'hpe-ilo', 'Physical Memory', '1', null, null);
     }

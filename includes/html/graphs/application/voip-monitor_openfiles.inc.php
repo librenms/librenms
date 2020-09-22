@@ -4,7 +4,7 @@ $scale_min = 1000;
 
 require 'includes/html/graphs/common.inc.php';
 
-$voip_monitor_rrd = rrd_name($device['hostname'], array('app', 'voip-monitor', $app['app_id']));
+$voip_monitor_rrd = rrd_name($device['hostname'], ['app', 'voip-monitor', $app['app_id']]);
 
 if (rrdtool_check_rrd_exists($voip_monitor_rrd)) {
     $rrd_filename = $voip_monitor_rrd;

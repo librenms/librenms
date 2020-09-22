@@ -12,10 +12,10 @@
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die(json_encode([
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin'
+        'message' => 'You need to be admin',
     ]));
 }
 
@@ -34,21 +34,21 @@ if (is_numeric($transport_id) && $transport_id > 0) {
     foreach (json_decode($transport['transport_config'], true) as $key => $value) {
         $details[] = [
             'name' => $key,
-            'value' => $value
+            'value' => $value,
         ];
     }
 }
 
 if (is_array($transport)) {
-    die(json_encode([
+    exit(json_encode([
         'name' => $transport['transport_name'],
         'type' => $transport['transport_type'],
         'is_default' => $is_default,
-        'details' => $details
+        'details' => $details,
     ]));
 } else {
-    die(json_encode([
+    exit(json_encode([
         'status' => 'error',
-        'message' => 'No alert transport found'
+        'message' => 'No alert transport found',
     ]));
 }

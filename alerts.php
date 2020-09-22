@@ -27,10 +27,10 @@
  * @author: Heath Barnhart <hbarnhart@kanren.net>
  */
 
-use LibreNMS\Util\FileLock;
 use LibreNMS\Alert\RunAlerts;
+use LibreNMS\Util\FileLock;
 
-$init_modules = ['alerts','laravel'];
+$init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
@@ -43,9 +43,9 @@ if (set_debug(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-if (!defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
-    echo 'Start: '.date('r')."\r\n";
-    echo "ClearStaleAlerts():" . PHP_EOL;
+if (! defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
+    echo 'Start: ' . date('r') . "\r\n";
+    echo 'ClearStaleAlerts():' . PHP_EOL;
     $alerts->clearStaleAlerts();
     echo "RunFollowUp():\r\n";
     $alerts->runFollowUp();
@@ -53,7 +53,7 @@ if (!defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
     $alerts->runAlerts();
     echo "RunAcks():\r\n";
     $alerts->runAcks();
-    echo 'End  : '.date('r')."\r\n";
+    echo 'End  : ' . date('r') . "\r\n";
 }
 
 $alerts_lock->release();
