@@ -51,7 +51,6 @@ $rancid_map['radlan'] = 'at';
 $rancid_map['ciscowlc'] = 'cisco-wlc8';
 $rancid_map['comware'] = 'h3c';
 
-
 foreach (dbFetchRows("SELECT `hostname`,`os`,`disabled`,`status` FROM `devices` WHERE `ignore` = 0 AND `type` != '' GROUP BY `hostname`") as $devices) {
     if (isset($rancid_map[$devices['os']])) {
         $status = 'up';
