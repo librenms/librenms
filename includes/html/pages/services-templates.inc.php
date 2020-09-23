@@ -109,7 +109,7 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
 
                         if ($service_template_iteration < 2 && $header) {
                             echo '<div class="panel panel-default">';
-                            echo '<div class="panel-heading"><h3 class="panel-title">' . $device_group_id  . '</h3>' . $devlink . '</div>';
+                            echo '<div class="panel-heading"><h3 class="panel-title">' . $device_group_name  . '</h3>' . $devlink . '</div>';
                             echo '<div class="panel-body">';
                             echo '<table class="table table-hover table-condensed">';
                             echo '<thead>';
