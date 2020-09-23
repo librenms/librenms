@@ -72,7 +72,7 @@ alert_log:
     alert_log_device_id_index: { Name: alert_log_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     alert_log_rule_id_index: { Name: alert_log_rule_id_index, Columns: [rule_id], Unique: false, Type: BTREE }
     alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
-    alert_log_rule_and_device_index: { Name: alert_log_rule_and_device_index, Columns: [rule_id, device_id], Unique: false, Type: BTREE }
+    alert_log_rule_id_device_id_index: { Name: alert_log_rule_id_device_id_index, Columns: [rule_id, device_id], Unique: false, Type: BTREE }
 alert_rules:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
