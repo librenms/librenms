@@ -59,7 +59,6 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     $alert_rules[$alertlog['id']]['severity_name'] = $alertlog['severity'];
 }
 
-$sql_severity = "";
 if (isset($vars['min_severity'])) {
     $rules_count = 0;
     foreach($alert_rules as $id => $ruledat) {
