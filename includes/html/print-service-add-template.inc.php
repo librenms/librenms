@@ -48,8 +48,10 @@ echo "
       <div class='col-sm-5'>
         <input name='params' id='params' class='form-control input-sm'>
       </div>
+    </div>
+    <div class='form-group'>  
       <div class='col-sm-5' alert alert-info>
-          <label class='control-label text-left input-sm'>This may be required based on the service check.</label>
+          <label class='control-label text-left input-sm'>Parameters may be required and will be different depending on the service check.</label>
       </div>
     </div>
     <div class='form-group'>
