@@ -470,7 +470,6 @@ function device_availability(\Illuminate\Http\Request $request)
     });
 }
 
-
 function device_outages(\Illuminate\Http\Request $request)
 {
     // return outages per device
@@ -491,7 +490,6 @@ function device_outages(\Illuminate\Http\Request $request)
         return api_success($outages->get(), 'outages');
     });
 }
-
 
 function get_vlans(Illuminate\Http\Request $request)
 {
