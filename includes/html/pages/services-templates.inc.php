@@ -88,8 +88,7 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                 foreach (dbFetchRows($host_sql, $host_par) as $device_group) {
                     $device_group_id = $device_group['id'];
                     $device_group_name = $device_group['name'];
-                    //$devlink = generate_device_link($device_group, null, array('tab' => 'group'));
-                    $devlink = generate_url(['page' => 'devices', 'group' => $device_group_id]);
+                    $devlink = '<a href="' . generate_url(['page' => 'devices', 'group' => $device_group_id]) . '">' . $device_group_name . '</a>';
 
                     if ($shift == 1) {
                         array_unshift($sql_param, $device_group_id);
