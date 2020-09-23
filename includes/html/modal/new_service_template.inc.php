@@ -12,6 +12,9 @@
  */
 
 if (Auth::user()->hasGlobalAdmin()) {
+    foreach (dbFetchRows('SELECT * FROM `device_groups` ORDER BY `name`') as $device_group) {
+        $devicegroupsform .= "<option value='" . $device_group['id'] . "'>" . $device_group['name'] . '</option>';
+    }
     // Build the types list.
     $dir = \LibreNMS\Config::get('nagios_plugins');
     if (file_exists($dir) && is_dir($dir)) {
@@ -43,6 +46,16 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <span id="ajax_response">&nbsp;</span>
                         </div>
                     </div>
+                    <div class="form-service-template row">
+                        <label for='device_group' class='col-sm-3 control-label'>Device Group: </label>
+                        <div class="col-sm-9">
+                            <select name='device_group' class='form-control input-sm'>
+                                $devicegroupsform
+                            </select>
+                        </div>
+                        <div class='col-sm-5'>
+                        </div>
+                    </div>                    
                     <div class="form-service-template row">
                         <label for='stype' class='col-sm-3 control-label'>Type: </label>
                         <div class="col-sm-9">
