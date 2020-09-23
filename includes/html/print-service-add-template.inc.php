@@ -51,6 +51,18 @@ echo "
           This may be required based on the service check.
       </div>
     </div>
+    <div class='form-group'>
+      <label for='ignore' class='col-sm-2 control-label'>Ignore alert tag </label>
+      <div class='col-sm-5'>
+        <input name='ignore' id='ignore' type='checkbox'>
+      </div>
+    </div>
+    <div class='form-group'>
+        <label for='disabled' class='col-sm-2 control-label'>Disable polling and alerting </label>
+        <div class='col-sm-5'>
+        <input name='disabled' id='disabled' type='checkbox'>
+    </div>
+</div>    
     <button type='submit' name='Submit' class='btn btn-success input-sm'>Add Service Template</button>
   </div>
 </form>";
