@@ -1,7 +1,7 @@
 <?php
 
-$class      = 'percent';
-$unit       = '%';
+$class = 'percent';
+$unit = '%';
 $graph_type = 'sensor_percent';
 
 require 'sensors.inc.php';

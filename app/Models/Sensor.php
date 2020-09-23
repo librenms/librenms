@@ -34,7 +34,7 @@ class Sensor extends DeviceRelatedModel
         'temperature'          => 'thermometer-three-quarters',
         'voltage'              => 'bolt',
         'waterflow'            => 'tint',
-        'percent'              => 'percent'
+        'percent'              => 'percent',
     ];
 
     // ---- Helper Functions ----
