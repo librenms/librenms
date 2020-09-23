@@ -24,8 +24,8 @@ if (is_numeric($service_template_id) && $service_template_id > 0) {
     $output = [
         'device_group_id' => $service[0]['device_group_id'],
         'stype'     => $service[0]['service_type'],
-        'ip'        => $service[0]['service_ip'],
         'desc'      => $service[0]['service_desc'],
+        'ip'        => $service[0]['service_ip'],
         'param'     => $service[0]['service_param'],
         'ignore'    => $service[0]['service_ignore'],
         'disabled'  => $service[0]['service_disabled'],

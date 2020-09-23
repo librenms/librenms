@@ -100,8 +100,8 @@ $('#create-service-template').on('hide.bs.modal', function (event) {
     $('#device_group_id').val('');
     $('#stype').val('');
     $("#stype").prop("disabled", false);
-    $('#ip').val('');
     $('#desc').val('');
+    $('#ip').val('');
     $('#param').val('');
     $('#ignore').val('');
     $('#disabled').val('');
@@ -122,8 +122,8 @@ $('#create-service-template').on('show.bs.modal', function (e) {
             $('#device_group_id').val(output['device_group_id']);
             $('#stype').val(output['stype']);
             $("#stype").prop("disabled", true);
-            $('#ip').val(output['ip']);
             $('#desc').val(output['desc']);
+            $('#ip').val(output['ip']);
             $('#param').val(output['param']);
             $('#ignore').val(output['ignore']);
             $('#disabled').val(output['disabled']);

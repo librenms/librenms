@@ -9,7 +9,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         if (Auth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
-            $service_template_id = add_service_template($vars['device_group'], $vars['type'], $vars['descr'], $vars['params'], 0);
+            $service_template_id = add_service_template($vars['device_group_id'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'], $vars['disabled'], 0);
             if ($service_template_id !== null) {
                 $message .= $message_break . 'Service Template added (' . $service_template_id . ')!';
                 $message_break .= '<br />';
