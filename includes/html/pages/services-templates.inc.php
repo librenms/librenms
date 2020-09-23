@@ -114,10 +114,13 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                             echo '<thead>';
                             echo '<th style="width:1%;max-width:1%;"></th>';
                             echo '<th style="width:10%;max-width: 10%;">Service</th>';
-                            echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
+                            echo '<th style="width:15%;max-width: 15%;">Parameters</th>';
+                            echo '<th style="width:15%;max-width: 15%;">Target</th>';
                             echo '<th style="width:15%;max-width: 15%;">Description</th>';
-                            echo '<th >Message</th>';
-                            echo '<th style="width:5%;max-width:5%;"></th>';
+                            echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
+                            echo '<th style="width:5%;max-width: 5%;">Ignored</th>';
+                            echo '<th style="width:5%;max-width: 5%;">Disabled</th>';
+                            echo '<th style="width:10%;max-width:10%;"></th>';
                             echo '</thead>';
                         }
 
@@ -126,10 +129,13 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                         echo '<tr id="row_' . $service_template['service_template_id'] . '">';
                         echo '<td><span data-toggle="tooltip" title="' . $title . '" class="alert-status ' . $label . '"></span></td>';
                         echo '<td>' . nl2br(display($service_template['service_template_type'])) . '</td>';
-                        echo '<td>' . formatUptime(time() - $service_template['service_template_changed']) . '</td>';
+                        echo '<td>' . nl2br(display($service_template['service_template_param'])) . '</td>';
+                        echo '<td>' . nl2br(display($service_template['service_template_ip'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_desc'])) . '</td>';
-                        echo '<td>' . nl2br(display($service_template['service_template_message'])) . '</td>';
-
+                        echo '<td>' . formatUptime(time() - $service_template['service_template_changed']) . '</td>';
+                        echo '<td>' . nl2br(display($service_template['service_template_ignore'])) . '</td>';
+                        echo '<td>' . nl2br(display($service_template['service_template_disabled'])) . '</td>';
+                        
                         if (Auth::user()->hasGlobalAdmin()) {
                             echo "<td>
                                     <button type='button' class='btn btn-warning btn-sm' aria-label='Apply' data-toggle='modal' data-target='#discover-service-template' data-device_group_id='{$device_group_id}' data-service_template_id='{$service_template['service_template_id']}' name='discover-service-template'><i class='fa fa-retweet' aria-hidden='true'></i></button>
