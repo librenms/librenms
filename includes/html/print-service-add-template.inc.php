@@ -58,11 +58,11 @@ echo "
       </div>
     </div>
     <div class='form-group'>
-        <label for='disabled' class='col-sm-2 control-label'>Disable polling and alerting </label>
-        <div class='col-sm-5'>
+      <label for='disabled' class='col-sm-2 control-label'>Disable polling and alerting </label>
+      <div class='col-sm-5'>
         <input name='disabled' id='disabled' type='checkbox'>
+      </div>
     </div>
-</div>    
     <button type='submit' name='Submit' class='btn btn-success input-sm'>Add Service Template</button>
   </div>
 </form>";
