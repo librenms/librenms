@@ -9,8 +9,8 @@
         <label for="state-{{ $id }}" class="control-label">@lang('State'):</label>
         <select class="form-control" name="state" id="state-{{ $id }}">
             <option value="-1">@lang('not filtered')</option>
-            <option value="0" @if($state === '1') selected @endif>@lang('OK')</option>
-            <option value="1" @if($state === '0') selected @endif>@lang('Alert')</option>
+            <option value="0" @if($state === '0') selected @endif>@lang('OK')</option>
+            <option value="1" @if($state === '1') selected @endif>@lang('Alert')</option>
         </select>
     </div>
     <div class="form-group">
