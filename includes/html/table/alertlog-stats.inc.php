@@ -55,6 +55,8 @@ if (isset($vars['min_severity'])) {
     }
     if ($rules_count > 0) {
         $where .= " AND rule_id in " . dbGenPlaceholders($rules_count);
+    } else {
+        $where .= " AND rule_id = 0";
     }
 }
 
