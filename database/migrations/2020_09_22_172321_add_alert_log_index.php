@@ -16,6 +16,9 @@ class AddAlertLogIndex extends Migration
         Schema::table('alert_log', function (Blueprint $table) {
             $table->index(['rule_id', 'device_id']);
         });
+        Schema::table('alert_log', function (Blueprint $table) {
+            $table->index(['rule_id', 'device_id', 'state']);
+        });
     }
 
     /**
@@ -27,6 +30,9 @@ class AddAlertLogIndex extends Migration
     {
         Schema::table('alert_log', function (Blueprint $table) {
             $table->dropIndex(['rule_id', 'device_id']);
+        });
+        Schema::table('alert_log', function (Blueprint $table) {
+            $table->dropIndex(['rule_id', 'device_id', 'state']);
         });
     }
 }
