@@ -1,7 +1,7 @@
 <?php
 
 echo "
-<h3><span class='label label-success threeqtr-width'>Add Service Template</span></h3>
+<h3><span class='alert alert-info'>Add Service Template</span></h3>
 <form id='addsrv-template' name='addsrv-template' method='post' action='' class='form-horizontal' role='form'>
   " . csrf_field() . "
   <div class='well well-lg'>
