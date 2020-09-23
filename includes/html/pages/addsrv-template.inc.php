@@ -32,7 +32,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
     echo "<div class='row'>
         <div class='col-sm-3'>
-        </div>   
+        </div>
         <div class='col-sm-6'>";
 
     include_once 'includes/html/print-service-add-template.inc.php';
