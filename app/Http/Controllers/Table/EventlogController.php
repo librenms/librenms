@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -28,6 +27,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Eventlog;
 use Carbon\Carbon;
 use LibreNMS\Config;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Util\Url;
 
 class EventlogController extends TableController
@@ -52,6 +52,11 @@ class EventlogController extends TableController
             'device_id' => 'device',
             'type' => 'eventtype',
         ];
+    }
+
+    protected function sortFields($request)
+    {
+        return ['datetime', 'type', 'device_id', 'message', 'username'];
     }
 
     /**
@@ -107,7 +112,7 @@ class EventlogController extends TableController
         $output .= $this->severityLabel($eventlog->severity);
         $output .= " eventlog-status'></span><span style='display:inline;'>";
         $output .= (new Carbon($eventlog->datetime))->format(Config::get('dateformat.compact'));
-        $output .= "</span>";
+        $output .= '</span>';
 
         return $output;
     }
@@ -119,18 +124,20 @@ class EventlogController extends TableController
     private function severityLabel($eventlog_severity)
     {
         switch ($eventlog_severity) {
-            case 1:
-                return "label-success"; //OK
-            case 2:
-                return "label-info"; //Informational
-            case 3:
-                return "label-primary"; //Notice
-            case 4:
-                return "label-warning"; //Warning
-            case 5:
-                return "label-danger"; //Critical
+            case Alert::OK:
+                return 'label-success'; //OK
+            case Alert::INFO:
+                return 'label-info'; //Informational
+            case Alert::NOTICE:
+                return 'label-primary'; //Notice
+            case Alert::WARNING:
+                return 'label-warning'; //Warning
+            case Alert::ERROR:
+                return 'label-danger'; //Critical
             default:
-                return "label-default"; //Unknown
+                return 'label-default'; //Unknown
         }
-    } // end eventlog_severity
+    }
+
+    // end eventlog_severity
 }

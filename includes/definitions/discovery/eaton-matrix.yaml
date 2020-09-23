@@ -1,5 +1,9 @@
 mib: TELECOM-MIB
 modules:
+    os:
+        hardware: TELECOM-MIB::matConName.0
+        version: TELECOM-MIB::matAgentSoftwareVerison.0
+        serial: TELECOM-MIB::matConSerialNum.0
     sensors:
         current:
             data:
@@ -7,12 +11,14 @@ modules:
                     oid: matInvTable
                     value: matInvOutputCurrent
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.7.{{ $index }}"
+                    divisor: 10
                     descr: "Inverter {{ $index }} Output"
                     index: "matInvOutputCurrent.{{ $index }}"
                 -
                     oid: matStsTable
                     value: matStsOutputCurrent
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.12.{{ $index }}"
+                    divisor: 10
                     descr: "STS Output"
                     index: "matStsOutputCurrent.{{ $index }}"
         voltage:
@@ -65,17 +71,19 @@ modules:
                     oid: matStsOutputPower
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.13.{{ $index }}"
                     index: "matStsOutputPower.{{ $index }}"
+                    divisor: 10
                     descr: "STS Output Power"
                 -
                     oid: matInvTable
                     value: matInvOutputPower
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.10.{{ $index }}"
+                    divisor: 10
                     descr: "Inverter {{ $index }} Output Power"
                     index: "matInvOutputPower.{{ $index }}"
                     high_limit: matConfInvOutputPower
 
         temperature:
-            data:      
+            data:
                 -
                     oid: matStsTemperature
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.16.{{ $index }}"

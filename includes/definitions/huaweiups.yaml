@@ -10,9 +10,9 @@ over:
     - { graph: device_load, text: Load }
 discovery:
     -
-      sysDescr:
-        - Linux GSE200M
-        - UPS
-      snmpget:
-        oid: UPS-MIB::upsIdentManufacturer.0
-        value: HUAWEI
+        sysDescr:
+            - Linux GSE200M
+            - UPS
+        snmpget:
+            oid: UPS-MIB::upsIdentManufacturer.0
+            value: HUAWEI

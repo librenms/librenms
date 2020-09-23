@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateUcdDiskioTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,7 @@ class CreateUcdDiskioTable extends Migration
     {
         Schema::create('ucd_diskio', function (Blueprint $table) {
             $table->increments('diskio_id');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->integer('diskio_index');
             $table->string('diskio_descr', 32);
         });

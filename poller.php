@@ -18,23 +18,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @subpackage poller
  * @copyright  (C) 2006 - 2012 Adam Armstrong
-
+ *
  * Modified 4/17/19
  * @author Heath Barnhart <hbarnhart@kanren.net>
  */
 
-use LibreNMS\Config;
 use LibreNMS\Alert\AlertRules;
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);
-echo Config::get('project_name')." Poller\n";
+echo Config::get('project_name') . " Poller\n";
 
 $options = getopt('h:m:i:n:r::d::v::a::f::q');
 
@@ -50,7 +48,7 @@ if (isset($options['h'])) {
         $doing = 'all';
     } elseif ($options['h']) {
         if (is_numeric($options['h'])) {
-            $where = "AND `device_id` = " . $options['h'];
+            $where = 'AND `device_id` = ' . $options['h'];
             $doing = $options['h'];
         } else {
             if (preg_match('/\*/', $options['h'])) {
@@ -73,8 +71,8 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
             WHERE `disabled` = 0
             ORDER BY `device_id` ASC
         ) temp
-        WHERE MOD(temp.rownum, '.mres($options['i']).') = '.mres($options['n']).';';
-    $doing = $options['n'].'/'.$options['i'];
+        WHERE MOD(temp.rownum, ' . mres($options['i']) . ') = ' . mres($options['n']) . ';';
+    $doing = $options['n'] . '/' . $options['i'];
 }
 
 if (empty($where)) {
@@ -115,7 +113,7 @@ EOH;
     if (isset($options['v'])) {
         $vdebug = true;
     }
-    update_os_cache(true); // Force update of OS Cache
+    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
 // If we've specified modules with -m, use them
@@ -127,21 +125,29 @@ $datastore = Datastore::init($options);
 echo "Starting polling run:\n\n";
 $polled_devices = 0;
 $unreachable_devices = 0;
-if (!isset($query)) {
+if (! isset($query)) {
     $query = "SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
 }
 
 foreach (dbFetch($query) as $device) {
     DeviceCache::setPrimary($device['device_id']);
     if ($device['os_group'] == 'cisco') {
-        $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = " . $device['device_id']);
+        $device['vrf_lite_cisco'] = dbFetchRows('SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ' . $device['device_id']);
     } else {
         $device['vrf_lite_cisco'] = '';
     }
 
-    if (!poll_device($device, $module_override)) {
+    if (! poll_device($device, $module_override)) {
         $unreachable_devices++;
     }
+
+    // Update device_groups
+    echo "### Start Device Groups ###\n";
+    $dg_start = microtime(true);
+    $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
+    d_echo('Groups Added: ' . implode(',', $group_changes['attached']) . PHP_EOL);
+    d_echo('Groups Removed: ' . implode(',', $group_changes['detached']) . PHP_EOL);
+    echo '### End Device Groups, runtime: ' . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
 
     echo "#### Start Alerts ####\n";
     $rules = new AlertRules();
@@ -150,25 +156,25 @@ foreach (dbFetch($query) as $device) {
     $polled_devices++;
 }
 
-$poller_end  = microtime(true);
-$poller_run  = ($poller_end - $poller_start);
+$poller_end = microtime(true);
+$poller_run = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
 if ($polled_devices) {
-    dbInsert(array(
+    dbInsert([
         'type' => 'poll',
         'doing' => $doing,
         'start' => $poller_start,
         'duration' => $poller_time,
         'devices' => $polled_devices,
-        'poller' => Config::get('base_url')
-    ), 'perf_times');
+        'poller' => Config::get('base_url'),
+    ], 'perf_times');
 }
 
 $string = $argv[0] . " $doing " . date(Config::get('dateformat.compact')) . " - $polled_devices devices polled in $poller_time secs";
 d_echo("$string\n");
 
-if (!isset($options['q'])) {
+if (! isset($options['q'])) {
     printStats();
 }
 

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -28,12 +27,12 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\DeviceCache;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
-use Gate;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ShowConfigController extends Controller implements DeviceTab
 {
+    private $rancidPath;
     private $rancidFile;
 
     public function visible(Device $device): bool
@@ -63,6 +62,7 @@ class ShowConfigController extends Controller implements DeviceTab
     public function data(Device $device): array
     {
         return [
+            'rancid_path' => $this->getRancidPath(),
             'rancid_file' => $this->getRancidConfigFile(),
         ];
     }
@@ -72,6 +72,15 @@ class ShowConfigController extends Controller implements DeviceTab
         return Config::get('oxidized.enabled') === true
             && Config::has('oxidized.url')
             && $device->getAttrib('override_Oxidized_disable') !== 'true';
+    }
+
+    private function getRancidPath()
+    {
+        if (is_null($this->rancidPath)) {
+            $this->rancidFile = $this->findRancidConfigFile();
+        }
+
+        return $this->rancidPath;
     }
 
     private function getRancidConfigFile()
@@ -85,8 +94,8 @@ class ShowConfigController extends Controller implements DeviceTab
 
     private function findRancidConfigFile()
     {
-        if (Config::has('rancid_configs') && !is_array(Config::get('rancid_configs'))) {
-            Config::set('rancid_configs', (array)Config::get('rancid_configs', []));
+        if (Config::has('rancid_configs') && ! is_array(Config::get('rancid_configs'))) {
+            Config::set('rancid_configs', (array) Config::get('rancid_configs', []));
         }
 
         if (Config::has('rancid_configs.0')) {
@@ -97,12 +106,18 @@ class ShowConfigController extends Controller implements DeviceTab
                 }
 
                 if (is_file($configs . $device['hostname'])) {
+                    $this->rancidPath = $configs;
+
                     return $configs . $device['hostname'];
                 } elseif (is_file($configs . strtok($device['hostname'], '.'))) { // Strip domain
+                    $this->rancidPath = $configs;
+
                     return $configs . strtok($device['hostname'], '.');
                 } else {
-                    if (!empty(Config::get('mydomain'))) { // Try with domain name if set
+                    if (! empty(Config::get('mydomain'))) { // Try with domain name if set
                         if (is_file($configs . $device['hostname'] . '.' . Config::get('mydomain'))) {
+                            $this->rancidPath = $configs;
+
                             return $configs . $device['hostname'] . '.' . Config::get('mydomain');
                         }
                     }

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://librenms.org
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
@@ -25,16 +24,19 @@
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 class AuthSSOTest extends DBTestCase
 {
-    private $last_user = null;
+    use DatabaseTransactions;
+
     private $original_auth_mech = null;
     private $server;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -75,9 +77,8 @@ class AuthSSOTest extends DBTestCase
         $_SERVER['REMOTE_USER'] = 'test';
 
         $_SERVER['mail'] = 'test@example.org';
-        $_SERVER['displayName'] = bin2hex(openssl_random_pseudo_bytes(16));
+        $_SERVER['displayName'] = Str::random();
     }
-
 
     // Set up $_SERVER in header mode
     public function basicEnvironmentHeader()
@@ -87,34 +88,18 @@ class AuthSSOTest extends DBTestCase
         Config::set('sso.mode', 'header');
 
         $_SERVER['REMOTE_ADDR'] = '::1';
-        $_SERVER['REMOTE_USER'] = bin2hex(openssl_random_pseudo_bytes(16));
+        $_SERVER['REMOTE_USER'] = Str::random();
 
         $_SERVER['HTTP_MAIL'] = 'test@example.org';
         $_SERVER['HTTP_DISPLAYNAME'] = 'Test User';
     }
 
-    public function makeBreakUser()
+    public function makeUser()
     {
-        $this->breakUser();
+        $user = Str::random();
+        $_SERVER['REMOTE_USER'] = $user;
 
-        $u = bin2hex(openssl_random_pseudo_bytes(16));
-        $this->last_user = $u;
-        $_SERVER['REMOTE_USER'] = $u;
-
-        return $u;
-    }
-
-    public function breakUser()
-    {
-        $a = LegacyAuth::reset();
-
-        if ($this->last_user !== null) {
-            $r = $a->deleteUser($a->getUserid($this->last_user));
-            $this->last_user = null;
-            return $r;
-        }
-
-        return true;
+        return $user;
     }
 
     // Excercise general auth flow
@@ -128,7 +113,7 @@ class AuthSSOTest extends DBTestCase
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
-        $user = $this->makeBreakUser();
+        $user = $this->makeUser();
         $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Retrieve it and validate
@@ -147,7 +132,7 @@ class AuthSSOTest extends DBTestCase
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
-        $user = $this->makeBreakUser();
+        $user = $this->makeUser();
         $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Retrieve it and validate
@@ -165,7 +150,7 @@ class AuthSSOTest extends DBTestCase
         // Retrieve it and validate the update was not persisted
         $dbuser = $a->getUser($a->getUserid($user));
         $this->assertFalse($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
-        $this->assertFalse($dbuser['level'] === "10");
+        $this->assertFalse($dbuser['level'] === '10');
         $this->assertFalse($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
     }
 
@@ -177,7 +162,7 @@ class AuthSSOTest extends DBTestCase
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
-        $user = $this->makeBreakUser();
+        $user = $this->makeUser();
         $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Change a few things and reauth
@@ -222,13 +207,13 @@ class AuthSSOTest extends DBTestCase
         unset($_SERVER['displayName']);
         unset($_SERVER['mail']);
 
-        $this->assertTrue($a->authenticate(['username' => $this->makeBreakUser()]));
+        $this->assertTrue($a->authenticate(['username' => $this->makeUser()]));
 
         $this->basicEnvironmentHeader();
         unset($_SERVER['HTTP_DISPLAYNAME']);
         unset($_SERVER['HTTP_MAIL']);
 
-        $this->assertTrue($a->authenticate(['username' => $this->makeBreakUser()]));
+        $this->assertTrue($a->authenticate(['username' => $this->makeUser()]));
     }
 
     // Document the modules current behaviour, so that changes trigger test failures
@@ -367,7 +352,7 @@ class AuthSSOTest extends DBTestCase
 
         //String
         Config::set('sso.level_attr', 'level');
-        $_SERVER['level'] = "9";
+        $_SERVER['level'] = '9';
         $this->assertTrue($a->authSSOCalculateLevel() === 9);
 
         //Invalid String
@@ -384,7 +369,7 @@ class AuthSSOTest extends DBTestCase
 
         //Unset pointer
         Config::forget('sso.level_attr');
-        $_SERVER['level'] = "9";
+        $_SERVER['level'] = '9';
         $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
 
@@ -406,21 +391,21 @@ class AuthSSOTest extends DBTestCase
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_attr', 'member');
         Config::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5]);
-        $_SERVER['member'] = "librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins";
+        $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Valid options
         $this->assertTrue($a->authSSOParseGroups() === 10);
 
         // No match
-        $_SERVER['member'] = "confluence-admins";
+        $_SERVER['member'] = 'confluence-admins';
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Delimiter only
-        $_SERVER['member'] = ";;;;";
+        $_SERVER['member'] = ';;;;';
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Empty
-        $_SERVER['member'] = "";
+        $_SERVER['member'] = '';
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Null
@@ -431,7 +416,7 @@ class AuthSSOTest extends DBTestCase
         unset($_SERVER['member']);
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
-        $_SERVER['member'] = "librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins";
+        $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Empty
         Config::set('sso.group_level_map', []);
@@ -454,13 +439,13 @@ class AuthSSOTest extends DBTestCase
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Test group filtering by regex
-        Config::set('sso.group_filter', "/confluence-(.*)/i");
+        Config::set('sso.group_filter', '/confluence-(.*)/i');
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5, 'confluence-admins' => 7]);
         $this->assertTrue($a->authSSOParseGroups() === 7);
 
         // Test group filtering by empty regex
-        Config::set('sso.group_filter', "");
+        Config::set('sso.group_filter', '');
         $this->assertTrue($a->authSSOParseGroups() === 10);
 
         // Test group filtering by null regex
@@ -468,11 +453,10 @@ class AuthSSOTest extends DBTestCase
         $this->assertTrue($a->authSSOParseGroups() === 10);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Config::set('auth_mechanism', $this->original_auth_mech);
         Config::forget('sso');
-        $this->breakUser();
         $_SERVER = $this->server;
         parent::tearDown();
     }

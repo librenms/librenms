@@ -3,11 +3,17 @@ path: blob/master/doc/
 
 # Distributed Poller
 
-LibreNMS has the ability to distribute polling of devices to other machines.
+A normal install contains all parts of LibreNMS:
+ - Poller/Discovery/etc workers
+ - RRD (Time series data store) *
+ - Database *
+ - Webserver (Web UI/API) *
+ 
+\* may only be installed on one server (however, some can be clustered)
 
-These machines can be in a different physical location and therefore
-minimize network latency for devices that are a considerable distance
-away or are behind NAT firewalls.
+Distributed Polling allows the workers to be spread across additional 
+servers for horizontal scaling. Distributed polling is not intended for
+remote polling.
 
 Devices can be grouped together into a `poller_group` to pin these
 devices to a single or a group of designated pollers.
@@ -23,7 +29,7 @@ to communicate with each other.
 These requirements are above the normal requirements for a full LibreNMS install.
 
 - rrdtool version 1.4 or above
-- python-memcached package
+- Python 3 python-memcached package
 - a memcached install
 - a rrdcached install
 
@@ -85,9 +91,7 @@ files directly.
 ### Database Server
 
 MySQL / MariaDB - At the moment these are the only database servers
-that are supported, work is being done to ensure MySQL Strict mode is
-also supported but this should be considered to be incomplete still
-and therefor disabled.
+that are supported.
 
 The pollers, web and API layers should all be able to access the
 database server directly.
@@ -151,6 +155,12 @@ It's not necessary to run discovery services on all pollers. In fact,
 you should only run one discovery process per poller group. Designate
 a single poller to run discovery (or a separate server if required).
 
+### Configuration
+
+Settings in config.php should be copied to all servers as they only apply locally.
+
+One way around this is to set settings in the database via the web ui or `./lnms config:set`
+
 ### Config sample
 
 The following config is taken from a live setup which consists of a
@@ -199,10 +209,10 @@ OPTS="$OPTS -w 1800 -z 900"
 Ubuntu (/etc/default/rrdcached) - RRDCached 1.5.5 and above.
 
 ```
-OPTS="-l 0:42217"
-OPTS="$OPTS -R -j /var/lib/rrdcached/journal/ -F"
-OPTS="$OPTS -b /opt/librenms/rrd -B"
-OPTS="$OPTS -w 1800 -z 900"
+BASE_OPTIONS="-l 0:42217"
+BASE_OPTIONS="$BASE_OPTIONS -R -j /var/lib/rrdcached/journal/ -F"
+BASE_OPTIONS="$BASE_OPTIONS -b /opt/librenms/rrd -B"
+BASE_OPTIONS="$BASE_OPTIONS -w 1800 -z 900"
 ```
 
 Poller 1:

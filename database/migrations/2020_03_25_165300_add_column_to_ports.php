@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddColumnToPorts extends Migration
 {
@@ -26,8 +26,7 @@ class AddColumnToPorts extends Migration
     public function down()
     {
         Schema::table('ports', function (Blueprint $table) {
-            $table->dropColumn('ifSpeed_prev');
-            $table->dropColumn('ifHighSpeed_prev');
+            $table->dropColumn(['ifSpeed_prev', 'ifHighSpeed_prev']);
         });
     }
 }

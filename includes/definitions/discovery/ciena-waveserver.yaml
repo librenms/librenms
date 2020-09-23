@@ -1,12 +1,17 @@
 mib: CIENA-WS-XCVR-MIB
 modules:
+    os:
+        hardware: CIENA-WS-CHASSIS-MIB::cwsChassisChassisidentificationDescription.0
+        version: CIENA-WS-SOFTWARE-MIB::cwsSoftwareStatusActiveVersion.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - cwsXcvrTemperatureThresholdLowAlarmThreshold
-                    - cwsXcvrTemperatureThresholdHighAlarmThreshold
-                    - cwsXcvrCienaIdDescription
+                -
+                    oid:
+                        - cwsXcvrTemperatureThresholdLowAlarmThreshold
+                        - cwsXcvrTemperatureThresholdHighAlarmThreshold
+                        - cwsXcvrCienaIdDescription
         temperature:
             data:
                 -
@@ -17,7 +22,7 @@ modules:
                     index: 'cwsXcvrTemperatureTable.{{ $index }}'
                     group: 'Modules'
                     low_limit: cwsXcvrTemperatureThresholdLowAlarmThreshold
-                    high_limit: cwsXcvrTemperatureThresholdHighAlarmThreshold 
+                    high_limit: cwsXcvrTemperatureThresholdHighAlarmThreshold
                     skip_values:
                         -
                             oid: cwsXcvrTemperatureThresholdHighAlarmThreshold

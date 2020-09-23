@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -38,7 +37,7 @@ class Database extends BaseValidation
 {
     public function validate(Validator $validator)
     {
-        if (!dbIsConnected()) {
+        if (! dbIsConnected()) {
             return;
         }
 
@@ -52,21 +51,23 @@ class Database extends BaseValidation
 
         if ($current === 0 || $current === $latest) {
             // Using Laravel migrations
-            if (!Schema::isCurrent()) {
-                $validator->fail("Your database is out of date!", './lnms migrate');
+            if (! Schema::isCurrent()) {
+                $validator->fail('Your database is out of date!', './lnms migrate');
+
                 return;
             }
 
             $migrations = Schema::getUnexpectedMigrations();
             if ($migrations->isNotEmpty()) {
-                $validator->warn("Your database schema has extra migrations (" . $migrations->implode(', ') .
-                "). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
+                $validator->warn('Your database schema has extra migrations (' . $migrations->implode(', ') .
+                '). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.');
             }
         } elseif ($current < $latest) {
             $validator->fail(
                 "Your database schema ($current) is older than the latest ($latest).",
-                "Manually run ./daily.sh, and check for any errors."
+                'Manually run ./daily.sh, and check for any errors.'
             );
+
             return;
         } elseif ($current > $latest) {
             $validator->warn("Your database schema ($current) is newer than expected ($latest). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
@@ -86,8 +87,8 @@ class Database extends BaseValidation
 
         if ($diff->compare(CarbonInterval::minute(1)) > 0) {
             $message = "Time between this server and the mysql database is off\n";
-            $message .= " Mysql time " . $db_time->toDateTimeString() . PHP_EOL;
-            $message .= " PHP time " . $php_time->toDateTimeString() . PHP_EOL;
+            $message .= ' Mysql time ' . $db_time->toDateTimeString() . PHP_EOL;
+            $message .= ' PHP time ' . $php_time->toDateTimeString() . PHP_EOL;
 
             $validator->fail($message);
         }
@@ -96,7 +97,7 @@ class Database extends BaseValidation
     private function checkMode(Validator $validator)
     {
         // Test for lower case table name support
-        $lc_mode = dbFetchCell("SELECT @@global.lower_case_table_names");
+        $lc_mode = dbFetchCell('SELECT @@global.lower_case_table_names');
         if ($lc_mode != 0) {
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
@@ -107,12 +108,12 @@ class Database extends BaseValidation
 
     private function checkMysqlEngine(Validator $validator)
     {
-        $db = Config::get('db_name', 'librenms');
+        $db = \config('database.connections.' . \config('database.default') . '.database');
         $query = "SELECT `TABLE_NAME` FROM information_schema.tables WHERE `TABLE_SCHEMA` = '$db' && `ENGINE` != 'InnoDB'";
         $tables = dbFetchRows($query);
-        if (!empty($tables)) {
+        if (! empty($tables)) {
             $validator->result(
-                ValidationResult::warn("Some tables are not using the recommended InnoDB engine, this may cause you issues.")
+                ValidationResult::warn('Some tables are not using the recommended InnoDB engine, this may cause you issues.')
                     ->setList('Tables', $tables)
             );
         }
@@ -163,31 +164,33 @@ class Database extends BaseValidation
     {
         $schema_file = Config::get('install_dir') . '/misc/db_schema.yaml';
 
-        if (!is_file($schema_file)) {
+        if (! is_file($schema_file)) {
             $validator->warn("We haven't detected the db_schema.yaml file");
+
             return;
         }
 
         $master_schema = Yaml::parse(file_get_contents($schema_file));
         $current_schema = dump_db_schema();
-        $schema_update = array();
+        $schema_update = [];
 
-        foreach ((array)$master_schema as $table => $data) {
+        foreach ((array) $master_schema as $table => $data) {
             if (empty($current_schema[$table])) {
                 $validator->fail("Database: missing table ($table)");
                 $schema_update[] = $this->addTableSql($table, $data);
             } else {
                 $current_columns = array_reduce($current_schema[$table]['Columns'], function ($array, $item) {
                     $array[$item['Field']] = $item;
+
                     return $array;
-                }, array());
+                }, []);
 
                 foreach ($data['Columns'] as $index => $cdata) {
                     $column = $cdata['Field'];
 
                     // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
                     if ($cdata['Type'] == 'timestamp') {
-                         $current_columns[$column]['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $current_columns[$column]['Extra']);
+                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED[ ]*/', '', $current_columns[$column]['Extra']);
                     }
 
                     if (empty($current_columns[$column])) {
@@ -235,7 +238,6 @@ class Database extends BaseValidation
                 }
                 $schema_update = array_merge($schema_update, $index_changes); // drop before create/update
 
-
                 $constraint_changes = [];
                 if (isset($data['Constraints'])) {
                     foreach ($data['Constraints'] as $name => $constraint) {
@@ -272,7 +274,7 @@ class Database extends BaseValidation
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):")
+            $result = ValidationResult::fail('We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):')
                 ->setFix('Run the following SQL statements to fix.')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);
@@ -281,10 +283,10 @@ class Database extends BaseValidation
 
     private function addTableSql($table, $table_schema)
     {
-        $columns = array_map(array($this, 'columnToSql'), $table_schema['Columns']);
-        $indexes = array_map(array($this, 'indexToSql'), isset($table_schema['Indexes']) ? $table_schema['Indexes'] : []);
+        $columns = array_map([$this, 'columnToSql'], $table_schema['Columns']);
+        $indexes = array_map([$this, 'indexToSql'], isset($table_schema['Indexes']) ? $table_schema['Indexes'] : []);
 
-        $def = implode(', ', array_merge(array_values((array)$columns), array_values((array)$indexes)));
+        $def = implode(', ', array_merge(array_values((array) $columns), array_values((array) $indexes)));
 
         return "CREATE TABLE `$table` ($def);";
     }
@@ -300,6 +302,7 @@ class Database extends BaseValidation
         } else {
             $sql .= " AFTER `$previous_column`";
         }
+
         return $sql . ';';
     }
 
@@ -391,7 +394,7 @@ class Database extends BaseValidation
     {
         $sql = "ALTER TABLE `$table` ADD CONSTRAINT `{$constraint['name']}` FOREIGN KEY (`{$constraint['foreign_key']}`) ";
         $sql .= " REFERENCES `{$constraint['table']}` (`{$constraint['key']}`)";
-        if (!empty($constraint['extra'])) {
+        if (! empty($constraint['extra'])) {
             $sql .= ' ' . $constraint['extra'];
         }
         $sql .= ';';

@@ -8,11 +8,11 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
 discovery:
     -
-      sysObjectID: .1.3.6.1.4.1.890
-      sysDescr_regex:
-        - '/^ES/'
-        - '/^GS/'
-        - '/^MES/'
-        - '/^MGS/'
-        - '/^XS/'
-        - '/^XGS/'
+        sysObjectID: .1.3.6.1.4.1.890
+        sysDescr_regex:
+            - '/^ES/'
+            - '/^GS/'
+            - '/^MES/'
+            - '/^MGS/'
+            - '/^XS/'
+            - '/^XGS/'

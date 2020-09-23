@@ -1,0 +1,26 @@
+mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>OS\S+)? ?(?<version>\d+\.\d+\.\S+)/'
+    processors:
+        data:
+            -
+                oid: HealthModuleEntry
+                num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.{{ $index }}'
+                index: 0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifDescr
+                        - ifName
+                        - entPhysicalName
+        temperature:
+            data:
+                -
+                    oid: chasChassisEntry
+                    value: chasCPMAHardwareBoardTemp
+                    num_oid: '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.3.1.8.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Temperature'
+                    index: 'chasCPMAHardwareBoardTemp.{{ $index }}'

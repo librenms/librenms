@@ -10,6 +10,6 @@
  */
 
 if ($device['os'] == 'f5') {
-    include "includes/polling/loadbalancers/f5-ltm.inc.php";
-    include "includes/polling/loadbalancers/f5-gtm.inc.php";
+    include 'includes/polling/loadbalancers/f5-ltm.inc.php';
+    include 'includes/polling/loadbalancers/f5-gtm.inc.php';
 }

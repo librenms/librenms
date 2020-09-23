@@ -7,10 +7,12 @@ icon: toshiba
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.1129.1.2.
-    - sysDescr:
-        - 'TOSHIBA e-STUDIO'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1129.1.2.
+    -
+        sysDescr:
+            - 'TOSHIBA e-STUDIO'
 discovery_modules:
     toner: true
 poller_modules:

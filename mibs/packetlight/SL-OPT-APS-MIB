@@ -7,11 +7,13 @@ SL-OPT-APS-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY, OBJECT-TYPE,
 	NOTIFICATION-TYPE ,Unsigned32,
+	Integer32, IpAddress, Opaque, Gauge32,
 	Counter32,TimeTicks					FROM SNMPv2-SMI
 	DisplayString, TruthValue, RowStatus
 								  		FROM SNMPv2-TC
 	MODULE-COMPLIANCE, OBJECT-GROUP,
 	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	slmTrapLogId   						FROM SL-MAIN-MIB
 	InterfaceIndex		               	FROM IF-MIB
 	PerfCurrentCount, PerfIntervalCount,
 	PerfTotalCount                      FROM PerfHist-TC-MIB
@@ -469,6 +471,75 @@ optApsConfigLosThreshold OBJECT-TYPE
 	::= { optApsConfigEntry 22 }
 
 
+--
+-- Equipment APS config Table
+--
+
+eqptApsConfigTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF EqptApsConfigEntry
+         MAX-ACCESS  		not-accessible
+         STATUS  current
+         DESCRIPTION
+             "This table contains objects to configure Equipment APS 
+              (Automatic Protection Switching) feature."
+         ::= { slOptApsConfig 2 }
+ 
+eqptApsConfigEntry OBJECT-TYPE
+        SYNTAX  		EqptApsConfigEntry
+        MAX-ACCESS  	not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This configuration is on device level thus only one entry exists." 
+         INDEX   {eqptApsConfigDummyIndex }
+         ::= { eqptApsConfigTable 1 }
+
+EqptApsConfigEntry ::=
+              SEQUENCE {
+               eqptApsConfigDummyIndex		INTEGER,
+               eqptApsConfigRole			INTEGER,
+               eqptApsConfigMate			IpAddress,
+               eqptApsConfigLinkStatus      INTEGER
+              }
+ 
+eqptApsConfigDummyIndex OBJECT-TYPE
+     SYNTAX			INTEGER 
+     MAX-ACCESS		read-only
+     STATUS			current
+     DESCRIPTION
+         "A dummy index. Always 1."
+     ::= { eqptApsConfigEntry 1 }
+ 
+eqptApsConfigRole OBJECT-TYPE
+	 SYNTAX    INTEGER {
+		eqptApsWorkingRole   (1),
+		eqptApsProtectionRole(2)
+	 }
+     MAX-ACCESS		read-write
+     STATUS			current
+     DESCRIPTION
+         "The device role."
+     ::= { eqptApsConfigEntry 2 }
+ 
+eqptApsConfigMate OBJECT-TYPE
+	 SYNTAX    IpAddress
+     MAX-ACCESS		read-write
+     STATUS			current
+     DESCRIPTION
+         "The IP address of the mate device."
+     ::= { eqptApsConfigEntry 3 }
+ 
+eqptApsConfigLinkStatus OBJECT-TYPE
+     SYNTAX    INTEGER {
+               eqptApsLinkUp    (1),
+               eqptApsLinkDown  (2)
+     }
+     MAX-ACCESS		read-write
+     STATUS			current
+     DESCRIPTION
+         "The IP address of the mate device."
+     ::= { eqptApsConfigEntry 4 }
+
+
 --                    
 -- APS TRAPS
 --
@@ -492,7 +563,7 @@ optApsConfigTableChanged NOTIFICATION-TYPE
        ::= { slOptApsTraps 2 }
 
 optApsTrapSwitchover0 NOTIFICATION-TYPE
-       OBJECTS { optApsConfigUserWorkingIndex, optApsConfigActiveConnectionRx }
+       OBJECTS { optApsConfigUserWorkingIndex, optApsConfigActiveConnectionRx, slmTrapLogId }
        STATUS  current 
        DESCRIPTION
                "An optApsTrapSwitchover notification is sent when the
@@ -501,7 +572,7 @@ optApsTrapSwitchover0 NOTIFICATION-TYPE
        ::= { slOptApsTraps0 1 }
 
 optApsConfigTableChanged0 NOTIFICATION-TYPE
-       OBJECTS { optApsConfigUserWorkingIndex }
+       OBJECTS { optApsConfigUserWorkingIndex, optApsConfigActiveConnectionRx, slmTrapLogId }
        STATUS  current 
        DESCRIPTION
                "An optApsConfigTableChanged notification is sent when the

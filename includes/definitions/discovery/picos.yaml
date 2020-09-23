@@ -1,10 +1,13 @@
 mib: PICA-PRIVATE-MIB
 modules:
+    os:
+        sysDescr_regex: '/for (?<hardware>\S+)/'
+        serial: PICA-PRIVATE-MIB::hostStatusGroup.16.0
     processors:
-          data:
-              -
-                  oid: cpuUsage
-                  num_oid: '.1.3.6.1.4.1.35098.1.1.{{ $index }}'
+        data:
+            -
+                oid: cpuUsage
+                num_oid: '.1.3.6.1.4.1.35098.1.1.{{ $index }}'
     sensors:
         fanspeed:
             data:

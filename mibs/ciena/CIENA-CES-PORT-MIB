@@ -1,0 +1,1605 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-PORT-MIB.my
+ --
+
+ CIENA-CES-PORT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI                 
+   DisplayString, MacAddress, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+   OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+   sysName, sysLocation
+        FROM RFC1213-MIB   
+   cienaGlobalSeverity, cienaGlobalMacAddress
+   		FROM CIENA-GLOBAL-MIB                    
+   CienaGlobalState
+   		FROM CIENA-TC          
+   cienaCesNotifications, cienaCesConfig
+        FROM CIENA-SMI
+   cienaCesChassisSystemId
+        FROM CIENA-CES-CHASSIS-MIB;
+
+
+ cienaCesPortConfigMIB MODULE-IDENTITY
+          LAST-UPDATED "201812180000Z"
+          ORGANIZATION "Ciena Corp."
+          CONTACT-INFO
+          "   Mib Meister
+              7035 Ridge Road
+              Hanover, Maryland 21076
+              USA
+              Phone:  +1 800 921 1144
+              Email:  support@ciena.com"
+          DESCRIPTION
+               "This module defines the port configuration objects and also the objects required for
+                port related notifications."
+          REVISION
+               "201812180000Z"
+          DESCRIPTION
+               "Added cienaCesPortL2CftProfileId and cienaCesPortL2CftStatus objects and
+                changed the name of cienaCesLogicalPortHoldOffState and cienaCesLogicalPortHoldOffTime to cienaCesPortHoldOffState and cienaCesPortHoldOffTime respectively 
+                to align with ../dev/5170-main branch.
+                Currenty cienaCesPortL2CftProfileId and cienaCesPortL2CftStatus objects are not supported in 8.7"  
+          REVISION
+               "201811120000Z"
+          DESCRIPTION
+               "Modified the SIZE range of cienaCesPortMaxFrameSize from (1522..9216) to (1200..10222) to accommodate wider range available in some devices."
+          REVISION
+               "201810090000Z"
+          DESCRIPTION
+               "Added cienaCesPortOperFecState to CienaCesLogicalPortConfigEntry MIB objects."
+          REVISION
+               "201806120000Z"
+          DESCRIPTION
+               "Added cienaCesLogicalPortHoldOffState and cienaCesLogicalPortHoldOffTime to CienaCesLogicalPortConfigEntry MIB objects."
+          REVISION
+               "201706070000Z"
+          DESCRIPTION
+               "Updated contact info."
+          REVISION
+               "201705190000Z"
+          DESCRIPTION
+               "Added y1731SytheticLoss as mode of signal degrade detection in object 
+                cienaCesLogicalPortConfigSignalDegradeDetection."
+          REVISION
+               "201705080000Z"
+          DESCRIPTION
+               "Changed cienaCesLogicalPortSignalDegradeDetection to
+               cienaCesLogicalPortConfigSignalDegradeDetection."
+          REVISION
+               "201610240000Z"
+          DESCRIPTION
+               "Added cienaCesLogicalPortSignalDegradeDetection  and
+               cienaCesLogicalPortConfigSignalDegradeState.
+                Added trap cienaCesPortNotificationPortSignalDegradeSet and
+                   cienaCesPortNotificationPortSignalDegradeClear"
+          REVISION
+               "201507030000Z"
+          DESCRIPTION
+               "Added cienaCesChPortPgIdMappingTable. Added trap cienaCesChPortNotificationPortUp
+               and cienaCesChPortNotificationPortDown"
+          REVISION
+               "201506230000Z" 
+          DESCRIPTION
+               " Added object cienaCesPortTerminalLoopbackState."
+          REVISION
+               "201505150000Z" 
+	  DESCRIPTION
+               "Added odu4 to cienaCesLogicalPortConfigPortType, cienaCesLogicalPortConfigEttpType,
+                and cienaCesEttpConfigEttpType."
+          REVISION
+               "201505050000Z"
+          DESCRIPTION
+               " Added object cienaCesPortLearnLimit. Port learn limit count"
+          REVISION
+               "201505010000Z" 
+	  DESCRIPTION
+               "Added twoPointFiveGigEthernet to cienaCesLogicalPortConfigPortType, cienaCesLogicalPortConfigEttpType,
+                and cienaCesEttpConfigEttpType.
+                Added twoPtFiveGig to cienaCesPortAdminSpeed, cienaCesPortOperSpeed, cienaCesEttpConfigAdminSpeed,
+                and cienaCesEttpConfigOperSpeed."
+          REVISION
+               "201407300000Z"
+          DESCRIPTION
+               "Added cienaCesPortAdministrativeSpeed. Port administrative speed in kbps."
+          REVISION
+               "201411280000Z"
+          DESCRIPTION
+               " Added objects cienaCesPortOuterTpidList,cienaCesPortEgressOuterTpid
+                 and cienaCesPortOuterVtagTpid"
+          REVISION
+               "201404140000Z"
+          DESCRIPTION
+               "Added objects cienaCesPortIngressRcosProfileId,cienaCesPortIngressRcosProfileName
+                and cienaCesPortIngressRcosPolicy."
+          REVISION
+               "201404110000Z"
+          DESCRIPTION
+               "Added cienaCesPortOperationalSpeed. Port operational speed in kbps."
+          REVISION
+               "201404010000Z"
+          DESCRIPTION
+               "Add per-port inner + outer TPIDs"
+          REVISION
+               "201308220000Z"
+          DESCRIPTION
+              "Added hundred gig ethernet support."
+          REVISION
+               "201308060000Z"
+          DESCRIPTION
+               "Updated cienaCesLogicalPortConfigEntry and cienaCesEttpConfigEntry. Added 
+                cienaCesEttpConfigDuplex, cienaCesEttpConfigFlowCntl, cienaCesEttpConfigAutoNeg, 
+                cienaCesEttpConfigAdvertisedFlowCntl, cienaCesEttpConfigIfgDecr, 
+                cienaCesLogicalPortConfigIngMirrorPort, cienaCesLogicalPortConfigEgrMirrorPort,  
+                cienaCesLogicalPortConfigIngFloodContainer, cienaCesLogicalPortConfigPriorityTagMode  
+                to match Port, ETTP Configuration CLI."
+          REVISION
+               "201307310000Z"
+          DESCRIPTION
+               " Updated cienaCesLogicalPortConfigEttpType under CienaCesLogicalPortConfigEntry. Added ETTP Port Type"
+          REVISION
+               "201307160000Z"
+          DESCRIPTION
+               " Updated cienaCesLogicalPortConfigEttpId under CienaCesLogicalPortConfigEntry. Added ettpId"
+          REVISION
+               "201307150000Z"
+          DESCRIPTION
+               " Added cienaCesEttpConfigTable. ETTPs for default-physical-ports and logical port mapping"
+          REVISION
+               "201303050000Z"
+          DESCRIPTION
+               " Updated cienaCesLogicalPortConfigPortType, cienaCesPortAdminSpeed and cienaCesPortOperSpeed
+                 with support for 100GE, ODU and ODUFlex rate."
+          REVISION
+               "201208010000Z"
+          DESCRIPTION
+               " Corrected the size of the cienaCesLogicalPortConfigPortDesc object
+                 from (0..31) to (0..128)."
+          REVISION
+               "201106010000Z"
+          DESCRIPTION
+               " Added objects cienaCesPortAdminSpeed, cienaCesPortOperSpeed and cienaCesPortMaxFrameSize  
+                 under cienaCesPortConfig." 
+          REVISION
+               "201003280000Z"
+	      DESCRIPTION
+		       "Initial creation."
+          ::= { cienaCesConfig 1 }
+
+ --
+ -- Textual conventions
+ --
+ EttpDuplexPolicy ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Port Duplex Policy."
+     SYNTAX       INTEGER {
+                    half(1),
+                    full(2)
+                  }
+
+ EttpAdvertisedFlowControlPolicy ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Port Flow Control Policy."
+     SYNTAX       INTEGER {
+                    off(1),
+                    asym-tx(2),
+                    sym(3),
+                    sym-asym-rx(4)
+                  }
+
+ EttpFlowControlPolicy ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Port Flow Control Policy."
+     SYNTAX       INTEGER {
+                    off(1),
+                    asym-tx(2),
+                    sym(3),
+                    asym-rx(5)
+                  }
+
+ EttpAutoNegPolicy ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Port Auto Negotiation Policy."
+     SYNTAX       INTEGER {
+                    off(1),
+                    on(2)
+                  }
+
+ PortPriorityTagPolicy ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Port Priority Tagged Policy."
+     SYNTAX       INTEGER {
+                    leave-tag(1),
+                    strip-tag(2)
+                  }     
+ --
+ -- Node definitions
+ --
+        
+ cienaCesPortConfigMIBObjects OBJECT IDENTIFIER ::= { cienaCesPortConfigMIB 1 }
+
+ --cienaCesPortGlobal OBJECT IDENTIFIER ::= { cienaCesPortConfigMIBObjects 1 } 
+ cienaCesPortConfig OBJECT IDENTIFIER ::= { cienaCesPortConfigMIBObjects 1 } 
+ cienaCesPortPgIdMapping	OBJECT IDENTIFIER	::= { cienaCesPortConfigMIBObjects 2 }
+ cienaCesEttpConfig OBJECT IDENTIFIER ::= { cienaCesPortConfigMIBObjects 3 } 
+ cienaCesLogicalPortTpid OBJECT IDENTIFIER ::= { cienaCesPortConfigMIBObjects 4 }
+ cienaCesChPortPgIdMapping	OBJECT IDENTIFIER	::= { cienaCesPortConfigMIBObjects 5 }
+ -- Notifications 
+  
+ cienaCesPortNotificationMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 2 } 
+ cienaCesPortNotificationMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesPortNotificationMIBNotificationPrefix 0 }
+
+ 
+ -- Conformance information 
+ 
+ cienaCesPortMIBConformance OBJECT IDENTIFIER ::= { cienaCesPortConfigMIB 2 } 
+ cienaCesPortMIBCompliances OBJECT IDENTIFIER ::= { cienaCesPortMIBConformance 1 }                
+ cienaCesPortMIBGroups      OBJECT IDENTIFIER ::= { cienaCesPortMIBConformance 2 }
+ 
+ --
+ -- Port table
+ --   
+ cienaCesLogicalPortConfigTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesLogicalPortConfigEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of Ethernet ports."
+     ::= { cienaCesPortConfig 1 }
+                
+ cienaCesLogicalPortConfigEntry OBJECT-TYPE
+     SYNTAX       CienaCesLogicalPortConfigEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Port entry in the Ethernet port table."
+     INDEX { cienaCesLogicalPortConfigPgId }
+     ::= { cienaCesLogicalPortConfigTable 1 } 
+ 	
+ CienaCesLogicalPortConfigEntry ::= SEQUENCE { 
+     cienaCesLogicalPortConfigPgId                         Unsigned32,
+     cienaCesLogicalPortConfigPortAdminState               CienaGlobalState,
+     cienaCesLogicalPortConfigPortOperState                INTEGER,   
+     cienaCesLogicalPortConfigPortLinkUpDownTrapState      CienaGlobalState,
+     cienaCesLogicalPortConfigPortAllTrapState             CienaGlobalState,
+     cienaCesLogicalPortConfigPortPortMacAddress           MacAddress,
+     cienaCesLogicalPortConfigPortName                     DisplayString,
+     cienaCesLogicalPortConfigPortDesc                     DisplayString,
+     cienaCesLogicalPortConfigPortType                     INTEGER,
+     cienaCesLogicalPortConfigPortIfIndex                  Integer32,
+     cienaCesPortAdminSpeed                                INTEGER,
+     cienaCesPortOperSpeed                                 INTEGER,
+     cienaCesPortMaxFrameSize                              INTEGER,
+     cienaCesLogicalPortConfigEttpAid                      DisplayString,
+     cienaCesLogicalPortLastDownReason1                    DisplayString,
+     cienaCesLogicalPortLastDownReason2                    DisplayString,
+     cienaCesLogicalPortLastDownReason3                    DisplayString,
+     cienaCesLogicalPortMaskedDownReason                   DisplayString,
+     cienaCesLogicalPortFacilityLoopback                   CienaGlobalState,
+     cienaCesPortIngressRcosProfileId                      Integer32,
+     cienaCesPortIngressRcosProfileName                    DisplayString,
+     cienaCesPortIngressRcosPolicy                         INTEGER,
+     cienaCesLogicalPortConfigEttpId                       Unsigned32,
+     cienaCesLogicalPortConfigEttpType                     INTEGER,
+     cienaCesLogicalPortConfigIngMirrorPort                DisplayString,
+     cienaCesLogicalPortConfigEgrMirrorPort                DisplayString,
+     cienaCesLogicalPortConfigIngFloodContainer            DisplayString,
+     cienaCesLogicalPortConfigPriorityTagMode              PortPriorityTagPolicy,
+     cienaCesLogicalPortConfigVidTpidCount                 Unsigned32,
+     cienaCesPortOperationalSpeed                          Gauge32,
+     cienaCesPortOuterTpidList                             DisplayString,
+     cienaCesPortEgressOuterTpid                           DisplayString, 
+     cienaCesPortOuterVtagTpid                             DisplayString,
+     cienaCesPortAdministrativeSpeed                       Unsigned32,
+     cienaCesPortTerminalLoopbackState                     CienaGlobalState,	
+     cienaCesPortLearnLimit                                INTEGER,
+     cienaCesLogicalPortConfigSignalDegradeDetection       INTEGER,
+     cienaCesLogicalPortConfigSignalDegradeState           INTEGER,     
+     cienaCesPortL2CftStatus                               INTEGER,
+     cienaCesPortL2CftProfileId                            Unsigned32,
+     cienaCesPortConfigHoldOffState                        TruthValue,
+     cienaCesPortConfigHoldOffTime                         Unsigned32,
+     cienaCesPortOperFecState  	                           INTEGER
+    }  
+
+  cienaCesLogicalPortConfigPgId   OBJECT-TYPE
+     SYNTAX         Unsigned32 (1..65535) 
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Port ID for the instance.  Port IDs start at 1, 
+             and may not be consecutive for each additional port. 
+             This port ID should refer to the dot1dBasePort in the 
+             dot1dBasePortEntry."
+     ::= { cienaCesLogicalPortConfigEntry 1 }            
+ 
+ cienaCesLogicalPortConfigPortAdminState OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The administrative state of the port."
+     ::= { cienaCesLogicalPortConfigEntry 2 }
+                
+ cienaCesLogicalPortConfigPortOperState OBJECT-TYPE
+     SYNTAX        INTEGER {
+                       invalid(1),
+                       enabled(2),
+                       disabled(3),
+                       notAuthenticated(4),
+                       loopbackTx(5),
+                       loopbackRx(6),
+                       unequipped(7)
+                  }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "The current operational state of the port."
+     ::= { cienaCesLogicalPortConfigEntry 3 }   
+ 
+  cienaCesLogicalPortConfigPortLinkUpDownTrapState OBJECT-TYPE
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the current value of the enterprise port traps state."
+     DEFVAL { enabled }
+     ::= { cienaCesLogicalPortConfigEntry 4 } 
+
+  cienaCesLogicalPortConfigPortAllTrapState OBJECT-TYPE
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "This object indicates whether the device generates traps for this port."
+     DEFVAL { enabled }
+     ::= { cienaCesLogicalPortConfigEntry 5 } 
+ 
+  cienaCesLogicalPortConfigPortPortMacAddress OBJECT-TYPE
+     SYNTAX        MacAddress
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the port MAC address."
+     ::= { cienaCesLogicalPortConfigEntry 6 }
+
+ cienaCesLogicalPortConfigPortName OBJECT-TYPE
+             SYNTAX      DisplayString (SIZE (0..32))
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                     "A textual string containing information about the
+                     port. This string should indicate the physical
+                     location of the port as well."
+             ::= { cienaCesLogicalPortConfigEntry 7 }
+
+ cienaCesLogicalPortConfigPortDesc OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..128))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+                 "This object specifies the port description."
+         ::= { cienaCesLogicalPortConfigEntry 8 }
+         
+ cienaCesLogicalPortConfigPortType OBJECT-TYPE   --need to review this list.
+             SYNTAX        INTEGER {
+                                unknown(1),
+                                ethernet(2),
+                                fastEthernet(3),
+                                hundredFx(4),
+                                gigEthernet(5),                 
+                                lagPort(6),
+                                gigHundredFx(7),
+                                tripleSpeed(8),
+                                tenGigEthernet(9),
+                                vmTripleSpeedTX(10),
+                                sonetOc3(11),
+                                sonetOc12(12),
+                                sonetOc48(13),
+                                sonetOc192(14),
+                                fortyGigEthernet(15),
+                                hundredGigEthernet(16),
+                                odu(17),
+                                ethLp(18),
+                                twoPointFiveGigEthernet(19),
+                                odu4(20)
+                           }
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "The port type for the port."
+             ::= { cienaCesLogicalPortConfigEntry 9 }
+             
+ cienaCesLogicalPortConfigPortIfIndex		OBJECT-TYPE
+ 	SYNTAX				Integer32
+ 	MAX-ACCESS			read-only
+ 	STATUS				current
+ 	DESCRIPTION
+ 			"This object indicates the corresponding ifNumber for the PGID in the standard IF-MIB."
+ 	::= { cienaCesLogicalPortConfigEntry 10 }
+
+cienaCesPortAdminSpeed OBJECT-TYPE
+     SYNTAX       INTEGER {
+                       notApplicable(1),
+                       tenMbps(2),
+                       hundredMbps(3),
+                       gig(4),
+                       tenGig(5),
+                       auto(6),
+                       fortyGig(7),
+                       hundredGig(8),
+                       oduFlex(9),
+                       twoPtFiveGig(10)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The desired speed of the port."
+     DEFVAL {auto}
+     ::= { cienaCesLogicalPortConfigEntry 11 }
+                
+ cienaCesPortOperSpeed OBJECT-TYPE
+     SYNTAX       INTEGER {
+                       notApplicable(1),
+                       tenMbps(2),
+                       hundredMbps(3),
+                       gig(4),
+                       tenGig(5),
+                       fortyGig(6),
+                       hundredGig(7),
+                       oduFlex(8),
+                       twoPtFiveGig(9)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The current operational speed of the port."
+     ::= { cienaCesLogicalPortConfigEntry 12 }
+ 
+ cienaCesPortMaxFrameSize OBJECT-TYPE
+     SYNTAX       INTEGER (1200..10222)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The maximum frame size allowed on this port including jumbo frame size."
+     ::= { cienaCesLogicalPortConfigEntry 13 }
+
+ cienaCesLogicalPortConfigEttpAid OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..32))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+                 "The TL1 AID of the ETTP object represented by this port.
+		 This field is undefined if the logical port maps to a LAG."
+         ::= { cienaCesLogicalPortConfigEntry 14 }
+
+ cienaCesLogicalPortLastDownReason1 OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..255))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+                 "The most recent fault(s) that changed the port state to down.
+		 This field is undefined if the logical port maps to a LAG."
+         ::= { cienaCesLogicalPortConfigEntry 15 }
+
+cienaCesLogicalPortLastDownReason2 OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..255))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+                 "The most recent fault(s) that changed the port state to down.
+                 This field is undefined if the logical port maps to a LAG."
+         ::= { cienaCesLogicalPortConfigEntry 16 }
+
+cienaCesLogicalPortLastDownReason3 OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..255))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+                 "The most recent fault(s) that changed the port state to down.
+                 This field is undefined if the logical port maps to a LAG."
+         ::= { cienaCesLogicalPortConfigEntry 17 }
+
+cienaCesLogicalPortMaskedDownReason OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..32))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+                 "The masked/debounced fault that explains why the port is down.
+		 This field is undefined if the logical port maps to a LAG."
+         ::= { cienaCesLogicalPortConfigEntry 18 }
+
+cienaCesLogicalPortFacilityLoopback OBJECT-TYPE
+         SYNTAX        CienaGlobalState
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+                 "The facility loopback state of the port.
+		 This field is undefined if the logical port maps to a LAG."
+         ::= { cienaCesLogicalPortConfigEntry 19 }
+
+cienaCesPortIngressRcosProfileId OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+	         "This object specifies the ID of the attached ingress resolved CoS profile."
+         ::= { cienaCesLogicalPortConfigEntry 20 }
+
+cienaCesPortIngressRcosProfileName OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..32))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+	         "This object specifies the name of the attached ingress resolved CoS profile."
+         ::= { cienaCesLogicalPortConfigEntry 21 }
+
+cienaCesPortIngressRcosPolicy OBJECT-TYPE
+         SYNTAX        INTEGER  {
+                           ignore(1),
+                           fixed(2),
+                           dot1dToRcosTag1(3),
+                           dot1dToRcosTag2(4),
+                           dscpToRcos(5),
+                           mplsToRcos(6),
+                           dscpMplsToRcos(7)
+                       }
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+	         "This object specifies the ingress resolved CoS policy."
+         DEFVAL        {dot1dToRcosTag1}
+         ::= { cienaCesLogicalPortConfigEntry 22 }      
+
+cienaCesLogicalPortConfigEttpId   OBJECT-TYPE
+     SYNTAX         Unsigned32 (1..65535) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "ETTP mapped to by PG-ID of the instance.  ETTP IDs start at 1, 
+             and may not be consecutive for each additional port. 
+             An ETTP-ID of 0 denotes that the logical port is not mapped directly to an ETTP
+             e.g. Aggregate port or default physical port which has been port-aliased."
+     ::= { cienaCesLogicalPortConfigEntry 23 }  
+
+cienaCesLogicalPortConfigEttpType OBJECT-TYPE
+             SYNTAX        INTEGER {
+                                unknown(1),
+                                ethernet(2),
+                                fastEthernet(3),
+                                hundredFx(4),
+                                gigEthernet(5),                 
+                                -- lagPort(6),
+                                gigHundredFx(7),
+                                tripleSpeed(8),
+                                tenGigEthernet(9),
+                                vmTripleSpeedTX(10),
+                                sonetOc3(11),
+                                sonetOc12(12),
+                                sonetOc48(13),
+                                sonetOc192(14),
+                                fortyGigEthernet(15),
+                                hundredGigEthernet(16),
+                                twoPointFiveGigEthernet(17),
+                                odu4(18)
+                           }
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "The port type for the associated ettp."
+             ::= { cienaCesLogicalPortConfigEntry 24 }
+
+cienaCesLogicalPortConfigIngMirrorPort OBJECT-TYPE
+             SYNTAX        DisplayString (SIZE (0..32))
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "This object indicates whether ingress traffic is being 
+                      mirrored. If ingress traffic is being mirrored this object 
+                      specifies which port the traffic is being mirrored to."
+             ::= { cienaCesLogicalPortConfigEntry 25 }
+
+cienaCesLogicalPortConfigEgrMirrorPort OBJECT-TYPE
+             SYNTAX        DisplayString (SIZE (0..32))
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "This object indicates whether egress traffic is being 
+                      mirrored. If egress traffic is being mirrored this object 
+                      specifies which port the traffic is being mirrored to."
+             ::= { cienaCesLogicalPortConfigEntry 26 }
+
+cienaCesLogicalPortConfigIngFloodContainer OBJECT-TYPE
+             SYNTAX        DisplayString (SIZE (0..32))
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "This object indicates whether ingress flood traffic is 
+                      rate limited. If ingress flood traffic is rate limited 
+                      this object specifies the flood containment profile for 
+                      the port."
+             ::= { cienaCesLogicalPortConfigEntry 27 }
+
+cienaCesLogicalPortConfigPriorityTagMode OBJECT-TYPE
+             SYNTAX        PortPriorityTagPolicy
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "This object specifies whether the priority tag of a frame 
+                      is stripped (strip-tag) or left intact (leave-tag) upon 
+                      ingress and egress."
+             DEFVAL        {strip-tag}
+             ::= { cienaCesLogicalPortConfigEntry 28 }
+
+cienaCesLogicalPortConfigVidTpidCount OBJECT-TYPE
+             SYNTAX        Unsigned32
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "This object specifies the number of ingress TPID-pairs (inner + outer) 
+                      configured on the port"
+             DEFVAL        {2}
+             ::= { cienaCesLogicalPortConfigEntry 29 }
+
+cienaCesPortOperationalSpeed OBJECT-TYPE
+             SYNTAX        Gauge32
+             UNITS         "kbps"
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "This object specifies the port's current bandwidth in
+		      kilobits per second"
+             ::= { cienaCesLogicalPortConfigEntry 30 }
+
+cienaCesPortOuterTpidList OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..32)) 
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+	         "This object specifies the valid outer vlan tag list which can be used as egress vlan tag or outer vlan tag."
+         ::= { cienaCesLogicalPortConfigEntry 31 }
+
+cienaCesPortEgressOuterTpid OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..32)) 
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+	         "This object specifies the egress vlan tag."
+         ::= { cienaCesLogicalPortConfigEntry 32 }
+
+cienaCesPortOuterVtagTpid OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..32))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+	         "This object specifies the outer vlan tag."
+         ::= { cienaCesLogicalPortConfigEntry 33 }
+
+cienaCesPortAdministrativeSpeed OBJECT-TYPE
+             SYNTAX        Unsigned32
+             UNITS         "kbps"
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "This object specifies the port's administrative bandwidth in
+		      kilobits per second"
+             ::= { cienaCesLogicalPortConfigEntry 34 }
+
+cienaCesPortTerminalLoopbackState OBJECT-TYPE
+         SYNTAX        CienaGlobalState
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+                 "The terminal loopback state of the port.
+                 This field is undefined if the logical port maps to a LAG."
+         ::= { cienaCesLogicalPortConfigEntry 35 }
+ 
+cienaCesPortLearnLimit OBJECT-TYPE
+         SYNTAX        INTEGER
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+	         "This object specifies learn limit count for port"
+	 DEFVAL        {64000}
+         ::= { cienaCesLogicalPortConfigEntry 36 }
+
+cienaCesLogicalPortConfigSignalDegradeDetection OBJECT-TYPE
+         SYNTAX        INTEGER {
+                       off(1),
+                       otn(2),
+                       y1731SyntheticLoss(3)
+                  }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies if signal degrade detection is enabled
+              or disabled on the port. And if enabled, this object specifies
+              the technology of which signal degrade detection uses."
+     ::= { cienaCesLogicalPortConfigEntry 37 }   
+
+cienaCesLogicalPortConfigSignalDegradeState OBJECT-TYPE
+         SYNTAX        INTEGER {
+                       none(1),
+                       degraded(2)
+                  }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "The signal degrade state of the port."
+     ::= { cienaCesLogicalPortConfigEntry 38 }   
+
+cienaCesPortL2CftStatus OBJECT-TYPE
+     SYNTAX        INTEGER {
+                       disabled(1),
+                       enabled(2)
+                    }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+                   "Admin Status of L2CFT profile attached to the port."
+     DEFVAL        { disabled }
+     ::=           { cienaCesLogicalPortConfigEntry 39 }   
+
+cienaCesPortL2CftProfileId OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..64)
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+                   "The ID of the custom L2CFT profile attached to the given port.
+                   A non-zero value refers to the L2CFT profile as indexed by the cienaCesDpL2CftProfileIndex object
+                   in the cienaCesDataplaneMIB module.
+                   A value of 0 means no L2CFT profile is attached to this port.
+                   Setting a non-zero value will attach the corresponding L2CFT profile to the given port." 
+     DEFVAL        { 0 }
+     ::=           { cienaCesLogicalPortConfigEntry 40 }   
+
+ cienaCesPortConfigHoldOffState OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              "The object specifies the hold-off state of the port."
+      DEFVAL        { false }
+      ::= { cienaCesLogicalPortConfigEntry 41 }
+
+ cienaCesPortConfigHoldOffTime OBJECT-TYPE
+      SYNTAX        Unsigned32 (3..20)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              "This object specifies the time (in deciseconds, 1ds=100ms) for which port
+               remains in hold-off state. During the hold-off time, all physical link
+               transitions are ignored."
+      DEFVAL        { 10 }
+      ::= { cienaCesLogicalPortConfigEntry 42 }
+
+ cienaCesPortOperFecState OBJECT-TYPE
+    SYNTAX        INTEGER {
+                     on(1),
+                     off(2)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current operational Forward Error Correction (FEC) state of the port."
+    ::= { cienaCesLogicalPortConfigEntry 43 }
+
+--
+ --cienaCesPortPgIdMappingTable
+ --
+cienaCesPortPgIdMappingTable  OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesPortPgIdMappingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table to map the hierarchical (dotted) port index to PGID value."
+     ::= { cienaCesPortPgIdMapping 1 }
+                
+ cienaCesPortPgIdMappingEntry OBJECT-TYPE
+     SYNTAX       CienaCesPortPgIdMappingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Entry in the PGID mapping table."
+     INDEX { cienaCesPortPgIdMappingChassisIndex, cienaCesPortPgIdMappingShelfIndex, 
+     		cienaCesPortPgIdMappingSlotIndex, cienaCesPortPgidMappingPortNumber }
+     ::= { cienaCesPortPgIdMappingTable 1 } 
+ 	
+ CienaCesPortPgIdMappingEntry ::= SEQUENCE { 
+	cienaCesPortPgIdMappingChassisIndex		Unsigned32,
+	cienaCesPortPgIdMappingShelfIndex		Unsigned32, 
+	cienaCesPortPgIdMappingSlotIndex		Unsigned32, 
+	cienaCesPortPgidMappingPortNumber		Unsigned32,
+	cienaCesPortPgIdMappingPgId				Unsigned32,
+	cienaCesPortPgIdMappingNotifChassisIndex		Unsigned32,
+	cienaCesPortPgIdMappingNotifShelfIndex		Unsigned32, 
+	cienaCesPortPgIdMappingNotifSlotIndex		Unsigned32, 
+	cienaCesPortPgIdMappingNotifPortNumber		Unsigned32
+}
+
+ cienaCesPortPgIdMappingChassisIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the chassis index for the port."               
+     ::= { cienaCesPortPgIdMappingEntry 1 }
+     
+ cienaCesPortPgIdMappingShelfIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (0..992)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the shelf index for the port."               
+     ::= { cienaCesPortPgIdMappingEntry 2 }
+
+ cienaCesPortPgIdMappingSlotIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..38)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the slot index for the port."
+     ::= { cienaCesPortPgIdMappingEntry 3 }
+
+ cienaCesPortPgidMappingPortNumber		OBJECT-TYPE
+ 	SYNTAX			Unsigned32(1..65535)
+ 	MAX-ACCESS		accessible-for-notify
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"The object indicates the port number for the corresponding PGID."
+ 	::= { cienaCesPortPgIdMappingEntry 4 }
+
+ cienaCesPortPgIdMappingPgId			OBJECT-TYPE
+ 	SYNTAX			Unsigned32(1..65535)
+ 	MAX-ACCESS		read-only
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"This object indicates the PGID value for the corresponding dotted index value."
+ 	::= { cienaCesPortPgIdMappingEntry 5 }		
+ 
+  cienaCesPortPgIdMappingNotifChassisIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the chassis index for the port used for trap definition."               
+     ::= { cienaCesPortPgIdMappingEntry 6 }
+     
+ cienaCesPortPgIdMappingNotifShelfIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (0..992)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the shelf index for the port used for trap definition."               
+     ::= { cienaCesPortPgIdMappingEntry 7 }
+
+ cienaCesPortPgIdMappingNotifSlotIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..38)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the slot index for the port used for trap definition."
+     ::= { cienaCesPortPgIdMappingEntry 8 }
+
+ cienaCesPortPgIdMappingNotifPortNumber		OBJECT-TYPE
+ 	SYNTAX			Unsigned32(1..65535)
+ 	MAX-ACCESS		accessible-for-notify
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"The object indicates the port number for the corresponding PGID
+ 		used for trap definition."
+ 	::= { cienaCesPortPgIdMappingEntry 9 }
+
+    
+ --
+ --cienaCesChPortPgIdMappingTable
+ --
+cienaCesChPortPgIdMappingTable  OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesChPortPgIdMappingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table to map the hierarchical (dotted) port index to PgId value.
+             This table supports channelized interfaces."
+     ::= { cienaCesChPortPgIdMapping 1 }
+                
+ cienaCesChPortPgIdMappingEntry OBJECT-TYPE
+     SYNTAX       CienaCesChPortPgIdMappingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Entry in the PgId mapping table."
+     INDEX { cienaCesChPortPgIdMappingChassisIndex, cienaCesChPortPgIdMappingShelfIndex, 
+     		cienaCesChPortPgIdMappingSlotIndex, cienaCesChPortPgIdMappingPortNumber,
+                cienaCesChPortPgIdMappingChannelNumber }
+     ::= { cienaCesChPortPgIdMappingTable 1 } 
+ 	
+ CienaCesChPortPgIdMappingEntry ::= SEQUENCE { 
+	cienaCesChPortPgIdMappingChassisIndex		Unsigned32,
+	cienaCesChPortPgIdMappingShelfIndex		Unsigned32, 
+	cienaCesChPortPgIdMappingSlotIndex		Unsigned32, 
+	cienaCesChPortPgIdMappingPortNumber		Unsigned32,
+	cienaCesChPortPgIdMappingChannelNumber		Unsigned32,
+	cienaCesChPortPgIdMappingPgId			Unsigned32,
+	cienaCesChPortPgIdMappingNotifChassisIndex	Unsigned32,
+	cienaCesChPortPgIdMappingNotifShelfIndex	Unsigned32, 
+	cienaCesChPortPgIdMappingNotifSlotIndex		Unsigned32, 
+	cienaCesChPortPgIdMappingNotifPortNumber	Unsigned32,
+	cienaCesChPortPgIdMappingNotifChannelNumber	Unsigned32
+}
+
+ cienaCesChPortPgIdMappingChassisIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the chassis index for the port."               
+     ::= { cienaCesChPortPgIdMappingEntry 1 }
+     
+ cienaCesChPortPgIdMappingShelfIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (0..992)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the shelf index for the port."               
+     ::= { cienaCesChPortPgIdMappingEntry 2 }
+
+ cienaCesChPortPgIdMappingSlotIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..38)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the slot index for the port."
+     ::= { cienaCesChPortPgIdMappingEntry 3 }
+
+ cienaCesChPortPgIdMappingPortNumber		OBJECT-TYPE
+ 	SYNTAX		Unsigned32(1..65535)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The object indicates the port number for the corresponding PgId."
+ 	::= { cienaCesChPortPgIdMappingEntry 4 }
+
+ cienaCesChPortPgIdMappingChannelNumber		OBJECT-TYPE
+ 	SYNTAX		Unsigned32(0..65535)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The object indicates the channel number for the corresponding PgId.
+                The value 0 is used if the port is not channelized."
+ 	::= { cienaCesChPortPgIdMappingEntry 5 }
+
+ cienaCesChPortPgIdMappingPgId			OBJECT-TYPE
+ 	SYNTAX			Unsigned32(1..4294967295)
+ 	MAX-ACCESS		read-only
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"This object indicates the PgId value for the port as specified by this object's index."
+ 	::= { cienaCesChPortPgIdMappingEntry 6 }		
+ 
+  cienaCesChPortPgIdMappingNotifChassisIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the chassis index for the port used for trap definition."               
+     ::= { cienaCesChPortPgIdMappingEntry 7 }
+     
+ cienaCesChPortPgIdMappingNotifShelfIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (0..992)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the shelf index for the port used for trap definition."               
+     ::= { cienaCesChPortPgIdMappingEntry 8 }
+
+ cienaCesChPortPgIdMappingNotifSlotIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..38)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the slot index for the port used for trap definition."
+     ::= { cienaCesChPortPgIdMappingEntry 9 }
+
+ cienaCesChPortPgIdMappingNotifPortNumber		OBJECT-TYPE
+ 	SYNTAX			Unsigned32(1..65535)
+ 	MAX-ACCESS		accessible-for-notify
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"The object indicates the port number for the corresponding PgId
+ 		used for trap definition."
+ 	::= { cienaCesChPortPgIdMappingEntry 10 }
+
+ cienaCesChPortPgIdMappingNotifChannelNumber		OBJECT-TYPE
+ 	SYNTAX			Unsigned32(0..65535)
+ 	MAX-ACCESS		accessible-for-notify
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"The object indicates the channel number for the corresponding PgId
+ 		used for trap definition. The value 0 is used if the port is
+                not channelized."
+ 	::= { cienaCesChPortPgIdMappingEntry 11 }
+
+    
+ --
+ -- Port Traps
+ --           
+ 
+ cienaCesPortNotificationPortUp  NOTIFICATION-TYPE
+        OBJECTS    {  cienaGlobalSeverity,  
+        			  cienaGlobalMacAddress,
+        			  cienaCesPortPgIdMappingNotifChassisIndex,
+        			  cienaCesPortPgIdMappingNotifShelfIndex,
+        			  cienaCesPortPgIdMappingNotifSlotIndex,
+        			  cienaCesPortPgIdMappingNotifPortNumber,
+        			  cienaCesLogicalPortConfigPortAdminState,
+                      cienaCesLogicalPortConfigPortOperState,
+                      cienaCesLogicalPortConfigPortName,  
+                      cienaCesLogicalPortConfigPortType, 
+                      cienaCesLogicalPortConfigPortDesc,
+                      sysName,
+                      sysLocation,
+                      cienaCesChassisSystemId,
+                      cienaCesLogicalPortConfigEttpAid
+                   }
+        STATUS     current
+        DESCRIPTION  
+                "A cienaCesLogicalPortNotificationPortUp trap signifies that the SNMP entity, acting in
+                 an agent role, has detected the link status has become operationally up for
+                 one of its communication links.
+       			To enable the device to send this notification:
+        			-	cienaCesPortEnhancedLinkTrapState needs to be set to enabled  
+        			-	cienaCesPortAllTrapState needs to be set to enabled  
+        			-   cienaCesLogicalPortConfigPortAllTrapState for the port needs to be set to enabled
+        			-	cienaCesLogicalPortConfigPortLinkUpDownTrapState for the port needs to be set to enabled  
+       			These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+       			cienaGlobalMacAddress, cienaCesPortPgIdMappingNotifChassisIndex, 
+       			cienaCesPortPgIdMappingNotifShelfIndex, cienaCesPortPgIdMappingNotifSlotIndex,
+       			cienaCesPortPgIdMappingNotifPortNumber, cienaCesLogicalPortConfigPortAdminState, 
+       			cienaCesLogicalPortConfigPortOperState, cienaCesLogicalPortConfigPortName, 
+       			cienaCesLogicalPortConfigPortType, cienaCesLogicalPortConfigPortDesc, sysName,
+			sysLocation, cienaCesChassisSystemId and cienaCesLogicalPortConfigEttpAid."
+        ::= { cienaCesPortNotificationMIBNotifications 2 } 
+
+ cienaCesPortNotificationPortDown  NOTIFICATION-TYPE
+        OBJECTS    {  cienaGlobalSeverity,
+        			  cienaGlobalMacAddress,
+        			  cienaCesPortPgIdMappingNotifChassisIndex,
+        			  cienaCesPortPgIdMappingNotifShelfIndex,
+        			  cienaCesPortPgIdMappingNotifSlotIndex,
+        			  cienaCesPortPgIdMappingNotifPortNumber,
+        			  cienaCesLogicalPortConfigPortAdminState,
+                      cienaCesLogicalPortConfigPortOperState,
+                      cienaCesLogicalPortConfigPortName,  
+                      cienaCesLogicalPortConfigPortType, 
+                      cienaCesLogicalPortConfigPortDesc,
+                      sysName,
+                      sysLocation,
+                      cienaCesChassisSystemId,
+                      cienaCesLogicalPortConfigEttpAid,
+                      cienaCesLogicalPortLastDownReason1,
+                      cienaCesLogicalPortLastDownReason2,
+                      cienaCesLogicalPortLastDownReason3,
+                      cienaCesLogicalPortMaskedDownReason
+                   }
+        STATUS     current
+        DESCRIPTION  
+                "A cienaCesLogicalPortNotificationPortDown trap signifies that the SNMP entity, acting in
+                 an agent role, has detected that the link status has become operationally down
+                 for one of its communication links.
+       			To enable the device to send this notification:
+        			-	cienaCesPortEnhancedLinkTrapState needs to be set to enabled  
+        			-	cienaCesPortAllTrapState needs to be set to enabled  
+        			-   cienaCesLogicalPortConfigPortAllTrapState for the port needs to be set to enabled
+        			-	cienaCesLogicalPortConfigPortLinkUpDownTrapState for the port needs to be set to enabled  
+       			These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+       			cienaGlobalMacAddress, cienaCesPortPgIdMappingNotifChassisIndex, cienaCesPortPgIdMappingNotifShelfIndex, 
+       			cienaCesPortPgIdMappingNotifSlotIndex, cienaCesPortPgIdMappingNotifPortNumber, 
+       			cienaCesLogicalPortConfigPortAdminState, cienaCesLogicalPortConfigPortOperState, 
+       			cienaCesLogicalPortConfigPortName, cienaCesLogicalPortConfigPortType, cienaCesLogicalPortConfigPortDesc, 
+       			sysName, and sysLocation."
+        ::= { cienaCesPortNotificationMIBNotifications 1 } 
+
+ cienaCesChPortNotificationPortUp  NOTIFICATION-TYPE
+        OBJECTS    {  cienaGlobalSeverity,  
+        		  cienaGlobalMacAddress,
+        		  cienaCesChPortPgIdMappingNotifChassisIndex,
+        		  cienaCesChPortPgIdMappingNotifShelfIndex,
+        		  cienaCesChPortPgIdMappingNotifSlotIndex,
+        		  cienaCesChPortPgIdMappingNotifPortNumber,
+        		  cienaCesChPortPgIdMappingNotifChannelNumber,
+        		  cienaCesLogicalPortConfigPortAdminState,
+                      cienaCesLogicalPortConfigPortOperState,
+                      cienaCesLogicalPortConfigPortName,  
+                      cienaCesLogicalPortConfigPortType, 
+                      cienaCesLogicalPortConfigPortDesc,
+                      sysName,
+                      sysLocation,
+                      cienaCesChassisSystemId,
+                      cienaCesLogicalPortConfigEttpAid
+                   }
+        STATUS     current
+        DESCRIPTION  
+                "A cienaCesChPortNotificationPortUp trap signifies that the SNMP entity, acting in
+                 an agent role, has detected the link status has become operationally up for
+                 one of its communication links.
+       			To enable the device to send this notification:
+        			- cienaCesPortEnhancedLinkTrapState needs to be set to enabled  
+        			- cienaCesPortAllTrapState needs to be set to enabled  
+        			- cienaCesLogicalPortConfigPortAllTrapState for the port needs to be set to enabled
+        			- cienaCesLogicalPortConfigPortLinkUpDownTrapState for the port needs to be set to enabled  
+       			These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+       			cienaGlobalMacAddress, cienaCesChPortPgIdMappingNotifChassisIndex, 
+       			cienaCesChPortPgIdMappingNotifShelfIndex, cienaCesChPortPgIdMappingNotifSlotIndex,
+       			cienaCesChPortPgIdMappingNotifPortNumber, cienaCesChPortPgIdMappingNotifChannelNumber,
+                        cienaCesLogicalPortConfigPortAdminState, 
+       			cienaCesLogicalPortConfigPortOperState, cienaCesLogicalPortConfigPortName, 
+       			cienaCesLogicalPortConfigPortType, cienaCesLogicalPortConfigPortDesc, sysName,
+			sysLocation, cienaCesChassisSystemId and cienaCesLogicalPortConfigEttpAid."
+        ::= { cienaCesPortNotificationMIBNotifications 3 } 
+
+ cienaCesChPortNotificationPortDown  NOTIFICATION-TYPE
+        OBJECTS    {  cienaGlobalSeverity,
+        		  cienaGlobalMacAddress,
+        		  cienaCesChPortPgIdMappingNotifChassisIndex,
+        		  cienaCesChPortPgIdMappingNotifShelfIndex,
+        		  cienaCesChPortPgIdMappingNotifSlotIndex,
+        		  cienaCesChPortPgIdMappingNotifPortNumber,
+        		  cienaCesChPortPgIdMappingNotifChannelNumber,
+        		  cienaCesLogicalPortConfigPortAdminState,
+                      cienaCesLogicalPortConfigPortOperState,
+                      cienaCesLogicalPortConfigPortName,  
+                      cienaCesLogicalPortConfigPortType, 
+                      cienaCesLogicalPortConfigPortDesc,
+                      sysName,
+                      sysLocation,
+                      cienaCesChassisSystemId,
+                      cienaCesLogicalPortConfigEttpAid,
+                      cienaCesLogicalPortLastDownReason1,
+                      cienaCesLogicalPortLastDownReason2,
+                      cienaCesLogicalPortLastDownReason3,
+                      cienaCesLogicalPortMaskedDownReason
+                   }
+        STATUS     current
+        DESCRIPTION  
+                "A cienaCesChPortNotificationPortDown trap signifies that the SNMP entity, acting in
+                 an agent role, has detected that the link status has become operationally down
+                 for one of its communication links.
+       			To enable the device to send this notification:
+        			- cienaCesPortEnhancedLinkTrapState needs to be set to enabled  
+        			- cienaCesPortAllTrapState needs to be set to enabled  
+        			- cienaCesLogicalPortConfigPortAllTrapState for the port needs to be set to enabled
+        			- cienaCesLogicalPortConfigPortLinkUpDownTrapState for the port needs to be set to enabled  
+       			These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+       			cienaGlobalMacAddress, cienaCesChPortPgIdMappingNotifChassisIndex, cienaCesChPortPgIdMappingNotifShelfIndex, 
+       			cienaCesChPortPgIdMappingNotifSlotIndex, cienaCesChPortPgIdMappingNotifPortNumber,
+                        cienaCesChPortPgIdMappingNotifChannelNumber,
+       			cienaCesLogicalPortConfigPortAdminState, cienaCesLogicalPortConfigPortOperState, 
+       			cienaCesLogicalPortConfigPortName, cienaCesLogicalPortConfigPortType, cienaCesLogicalPortConfigPortDesc, 
+       			sysName, and sysLocation."
+        ::= { cienaCesPortNotificationMIBNotifications 4 } 
+
+  cienaCesPortNotificationPortSignalDegradeSet  NOTIFICATION-TYPE
+        OBJECTS    {  cienaGlobalSeverity,
+                      cienaGlobalMacAddress,
+                      cienaCesPortPgIdMappingNotifChassisIndex,
+                      cienaCesPortPgIdMappingNotifShelfIndex,
+                      cienaCesPortPgIdMappingNotifSlotIndex,
+                      cienaCesPortPgIdMappingNotifPortNumber,
+                      cienaCesChPortPgIdMappingNotifChannelNumber,
+                      cienaCesLogicalPortConfigPortAdminState,
+                      cienaCesLogicalPortConfigPortOperState,
+                      cienaCesLogicalPortConfigPortName,
+                      cienaCesLogicalPortConfigPortType,
+                      cienaCesLogicalPortConfigPortDesc,
+                      sysName,
+                      sysLocation,
+                      cienaCesChassisSystemId,
+                      cienaCesLogicalPortConfigEttpAid,
+                      cienaCesLogicalPortConfigSignalDegradeDetection
+                   }
+        STATUS     current
+        DESCRIPTION
+                "A cienaCesPortNotificationPortSignalDegradeSet trap is raised when a
+                 signal degrade condition is detected against the specified port.
+
+                 This trap is enabled by default. Variable bindings include:
+                        cienaGlobalSeverity, 
+                        cienaGlobalMacAddress,   
+                        cienaCesPortPgIdMappingNotifChassisIndex, 
+                        cienaCesPortPgIdMappingNotifShelfIndex, 
+                        cienaCesPortPgIdMappingNotifSlotIndex,
+                        cienaCesPortPgIdMappingNotifPortNumber, 
+                        cienaCesLogicalPortConfigPortAdminState, 
+                        cienaCesLogicalPortConfigPortOperState, 
+                        cienaCesLogicalPortConfigPortName, 
+                        cienaCesLogicalPortConfigPortType, 
+                        cienaCesLogicalPortConfigPortDesc,
+                        sysName,
+                        sysLocation,
+                        cienaCesChassisSystemId,
+                        cienaCesLogicalPortConfigEttpAid,
+                        cienaCesLogicalPortConfigSignalDegradeDetection"
+        ::= { cienaCesPortNotificationMIBNotifications 5 }
+
+cienaCesPortNotificationPortSignalDegradeClear  NOTIFICATION-TYPE
+        OBJECTS    {  cienaGlobalSeverity,
+                      cienaGlobalMacAddress,
+                      cienaCesPortPgIdMappingNotifChassisIndex,
+                      cienaCesPortPgIdMappingNotifShelfIndex,
+                      cienaCesPortPgIdMappingNotifSlotIndex,
+                      cienaCesPortPgIdMappingNotifPortNumber,
+                      cienaCesChPortPgIdMappingNotifChannelNumber,
+                      cienaCesLogicalPortConfigPortAdminState,
+                      cienaCesLogicalPortConfigPortOperState,
+                      cienaCesLogicalPortConfigPortName,
+                      cienaCesLogicalPortConfigPortType,
+                      cienaCesLogicalPortConfigPortDesc,
+                      sysName,
+                      sysLocation,
+                      cienaCesChassisSystemId,
+                      cienaCesLogicalPortConfigEttpAid
+                   }
+        STATUS     current
+        DESCRIPTION
+                "A cienaCesPortNotificationPortSignalDegradeClear trap is raised when 
+                 the signal degrade condition is cleared against the specified port.
+
+                 This trap is enabled by default. Variable bindings include:
+                        cienaGlobalSeverity, 
+                        cienaGlobalMacAddress,   
+                        cienaCesPortPgIdMappingNotifChassisIndex, 
+                        cienaCesPortPgIdMappingNotifShelfIndex, 
+                        cienaCesPortPgIdMappingNotifSlotIndex,
+                        cienaCesPortPgIdMappingNotifPortNumber, 
+                        cienaCesLogicalPortConfigPortAdminState, 
+                        cienaCesLogicalPortConfigPortOperState, 
+                        cienaCesLogicalPortConfigPortName, 
+                        cienaCesLogicalPortConfigPortType, 
+                        cienaCesLogicalPortConfigPortDesc,
+                        sysName,
+                        sysLocation,
+                        cienaCesChassisSystemId
+                        cienaCesLogicalPortConfigEttpAid."
+        ::= { cienaCesPortNotificationMIBNotifications 6 }
+
+
+
+ --
+ -- Groups definition
+
+ portConfigGroup    OBJECT-GROUP
+       OBJECTS { cienaCesLogicalPortConfigPortAdminState,
+                 cienaCesLogicalPortConfigPortOperState,
+                 cienaCesLogicalPortConfigPortLinkUpDownTrapState,
+                 cienaCesLogicalPortConfigPortAllTrapState,
+                 cienaCesLogicalPortConfigPortPortMacAddress,
+                 cienaCesLogicalPortConfigPortName,
+                 cienaCesLogicalPortConfigPortDesc,
+                 cienaCesLogicalPortConfigPortType }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               about port configurations."
+       ::= { cienaCesPortMIBGroups 1 }
+    
+ portNotifGroup    NOTIFICATION-GROUP
+       NOTIFICATIONS { cienaCesPortNotificationPortDown, cienaCesPortNotificationPortUp }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               about port notifications."
+       ::= { cienaCesPortMIBGroups 2 }
+
+  portPgIdMappingGroup    OBJECT-GROUP
+       OBJECTS { cienaCesPortPgidMappingPortNumber,
+                 cienaCesPortPgIdMappingPgId }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               about port PgId mappings."
+       ::= { cienaCesPortMIBGroups 3 }
+
+ --
+ -- Ettp table
+ --  
+cienaCesEttpConfigTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesEttpConfigEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of Ethernet (default) physical ports. (ETTPs)."
+
+     ::= { cienaCesEttpConfig 1 }
+
+cienaCesEttpConfigEntry OBJECT-TYPE
+     SYNTAX       CienaCesEttpConfigEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "ETTP entry in the Ethernet default physical port table."
+     INDEX { cienaCesEttpConfigEttpId }
+
+     ::= { cienaCesEttpConfigTable 1 } 
+
+CienaCesEttpConfigEntry ::= SEQUENCE { 
+     cienaCesEttpConfigEttpId                   Unsigned32,
+     cienaCesEttpConfigOperState                INTEGER,   
+     cienaCesEttpConfigLinkUpDownTrapState      CienaGlobalState,
+     cienaCesEttpConfigAllTrapState             CienaGlobalState,
+     cienaCesEttpConfigMacAddress               MacAddress,
+     cienaCesEttpConfigName                     DisplayString,
+     cienaCesEttpConfigEttpType                 INTEGER,
+     cienaCesEttpConfigAdminSpeed               INTEGER,
+     cienaCesEttpConfigOperSpeed                INTEGER,
+     cienaCesEttpConfigEthLpPgid                Unsigned32,
+     cienaCesEttpConfigDuplex                   EttpDuplexPolicy,
+     cienaCesEttpConfigFlowCntl                 EttpFlowControlPolicy,
+     cienaCesEttpConfigAutoNeg                  EttpAutoNegPolicy,
+     cienaCesEttpConfigAdvertisedFlowCntl       EttpAdvertisedFlowControlPolicy,
+     cienaCesEttpConfigIfgDecr                  Unsigned32,
+     cienaCesEttpConfigXcvrFreq                 Unsigned32
+   }  
+
+cienaCesEttpConfigEttpId   OBJECT-TYPE
+     SYNTAX         Unsigned32 (1..65535) 
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "ETTP ID for the instance.  ETTP IDs start at 1, 
+             and may not be consecutive for each additional ettp.
+             Note that ETTP-IDs map directly 1:1 to default physical port PGIDs"
+
+     ::= { cienaCesEttpConfigEntry 1 }            
+
+cienaCesEttpConfigOperState OBJECT-TYPE
+
+     SYNTAX        INTEGER {
+                       invalid(1),
+                       enabled(2),
+                       disabled(3),
+                       notAuthenticated(4),
+                       loopbackTx(5),
+                       loopbackRx(6),
+                       unequipped(7)
+                  }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "The current operational state of the ettp."
+
+     ::= { cienaCesEttpConfigEntry 2 }   
+
+cienaCesEttpConfigLinkUpDownTrapState OBJECT-TYPE
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the current value of the enterprise ettp traps state."
+     DEFVAL { enabled }
+
+     ::= { cienaCesEttpConfigEntry 3 } 
+
+
+cienaCesEttpConfigAllTrapState OBJECT-TYPE
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "This object indicates whether the device generates traps for this ettp."
+
+     DEFVAL { enabled }
+     ::= { cienaCesEttpConfigEntry 4 } 
+
+cienaCesEttpConfigMacAddress OBJECT-TYPE
+     SYNTAX        MacAddress
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the ettp MAC address."
+
+     ::= { cienaCesEttpConfigEntry 5 }
+
+cienaCesEttpConfigName OBJECT-TYPE
+             SYNTAX      DisplayString (SIZE (0..32))
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                     "A textual string containing information about the
+                     ettp. This string should indicate the physical
+                     location of the ettp as well."
+             ::= { cienaCesEttpConfigEntry 6 }
+
+cienaCesEttpConfigEttpType OBJECT-TYPE
+
+             SYNTAX        INTEGER {
+                                unknown(1),
+                                ethernet(2),
+                                fastEthernet(3),
+                                hundredFx(4),
+                                gigEthernet(5),                 
+                                -- lagPort(6),
+                                gigHundredFx(7),
+                                tripleSpeed(8),
+                                tenGigEthernet(9),
+                                vmTripleSpeedTX(10),
+                                sonetOc3(11),
+                                sonetOc12(12),
+                                sonetOc48(13),
+                                sonetOc192(14),
+                                fortyGigEthernet(15),
+                                hundredGigEthernet(16),
+                                twoPointFiveGigEthernet(17),
+                                odu4(18)
+                           }
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION
+                     "The port type for the ettp."
+
+             ::= { cienaCesEttpConfigEntry 7 }
+
+cienaCesEttpConfigAdminSpeed OBJECT-TYPE
+     SYNTAX       INTEGER {
+                       notApplicable(1),
+                       tenMbps(2),
+                       hundredMbps(3),
+                       gig(4),
+                       tenGig(5),
+                       auto(6),
+                       fortyGig(7),
+                       hundredGig(8),
+                       -- oduFlex(9),
+                       twoPtFiveGig(10)
+                  }
+
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The desired speed of the ettp."
+     DEFVAL {auto}
+
+     ::= { cienaCesEttpConfigEntry 8 }
+
+cienaCesEttpConfigOperSpeed OBJECT-TYPE
+
+     SYNTAX       INTEGER {
+                       notApplicable(1),
+                       tenMbps(2),
+                       hundredMbps(3),
+                       gig(4),
+                       tenGig(5),
+                       fortyGig(6),
+                       hundredGig(7),
+                       -- oduFlex(8),
+                       twoPtFiveGig(9)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The current operational speed of the ettp."
+
+     ::= { cienaCesEttpConfigEntry 9 }
+
+cienaCesEttpConfigEthLpPgid   OBJECT-TYPE
+     SYNTAX         Unsigned32 (1..65535) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "PG ID-mapped to the instance.
+              ETTPs will map to a logical port which can be one of default-physical-port, aggregate-port, port-alias-port"
+
+     ::= { cienaCesEttpConfigEntry 10 } 
+   
+cienaCesEttpConfigDuplex OBJECT-TYPE
+     SYNTAX        EttpDuplexPolicy
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object indicates whether the port can transmit and receive data simultaneously."
+     DEFVAL        {full}
+     ::= { cienaCesEttpConfigEntry 11 }
+
+cienaCesEttpConfigFlowCntl OBJECT-TYPE
+     SYNTAX        EttpFlowControlPolicy
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object indicates the port action when frames are received faster than the port can process them."
+     DEFVAL        {off}
+     ::= { cienaCesEttpConfigEntry 12 }
+
+cienaCesEttpConfigAutoNeg OBJECT-TYPE
+     SYNTAX        EttpAutoNegPolicy
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object indicates whether the port should negotiate with its link partner to determine common operating parameters."
+     DEFVAL        {off}
+     ::= { cienaCesEttpConfigEntry 13 }
+
+cienaCesEttpConfigAdvertisedFlowCntl OBJECT-TYPE
+     SYNTAX        EttpAdvertisedFlowControlPolicy
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object indicates whether flow control settings are advertised."
+     DEFVAL        {off}
+     ::= { cienaCesEttpConfigEntry 14 }
+
+cienaCesEttpConfigIfgDecr OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..5)
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the number of bytes by which to decrease the Inter-frame Gap (IFG) for frames being received on the port."
+     ::= { cienaCesEttpConfigEntry 15 }
+
+cienaCesEttpConfigXcvrFreq OBJECT-TYPE
+     SYNTAX        Unsigned32 (191100..196150)
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the desired frequency of the transceiver in GHz."
+     ::= { cienaCesEttpConfigEntry 16 }
+
+ --
+ -- Logical Port TPID table
+ --  
+cienaCesLogicalPortTpidTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF CienaCesLogicalPortTpidEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Table of ingress TPIDs for every port"
+        ::= { cienaCesLogicalPortTpid 1 }
+
+cienaCesLogicalPortTpidEntry            OBJECT-TYPE
+        SYNTAX          CienaCesLogicalPortTpidEntry
+        MAX-ACCESS      not-accessible  
+        STATUS          current                     
+        DESCRIPTION
+                "Each entry represents an individual ingress TPID pairs belonging to a port. 
+                 The number of ingress TPID entries per port is decided by the 
+                 cienaCesLogicalPortConfigVidTpidCount object. E.g. 8100 and 88A8"
+        INDEX { cienaCesLogicalPortConfigPgId, 
+                cienaCesLogicalPortTpidIndex } 
+        ::= { cienaCesLogicalPortTpidTable 1 }
+
+CienaCesLogicalPortTpidEntry ::= SEQUENCE {
+     cienaCesLogicalPortTpidIndex             Unsigned32,
+     cienaCesLogicalPortInnerVidTpid          Unsigned32,
+     cienaCesLogicalPortOuterVidTpid          Unsigned32
+}
+
+cienaCesLogicalPortTpidIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the ingress tpid pair index for the port. size => CS_MAX_L2_ETYPES"               
+     ::= { cienaCesLogicalPortTpidEntry 1 }
+
+cienaCesLogicalPortInnerVidTpid       OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the inner vlan tag TPID for the ingress tpid pair index of the port."               
+     ::= { cienaCesLogicalPortTpidEntry 2 }
+
+cienaCesLogicalPortOuterVidTpid       OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the outer vlan tag TPID for the ingress tpid pair index of the port."               
+     ::= { cienaCesLogicalPortTpidEntry 3 }
+
+
+END            

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,6 +24,7 @@
 
 namespace App\Http\Controllers;
 
+use App;
 use App\Models\Application;
 use App\Models\Callback;
 use App\Models\Device;
@@ -72,6 +72,7 @@ class AboutController extends Controller
             'version_local'     => $version->local(),
             'version_mysql'     => current(DB::selectOne('select version()')),
             'version_php'       => phpversion(),
+            'version_laravel'   => App::VERSION(),
             'version_python'    => Version::python(),
             'version_webserver' => $request->server('SERVER_SOFTWARE'),
             'version_rrdtool'   => str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(

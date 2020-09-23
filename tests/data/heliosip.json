@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.6530",
                     "sysDescr": "2N IP Force",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "2.22.0.31.8",
+                    "hardware": "2N IP Force",
                     "features": null,
                     "os": "heliosip",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "54-2354-8708",
                     "icon": "2n.svg",
-                    "location": null
+                    "location": "Front Door"
                 }
             ]
         },
@@ -51,9 +51,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -143,9 +145,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "ifSpeed_prev": null,
-                    "ifHighSpeed_prev": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         },
@@ -162,9 +162,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 100000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -254,9 +256,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "ifSpeed_prev": null,
-                    "ifHighSpeed_prev": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         }

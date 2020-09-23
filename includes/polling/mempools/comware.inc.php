@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $usage = snmp_get($device, "hh3cEntityExtMemUsage.{$mempool['mempool_index']}", '-Ovq', 'HH3C-ENTITY-EXT-MIB');
 $mempool['total'] = 100;
 $mempool['used'] = $usage;

@@ -52,7 +52,7 @@ use LibreNMS\RRD\RrdDefinition;
 $data = snmpwalk_cache_oid($device, 'ipSystemStats', null, 'IP-MIB');
 
 if ($data) {
-    $oids = array(
+    $oids = [
         'ipSystemStatsInReceives',
         'ipSystemStatsInHdrErrors',
         'ipSystemStatsInAddrErrors',
@@ -69,7 +69,7 @@ if ($data) {
         'ipSystemStatsOutFragFails',
         'ipSystemStatsOutFragCreates',
         'ipSystemStatsOutForwDatagrams',
-    );
+    ];
 
     foreach ($data as $af => $stats) {
         echo "$af ";
@@ -95,12 +95,12 @@ if ($data) {
             $stats['ipSystemStatsOutForwDatagrams'] = $stats['ipSystemStatsHCOutForwDatagrams'];
         }
 
-        $rrd_name = array('ipSystemStats', $af);
+        $rrd_name = ['ipSystemStats', $af];
         $rrd_def = new RrdDefinition();
-        $fields  = array();
+        $fields = [];
 
         foreach ($oids as $oid) {
-            $oid_ds      = str_replace('ipSystemStats', '', $oid);
+            $oid_ds = str_replace('ipSystemStats', '', $oid);
             $rrd_def->addDataset($oid_ds, 'COUNTER');
             if (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's')) {
                 $stats[$oid] = '0';
@@ -112,8 +112,8 @@ if ($data) {
         data_update($device, 'ipSystemStats', $tags, $fields);
 
         // FIXME per-AF?
-        $graphs['ipsystemstats_'.$af]         = true;
-        $graphs['ipsystemstats_'.$af.'_frag'] = true;
+        $os->enableGraph("ipsystemstats_$af");
+        $os->enableGraph("ipsystemstats_{$af}_frag");
     }//end foreach
 }//end if
 

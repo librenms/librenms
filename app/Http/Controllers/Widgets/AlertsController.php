@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -41,6 +40,7 @@ class AlertsController extends WidgetController
         'proc' => 0,
         'location' => 1,
         'sort' => 1,
+        'hidenavigation' => 0,
     ];
 
     public function getView(Request $request)

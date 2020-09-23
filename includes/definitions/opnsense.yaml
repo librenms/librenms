@@ -7,11 +7,12 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }
 discovery:
-    - sysDescr:
-        - OPNsense
     -
-      sysObjectID: .1.3.6.1.4.1.8072.3.2.8
-      snmpget:
-          oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.7.118.101.114.115.105.111.110
-          op: contains
-          value: 'OPNsense'
+        sysDescr:
+            - OPNsense
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.8
+        snmpget:
+            oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.7.118.101.114.115.105.111.110
+            op: contains
+            value: 'OPNsense'

@@ -6,5 +6,6 @@ over:
 icon: tripplite
 rfc1628_compat: true
 discovery:
-    - sysDescr_regex:
-        - '/POWERALERT/i'
+    -
+        sysDescr_regex:
+            - '/POWERALERT/i'

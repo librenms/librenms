@@ -20,25 +20,32 @@ Collection](../Alerting/Rules.md#alert-rules-collection).
 
 ## Setting the ping check to 1 minute
 
-1: Change the ping_rrd_step setting in config.php
+1: If you are using [RRDCached](http://docs.librenms.org/Extensions/RRDCached/), stop the service.
+
+    - This will flush all pending writes so that the rrdstep.php script can change the steps.
+    
+2: Change the ping_rrd_step setting in config.php
 
 ```
 $config['ping_rrd_step'] = 60;
 ```
 
-2: Update the rrd files to change the step (step is hardcoded at file
+3: Update the rrd files to change the step (step is hardcoded at file
 creation in rrd files)
 
 ```
 ./scripts/rrdstep.php -h all
 ```
 
-3: Add the following line to /etc/cron.d/librenms to allow 1 minute
+4: Add the following line to /etc/cron.d/librenms to allow 1 minute
 ping checks
 
 ```
 *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
 ```
+
+5: If applicable: Start the [RRDCached](http://docs.librenms.org/Extensions/RRDCached/) service
+
 
 **NOTE**: If you are using distributed pollers you can restrict a
 poller to a group by appending `-g` to the cron entry.  Alternatively,
@@ -46,11 +53,11 @@ you should only run ping.php on a single node.
 
 ## Sub minute ping check
 
-Cron only has a resolution of one minute, so we have to use a trick to
-allow sub minute checks. We add two entries, but add a delay before one.
+Cron only has a resolution of one minute, so for sub-minute ping checks we need to adapt both `ping`
+and `alerts` entries. We add two entries per function, but add a delay before one of these entries.
 
-Alerts are only run every minute, so you will have to modify them as
-well. Remove the original alerts.php entry.
+Remember, you need to remove the original `ping.php` and `alerts.php` entries in crontab before
+proceeding!
 
 1: Set ping_rrd_step
 
@@ -82,9 +89,9 @@ down before the parent.
 
 # Settings
 
-ping.php uses much the same settings as the poller fping with one
+`ping.php` uses much the same settings as the poller fping with one
 exception: retries is used instead of count.
-ping.php does not measure loss and avg response time, only up/down, so
+`ping.php` does not measure loss and avg response time, only up/down, so
 once a device responds it stops pinging it.
 
 ```

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePortsFdbTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -16,7 +15,7 @@ class CreatePortsFdbTable extends Migration
         Schema::create('ports_fdb', function (Blueprint $table) {
             $table->unsignedBigInteger('ports_fdb_id', true);
             $table->unsignedInteger('port_id')->index();
-            $table->string('mac_address', 32)->index('mac_address');
+            $table->string('mac_address', 32)->index();
             $table->unsignedInteger('vlan_id')->index();
             $table->unsignedInteger('device_id')->index();
         });

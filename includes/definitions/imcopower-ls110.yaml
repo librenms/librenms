@@ -4,7 +4,7 @@ type: power
 icon: imco
 group: IMCO POWER
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.33283.1
-mib_dir:
-    - imco
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.33283.1
+mib_dir: imco

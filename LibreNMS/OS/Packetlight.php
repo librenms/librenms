@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 PipoCanaja
  * @author     PipoCanaja
@@ -31,19 +30,25 @@ class Packetlight extends OS
 {
     /**
      * Subtract 30 (for yaml user_func)
-     *
      */
     public static function offsetSfpDbm($value)
     {
-        return ($value - 30);
+        return $value - 30;
     }
 
     /**
      * Subtract 128 (for yaml user_func)
-     *
      */
     public static function offsetSfpTemperature($value)
     {
-        return ($value - 128);
+        return $value - 128;
+    }
+
+    /**
+     * Convert Watts 10e-7 to Dbm
+     */
+    public static function convertWattToDbm($value)
+    {
+        return 10 * log10($value / 10000000) + 30;
     }
 }

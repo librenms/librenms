@@ -32,7 +32,7 @@
                     "type": "appliance",
                     "serial": null,
                     "icon": "hpe.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

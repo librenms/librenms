@@ -27,8 +27,8 @@ discovery_modules:
     cisco-pw: true
     vrf: true
     cisco-vrf-lite: true
-mib_dir:
-    - cisco
+mib_dir: cisco
 discovery:
-    - sysDescr:
-        - 'Cisco Controller'
+    -
+        sysDescr:
+            - 'Cisco Controller'

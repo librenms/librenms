@@ -1,11 +1,16 @@
 mib: OG-STATUSv2-MIB
 modules:
+    os:
+        version: OG-STATUSv2-MIB::ogFirmwareVersion
+        version_regex: '/(?<version>\S+)/'
+        serial: OG-STATUSv2-MIB::ogSerialNumber
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - ogCellModemTable
-                    - ogEmdTemperatureTable
+                -
+                    oid:
+                        - ogCellModemTable
+                        - ogEmdTemperatureTable
         temperature:
             data:
                 -

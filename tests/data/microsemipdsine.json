@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.7428.1.1.1.23",
                     "sysDescr": "Midspan.  Unit S/N=000076.  App Ver=4.17.05.07, Sep 12 2011, 11:19:52.  BOOT Ver=1.07, Jul  8 2009, 15:34:57",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "4.17.05.07",
+                    "hardware": "Midspan",
                     "features": null,
                     "os": "microsemipdsine",
                     "type": "network",
-                    "serial": null,
+                    "serial": "000076",
                     "icon": "microsemi.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "Midspan.  Unit S/N=000076.  App Ver=4.17.05.07, Sep 12 2011, 11:19:52.  BOOT Ver=1.07, Jul  8 2009, 15:34:57",
                     "sysContact": "<private>",
                     "version": "4.17.05.07",
-                    "hardware": "PoE Midspan",
+                    "hardware": "Midspan",
                     "features": null,
                     "os": "microsemipdsine",
                     "type": "network",
@@ -51,9 +51,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -143,9 +145,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "ifSpeed_prev": null,
-                    "ifHighSpeed_prev": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         },
@@ -162,9 +162,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 100000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -254,9 +256,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "ifSpeed_prev": null,
-                    "ifHighSpeed_prev": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         }

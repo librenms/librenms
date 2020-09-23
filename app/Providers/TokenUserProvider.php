@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -52,7 +51,6 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        return;
     }
 
     /**
@@ -63,12 +61,12 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (!ApiToken::isValid($credentials['api_token'])) {
+        if (! ApiToken::isValid($credentials['api_token'])) {
             return null;
         }
 
         $user = ApiToken::userFromToken($credentials['api_token']);
-        if (!is_null($user)) {
+        if (! is_null($user)) {
             return $user;
         }
 

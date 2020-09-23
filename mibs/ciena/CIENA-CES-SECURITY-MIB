@@ -1,0 +1,243 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-SECURITY-MIB.my
+ --
+
+ CIENA-CES-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+   NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY
+       FROM SNMPv2-SMI
+   DisplayString
+       FROM SNMPv2-TC
+   OBJECT-GROUP, NOTIFICATION-GROUP
+       FROM SNMPv2-CONF
+   cienaGlobalSeverity, cienaGlobalMacAddress
+       FROM CIENA-GLOBAL-MIB
+   cienaCesNotifications, cienaCesConfig
+       FROM CIENA-SMI;
+
+ cienaCesSecurityMIB MODULE-IDENTITY
+                        LAST-UPDATED "201709270000Z"
+                        ORGANIZATION "Ciena Corp."
+                        CONTACT-INFO
+                            "   Mib Meister
+                                7035 Ridge Road
+                                Hanover, Maryland 21076
+                                USA
+                                Phone:  +1 800 921 1144
+                                Email:  support@ciena.com"
+              DESCRIPTION
+                       "This module defines the security configuration objects and also the objects required for
+                       any security related notifications."
+
+              REVISION "201709270000Z"
+              DESCRIPTION
+                       "Initial creation."
+          ::= { cienaCesConfig 44 }
+
+ --
+ -- Node definitions
+ --
+
+ cienaCesSecurityMIBObjects OBJECT IDENTIFIER ::= { cienaCesSecurityMIB 1 }
+
+ cienaCesSecurityCertExpiry OBJECT IDENTIFIER ::= { cienaCesSecurityMIBObjects 1 }
+ cienaCesSecurityCertCrl    OBJECT IDENTIFIER ::= { cienaCesSecurityMIBObjects 2 }
+
+ cienaCesSecurityMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 43 }
+ cienaCesSecurityMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesSecurityMIBNotificationPrefix 0 }
+
+ -- Conformance information
+
+ cienaCesSecurityMIBConformance OBJECT IDENTIFIER ::= { cienaCesSecurityMIB 2 }
+ cienaCesSecurityMIBCompliances OBJECT IDENTIFIER ::= { cienaCesSecurityMIBConformance 1 }
+ cienaCesSecurityMIBGroups      OBJECT IDENTIFIER ::= { cienaCesSecurityMIBConformance 2 }
+
+ --
+ -- Global stuff
+ --
+
+ cienaCesSecurityCertType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                                ca(1),
+                                devCert(2),
+                                sshClient(3),
+                                sshServer(4)
+                         }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This object indicates the type of the certificate."
+    ::= { cienaCesSecurityCertExpiry 1 }
+
+ cienaCesSecurityCertName    OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the name of the certificate."
+     ::= { cienaCesSecurityCertExpiry 2 }
+
+ cienaCesSecurityCertValidTo    OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the validTo date of the certificate."
+     ::= { cienaCesSecurityCertExpiry 3 }
+
+ cienaCesSecurityCaCrlType OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the type of object, CA or CRL."
+    ::= { cienaCesSecurityCertCrl 1 }
+
+ cienaCesSecurityCertCrlOperation OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the type of operation on the cert or CRL."
+    ::= { cienaCesSecurityCertCrl 2 }
+
+ cienaCesSecurityCaCrlInvalidCaReason OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the reason the CA is invalid."
+    ::= { cienaCesSecurityCertCrl 3 }
+
+ cienaCesSecurityCertKeyOperation OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the type of operation on the cert key."
+    ::= { cienaCesSecurityCertCrl 4 }
+
+ cienaCesSecurityCertExpiryWarningNotification NOTIFICATION-TYPE
+      OBJECTS {
+                        cienaGlobalSeverity,
+                        cienaGlobalMacAddress,
+                        cienaCesSecurityCertType,
+                        cienaCesSecurityCertName,
+                        cienaCesSecurityCertValidTo
+              }
+      STATUS            current
+      DESCRIPTION
+          "A cienaCesSecurityCertExpiryWarningNotification is sent if
+           the current time is greater than or equal to (the expiry time
+            minus the initial warning interval), but less than the expiry
+            time. They are sent at configured intervals.
+           To enable the device to send this trap:
+             cienaCesSecurityCertExpiryWarningTrapState needs to be set to enabled."
+      ::= { cienaCesSecurityMIBNotifications 1 }
+
+ cienaCesSecurityCertExpiryExpiredNotification NOTIFICATION-TYPE
+      OBJECTS {
+                        cienaGlobalSeverity,
+                        cienaGlobalMacAddress,
+                        cienaCesSecurityCertType,
+                        cienaCesSecurityCertName,
+                        cienaCesSecurityCertValidTo
+              }
+      STATUS            current
+      DESCRIPTION
+          "A cienaCesSecurityCertExpiryExpiredNotification is sent if
+           the current time is greater than or equal to the expiry time.
+           They are sent at configured intervals.
+           To enable the device to send this trap:
+             cienaCesSecurityCertExpiryExpiredTrapState needs to be set to enabled."
+      ::= { cienaCesSecurityMIBNotifications 2 }
+
+ cienaCesSecurityCaCrlInstallNotification NOTIFICATION-TYPE
+      OBJECTS {
+                        cienaGlobalSeverity,
+                        cienaGlobalMacAddress,
+                        cienaCesSecurityCaCrlType,
+                        cienaCesSecurityCertName,
+                        cienaCesSecurityCertCrlOperation
+              }
+      STATUS            current
+      DESCRIPTION
+          "A cienaCesSecurityCaCrlInstallNotification is sent if
+           a CA certificate has been successfully installed.
+           To enable the device to send this trap:
+             cienaCesSecurityCaCrlInstallTrapState needs to be set to enabled."
+      ::= { cienaCesSecurityMIBNotifications 3 }
+
+ cienaCesSecurityCaCrlInvalidCaNotification NOTIFICATION-TYPE
+      OBJECTS {
+                        cienaGlobalSeverity,
+                        cienaGlobalMacAddress,
+                        cienaCesSecurityCaCrlInvalidCaReason
+              }
+      STATUS            current
+      DESCRIPTION
+          "A cienaCesSecurityCaCrlInvalidCaNotification is sent if
+           during an attempted installation, the CA certificate
+           is found to be invalid.
+           To enable the device to send this trap:
+             cienaCesSecurityCaCrlInvalidCaTrapState needs to be set to enabled."
+      ::= { cienaCesSecurityMIBNotifications 4 }
+
+ cienaCesSecurityDevCertInstallNotification NOTIFICATION-TYPE
+      OBJECTS {
+                        cienaGlobalSeverity,
+                        cienaGlobalMacAddress,
+                        cienaCesSecurityCertName,
+                        cienaCesSecurityCertCrlOperation
+              }
+      STATUS            current
+      DESCRIPTION
+          "A cienaCesSecurityDevCertInstallNotification is sent if
+           a device certificate has been successfully installed or uninstalled.
+           To enable the device to send this trap:
+             cienaCesSecurityDevCertInstallTrapState needs to be set to enabled."
+      ::= { cienaCesSecurityMIBNotifications 5 }
+
+ cienaCesSecurityDevCertKeyCreateNotification NOTIFICATION-TYPE
+      OBJECTS {
+                        cienaGlobalSeverity,
+                        cienaGlobalMacAddress,
+                        cienaCesSecurityCertName,
+                        cienaCesSecurityCertKeyOperation
+              }
+      STATUS            current
+      DESCRIPTION
+          "A cienaCesSecurityDevCertKeyCreateNotification is sent if
+           a device certificate key has been successfully created.
+           To enable the device to send this trap:
+             cienaCesSecurityDevCertKeyCreateTrapState needs to be set to enabled."
+      ::= { cienaCesSecurityMIBNotifications 6 }
+
+ cienaCesSecurityCertExpiryGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+                       cienaCesSecurityCertExpiryWarningNotification,
+                       cienaCesSecurityCertExpiryExpiredNotification
+                     }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               about security certificate expiry notifications."
+       ::= { cienaCesSecurityMIBGroups 1 }
+
+ cienaCesSecurityCertCrlGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+                       cienaCesSecurityCaCrlInstallNotification,
+                       cienaCesSecurityCaCrlInvalidCaNotification,
+                       cienaCesSecurityDevCertInstallNotification,
+                       cienaCesSecurityDevCertKeyCreateNotification
+                     }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               about certificate and certificate revocation
+               list notifications."
+       ::= { cienaCesSecurityMIBGroups 2 }
+
+END

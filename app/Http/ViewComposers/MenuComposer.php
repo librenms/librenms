@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -62,7 +61,7 @@ class MenuComposer
         // end global Settings
 
         //TODO: should be handled via CSS Themes
-        $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
+        $vars['navbar'] = in_array($site_style, ['mono']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
@@ -109,6 +108,7 @@ class MenuComposer
             ->get(['sensor_class'])
             ->sortBy(function ($wireless_sensor) use ($wireless_menu_order) {
                 $pos = array_search($wireless_sensor->sensor_class, $wireless_menu_order);
+
                 return $pos === false ? 100 : $pos; // unknown at bottom
             });
 
@@ -127,7 +127,7 @@ class MenuComposer
                         'url' => 'vrf',
                         'icon' => 'arrows',
                         'text' => 'VRFs',
-                    ]
+                    ],
                 ];
             }
 
@@ -137,7 +137,7 @@ class MenuComposer
                         'url' => 'mpls',
                         'icon' => 'tag',
                         'text' => 'MPLS',
-                    ]
+                    ],
                 ];
             }
 
@@ -147,7 +147,7 @@ class MenuComposer
                         'url' => 'ospf',
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPF Devices',
-                    ]
+                    ],
                 ];
             }
 
@@ -157,7 +157,7 @@ class MenuComposer
                         'url' => 'cisco-otv',
                         'icon' => 'exchange',
                         'text' => 'Cisco OTV',
-                    ]
+                    ],
                 ];
             }
 
@@ -192,7 +192,7 @@ class MenuComposer
                         'url' => 'cef',
                         'icon' => 'exchange',
                         'text' => 'Cisco CEF',
-                    ]
+                    ],
                 ];
             }
         }
@@ -221,6 +221,9 @@ class MenuComposer
             ->orWhere(function ($query) use ($user) {
                 $query->isUnread($user);
             })->count();
+
+        // Poller Settings
+        $vars['poller_clusters'] = \App\Models\PollerCluster::exists();
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');

@@ -1,10 +1,14 @@
 mib: PRVT-INTERWORKING-OS-MIB:PRVT-SYS-MON-MIB
 modules:
+    os:
+        hardware: PRVT-SWITCH-MIB::sysPartNumber.0
+        serial: PRVT-SWITCH-MIB::sysSerialNumber.0
+        version: PRVT-INTERWORKING-OS-MIB::oSversionNumber.0
     processors:
-          data:
-              -
-                  oid: cpuMonitoringUtilization
-                  num_oid: '.1.3.6.1.4.1.738.10.111.1.1.3.1.1.{{ $index }}'
-              -
-                  oid: prvtSysMonCurrentCpuUsage
-                  num_oid: '.1.3.6.1.4.1.738.10.111.3.1.1.{{ $index }}'
+        data:
+            -
+                oid: cpuMonitoringUtilization
+                num_oid: '.1.3.6.1.4.1.738.10.111.1.1.3.1.1.{{ $index }}'
+            -
+                oid: prvtSysMonCurrentCpuUsage
+                num_oid: '.1.3.6.1.4.1.738.10.111.3.1.1.{{ $index }}'

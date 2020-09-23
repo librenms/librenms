@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,6 +25,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use LibreNMS\Enum\Alert;
 
 class Eventlog extends DeviceRelatedModel
 {
@@ -45,7 +45,7 @@ class Eventlog extends DeviceRelatedModel
      * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
      * @param int $reference the id of the referenced entity.  Supported types: interface
      */
-    public static function log($text, $device = null, $type = null, $severity = 2, $reference = null)
+    public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null)
     {
         $log = new static([
             'reference' => $reference,

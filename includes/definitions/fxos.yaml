@@ -26,5 +26,6 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysDescr:
-        - 'Cisco FX-OS'
+    -
+        sysDescr:
+            - 'Cisco FX-OS'

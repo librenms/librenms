@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreatePortsNacTable extends Migration
 {
@@ -16,7 +16,7 @@ class CreatePortsNacTable extends Migration
         Schema::create('ports_nac', function (Blueprint $table) {
             $table->increments('ports_nac_id');
             $table->string('auth_id', 50);
-            $table->unsignedInteger('device_id')->index('ports_nac_device_id_index');
+            $table->unsignedInteger('device_id')->index();
             $table->unsignedInteger('port_id');
             $table->string('domain', 50);
             $table->string('username', 50);

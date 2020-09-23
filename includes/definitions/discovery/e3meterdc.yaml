@@ -1,12 +1,15 @@
 mib: NETTRACK-E3METER-CTR-SNMP-MIB
 modules:
+    os:
+        version: NETTRACK-E3METER-CTR-SNMP-MIB::e3ConcentratorFWVersion
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - e3IpsLabel
-                    - e3IpsModel
-                    - e3IpsHWVersion
+                -
+                    oid:
+                        - e3IpsLabel
+                        - e3IpsModel
+                        - e3IpsHWVersion
         count:
             data:
                 -

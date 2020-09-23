@@ -1,0 +1,266 @@
+DellMDStorageArray DEFINITIONS ::= BEGIN
+
+-- Initial version. 10/1/98
+-- Second turn 10/2/98  added another trap
+-- Third version. 10/20/98
+-- Fourth version 10/23/98  Changes in this version are
+--                                      1) Deleted the FRU code from the MIB
+--                                      2) The deviceUserLabel WILL BE the same as the Storage Array Name.
+--                            3) Fixed typos.
+--                                      4) The deviceErrorCode WILL BE the same as the MEL event number.
+-- The changes came from a meeting held on 10/22/98.
+-- Changes to add componentType and componentLocation 08/11/00
+--
+-- New version of the mib.  The mibs has been renumbered. 10/28/98
+-- New version of the mib.  The mib has been renumbered to 204 08/11/00
+-- changed symbios to LSI Logic Storage Systems. 05/16/01
+-- changed version to 205 7/15/03 SM7_10.MIB
+-- SM7_10.MIB reset version back to 204 for this mib. will create a new mib for version 205. new mib is SM8_R4.MIB
+-- created SM8_R4.MIB version 205 7/15/03
+-- created SM9_R1.MIB version 206 2/12/04 to change the deviceUserLabel from 18 to 30 characters.
+-- changed LSI Logic Storage Systems to Engenio Information Technologies changed version to 300. 11/19/2004
+-- SM9_R3 replaces SM9_R2.  SM9_R2 has a coding defect. SM9_R3 has been issued to correct this defect. 06/30/2005
+-- SM10_R1 introduces support for accommodating both IPv4 and IPv6 IP addresses. 10/25/07
+-- Dell revisions made on 11/16/2009
+-- Validated MIB on 11/16/2009 using the tool at http://wwwsnmp.cs.utwente.nl/ietf/mibs/validate/
+-- Validation passed at severity level 3. 11/16/2009
+
+	IMPORTS
+		OBJECT-TYPE,
+		enterprises,
+		NOTIFICATION-TYPE,
+        MODULE-IDENTITY
+	FROM SNMPv2-SMI
+		DisplayString
+      	FROM SNMPv2-TC
+		InetAddressType,
+		InetAddress
+	FROM INET-ADDRESS-MIB;
+	      
+
+    dellMDStorageArrayMIB MODULE-IDENTITY
+        LAST-UPDATED "200911161200Z"
+        ORGANIZATION "Dell"
+        CONTACT-INFO "http://support.dell.com"
+        DESCRIPTION  "MD Storage Array MIB"
+        REVISION     "200911161200Z"
+        DESCRIPTION  "Initial"
+        ::= { mdStorageManager 0 }
+
+dell 			    OBJECT IDENTIFIER ::= { enterprises 674 }
+storage			    OBJECT IDENTIFIER ::= { dell 10893 }
+hardware		    OBJECT IDENTIFIER ::= { storage 2 }
+mdStorageManager	OBJECT IDENTIFIER ::= { hardware 30 }
+
+
+	infoTable OBJECT-TYPE
+		 SYNTAX  SEQUENCE OF InfoEntry
+		 MAX-ACCESS  not-accessible 
+		 STATUS  current
+		 DESCRIPTION
+		      "Information for array traps."
+		 ::= { mdStorageManager 1 }
+
+	infoEntry OBJECT-TYPE
+		 SYNTAX InfoEntry
+		 MAX-ACCESS not-accessible
+		 STATUS current
+		 DESCRIPTION
+		     "The data for array traps."
+		 INDEX  { deviceHostIPType }
+		 ::= { infoTable 1 }     
+	
+	
+	
+	InfoEntry ::= 
+	SEQUENCE {
+		deviceHostIPType
+			InetAddressType,
+		deviceHostIPAddr
+			InetAddress,
+		deviceHostName
+			DisplayString,
+		deviceUserLabel
+			DisplayString,
+		deviceErrorCode
+			DisplayString,
+		eventTime
+			DisplayString,
+		trapDescription
+			DisplayString,
+		componentType
+			DisplayString,
+		componentLocation
+			DisplayString
+	}			
+	deviceHostIPType OBJECT-TYPE
+		SYNTAX InetAddressType 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"Type of IP Address of the network-attached device or device host. 0 unknown, 1 ipv4, 2 ipv6"
+		::= { infoEntry 1 }
+		
+	deviceHostIPAddr OBJECT-TYPE
+		SYNTAX InetAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"IP Address of the network-attached device or device host."
+		::= { infoEntry 2 }
+				
+	deviceHostName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The user label for the host of the device being reported on."
+		::= { infoEntry 3 }
+		
+	deviceUserLabel OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..29))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The user label for the device being reported on."
+		::= { infoEntry 4 }
+
+	deviceErrorCode OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..19))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The error code as reported by the device or host."
+		::= { infoEntry 5 }
+
+	eventTime OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..39))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"The time at which the event happen on the device."
+		::= { infoEntry 6 }
+
+	trapDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..69))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"A string to indicate the nature of the trap"
+		::= { infoEntry 7 }
+
+	componentType OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..59))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"A string to identify the failing component type"
+		::= { infoEntry 8 }
+
+	componentLocation OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..39))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"A string to identify the location of the failing component"
+		::= { infoEntry 9 }
+
+	
+
+--End of items in the info table
+
+
+--
+--      TRAP Definitions
+--
+
+		storageArrayCritical TRAP-TYPE
+		ENTERPRISE mdStorageManager
+		VARIABLES  { deviceHostIP, deviceHostName, deviceUserLabel, deviceErrorCode, eventTime, trapDescription, componentType, componentLocation }
+		DESCRIPTION
+			"This trap indicates an event where user-interaction is required immediately.
+			Some example events are component failures or critical errors."
+
+		--#TYPE "Storage Array Critical"
+
+		--#SEVERITY "Critical"
+
+		--#SUMMARY "User-interaction is required immediately for IP Address= %s, HostName= %s, UserLabel= %s, ErrorCode= %s, TimeStamp= %s, ErrorMessage= %s, ComponentType= %s, ComponentLocation= %s"
+
+		--#ARGUMENTS {0,1,2,3,4,5,6,7}
+
+		--#CATEGORY "Error Events"
+
+		--#STATE "Failed"
+
+		--#STATUS "Mandatory"
+
+		::= 1
+
+		
+			storageArrayWarning TRAP-TYPE
+		ENTERPRISE mdStorageManager
+		VARIABLES  { deviceHostIP, deviceHostName, deviceUserLabel, deviceErrorCode, eventTime, trapDescription, componentType, componentLocation }
+		DESCRIPTION
+			"This trap indicates an event where user-interaction may be required. Example are events that put the array in a non-optimal state."
+
+		--#TYPE "Storage Array Warning"
+
+		--#SEVERITY "Warning"
+
+		--#SUMMARY "User-interaction is required for IP Address= %s, HostName= %s, UserLabel= %s, ErrorCode= %s, TimeStamp= %s, ErrorMessage= %s, ComponentType= %s, ComponentLocation= %s"
+
+		--#ARGUMENTS {0,1,2,3,4,5,6,7}
+
+		--#CATEGORY "Error Events"
+
+		--#STATE "Degraded"
+
+		--#STATUS "Optional"
+
+		::= 2
+
+	storageArrayInformational TRAP-TYPE
+		ENTERPRISE mdStorageManager
+		VARIABLES  { deviceHostIP, deviceHostName, deviceUserLabel, deviceErrorCode, eventTime, trapDescription, componentType, componentLocation }
+		DESCRIPTION
+			"This trap indicates a non-failure event of interest where user interaction is generally not required."
+
+		--#TYPE "Storage Array Informational"
+
+		--#SEVERITY "Informational"
+
+		--#SUMMARY "Non-failure event of interest for IP Address= %s, HostName= %s, UserLabel= %s, ErrorCode= %s, TimeStamp= %s, ErrorMessage= %s, ComponentType= %s, ComponentLocation= %s"
+
+		--#ARGUMENTS {0,1,2,3,4,5,6,7}
+
+		--#CATEGORY "Status Events"
+
+		--#STATE "Operational"
+
+		--#STATUS "Optional"
+
+		::= 3
+ 
+	storageArrayDebug TRAP-TYPE
+		ENTERPRISE mdStorageManager
+		VARIABLES  { deviceHostIP, deviceHostName, deviceUserLabel, deviceErrorCode, eventTime, trapDescription, componentType, componentLocation }
+		DESCRIPTION
+			"This trap indicates an interal system debug event of interest."
+
+		--#TYPE "Storage Array Debug"
+
+		--#SEVERITY "Debug"
+
+		--#SUMMARY "Internal debug event for IP Address= %s, HostName= %s, UserLabel= %s, ErrorCode= %s, TimeStamp= %s, ErrorMessage= %s, ComponentType= %s, ComponentLocation= %s"
+
+		--#ARGUMENTS {0,1,2,3,4,5,6,7}
+
+		--#CATEGORY "Status Events"
+
+		--#STATE "Operational"
+
+		--#STATUS "Optional"
+
+		::= 4
+END

@@ -6,7 +6,6 @@
 
 @parent
 
-<br />
 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#poller-groups">@lang('Create new poller group')</button>
 <br /><br />
 <div class="table-responsive">

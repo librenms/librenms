@@ -7,7 +7,9 @@ over:
     - { graph: device_voltage, text: Voltage }
     - { graph: device_current, text: Current }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.30966
-    - sysDescr:
-        - 'net-pdu'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.30966
+    -
+        sysDescr:
+            - 'net-pdu'

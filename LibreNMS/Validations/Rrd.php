@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -51,7 +50,6 @@ class Rrd extends BaseValidation
             );
         }
 
-
         if (Config::get('rrdcached')) {
             self::checkRrdcached($validator);
         } else {
@@ -70,10 +68,10 @@ class Rrd extends BaseValidation
 
     public static function checkRrdcached(Validator $validator)
     {
-        list($host,$port) = explode(':', Config::get('rrdcached'));
+        [$host,$port] = explode(':', Config::get('rrdcached'));
         if ($host == 'unix') {
             // Using socket, check that file exists
-            if (!file_exists($port)) {
+            if (! file_exists($port)) {
                 $validator->fail("$port doesn't appear to exist, rrdcached test failed");
             }
         } else {

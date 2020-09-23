@@ -121,9 +121,9 @@ Logs are sent to the system logging service (usually `journald` or
 options available.
 
 ```php
-distributed_poller                             = true;  # Set to true to enable distributed polling
-distributed_poller_name                        = null;  # Uniquely identifies the poller instance
-distributed_poller_group                       = 0;     # Which group to poll
+$config['distributed_poller']                    = true;            # Set to true to enable distributed polling
+$config['distributed_poller_name']               = php_uname('n');  # Uniquely identifies the poller instance
+$config['distributed_poller_group']              = 0;               # Which group to poll
 ```
 ### Tuning the number of workers
 
@@ -197,11 +197,12 @@ Then install and configure the runtime and service:
 
 ```
 # yum install rh-python36 epel-release
-# yum install redis
+# yum --enablerepo=remi install redis
 # vi /opt/librenms/config.php
 # vi /etc/redis.conf
 # systemctl enable --now redis.service
 # scl enable rh-python36 bash
+# change directory to librenms (default /opt/librenms)
 # pip3 install -r requirements.txt
 # cp /opt/librenms/misc/librenms.service.scl /etc/systemd/system/librenms.service
 # systemctl enable --now librenms.service

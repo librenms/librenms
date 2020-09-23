@@ -6,8 +6,9 @@ icon: lexmark
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - Lexmark
+    -
+        sysDescr:
+            - Lexmark
 discovery_modules:
     toner: true
 poller_modules:

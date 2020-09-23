@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateComponentPrefsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,7 @@ class CreateComponentPrefsTable extends Migration
     {
         Schema::create('component_prefs', function (Blueprint $table) {
             $table->increments('id')->comment('ID for each entry');
-            $table->unsignedInteger('component')->index('component')->comment('id from the component table');
+            $table->unsignedInteger('component')->index()->comment('id from the component table');
             $table->string('attribute')->comment('Attribute for the Component');
             $table->text('value')->comment('Value for the Component');
         });

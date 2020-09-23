@@ -33,6 +33,17 @@ class UserPolicy
     }
 
     /**
+     * Determine whether the user can view any user.
+     *
+     * @param  \App\User $user
+     * @return mixed
+     */
+    public function viewAny(User $user)
+    {
+        return $user->isAdmin();
+    }
+
+    /**
      * Determine whether the user can create users.
      *
      * @param  \App\Models\User  $user

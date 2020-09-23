@@ -1,11 +1,16 @@
 mib: 'HILLSTONE-FAN-MIB'
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+)$/'
+        serial: HILLSTONE-SYSTEM-MIB::sysSerialNumber.0
+        version: HILLSTONE-SYSTEM-MIB::sysSoftware.0
+        version_regex: '/Version (?<version>\S+)/'
     processors:
-          data:
-              -
-                  oid: HILLSTONE-SYSTEM-MIB::sysCPU
-                  value: sysCPU
-                  num_oid: '.1.3.6.1.4.1.28557.2.2.1.3.{{ $index }}'
+        data:
+            -
+                oid: HILLSTONE-SYSTEM-MIB::sysCPU
+                value: sysCPU
+                num_oid: '.1.3.6.1.4.1.28557.2.2.1.3.{{ $index }}'
     sensors:
         temperature:
             data:

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,7 +24,7 @@
 
 use LibreNMS\Util\Laravel;
 
-if (!function_exists('d_echo')) {
+if (! function_exists('d_echo')) {
     /**
      * Legacy convenience function - please use this instead of 'if ($debug) { echo ...; }'
      * Use Log directly in pure Laravel code!
@@ -43,13 +42,13 @@ if (!function_exists('d_echo')) {
             print_r($text);
         }
 
-        if (!$debug && $no_debug_text) {
+        if (! $debug && $no_debug_text) {
             echo "$no_debug_text";
         }
     }
 }
 
-if (!function_exists('set_debug')) {
+if (! function_exists('set_debug')) {
     /**
      * Set debugging output
      *
@@ -87,7 +86,7 @@ if (!function_exists('set_debug')) {
     }
 }
 
-if (!function_exists('array_pairs')) {
+if (! function_exists('array_pairs')) {
     /**
      * Get all consecutive pairs of values in an array.
      * [1,2,3,4] -> [[1,2],[2,3],[3,4]]

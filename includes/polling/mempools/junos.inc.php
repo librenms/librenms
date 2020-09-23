@@ -4,10 +4,10 @@ $oid = $mempool['mempool_index'];
 
 d_echo('JunOS Mempool');
 
-if (!is_array($mempool_cache['junos'])) {
+if (! is_array($mempool_cache['junos'])) {
     d_echo('caching');
 
-    $mempool_cache['junos'] = array();
+    $mempool_cache['junos'] = [];
     $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingBuffer', $mempool_cache['junos'], 'JUNIPER-MIB', 'junos');
     $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingDRAMSize', $mempool_cache['junos'], 'JUNIPER-MIB', 'junos');
     $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingMemory', $mempool_cache['junos'], 'JUNIPER-MIB', 'junos');
@@ -25,5 +25,5 @@ if ($entry['jnxOperatingDRAMSize']) {
 }
 
 $mempool['total'] = $memory_available;
-$mempool['used']  = ($memory_available / 100 * $perc);
-$mempool['free']  = ($memory_available - $mempool['used']);
+$mempool['used'] = ($memory_available / 100 * $perc);
+$mempool['free'] = ($memory_available - $mempool['used']);

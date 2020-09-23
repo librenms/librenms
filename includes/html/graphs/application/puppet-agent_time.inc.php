@@ -1,17 +1,18 @@
 <?php
-$unitlen       = 15;
-$bigdescrlen   = 20;
-$smalldescrlen = 20;
-$dostack       = 0;
-$printtotal    = 0;
-$unit_text    = 'Runtime/sec';
-$colours      = 'psychedelic';
-$rrd_list     = array();
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'puppet-agent', $app['app_id'], 'time'));
-$array        = array(
+$unitlen = 15;
+$bigdescrlen = 20;
+$smalldescrlen = 20;
+$dostack = 0;
+$printtotal = 0;
+$unit_text = 'Runtime/sec';
+$colours = 'psychedelic';
+$rrd_list = [];
+
+$rrd_filename = rrd_name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'time']);
+$array = [
     'catalog_application',
-    'config_restrieval',
+    'config_retrieval',
     'convert_catalog',
     'fact_generation',
     'node_retrieval',
@@ -19,14 +20,14 @@ $array        = array(
     'schedule',
     'transaction_evaluation',
     'total',
-);
+];
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds) {
-        $rrd_list[]=array(
+        $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => $ds,
             'ds' => $ds,
-        );
+        ];
     }
 } else {
     echo "file missing: $file";

@@ -14,9 +14,8 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.1.0', '-OQv'), '"');
-$serial   = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.2.0', '-OQv'), '"');
-$version  = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.3.0', '-OQv'), '"');
-
+$serial = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.2.0', '-OQv'), '"');
+$version = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.3.0', '-OQv'), '"');
 
 /* optimisation oids
  *
@@ -28,20 +27,20 @@ $version  = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.3.0', '-OQv'), '"')
  *
  */
 
-$conn_array = array(
+$conn_array = [
     '.1.3.6.1.4.1.17163.1.1.5.2.3.0',
     '.1.3.6.1.4.1.17163.1.1.5.2.4.0',
     '.1.3.6.1.4.1.17163.1.1.5.2.5.0',
     '.1.3.6.1.4.1.17163.1.1.5.2.6.0',
     '.1.3.6.1.4.1.17163.1.1.5.2.7.0',
-);
+];
 $connections = snmp_get_multi_oid($device, $conn_array);
 
-$conn_half_open   = $connections['.1.3.6.1.4.1.17163.1.1.5.2.3.0'];
+$conn_half_open = $connections['.1.3.6.1.4.1.17163.1.1.5.2.3.0'];
 $conn_half_closed = $connections['.1.3.6.1.4.1.17163.1.1.5.2.4.0'];
 $conn_established = $connections['.1.3.6.1.4.1.17163.1.1.5.2.5.0'];
-$conn_active      = $connections['.1.3.6.1.4.1.17163.1.1.5.2.6.0'];
-$conn_total       = $connections['.1.3.6.1.4.1.17163.1.1.5.2.7.0'];
+$conn_active = $connections['.1.3.6.1.4.1.17163.1.1.5.2.6.0'];
+$conn_total = $connections['.1.3.6.1.4.1.17163.1.1.5.2.7.0'];
 
 if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && $conn_active >= 0 && $conn_total >= 0) {
     $rrd_def = RrdDefinition::make()
@@ -51,18 +50,18 @@ if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && 
         ->addDataset('active', 'GAUGE', 0)
         ->addDataset('total', 'GAUGE', 0);
 
-    $fields = array(
+    $fields = [
         'half_open'   => $conn_half_open,
         'half_closed' => $conn_half_closed,
         'established' => $conn_established,
         'active'      => $conn_active,
         'total'       => $conn_total,
-    );
+    ];
 
     $tags = compact('rrd_def');
 
     data_update($device, 'riverbed_connections', $tags, $fields);
-    $graphs['riverbed_connections'] = true;
+    $os->enableGraph('riverbed_connections');
 }
 
 /* datastore oids
@@ -71,10 +70,10 @@ if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && 
  * miss .1.3.6.1.4.1.17163.1.1.5.4.2.0
  *
  */
-$datastore_array = array(
+$datastore_array = [
     '.1.3.6.1.4.1.17163.1.1.5.4.1.0',
     '.1.3.6.1.4.1.17163.1.1.5.4.2.0',
-);
+];
 $datastore = snmp_get_multi_oid($device, $datastore_array);
 
 $datastore_hits = $datastore['.1.3.6.1.4.1.17163.1.1.5.4.1.0'];
@@ -85,15 +84,15 @@ if ($datastore_hits >= 0 && $datastore_miss >= 0) {
         ->addDataset('datastore_hits', 'GAUGE', 0)
         ->addDataset('datastore_miss', 'GAUGE', 0);
 
-    $fields = array(
+    $fields = [
         'datastore_hits' => $datastore_hits,
         'datastore_miss' => $datastore_miss,
-    );
+    ];
 
     $tags = compact('rrd_def');
 
     data_update($device, 'riverbed_datastore', $tags, $fields);
-    $graphs['riverbed_datastore'] = true;
+    $os->enableGraph('riverbed_datastore');
 }
 
 /* optimization oids
@@ -102,14 +101,14 @@ if ($datastore_hits >= 0 && $datastore_miss >= 0) {
  * passthrough .1.3.6.1.4.1.17163.1.1.5.2.2.0
  *
  */
-$optimization_array = array(
+$optimization_array = [
     '.1.3.6.1.4.1.17163.1.1.5.2.1.0',
     '.1.3.6.1.4.1.17163.1.1.5.2.2.0',
-);
+];
 
 $optimizations = snmp_get_multi_oid($device, $optimization_array);
 
-$conn_optimized   = $optimizations['.1.3.6.1.4.1.17163.1.1.5.2.1.0'];
+$conn_optimized = $optimizations['.1.3.6.1.4.1.17163.1.1.5.2.1.0'];
 $conn_passthrough = $optimizations['.1.3.6.1.4.1.17163.1.1.5.2.2.0'];
 
 if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
@@ -117,15 +116,15 @@ if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
         ->addDataset('conn_optimized', 'GAUGE', 0)
         ->addDataset('conn_passthrough', 'GAUGE', 0);
 
-    $fields = array(
+    $fields = [
         'conn_optimized' => $conn_optimized,
         'conn_passthrough' => $conn_passthrough,
-    );
+    ];
 
     $tags = compact('rrd_def');
 
     data_update($device, 'riverbed_optimization', $tags, $fields);
-    $graphs['riverbed_optimization'] = true;
+    $os->enableGraph('riverbed_optimization');
 }
 
 /* bandwidth passthrough
@@ -136,11 +135,11 @@ if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
  *
  */
 
-$bandwidth_array = array(
+$bandwidth_array = [
     '.1.3.6.1.4.1.17163.1.1.5.3.3.1.0',
     '.1.3.6.1.4.1.17163.1.1.5.3.3.2.0',
     '.1.3.6.1.4.1.17163.1.1.5.3.3.3.0',
-);
+];
 
 $bandwidth = snmp_get_multi_oid($device, $bandwidth_array);
 
@@ -154,14 +153,14 @@ if ($bw_in >= 0 && $bw_out >= 0 && $bw_total >= 0) {
         ->addDataset('bw_out', 'COUNTER', 0)
         ->addDataset('bw_total', 'COUNTER', 0);
 
-    $fields = array(
+    $fields = [
         'bw_in' => $bw_in,
         'bw_out' => $bw_out,
         'bw_total' => $bw_total,
-    );
+    ];
 
     $tags = compact('rrd_def');
 
     data_update($device, 'riverbed_passthrough', $tags, $fields);
-    $graphs['riverbed_passthrough'] = true;
+    $os->enableGraph('riverbed_passthrough');
 }

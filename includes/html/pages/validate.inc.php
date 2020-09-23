@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -44,12 +43,11 @@ $no_refresh = true;
 
 <?php
 
-
 $validator = new Validator();
 $validator->validate();
 
 foreach ($validator->getAllResults() as $group => $results) {
-    echo '<div class="panel-group"><div class="panel panel-default"><div class="panel-heading"> ';
+    echo '<div class="panel-group" style="margin-bottom: 5px"><div class="panel panel-default"><div class="panel-heading"> ';
     echo "<h4 class='panel-title'><a data-toggle='collapse' data-target='#${group}Body'>";
     echo ucfirst($group);
 
@@ -62,7 +60,7 @@ foreach ($validator->getAllResults() as $group => $results) {
     } elseif ($group_status == ValidationResult::FAILURE) {
         echo ' <span class="text-danger pull-right">Failure</span>';
     }
-    echo "</a></h4>";
+    echo '</a></h4>';
     echo " </div><div id='${group}Body' class='panel-collapse collapse";
     if ($group_status !== ValidationResult::SUCCESS) {
         echo ' in';
@@ -72,7 +70,6 @@ foreach ($validator->getAllResults() as $group => $results) {
 
     foreach ($results as $rnum => $result) {
         /** @var ValidationResult $result */
-
         echo '<div class="panel';
         if ($result->getStatus() == ValidationResult::SUCCESS) {
             echo ' panel-success"><div class="panel-heading bg-success"> Ok: ';
@@ -89,7 +86,7 @@ foreach ($validator->getAllResults() as $group => $results) {
             echo '<div class="panel-body">';
             if ($result->hasFix()) {
                 echo 'Fix: <code>';
-                foreach ((array)$result->getFix() as $fix) {
+                foreach ((array) $result->getFix() as $fix) {
                     echo '<br />' . linkify($fix) . PHP_EOL;
                 }
                 echo '</code>';
@@ -102,9 +99,8 @@ foreach ($validator->getAllResults() as $group => $results) {
                 $list = $result->getList();
                 $short_size = 10;
 
-
                 echo "<ul id='shortList$group$rnum' class='list-group' style='margin-bottom: -1px'>";
-                echo "<li class='list-group-item active'>" . $result->getListDescription() . "</li>";
+                echo "<li class='list-group-item active'>" . $result->getListDescription() . '</li>';
 
                 foreach (array_slice($list, 0, $short_size) as $li) {
                     echo "<li class='list-group-item'>$li</li>";
@@ -127,10 +123,8 @@ foreach ($validator->getAllResults() as $group => $results) {
         }
         echo '</div>';
     }
-    echo '</div></div></div>';
+    echo '</div></div></div></div>';
 }
-
-
 
 ?>
         </div>

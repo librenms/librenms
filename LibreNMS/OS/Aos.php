@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -47,7 +46,7 @@ class Aos extends OS implements ProcessorDiscovery
             'Device CPU'
         );
 
-        if (!$processor->isValid()) {
+        if (! $processor->isValid()) {
             // AOS7 devices use a different OID for CPU load. Not all Switches have
             // healthModuleCpuLatest so we use healthModuleCpu1MinAvg which makes no
             // difference for a 5 min. polling interval.
@@ -62,6 +61,6 @@ class Aos extends OS implements ProcessorDiscovery
             );
         }
 
-        return array($processor);
+        return [$processor];
     }
 }

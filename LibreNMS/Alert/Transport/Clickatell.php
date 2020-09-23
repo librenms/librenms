@@ -18,9 +18,8 @@
  * @author f0o <f0o@librenms.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
@@ -31,6 +30,7 @@ class Clickatell extends Transport
     {
         $clickatell_opts['token'] = $this->config['clickatell-token'];
         $clickatell_opts['to'] = preg_split('/([,\r\n]+)/', $this->config['clickatell-numbers']);
+
         return $this->contactClickatell($obj, $clickatell_opts);
     }
 
@@ -40,14 +40,15 @@ class Clickatell extends Transport
 
         $curl = curl_init($url);
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-        $ret  = curl_exec($curl);
+        $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 200) {
             return var_dump($ret);
         }
+
         return true;
     }
 
@@ -66,12 +67,12 @@ class Clickatell extends Transport
                     'name'  => 'clickatell-numbers',
                     'descr' => 'Enter mobile numbers, can be new line or comma separated',
                     'type'  => 'textarea',
-                ]
+                ],
             ],
             'validation' => [
                 'clickatell-token'   => 'required|string',
                 'clickatell-numbers' => 'required|string',
-            ]
+            ],
         ];
     }
 }

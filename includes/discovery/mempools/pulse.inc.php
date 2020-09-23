@@ -15,7 +15,7 @@
 if ($device['os'] == 'pulse') {
     echo 'PULSE-MEMORY-POOL: ';
 
-    $usage = str_replace('"', "", snmp_get($device, 'PULSESECURE-PSG-MIB::iveMemoryUtil.0', '-OvQ'));
+    $usage = str_replace('"', '', snmp_get($device, 'PULSESECURE-PSG-MIB::iveMemoryUtil.0', '-OvQ'));
 
     if (is_numeric($usage)) {
         discover_mempool($valid_mempool, $device, 0, 'pulse-mem', 'Main Memory', '100', null, null);

@@ -30,11 +30,17 @@ Vue.use(VTooltip);
 import vSelect from 'vue-select'
 Vue.component('v-select', vSelect);
 
-Vue.mixin({
-    methods: {
-        route: route
-    }
-});
+import Multiselect from 'vue-multiselect'
+Vue.component('multiselect', Multiselect)
+
+import VueTabs from 'vue-nav-tabs'
+Vue.use(VueTabs)
+
+// Vue.mixin({
+//     methods: {
+//         route: route
+//     }
+// });
 
 Vue.filter('ucfirst', function (value) {
     if (!value) return '';

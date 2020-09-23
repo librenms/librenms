@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class AddVlanAndElapsedToNac extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -28,8 +27,7 @@ class AddVlanAndElapsedToNac extends Migration
     public function down()
     {
         Schema::table('ports_nac', function (Blueprint $table) {
-            $table->dropColumn('vlan');
-            $table->dropColumn('time_elapsed');
+            $table->dropColumn(['vlan', 'time_elapsed']);
             $table->string('time_left', 50)->change();
         });
     }

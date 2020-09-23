@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateCiscoASATable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,7 @@ class CreateCiscoASATable extends Migration
     {
         Schema::create('ciscoASA', function (Blueprint $table) {
             $table->increments('ciscoASA_id');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->string('oid');
             $table->bigInteger('data');
             $table->bigInteger('high_alert');

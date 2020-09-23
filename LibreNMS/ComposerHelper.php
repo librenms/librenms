@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,14 +24,15 @@
 
 namespace LibreNMS;
 
-use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
+use LibreNMS\Exceptions\FileWriteFailedException;
+use LibreNMS\Util\EnvHelper;
 
 class ComposerHelper
 {
     public static function postRootPackageInstall(Event $event)
     {
-        if (!file_exists('.env')) {
+        if (! file_exists('.env')) {
             self::setPermissions();
             self::populateEnv();
         }
@@ -40,7 +40,7 @@ class ComposerHelper
 
     public static function postInstall(Event $event)
     {
-        if (!file_exists('.env')) {
+        if (! file_exists('.env')) {
             self::setPermissions();
         }
 
@@ -49,7 +49,7 @@ class ComposerHelper
 
     public static function preUpdate(Event $event)
     {
-        if (!getenv('FORCE')) {
+        if (! getenv('FORCE')) {
             echo "Running composer update is not advisable.  Please run composer install to update instead.\n";
             echo "If know what you are doing and want to write a new composer.lock file set FORCE=1.\n";
             echo "If you don't know what to do, run: composer install\n";
@@ -61,28 +61,22 @@ class ComposerHelper
     {
         $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
 
-        if (!is_file("$vendor_dir/autoload.php")) {
+        if (! is_file("$vendor_dir/autoload.php")) {
             // checkout vendor from 1.36
-            $cmds = array(
+            $cmds = [
                 "git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- $vendor_dir",
-                "git reset HEAD $vendor_dir"  // don't add vendor directory to the index
-            );
+                "git reset HEAD $vendor_dir",  // don't add vendor directory to the index
+            ];
 
             self::exec($cmds);
         }
     }
-
 
     /**
      * Initially populate .env file
      */
     private static function populateEnv()
     {
-        if (!file_exists('.env')) {
-            copy('.env.example', '.env');
-            self::exec('php artisan key:generate');
-        }
-
         $config = [
             'db_host' => '',
             'db_port' => '',
@@ -97,60 +91,22 @@ class ComposerHelper
 
         @include 'config.php';
 
-        self::setEnv([
-            'NODE_ID'        => uniqid(),
-            'DB_HOST'        => $config['db_host'],
-            'DB_PORT'        => $config['db_port'],
-            'DB_USERNAME'    => $config['db_user'],
-            'DB_PASSWORD'    => $config['db_pass'],
-            'DB_DATABASE'    => $config['db_name'],
-            'DB_SOCKET'      => $config['db_socket'],
-            'APP_URL'        => $config['base_url'],
-            'LIBRENMS_USER'  => $config['user'],
-            'LIBRENMS_GROUP' => $config['group'],
-        ]);
-    }
-
-    /**
-     * Set a setting in .env file
-     *
-     * @param array $settings KEY => value list of settings
-     * @param string $file
-     */
-    private static function setEnv($settings, $file = '.env')
-    {
-        $original_content = $content = file_get_contents($file);
-
-        // ensure trailing line return
-        if (substr($content, -1) !== PHP_EOL) {
-            $content .= PHP_EOL;
-        }
-
-        foreach ($settings as $key => $value) {
-            // only add non-empty settings
-            if (empty($value)) {
-                continue;
-            }
-
-            // quote strings with spaces
-            if (strpos($value, ' ') !== false) {
-                $value = "\"$value\"";
-            }
-
-            if (strpos($content, "$key=") !== false) {
-                // only replace ones that aren't already set for safety and uncomment
-                // escape $ in the replacement
-                $content = preg_replace("/#?$key=\n/", addcslashes("$key=$value\n", '$'), $content);
-            } else {
-                $content .= "$key=$value\n";
-            }
-        }
-
-        $content = self::fixComments($content);
-
-        // only write if the content has changed
-        if ($content !== $original_content) {
-            file_put_contents($file, $content);
+        try {
+            EnvHelper::init();
+            EnvHelper::writeEnv([
+                'NODE_ID' => uniqid(),
+                'DB_HOST' => $config['db_host'],
+                'DB_PORT' => $config['db_port'],
+                'DB_USERNAME' => $config['db_user'],
+                'DB_PASSWORD' => $config['db_pass'],
+                'DB_DATABASE' => $config['db_name'],
+                'DB_SOCKET' => $config['db_socket'],
+                'APP_URL' => $config['base_url'],
+                'LIBRENMS_USER' => $config['user'],
+                'LIBRENMS_GROUP' => $config['group'],
+            ]);
+        } catch (FileWriteFailedException $exception) {
+            echo $exception->getMessage() . PHP_EOL;
         }
     }
 
@@ -171,25 +127,7 @@ class ComposerHelper
      */
     private static function exec($cmds)
     {
-        $cmd = "set -v\n" . implode(PHP_EOL, (array)$cmds);
+        $cmd = "set -v\n" . implode(PHP_EOL, (array) $cmds);
         passthru($cmd);
-    }
-
-    /**
-     * Fix .env with # in them without a space before it
-     */
-    private static function fixComments($dotenv)
-    {
-        return implode(PHP_EOL, array_map(function ($line) {
-            $parts = explode('=', $line, 2);
-            if (isset($parts[1])
-                && preg_match('/(?<!\s)#/', $parts[1]) // number symbol without a space before it
-                && !preg_match('/^(".*"|\'.*\')$/', $parts[1]) // not already quoted
-            ) {
-                return trim($parts[0]) . '="' . trim($parts[1]) . '"';
-            }
-
-            return $line;
-        }, explode(PHP_EOL, $dotenv)));
     }
 }

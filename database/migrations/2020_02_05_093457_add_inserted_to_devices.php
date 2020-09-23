@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddInsertedToDevices extends Migration
 {
@@ -15,7 +15,7 @@ class AddInsertedToDevices extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             // add inserted column after device id with a default of current_timestamp
-            $table->timestamp('inserted')->default(DB::raw('CURRENT_TIMESTAMP'))->after('device_id');
+            $table->timestamp('inserted')->nullable()->default(null)->after('device_id');
         });
     }
 

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://librenms.org
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
@@ -27,15 +26,13 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\AuthenticationException;
 
-// Note that as this test set depends on mres(), it is a DBTestCase even though the database is unused
-class AuthHTTPTest extends DBTestCase
+class AuthHTTPTest extends TestCase
 {
     private $original_auth_mech;
     private $server;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +41,7 @@ class AuthHTTPTest extends DBTestCase
         $this->server = $_SERVER;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Config::set('auth_mechanism', $this->original_auth_mech);
         $_SERVER = $this->server;
@@ -68,8 +65,8 @@ class AuthHTTPTest extends DBTestCase
         $old_username = null;
         $new_username = null;
 
-        $users = array('steve',  '   steve', 'steve   ', '   steve   ', '    steve   ', '', 'CAT');
-        $vars = array('REMOTE_USER', 'PHP_AUTH_USER');
+        $users = ['steve',  '   steve', 'steve   ', '   steve   ', '    steve   ', '', 'CAT'];
+        $vars = ['REMOTE_USER', 'PHP_AUTH_USER'];
 
         $a = LegacyAuth::reset();
 

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,6 +24,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
@@ -39,15 +39,16 @@ class Symbol extends OS implements WirelessClientsDiscovery
      */
     public function discoverWirelessClients()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
-        if (str_i_contains($device['hardware'], 'AP')) {
+        if (Str::contains(strtolower($device['hardware']), 'ap')) {
             $oid = '.1.3.6.1.4.1.388.11.2.4.2.100.10.1.18.1';
-            return array(
-                new WirelessSensor('clients', $device['device_id'], $oid, 'symbol', 1, 'Clients')
-            );
+
+            return [
+                new WirelessSensor('clients', $device['device_id'], $oid, 'symbol', 1, 'Clients'),
+            ];
         }
 
-        return array();
+        return [];
     }
 }

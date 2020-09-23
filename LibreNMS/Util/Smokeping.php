@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -48,11 +47,11 @@ class Smokeping
     {
         if (is_null($this->files) && Config::has('smokeping.dir')) {
             $dir = $this->generateFileName();
-            if (is_dir($dir)) {
+            if (is_dir($dir) && is_readable($dir)) {
                 foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
                     if (stripos($file, '.rrd') !== false) {
                         if (strpos($file, '~') !== false) {
-                            list($target, $slave) = explode('~', $this->filenameToHostname($file));
+                            [$target, $slave] = explode('~', $this->filenameToHostname($file));
                             $this->files['in'][$target][$slave] = $file;
                             $this->files['out'][$slave][$target] = $file;
                         } else {
@@ -71,6 +70,7 @@ class Smokeping
     public function findFiles()
     {
         $this->files = null;
+
         return $this->getFiles();
     }
 
@@ -86,21 +86,27 @@ class Smokeping
     public function otherGraphs($direction)
     {
         $remote = $direction == 'in' ? 'src' : 'dest';
-        $data = array_keys(array_filter($this->getFiles()[$direction][$this->device->hostname], function ($file) {
-            return Str::contains($file, '~');
-        }));
+        $data = [];
+        foreach ($this->getFiles()[$direction][$this->device->hostname] as $remote_host => $file) {
+            if (Str::contains($file, '~')) {
+                $device = \DeviceCache::getByHostname($remote_host);
+                if (empty($device->device_id)) {
+                    \Log::debug('Could not find smokeping slave device in LibreNMS', ['slave' => $remote_host]);
+                    continue;
+                }
 
-        return array_map(function ($other) use ($direction, $remote) {
-            $device = \DeviceCache::getByHostname($other);
-            return [
-                'device' => $device,
-                'graph' => [
-                    'type' => 'smokeping_' . $direction,
-                    'device' => $this->device->device_id,
-                    $remote => $device->device_id,
-                ]
-            ];
-        }, $data);
+                $data[] = [
+                    'device' => $device,
+                    'graph' => [
+                        'type' => 'smokeping_' . $direction,
+                        'device' => $this->device->device_id,
+                        $remote => $device->device_id,
+                    ],
+                ];
+            }
+        }
+
+        return $data;
     }
 
     public function hasGraphs()
@@ -110,12 +116,12 @@ class Smokeping
 
     public function hasInGraph()
     {
-        return !empty($this->getFiles()['in'][$this->device->hostname]);
+        return ! empty($this->getFiles()['in'][$this->device->hostname]);
     }
 
     public function hasOutGraph()
     {
-        return !empty($this->getFiles()['out'][$this->device->hostname]);
+        return ! empty($this->getFiles()['out'][$this->device->hostname]);
     }
 
     private function filenameToHostname($name)
@@ -123,6 +129,7 @@ class Smokeping
         if (Config::get('smokeping.integration') === true) {
             $name = str_replace('_', '.', $name);
         }
+
         return str_replace('.rrd', '', $name);
     }
 }

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateVrfsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,8 +17,8 @@ class CreateVrfsTable extends Migration
             $table->string('vrf_oid', 256);
             $table->string('vrf_name', 128)->nullable();
             $table->string('mplsVpnVrfRouteDistinguisher', 128)->nullable();
-            $table->text('mplsVpnVrfDescription', 65535);
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->text('mplsVpnVrfDescription');
+            $table->unsignedInteger('device_id')->index();
         });
     }
 

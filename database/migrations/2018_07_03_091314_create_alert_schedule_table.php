@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateAlertScheduleTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -24,7 +23,7 @@ class CreateAlertScheduleTable extends Migration
             $table->time('end_recurring_hr')->default('00:00:00');
             $table->string('recurring_day', 15)->nullable();
             $table->string('title');
-            $table->text('notes', 65535);
+            $table->text('notes');
         });
     }
 

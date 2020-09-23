@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -29,7 +28,6 @@ use App\Models\MuninPlugin;
 
 class MuninPluginController extends SelectController
 {
-
     /**
      * Defines the base query for this resource
      *
@@ -49,7 +47,7 @@ class MuninPluginController extends SelectController
     {
         return [
             'id' => $munin_plugin->mplug_id,
-            'text' => $munin_plugin->device->shortDisplayName() . ' - ' . $munin_plugin->mplug_type
+            'text' => $munin_plugin->device->shortDisplayName() . ' - ' . $munin_plugin->mplug_type,
         ];
     }
 }

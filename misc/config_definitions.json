@@ -273,7 +273,17 @@
                 "Accept",
                 "X-Auth-Token"
             ],
+            "group": "api",
+            "section": "cors",
+            "order": 4,
             "type": "array"
+        },
+        "api.cors.allowcredentials": {
+            "default": false,
+            "group": "api",
+            "section": "cors",
+            "order": 7,
+            "type": "boolean"
         },
         "api.cors.allowmethods": {
             "default": [
@@ -283,14 +293,37 @@
                 "DELETE",
                 "PATCH"
             ],
+            "group": "api",
+            "section": "cors",
+            "order": 2,
             "type": "array"
         },
         "api.cors.enabled": {
             "default": false,
+            "group": "api",
+            "section": "cors",
+            "order": 1,
             "type": "boolean"
+        },
+        "api.cors.exposeheaders": {
+            "default": [
+                "Cache-Control",
+                "Content-Language",
+                "Content-Type",
+                "Expires",
+                "Last-Modified",
+                "Pragma"
+            ],
+            "group": "api",
+            "section": "cors",
+            "order": 5,
+            "type": "array"
         },
         "api.cors.maxage": {
             "default": 86400,
+            "group": "api",
+            "section": "cors",
+            "order": 6,
             "type": "integer",
             "units": "seconds",
             "validate": {
@@ -298,8 +331,11 @@
             }
         },
         "api.cors.origin": {
-            "default": "*",
-            "type": "text"
+            "default": ["*"],
+            "group": "api",
+            "section": "cors",
+            "order": 3,
+            "type": "array"
         },
         "api_demo": {
             "default": false,
@@ -373,6 +409,12 @@
             "group": "auth",
             "section": "ad",
             "order": 10,
+            "type": "text"
+        },
+        "auth_ad_url": {
+            "group": "auth",
+            "section": "ad",
+            "order": 11,
             "type": "text"
         },
         "auth_ldap_attr.uid": {
@@ -1190,6 +1232,10 @@
         },
         "distributed_poller_group": {
             "default": 0,
+            "type": "integer"
+        },
+        "default_poller_group": {
+            "default": 0,
             "type": "integer",
             "group": "poller",
             "section": "distributed",
@@ -1212,9 +1258,21 @@
             "order": 2,
             "type": "integer"
         },
+        "graphing.availability": {
+            "group": "poller",
+            "section": "availability",
+            "order": 10,
+            "default": [
+                "86400",
+                "604800",
+                "2592000",
+                "31536000"
+            ],
+            "type": "array"
+        },
         "dot": {
             "default": "/usr/bin/dot",
-            "type": "text"
+            "type": "executable"
         },
         "email_auto_tls": {
             "default": true,
@@ -1259,7 +1317,7 @@
             "group": "alerting",
             "section": "email",
             "order": 5,
-            "type": "text",
+            "type": "executable",
             "when": {
                 "setting": "email_backend",
                 "operator": "equals",
@@ -1484,14 +1542,14 @@
             "group": "external",
             "section": "binaries",
             "order": 0,
-            "type": "text"
+            "type": "executable"
         },
         "fping6": {
             "default": "fping6",
             "group": "external",
             "section": "binaries",
             "order": 1,
-            "type": "text"
+            "type": "executable"
         },
         "fping_options.count": {
             "default": 3,
@@ -1561,18 +1619,34 @@
                 "bing": "Bing Maps"
             }
         },
+        "geoloc.latlng": {
+            "default": false,
+            "group": "external",
+            "section": "location",
+            "order": 2,
+            "type": "boolean",
+            "when": {
+                "setting": "geoloc.engine",
+                "operator": "in",
+                "value": [
+                    "google",
+                    "mapquest",
+                    "bing"
+                ]
+            }
+        },
         "github_api": {
             "default": "https://api.github.com/repos/librenms/librenms/",
             "type": "text"
         },
         "graph_colours.blues": {
             "default": [
-                "A0A0E5",
-                "8080BD",
-                "606096",
-                "40406F",
-                "202048",
-                "000033"
+                "A9A9F2",
+                "9696DD",
+                "8080C9",
+                "6A6AB7",
+                "5151A3",
+                "3D3D99"
             ],
             "type": "array"
         },
@@ -1589,12 +1663,12 @@
         },
         "graph_colours.greens": {
             "default": [
-                "B6D14B",
-                "91B13C",
-                "6D912D",
-                "48721E",
-                "24520F",
-                "003300"
+                "CAE853",
+                "B2D849",
+                "94C63D",
+                "75BA30",
+                "49A81E",
+                "0C990C"
             ],
             "type": "array"
         },
@@ -2779,6 +2853,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.availability": {
+            "default": {
+                "section": "availability",
+                "order": 0,
+                "descr": "Device Availability"
+            },
+            "type": "graph"
+        },
         "graph_types.device.sub10_sub10RadioLclAFER": {
             "default": {
                 "section": "wireless",
@@ -3244,7 +3326,7 @@
             }
         },
         "html_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "http_proxy": {
             "group": "system",
@@ -3402,7 +3484,7 @@
             "order": 8
         },
         "install_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "int_core": {
             "default": true,
@@ -3450,7 +3532,7 @@
             "group": "external",
             "section": "binaries",
             "order": 3,
-            "type": "text"
+            "type": "executable"
         },
         "irc_alert": {
             "default": false,
@@ -3562,7 +3644,7 @@
             "type": "color"
         },
         "log_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "log_file": {
             "type": "text"
@@ -3587,7 +3669,7 @@
             "type": "text"
         },
         "mib_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "mono_font": {
             "default": "DejaVuSansMono",
@@ -3598,7 +3680,7 @@
             "group": "external",
             "section": "binaries",
             "order": 4,
-            "type": "text"
+            "type": "executable"
         },
         "mydomain": {
             "type": "text",
@@ -3613,7 +3695,10 @@
         },
         "nagios_plugins": {
             "default": "/usr/lib/nagios/plugins",
-            "type": "text"
+            "type": "directory"
+        },
+        "nets": {
+            "type": "array"
         },
         "network_map_items": {
             "default": [
@@ -3678,7 +3763,7 @@
             "group": "external",
             "section": "binaries",
             "order": 8,
-            "type": "text"
+            "type": "executable"
         },
         "nfsen_enable": {
             "default": false,
@@ -3804,7 +3889,7 @@
             "group": "external",
             "section": "binaries",
             "order": 5,
-            "type": "text"
+            "type": "executable"
         },
         "notifications.LibreNMS": {
             "default": "http://www.librenms.org/notifications.rss",
@@ -3997,10 +4082,10 @@
             "group": "external",
             "section": "binaries",
             "order": 6,
-            "type": "text"
+            "type": "executable"
         },
         "plugin_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "poller_modules.unix-agent": {
             "order": 420,
@@ -4391,6 +4476,13 @@
             "section": "prometheus",
             "order": 2
         },
+        "prometheus.attach_sysname": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 3
+        },
         "public_status": {
             "default": false,
             "group": "auth",
@@ -4451,7 +4543,7 @@
             "group": "poller",
             "section": "rrdtool",
             "order": 6,
-            "type": "text"
+            "type": "directory"
         },
         "rrd_purge": {
             "group": "system",
@@ -4461,7 +4553,7 @@
             "type": "integer"
         },
         "rrd_rra": {
-            "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 ",
+            "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440 RRA:MIN:0.5:24:1440 RRA:MIN:0.5:288:1440 RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440 RRA:MAX:0.5:24:1440 RRA:MAX:0.5:288:1440 RRA:LAST:0.5:1:2016 ",
             "group": "poller",
             "section": "rrdtool",
             "order": 4,
@@ -4477,8 +4569,16 @@
             "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
             "type": "text"
         },
+        "rrdgraph_def_text_dark": {
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "type": "text"
+        },
         "rrdgraph_def_text_color": {
             "default": "000000",
+            "type": "color"
+        },
+        "rrdgraph_def_text_color_dark": {
+            "default": "bfc0c0",
             "type": "color"
         },
         "rrdgraph_real_percentile": {
@@ -4490,7 +4590,7 @@
             "group": "external",
             "section": "binaries",
             "order": -1,
-            "type": "text"
+            "type": "executable"
         },
         "rrdtool_tune": {
             "default": false,
@@ -4503,12 +4603,178 @@
             "default": true,
             "type": "boolean"
         },
+        "service_poller_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 5,
+            "type": "boolean"
+        },
+        "service_poller_workers": {
+            "default": 24,
+            "group": "poller",
+            "section": "distributed",
+            "order": 6,
+            "type": "integer",
+            "units": "Workers"
+        },
+        "service_poller_frequency": {
+            "default": 300,
+            "group": "poller",
+            "section": "distributed",
+            "order": 7,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_poller_down_retry": {
+            "default": 60,
+            "group": "poller",
+            "section": "distributed",
+            "order": 8,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_discovery_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 9,
+            "type": "boolean"
+        },
+        "service_discovery_workers": {
+            "default": 16,
+            "group": "poller",
+            "section": "distributed",
+            "order": 10,
+            "type": "integer",
+            "units": "Workers"
+        },
+        "service_discovery_frequency": {
+            "default": 21600,
+            "group": "poller",
+            "section": "distributed",
+            "order": 11,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_services_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 12,
+            "type": "boolean"
+        },
+        "service_services_workers": {
+            "default": 8,
+            "group": "poller",
+            "section": "distributed",
+            "order": 13,
+            "type": "integer",
+            "units": "Workers"
+        },
+        "service_services_frequency": {
+            "default": 300,
+            "group": "poller",
+            "section": "distributed",
+            "order": 14,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_billing_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 15,
+            "type": "boolean"
+        },
+        "service_billing_frequency": {
+            "default": 300,
+            "group": "poller",
+            "section": "distributed",
+            "order": 16,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_billing_calculate_frequency": {
+            "default": 60,
+            "group": "poller",
+            "section": "distributed",
+            "order": 17,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_alerting_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 18,
+            "type": "boolean"
+        },
+        "service_alerting_frequency": {
+            "default": 60,
+            "group": "poller",
+            "section": "distributed",
+            "order": 19,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_ping_enabled": {
+            "default": false,
+            "group": "poller",
+            "section": "distributed",
+            "order": 20,
+            "type": "boolean"
+        },
+        "ping_rrd_step": {
+            "default": 60,
+            "group": "poller",
+            "section": "distributed",
+            "order": 21,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_update_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 22,
+            "type": "boolean"
+        },
+        "service_update_frequency": {
+            "default": 86400,
+            "group": "poller",
+            "section": "distributed",
+            "order": 23,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_loglevel": {
+            "default": "INFO",
+            "group": "poller",
+            "section": "distributed",
+            "order": 24,
+            "type": "select",
+            "options": {
+                "DEBUG": "DEBUG",
+                "INFO": "INFO",
+                "WARNING": "WARNING",
+                "ERROR": "ERROR",
+                "CRITICAL": "CRITICAL"
+            }
+        },
+        "service_watchdog_enabled": {
+            "default": false,
+            "group": "poller",
+            "section": "distributed",
+            "order": 25,
+            "type": "boolean"
+        },
         "sfdp": {
             "default": "/usr/bin/sfdp",
             "group": "external",
             "section": "binaries",
             "order": 7,
-            "type": "text"
+            "type": "executable"
         },
         "shorthost_target_length": {
             "group": "webui",
@@ -4627,7 +4893,15 @@
             "type": "text"
         },
         "smokeping.pings": {
-            "default": 20,
+            "default": 5,
+            "group": "external",
+            "section": "smokeping",
+            "order": 2,
+            "type": "integer",
+            "units": "pings"
+        },
+        "smokeping.probes": {
+            "default": 2,
             "type": "integer"
         },
         "snmp.community": {
@@ -4703,28 +4977,28 @@
             "group": "external",
             "section": "binaries",
             "order": 8,
-            "type": "text"
+            "type": "executable"
         },
         "snmpget": {
             "default": "/usr/bin/snmpget",
             "group": "external",
             "section": "binaries",
             "order": 9,
-            "type": "text"
+            "type": "executable"
         },
         "snmpgetnext": {
             "default": "snmpgetnext",
             "group": "external",
             "section": "binaries",
             "order": 10,
-            "type": "text"
+            "type": "executable"
         },
         "snmptranslate": {
             "default": "/usr/bin/snmptranslate",
             "group": "external",
             "section": "binaries",
             "order": 11,
-            "type": "text"
+            "type": "executable"
         },
         "snmptraps.eventlog": {
             "default": "unhandled",
@@ -4739,7 +5013,7 @@
             "group": "external",
             "section": "binaries",
             "order": 12,
-            "type": "text"
+            "type": "executable"
         },
         "sso.create_users": {
             "default": true,
@@ -4785,7 +5059,7 @@
             "type": "integer"
         },
         "temp_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "title_image": {
             "group": "webui",
@@ -4806,14 +5080,14 @@
             "group": "external",
             "section": "binaries",
             "order": 13,
-            "type": "text"
+            "type": "executable"
         },
         "traceroute6": {
             "default": "traceroute6",
             "group": "external",
             "section": "binaries",
             "order": 14,
-            "type": "text"
+            "type": "executable"
         },
         "transit_descr": {
             "default": ["transit"],
@@ -4891,7 +5165,7 @@
             "group": "external",
             "section": "binaries",
             "order": 15,
-            "type": "text"
+            "type": "executable"
         },
         "warn.ifdown": {
             "default": true,
@@ -4991,11 +5265,31 @@
             "group": "external",
             "section": "binaries",
             "order": 16,
-            "type": "text"
+            "type": "executable"
         },
         "xirrus_disable_stations": {
             "default": false,
             "type": "boolean"
+        },
+        "smokeping.integration": {
+            "default": false,
+            "group": "external",
+            "section": "smokeping",
+            "order": 0,
+            "type": "boolean"
+        },
+        "smokeping.dir": {
+            "default": "/var/lib/smokeping/rrd",
+            "group": "external",
+            "section": "smokeping",
+            "order": 1,
+            "type": "directory"
+        },
+        "smokeping.url": {
+            "group": "external",
+            "section": "smokeping",
+            "order": 3,
+            "type": "text"
         }
     }
 }

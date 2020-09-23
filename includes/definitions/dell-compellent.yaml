@@ -23,5 +23,5 @@ discovery_modules:
     wireless: false
 discovery:
     -
-      sysDescr: COMPELLENT
-      sysObjectID: .1.3.6.1.4.1.8072.3.2.8
+        sysDescr: COMPELLEN
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.8

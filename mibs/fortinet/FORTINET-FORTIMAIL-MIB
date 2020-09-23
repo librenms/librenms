@@ -1,0 +1,735 @@
+--
+-- MODULE-IDENTITY
+--  OrgName
+--    Fortinet, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+FORTINET-FORTIMAIL-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		DisplayString, TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Gauge32, 
+		IpAddress
+			FROM SNMPv2-SMI
+		ifIndex
+			FROM IF-MIB
+		FnBoolState, FnIndex, FnSessionProto, fortinet
+			FROM FORTINET-CORE-MIB;
+
+fnFortiMailMib MODULE-IDENTITY
+    LAST-UPDATED "201306280000Z"
+    ORGANIZATION 
+        "Fortinet Technologies, Inc."
+    CONTACT-INFO 
+        "Technical Support
+         email: support@fortinet.com
+         http://www.fortinet.com
+        "
+	DESCRIPTION
+		"Add fmlMailQueueStatistics listing mail queues and 
+			number of emails and size of emails in queues"
+	REVISION	"201306280000Z"
+	DESCRIPTION
+		"MIB module for Fortinet FortiMail devices"
+	REVISION	"201003230000Z"
+    DESCRIPTION 
+		"Inherit FORTINET-CORE-MIB, combine FortiMail traps"
+    REVISION    "200910220000Z"
+    DESCRIPTION 
+        "MIB module for FortiMail devices."
+    ::= { fortinet 105 }
+
+	--
+	-- Textual conventions --
+	--
+
+	FmlIpv6Address ::= TEXTUAL-CONVENTION
+             DISPLAY-HINT "2x:"
+             STATUS       current
+             DESCRIPTION
+               "This data type is used to model IPv6 addresses.
+                This is a binary string of 16 octets in network
+                byte-order."
+             SYNTAX       OCTET STRING (SIZE (16))
+
+	FmlOpMode ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "fortimail operation mode."
+        SYNTAX      INTEGER {
+			gateway     (1),
+			transparent (2),
+			server		(3)
+	}
+
+	FmlSysEventCodeVal ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "enumerated type for System component events."
+        SYNTAX      INTEGER {
+			systemHalt (1),
+			systemReboot (2),
+			systemReload (3),
+			systemUpgrade (4),
+			guiUpgrade (5),
+			logdiskFormat (6),
+			maildiskFormat (7),
+			avDBUpdateSuccess (8),
+			avDBUpdateNetworkError (9),
+			avDBUpdateFailure (10)
+		}
+
+	FmlRAIDCodeVal ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "enumerated type for RAID system events."
+        SYNTAX      INTEGER {
+			degradedArray (1),
+			sparesMissing (2),
+			rebuildStarted (3),
+			rebuildFinished (4),
+			fail (5),
+			failSpare (6),
+			spareActive (7)
+		}	
+	
+	FmlHAEventIdVal ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "enumerated type for HA events."
+        SYNTAX      INTEGER {
+			masterUnitSwitch (1),
+			slaveUnitSwitch  (2),
+			unitShutdown (3)
+		}	
+	
+	FmlHAModeVal ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "enumerated type for HA mode."
+		SYNTAX 		INTEGER {
+			off	   (0),
+			master (1),
+			slave  (2),
+			configMaster (3),
+			configSlave (4)
+		}	
+	
+	
+	--
+	--
+	--
+
+	fmlTraps			OBJECT IDENTIFIER ::=  { fnFortiMailMib 0 }
+	fmlSystem       	OBJECT IDENTIFIER ::=  { fnFortiMailMib 1 }
+	fmlSysOptions   	OBJECT IDENTIFIER ::=  { fmlSystem 101 }
+	fmlIp				OBJECT IDENTIFIER ::=  { fmlSystem 102 }
+	fmlMailOptions  	OBJECT IDENTIFIER ::=  { fmlSystem 103 }
+	fmlHwSensors		OBJECT IDENTIFIER ::=  { fmlSystem 110 }
+	fmlSysHA			OBJECT IDENTIFIER ::=  { fmlSystem 200 }
+	fmlMIBConformance 	OBJECT IDENTIFIER ::=  { fnFortiMailMib 600 }
+
+	
+	--
+	-- fnFortiMailMib.fmlSystem
+	--
+
+	fmlSysModel          OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "System model string"
+		::= { fmlSystem    1 }
+
+	fmlSysSerial         OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Device serial number"
+		::= { fmlSystem    2 }
+
+	fmlSysVersion        OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 128 ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Device firmware version"
+		::= { fmlSystem    3 }
+
+	fmlSysVersionAv      OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 128 ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Antivirus DB version"
+		::= { fmlSystem    4 }
+
+	fmlSysOpMode         OBJECT-TYPE
+		SYNTAX          FmlOpMode
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Operational mode (Gateway, Transparent or Server)"
+		::= { fmlSystem    5 }
+
+	fmlSysCpuUsage       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous CPU usage"
+		::= { fmlSystem    6 }
+
+	fmlSysMemUsage       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous memory utilization"
+		::= { fmlSystem    7 }
+
+	fmlSysLogDiskUsage   OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous log disk usage"
+		::= { fmlSystem    8 }
+
+	fmlSysMailDiskUsage  OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous mail disk usage"
+		::= { fmlSystem    9 }
+
+	fmlSysSesCount       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous session count"
+		::= { fmlSystem    10 }
+
+	fmlSysEventCode OBJECT-TYPE
+		SYNTAX          FmlSysEventCodeVal
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "System component events"
+		::= { fmlSystem  11 }
+
+	fmlRAIDCode OBJECT-TYPE
+		SYNTAX          FmlRAIDCodeVal
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "RAID system events"
+		::= { fmlSystem  12 }
+
+	fmlRAIDDevName      OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "RAID Device name"
+		::= { fmlSystem    13 }
+
+	fmlHAEventId OBJECT-TYPE
+		SYNTAX          FmlHAEventIdVal
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "HA event type ID"
+		::= { fmlSystem  14 }
+
+	fmlHAUnitIp OBJECT-TYPE
+		SYNTAX          IpAddress
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "Unit IP address where event occurs "
+		::= { fmlSystem  15 }
+
+	fmlHAEventReason      OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "The reason for the HA event"
+		::= { fmlSystem    16 }
+
+	fmlSysLoad       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous system load"
+		::= { fmlSystem    30 }
+
+	fmlRemoteStorageStatus OBJECT-TYPE
+		SYNTAX          INTEGER { false(0), true(1) }
+		MAX-ACCESS		accessible-for-notify
+		STATUS          obsolete
+		DESCRIPTION     "Remote Storage Status"
+		::= { fmlSystem 31 }
+	--
+	-- fnFortiMailMib.fmlSystem.fmlSysOptions
+	--
+
+	fmlSysOptIdleTimeout OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Idle period after which the administrator
+		                 is automatically logged out off the system"
+		::= { fmlSysOptions  1 }
+
+	fmlSysOptAuthTimeout	OBJECT-TYPE	
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Authentication idle timeout value"
+		::= { fmlSysOptions  2 }
+		
+	--		
+	-- fnFortiMailMib.fmlSystem.fmlIp
+	--
+
+	fmlIpSessTable       OBJECT-TYPE
+        	SYNTAX      SEQUENCE OF FmlIpSessEntry
+	        MAX-ACCESS  not-accessible
+        	STATUS      current
+	        DESCRIPTION "IP Sessions Info"
+        	::= { fmlIp        2 }
+
+	fmlIpSessEntry	OBJECT-TYPE
+        	SYNTAX      FmlIpSessEntry
+	        MAX-ACCESS  not-accessible
+        	STATUS      current
+	        DESCRIPTION "Particular IP Session info"
+	        INDEX       { fmlIpSessIndex }
+        	::= { fmlIpSessTable 1 }
+
+	FmlIpSessEntry ::=
+        	SEQUENCE {
+		    fmlIpSessIndex	     FnIndex,
+		    fmlIpSessProto	     FnSessionProto,
+		    fmlIpSessFromAddr	 IpAddress,
+			fmlIpv6SessFromAddr	 FmlIpv6Address,
+		    fmlIpSessFromPort	 Integer32,
+		    fmlIpSessToAddr	     IpAddress,
+			fmlIpv6SessToAddr	 FmlIpv6Address,
+		    fmlIpSessToPort	     Integer32,
+		    fmlIpSessExp		 Gauge32 
+        	}
+
+	fmlIpSessIndex	OBJECT-TYPE	
+		SYNTAX      FnIndex
+		MAX-ACCESS 	not-accessible 
+		STATUS      current
+		DESCRIPTION "An index value that uniquely identifies
+                	     an IP session"
+		::=  { fmlIpSessEntry  1 }
+
+	fmlIpSessProto	OBJECT-TYPE	
+		SYNTAX      FnSessionProto
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "The protocol of the connection"
+		::=  { fmlIpSessEntry  2 }
+
+	fmlIpSessFromAddr	OBJECT-TYPE	
+		SYNTAX      IpAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Source IP address"
+		::=  { fmlIpSessEntry  3 }
+
+	fmlIpv6SessFromAddr  OBJECT-TYPE
+		SYNTAX      FmlIpv6Address
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Source IP address"
+		::= { fmlIpSessEntry 4}
+
+
+	fmlIpSessFromPort	OBJECT-TYPE	
+		SYNTAX      Integer32 ( 0 .. 65535  )
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Source Port number"
+		::=  { fmlIpSessEntry  5 }
+
+	fmlIpSessToAddr	OBJECT-TYPE	
+		SYNTAX      IpAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Destination IP address"
+		::=  { fmlIpSessEntry  6 }
+
+	fmlIpv6SessToAddr  OBJECT-TYPE
+		SYNTAX      FmlIpv6Address
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Source IP address"
+		::= { fmlIpSessEntry 7}
+
+
+	fmlIpSessToPort	OBJECT-TYPE	
+		SYNTAX      Integer32 ( 0 .. 65535  )
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Destination Port number"
+		::=  { fmlIpSessEntry  8 }
+
+	fmlIpSessExp	OBJECT-TYPE	
+		SYNTAX      Gauge32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Time (in seconds) before connection expires"
+		::=  { fmlIpSessEntry  9 }
+
+	--
+	-- fnFortiMailMib.fmlSystem.fmlMailOptions
+	--
+	fmlMailOptionsDeferQueue OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          obsolete
+		DESCRIPTION     "Instantaneous deferred emails number"
+		::= { fmlMailOptions  1 }
+
+	fmlMailQueueStatistics		OBJECT-TYPE
+		SYNTAX			SEQUENCE OF FmlMailQueueEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Statistics of mail queues"
+		::= { fmlMailOptions 2 }
+		
+	fmlMailQueueEntry		OBJECT-TYPE
+		SYNTAX			FmlMailQueueEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Statistics of a mail queue, e.g. number of mails in queue, size of mails"
+		INDEX			{ fmlMailQueueIndex }
+		::= { fmlMailQueueStatistics 1 }
+	
+	FmlMailQueueEntry ::= SEQUENCE {
+		fmlMailQueueIndex		FnIndex,
+		fmlMailQueueName		DisplayString,
+		fmlMailQueueMailCount	Gauge32,
+		fmlMailQueueMailSize	Gauge32
+	}
+	
+	fmlMailQueueIndex		OBJECT-TYPE
+		SYNTAX			FnIndex
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"mail queue index"
+		::= { fmlMailQueueEntry 1 }
+	
+	fmlMailQueueName		OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"mail queue name"
+		::= { fmlMailQueueEntry 2 }
+	
+	fmlMailQueueMailCount	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"number of emails in mail queue"
+		::= { fmlMailQueueEntry 3 }
+
+	fmlMailQueueMailSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"size of emails in mail queue in KB"
+		::= { fmlMailQueueEntry 4 }
+
+	--			
+	-- fnFortiMailMib.fmlSystem.fmlHwSensors
+	--
+
+	fmlHwSensorCount         OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "The number of hardware sensors in the system"
+		::= { fmlHwSensors 1 }
+
+	fmlHwSensorTable         OBJECT-TYPE
+		SYNTAX          SEQUENCE OF FmlHwSensorEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "A list of hardware sensors in the system user accounts"
+		::= { fmlHwSensors 2 }
+
+	fmlHwSensorEntry         OBJECT-TYPE
+		SYNTAX          FmlHwSensorEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "An entry containing information of hardware sensors"
+		INDEX           { fmlHwSensorEntIndex }
+		::= { fmlHwSensorTable 1 }
+
+	FmlHwSensorEntry ::= SEQUENCE {
+		fmlHwSensorEntIndex       FnIndex,
+		fmlHwSensorEntName        DisplayString,
+		fmlHwSensorEntValue       DisplayString,
+		fmlHwSensorEntAlarmStatus INTEGER
+	}
+
+	fmlHwSensorEntIndex      OBJECT-TYPE
+		SYNTAX          FnIndex 
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "Index of the hardware sensors"
+		::= { fmlHwSensorEntry 1 }
+
+	fmlHwSensorEntName       OBJECT-TYPE
+		SYNTAX          DisplayString
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Sensor Name"
+		::= { fmlHwSensorEntry 2 }
+
+	fmlHwSensorEntValue      OBJECT-TYPE
+		SYNTAX          DisplayString
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Reading value of the sensor"
+		::= { fmlHwSensorEntry 3 }
+
+	fmlHwSensorEntAlarmStatus OBJECT-TYPE
+		SYNTAX          INTEGER { false(0), true(1) }
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Alarm status of the sensor"
+		::= { fmlHwSensorEntry 4 }
+
+	--
+	-- fnFortiMailMib.fmlSystem.fmlSysHA
+	--
+
+	fmlHAMode OBJECT-TYPE
+		SYNTAX          FmlHAModeVal
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Configured HA mode"
+		::= { fmlSysHA 1 }
+
+	fmlHAEffectiveMode OBJECT-TYPE
+		SYNTAX          FmlHAModeVal
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Effective HA mode"
+		::= { fmlSysHA  2 }
+
+	--
+	-- fnFortiMailMib.fmlTraps
+	--
+
+	fmlTrapCpuHighThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fmlSysSerial }
+		STATUS        obsolete
+		DESCRIPTION   "Trap being sent if CPU usage becomes too high, which is defined in FORTINET-CORE-MIB"
+		::=  {  fmlTraps  101  }
+
+	fmlTrapMemLowThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fmlSysSerial }
+		STATUS        obsolete
+		DESCRIPTION   "Trap being sent if memory usage becomes too high, which is defined in FORTINET-CORE-MIB"
+		::=  {  fmlTraps  102  }
+
+	fmlTrapLogDiskHighThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fmlSysSerial }
+		STATUS        obsolete
+		DESCRIPTION   "Trap being sent if Log disk usage becomes too high, which is defined in FORTINET-CORE-MIB"
+		::=  {  fmlTraps  103  }
+
+	fmlTrapMailDiskHighThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fmlSysSerial}
+		STATUS        current
+		DESCRIPTION   "Trap being sent if Mailbox disk usage becomes too high"
+		::=  {  fmlTraps  104  }		
+		
+	fmlTrapMailDeferredQueueHighThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fmlSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap being sent if Mail server deferred emails becomes too high"
+		::=  {  fmlTraps  105  }		
+		
+	fmlTrapAvThresholdEvent	NOTIFICATION-TYPE
+		OBJECTS      { fmlSysSerial }
+		STATUS       current
+		DESCRIPTION   "Trap being sent when detected virus number reaches the threshold"
+		::=  {  fmlTraps  106  }	
+
+	fmlTrapSpamThresholdEvent	NOTIFICATION-TYPE
+		OBJECTS      { fmlSysSerial }
+		STATUS       current
+		DESCRIPTION   "Trap being sent when detected spam email number reaches the threshold"
+		::=  {  fmlTraps  107  }	
+
+	fmlTrapPSUFailureEvent  NOTIFICATION-TYPE
+		OBJECTS      { fmlSysSerial, fmlHwSensorEntName, fmlHwSensorEntValue, fmlHwSensorEntAlarmStatus }
+		STATUS       obsolete
+		DESCRIPTION   "Trap being sent when detected a power suply unit failure, which is defined in FORTINET-CORE-MIB"
+		::=  {  fmlTraps  108  }
+
+	fmlTrapSystemEvent	NOTIFICATION-TYPE
+		OBJECTS      { fmlSysSerial, fmlSysEventCode }
+		STATUS       current
+		DESCRIPTION   "Trap being sent when system component halt, reboot, upgrade etc.,"
+		::=  {  fmlTraps  201  }
+		
+	fmlTrapRAIDEvent	NOTIFICATION-TYPE
+		OBJECTS      { fmlSysSerial, fmlRAIDCode, fmlRAIDDevName }
+		STATUS       current
+		DESCRIPTION   "Trap being sent for RAID operation"
+		::=  {  fmlTraps  202  }
+
+	fmlTrapHAEvent	NOTIFICATION-TYPE
+		OBJECTS      { fmlSysSerial, fmlHAEventId, fmlHAUnitIp, fmlHAEventReason }
+		STATUS       current
+		DESCRIPTION   "Trap being sent when HA event occurs"
+		::=  {  fmlTraps  203  }
+
+	fmlTrapRemoteStorage NOTIFICATION-TYPE
+		OBJECTS       { fmlSysSerial, fmlRemoteStorageStatus }
+		STATUS        obsolete
+		DESCRIPTION   "Trap being sent when status of the remote storage changes"
+		::=  {  fmlTraps  205  }
+
+	fmlTrapIpChange NOTIFICATION-TYPE
+		OBJECTS       { fmlSysSerial, ifIndex }
+		STATUS        obsolete
+		DESCRIPTION   "Trap being sent when IP address of
+					   the specified interface has been
+					   changed, which is defined in FORTINET-CORE-MIB"
+		::=  {  fmlTraps  301  }
+
+	--
+	-- fnFortiMailMib.fmlMIBConformance
+	--
+	
+	fmlSystemConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fmlSysModel, fmlSysSerial, fmlSysVersion, fmlSysVersionAv, fmlSysOpMode, fmlSysCpuUsage,
+					fmlSysMemUsage, fmlSysLogDiskUsage, fmlSysMailDiskUsage, fmlSysSesCount, fmlSysEventCode,
+					fmlRAIDCode, fmlRAIDDevName, fmlHAEventId, fmlHAUnitIp, fmlHAEventReason,
+					fmlSysLoad }
+		STATUS 		current
+		DESCRIPTION
+				"object related to fortimail system."
+		::= { fmlMIBConformance 1 }
+
+	fmlSysOptionsConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fmlSysOptIdleTimeout, fmlSysOptAuthTimeout }
+		STATUS		current
+		DESCRIPTION
+				"object related to fortimail system option."
+		::= { fmlMIBConformance 2 }
+	
+	fmlIpConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fmlIpSessProto, fmlIpSessFromAddr, fmlIpSessFromPort, fmlIpSessToAddr,
+					fmlIpSessToPort, fmlIpSessExp }
+		STATUS		current
+		DESCRIPTION
+				"object related to fortimail ip."
+		::= { fmlMIBConformance 3 }
+	
+	fmlMailOptionsConformanceGroup OBJECT-GROUP
+		OBJECTS		{ fmlMailQueueName, fmlMailQueueMailCount, fmlMailQueueMailSize }
+		STATUS		current
+		DESCRIPTION
+				"object related to fortimail mail options." 
+		::= { fmlMIBConformance 4 }
+
+	fmlHwSensorsConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fmlHwSensorCount, fmlHwSensorEntName, fmlHwSensorEntValue, 
+					fmlHwSensorEntAlarmStatus }
+		STATUS		current
+		DESCRIPTION
+				"object related to fortimail hw sensors."
+		::= { fmlMIBConformance 5 }
+
+	fmlHAModeConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fmlHAMode, fmlHAEffectiveMode }
+		STATUS		current
+		DESCRIPTION
+				"object related to fortimail HA mode."
+		::= { fmlMIBConformance 6 }
+
+	fmlTrapsComplianceGroup NOTIFICATION-GROUP
+		NOTIFICATIONS {
+			fmlTrapMailDiskHighThreshold,
+			fmlTrapMailDeferredQueueHighThreshold,
+			fmlTrapAvThresholdEvent,
+			fmlTrapSpamThresholdEvent,
+			fmlTrapSystemEvent,
+			fmlTrapRAIDEvent,
+			fmlTrapHAEvent
+		}
+		STATUS current
+		DESCRIPTION "Event notifications"
+		::= { fmlMIBConformance 7 }
+		
+	fmlObsoleteTrapsComplianceGroup NOTIFICATION-GROUP
+		NOTIFICATIONS {
+			fmlTrapCpuHighThreshold,
+			fmlTrapMemLowThreshold,
+			fmlTrapLogDiskHighThreshold,
+			fmlTrapPSUFailureEvent,
+			fmlTrapIpChange
+		}
+		STATUS obsolete
+		DESCRIPTION "Event notifications, items in this group are defined in FORTINET-CORE-MIB"
+		::= { fmlMIBConformance 8 }
+		
+	fmlMIBCompliance MODULE-COMPLIANCE
+		STATUS 		current
+		DESCRIPTION 
+			"the compliance statement for the application MIB."
+		
+		MODULE		-- this module
+		
+			GROUP	fmlSystemConformanceGroup
+			DESCRIPTION 
+				"this group is mandatory for all Fortimail appliances supporting this MIB."
+			
+			GROUP	fmlSysOptionsConformanceGroup	
+			DESCRIPTION 
+				"this group is mandatory for all Fortimail appliances supporting this MIB."
+			
+			GROUP	fmlIpConformanceGroup	
+			DESCRIPTION 
+				"this group is mandatory for all Fortimail appliances supporting this MIB."
+
+			GROUP	fmlMailOptionsConformanceGroup	
+			DESCRIPTION 
+				"this group is mandatory for all Fortimail appliances supporting this MIB."
+
+			GROUP 	fmlHwSensorsConformanceGroup
+			DESCRIPTION
+				"this group is mandatory for all Fortimail appliances supporting this MIB."
+
+			GROUP 	fmlHAModeConformanceGroup
+			DESCRIPTION
+				"this group is mandatory for all Fortimail appliances supporting this MIB."
+
+			GROUP	fmlTrapsComplianceGroup
+			DESCRIPTION
+				"this group is mandatory for all Fortimail appliances supporting this MIB."
+
+			::= { fmlMIBConformance 100 }
+
+	fmlObsoleteMIBCompliance MODULE-COMPLIANCE
+		STATUS 		obsolete
+		DESCRIPTION 
+			"the obsolete compliance statement for the application MIB."
+		
+		MODULE
+	
+			GROUP	fmlObsoleteTrapsComplianceGroup
+			DESCRIPTION
+				"items in this group are defined in FORTINET-CORE-MIB."
+
+			::= { fmlMIBConformance 101 }	
+
+END

@@ -3,35 +3,154 @@ path: blob/master/doc/
 
 # Smokeping integration
 
-[SmokePing](https://oss.oetiker.ch/smokeping/) is a tool which lets us
-keep track of network latency, and visualise this through RRD graphs.
+[SmokePing](https://oss.oetiker.ch/smokeping/) is a tool which lets us keep
+track of network latency, and visualise this through RRD graphs.
 
 LibreNMS has support for both new and pre-existing SmokePing installations.
 
-For new installations, we can use the included
-`scripts/gen_smokeping.php` script to generate a Smokeping config file.
+For new installations, we can use the `lnms` cli to generate a Smokeping
+configuration file.
 
-## New Smokeping installation
+## Pre-Existing Smokeping Installation
 
-### Install and integrate Smokeping - Debian/Ubuntu
+If you have an existing smokeping server, follow the instructions, you only need
+to look at [Configure LibreNMS - All Operating Systems](#configure-librenms-all-operating-systems).
 
-This guide assumes you have already [installed
-librenms](http://docs.librenms.org/Installation/Installing-LibreNMS/),
-and is working with either **Apache** or
-**nginx**.
+## New Installation
 
-Note: You may need to install `fcgiwrap` as well (at least with `nginx`).
+All installation steps assume a clean configuration - if you have an existing
+smokeping setup, you'll need to adapt these steps somewhat.
 
-### Install Smokeping
+### Install and integrate Smokeping Backend - RHEL, CentOS and alike
+
+Smokeping is available via EPEL, which if you're running LibreNMS, you probably
+already have. If you want to do something like run Smokeping on a seperate host
+and ship data via RRCached though, here's the install command:
 
 ```bash
-sudo apt update && sudo apt install smokeping
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+sudo yum install smokeping
 ```
 
-## Configure SmokePing
+Once installed, you should need a cron script installed to make sure that the
+configuration file is updated. You can find an example in `misc/librenms-smokeping-rhel.example`.
+Put this into /etc/cron.d/hourly, and mark it executable:
 
-Smokeping has several configuration files. By default, these are
-located in `/etc/smokeping/config.d/`
+```
+sudo cp /opt/librenms/misc/smokeping-rhel.example /etc/cron.hourly/librenms-smokeping
+sudo chmod +x /etc/cron.hourly/librenms-smokeping
+```
+
+Finally, update the default configuration. Strip *everything* from the
+`*** Probes ***` and `*** Targets ***` stanza's, and replace with:
+
+```
+*** Probes ***
+
+@include /etc/smokeping/librenms-probes.conf
+```
+
+```
+*** Targets ***
+
+probe = FPing
+
+menu = Top
+title = Network Latency Grapher
+remark = Welcome to the SmokePing website of <b>Insert Company Name Here</b>. \
+         Here you will learn all about the latency of our network.
+
+@include /etc/smokeping/librenms-targets.conf
+```
+
+Note there may be other stanza's (possibly `*** Slaves ***`) between the
+`*** Probes ***` and `*** Targets ***` stanza's - leave these intact.
+
+Leave everything else untouched. If you need to add other confiruation, make
+sure it comes *after* the LibreNMS configuration, and keep in mind that
+Smokeping does not allow duplicate modules, and cares about the configuration
+file sequence.
+
+Once you're happy, manually kick off the cron once, then enable and start
+smokeping:
+
+```bash
+sudo /etc/cron.hourly/librenms-smokeping
+sudo systemctl enable --now smokeping
+```
+
+### Install and integrate Smokeping Backend - Ubuntu, Debian and alike
+
+Smokeping is available via the default repositories.
+
+```bash
+sudo apt-get install smokeping
+```
+
+Once installed, you should need a cron script installed to make sure that the
+configuration file is updated. You can find an example in `misc/librenms-smokeping-debian.example`.
+Put this into /etc/cron.d/hourly, and mark it executable:
+
+```
+sudo cp /opt/librenms/misc/smokeping-debian.example /etc/cron.hourly/librenms-smokeping
+sudo chmod +x /etc/cron.hourly/librenms-smokeping
+```
+
+Finally, update the default configuration. Strip *everything* from
+`/etc/smokeping/config.d/Probes` and replace with:
+
+```
+*** Probes ***
+
+@include /etc/smokeping/config.d/librenms-probes.conf
+```
+
+Strip *everything* from `/etc/smokeping/config.d/Targets` and replace with:
+
+```
+*** Targets ***
+
+probe = FPing
+
+menu = Top
+title = Network Latency Grapher
+remark = Welcome to the SmokePing website of <b>Insert Company Name Here</b>. \
+         Here you will learn all about the latency of our network.
+
+@include /etc/smokeping/config.d/librenms-targets.conf
+```
+
+Leave everything else untouched. If you need to add other confiruation, make
+sure it comes *after* the LibreNMS configuration, and keep in mind that
+Smokeping does not allow duplicate modules, and cares about the configuration
+file sequence.
+
+## Configure LibreNMS - All Operating Systems
+
+Edit `/opt/librenms/config.php` and add the following:
+
+```php
+$config['smokeping']['dir'] = '/var/lib/smokeping';
+$config['smokeping']['pings'] = 20;
+$config['smokeping']['probes'] = 2;
+$config['smokeping']['integration'] = true;
+$config['smokeping']['url'] = 'smokeping/';  // If you have a specific URL or path for smokeping
+```
+`dir` should match the location that smokeping writes RRD's to
+`pings` should match the default smokeping value, default 20
+`probes` should be the number of processes to spread pings over, default 2
+
+These settings can also be set in the Web UI.
+
+## Configure Smokeping's Web UI - Optional
+
+This section covers the required configuration for your web server of
+choice. This covers the required configuration for either Apache or Nginx.
+
+LibreNMS does not need the Web UI - you can find the graphs in LibreNMS on the
+*latency* tab.
+
+### Apache Configuration - Ubuntu, Debian and alike
 
 Edit the `General` configuration file's **Owner** and **contact**, and
 **cgiurl hostname** details:
@@ -43,79 +162,7 @@ contact  = admin@ACME.xxx
 cgiurl   = http://yourlibrenms/cgi-bin/smokeping.cgi
 ```
 
-### Configure Smokeping to use LibreNMS list of nodes
-
-Add the following line to `/etc/smokeping/config` config file:
-
-```bash
-@include /etc/smokeping/config.d/librenms.conf
-```
-
-We will generate the conf file in the next step.
-
-### Generate LibreNMS list of Smokeping Nodes
-
-LibreNMS comes equipped with a script which exports our list of nodes
-from LibreNMS into a configuration file in the format required by
-Smokeping.
-
-To generate the config file once:
-
-```bash
-(echo "+ LibreNMS"; php -f /opt/librenms/scripts/gen_smokeping.php) | sudo tee /etc/smokeping/config.d/librenms.conf
-```
-
-**However**, it is more desirable to set up a cron job which
-regenerates our list of nodes and adds these into Smokeping. You can
-add the following to the end of your librenms cron job, e.g. `nano /etc/cron.d/librenms`
-
-**Ubuntu 16.04** Sample cron (will run daily at 00:05) :
-
-```bash
-05  00    * * *   root (echo "+ LibreNMS"; php -f /opt/librenms/scripts/gen_smokeping.php) > /etc/smokeping/config.d/librenms.conf && systemctl reload smokeping.service >> /dev/null 2>&1
-```
-
-**Ubuntu 14.04** Sample cron (will run daily at 00:05):
-
-```bash
-05  00    * * * root (echo "+ LibreNMS"; php -f /opt/librenms/scripts/gen_smokeping.php) > /opt/smokeping/etc/librenms.conf && /opt/smokeping/bin/smokeping --reload >> /dev/null 2>&1
-```
-
-**Why echo "+ LibreNMS" ?**
-
-This is in the cron job because the `gen_smokeping.php` script contains
-
-```
-menu = Top
-title = Network Latency Grapher
-```
-
-Which can cause Smokeping to not start. `echo "+ LibreNMS"` prepends
-this in our smokeping config file. We could remove the above from the
-gen_smokeping script, however this may cause issues with LibreNMS
-failing to update with `daily.sh` due config files being modified.
-
-## Configure LibreNMS
-
-Edit `/opt/librenms/config.php` and add the following:
-
-**Note:** Make sure you point dir to the correct Smokeping data directory:
-
-```php
-$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 and newer Location
-#$config['smokeping']['dir'] = '/opt/smokeping/data';
-$config['smokeping']['pings'] = 20;    // should be equal to "pings" in your smokeping config
-$config['smokeping']['integration'] = true;
-```
-
-## Configure web server
-
-This section covers the required configuration for your web server of
-choice. This covers the required configuration for either Apache or Nginx.
-
-### Apache Configuration
-
-Smokeping should automatically install an Apache config file in
+Smokeping should automatically install an Apache configuration file in
 `/etc/apache2/conf-available/`. Verify this using :
 
 ```bash
@@ -123,7 +170,8 @@ librenms@librenms:~/scripts$ ls /etc/apache2/conf-available/ | grep smokeping
 smokeping.conf
 ```
 
-If you don't see `smokeping.conf` listed, you'll need to create a symlink for it:
+If you don't see `smokeping.conf` listed, you'll need to create a symlink for
+it:
 
 ```bash
 ln -s /etc/smokeping/apache2.conf /etc/apache2/conf-available/smokeping.conf
@@ -133,7 +181,7 @@ After creating the symlink, restart Apache with `sudo systemctl apache2 restart`
 
 You should be able to load the Smokeping web interface at `http://yourhost/cgi-bin/smokeping.cgi`
 
-### Nginx Configuration
+### Nginx Configuration - Ubuntu, Debian and alike
 
 This section assumes you have configured LibreNMS with Nginx as
 specified in [Configure Nginx](https://docs.librenms.org/Installation/Installation-Ubuntu-1804-Nginx/).
@@ -176,8 +224,8 @@ The following will configure Nginx to respond to `http://yourlibrenms/smokeping`
         }
 ```
 
-After saving the config file, verify your Nginx config file syntax is
-OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl restart nginx`
+After saving the configuration file, verify your Nginx configuration file syntax
+is OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl restart nginx`
 
 You should be able to load the Smokeping web interface at `http://yourhost/smokeping`
 
@@ -215,128 +263,68 @@ Then you just need to add to your config `auth_basic` parameters
         }
 ```
 
-### Start SmokePing
+## Common Problems
 
-Use the below commands to start and verify smokeping is running.
+### RRDs::update ERROR: opening ... Permission denied
+There is a problem writing to the RRD directory. This is somewhat out of scope
+of LibreNMS, but make sure that file permissions and SELinux labels allow the
+smokeping user to write to the directory.
 
-**Ubuntu 14.04:**  `sudo service smokeping start`
+If you're using RRDCacheD, make sure that the permissions are correct there too,
+and that if you're using -B that the smokeping RRD's are inside the base
+directory; update the smokeping rrd directory if required.
 
-Verify: `sudo service smokeping status`
+It's not recommended to run RRDCachedD without the -B switch.
 
-**Ubuntu 16.04 and newer:**  `sudo systemctl start smokeping`
+#### Share RRDCached with LibreNMS
 
-Verify: `sudo systemctl status smokeping`
-
-## Verify in LibreNMS
-
-Within LibreNMS, you should now have a new device sub-tab called Ping
-
---------------
-# Pre-Existing Smokeping Installation
-
-The following section covers the requirements for an existing
-SmokePing installation. The primary difference is this section does
-not cover using the LibreNMS Smokeping config script, and assumes an
-existing Smokeping server is set up and working correctly.
-
-In terms of configuration, simply add the location of where smokeping
-data such as RRD files are stored. If this is on a separate server,
-ensure there is a mount point reachable, along with the server's hostname.
-
-**Note:** The location should be the RRD root folder, NOT the
-sub-directory such as network.
-
-```php
-$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 and newer Location
-#$config['smokeping']['dir'] = '/opt/smokeping/data';
-$config['smokeping']['pings'] = 20;    // should be equal to "pings" in your smokeping config
-$config['smokeping']['integration'] = true;
-```
-
-You should now see a new tab in your device page called ping.
-
-# Issues
-
-## `ERROR: /etc/smokeping/config.d/pathnames, line 1: File '/usr/sbin/sendmail' does not exist`
-
-If you got this error at the end of the installation, simply edit
-smokeping's config file like so:
-
-```diff
-nano /etc/smokeping/config.d/pathnames
-
--sendmail = /usr/sbin/sendmail
-+#sendmail = /usr/sbin/sendmail
-```
-
-## Smokeping and RRDCached
-
-If you are using the standard smokeping data dir
-(`/etc/smokeping/data`) then you may need to alter the rrdcached
-config slightly.
-
-In the standard configuration the -B argument may have been used to
-restrict rrdcached to read only from a single base dir.
-
-If this is true, when you try an open one of the smokeping graphs from
-within LibreNMS you will see something like this error at the end of
-the rrdcached command:
-
-```bash
-ERROR: rrdcached: /var/lib/smokeping/<device name>.rrd: Permission denied
-```
-
-You will need to either change the dir in which smokeping saves its
-rrd files to be the same as the main librenms dir or you can remove
-the -B argument from the rrdcached config to allow it to read from
-more than one dir.
-
-### To remove the -B switch:
-
-```bash
-sudo nano /etc/default/rrdcached
-```
-
-then find:
-
-```bash
-BASE_OPTIONS=
-```
-
-If -B is in the list of arguments delete it.
-
-### To store smokeping rrd in librenms rrd folder
-
+Move the RRD's and give smokeping access rights to the LibreNMS RRD directory:
 ```bash
 sudo systemctl stop smokeping
-sudo mv /var/lib/smokeping/ /opt/librenms/rrd/
-sudo nano /etc/smokeping/config.d/pathnames
-```
-Then update the config file:
-
-```bash
-datadir = /opt/librenms/rrd/smokeping
-dyndir = /opt/librenms/rrd/smokeping/__cgi
-```
-And give to smokeping rights to access files
-
-```bash
+sudo mv /var/lib/smokeping /opt/librenms/rrd/
 sudo usermod -a -G librenms smokeping
 ```
 
-Restart smokeping service
+Update data directory in */etc/smokeping*:
+
+```
+datadir = /opt/librenms/rrd/smokeping
+dyndir = /opt/librenms/rrd/smokeping/__cgi
+```
+
+Finally restart the smokeping service:
 
 ```bash
 sudo systemctl start smokeping
 ```
 
-Finally update smokeping rrd path in librenms
+Remember to update *config.php* with the new locations.
 
-```bash
-nano /opt/librenms/config.php
-```
+### Probe FPing missing missing from the probes section
 
-```php
-$config['smokeping']['dir'] = '/opt/librenms/rrd/smokeping';
-#$config['smokeping']['dir'] = '/var/lib/smokeping';
+Take a look at the instructions again - something isn't correct in your
+configuration.
+
+### Section or variable already exists
+
+Most likely, content wasn't fully removed from the `*** Probes ***`
+`*** Targets***` stanza's as instructed.
+If you're trying to integrate LibreNMS, smokeping *and* another source of
+configuration, you're probably trying to redefine a module (e.g. '+ FPing' more
+than once) or stanza. Otherwise, look again at the instructions.
+
+### Mandatory variable 'probe' not defined
+The target block must have a default probe. If you follow the instructions you
+will have one. If you're trying to integrate LibreNMS, smokeping *and* another
+source of configuration, you need to make sure there are no duplicate or missing
+definitions.
+
+### File '/usr/sbin/sendmail' does not exist`
+
+If you got this error at the end of the installation, simply edit
+commend out the sendmail entry in the configuration:
+
+```diff
+-sendmail = /usr/sbin/sendmail
++#sendmail = /usr/sbin/sendmail
 ```

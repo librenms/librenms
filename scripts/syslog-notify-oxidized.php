@@ -4,8 +4,6 @@
 $init_modules = [];
 require __DIR__ . '/../includes/init.php';
 
-use LibreNMS\Config;
-
 $hostname = $argv[1];
 $os = $argv[2];
 $msg = $argv[3];

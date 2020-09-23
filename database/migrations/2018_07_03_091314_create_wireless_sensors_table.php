@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateWirelessSensorsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -16,10 +15,10 @@ class CreateWirelessSensorsTable extends Migration
         Schema::create('wireless_sensors', function (Blueprint $table) {
             $table->increments('sensor_id');
             $table->boolean('sensor_deleted')->default(0);
-            $table->string('sensor_class', 64)->index('sensor_class');
-            $table->unsignedInteger('device_id')->default(0)->index('sensor_host');
+            $table->string('sensor_class', 64)->index();
+            $table->unsignedInteger('device_id')->default(0)->index();
             $table->string('sensor_index', 64)->nullable();
-            $table->string('sensor_type')->index('sensor_type');
+            $table->string('sensor_type')->index();
             $table->string('sensor_descr')->nullable();
             $table->integer('sensor_divisor')->default(1);
             $table->integer('sensor_multiplier')->default(1);
@@ -34,7 +33,7 @@ class CreateWirelessSensorsTable extends Migration
             $table->enum('sensor_custom', ['No', 'Yes'])->default('No');
             $table->string('entPhysicalIndex', 16)->nullable();
             $table->string('entPhysicalIndex_measured', 16)->nullable();
-            $table->timestamp('lastupdate')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('lastupdate')->useCurrent();
             $table->text('sensor_oids');
             $table->unsignedInteger('access_point_id')->nullable();
         });

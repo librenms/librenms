@@ -12,14 +12,12 @@
  * the source code distribution for details.
 */
 
-
 /*
 / ADTRAN-AOSCPU::adGenAOSMemPool.0 = Gauge32: 67108863
 / ADTRAN-AOSCPU::adGenAOSHeapSize.0 = Gauge32: 39853040
 / ADTRAN-AOSCPU::adGenAOSHeapFree.0 = Gauge32: 25979888
 */
 
-
-$mempool['used']  = snmp_get($device, 'adGenAOSHeapSize.0', '-OvQ', 'ADTRAN-AOSCPU');
+$mempool['used'] = snmp_get($device, 'adGenAOSHeapSize.0', '-OvQ', 'ADTRAN-AOSCPU');
 $mempool['total'] = snmp_get($device, 'adGenAOSMemPool.0', '-OvQ', 'ADTRAN-AOSCPU');
-$mempool['free']  = ($mempool['total'] - $mempool['used']);
+$mempool['free'] = ($mempool['total'] - $mempool['used']);

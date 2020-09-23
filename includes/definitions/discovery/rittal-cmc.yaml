@@ -1,5 +1,7 @@
 mib: RITTAL-CMC-TC-MIB
 modules:
+    os:
+        sysDescr_regex: '/SN (?<serial>\S+) HW V(?<hardware>\S+) - SW V(?<version>\S+)/'
     sensors:
         temperature:
             data:
@@ -12,9 +14,9 @@ modules:
                     group: 'Water'
                     skip_values:
                         -
-                          oid: unit1SensorType
-                          op: 'not_in_array'
-                          value: [58,59,64,66,100,101]
+                            oid: unit1SensorType
+                            op: 'not_in_array'
+                            value: [58,59,64,66,100,101]
                 -
                     oid: cmcTcUnit1SensorTable
                     value: unit1SensorValue
@@ -24,9 +26,9 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit1SensorType
-                          op: 'not_in_array'
-                          value: [48,49,50,51,52,53,54,55,56,57]
+                            oid: unit1SensorType
+                            op: 'not_in_array'
+                            value: [48,49,50,51,52,53,54,55,56,57]
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -36,9 +38,9 @@ modules:
                     group: 'Water'
                     skip_values:
                         -
-                          oid: unit2SensorType
-                          op: 'not_in_array'
-                          value: [58,59,64,66,100,101]
+                            oid: unit2SensorType
+                            op: 'not_in_array'
+                            value: [58,59,64,66,100,101]
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -48,9 +50,9 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit2SensorType
-                          op: 'not_in_array'
-                          value: [48,49,50,51,52,53,54,55,56,57]
+                            oid: unit2SensorType
+                            op: 'not_in_array'
+                            value: [48,49,50,51,52,53,54,55,56,57]
                 -
                     oid: cmcTcUnit3SensorTable
                     value: unit3SensorValue
@@ -60,9 +62,9 @@ modules:
                     group: 'Water'
                     skip_values:
                         -
-                          oid: unit3SensorType
-                          op: 'not_in_array'
-                          value: [58,59,64,66,100,101]
+                            oid: unit3SensorType
+                            op: 'not_in_array'
+                            value: [58,59,64,66,100,101]
                 -
                     oid: cmcTcUnit3SensorTable
                     value: unit3SensorValue
@@ -72,9 +74,9 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit3SensorType
-                          op: 'not_in_array'
-                          value: [48,49,50,51,52,53,54,55,56,57]
+                            oid: unit3SensorType
+                            op: 'not_in_array'
+                            value: [48,49,50,51,52,53,54,55,56,57]
                 -
                     oid: cmcTcUnit4SensorTable
                     value: unit4SensorValue
@@ -84,9 +86,9 @@ modules:
                     group: 'Water'
                     skip_values:
                         -
-                          oid: unit4SensorType
-                          op: 'not_in_array'
-                          value: [58,59,64,66,100,101]
+                            oid: unit4SensorType
+                            op: 'not_in_array'
+                            value: [58,59,64,66,100,101]
                 -
                     oid: cmcTcUnit4SensorTable
                     value: unit4SensorValue
@@ -96,9 +98,9 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit4SensorType
-                          op: 'not_in_array'
-                          value: [48,49,50,51,52,53,54,55,56,57]
+                            oid: unit4SensorType
+                            op: 'not_in_array'
+                            value: [48,49,50,51,52,53,54,55,56,57]
         fanspeed:
             data:
                 -
@@ -110,9 +112,9 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit1SensorType
-                          op: 'not_in_array'
-                          value: [40,41,42,43,44,45,46,47]
+                            oid: unit1SensorType
+                            op: 'not_in_array'
+                            value: [40,41,42,43,44,45,46,47]
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -122,9 +124,9 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit2SensorType
-                          op: 'not_in_array'
-                          value: [40,41,42,43,44,45,46,47]
+                            oid: unit2SensorType
+                            op: 'not_in_array'
+                            value: [40,41,42,43,44,45,46,47]
                 -
                     oid: cmcTcUnit3SensorTable
                     value: unit3SensorValue
@@ -134,9 +136,9 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit3SensorType
-                          op: 'not_in_array'
-                          value: [40,41,42,43,44,45,46,47]
+                            oid: unit3SensorType
+                            op: 'not_in_array'
+                            value: [40,41,42,43,44,45,46,47]
                 -
                     oid: cmcTcUnit4SensorTable
                     value: unit4SensorValue
@@ -146,9 +148,9 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit2SensorType
-                          op: 'not_in_array'
-                          value: [40,41,42,43,44,45,46,47]
+                            oid: unit2SensorType
+                            op: 'not_in_array'
+                            value: [40,41,42,43,44,45,46,47]
                 -
                     oid: cmcTcUnit1SensorTable
                     value: unit1SensorValue
@@ -158,9 +160,9 @@ modules:
                     group: 'Water'
                     skip_values:
                         -
-                          oid: unit1SensorType
-                          op: '!='
-                          value: 61
+                            oid: unit1SensorType
+                            op: '!='
+                            value: 61
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -170,9 +172,9 @@ modules:
                     group: 'Water'
                     skip_values:
                         -
-                          oid: unit2SensorType
-                          op: '!='
-                          value: 61
+                            oid: unit2SensorType
+                            op: '!='
+                            value: 61
                 -
                     oid: cmcTcUnit3SensorTable
                     value: unit3SensorValue
@@ -182,9 +184,9 @@ modules:
                     group: 'Water'
                     skip_values:
                         -
-                          oid: unit3SensorType
-                          op: '!='
-                          value: 61
+                            oid: unit3SensorType
+                            op: '!='
+                            value: 61
                 -
                     oid: cmcTcUnit4SensorTable
                     value: unit4SensorValue
@@ -194,9 +196,9 @@ modules:
                     group: 'Water'
                     skip_values:
                         -
-                          oid: unit4SensorType
-                          op: '!='
-                          value: 61
+                            oid: unit4SensorType
+                            op: '!='
+                            value: 61
         cooling:
             data:
                 -
@@ -207,9 +209,9 @@ modules:
                     index: 'unit1SensorIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: unit1SensorType
-                          op: '!='
-                          value: 27
+                            oid: unit1SensorType
+                            op: '!='
+                            value: 27
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -218,9 +220,9 @@ modules:
                     index: 'unit2SensorIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: unit2SensorType
-                          op: '!='
-                          value: 27
+                            oid: unit2SensorType
+                            op: '!='
+                            value: 27
                 -
                     oid: cmcTcUnit3SensorTable
                     value: unit3SensorValue
@@ -229,9 +231,9 @@ modules:
                     index: 'unit3SensorIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: unit3SensorType
-                          op: '!='
-                          value: 27
+                            oid: unit3SensorType
+                            op: '!='
+                            value: 27
                 -
                     oid: cmcTcUnit4SensorTable
                     value: unit4SensorValue
@@ -240,9 +242,9 @@ modules:
                     index: 'unit4SensorIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: unit4SensorType
-                          op: '!='
-                          value: 27
+                            oid: unit4SensorType
+                            op: '!='
+                            value: 27
         waterflow:
             data:
                 -
@@ -253,9 +255,9 @@ modules:
                     index: 'unit1SensorIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: unit1uensorType
-                          op: '!='
-                          value: 60
+                            oid: unit1uensorType
+                            op: '!='
+                            value: 60
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -264,9 +266,9 @@ modules:
                     index: 'unit2SensorIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: unit2SensorType
-                          op: '!='
-                          value: 60
+                            oid: unit2SensorType
+                            op: '!='
+                            value: 60
                 -
                     oid: cmcTcUnit3SensorTable
                     value: unit3SensorValue
@@ -275,9 +277,9 @@ modules:
                     index: 'unit3SensorIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: unit3SensorType
-                          op: '!='
-                          value: 60
+                            oid: unit3SensorType
+                            op: '!='
+                            value: 60
                 -
                     oid: cmcTcUnit4SensorTable
                     value: unit4SensorValue
@@ -286,9 +288,9 @@ modules:
                     index: 'unit4SensorIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: unit4SensorType
-                          op: '!='
-                          value: 60
+                            oid: unit4SensorType
+                            op: '!='
+                            value: 60
         state:
             data:
                 -

@@ -3,5 +3,6 @@ type: server
 text: 'Novell Netware'
 icon: novell
 discovery:
-    - sysDescr:
-        - 'Novell NetWare'
+    -
+        sysDescr:
+            - 'Novell NetWare'

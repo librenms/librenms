@@ -1,0 +1,14 @@
+mib: FORTINET-FORTISANDBOX-MIB
+modules:
+    os:
+        version: FORTINET-FORTISANDBOX-MIB::fsaSysVersion.0
+        hardware: ENTITY-MIB::entPhysicalModelName.1
+        serial:
+            - FORTINET-CORE-MIB::fnSysSerial.0
+            - ENTITY-MIB::entPhysicalSerialNum.1
+    processors:
+        data:
+            -
+                oid: fsaSysCpuUsage
+                num_oid: '.1.3.6.1.4.1.12356.118.3.1.2.{{ $index }}'
+                type: fortisandbox

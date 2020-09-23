@@ -1,7 +1,9 @@
 mib: COLUBRIS-USAGE-INFORMATION-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>MSM\S+) .* Serial number (?<serial>\S+) - Firmware version (?<version>\S+)/'
     processors:
-          data:
-              -
-                  oid: coUsInfoCpuUseNow
-                  num_oid: '.1.3.6.1.4.1.8744.5.21.1.1.5.{{ $index }}'
+        data:
+            -
+                oid: coUsInfoCpuUseNow
+                num_oid: '.1.3.6.1.4.1.8744.5.21.1.1.5.{{ $index }}'

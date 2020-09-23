@@ -1,0 +1,194 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-SW-XGRADE-MIB.my
+ --
+ 
+ CIENA-CES-SW-XGRADE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS       
+   NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY
+	FROM SNMPv2-SMI
+   TruthValue
+	FROM SNMPv2-TC
+   cienaGlobalSeverity, cienaGlobalMacAddress
+	FROM CIENA-GLOBAL-MIB    
+   cienaCesNotifications, cienaCesConfig
+	FROM CIENA-SMI;
+   
+   
+ cienaCesSwXgradeMIB MODULE-IDENTITY
+ 	      LAST-UPDATED "201706070000Z"
+ 	      ORGANIZATION "Ciena Corp."
+ 	      CONTACT-INFO
+ 	      "   Mib Meister
+ 	          7035 Ridge Road
+ 	          Hanover, Maryland 21076
+ 	          USA
+ 	          Phone:  +1 800 921 1144
+ 	          Email:  support@ciena.com"
+ 	      DESCRIPTION
+		       "This module defines the software xgrade related notifications."
+	      REVISION "201706070000Z"
+	      DESCRIPTION
+                      "Updated contact info."
+	      REVISION "201207240000Z"
+	      DESCRIPTION
+                      "Added a new enumeration value to OID cienaCesSwXgradeOp."
+	      REVISION "201005100000Z"
+	      DESCRIPTION
+		       "Initial creation. This module defines the software xgrade related notifications."
+              ::= { cienaCesConfig 13 }
+                  
+ --
+ -- Node definitions
+ --
+   
+ cienaCesSwXgradeMIBObjects OBJECT IDENTIFIER ::= { cienaCesSwXgradeMIB 1 }
+ 
+ --
+ -- Software Xgrade
+ --
+ cienaCesSwXgrade           OBJECT IDENTIFIER ::= { cienaCesSwXgradeMIBObjects 1 }
+ 
+ 
+ -- Notifications 
+  
+ cienaCesSwXgradeMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 13 } 
+ cienaCesSwXgradeMIBNotifications       OBJECT IDENTIFIER ::=  { cienaCesSwXgradeMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ cienaCesSwXgradeMIBConformance OBJECT IDENTIFIER ::= { cienaCesSwXgradeMIB 3 } 
+ cienaCesSwXgradeMIBCompliances OBJECT IDENTIFIER ::= { cienaCesSwXgradeMIBConformance 1 }     
+ cienaCesSwXgradeMIBGroups      OBJECT IDENTIFIER ::= { cienaCesSwXgradeMIBConformance 2 }
+
+ 
+ cienaCesSwXgradeGracefulUpgrade OBJECT-TYPE
+  	SYNTAX 			TruthValue
+  	MAX-ACCESS 		accessible-for-notify
+  	STATUS 			current
+  	DESCRIPTION 
+  		"This object specifies whether a graceful upgrade
+  		was issued. Returns True(1) if a graceful upgrade was issued. False(2) otherwise." 
+  	::= { cienaCesSwXgrade 1}
+
+ cienaCesSwXgradeOp   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        none(0),
+                        download(1),
+                        install(2),
+                        activate(3),
+                        protect(4),
+                        validate(5),
+                        revert(6),  
+                       	configure(7),
+                        run(8),
+			remove(9)
+                     }                  
+     MAX-ACCESS      accessible-for-notify               
+     STATUS          current
+     DESCRIPTION
+         "The possible operations for upgrading the software, including:
+               
+         none:  No upgrade operation is selected.
+
+         download: This operation is to initiate the file transfer of the software package 
+         from the TFTP server specified by cienaCesSwXgradePackagePath to 
+         cienaCesSwXgradeDestPath. The default TFTP server is used for file transfer 
+         if the cienaCesSwXgradeTftpServer is set to an empty string.
+                     
+         install: This operation is to install the software to the standby CTM (if present)
+         and all line modules. The image files are either stored in the TFTP server 
+         specified by cienaCesSwXgradePackagePath and cienaCesSwXgradeTftpServer or in 
+         the compact flash of the active CTM.
+                            
+         activate: This operation is to activate any new software installed on all the modules. 
+         The system automatically reverts to the previous software package if a protect operation 
+         is not set within a time period specified by cienaCesSwXgradeRevertTimeout. If no time 
+         period is specified (cienaCesSwXgradeRevertTimeout value 0), then the system does not 
+         revert automatically and remains in the unprotected state indefinitely. 
+         WARNING: Activating software requires a system restart.
+                                           
+         protect: This operation protects a new software package. If the protect operation 
+         is not entered before the protect timeout is reached (specified by 
+         cienaCesSwXgradeReverTimeout), the system automatically reverts to the previous
+         software package.  
+
+         revert: This operation reverts to the previous software package.
+
+         validate: This operation validates the software package at the location specified by 
+         the cienaCesSwXgradePackagePath. Setting the cienaCesSwXgradePackagePath to an empty 
+         string validates the installed software.
+
+         run: This operation refers to the downloading, parsing, and executing of a specified 
+         command file as initiated through CLI, DHCP, or the file transfer MIB module. This is 
+         used in appropriate notifications to report the completion of such event. An error is 
+         returned when this object is attempted to be set to this value using an SNMP set-request.
+
+	 remove: This operation is to remove an installed software package from the CTMs and 
+	 all line modules." 
+       ::= { cienaCesSwXgrade 2 }   
+ 
+ cienaCesSwXgradeStatus  OBJECT-TYPE
+     SYNTAX          INTEGER  {
+         success(1),                   -- sucessfully completed
+         failed(2),                    -- Generic Error
+         unknown(3),                   -- no status available
+         processing(4),                -- in progress
+         invalidCfgRule(5),            -- Invalid config applyRule in cmd file
+         invalidFileName(6),           -- Invalid File Name
+         fileSystemError(7),           -- 
+         cannotResolveHostName(8),     -- Cannot resolve hostname
+         tftpClientTimeout(9),         -- TFTP client timeout waiting for server
+         tftpServerError(10),          -- TFTP server reported error
+         tftpBadTag(11),               -- TFTP bad tag from server
+         tftpBadValue(12),             -- TFTP bad value from server
+         networkError(13),             -- 
+         platformTypeNotSupported(14), -- Software package does not support this platform type
+         swMgrBusy(15),                -- SW manager subsystem is busy. Wait and try again
+         needBackupSw(16),             -- Requires backup sw installed
+         internalError(17),            -- system internal error
+         fileNotExist(18),             -- Package path does not exist in local file system
+         missingAttribute(19),         -- Missing attribute(2) for the operation
+         invalidXgradeOp(20),          -- Ivalid XgradeOp code
+         noDefaultTftpConfigured(21),  -- Requires default TFTP server name/address
+         completedWithFailures (22)    -- Upgrade completed but failures were detected
+         }
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "Display the result of the last cienaCesSwXgradeOp. "
+       ::= { cienaCesSwXgrade 3 } 
+   
+  
+ --
+ -- Notifications
+ --
+ cienaCesSwXgradeCompletion NOTIFICATION-TYPE
+     OBJECTS      { 
+				     cienaGlobalSeverity,
+    	    		 cienaGlobalMacAddress,
+                     cienaCesSwXgradeOp,
+                     cienaCesSwXgradeStatus,
+                     cienaCesSwXgradeGracefulUpgrade
+                     
+                  }
+     STATUS    current
+     DESCRIPTION
+        "A cienaCesSwXgradeCompletion notification is sent at the 
+         completion of a cienaCesSwXgradeOp (download/install/activate/
+         ... etc). To enable the device to send this trap, 
+         cienaCesSwXgradeCompletionTrapState must be set to enabled. The
+         cienaCesSwXgradeCompletionTrapState is enabled by default. Variable 
+         bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+         cienaCesSwXgradeOp, cienaCesSwXgradeStatus, and 
+         cienaCesSwXgradeGracefulUpgrade."
+   ::= { cienaCesSwXgradeMIBNotifications 1 }
+
+ END
+ 
+ -- 
+ -- CIENA-CES-SW-XGRADE-MIB
+ --
+ 
+ 

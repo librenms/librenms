@@ -26,5 +26,6 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.9.1.2238
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.1.2238

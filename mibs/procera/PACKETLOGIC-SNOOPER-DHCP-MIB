@@ -9,29 +9,29 @@ IMPORTS
 	CounterBasedGauge64 FROM HCNUM-TC;
 
 dhcp MODULE-IDENTITY
-	LAST-UPDATED "201212131322Z"
+	LAST-UPDATED "201909121500Z"
 	ORGANIZATION "Procera Networks, Inc."
 	CONTACT-INFO "support@proceranetworks.com"
 	DESCRIPTION "MIB for dhcp snoopers"
-	REVISION "201212131322Z"
+	REVISION "201909121500Z"
 	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
 
 	::={snoopers 1}
 
 DhcpEntry ::= SEQUENCE {
-	dhcpRequestsInQueue SIZE,
-	dhcpDynAddFailures MOMENT,
-	dhcpPLDBReconnects SIZE,
-	dhcpPLDBUptime TIMESPAN,
-	dhcpPLDBCommits MOMENT,
-	dhcpPLDReconnects SIZE,
-	dhcpPLDUptime TIMESPAN,
-	dhcpPLDOperations MOMENT,
-	dhcpPackets MOMENT,
-	dhcpUnparsablePackets MOMENT,
-	dhcpPacketsReq MOMENT,
-	dhcpPacketsAck MOMENT,
-	dhcpPacketsIgnored MOMENT,
+	dhcpRequestsInQueue CounterBasedGauge64,
+	dhcpDynAddFailures Counter64,
+	dhcpPLDBReconnects CounterBasedGauge64,
+	dhcpPLDBUptime TimeTicks,
+	dhcpPLDBCommits Counter64,
+	dhcpPLDReconnects CounterBasedGauge64,
+	dhcpPLDUptime TimeTicks,
+	dhcpPLDOperations Counter64,
+	dhcpPackets Counter64,
+	dhcpUnparsablePackets Counter64,
+	dhcpPacketsReq Counter64,
+	dhcpPacketsAck Counter64,
+	dhcpPacketsIgnored Counter64,
 	dhcpEntryIndex Integer32
 }
 
@@ -75,6 +75,55 @@ dhcpRequestsInQueueMax	OBJECT-TYPE
 
 	::={dhcpRequestsInQueue 3}
 
+dhcpRequestsInQueueLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpRequestsInQueueLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpRequestsInQueue"
+	::={dhcpRequestsInQueue 4}
+
+dhcpRequestsInQueueLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpRequestsInQueueLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpRequestsInQueue"
+	INDEX { dhcpRequestsInQueueLevelName }
+	::={dhcpRequestsInQueueLevelTable 1}
+
+DhcpRequestsInQueueLevelEntry ::=
+	SEQUENCE {
+		dhcpRequestsInQueueLevelName	DisplayString,
+		dhcpRequestsInQueueLevelVal	CounterBasedGauge64,
+		dhcpRequestsInQueueLevelMax	CounterBasedGauge64
+	}
+
+dhcpRequestsInQueueLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpRequestsInQueue"
+	::={dhcpRequestsInQueueLevelEntry 1}
+
+dhcpRequestsInQueueLevelVal OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpRequestsInQueue"
+	::={dhcpRequestsInQueueLevelEntry 2}
+
+dhcpRequestsInQueueLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpRequestsInQueue"
+	::={dhcpRequestsInQueueLevelEntry 4}
+
+
 dhcpDynAddFailures	OBJECT IDENTIFIER ::={dhcpEntry 2}
 
 dhcpDynAddFailuresVal	OBJECT-TYPE
@@ -101,6 +150,64 @@ dhcpDynAddFailuresMax	OBJECT-TYPE
 
 	::={dhcpDynAddFailures 3}
 
+dhcpDynAddFailuresLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpDynAddFailuresLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpDynAddFailures"
+	::={dhcpDynAddFailures 4}
+
+dhcpDynAddFailuresLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpDynAddFailuresLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpDynAddFailures"
+	INDEX { dhcpDynAddFailuresLevelName }
+	::={dhcpDynAddFailuresLevelTable 1}
+
+DhcpDynAddFailuresLevelEntry ::=
+	SEQUENCE {
+		dhcpDynAddFailuresLevelName	DisplayString,
+		dhcpDynAddFailuresLevelVal	Counter64,
+		dhcpDynAddFailuresLevelMom	CounterBasedGauge64,
+		dhcpDynAddFailuresLevelMax	CounterBasedGauge64
+	}
+
+dhcpDynAddFailuresLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpDynAddFailures"
+	::={dhcpDynAddFailuresLevelEntry 1}
+
+dhcpDynAddFailuresLevelVal OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpDynAddFailures"
+	::={dhcpDynAddFailuresLevelEntry 2}
+
+dhcpDynAddFailuresLevelMom OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpDynAddFailures"
+	::={dhcpDynAddFailuresLevelEntry 3}
+
+dhcpDynAddFailuresLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpDynAddFailures"
+	::={dhcpDynAddFailuresLevelEntry 4}
+
+
 dhcpPLDBReconnects	OBJECT IDENTIFIER ::={dhcpEntry 3}
 
 dhcpPLDBReconnectsVal	OBJECT-TYPE
@@ -119,6 +226,55 @@ dhcpPLDBReconnectsMax	OBJECT-TYPE
 
 	::={dhcpPLDBReconnects 3}
 
+dhcpPLDBReconnectsLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPLDBReconnectsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPLDBReconnects"
+	::={dhcpPLDBReconnects 4}
+
+dhcpPLDBReconnectsLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPLDBReconnectsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPLDBReconnects"
+	INDEX { dhcpPLDBReconnectsLevelName }
+	::={dhcpPLDBReconnectsLevelTable 1}
+
+DhcpPLDBReconnectsLevelEntry ::=
+	SEQUENCE {
+		dhcpPLDBReconnectsLevelName	DisplayString,
+		dhcpPLDBReconnectsLevelVal	CounterBasedGauge64,
+		dhcpPLDBReconnectsLevelMax	CounterBasedGauge64
+	}
+
+dhcpPLDBReconnectsLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPLDBReconnects"
+	::={dhcpPLDBReconnectsLevelEntry 1}
+
+dhcpPLDBReconnectsLevelVal OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDBReconnects"
+	::={dhcpPLDBReconnectsLevelEntry 2}
+
+dhcpPLDBReconnectsLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDBReconnects"
+	::={dhcpPLDBReconnectsLevelEntry 4}
+
+
 dhcpPLDBUptime	OBJECT IDENTIFIER ::={dhcpEntry 4}
 
 dhcpPLDBUptimeVal	OBJECT-TYPE
@@ -128,6 +284,46 @@ dhcpPLDBUptimeVal	OBJECT-TYPE
 	DESCRIPTION "PLDB conn uptime"
 
 	::={dhcpPLDBUptime 1}
+
+dhcpPLDBUptimeLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPLDBUptimeLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPLDBUptime"
+	::={dhcpPLDBUptime 2}
+
+dhcpPLDBUptimeLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPLDBUptimeLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPLDBUptime"
+	INDEX { dhcpPLDBUptimeLevelName }
+	::={dhcpPLDBUptimeLevelTable 1}
+
+DhcpPLDBUptimeLevelEntry ::=
+	SEQUENCE {
+		dhcpPLDBUptimeLevelName	DisplayString,
+		dhcpPLDBUptimeLevelVal	TimeTicks
+	}
+
+dhcpPLDBUptimeLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPLDBUptime"
+	::={dhcpPLDBUptimeLevelEntry 1}
+
+dhcpPLDBUptimeLevelVal OBJECT-TYPE
+	SYNTAX	 TimeTicks
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDBUptime"
+	::={dhcpPLDBUptimeLevelEntry 2}
+
 
 dhcpPLDBCommits	OBJECT IDENTIFIER ::={dhcpEntry 5}
 
@@ -155,6 +351,64 @@ dhcpPLDBCommitsMax	OBJECT-TYPE
 
 	::={dhcpPLDBCommits 3}
 
+dhcpPLDBCommitsLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPLDBCommitsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPLDBCommits"
+	::={dhcpPLDBCommits 4}
+
+dhcpPLDBCommitsLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPLDBCommitsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPLDBCommits"
+	INDEX { dhcpPLDBCommitsLevelName }
+	::={dhcpPLDBCommitsLevelTable 1}
+
+DhcpPLDBCommitsLevelEntry ::=
+	SEQUENCE {
+		dhcpPLDBCommitsLevelName	DisplayString,
+		dhcpPLDBCommitsLevelVal	Counter64,
+		dhcpPLDBCommitsLevelMom	CounterBasedGauge64,
+		dhcpPLDBCommitsLevelMax	CounterBasedGauge64
+	}
+
+dhcpPLDBCommitsLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPLDBCommits"
+	::={dhcpPLDBCommitsLevelEntry 1}
+
+dhcpPLDBCommitsLevelVal OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDBCommits"
+	::={dhcpPLDBCommitsLevelEntry 2}
+
+dhcpPLDBCommitsLevelMom OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDBCommits"
+	::={dhcpPLDBCommitsLevelEntry 3}
+
+dhcpPLDBCommitsLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDBCommits"
+	::={dhcpPLDBCommitsLevelEntry 4}
+
+
 dhcpPLDReconnects	OBJECT IDENTIFIER ::={dhcpEntry 6}
 
 dhcpPLDReconnectsVal	OBJECT-TYPE
@@ -173,6 +427,55 @@ dhcpPLDReconnectsMax	OBJECT-TYPE
 
 	::={dhcpPLDReconnects 3}
 
+dhcpPLDReconnectsLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPLDReconnectsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPLDReconnects"
+	::={dhcpPLDReconnects 4}
+
+dhcpPLDReconnectsLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPLDReconnectsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPLDReconnects"
+	INDEX { dhcpPLDReconnectsLevelName }
+	::={dhcpPLDReconnectsLevelTable 1}
+
+DhcpPLDReconnectsLevelEntry ::=
+	SEQUENCE {
+		dhcpPLDReconnectsLevelName	DisplayString,
+		dhcpPLDReconnectsLevelVal	CounterBasedGauge64,
+		dhcpPLDReconnectsLevelMax	CounterBasedGauge64
+	}
+
+dhcpPLDReconnectsLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPLDReconnects"
+	::={dhcpPLDReconnectsLevelEntry 1}
+
+dhcpPLDReconnectsLevelVal OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDReconnects"
+	::={dhcpPLDReconnectsLevelEntry 2}
+
+dhcpPLDReconnectsLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDReconnects"
+	::={dhcpPLDReconnectsLevelEntry 4}
+
+
 dhcpPLDUptime	OBJECT IDENTIFIER ::={dhcpEntry 7}
 
 dhcpPLDUptimeVal	OBJECT-TYPE
@@ -182,6 +485,46 @@ dhcpPLDUptimeVal	OBJECT-TYPE
 	DESCRIPTION "PLd conn uptime"
 
 	::={dhcpPLDUptime 1}
+
+dhcpPLDUptimeLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPLDUptimeLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPLDUptime"
+	::={dhcpPLDUptime 2}
+
+dhcpPLDUptimeLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPLDUptimeLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPLDUptime"
+	INDEX { dhcpPLDUptimeLevelName }
+	::={dhcpPLDUptimeLevelTable 1}
+
+DhcpPLDUptimeLevelEntry ::=
+	SEQUENCE {
+		dhcpPLDUptimeLevelName	DisplayString,
+		dhcpPLDUptimeLevelVal	TimeTicks
+	}
+
+dhcpPLDUptimeLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPLDUptime"
+	::={dhcpPLDUptimeLevelEntry 1}
+
+dhcpPLDUptimeLevelVal OBJECT-TYPE
+	SYNTAX	 TimeTicks
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDUptime"
+	::={dhcpPLDUptimeLevelEntry 2}
+
 
 dhcpPLDOperations	OBJECT IDENTIFIER ::={dhcpEntry 8}
 
@@ -209,6 +552,64 @@ dhcpPLDOperationsMax	OBJECT-TYPE
 
 	::={dhcpPLDOperations 3}
 
+dhcpPLDOperationsLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPLDOperationsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPLDOperations"
+	::={dhcpPLDOperations 4}
+
+dhcpPLDOperationsLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPLDOperationsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPLDOperations"
+	INDEX { dhcpPLDOperationsLevelName }
+	::={dhcpPLDOperationsLevelTable 1}
+
+DhcpPLDOperationsLevelEntry ::=
+	SEQUENCE {
+		dhcpPLDOperationsLevelName	DisplayString,
+		dhcpPLDOperationsLevelVal	Counter64,
+		dhcpPLDOperationsLevelMom	CounterBasedGauge64,
+		dhcpPLDOperationsLevelMax	CounterBasedGauge64
+	}
+
+dhcpPLDOperationsLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPLDOperations"
+	::={dhcpPLDOperationsLevelEntry 1}
+
+dhcpPLDOperationsLevelVal OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDOperations"
+	::={dhcpPLDOperationsLevelEntry 2}
+
+dhcpPLDOperationsLevelMom OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDOperations"
+	::={dhcpPLDOperationsLevelEntry 3}
+
+dhcpPLDOperationsLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPLDOperations"
+	::={dhcpPLDOperationsLevelEntry 4}
+
+
 dhcpPackets	OBJECT IDENTIFIER ::={dhcpEntry 9}
 
 dhcpPacketsVal	OBJECT-TYPE
@@ -234,6 +635,64 @@ dhcpPacketsMax	OBJECT-TYPE
 	DESCRIPTION "Packets"
 
 	::={dhcpPackets 3}
+
+dhcpPacketsLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPacketsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPackets"
+	::={dhcpPackets 4}
+
+dhcpPacketsLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPacketsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPackets"
+	INDEX { dhcpPacketsLevelName }
+	::={dhcpPacketsLevelTable 1}
+
+DhcpPacketsLevelEntry ::=
+	SEQUENCE {
+		dhcpPacketsLevelName	DisplayString,
+		dhcpPacketsLevelVal	Counter64,
+		dhcpPacketsLevelMom	CounterBasedGauge64,
+		dhcpPacketsLevelMax	CounterBasedGauge64
+	}
+
+dhcpPacketsLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPackets"
+	::={dhcpPacketsLevelEntry 1}
+
+dhcpPacketsLevelVal OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPackets"
+	::={dhcpPacketsLevelEntry 2}
+
+dhcpPacketsLevelMom OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPackets"
+	::={dhcpPacketsLevelEntry 3}
+
+dhcpPacketsLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPackets"
+	::={dhcpPacketsLevelEntry 4}
+
 
 dhcpUnparsablePackets	OBJECT IDENTIFIER ::={dhcpEntry 10}
 
@@ -261,6 +720,64 @@ dhcpUnparsablePacketsMax	OBJECT-TYPE
 
 	::={dhcpUnparsablePackets 3}
 
+dhcpUnparsablePacketsLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpUnparsablePacketsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpUnparsablePackets"
+	::={dhcpUnparsablePackets 4}
+
+dhcpUnparsablePacketsLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpUnparsablePacketsLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpUnparsablePackets"
+	INDEX { dhcpUnparsablePacketsLevelName }
+	::={dhcpUnparsablePacketsLevelTable 1}
+
+DhcpUnparsablePacketsLevelEntry ::=
+	SEQUENCE {
+		dhcpUnparsablePacketsLevelName	DisplayString,
+		dhcpUnparsablePacketsLevelVal	Counter64,
+		dhcpUnparsablePacketsLevelMom	CounterBasedGauge64,
+		dhcpUnparsablePacketsLevelMax	CounterBasedGauge64
+	}
+
+dhcpUnparsablePacketsLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpUnparsablePackets"
+	::={dhcpUnparsablePacketsLevelEntry 1}
+
+dhcpUnparsablePacketsLevelVal OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpUnparsablePackets"
+	::={dhcpUnparsablePacketsLevelEntry 2}
+
+dhcpUnparsablePacketsLevelMom OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpUnparsablePackets"
+	::={dhcpUnparsablePacketsLevelEntry 3}
+
+dhcpUnparsablePacketsLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpUnparsablePackets"
+	::={dhcpUnparsablePacketsLevelEntry 4}
+
+
 dhcpPacketsReq	OBJECT IDENTIFIER ::={dhcpEntry 11}
 
 dhcpPacketsReqVal	OBJECT-TYPE
@@ -286,6 +803,64 @@ dhcpPacketsReqMax	OBJECT-TYPE
 	DESCRIPTION "Packets (DHCPREQUEST)"
 
 	::={dhcpPacketsReq 3}
+
+dhcpPacketsReqLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPacketsReqLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPacketsReq"
+	::={dhcpPacketsReq 4}
+
+dhcpPacketsReqLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPacketsReqLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPacketsReq"
+	INDEX { dhcpPacketsReqLevelName }
+	::={dhcpPacketsReqLevelTable 1}
+
+DhcpPacketsReqLevelEntry ::=
+	SEQUENCE {
+		dhcpPacketsReqLevelName	DisplayString,
+		dhcpPacketsReqLevelVal	Counter64,
+		dhcpPacketsReqLevelMom	CounterBasedGauge64,
+		dhcpPacketsReqLevelMax	CounterBasedGauge64
+	}
+
+dhcpPacketsReqLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPacketsReq"
+	::={dhcpPacketsReqLevelEntry 1}
+
+dhcpPacketsReqLevelVal OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsReq"
+	::={dhcpPacketsReqLevelEntry 2}
+
+dhcpPacketsReqLevelMom OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsReq"
+	::={dhcpPacketsReqLevelEntry 3}
+
+dhcpPacketsReqLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsReq"
+	::={dhcpPacketsReqLevelEntry 4}
+
 
 dhcpPacketsAck	OBJECT IDENTIFIER ::={dhcpEntry 12}
 
@@ -313,6 +888,64 @@ dhcpPacketsAckMax	OBJECT-TYPE
 
 	::={dhcpPacketsAck 3}
 
+dhcpPacketsAckLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPacketsAckLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPacketsAck"
+	::={dhcpPacketsAck 4}
+
+dhcpPacketsAckLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPacketsAckLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPacketsAck"
+	INDEX { dhcpPacketsAckLevelName }
+	::={dhcpPacketsAckLevelTable 1}
+
+DhcpPacketsAckLevelEntry ::=
+	SEQUENCE {
+		dhcpPacketsAckLevelName	DisplayString,
+		dhcpPacketsAckLevelVal	Counter64,
+		dhcpPacketsAckLevelMom	CounterBasedGauge64,
+		dhcpPacketsAckLevelMax	CounterBasedGauge64
+	}
+
+dhcpPacketsAckLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPacketsAck"
+	::={dhcpPacketsAckLevelEntry 1}
+
+dhcpPacketsAckLevelVal OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsAck"
+	::={dhcpPacketsAckLevelEntry 2}
+
+dhcpPacketsAckLevelMom OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsAck"
+	::={dhcpPacketsAckLevelEntry 3}
+
+dhcpPacketsAckLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsAck"
+	::={dhcpPacketsAckLevelEntry 4}
+
+
 dhcpPacketsIgnored	OBJECT IDENTIFIER ::={dhcpEntry 13}
 
 dhcpPacketsIgnoredVal	OBJECT-TYPE
@@ -338,6 +971,64 @@ dhcpPacketsIgnoredMax	OBJECT-TYPE
 	DESCRIPTION "Ignored packets"
 
 	::={dhcpPacketsIgnored 3}
+
+dhcpPacketsIgnoredLevelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF DhcpPacketsIgnoredLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table for dhcpPacketsIgnored"
+	::={dhcpPacketsIgnored 4}
+
+dhcpPacketsIgnoredLevelEntry OBJECT-TYPE
+	SYNTAX      DhcpPacketsIgnoredLevelEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry for dhcpPacketsIgnored"
+	INDEX { dhcpPacketsIgnoredLevelName }
+	::={dhcpPacketsIgnoredLevelTable 1}
+
+DhcpPacketsIgnoredLevelEntry ::=
+	SEQUENCE {
+		dhcpPacketsIgnoredLevelName	DisplayString,
+		dhcpPacketsIgnoredLevelVal	Counter64,
+		dhcpPacketsIgnoredLevelMom	CounterBasedGauge64,
+		dhcpPacketsIgnoredLevelMax	CounterBasedGauge64
+	}
+
+dhcpPacketsIgnoredLevelName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Table entry display string for dhcpPacketsIgnored"
+	::={dhcpPacketsIgnoredLevelEntry 1}
+
+dhcpPacketsIgnoredLevelVal OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsIgnored"
+	::={dhcpPacketsIgnoredLevelEntry 2}
+
+dhcpPacketsIgnoredLevelMom OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsIgnored"
+	::={dhcpPacketsIgnoredLevelEntry 3}
+
+dhcpPacketsIgnoredLevelMax OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"Table entry attribute for dhcpPacketsIgnored"
+	::={dhcpPacketsIgnoredLevelEntry 4}
+
 
 
 

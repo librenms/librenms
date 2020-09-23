@@ -1,10 +1,18 @@
 mib: DellrPDU-MIB
 modules:
+    os:
+        hardware:
+            - DellrPDU-MIB::rPDUIdentModelNumberD.1
+            - DellrPDU-MIB::rPDUIdentHardwareRevD.1
+        hardware_template: '{{ DellrPDU-MIB::rPDUIdentModelNumberD.1 }} {{ DellrPDU-MIB::rPDUIdentHardwareRevD.1 }}'
+        serial: DellrPDU-MIB::rPDUIdentSerialNumberD.1
+        version: DellrPDU-MIB::rPDUIdentFirmwareRevD.1
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - rPDUOutletMeteredStatusName
+                -
+                    oid:
+                        - rPDUOutletMeteredStatusName
         current:
             data:
                 -

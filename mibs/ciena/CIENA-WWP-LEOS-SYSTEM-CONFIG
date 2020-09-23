@@ -1,0 +1,2413 @@
+WWP-LEOS-SYSTEM-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		InetAddress, InetAddressType
+			FROM INET-ADDRESS-MIB
+		OBJECT-GROUP, MODULE-COMPLIANCE
+			FROM SNMPv2-CONF
+		enterprises, IpAddress, Unsigned32,
+		MODULE-IDENTITY, NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		DateAndTime, DisplayString, RowStatus,
+		TruthValue, TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		wwpModulesLeos
+			FROM WWP-SMI;
+
+--
+-- Textual conventions
+--
+	FileName ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 
+			"255a"
+		STATUS current
+		DESCRIPTION
+			"Represents the textual convention which defines the 
+			name string and display hint"
+		SYNTAX OCTET STRING (SIZE (1..64))
+
+	SystemClientAdminState ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"This textual convention enumerates the administration state of
+			a system FTP/TFTP client."
+		SYNTAX INTEGER
+			{
+			enable(1),
+			disable(2)
+			}
+
+	SystemServerAdminState ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"This textual convention enumerates the administration state of
+			a system FTP/SFTP/TFTP server."
+		SYNTAX INTEGER
+			{
+			enable(1),
+			disable(2)
+			}
+
+--
+-- Node definitions
+--
+	-- 1.3.6.1.4.1.6141.2.60.12
+	wwpLeosSystemConfigMIB MODULE-IDENTITY
+		LAST-UPDATED "201508200000Z"		-- August 20, 2015 at 00:00 GMT (201508200000Z)
+		ORGANIZATION
+			"Ciena, Inc"
+		CONTACT-INFO
+			"   Mib Meister
+			115 North Sullivan Road
+			Spokane Valley, WA 99037
+			   	USA		 		
+			   	Phone:  +1 509 242 9000
+			Email:  support@ciena.com"
+		DESCRIPTION
+			"The MIB module for the WWP System Config information."
+		REVISION "201508200000Z"		-- August 20, 2015 at 00:00 GMT (201508200000Z)
+		DESCRIPTION
+			"Defined wwpLeosSystemXFtpSftp, wwpLeosSystemXFtpSftpClient, and wwpLeosSystemXftpSftpClientAlgorithm
+			along with all of the objects these nodes encompass, providing the ability to configure the algorithms
+			used by the various functions of the SFTP client's SSH protocol when used by the xftp feature."
+		REVISION "201507170000Z"		-- July 17, 2015 at 00:00 GMT (201507170000Z)
+		DESCRIPTION
+			"Corrected DESCRIPTION for wwpLeosSystemXFtpFtpServerSecret and
+			wwpLeosSystemXFtpSFtpServerSecret."
+		REVISION "201506220000Z"		-- June 22, 2015 at 00:00 GMT (201506220000Z)
+		DESCRIPTION
+			"Added wwpLeosSystemXFtpSecret."
+		REVISION "201501210000Z"		-- January 21, 2015 at 00:00 GMT (201501210000Z)
+		DESCRIPTION
+			"Added wwpLeosSystemScpServerAdminState."
+		REVISION "201411100000Z"		-- November 10, 2014 at 00:00 GMT (201411100000Z)
+		DESCRIPTION
+			"Defined SystemClientAdminState, wwpLeosSystemClients, wwpLeosSystemFtpClientAdminState,
+			and wwpLeosSystemTftpClientAdminState to support ability to enable/disable ftp and tftp
+			client connections from the device."
+		REVISION "201410150000Z"		-- October 15, 2014 at 00:00 GMT (201410150000Z)
+		DESCRIPTION
+			"Changed the SYNTAX of wwpLeosSystemXFtpFtpServerSecret to OCTET STRING(SIZE(0..259)).
+			Changed the SYNTAX of wwpLeosSystemXFtpSFtpServerSecret to OCTET STRING(SIZE(0..259))."
+		REVISION "201407150000Z"		-- July 15, 2014 at 00:00 GMT (201407150000Z)
+		DESCRIPTION
+			"Updated descriptions in wwpLeosTelnetMaxBaseUserSessions,
+			wwpLeosTelnetMaxAdminUserSessions, and wwpLeosTelnetMaxSuperUserSessions
+			to be more accurate."
+		REVISION "201304230000Z"		-- April 23, 2013 at 00:00 GMT (201304230000Z)
+		DESCRIPTION
+			"Miscellaneous spelling and description corrections."
+		REVISION "201210300000Z"		-- October 30, 2012 at 00:00 GMT (201210300000Z)
+		DESCRIPTION
+			"Added wwpLeosSystemFtpServerAdminState and 
+			wwpLeosSystemTftpServerAdminState for enable/disable of FTP/TFTP 
+			server.  Added new entries to show status of /mnt/xftp directory
+			along with its associated trap."
+		REVISION "201209190000Z"		-- September 19, 2012 at 00:00 GMT (201209190000Z)
+		DESCRIPTION
+			"Added wwpLeosSystemServers for enable/disable of SFTP server."
+		REVISION "201207060000Z"		-- July 6, 2012 at 00:00 GMT (201207060000Z)
+		DESCRIPTION
+			"Added three new tables for XFTP server settings."
+		REVISION "201206270000Z"		-- June 27, 2012 at 00:00 GMT (201206270000Z)
+		DESCRIPTION
+			"Corrected string lengths."
+		REVISION "201204160000Z"		-- April 16, 2012 at 00:00 GMT (201204160000Z)
+		DESCRIPTION
+			"Added a new table for Default Gateway to support IPv6 configuration.
+			The old OID, wwpLeosSystemConfigDefaultGateway, will continue to
+			support ipv4 configuration."
+		REVISION "201111050000Z"		-- November 5, 2011 at 00:00 GMT (201111050000Z)
+		DESCRIPTION
+			"Added a new table for Guardian configuration"
+		REVISION "201107050000Z"		-- July 5, 2011 at 00:00 GMT (201107050000Z)
+		DESCRIPTION
+			"Added a new object wwpLeosTelnetMaxAdminUserSessions."
+		REVISION "200203160000Z"		-- March 16, 2002 at 00:00 GMT (200203160000Z)
+		DESCRIPTION
+			"Initial creation."
+	::= { wwpModulesLeos 12 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1
+	wwpLeosSystemConfigMIBObjects OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIB 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1
+	wwpLeosSystemConfigAttr OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.1
+	wwpLeosSystemConfigDefaultGateway OBJECT-TYPE
+		SYNTAX IpAddress
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Default gateway IP address."
+	::= { wwpLeosSystemConfigAttr 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.2
+	wwpLeosSystemConfigBootCmdFile OBJECT-TYPE
+		SYNTAX FileName
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Name of the last command file successfully
+			executed by the device."
+	::= { wwpLeosSystemConfigAttr 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.3
+	wwpLeosSystemConfigBootCfgFile OBJECT-TYPE
+		SYNTAX FileName
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This object specifies the bootup configuration file for the system.
+			Setting is object is similar to setting default load config file name.
+			When the device reboots, it attempts to load the file specified by
+			wwpLeosSystemConfigBootCfgFile."
+	::= { wwpLeosSystemConfigAttr 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.4
+	wwpLeosSystemClockDateTime OBJECT-TYPE
+		SYNTAX DateAndTime
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The current system date and time of box.
+			
+			There are no provisions for local time or
+			daylight savings. All times use the 24 hr clock
+			and are UTC.
+			
+			Because device time is UTC, only first 7 bytes of
+			DateAndTime data are returned, as per RFC1903."
+	::= { wwpLeosSystemConfigAttr 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.5
+	wwpLeosSystemConfigSavePermFile OBJECT-TYPE
+		SYNTAX FileName
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This object sets the save file name
+			to the value of wwpLeosSystemConfigSavePermFile.
+			Whenever wwpLeosSystemConfigControl is set to 'save' and
+			wwpLeosSystemConfigSaveFile is not set, the device uses
+			wwpLeosSystemConfigSavePermFile as the file name
+			to store config."
+	::= { wwpLeosSystemConfigAttr 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.6
+	wwpLeosSystemConfigLastFileNameReset OBJECT-TYPE
+		SYNTAX TruthValue
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Setting this object resets the name of the last configuration
+			file that was successfully executed by the device."
+	::= { wwpLeosSystemConfigAttr 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.7
+	wwpLeosSystemServiceMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			none(0),
+			mpls(1),
+			pbt(2),
+			aoam(3)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Setting this object changes the service mode of operation.
+			It causes the device to reboot. If this object is set to 'none' the
+			device rejects the request and returns an error.
+			Applicable to 311v only."
+	::= { wwpLeosSystemConfigAttr 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.8
+	wwpLeosSystemConfigBackupGateway OBJECT-TYPE
+		SYNTAX IpAddress
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Backup gateway IP address."
+	::= { wwpLeosSystemConfigAttr 8 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.9
+	wwpLeosSystemConfigCustomerCfgFile OBJECT-TYPE
+		SYNTAX FileName
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This object sets the name of the default customer configuration
+			file, which is the file that is copied to the default configuration
+			file during a reset-to-customer-default operation.  Setting this object to
+			an empty string removes the file name from the system configuration."
+	::= { wwpLeosSystemConfigAttr 9 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.10
+	wwpLeosSystemConfigDefaultGatewayTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemConfigDefaultGatewayEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the default gateways."
+	::= { wwpLeosSystemConfigAttr 10 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.10.1
+	wwpLeosSystemConfigDefaultGatewayEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemConfigDefaultGatewayEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemConfigDefaultGatewayTable."
+		INDEX { wwpLeosSystemConfigDefaultGatewayIndex } 
+	::= { wwpLeosSystemConfigDefaultGatewayTable 1 }
+
+
+	WwpLeosSystemConfigDefaultGatewayEntry ::= SEQUENCE
+		{
+		wwpLeosSystemConfigDefaultGatewayIndex Integer32,
+		wwpLeosSystemConfigDefaultGatewayInetAddrType InetAddressType,
+		wwpLeosSystemConfigDefaultGatewayInetAddress InetAddress,
+		wwpLeosSystemConfigDefaultGatewayInterfaceName DisplayString,
+		wwpLeosSystemConfigDefaultGatewayMetric Integer32,
+		wwpLeosSystemConfigDefaultGatewayStatus RowStatus
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.10.1.1
+	wwpLeosSystemConfigDefaultGatewayIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..16)
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Unique identifier to the table."
+	::= { wwpLeosSystemConfigDefaultGatewayEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.10.1.2
+	wwpLeosSystemConfigDefaultGatewayInetAddrType OBJECT-TYPE
+		SYNTAX InetAddressType
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The Inet address type of default gateway. Used in conjunction with 
+			wwpLeosSystemConfigDefaultGatewayInetAddress.
+			When set to :
+			Ipv4: wwpLeosSystemConfigDefaultGatewayInetAddress should be compliant with 
+			      InetAddressIPv4 from RFC 4001
+			Ipv6: wwpLeosSystemConfigDefaultGatewayInetAddress should be compliant with
+			      InetAddressIPv6 from RFC 4001."
+	::= { wwpLeosSystemConfigDefaultGatewayEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.10.1.3
+	wwpLeosSystemConfigDefaultGatewayInetAddress OBJECT-TYPE
+		SYNTAX InetAddress
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Default gateway IP address. This OID must be used in 
+			conjunction with wwpLeosSystemConfigDefaultGatewayInetAddrType. 
+			The InetAddress set here should be compliant with RFC 4001 InetAddressType.
+			When this OID is set, wwpLeosSystemConfigDefaultGateway is set to 0.0.0.0."
+	::= { wwpLeosSystemConfigDefaultGatewayEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.10.1.4
+	wwpLeosSystemConfigDefaultGatewayInterfaceName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Interface Name of the gateway, local or remote."
+	::= { wwpLeosSystemConfigDefaultGatewayEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.10.1.5
+	wwpLeosSystemConfigDefaultGatewayMetric OBJECT-TYPE
+		SYNTAX Integer32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Metric of the gateway."
+	::= { wwpLeosSystemConfigDefaultGatewayEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.10.1.6
+	wwpLeosSystemConfigDefaultGatewayStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Used to manage the creation and deletion of the conceptual rows in this table.
+			To create a row in this table, a manager must set this object to 'createAndGo'. 
+			To delete an entry, set this object to 'destroy'."
+	::= { wwpLeosSystemConfigDefaultGatewayEntry 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.11
+	wwpLeosSystemConfigBackupGatewayTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemConfigBackupGatewayEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the default gateways"
+	::= { wwpLeosSystemConfigAttr 11 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.11.1
+	wwpLeosSystemConfigBackupGatewayEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemConfigBackupGatewayEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemConfigBackupGatewayTable."
+		INDEX { wwpLeosSystemConfigBackupGatewayIndex } 
+	::= { wwpLeosSystemConfigBackupGatewayTable 1 }
+
+
+	WwpLeosSystemConfigBackupGatewayEntry ::= SEQUENCE
+		{
+		wwpLeosSystemConfigBackupGatewayIndex Integer32,
+		wwpLeosSystemConfigBackupGatewayInetAddrType InetAddressType,
+		wwpLeosSystemConfigBackupGatewayInetAddress InetAddress,
+		wwpLeosSystemConfigBackupGatewayInterfaceName DisplayString,
+		wwpLeosSystemConfigBackupGatewayMetric Integer32,
+		wwpLeosSystemConfigBackupGatewayStatus RowStatus
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.11.1.1
+	wwpLeosSystemConfigBackupGatewayIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..16)
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Unique identifier to the table."
+	::= { wwpLeosSystemConfigBackupGatewayEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.11.1.2
+	wwpLeosSystemConfigBackupGatewayInetAddrType OBJECT-TYPE
+		SYNTAX InetAddressType
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The Inet address type of backup gateway. Used in conjunction with 
+			wwpLeosSystemConfigBackupGatewayInetAddress.
+			When set to :
+			ipv4: wwpLeosSystemConfigBackupGatewayInetAddress should be compliant with 
+			      InetAddressIPv4 from RFC 4001
+			ipv6: wwpLeosSystemConfigBackupGatewayInetAddress should be compliant with
+			      InetAddressIPv6 from RFC 4001."
+	::= { wwpLeosSystemConfigBackupGatewayEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.11.1.3
+	wwpLeosSystemConfigBackupGatewayInetAddress OBJECT-TYPE
+		SYNTAX InetAddress
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Backup gateway IP address. This OID must be used in 
+			conjunction with wwpLeosSystemConfigBackupGatewayInetAddrType. 
+			The InetAddress set here should be compliant with rfc 4001 InetAddressType.
+			When this OID is set, wwpLeosSystemConfigBackupGateway is set ot 0.0.0.0."
+	::= { wwpLeosSystemConfigBackupGatewayEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.11.1.4
+	wwpLeosSystemConfigBackupGatewayInterfaceName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Interface Name of the gateway, local or remote."
+	::= { wwpLeosSystemConfigBackupGatewayEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.11.1.5
+	wwpLeosSystemConfigBackupGatewayMetric OBJECT-TYPE
+		SYNTAX Integer32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Metric of the gateway."
+	::= { wwpLeosSystemConfigBackupGatewayEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.1.11.1.6
+	wwpLeosSystemConfigBackupGatewayStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Used to manage the creation and deletion of the conceptual rows in this table.
+			To create a row in this table, set this object to 'createAndGo'. 
+			To delete an entry, set this object to 'destroy'."
+	::= { wwpLeosSystemConfigBackupGatewayEntry 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2
+	wwpLeosSystemConfig OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2.1
+	wwpLeosSystemConfigSaveFileName OBJECT-TYPE
+		SYNTAX FileName
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"wwpLeosSystemConfigSaveFileName specifies the name of the config
+			file to be used when wwpLeosSystemConfigControl has been set
+			to 'save'. If this object is not set the device uses
+			the file name specified by wwpLeosSystemConfigSavePermFile.
+			If wwpLeosSystemConfigSavePermFile is also not set, the default configuration
+			file name i.e startup-config is used to save the config.
+			Once 'wwpLeosSystemConfigControl' has been successfully applied,
+			a read on wwpLeosSystemConfigSaveFileName always returns an empty
+			string else it shows what the user has configured."
+	::= { wwpLeosSystemConfig 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2.2
+	wwpLeosSystemConfigControl OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			none(0),
+			save(1),
+			mfgDefaultCfg(2)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Controls configuration options on the device.
+			The current options are:
+			save:   
+			to make the configuration changes made
+			using SNMP persistent across a reboot.
+			
+			mfgDefaultCfg:
+			Set system configuration to factory defaults.
+			Note: This wipes out all the current
+			configuration including password and VLAN
+			information.
+			
+			If the system does not support any of these control
+			configuration options, it returns an error while
+			trying to set this object to the specific option.
+			
+			A read on this object returns none(0)."
+	::= { wwpLeosSystemConfig 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2.3
+	wwpLeosSystemConfigFilepath OBJECT-TYPE
+		SYNTAX FileName
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Returns the path for configuration related files."
+	::= { wwpLeosSystemConfig 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2.4
+	wwpLeosSystemConfigFileTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemConfigFileEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the configs"
+	::= { wwpLeosSystemConfig 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2.4.1
+	wwpLeosSystemConfigFileEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemConfigFileEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemConfigFileTable."
+		INDEX { wwpLeosSystemConfigFileIndex } 
+	::= { wwpLeosSystemConfigFileTable 1 }
+
+
+	WwpLeosSystemConfigFileEntry ::= SEQUENCE
+		{
+		wwpLeosSystemConfigFileIndex Integer32,
+		wwpLeosSystemConfigFileName FileName,
+		wwpLeosSystemConfigActivateFile INTEGER
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2.4.1.1
+	wwpLeosSystemConfigFileIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Unique identifier to the table."
+	::= { wwpLeosSystemConfigFileEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2.4.1.2
+	wwpLeosSystemConfigFileName OBJECT-TYPE
+		SYNTAX FileName
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The name of the configuration file."
+	::= { wwpLeosSystemConfigFileEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.2.4.1.3
+	wwpLeosSystemConfigActivateFile OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			loadCfg(1),
+			resetToCfg(2),
+			none(3)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Set this object to 'loadCfg to load the 'wwpLeosSystemConfigFileName' configuration.
+			If the operation is successful, this object performs
+			       the CLI equivalent to these commands and returns the status.
+			
+			Setting this object to 'resetToCfg' kills the load module, reloads a new load module and
+			applies the config file specified by wwpLeosSystemConfigFileName.
+			
+			Setting this object to 'none' does nothing."
+		DEFVAL {  { none }  } 
+	::= { wwpLeosSystemConfigFileEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.3
+	wwpLeosSystemTelnet OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.3.1
+	wwpLeosTelnetMaxBaseUserSessions OBJECT-TYPE
+		SYNTAX Integer32 (0..10)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The max number of limited user CLI sessions
+			for the device. Includes both SSH and telnet sessions."
+	::= { wwpLeosSystemTelnet 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.3.2
+	wwpLeosTelnetMaxSuperUserSessions OBJECT-TYPE
+		SYNTAX Integer32 (0..10)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The max number of super user CLI sessions
+			for the device. Includes both SSH and telnet sessions."
+	::= { wwpLeosSystemTelnet 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.3.3
+	wwpLeosTelnetMaxAdminUserSessions OBJECT-TYPE
+		SYNTAX Integer32 (0..10)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The max number of admin users CLI sessions for
+			the device. Includes both SSH and telnet sessions."
+	::= { wwpLeosSystemTelnet 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7
+	wwpLeosSystemCpuLoadQuery OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.1
+	wwpLeosSystemCpuLoad1Min OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The OID to display CPU load in last 1 minute.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.2
+	wwpLeosSystemCpuLoad10Min OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The OID to display CPU load in last 10 minutes.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.3
+	wwpLeosSystemCpuLoad15Min OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The OID to display CPU load in last 15 minutes.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.4
+	wwpLeosSystemCpuLoad5Min OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The OID to display CPU load in last 5 minutes.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.5
+	wwpLeosSystemCpuLoad1MinMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The minimum 1 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.6
+	wwpLeosSystemCpuLoad1MinMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The maximum 1 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.7
+	wwpLeosSystemCpuLoad1MinState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 1 minute CPU load average state."
+	::= { wwpLeosSystemCpuLoadQuery 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.8
+	wwpLeosSystemCpuLoad15MinMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The minimum 15 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 8 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.9
+	wwpLeosSystemCpuLoad15MinMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The maximum 15 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 9 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.10
+	wwpLeosSystemCpuLoad15MinState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 15 minute CPU load average state."
+	::= { wwpLeosSystemCpuLoadQuery 10 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.11
+	wwpLeosSystemCpuLoad5MinMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The minimum 5 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 11 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.12
+	wwpLeosSystemCpuLoad5MinMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The maximum 5 minute CPU load average.  This value is an integer representation of the CPU load (load average * 100)."
+	::= { wwpLeosSystemCpuLoadQuery 12 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.7.13
+	wwpLeosSystemCpuLoad5MinState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 5 minute CPU load average state."
+	::= { wwpLeosSystemCpuLoadQuery 13 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.8
+	wwpLeosSystemConfigNotif OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 8 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.8.1
+	wwpLeosSystemConfigNotifTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemConfigNotifEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the configuration file line numbers.
+			This table is only used when sending wwpLeosImproperCmdInConfigFile
+			notification. No Get, GetNext or Set is allowed in this table."
+	::= { wwpLeosSystemConfigNotif 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.8.1.1
+	wwpLeosSystemConfigNotifEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemConfigNotifEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemConfigNotifTable.
+			No Get, GetNext or Set is allowed in this table."
+		INDEX { wwpLeosSystemConfigFileIndex } 
+	::= { wwpLeosSystemConfigNotifTable 1 }
+
+
+	WwpLeosSystemConfigNotifEntry ::= SEQUENCE
+		{
+		wwpLeosSystemConfigErrLineNum Integer32,
+		wwpLeosSystemConfigErrStr DisplayString,
+		wwpLeosSystemConfigErrLinesTotal Integer32
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.8.1.1.1
+	wwpLeosSystemConfigErrLineNum OBJECT-TYPE
+		SYNTAX Integer32 (0..64)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The OID is sent in the wwpLeosImproperCmdInConfigFile
+			trap to identify the line number that failed
+			when the configuration was applied. No Get, GetNext or Set is
+			allowed in this table."
+	::= { wwpLeosSystemConfigNotifEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.8.1.1.2
+	wwpLeosSystemConfigErrStr OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The OID is  wwpLeosSystemConfigErrStr
+			trap to identify the line that failed
+			when the configuration was applied. No Get, GetNext or Set is
+			allowed on this table."
+	::= { wwpLeosSystemConfigNotifEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.8.1.1.3
+	wwpLeosSystemConfigErrLinesTotal OBJECT-TYPE
+		SYNTAX Integer32 (0..64)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The OID is sent in the wwpLeosImproperCmdInConfigFile
+			trap to identify the total line numbers that failed
+			when the configuration was applied. No Get, GetNext or Set is
+			allowed in this table."
+	::= { wwpLeosSystemConfigNotifEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9
+	wwpLeosSystemMemoryUsageQuery OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 9 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1
+	wwpLeosSystemMemoryUsageTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemMemoryUsageEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of Memory Usage for various Memory Pools."
+	::= { wwpLeosSystemMemoryUsageQuery 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1.1
+	wwpLeosSystemMemoryUsageEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemMemoryUsageEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for each Memory Pool."
+		INDEX { wwpLeosSystemMemoryUsagePoolIndex } 
+	::= { wwpLeosSystemMemoryUsageTable 1 }
+
+
+	WwpLeosSystemMemoryUsageEntry ::= SEQUENCE
+		{
+		wwpLeosSystemMemoryUsagePoolIndex INTEGER,
+		wwpLeosSystemMemoryUsageMemoryTotal Unsigned32,
+		wwpLeosSystemMemoryUsageMemoryLWM Unsigned32,
+		wwpLeosSystemMemoryUsageMemoryFree Unsigned32,
+		wwpLeosSystemMemoryUsageStatus INTEGER,
+		wwpLeosSystemMemoryUsageMemoryUsed Unsigned32,
+		wwpLeosSystemMemoryUsageMemoryAvailable Unsigned32
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1.1.1
+	wwpLeosSystemMemoryUsagePoolIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			ose-pool-1(1),
+			global-heap(2),
+			malloc-heap(3)
+		}
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The Memory Pool type."
+	::= { wwpLeosSystemMemoryUsageEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1.1.2
+	wwpLeosSystemMemoryUsageMemoryTotal OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"bytes"
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total size of the Memory Pool in bytes."
+	::= { wwpLeosSystemMemoryUsageEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1.1.3
+	wwpLeosSystemMemoryUsageMemoryLWM OBJECT-TYPE
+		SYNTAX Unsigned32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Lowest free memory in the Memory Pool in bytes.
+			Not supported in SAOS 6.x"
+	::= { wwpLeosSystemMemoryUsageEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1.1.4
+	wwpLeosSystemMemoryUsageMemoryFree OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"bytes"
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Amount of free memory in the Memory Pool in bytes.
+			This corresponds to the CLI's memory never used."
+	::= { wwpLeosSystemMemoryUsageEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1.1.5
+	wwpLeosSystemMemoryUsageStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			lowMemory(2),
+			notSupported(3)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Denotes if the free memory amount is normal or below limit."
+	::= { wwpLeosSystemMemoryUsageEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1.1.6
+	wwpLeosSystemMemoryUsageMemoryUsed OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"bytes"
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Amount of used memory in the Memory Pool in bytes."
+	::= { wwpLeosSystemMemoryUsageEntry 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.9.1.1.7
+	wwpLeosSystemMemoryUsageMemoryAvailable OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"bytes"
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Amount of available memory in the Memory Pool in bytes."
+	::= { wwpLeosSystemMemoryUsageEntry 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10
+	wwpLeosSystemXFtp OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 10 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.1
+	wwpLeosSystemXFtpMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			tftp(1),
+			ftp(2),
+			sftp(3)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Select between modes of file transfer.
+			The default mode is tftp."
+	::= { wwpLeosSystemXFtp 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.2
+	wwpLeosSystemXFtpServer OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"IP address or the host name of default server."
+	::= { wwpLeosSystemXFtp 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.3
+	wwpLeosSystemXFtpUserName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Name used to login with."
+	::= { wwpLeosSystemXFtp 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.4
+	wwpLeosSystemXFtpPasswd OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..128))
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Password used to login with."
+	::= { wwpLeosSystemXFtp 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.5
+	wwpLeosSystemXFtpNumOfRetries OBJECT-TYPE
+		SYNTAX Integer32 (1..10)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Number of times to retry a file transfer request if it fails."
+	::= { wwpLeosSystemXFtp 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.6
+	wwpLeosSystemXFtpRetryInterval OBJECT-TYPE
+		SYNTAX Integer32 (1..300)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Length of time in seconds to wait before retrying a file transfer if it fails."
+	::= { wwpLeosSystemXFtp 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.7
+	wwpLeosSystemXFtpConnectionTimeout OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Length of time in seconds to wait before connection times out."
+	::= { wwpLeosSystemXFtp 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.8
+	wwpLeosSystemXFtpTFtpServerTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemXFtpTFtpServerEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the default TFTP server"
+	::= { wwpLeosSystemXFtp 8 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.8.1
+	wwpLeosSystemXFtpTFtpServerEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemXFtpTFtpServerEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemXFtpTFtpServerTable."
+		INDEX { wwpLeosSystemXFtpTFtpServerIndex } 
+	::= { wwpLeosSystemXFtpTFtpServerTable 1 }
+
+
+	WwpLeosSystemXFtpTFtpServerEntry ::= SEQUENCE
+		{
+		wwpLeosSystemXFtpTFtpServerIndex Integer32,
+		wwpLeosSystemXFtpTFtpServerHostName DisplayString,
+		wwpLeosSystemXFtpTFtpServerRowStatus RowStatus
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.8.1.1
+	wwpLeosSystemXFtpTFtpServerIndex OBJECT-TYPE
+		SYNTAX Integer32 (1)
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Unique identifier to the table."
+	::= { wwpLeosSystemXFtpTFtpServerEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.8.1.2
+	wwpLeosSystemXFtpTFtpServerHostName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Host name or IP address of the default TFTP server."
+	::= { wwpLeosSystemXFtpTFtpServerEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.8.1.6
+	wwpLeosSystemXFtpTFtpServerRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Used to manage the creation and deletion of the conceptual rows in this table.
+			To create a row in this table, set this object to 'createAndGo'.
+			To delete an entry, set this object to 'destroy'.
+			At the current time, there is only one, static row in this table, with index 1."
+	::= { wwpLeosSystemXFtpTFtpServerEntry 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.9
+	wwpLeosSystemXFtpFtpServerTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemXFtpFtpServerEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the default FTP server."
+	::= { wwpLeosSystemXFtp 9 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.9.1
+	wwpLeosSystemXFtpFtpServerEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemXFtpFtpServerEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemXFtpFtpServerTable."
+		INDEX { wwpLeosSystemXFtpFtpServerIndex } 
+	::= { wwpLeosSystemXFtpFtpServerTable 1 }
+
+
+	WwpLeosSystemXFtpFtpServerEntry ::= SEQUENCE
+		{
+		wwpLeosSystemXFtpFtpServerIndex Integer32,
+		wwpLeosSystemXFtpFtpServerHostName DisplayString,
+		wwpLeosSystemXFtpFtpServerUserName DisplayString,
+		wwpLeosSystemXFtpFtpServerPassword DisplayString,
+		wwpLeosSystemXFtpFtpServerSecret OCTET STRING,
+		wwpLeosSystemXFtpFtpServerRowStatus RowStatus
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.9.1.1
+	wwpLeosSystemXFtpFtpServerIndex OBJECT-TYPE
+		SYNTAX Integer32 (1)
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Unique identifier to the table."
+	::= { wwpLeosSystemXFtpFtpServerEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.9.1.2
+	wwpLeosSystemXFtpFtpServerHostName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Host name or IP address of the default FTP server."
+	::= { wwpLeosSystemXFtpFtpServerEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.9.1.3
+	wwpLeosSystemXFtpFtpServerUserName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"User name / login ID to be used with the default FTP server."
+	::= { wwpLeosSystemXFtpFtpServerEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.9.1.4
+	wwpLeosSystemXFtpFtpServerPassword OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Password to be used with the default FTP server.
+			Returns an empty string when read.
+			Either the password or the secret may be set, but not both."
+	::= { wwpLeosSystemXFtpFtpServerEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.9.1.5
+	wwpLeosSystemXFtpFtpServerSecret OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0..259))
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Password secret to be used with the default FTP server.
+			Either the password or the secret may be set, but not both."
+	::= { wwpLeosSystemXFtpFtpServerEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.9.1.6
+	wwpLeosSystemXFtpFtpServerRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Used to manage the creation and deletion of the conceptual rows in this table.
+			To create a row in this table, set this object to 'createAndGo'.
+			To delete an entry, set this object to 'destroy'.
+			At the current time, there is only one, static row in this table, with index 1."
+	::= { wwpLeosSystemXFtpFtpServerEntry 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.10
+	wwpLeosSystemXFtpSFtpServerTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemXFtpSFtpServerEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the default SFTP server"
+	::= { wwpLeosSystemXFtp 10 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.10.1
+	wwpLeosSystemXFtpSFtpServerEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemXFtpSFtpServerEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemXFtpSFtpServerTable."
+		INDEX { wwpLeosSystemXFtpSFtpServerIndex } 
+	::= { wwpLeosSystemXFtpSFtpServerTable 1 }
+
+
+	WwpLeosSystemXFtpSFtpServerEntry ::= SEQUENCE
+		{
+		wwpLeosSystemXFtpSFtpServerIndex Integer32,
+		wwpLeosSystemXFtpSFtpServerHostName DisplayString,
+		wwpLeosSystemXFtpSFtpServerUserName DisplayString,
+		wwpLeosSystemXFtpSFtpServerPassword DisplayString,
+		wwpLeosSystemXFtpSFtpServerSecret OCTET STRING,
+		wwpLeosSystemXFtpSFtpServerRowStatus RowStatus
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.10.1.1
+	wwpLeosSystemXFtpSFtpServerIndex OBJECT-TYPE
+		SYNTAX Integer32 (1)
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Unique identifier to the table."
+	::= { wwpLeosSystemXFtpSFtpServerEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.10.1.2
+	wwpLeosSystemXFtpSFtpServerHostName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Host name or IP address of the default SFTP server."
+	::= { wwpLeosSystemXFtpSFtpServerEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.10.1.3
+	wwpLeosSystemXFtpSFtpServerUserName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"User name / login ID to be used with the default SFTP server."
+	::= { wwpLeosSystemXFtpSFtpServerEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.10.1.4
+	wwpLeosSystemXFtpSFtpServerPassword OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Password to be used with the default SFTP server.
+			Returns an empty string when read.
+			Either the password or the secret may be set, but not both."
+	::= { wwpLeosSystemXFtpSFtpServerEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.10.1.5
+	wwpLeosSystemXFtpSFtpServerSecret OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0..259))
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Password secret to be used with the default SFTP server.
+			Either the password or the secret may be set, but not both."
+	::= { wwpLeosSystemXFtpSFtpServerEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.10.1.6
+	wwpLeosSystemXFtpSFtpServerRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Used to manage the creation and deletion of the conceptual rows in this table.
+			To create a row in this table, set this object to 'createAndGo'.
+			To delete an entry, set this object to 'destroy'.
+			At the current time, there is only one, static row in this table, with index 1."
+	::= { wwpLeosSystemXFtpSFtpServerEntry 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.11
+	wwpLeosSystemXFtpSecret OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0..259))
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the pre-encypted secret. This global secret will be 
+			automatically applied to either the ftp or sftp table, depending
+			on the value of the wwpLeosSystemXFtpMode object."
+	::= { wwpLeosSystemXFtp 11 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12
+	wwpLeosSystemXFtpSftp OBJECT IDENTIFIER ::= { wwpLeosSystemXFtp 12 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1
+	wwpLeosSystemXFtpSftpClient OBJECT IDENTIFIER ::= { wwpLeosSystemXFtpSftp 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1
+	wwpLeosSystemXftpSftpClientAlgorithm OBJECT IDENTIFIER ::= { wwpLeosSystemXFtpSftpClient 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.1
+	wwpLeosSystemXftpSftpClientKexAlgorithmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemXftpSftpClientKexAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the SFTP Client's SSH key-exchange (KEX) algorithms."
+	::= { wwpLeosSystemXftpSftpClientAlgorithm 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.1.1
+	wwpLeosSystemXftpSftpClientKexAlgorithmEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemXftpSftpClientKexAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemXftpSftpClientKexAlgorithmTable."
+		INDEX { wwpLeosSystemXftpSftpClientKexAlgorithmIndex } 
+	::= { wwpLeosSystemXftpSftpClientKexAlgorithmTable 1 }
+
+
+	WwpLeosSystemXftpSftpClientKexAlgorithmEntry ::= SEQUENCE
+		{
+		wwpLeosSystemXftpSftpClientKexAlgorithmIndex Unsigned32,
+		wwpLeosSystemXftpSftpClientKexAlgorithmName DisplayString,
+		wwpLeosSystemXftpSftpClientKexAlgorithmAdminState INTEGER,
+		wwpLeosSystemXftpSftpClientKexAlgorithmOperState INTEGER,
+		wwpLeosSystemXftpSftpClientKexAlgorithmPriority Unsigned32
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.1.1.1
+	wwpLeosSystemXftpSftpClientKexAlgorithmIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An arbitrary index into the table identifying a unique algorithm as
+			identified by the value of wwpLeosSystemXftpSftpClientKexAlgorithmName."
+	::= { wwpLeosSystemXftpSftpClientKexAlgorithmEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.1.1.2
+	wwpLeosSystemXftpSftpClientKexAlgorithmName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the algorithm as used by the SFTP client's SSH protocol
+			when negotiating the key exchange algorithm with SSH servers."
+	::= { wwpLeosSystemXftpSftpClientKexAlgorithmEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.1.1.3
+	wwpLeosSystemXftpSftpClientKexAlgorithmAdminState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The administrative state of the algorithm, indicating whether the
+			administrative settings are set to allow the inclusion of the
+			specified algorithm in the key exchange algorithm negotiation process.
+			Such inclusion or exclusion of the algorithm is indicated by the
+			corresponding value of wwpLeosSystemXftpSftpClientKexAlgorithmOperState."
+	::= { wwpLeosSystemXftpSftpClientKexAlgorithmEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.1.1.4
+	wwpLeosSystemXftpSftpClientKexAlgorithmOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The operational state of the algorithm, indicating whether the
+			specified algorithm will be included in the key exchange algorithm
+			negotiation process.  The operational state is determined based on
+			the corresponding value of wwpLeosSystemXftpSftpClientKexAlgorithmAdminState
+			as well as other system attributes which may limit the allowable
+			algorithms that may be used."
+	::= { wwpLeosSystemXftpSftpClientKexAlgorithmEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.1.1.5
+	wwpLeosSystemXftpSftpClientKexAlgorithmPriority OBJECT-TYPE
+		SYNTAX Unsigned32 (1..3)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The priority, or importance, of the specified algorithm amongst
+			the other algorithms in this table.  Value 1 is highest priority.
+			During the key exchange algorithm negotiation, the SFTP client's
+			SSH protocol will consider all operationally enabled algorithms
+			in order of priority, as part of the algorithm negotiation process.
+			When the priority of one algorithm is set to a new value, it will
+			necessarily cause the priority of other algorithms to adjust in
+			order to make room for the new set priority of the algorithm."
+	::= { wwpLeosSystemXftpSftpClientKexAlgorithmEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.2
+	wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the SFTP client's SSH server host key algorithms."
+	::= { wwpLeosSystemXftpSftpClientAlgorithm 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.2.1
+	wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmTable."
+		INDEX { wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmIndex } 
+	::= { wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmTable 1 }
+
+
+	WwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry ::= SEQUENCE
+		{
+		wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmIndex Unsigned32,
+		wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmName DisplayString,
+		wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmAdminState INTEGER,
+		wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmOperState INTEGER,
+		wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmPriority Unsigned32
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.2.1.1
+	wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An arbitrary index into the table identifying a unique algorithm as
+			identified by the value of wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmName."
+	::= { wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.2.1.2
+	wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the algorithm as used by the SFTP client's SSH protocol when
+			negotiating the server host key algorithm with SSH servers."
+	::= { wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.2.1.3
+	wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmAdminState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The administrative state of the algorithm, indicating whether the
+			administrative settings are set to allow the inclusion of the
+			specified algorithm in the server host key algorithm negotiation
+			process.  Such inclusion or exclusion of the algorithm is indicated
+			by the corresponding value of wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmOperState."
+	::= { wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.2.1.4
+	wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The operational state of the algorithm, indicating whether the
+			specified algorithm will be included in the server host key algorithm
+			negotiation process.  The operational state is determined based on
+			the corresponding value of wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmAdminState
+			as well as other system attributes which may limit the allowable
+			algorithms that may be used."
+	::= { wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.2.1.5
+	wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmPriority OBJECT-TYPE
+		SYNTAX Unsigned32 (1..6)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The priority, or importance, of the specified algorithm amongst
+			the other algorithms in this table.  Value 1 is highest priority.
+			During the server host key algorithm negotiation, the SFTP client's
+			SSH protocol will consider all operationally enabled algorithms in
+			order of priority, as part of the algorithm negotiation process.
+			When the priority of an algorithm is set to a new value, it will
+			necessarily cause the priority of other algorithms to adjust in
+			order to make room for the new set priority of the algorithm."
+	::= { wwpLeosSystemXftpSftpClientServerHostKeyAlgorithmEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.3
+	wwpLeosSystemXftpSftpClientEncryptionAlgorithmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the SFTP client's SSH encryption algorithms."
+	::= { wwpLeosSystemXftpSftpClientAlgorithm 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.3.1
+	wwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemXftpSftpClientEncryptionAlgorithmTable."
+		INDEX { wwpLeosSystemXftpSftpClientEncryptionAlgorithmIndex } 
+	::= { wwpLeosSystemXftpSftpClientEncryptionAlgorithmTable 1 }
+
+
+	WwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry ::= SEQUENCE
+		{
+		wwpLeosSystemXftpSftpClientEncryptionAlgorithmIndex Unsigned32,
+		wwpLeosSystemXftpSftpClientEncryptionAlgorithmName DisplayString,
+		wwpLeosSystemXftpSftpClientEncryptionAlgorithmAdminState INTEGER,
+		wwpLeosSystemXftpSftpClientEncryptionAlgorithmOperState INTEGER,
+		wwpLeosSystemXftpSftpClientEncryptionAlgorithmPriority Unsigned32
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.3.1.1
+	wwpLeosSystemXftpSftpClientEncryptionAlgorithmIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An arbitrary index into the table identifying a unique algorithm as
+			identified by the value of wwpLeosSystemXftpSftpClientEncryptionAlgorithmAdminState."
+	::= { wwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.3.1.2
+	wwpLeosSystemXftpSftpClientEncryptionAlgorithmName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the algorithm as used by the SFTP client SSH protocol
+			when negotiating the encryption algorithm with SSH servers."
+	::= { wwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.3.1.3
+	wwpLeosSystemXftpSftpClientEncryptionAlgorithmAdminState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The administrative state of the algorithm, indicating whether the
+			administrative settings are set to allow the inclusion of the
+			specified algorithm in the encryption algorithm negotiation process.
+			Such inclusion or exclusion of the algorithm is indicated by the
+			corresponding value of wwpLeosSystemXftpSftpClientEncryptionAlgorithmOperState."
+	::= { wwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.3.1.4
+	wwpLeosSystemXftpSftpClientEncryptionAlgorithmOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The operational state of the algorithm, indicating whether the
+			specified algorithm will be included in the encryption algorithm
+			negotiation process.  The operational state is determined based on
+			the corresponding value of wwpLeosSystemXftpSftpClientEncryptionAlgorithmAdminState
+			as well as other system attributes which may limit the allowable
+			algorithms that may be used."
+	::= { wwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.3.1.5
+	wwpLeosSystemXftpSftpClientEncryptionAlgorithmPriority OBJECT-TYPE
+		SYNTAX Unsigned32 (1..12)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The priority, or importance, of the specified algorithm amongst
+			the other algorithms in this table.  Value 1 is highest priority.
+			During the encryption algorithm negotiation, the SFTP client's SSH
+			protocol will consider all operationally enabled algorithms in
+			order of priority, as part of the algorithm negotiation process.
+			When the priority of one algorithm is set to a new value, it will
+			necessarily cause the priority of other algorithms to adjust in
+			order to make room for the new set priority of the algorithm."
+	::= { wwpLeosSystemXftpSftpClientEncryptionAlgorithmEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.4
+	wwpLeosSystemXftpSftpClientMacAlgorithmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemXftpSftpClientMacAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the SFTP client's SSH message
+			authentication code (MAC) algorithms."
+	::= { wwpLeosSystemXftpSftpClientAlgorithm 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.4.1
+	wwpLeosSystemXftpSftpClientMacAlgorithmEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemXftpSftpClientMacAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemXftpSftpClientMacAlgorithmTable."
+		INDEX { wwpLeosSystemXftpSftpClientMacAlgorithmIndex } 
+	::= { wwpLeosSystemXftpSftpClientMacAlgorithmTable 1 }
+
+
+	WwpLeosSystemXftpSftpClientMacAlgorithmEntry ::= SEQUENCE
+		{
+		wwpLeosSystemXftpSftpClientMacAlgorithmIndex Unsigned32,
+		wwpLeosSystemXftpSftpClientMacAlgorithmName DisplayString,
+		wwpLeosSystemXftpSftpClientMacAlgorithmAdminState INTEGER,
+		wwpLeosSystemXftpSftpClientMacAlgorithmOperState INTEGER,
+		wwpLeosSystemXftpSftpClientMacAlgorithmPriority Unsigned32
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.4.1.1
+	wwpLeosSystemXftpSftpClientMacAlgorithmIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An arbitrary index into the table identifying a unique algorithm as
+			identified by the value of wwpLeosSystemXftpSftpClientMacAlgorithmName."
+	::= { wwpLeosSystemXftpSftpClientMacAlgorithmEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.4.1.2
+	wwpLeosSystemXftpSftpClientMacAlgorithmName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the algorithm as used by the SFTP client's SSH protocol when
+			negotiating the message authentication code algorithm with SSH servers."
+	::= { wwpLeosSystemXftpSftpClientMacAlgorithmEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.4.1.3
+	wwpLeosSystemXftpSftpClientMacAlgorithmAdminState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The administrative state of the algorithm, indicating whether the
+			administrative settings are set to allow the inclusion of the
+			specified algorithm in the message authentication code algorithm
+			negotiation process.  Such inclusion or exclusion of the algorithm is
+			indicated by the corresponding value of wwpLeosSystemXftpSftpClientMacAlgorithmOperState."
+	::= { wwpLeosSystemXftpSftpClientMacAlgorithmEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.4.1.4
+	wwpLeosSystemXftpSftpClientMacAlgorithmOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The operational state of the algorithm, indicating whether the
+			specified algorithm will be included in the message authentication code
+			algorithm negotiation process.  The operational state is determined based on
+			the corresponding value of wwpLeosSystemXftpSftpClientMacAlgorithmAdminState
+			as well as other system attributes which may limit the allowable
+			algorithms that may be used."
+	::= { wwpLeosSystemXftpSftpClientMacAlgorithmEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.4.1.5
+	wwpLeosSystemXftpSftpClientMacAlgorithmPriority OBJECT-TYPE
+		SYNTAX Unsigned32 (1..6)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The priority, or importance, of the specified algorithm amongst
+			the other algorithms in this table.  Value 1 is highest priority.
+			During the message authentication code algorithm negotiation, the
+			SFTP client's SSH protocol will consider all operationally enabled
+			algorithms in order or priority, as part of the algorithm negotiation
+			process.  When the priority of an algorithm is set to a new value,
+			it will necessarily cause the priority of other algorithms to adjust
+			in order to make room for the new set priority of the algorithm."
+	::= { wwpLeosSystemXftpSftpClientMacAlgorithmEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.5
+	wwpLeosSystemXftpSftpClientCompressionAlgorithmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF WwpLeosSystemXftpSftpClientCompressionAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The (conceptual) table listing the SFTP client's SSH compression algorithms.
+			
+			NOTE: At this time the system xftp feature only supports 'none'
+			compression algorithm. This table is provided for completeness
+			since the compression algorithm is one of the algorithms negotiated
+			during SSH connections."
+	::= { wwpLeosSystemXftpSftpClientAlgorithm 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.5.1
+	wwpLeosSystemXftpSftpClientCompressionAlgorithmEntry OBJECT-TYPE
+		SYNTAX WwpLeosSystemXftpSftpClientCompressionAlgorithmEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the wwpLeosSystemXftpSftpClientCompressionAlgorithmTable."
+		INDEX { wwpLeosSystemXftpSftpClientCompressionAlgorithmIndex } 
+	::= { wwpLeosSystemXftpSftpClientCompressionAlgorithmTable 1 }
+
+
+	WwpLeosSystemXftpSftpClientCompressionAlgorithmEntry ::= SEQUENCE
+		{
+		wwpLeosSystemXftpSftpClientCompressionAlgorithmIndex Unsigned32,
+		wwpLeosSystemXftpSftpClientCompressionAlgorithmName DisplayString,
+		wwpLeosSystemXftpSftpClientCompressionAlgorithmAdminState INTEGER,
+		wwpLeosSystemXftpSftpClientCompressionAlgorithmOperState INTEGER,
+		wwpLeosSystemXftpSftpClientCompressionAlgorithmPriority Unsigned32
+		}
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.5.1.1
+	wwpLeosSystemXftpSftpClientCompressionAlgorithmIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An arbitrary index into the table identifying a unique algorithm as
+			identified by the value of wwpLeosSystemXftpSftpClientCompressionAlgorithmAdminState."
+	::= { wwpLeosSystemXftpSftpClientCompressionAlgorithmEntry 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.5.1.2
+	wwpLeosSystemXftpSftpClientCompressionAlgorithmName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the algorithm as used by the SFTP client SSH protocol
+			when negotiating the compression algorithm with SSH servers."
+	::= { wwpLeosSystemXftpSftpClientCompressionAlgorithmEntry 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.5.1.3
+	wwpLeosSystemXftpSftpClientCompressionAlgorithmAdminState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The administrative state of the algorithm, indicating whether the
+			administrative settings are set to allow the inclusion of the
+			specified algorithm in the compression algorithm negotiation process.
+			Such inclusion or exclusion of the algorithm is indicated by the
+			corresponding value of wwpLeosSystemXftpSftpClientCompressionAlgorithmOperState."
+	::= { wwpLeosSystemXftpSftpClientCompressionAlgorithmEntry 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.5.1.4
+	wwpLeosSystemXftpSftpClientCompressionAlgorithmOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disabled(1),
+			enabled(2)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The operational state of the algorithm, indicating whether the
+			specified algorithm will be included in the compression algorithm
+			negotiation process.  The operational state is determined based on
+			the corresponding value of wwpLeosSystemXftpSftpClientCompressionAlgorithmAdminState
+			as well as other system attributes which may limit the allowable
+			algorithms that may be used."
+	::= { wwpLeosSystemXftpSftpClientCompressionAlgorithmEntry 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.10.12.1.1.5.1.5
+	wwpLeosSystemXftpSftpClientCompressionAlgorithmPriority OBJECT-TYPE
+		SYNTAX Unsigned32 (1)
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The priority, or importance, of the specified algorithm amongst
+			the other algorithms in this table.  Value 1 is highest priority.
+			During the compression algorithm negotiation, the SFTP client's SSH
+			protocol will consider all operationally enabled algorithms in
+			order of priority, as part of the algorithm negotiation process.
+			When the priority of one algorithm is set to a new value, it will
+			necessarily cause the priority of other algorithms to adjust in
+			order to make room for the new set priority of the algorithm."
+	::= { wwpLeosSystemXftpSftpClientCompressionAlgorithmEntry 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11
+	wwpLeosSystemCpuUtilization OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 11 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.1
+	wwpLeosSystemCpuUtilizationLast5Seconds OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Average 5 second CPU usage measurement."
+	::= { wwpLeosSystemCpuUtilization 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.2
+	wwpLeosSystemCpuUtilizationLast5SecondsMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minimum 5 second CPU usage measurement."
+	::= { wwpLeosSystemCpuUtilization 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.3
+	wwpLeosSystemCpuUtilizationLast5SecondsMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The maximum 5 second CPU usage measurement."
+	::= { wwpLeosSystemCpuUtilization 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.4
+	wwpLeosSystemCpuUtilizationLast5SecondsState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 5 second CPU usage state."
+	::= { wwpLeosSystemCpuUtilization 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.5
+	wwpLeosSystemCpuUtilizationLast10Seconds OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 10 second CPU usage measurement."
+	::= { wwpLeosSystemCpuUtilization 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.6
+	wwpLeosSystemCpuUtilizationLast10SecondsMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minimum 10 second CPU usage measurement."
+	::= { wwpLeosSystemCpuUtilization 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.7
+	wwpLeosSystemCpuUtilizationLast10SecondsMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum 10 second CPU usage measurement."
+	::= { wwpLeosSystemCpuUtilization 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.8
+	wwpLeosSystemCpuUtilizationLast10SecondsState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 10 second CPU usage state."
+	::= { wwpLeosSystemCpuUtilization 8 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.9
+	wwpLeosSystemCpuUtilizationLast60Seconds OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 60 second CPU usage state."
+	::= { wwpLeosSystemCpuUtilization 9 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.10
+	wwpLeosSystemCpuUtilizationLast60SecondsMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minimum 60 second CPU usage measurement."
+	::= { wwpLeosSystemCpuUtilization 10 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.11
+	wwpLeosSystemCpuUtilizationLast60SecondsMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum 60 second CPU usage measurement."
+	::= { wwpLeosSystemCpuUtilization 11 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.11.12
+	wwpLeosSystemCpuUtilizationLast60SecondsState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 60 second CPU state."
+	::= { wwpLeosSystemCpuUtilization 12 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12
+	wwpLeosSystemFileSystemUtilization OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 12 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.1
+	wwpLeosSystemFileSystemUtilizationTmpfsCurrent OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current percentage usage of the /tmp/ directory in the filesystem."
+	::= { wwpLeosSystemFileSystemUtilization 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.2
+	wwpLeosSystemFileSystemUtilizationTmpfsMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minimum percentage usage of the /tmp/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.3
+	wwpLeosSystemFileSystemUtilizationTmpfsMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum percentage usage of the /tmp/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.4
+	wwpLeosSystemFileSystemUtilizationTmpfsState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current state of the /tmp/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.5
+	wwpLeosSystemFileSystemUtilizationSysfsCurrent OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current percentage usage of the /mnt/sysfs/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.6
+	wwpLeosSystemFileSystemUtilizationSysfsMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minimum percentage usage of the /mnt/sysfs/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.7
+	wwpLeosSystemFileSystemUtilizationSysfsMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum percentage usage of the /mnt/sysfs/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.8
+	wwpLeosSystemFileSystemUtilizationSysfsState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current state of the /mnt/sysfs/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 8 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.9
+	wwpLeosSystemFileSystemUtilizationXftpCurrent OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current percentage usage of the /mnt/xftp/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 9 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.10
+	wwpLeosSystemFileSystemUtilizationXftpMinimum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minimum percentage usage of the /mnt/xftp/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 10 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.11
+	wwpLeosSystemFileSystemUtilizationXftpMaximum OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum percentage usage of the /mnt/xftp/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 11 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.12.12
+	wwpLeosSystemFileSystemUtilizationXftpState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current state of the /mnt/xftp/ directory in the file system."
+	::= { wwpLeosSystemFileSystemUtilization 12 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.13
+	wwpLeosSystemMemoryUtilization OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 13 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.13.1
+	wwpLeosSystemMemoryUtilizationUsedMemoryCurrent OBJECT-TYPE
+		SYNTAX Gauge32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current number of used memory in bytes."
+	::= { wwpLeosSystemMemoryUtilization 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.13.2
+	wwpLeosSystemMemoryUtilizationUsedMemoryMinimum OBJECT-TYPE
+		SYNTAX Gauge32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minimum number of used memory in bytes."
+	::= { wwpLeosSystemMemoryUtilization 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.13.3
+	wwpLeosSystemMemoryUtilizationUsedMemoryMaximum OBJECT-TYPE
+		SYNTAX Gauge32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum number of used memory in bytes."
+	::= { wwpLeosSystemMemoryUtilization 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.13.4
+	wwpLeosSystemMemoryUtilizationAvailableMemoryCurrent OBJECT-TYPE
+		SYNTAX Gauge32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current number of available memory in bytes."
+	::= { wwpLeosSystemMemoryUtilization 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.13.5
+	wwpLeosSystemMemoryUtilizationAvailableMemoryMinimum OBJECT-TYPE
+		SYNTAX Gauge32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minimum number of available memory in bytes."
+	::= { wwpLeosSystemMemoryUtilization 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.13.6
+	wwpLeosSystemMemoryUtilizationAvailableMemoryMaximum OBJECT-TYPE
+		SYNTAX Gauge32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum number of available memory in bytes."
+	::= { wwpLeosSystemMemoryUtilization 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.13.7
+	wwpLeosSystemMemoryUtilizationAvailableMemoryState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal(1),
+			warning(2),
+			degraded(3),
+			faulted(4)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current state of the available memory."
+	::= { wwpLeosSystemMemoryUtilization 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.14
+	wwpLeosSystemGuardian OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 14 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.14.1
+	wwpLeosSystemGuardianAdminEnable OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			enable(1),
+			disable(2)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the admin state for the system guardian. A reboot is required for 
+			changes to take effect"
+	::= { wwpLeosSystemGuardian 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.14.2
+	wwpLeosSystemGuardianOperEnable OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			enable(1),
+			disable(2),
+			suspended(3)
+		}
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Displays the current guardian operational state."
+	::= { wwpLeosSystemGuardian 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.14.3
+	wwpLeosSystemGuardianLimitNumReboots OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			on(1),
+			off(2)
+		}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Limits the number of consecutive guardian reboots to 3 if set to on."
+	::= { wwpLeosSystemGuardian 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.14.4
+	wwpLeosSystemGuardianConsecutiveReboots OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The current number of consecutive guardian reboots."
+	::= { wwpLeosSystemGuardian 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.14.5
+	wwpLeosSystemGuardianTotalReboots OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of guardian reboots."
+	::= { wwpLeosSystemGuardian 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.15
+	wwpLeosSystemServers OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 15 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.15.1
+	wwpLeosSystemSftpServerAdminState OBJECT-TYPE
+		SYNTAX SystemServerAdminState
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the administrative state for the SFTP server."
+	::= { wwpLeosSystemServers 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.15.2
+	wwpLeosSystemFtpServerAdminState OBJECT-TYPE
+		SYNTAX SystemServerAdminState
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the administrative state for the FTP server."
+	::= { wwpLeosSystemServers 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.15.3
+	wwpLeosSystemTftpServerAdminState OBJECT-TYPE
+		SYNTAX SystemServerAdminState
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the administrative state for the TFTP server."
+	::= { wwpLeosSystemServers 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.15.4
+	wwpLeosSystemScpServerAdminState OBJECT-TYPE
+		SYNTAX SystemServerAdminState
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the administrative state for the SCP server."
+	::= { wwpLeosSystemServers 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.16
+	wwpLeosSystemClients OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBObjects 16 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.16.2
+	wwpLeosSystemFtpClientAdminState OBJECT-TYPE
+		SYNTAX SystemClientAdminState
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the administrative state for the FTP client."
+	::= { wwpLeosSystemClients 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.1.16.3
+	wwpLeosSystemTftpClientAdminState OBJECT-TYPE
+		SYNTAX SystemClientAdminState
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the administrative state for the TFTP client."
+	::= { wwpLeosSystemClients 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2
+	wwpLeosSystemConfigMIBNotificationPrefix OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIB 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0
+	wwpLeosSystemConfigMIBNotifications OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBNotificationPrefix 0 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.1
+	wwpLeosImproperCmdInConfigFile NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemConfigFileName, wwpLeosSystemConfigErrLineNum, 
+		wwpLeosSystemConfigErrLinesTotal } 
+		STATUS current
+		DESCRIPTION
+			"A wwpLeosImproperCmdInConfigFile notif signifies that the SNMP entity, acting in
+			an agent role, has counted the number of improper commands that were found in the
+			configuration file while processing the wwpLeosSystemConfigFileName"
+	::= { wwpLeosSystemConfigMIBNotifications 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.2
+	wwpLeosSystemServiceModeChange NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemServiceMode } 
+		STATUS current
+		DESCRIPTION
+			"A wwpLeosSystemServiceModeChange notification is sent whenever someone changes the system service mode 
+			between mpls and pbt."
+	::= { wwpLeosSystemConfigMIBNotifications 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.3
+	wwpLeosSystemMemoryStatusNotification NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemMemoryUsageMemoryTotal, 
+		wwpLeosSystemMemoryUsageMemoryFree, wwpLeosSystemMemoryUsageStatus, 
+		wwpLeosSystemMemoryUsageMemoryAvailable } 
+		STATUS current
+		DESCRIPTION
+			"A wwpLeosSystemMemoryStatusNotification notification is sent whenever the system memory is
+			below threshold limit."
+	::= { wwpLeosSystemConfigMIBNotifications 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.4
+	wwpLeosImproperCmdInConfigLineString NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemConfigErrStr, wwpLeosSystemConfigErrLineNum, 
+		wwpLeosSystemConfigFileName } 
+		STATUS current
+		DESCRIPTION
+			"A wwpLeosImproperCmdInConfigLineString notif signifies that the SNMP entity, acting in
+			an agent role, has detected that improper commands were found in the
+			configuration file while processing the wwpLeosSystemConfigFileName. 
+			wwpLeosSystemConfigErrStr will specify the commands which failed with the line number."
+	::= { wwpLeosSystemConfigMIBNotifications 4 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.5
+	wwpLeosSystemCpuUtilization5SecondStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemCpuUtilizationLast5Seconds, 
+		wwpLeosSystemCpuUtilizationLast5SecondsState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemCpuUtilizationStatusTrap is sent when the 5 second CPU utilization changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 5 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.6
+	wwpLeosSystemCpuUtilization10SecondStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemCpuUtilizationLast10Seconds, 
+		wwpLeosSystemCpuUtilizationLast10SecondsState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemCpuUtilization10SecondStatusTrap is sent when the 10 second CPU utilization changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 6 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.7
+	wwpLeosSystemCpuUtilization60SecondStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemCpuUtilizationLast60Seconds, 
+		wwpLeosSystemCpuUtilizationLast60SecondsState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemCpuUtilizationStatusTrap is sent when the 60 second CPU utilization changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 7 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.8
+	wwpLeosSystemCpu1MinLoadStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemCpuLoad1Min, wwpLeosSystemCpuLoad1MinState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemCpuLoadStatusTrap is sent when the CPU load over one minute changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 8 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.9
+	wwpLeosSystemCpu5MinLoadStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemCpuLoad5Min, wwpLeosSystemCpuLoad5MinState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemCpuLoadStatusTrap is sent when the CPU load over five minutes changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 9 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.10
+	wwpLeosSystemCpu15MinLoadStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemCpuLoad15Min, wwpLeosSystemCpuLoad15MinState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemCpuLoadStatusTrap is sent when the CPU load over fifteen minutes changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 10 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.11
+	wwpLeosSystemMemoryUtilizationStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemMemoryUtilizationAvailableMemoryCurrent, 
+		wwpLeosSystemMemoryUtilizationAvailableMemoryState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemMemoryUtilizationStatusTrap is sent when the memory utilization changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 11 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.12
+	wwpLeosSystemFileSystemUtilizationTmpStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemFileSystemUtilizationTmpfsCurrent, 
+		wwpLeosSystemFileSystemUtilizationTmpfsState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemFileSystemUtilizationTmpStatusTrap is sent when the usage of '/tmp/' changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 12 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.13
+	wwpLeosSystemFileSystemUtilizationSysfsStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemFileSystemUtilizationSysfsCurrent, 
+		wwpLeosSystemFileSystemUtilizationSysfsState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemFileSystemUtilizationSysfsStatusTrap is sent when the usage of '/mnt/sysfs/' changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 13 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.2.0.14
+	wwpLeosSystemFileSystemUtilizationXftpStatusTrap NOTIFICATION-TYPE
+		OBJECTS { wwpLeosSystemFileSystemUtilizationXftpCurrent, 
+		wwpLeosSystemFileSystemUtilizationXftpState } 
+		STATUS current
+		DESCRIPTION
+			"The wwpLeosSystemFileSystemUtilizationXftpStatusTrap is sent when the usage of '/mnt/xftp/' changes states."
+	::= { wwpLeosSystemConfigMIBNotifications 14 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.3
+	wwpLeosSystemConfigMIBConformance OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIB 3 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.3.1
+	wwpLeosSystemConfigCompliances OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBConformance 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.3.1.1
+	wwpLeosDefaultGatewayCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION
+			"The compliance statement of wwpLeosSystemConfigAttr."
+		MODULE -- this module
+			GROUP wwpLeosDefaultGatewayIPv6Group
+				DESCRIPTION
+					"This group is mandatory when IPv6 addresses are supported."
+			OBJECT wwpLeosSystemConfigDefaultGatewayInetAddrType
+				SYNTAX InetAddressType
+					{
+					ipv4(1),
+					ipv6(2)
+					}
+				DESCRIPTION
+					"An implementation is only required to support IPv4
+					and IPv6 addresses without zone indices."
+
+	::= { wwpLeosSystemConfigCompliances 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.3.1.2
+	wwpLeosBackupGatewayCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION
+			"The compliance statement of wwpLeosSystemConfigAttr."
+		MODULE -- this module
+			GROUP wwpLeosBackupGatewayIPv6Group
+				DESCRIPTION
+					"This group is mandatory when IPv6 addresses are supported."
+			OBJECT wwpLeosSystemConfigBackupGatewayInetAddrType
+				SYNTAX InetAddressType
+					{
+					ipv4(1),
+					ipv6(2)
+					}
+				DESCRIPTION
+					"An implementation is only required to support IPv4
+					and IPv6 addresses without zone indices."
+
+	::= { wwpLeosSystemConfigCompliances 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.3.2
+	wwpLeosSystemConfigMIBGroups OBJECT IDENTIFIER ::= { wwpLeosSystemConfigMIBConformance 2 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.3.2.1
+	wwpLeosDefaultGatewayIPv6Group OBJECT-GROUP
+		OBJECTS { wwpLeosSystemConfigDefaultGatewayInetAddrType, 
+		wwpLeosSystemConfigDefaultGatewayInetAddress } 
+		STATUS current
+		DESCRIPTION
+			"System config default gateway objects for supporting IPv6."
+	::= { wwpLeosSystemConfigMIBGroups 1 }
+
+	-- 1.3.6.1.4.1.6141.2.60.12.3.2.2
+	wwpLeosBackupGatewayIPv6Group OBJECT-GROUP
+		OBJECTS { wwpLeosSystemConfigBackupGatewayInetAddrType, 
+		wwpLeosSystemConfigBackupGatewayInetAddress } 
+		STATUS current
+		DESCRIPTION
+			"System config backup gateway objects for supporting IPv6."
+	::= { wwpLeosSystemConfigMIBGroups 2 }
+
+END
+

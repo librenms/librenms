@@ -13,29 +13,29 @@
 * @author     LibreNMS Contributors
 */
 
-$param = array();
+$param = [];
 
 $pagetitle[] = 'Alert Log';
 
-$alert_states = array(
+$alert_states = [
     // divined from librenms/alerts.php
     'Any' => -1,
     'Ok (recovered)' => 0,
     'Alert' => 1,
-//    'Acknowledged' => 2,
+    //    'Acknowledged' => 2,
     'Worse' => 3,
     'Better' => 4,
-);
+];
 
-$alert_severities = array(
+$alert_severities = [
     // alert_rules.status is enum('ok','warning','critical')
     'Any' => '',
     'Ok, warning and critical' => 1,
     'Warning and critical' => 2,
     'Critical' => 3,
     'OK' => 4,
-    'Warning' => 5
-);
+    'Warning' => 5,
+];
 
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
@@ -51,7 +51,7 @@ $common_output[] = '<div class="panel panel-default panel-condensed">
             ';
 
 if (isset($_POST['device_id'])) {
-    $selected_device = '<option value="' . (int)$_POST['device_id'] . '" selected="selected">';
+    $selected_device = '<option value="' . (int) $_POST['device_id'] . '" selected="selected">';
     $selected_device .= htmlentities($_POST['hostname']) . '</option>';
 } else {
     $selected_device = $device_id;
@@ -59,14 +59,14 @@ if (isset($_POST['device_id'])) {
 }
 if (isset($_POST['state'])) {
     $selected_state = '<option value="' . $_POST['state'] . '" selected="selected">';
-    $selected_state .= array_search((int)$_POST['state'], $alert_states) . '</option>';
+    $selected_state .= array_search((int) $_POST['state'], $alert_states) . '</option>';
 } else {
     $selected_state = '';
     $_POST['state'] = -1;
 }
 if (isset($_POST['min_severity'])) {
     $selected_min_severity = '<option value="' . $_POST['min_severity'] . '" selected="selected">';
-    $selected_min_severity .= array_search((int)$_POST['min_severity'], $alert_severities) . '</option>';
+    $selected_min_severity .= array_search((int) $_POST['min_severity'], $alert_severities) . '</option>';
 } else {
     $selected_min_severity = '';
     $_POST['min_severity'] = '';
@@ -77,11 +77,12 @@ $common_output[] = '
     <table id="alertlog" class="table table-hover table-condensed table-striped">
         <thead>
         <tr>
-            <th data-column-id="status" data-sortable="false"></th>
+            <th data-column-id="status" data-sortable="false">State</th>
             <th data-column-id="time_logged" data-order="desc">Timestamp</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert">Alert</th>
+            <th data-column-id="severity">Severity</th>
         </tr>
         </thead>
     </table>
@@ -101,13 +102,13 @@ $common_output[] = '
             <input type=hidden name="hostname" id="hostname"> \
 ';
 
-if (isset($vars['fromdevice']) && !$vars['fromdevice']) {
+if (isset($vars['fromdevice']) && ! $vars['fromdevice']) {
     $common_output[] = '<div class="form-group"> \
                 <label> \
                 <strong>Device&nbsp;</strong> \
                 </label> \
                 <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;"> \
-                ' . $selected_device. ' \
+                ' . $selected_device . ' \
                </select> \
                </div> \
                ';
@@ -118,7 +119,7 @@ $common_output[] = '<div class="form-group"> \
                <strong>&nbsp;State&nbsp;</strong> \
                </label> \
                <select name="state" id="state" class="form-control input-sm"> \
-                $common_output[] = ' . $selected_state. ' \
+                $common_output[] = ' . $selected_state . ' \
                <option value="-1">Any</option> \
                <option value="0">Ok (recovered)</option> \
                <option value="1">Alert</option> \
@@ -131,7 +132,7 @@ $common_output[] = '<div class="form-group"> \
                <strong>&nbsp;Severity&nbsp;</strong> \
                </label> \
                <select name="min_severity" id="min_severity" class="form-control input-sm"> \
-                ' . $selected_min_severity. ' \
+                ' . $selected_min_severity . ' \
                <option value>Any</option> \
                <option value="3">Critical</option> \
                <option value="5">Warning</option> \
@@ -147,9 +148,9 @@ $common_output[] = '<div class="form-group"> \
         post: function () {
             return {
                 id: "alertlog",
-                device_id: \'' . htmlspecialchars($_POST['device_id']). '\',
-                state: \'' . htmlspecialchars($_POST['state']). '\',
-                min_severity: \'' . htmlspecialchars($_POST['min_severity']). '\'
+                device_id: \'' . htmlspecialchars($_POST['device_id']) . '\',
+                state: \'' . htmlspecialchars($_POST['state']) . '\',
+                min_severity: \'' . htmlspecialchars($_POST['min_severity']) . '\'
             };
         },
         url: "ajax_table.php"
@@ -161,7 +162,7 @@ $common_output[] = '<div class="form-group"> \
         max = high - low;
         search = $(\'.search-field\').val();
 
-        $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . $_POST['device_id']. '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-heartbeat fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to pdf</a>");
+        $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . $_POST['device_id'] . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-heartbeat fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to pdf</a>");
 
         grid.find(".incident-toggle").each(function () {
             $(this).parent().addClass(\'incident-toggle-td\');

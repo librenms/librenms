@@ -65,7 +65,7 @@
             {!! \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) !!}
             <span class="device-rebooted">@lang('Device Rebooted')</span>
             <br />
-            <span class="body-date-1">{{ $device->formatUptime(true) }}</span>
+            <span class="body-date-1">{{ $device->formatDownUptime(true) }}</span>
         </div>
     @endforeach
 
@@ -95,20 +95,19 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-default panel-condensed">
-                <div class="panel-heading">
-                    <strong>@lang('Syslog entries')</strong>
-                </div>
-                <table class="table table-hover table-condensed table-striped">
-                @foreach ($syslog as $entry)
-                    <tr>
-                        <td>{{ $entry->date }}</td>
-                        <td><strong>{!! \LibreNMS\Util\Url::deviceLink($entry->device) !!}</strong></td>
-                        <td><strong>{{ $entry->program }} : </strong> {{ $entry->msg }}</td>
-                    </tr>
-                @endforeach
-                </table>
-            </div>
+            <x-panel title="{{ __('Syslog entries') }}">
+                <x-slot name="table">
+                    <table class="table table-hover table-condensed table-striped">
+                    @foreach ($syslog as $entry)
+                        <tr>
+                            <td>{{ $entry->date }}</td>
+                            <td><strong>{!! \LibreNMS\Util\Url::deviceLink($entry->device) !!}</strong></td>
+                            <td><strong>{{ $entry->program }} : </strong> {{ $entry->msg }}</td>
+                        </tr>
+                    @endforeach
+                    </table>
+                </x-slot>
+            </x-panel>
         </div>
    </div>
 </div>

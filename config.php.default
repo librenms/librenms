@@ -2,19 +2,13 @@
 
 ## Have a look in misc/config_definitions.json for examples of settings you can set here. DO NOT EDIT misc/config_definitions.json!
 
-### Database config
-$config['db_host'] = 'localhost';
-$config['db_user'] = 'USERNAME';
-$config['db_pass'] = 'PASSWORD';
-$config['db_name'] = 'librenms';
-
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
 $config['user'] = 'librenms';
 
 ### This should *only* be set if you want to *force* a particular hostname/port
 ### It will prevent the web interface being usable form any other hostname
-$config['base_url']        = "/";
+#$config['base_url']        = "/";
 
 ### Enable this to use rrdcached. Be sure rrd_dir is within the rrdcached dir
 ### and that your web server has permission to talk to rrdcached.

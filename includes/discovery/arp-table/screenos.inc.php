@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -27,7 +26,7 @@
 // collect arp data
 $nsIpArpTable = snmpwalk_group($device, 'nsIpArpTable', 'NETSCREEN-IP-ARP-MIB');
 
-if (!empty($nsIpArpTable)) {
+if (! empty($nsIpArpTable)) {
     // get internal id to ifIndex map
     $nsIfInfo = snmpwalk_group($device, 'nsIfInfo', 'NETSCREEN-INTERFACE-MIB', 0);
     $nsIfInfo = array_flip($nsIfInfo['nsIfInfo']);

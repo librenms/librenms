@@ -43,7 +43,7 @@ if (is_numeric($users)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'pulse_users', $tags, $fields);
-    $graphs['pulse_users'] = true;
+    $os->enableGraph('pulse_users');
 }
 
 $sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
@@ -57,7 +57,7 @@ if (is_numeric($sessions)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'pulse_sessions', $tags, $fields);
-    $graphs['pulse_sessions'] = true;
+    $os->enableGraph('pulse_sessions');
 }
 ```
 

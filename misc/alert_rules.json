@@ -1,8 +1,7 @@
 [
   {
     "rule": "macros.device_down = \"1\"",
-    "name": "Devices up/down",
-    "default": false
+    "name": "Devices up/down"
   },
   {
     "rule": "macros.device_down = \"1\" && devices.status_reason = \"icmp\"",
@@ -23,14 +22,12 @@
   {
     "rule": "bgpPeers.bgpPeerState != \"established\" && macros.device_up = \"1\" && bgpPeers.bgpPeerAdminStatus != \"stop\"",
     "name": "BGP Session down",
-    "extra": "{\"count\": 1}",
-    "default": true
+    "extra": "{\"count\": 1}"
   },
   {
     "rule": "bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && bgpPeers.bgpPeerState = \"established\" && macros.device_up = \"1\"",
     "name": "BGP Session established",
-    "extra": "{\"count\": 1}",
-    "default": true
+    "extra": "{\"count\": 1}"
   },
   {
     "rule": "macros.port_down = \"1\"",
@@ -76,14 +73,12 @@
   {
     "rule": "wireless_sensors.sensor_type == \"arubaos\" && wireless_sensors.sensor_class == \"ap-count\" && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\" && wireless_sensors.sensor_current <= `wireless_sensors.sensor_limit_low_warn` && wireless_sensors.sensor_current > `wireless_sensors.sensor_limit_low`",
     "name": "Aruba Wireless AP Count Low Warning",
-    "severity": "warning",
-    "default": false
+    "severity": "warning"
   },
   {
     "rule": "wireless_sensors.sensor_type == \"arubaos\" && wireless_sensors.sensor_class == \"ap-count\" && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\" && wireless_sensors.sensor_current <= `wireless_sensors.sensor_limit_low`",
     "name": "Aruba Wireless AP Count Low Critical",
-    "severity": "critical",
-    "default": false
+    "severity": "critical"
   },
   {
     "rule": "macros.state_sensor_critical && sensors.sensor_alert = 1",
@@ -92,8 +87,7 @@
   },
   {
     "rule": "macros.state_sensor_warning && sensors.sensor_alert = 1",
-    "name": "State Sensor Warning",
-    "default": false
+    "name": "State Sensor Warning"
   },
   {
     "rule": "macros.bill_quota_over_quota >= \"75\"",
@@ -176,7 +170,7 @@
     "name": "APC UPS Diagonstics Test Result"
   },
   {
-    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]},{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"}]}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]},{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"not_equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"}]}],"valid":true},
     "name": "APC UPS Switched to Battery Power"
   },
   {
@@ -312,7 +306,7 @@
     "name": "Cisco NX-OS device has a bad fan"
   },
   {
-    "rule": "devices.os = \"panos\" & sensors.sensor_type = \"panSysHAState\" && sensors.sensor_current = \"1\" && sensors.sensor_prev = \"2\"",
+    "rule": "devices.os = \"panos\" && sensors.sensor_type = \"panSysHAState\" && sensors.sensor_current = \"1\" && sensors.sensor_prev = \"2\"",
     "name": "Palo Alto Networks passive firewall changed to active"
   },
   {
@@ -437,24 +431,88 @@
   },
  {
     "rule": "customoids.customoid_current >= `customoids.customoid_limit` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
-    "name": "CustomOID over limit",
-    "default": true
+    "name": "CustomOID over limit"
   },
   {
     "rule": "customoids.customoid_current <= `customoids.customoid_limit_low` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
-    "name": "CustomOID under limit",
-    "default": true
+    "name": "CustomOID under limit"
   },
   {
     "rule": "customoids.customoid_current >= `customoids.customoid_limit_warn` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID over warning limit",
-    "severity": "warning",
-    "default": true
+    "severity": "warning"
   },
   {
     "rule": "customoids.customoid_current <= `customoids.customoid_limit_low_warn` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID under warning limit",
-    "severity": "warning",
-    "default": true
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSOnBattery\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT on battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSLowBattery\" && macros.state_sensor_critical = 1",
+    "name": "UPS-NUT low battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSHighBattery\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT high battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSBatteryReplace\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery needs to be replaced"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSBatteryCharging\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery is charging"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSBatteryDischarging\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery is discharging"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSUPSBypass\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT bypass circuit is active"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSRuntimeCalibration\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT performing runtime calibration"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSOffline\" && macros.state_sensor_critical = 1",
+    "name": "UPS-NUT offline and is not supplying power to the load"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSUPSOverloaded\" && macros.state_sensor_critical = 1",
+    "name": "UPS-NUT overloaded"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSUPSBuck\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT trimming incoming voltage"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSUPSBoost\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT boosting incoming voltage"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSForcedShutdown\" && macros.state_sensor_critical = 1",
+    "name": "UPS-NUT trimming incoming voltage"
+  },
+  {
+    "rule": "devices.os = \"qnap\" && sensors.sensor_type = \"systemPowerStatus\" && sensors.sensor_current = \"-1\"",
+    "name": "QNAP NAS has a failed power status"
+  },
+  {
+    "rule": "devices.os = \"qnap\" && sensors.sensor_type = \"systemFanStatus\" && sensors.sensor_current = \"-1\"",
+    "name": "QNAP NAS has a failed fan status"
+  },
+  {
+    "rule": "devices.os = \"qnap\" && sensors.sensor_type = \"raidStatus\" && sensors.sensor_current != \"0\"",
+    "name": "QNAP NAS has a bad RAID status"
+  },
+  {
+    "rule": "devices.os = \"qnap\" && sensors.sensor_type = \"diskSmartInfo\" && sensors.sensor_current != \"0\"",
+    "name": "QNAP NAS has a bad SMART disk status"
   }
 ]

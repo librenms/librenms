@@ -1,14 +1,19 @@
 mib: Sentry4-MIB
 modules:
+    os:
+        hardware: Sentry4-MIB::st4UnitModel.1
+        serial: Sentry4-MIB::st4UnitProductSN.1
+        version: Sentry4-MIB::st4SystemFirmwareVersion.0
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - st4InputCordName
-                    - st4LineLabel
-                    - st4PhaseLabel
-                    - st4OcpLabel
-                    - st4BranchLabel
+                -
+                    oid:
+                        - st4InputCordName
+                        - st4LineLabel
+                        - st4PhaseLabel
+                        - st4OcpLabel
+                        - st4BranchLabel
         current:
             data:
                 -

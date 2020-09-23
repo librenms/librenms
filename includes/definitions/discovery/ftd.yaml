@@ -1,0 +1,12 @@
+modules:
+    os:
+        sysDescr_regex: '/Version (?<version>[^,]+)/'
+        serial:
+            - ENTITY-MIB::entPhysicalSerialNum.1
+            - ENTITY-MIB::entPhysicalSerialNum.4
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+            - ENTITY-MIB::entPhysicalSoftwareRev.4
+        hardware:
+            - ENTITY-MIB::entPhysicalModelName.1
+            - ENTITY-MIB::entPhysicalModelName.4

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -50,8 +49,8 @@ class DuskUnsafeException extends \Exception implements UpgradeableException
      */
     public function render(\Illuminate\Http\Request $request)
     {
-        $title = __('It is unsafe to run Dusk in production');
-        $message = __('Run ":command" to remove Dusk or if you are a developer set the appropriate APP_ENV', ['command' => './scripts/composer_wrapper.php install --no-dev']);
+        $title = trans('exceptions.dusk_unsafe.title');
+        $message = trans('exceptions.dusk_unsafe.message', ['command' => './scripts/composer_wrapper.php install --no-dev']);
 
         return $request->wantsJson() ? response()->json([
             'status' => 'error',

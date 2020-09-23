@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\DeviceGroup;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DeviceGroupPolicy
@@ -36,6 +36,17 @@ class DeviceGroupPolicy
      * @return mixed
      */
     public function view(User $user, DeviceGroup $deviceGroup)
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can view any device group.
+     *
+     * @param  \App\User $user
+     * @return mixed
+     */
+    public function viewAny(User $user)
     {
         return false;
     }

@@ -17,17 +17,16 @@
  * @author Adam Bishop <adam@omega.org.uk>
  * @copyright 2020 Adam Bishop, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
-namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
+namespace LibreNMS\Alert\Transport;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Alert\Transport;
+use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 class Sensu extends Transport
 {
@@ -37,26 +36,19 @@ class Sensu extends Transport
     const CRITICAL = 2;
     const UNKNOWN = 3;
 
-    // LibreNMS alert coding
-    const RECOVER = 0;
-    const ALERT = 1;
-    const ACK = 2;
-    const WORSE = 3;
-    const BETTER = 4;
-
-    private static $status = array(
+    private static $status = [
         'ok' => Sensu::OK,
         'warning' => Sensu::WARNING,
-        'critical' => Sensu::CRITICAL
-    );
+        'critical' => Sensu::CRITICAL,
+    ];
 
-    private static $severity = array(
-        'recovered' => Sensu::RECOVER,
-        'alert' => Sensu::ALERT,
-        'acknowledged' => Sensu::ACK,
-        'worse' => Sensu::WORSE,
-        'better' => Sensu::BETTER,
-    );
+    private static $severity = [
+        'recovered' => AlertState::RECOVERED,
+        'alert' => AlertState::ACTIVE,
+        'acknowledged' => AlertState::ACKNOWLEDGED,
+        'worse' => AlertState::WORSE,
+        'better' => AlertState::BETTER,
+    ];
 
     private static $client = null;
 
@@ -64,8 +56,8 @@ class Sensu extends Transport
     {
         $sensu_opts = [];
         $sensu_opts['url'] = $this->config['sensu-url'] ? $this->config['sensu-url'] : 'http://127.0.0.1:3031';
-        $sensu_opts['namespace'] =  $this->config['sensu-namespace'] ? $this->config['sensu-namespace'] : 'default';
-        $sensu_opts['prefix'] =  $this->config['sensu-prefix'];
+        $sensu_opts['namespace'] = $this->config['sensu-namespace'] ? $this->config['sensu-namespace'] : 'default';
+        $sensu_opts['prefix'] = $this->config['sensu-prefix'];
         $sensu_opts['source-key'] = $this->config['sensu-source-key'];
 
         Sensu::$client = new Client();
@@ -73,7 +65,7 @@ class Sensu extends Transport
         try {
             return $this->contactSensu($obj, $sensu_opts);
         } catch (GuzzleException $e) {
-            return "Sending event to Sensu failed: " . $e->getMessage();
+            return 'Sending event to Sensu failed: ' . $e->getMessage();
         }
     }
 
@@ -85,7 +77,7 @@ class Sensu extends Transport
             return 'Sensu API is not responding';
         }
 
-        if ($obj['state'] !== Sensu::RECOVER && $obj['state'] !== Sensu::ACK && $obj['alerted'] === 0) {
+        if ($obj['state'] !== AlertState::RECOVERED && $obj['state'] !== AlertState::ACKNOWLEDGED && $obj['alerted'] === 0) {
             // If this is the first event, send a forced "ok" dated (rrd.step / 2) seconds ago to tell Sensu the last time the check was healthy
             $data = Sensu::generateData($obj, $opts, Sensu::OK, round(Config::get('rrd.step', 300) / 2));
             Log::debug('Sensu transport sent last good event to socket: ', $data);
@@ -133,7 +125,7 @@ class Sensu extends Transport
                 'system' => [
                     'hostname' => $obj['hostname'],
                     'os' => $obj['os'],
-                ]
+                ],
             ],
         ];
     }
@@ -142,7 +134,7 @@ class Sensu extends Transport
     {
         return array_filter([
             'generated-by' => 'LibreNMS',
-            'acknowledged' => $obj['state'] === Sensu::ACK ? 'true' : 'false',
+            'acknowledged' => $obj['state'] === AlertState::ACKNOWLEDGED ? 'true' : 'false',
             'contact' => $obj['sysContact'],
             'description' => $obj['sysDescr'],
             'location' => $obj['location'],
@@ -158,7 +150,7 @@ class Sensu extends Transport
     {
         // Sensu only has a single short (status) to indicate both severity and status, so we need to map LibreNMS' state and severity onto it
 
-        if ($state === Sensu::RECOVER) {
+        if ($state === AlertState::RECOVERED) {
             // LibreNMS alert is resolved, send ok
             return Sensu::OK;
         }
@@ -243,15 +235,15 @@ class Sensu extends Transport
                     'options' => [
                         'hostname' => 'hostname',
                         'sysName' => 'sysName',
-                        'shortname' => 'shortname'
+                        'shortname' => 'shortname',
                     ],
-                    'default' => 'hostname'
+                    'default' => 'hostname',
                 ],
             ],
             'validation' => [
                 'sensu-url' => 'url',
                 'sensu-source-key' => 'required|in:hostname,sysName,shortname',
-            ]
+            ],
         ];
     }
 }

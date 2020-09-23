@@ -177,33 +177,11 @@ if __name__ == '__main__':
     logger = LNMS.logger_get_logger(LOG_FILE, debug=_DEBUG)
 
     install_dir = os.path.dirname(os.path.realpath(__file__))
-    config_file = install_dir + '/config.php'
-
-    LNMS.check_for_file(config_file)
-
-    try:
-        conf = LNMS.get_config_data(install_dir)
-        config = json.loads(conf)
-    except:
-        print("ERROR: Could not load or parse configuration, are PATHs correct?")
-        sys.exit(2)
+    LNMS.check_for_file(install_dir + '/.env')
+    config = json.loads(LNMS.get_config_data(install_dir))
 
     poller_path = config['install_dir'] + '/poller.php'
     log_dir = config['log_dir']
-
-    # TODO: Use LibreNMS.DB
-    db_username = config['db_user']
-    db_password = config['db_pass']
-    db_port = int(config['db_port'])
-
-    if config['db_socket']:
-        db_server = config['db_host']
-        db_socket = config['db_socket']
-    else:
-        db_server = config['db_host']
-        db_socket = None
-
-    db_dbname = config['db_name']
 
     if 'rrd' in config and 'step' in config['rrd']:
         step = config['rrd']['step']
@@ -254,8 +232,8 @@ if __name__ == '__main__':
             raise
         except ImportError:
             print("ERROR: missing memcache python module:")
-            print("On deb systems: apt-get install python-memcache")
-            print("On other systems: easy_install python-memcached")
+            print("On deb systems: apt-get install python3-memcache")
+            print("On other systems: pip3 install python-memcached")
             print("Disabling distributed poller.")
             distpoll = False
     else:
@@ -300,7 +278,7 @@ if __name__ == '__main__':
         query = 'select device_id from devices where disabled = 0 order by last_polled_timetaken desc'
     # EOC2
 
-    db = LNMS.db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname)
+    db = LNMS.db_open(config['db_socket'], config['db_host'], config['db_port'], config['db_user'], config['db_pass'], config['db_name'])
     cursor = db.cursor()
     cursor.execute(query)
     devices = cursor.fetchall()
@@ -374,7 +352,7 @@ if __name__ == '__main__':
 
     show_stopper = False
 
-    db = LNMS.db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname)
+    db = LNMS.db_open(config['db_socket'], config['db_host'], config['db_port'], config['db_user'], config['db_pass'], config['db_name'])
     cursor = db.cursor()
     query = "update pollers set last_polled=NOW(), devices='%d', time_taken='%d' where poller_name='%s'" % (
         polled_devices,

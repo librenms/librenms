@@ -30,6 +30,11 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysDescr:
-        - NX-OS(tm)
-        - Cisco NX-OS
+    -
+        sysDescr:
+            - NX-OS(tm)
+            - Cisco NX-OS
+        sysDescr_except:
+            - Cisco NX-OS(tm) ucs # exclude UCS, and indentify as "UCOS" OS
+        sysObjectID_except:
+            - .1.3.6.1.4.1.9.12.3.1.3.1062 # exclude UCS, and indentify as "UCOS" OS

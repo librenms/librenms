@@ -3,14 +3,13 @@ text: 'cdata'
 type: network
 icon: cdata
 group: cdata
-mib_dir:
-    - cdata
+mib_dir: cdata
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - 
+    -
         sysObjectID:
             - .1.3.6.1.4.1.17409
         sysObjectID_except:

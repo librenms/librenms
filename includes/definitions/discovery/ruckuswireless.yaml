@@ -1,8 +1,19 @@
 mib: RUCKUS-ZD-SYSTEM-MIB
 modules:
+    os:
+        features:
+            - RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumRegisteredAP.0
+            - RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemLicensedAPs.0
+        features_template: 'Licenses: {{ RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumRegisteredAP.0 }}/{{ RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemLicensedAPs.0 }}'
+        hardware: RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemModel.0
+        version:
+            - RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemVersion.0
+            - RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemCountryCode.0
+        version_template: '{{ RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemVersion.0 }} ({{ RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemCountryCode.0 }})'
+        serial: RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemSerialNumber.0
     processors:
-          data:
-              -
-                  oid: ruckusZDSystemCPUUtil
-                  num_oid: '.1.3.6.1.4.1.25053.1.2.1.1.1.5.58.0'
-                  type: ruckuszd
+        data:
+            -
+                oid: ruckusZDSystemCPUUtil
+                num_oid: '.1.3.6.1.4.1.25053.1.2.1.1.1.5.58.0'
+                type: ruckuszd

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateDevicesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,16 +14,16 @@ class CreateDevicesTable extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->increments('device_id');
-            $table->string('hostname', 128)->index('hostname');
-            $table->string('sysName', 128)->nullable()->index('sysName');
+            $table->string('hostname', 128)->index();
+            $table->string('sysName', 128)->nullable()->index();
             $table->binary('ip')->nullable();
             $table->string('community')->nullable();
-            $table->enum('authlevel', array('noAuthNoPriv','authNoPriv','authPriv'))->nullable();
+            $table->enum('authlevel', ['noAuthNoPriv', 'authNoPriv', 'authPriv'])->nullable();
             $table->string('authname', 64)->nullable();
             $table->string('authpass', 64)->nullable();
-            $table->enum('authalgo', array('MD5','SHA'))->nullable();
+            $table->enum('authalgo', ['MD5', 'SHA'])->nullable();
             $table->string('cryptopass', 64)->nullable();
-            $table->enum('cryptoalgo', array('AES','DES',''))->nullable();
+            $table->enum('cryptoalgo', ['AES', 'DES', ''])->nullable();
             $table->string('snmpver', 4)->default('v2c');
             $table->smallInteger('port')->unsigned()->default(161);
             $table->string('transport', 16)->default('udp');
@@ -39,32 +38,34 @@ class CreateDevicesTable extends Migration
             $table->text('hardware')->nullable();
             $table->text('features')->nullable();
             $table->unsignedInteger('location_id')->nullable();
-            $table->string('os', 32)->nullable()->index('os');
-            $table->boolean('status')->default(0)->index('status');
+            $table->string('os', 32)->nullable()->index();
+            $table->boolean('status')->default(0)->index();
             $table->string('status_reason', 50);
             $table->boolean('ignore')->default(0);
             $table->boolean('disabled')->default(0);
             $table->bigInteger('uptime')->nullable();
             $table->unsignedInteger('agent_uptime')->default(0);
-            $table->timestamp('last_polled')->nullable()->index('last_polled');
-            $table->timestamp('last_poll_attempted')->nullable()->index('last_poll_attempted');
+            $table->timestamp('last_polled')->nullable()->index();
+            $table->timestamp('last_poll_attempted')->nullable()->index();
             $table->float('last_polled_timetaken', 5)->nullable();
             $table->float('last_discovered_timetaken', 5)->nullable();
             $table->timestamp('last_discovered')->nullable();
             $table->timestamp('last_ping')->nullable();
             $table->float('last_ping_timetaken')->nullable();
-            $table->text('purpose', 65535)->nullable();
+            $table->text('purpose')->nullable();
             $table->string('type', 20)->default('');
-            $table->text('serial', 65535)->nullable();
+            $table->text('serial')->nullable();
             $table->string('icon')->nullable();
             $table->integer('poller_group')->default(0);
             $table->boolean('override_sysLocation')->nullable()->default(0);
-            $table->text('notes', 65535)->nullable();
+            $table->text('notes')->nullable();
             $table->integer('port_association_mode')->default(1);
             $table->integer('max_depth')->default(0);
         });
 
-        \DB::statement("ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;");
+        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            \DB::statement('ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;');
+        }
     }
 
     /**

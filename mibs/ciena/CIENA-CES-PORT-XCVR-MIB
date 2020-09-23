@@ -1,0 +1,994 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-PORT-XCVR-MIB.my
+ --
+
+ CIENA-CES-PORT-XCVR-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Integer32, Unsigned32, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY			
+	    FROM SNMPv2-SMI			
+   DisplayString
+	    FROM SNMPv2-TC						
+   cienaCesNotifications, cienaCesConfig
+       FROM CIENA-SMI
+   cienaGlobalSeverity, cienaGlobalMacAddress
+   	   FROM CIENA-GLOBAL-MIB;
+	
+	
+ cienaCesPortXcvrMIB MODULE-IDENTITY
+          LAST-UPDATED "201901030000Z"
+          ORGANIZATION "Ciena Corp."
+          CONTACT-INFO
+          "   Mib Meister
+              7035 Ridge Road
+              Hanover, Maryland 21076
+              USA
+              Phone:  +1 800 921 1144
+              Email:  support@ciena.com" 
+          DESCRIPTION
+                   "This module defines the port XCVR related notifications."
+          REVISION
+                   "201901030000Z"
+          DESCRIPTION
+                   "Add Rx/Tx power High/LowWarning Notifications."
+          REVISION
+                   "201809280000Z"
+          DESCRIPTION
+                   "Added cfp, qsfpPlus and qsfp28 in cienaCesPortXcvrIdentiferType.
+                    Added unit information."
+          REVISION
+                   "201806150000Z"
+          DESCRIPTION
+                   "Added a new object cienaCesPortXcvrFecMode."
+             REVISION
+                   "201706070000Z"
+          DESCRIPTION
+                   "Updated contact info."
+             REVISION
+                   "201610070000Z"
+          DESCRIPTION
+                   "Added a new object cienaCesPortXcvrUncertifiedNotification."
+             REVISION
+                   "201108230000Z"
+          DESCRIPTION
+                   "Added a new object cienaCesPortXcvrTxOutputPower."
+             REVISION
+                   "201107060000Z"
+          DESCRIPTION
+                   "Corrected Units changed watts to uW in descriptions."
+       ::= { cienaCesConfig 9 }
+						
+ --
+ -- Node definitions
+ --
+	
+ cienaCesPortXcvrMIBObjects OBJECT IDENTIFIER ::= { cienaCesPortXcvrMIB 1 }
+ 
+ cienaCesPortXcvr  OBJECT IDENTIFIER ::= { cienaCesPortXcvrMIBObjects 1 }
+
+ cienaCesPortXcvrNotif  OBJECT IDENTIFIER ::= { cienaCesPortXcvrMIBObjects 2 }
+
+ -- Notifications 
+  
+ cienaCesPortXcvrMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 9 } 
+ cienaCesPortXcvrMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesPortXcvrMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ cienaCesPortXcvrMIBConformance OBJECT IDENTIFIER ::= { cienaCesPortXcvrMIB 3 } 
+ cienaCesPortXcvrMIBCompliances OBJECT IDENTIFIER ::= { cienaCesPortXcvrMIBConformance 1 } 		
+ cienaCesPortXcvrMIBGroups      OBJECT IDENTIFIER ::= { cienaCesPortXcvrMIBConformance 2 }
+
+		
+ cienaCesPortXcvrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesPortXcvrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "This table contains descriptions and settings for each of the 
+	     physical transceiver devices."
+    ::= { cienaCesPortXcvr 1 }
+		 
+ cienaCesPortXcvrEntry OBJECT-TYPE
+    SYNTAX        CienaCesPortXcvrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION "The transceiver device entry."
+    INDEX { cienaCesPortXcvrId }
+    ::= { cienaCesPortXcvrTable 1 }
+
+ CienaCesPortXcvrEntry ::= SEQUENCE {     
+    cienaCesPortXcvrId                                		INTEGER,    
+    cienaCesPortXcvrOperState                         		INTEGER,  
+    cienaCesPortXcvrTemperature	                     		INTEGER, 
+	cienaCesPortXcvrVcc				                 		INTEGER,
+    cienaCesPortXcvrBias				                 	INTEGER,
+    cienaCesPortXcvrRxPower		 	                 		INTEGER, 
+    cienaCesPortXcvrHighTempAlarmThreshold	         		Integer32,
+    cienaCesPortXcvrLowTempAlarmThreshold	         		Integer32,
+    cienaCesPortXcvrHighVccAlarmThreshold	         		Integer32,
+    cienaCesPortXcvrLowVccAlarmThreshold	             	Integer32,
+    cienaCesPortXcvrHighBiasAlarmThreshold	         		Integer32,
+    cienaCesPortXcvrLowBiasAlarmThreshold	         		Integer32,
+    cienaCesPortXcvrHighTxPwAlarmThreshold	         		Integer32,
+    cienaCesPortXcvrLowTxPwAlarmThreshold	         		Integer32,
+    cienaCesPortXcvrHighRxPwAlarmThreshold	         		Integer32,
+    cienaCesPortXcvrLowRxPwAlarmThreshold	         		Integer32,
+	cienaCesPortXcvrNotifChassisIndex						Unsigned32,
+	cienaCesPortXcvrNotifShelfIndex							Unsigned32, 
+	cienaCesPortXcvrNotifSlotIndex							Unsigned32, 
+	cienaCesPortXcvrNotifPortNumber							Unsigned32,
+    cienaCesPortXcvrIdentiferType   	                    INTEGER,
+    cienaCesPortXcvrExtIdentiferType                  		INTEGER,
+    cienaCesPortXcvrConnectorType                     	    INTEGER, 
+    cienaCesPortXcvrType		                            INTEGER,
+    cienaCesPortXcvrAdminState		   		                INTEGER,
+    cienaCesPortXcvrVendorName	 	                	    DisplayString,
+    cienaCesPortXcvrVendorOUI	 	                        OCTET STRING,
+    cienaCesPortXcvrVendorPartNum                           DisplayString,    
+    cienaCesPortXcvrRevNum                                  DisplayString,
+    cienaCesPortXcvrSerialNum	                            DisplayString,
+    cienaCesPortXcvrMfgDate		                            DisplayString,
+    cienaCesPortXcvrWaveLength	                            INTEGER,
+    cienaCesPortXcvrTxState		                            INTEGER,
+    cienaCesPortXcvrTxFaultStatus                           INTEGER,
+    cienaCesPortXcvrTxOutputPower	                 		INTEGER,
+    cienaCesPortXcvrFecMode                                 INTEGER
+ }
+
+ cienaCesPortXcvrId OBJECT-TYPE
+    SYNTAX           INTEGER (1..65535)
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+	    "The ID for the transceiver."
+    ::= { cienaCesPortXcvrEntry 1 } 
+
+ cienaCesPortXcvrOperState OBJECT-TYPE
+    SYNTAX           INTEGER {
+                        disabled(1),
+                        enabled(2),
+                        loopback(3),
+                        notPresent(4),
+                        faulted(5)
+                     }
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "The operational state of the transceiver."
+    ::= { cienaCesPortXcvrEntry 2 }
+
+ cienaCesPortXcvrTemperature OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    UNITS         "celsius"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The temperature of the transceiver.
+         Units are celsius."
+    ::= { cienaCesPortXcvrEntry 3 }
+ 
+ cienaCesPortXcvrVcc OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    UNITS         "mV"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "The voltage of the transceiver.
+          Units are milli volts"
+    ::= { cienaCesPortXcvrEntry 4 }
+ 
+ cienaCesPortXcvrBias OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    UNITS         "mA"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The bias of the transceiver.
+         Units are milli amps"
+    ::= { cienaCesPortXcvrEntry 5 }
+
+ cienaCesPortXcvrRxPower OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "The measured receive power of the transceiver. 
+	     Units are micro watts."
+   ::= { cienaCesPortXcvrEntry 6 }
+
+  cienaCesPortXcvrHighTempAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "celsius"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the higher threshold for the temperature alarm.
+         Units are celsius."
+    ::= { cienaCesPortXcvrEntry 7 }
+  
+  cienaCesPortXcvrLowTempAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "celsius"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the lower threshold for the temperature alarm.
+         Units are celsius."
+    ::= { cienaCesPortXcvrEntry 8 } 
+
+  cienaCesPortXcvrHighVccAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "mV"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the higher threshold for the voltage alarm.
+         Units are milli volts"
+    ::= { cienaCesPortXcvrEntry 9 }
+  
+  cienaCesPortXcvrLowVccAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "mV"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the lower threshold for the voltage alarm.
+         Units are milli volts"
+    ::= { cienaCesPortXcvrEntry 10 }
+ 
+ cienaCesPortXcvrHighBiasAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "mA"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the higher threshold for the bias alarm.
+         Units are milli amps"
+    ::= { cienaCesPortXcvrEntry 11 }
+
+ cienaCesPortXcvrLowBiasAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "mA"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the lower threshold for the bias alarm.
+         Units are milli amps"
+    ::= { cienaCesPortXcvrEntry 12 }
+
+ cienaCesPortXcvrHighTxPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the higher threshold for the Tx power alarm.
+	     Units are micro watts"
+    ::= { cienaCesPortXcvrEntry 13 }
+
+ cienaCesPortXcvrLowTxPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the lower threshold for the Tx power alarm.
+	     Units are micro watts."
+    ::= { cienaCesPortXcvrEntry 14 }
+
+  cienaCesPortXcvrHighRxPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the higher threshold for the Rx power alarm.
+	     Units are micro watts."
+    ::= { cienaCesPortXcvrEntry 15 }
+
+  cienaCesPortXcvrLowRxPwAlarmThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the lower threshold for the Rx power alarm.
+	     Units are micro watts."
+    ::= { cienaCesPortXcvrEntry 16 }
+ 
+ cienaCesPortXcvrNotifChassisIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "Indicates the chassis index for the port used for trap definition."               
+     ::= { cienaCesPortXcvrEntry 17 }
+     
+ cienaCesPortXcvrNotifShelfIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "Indicates the shelf index for the port used for trap definition."               
+     ::= { cienaCesPortXcvrEntry 18 }
+
+ cienaCesPortXcvrNotifSlotIndex          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..7)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "Indicates the slot index for the port used for trap definition."
+     ::= { cienaCesPortXcvrEntry 19 }
+
+ cienaCesPortXcvrNotifPortNumber		OBJECT-TYPE
+ 	SYNTAX			Unsigned32(1..65535)
+ 	MAX-ACCESS		accessible-for-notify
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"Indicates the port number for the corresponding PGID
+ 		used for trap definition."
+ 	::= { cienaCesPortXcvrEntry 20 }
+   
+ cienaCesPortXcvrIdentiferType OBJECT-TYPE
+    SYNTAX           INTEGER {
+                       unknown(1),
+		               gbic(2),
+		               solderedType(3),
+		               sfp(4),
+                       xbi(5),
+                       xenpak(6),
+                       xfp(7),
+                       xff(8),
+                       xfpe(9),
+                       xpak(10),
+                       x2(11),
+		               reserved(12),
+		               vendorSpecific(13),
+                       cfp(14),
+                       qsfpPlus(15),  
+                       qsfp28(16)
+                     }
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "Type for the transceiver."
+    ::= { cienaCesPortXcvrEntry 21 }
+   
+ cienaCesPortXcvrExtIdentiferType OBJECT-TYPE
+    SYNTAX           INTEGER 
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "Extended identifier type represents for this transceiver."
+    ::= { cienaCesPortXcvrEntry 22 }
+
+ cienaCesPortXcvrConnectorType OBJECT-TYPE
+    SYNTAX     		 INTEGER (1..65535)
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "Type of connector:
+ 
+	       	   unknown(1)
+		       sc(2)
+		       fiberChannelStyle1(3)
+		       fiberChannelStyle2(4)
+		       bnc/tnc(5)
+		       coaxialHeader(6)
+		       fiberJack(7)
+		       lc(8)
+		       mt-rj(9)
+		       mu(10)
+		       sg(11)
+		       opticalPitTail(12)
+		       reserved(13..32)
+		       hssdc(33)
+		       copperPitTail(34)
+		       reserved(35..128)
+		       vendorSpecific(129..256)"
+    ::= { cienaCesPortXcvrEntry 23 }
+
+ cienaCesPortXcvrType OBJECT-TYPE
+    SYNTAX           INTEGER (1..65535)
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "Type of transceiver."
+    ::= { cienaCesPortXcvrEntry 24 }
+
+ cienaCesPortXcvrVendorName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "String containing this transceiver's vendor name."
+    ::= { cienaCesPortXcvrEntry 25 }
+
+ cienaCesPortXcvrVendorOUI OBJECT-TYPE
+    SYNTAX        OCTET STRING(SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "String containing this transceiver's vendor OUI."
+    ::= { cienaCesPortXcvrEntry 26 }
+
+ cienaCesPortXcvrVendorPartNum OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "String containing this transceiver's vendor part number."
+    ::= { cienaCesPortXcvrEntry 27 }
+ 	
+ cienaCesPortXcvrRevNum   OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+	    "String containing this tranceiver's part revision number."
+    ::= { cienaCesPortXcvrEntry 28 }
+
+ cienaCesPortXcvrSerialNum   OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+	    "String containing this tranceiver's part serial number."
+    ::= { cienaCesPortXcvrEntry 29 } 		
+
+ cienaCesPortXcvrMfgDate OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "String containing this transceiver's manufactured date."
+    ::= { cienaCesPortXcvrEntry 30 }
+
+ cienaCesPortXcvrWaveLength OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "The wavelength of the transceiver. Units are nano meter."
+    ::= { cienaCesPortXcvrEntry 31 }
+
+ cienaCesPortXcvrTxState OBJECT-TYPE
+    SYNTAX       INTEGER {	
+		      enabled(1),
+		      disabled(2)
+	         }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+	    "Indicates whether this transceiver is currently set to transmit."
+    ::= { cienaCesPortXcvrEntry 32 }		
+ 		
+ cienaCesPortXcvrTxFaultStatus OBJECT-TYPE
+    SYNTAX        INTEGER {	
+		       fault(1),
+		       noFault(2)
+	     	  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "Indicates the fault status of this transceiver."
+    ::= { cienaCesPortXcvrEntry 33 }
+
+ cienaCesPortXcvrAdminState OBJECT-TYPE
+    SYNTAX           INTEGER {
+                        disabled(1),
+                        enabled(2),
+                        loopback(3)                        
+                     }
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+	    "The administrative state of the transceiver."
+    ::= { cienaCesPortXcvrEntry 34 }
+   
+  cienaCesPortXcvrTxOutputPower OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    UNITS         "uW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	    "The measured transmitted output power of the transceiver. 
+	     Units are micro watts."
+    ::= { cienaCesPortXcvrEntry 35 }
+
+  cienaCesPortXcvrFecMode OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        none(1),	
+                        gfec(2),
+                        efec(3)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This represents the transceiver's FEC Mode.
+         gfec means generic forward error correction,
+         efec means enhanced forward error correction."
+   ::= { cienaCesPortXcvrEntry 36 }
+
+
+ --
+ -- notification
+ --
+ cienaCesPortXcvrEventType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                        inserted(1),
+                        removed(2)
+                   }                         
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+	    "Indicates if the transceiver specified by the ciena54XXPortXcvrId has come up, 
+	     gone down or has been selected."
+    ::= { cienaCesPortXcvrNotif 1}
+
+  cienaCesPortXcvrErrorType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                        none(0),
+                        chksumFailed(1),
+                        opticalFault(2)                        
+                   }
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+	    "Indicates if the transceiver specified by the cienaCesPortXcvrId is faulted because of 
+	     checksum failure or optical fault. This object only makes sense if the transceiver has 
+	     been detected faulted; otherwise it returns 'none'."
+    ::= { cienaCesPortXcvrNotif 2 } 
+ 
+ cienaCesPortXcvrRemovedNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+     			cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrRemovedNotification is sent if the transceiver has been removed. 
+		To enable the device to send this notification: cienaCesPortXcvrLinkStateChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to 
+		enabled. These objects are set to enabled by default. Variable bindings include: 
+		cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, 
+		cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, and 
+		cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 1 }
+
+ cienaCesPortXcvrInsertedNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+     			cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrInsertedNotification is sent if the transceiver has been inserted. To 
+		enable the device to send this notification: cienaCesPortXcvrLinkStateChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to 
+		enabled. These objects are set to enabled by default. Variable bindings include: 
+		cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, 
+		cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, and 
+		cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 2 }
+
+ cienaCesPortXcvrErrorTypeNotification NOTIFICATION-TYPE
+	OBJECTS	{	cienaGlobalSeverity,
+				cienaGlobalMacAddress,                
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrErrorType        
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrErrorTypeNotification is sent if the transceiver is detected to be faulted.
+		The reason for the failure is specified by cienaCesPortXcvrErrorType. To enable the device to 
+		send this notification: cienaCesPortXcvrErrorTrapState, cienaCesLogicalPortConfigPortAllTrapState,
+		and cienaCesPortAllTrapState need to be set to enabled. These objects are enabled by default. 
+		Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
+		cienaCesPortXcvrNotifPortNumber, and cienaCesPortXcvrErrorType."
+::= { cienaCesPortXcvrMIBNotifications 5 }
+
+ cienaCesPortXcvrTempHighNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+   			    cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrTempHighNotification is sent if the transceiver temperature exceeds the 
+		threshold. To enable the device to send this notification: cienaCesPortXcvrTempChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 6 }
+ 
+ cienaCesPortXcvrTempLowNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity,
+				cienaGlobalMacAddress,             
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrTempLowNotification is sent if the transceiver temperature falls below the 
+		threshold. To enable the device to send this notification: cienaCesPortXcvrTempChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 7 }
+
+ cienaCesPortXcvrTempNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity,  
+				cienaGlobalMacAddress,           
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrTempNormalNotification is sent when the transceiver temperature returns to 
+		normal state.  To enable the device to send this notification: cienaCesPortXcvrTempChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 8 }
+ 
+ cienaCesPortXcvrVoltageHighNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrVoltageHighNotification is sent if the transceiver voltage exceeds the 
+		threshold. To enable the device to send this notification: cienaCesPortXcvrVoltageChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, cienaCesPortAllTrapState needs to be set to enabled
+       These objects are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex,
+       cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, and 
+       cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 9 }
+ 
+ cienaCesPortXcvrVoltageLowNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity,  
+				cienaGlobalMacAddress,           
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrVoltageLowNotification is sent if the transceiver voltage falls below the 
+		threshold. To enable the device to send this notification: cienaCesPortXcvrVoltageChangeTrapState,
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 10 }
+
+ cienaCesPortXcvrVoltageNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrVoltageNormalNotification is sent when the transceiver voltage returns back
+		to normal state. To enable the device to send this notification: cienaCesPortXcvrVoltageChangeTrapState,
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 11 }
+ 
+ cienaCesPortXcvrBiasHighNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity,  
+				cienaGlobalMacAddress,           
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrBiasHighNotification is sent if the transceiver bias exceeds the 
+		threshold. To enable the device to send this notification: cienaCesPortXcvrBiasChangeTrapState,
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 12 }
+ 
+ cienaCesPortXcvrBiasLowNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+        		cienaCesPortXcvrNotifChassisIndex,
+        	    cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrBiasLowNotification is sent if the transceiver bias falls below the 
+		threshold. To enable the device to send this notification: cienaCesPortXcvrBiasChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 13 }
+
+ cienaCesPortXcvrBiasNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity,  
+				cienaGlobalMacAddress,           
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        	    cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrBiasNormalNotification is sent when the transceiver bias returns to normal 
+		state. To enable the device to send this notification: cienaCesPortXcvrBiasChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 14 }
+ 
+ cienaCesPortXcvrTxPowerHighNotification NOTIFICATION-TYPE
+	OBJECTS	{    cienaGlobalSeverity,
+				 cienaGlobalMacAddress,            
+        		 cienaCesPortXcvrNotifChassisIndex,
+        		 cienaCesPortXcvrNotifShelfIndex,
+        		 cienaCesPortXcvrNotifSlotIndex,
+        		 cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrTxPowerHighNotification is sent if the transceiver TxPower exceeds the 
+		threshold. To enable the device to send this notification: cienaCesPortXcvrTxPowerChangeTrapState,
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 15 }
+ 
+ cienaCesPortXcvrTxPowerLowNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity,  
+				cienaGlobalMacAddress,           
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrTxPowerLowNotification is sent if the transceiver TxPower falls below 
+		the threshold. To enable the device to send this notification: cienaCesPortXcvrTxPowerChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 16 }
+
+ cienaCesPortXcvrTxPowerNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrTxPowerNormalNotification is sent when the transceiver TxPower returns to 
+		normal state. To enable the device to send this notification: cienaCesPortXcvrTxPowerChangeTrapState,
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled. 
+		These above values are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
+       cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+       cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 17 }
+ 
+ cienaCesPortXcvrRxPowerHighNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+        	    cienaCesPortXcvrNotifChassisIndex,
+        	    cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrRxPowerHighNotification is sent if the transceiver RxPower exceeds 
+		the threshold. To enable the device to send this notification: cienaCesPortXcvrRxPowerChangeTrapState, 
+		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled. 
+		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 18 }
+ 
+ cienaCesPortXcvrRxPowerLowNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity, 
+				cienaGlobalMacAddress,            
+        		cienaCesPortXcvrNotifChassisIndex,
+        		cienaCesPortXcvrNotifShelfIndex,
+        		cienaCesPortXcvrNotifSlotIndex,
+        		cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrRxPowerLowNotification is sent if the transceiver RxPower falls below
+		the the threshold. To enable the device to send this notification: 
+		cienaCesPortXcvrRxPowerChangeTrapState, cienaCesLogicalPortConfigPortAllTrapState,
+		cienaCesPortAllTrapState needs to be set to enabled. These objects are set to enabled 
+		by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
+		and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 19 }
+
+ cienaCesPortXcvrRxPowerNormalNotification NOTIFICATION-TYPE
+	OBJECTS	{   cienaGlobalSeverity,  
+				cienaGlobalMacAddress,           
+        	    cienaCesPortXcvrNotifChassisIndex,
+        	    cienaCesPortXcvrNotifShelfIndex,
+        	    cienaCesPortXcvrNotifSlotIndex,
+        	    cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrRxPowerNormalNotification is sent when the transceiver RxPower returns 
+		to normal state. To enable the device to send this notification: 
+		cienaCesPortXcvrRxPowerChangeTrapState, cienaCesLogicalPortConfigPortAllTrapState, and 
+		cienaCesPortAllTrapState needs to be set to enabled. These objects are set to enabled by 
+		default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
+		and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 20 }
+   
+  cienaCesPortXcvrSpeedInfoMissingNotification NOTIFICATION-TYPE
+	OBJECTS	{   	  cienaGlobalSeverity,   
+					  cienaGlobalMacAddress,          
+        			  cienaCesPortXcvrNotifChassisIndex,
+        			  cienaCesPortXcvrNotifShelfIndex,
+        			  cienaCesPortXcvrNotifSlotIndex,
+        			  cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrSpeedInfoMissingNotification is sent if the transceiver speed 
+		information is not found. To enable the device to send this notification: 
+		cienaCesPortXcvrSpeedInfoTrapState, cienaCesLogicalPortConfigPortAllTrapState, and 
+		cienaCesPortAllTrapState need to be set to enabled. These objects are set to enabled 
+		by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 21 }
+  
+  cienaCesPortXcvrUncertifiedNotification NOTIFICATION-TYPE
+	OBJECTS	{   	  cienaGlobalSeverity,   
+					  cienaGlobalMacAddress,          
+        			  cienaCesPortXcvrNotifChassisIndex,
+        			  cienaCesPortXcvrNotifShelfIndex,
+        			  cienaCesPortXcvrNotifSlotIndex,
+        			  cienaCesPortXcvrNotifPortNumber
+		}
+	STATUS	current
+	DESCRIPTION
+		"A cienaCesPortXcvrUncertifiedNotification is sent if the transceiver is not 
+		certified for use by Ciena. To enable the device to send this notification: 
+		cienaCesPortXcvrUncertifiedTrapState,  cienaCesLogicalPortConfigPortAllTrapState, 
+		and cesPortAllTrapState need to be set to enabled. cienaCesPortXcvrUncertifiedTrapState 
+		is set to disabled by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
+		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+	::= { cienaCesPortXcvrMIBNotifications 22 }
+
+ cienaCesPortXcvrRxPowerHighWarningNotification NOTIFICATION-TYPE
+   OBJECTS  {   cienaGlobalSeverity, 
+                cienaGlobalMacAddress,            
+                cienaCesPortXcvrNotifChassisIndex,
+                cienaCesPortXcvrNotifShelfIndex,
+                cienaCesPortXcvrNotifSlotIndex,
+                cienaCesPortXcvrNotifPortNumber
+      }
+   STATUS   current
+   DESCRIPTION
+      "A cienaCesPortXcvrRxPowerHighWarningNotification is sent if the transceiver RxPower exceeds 
+      the threshold. To enable the device to send this notification: cienaCesPortXcvrRxPowerChangeTrapState, 
+      cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled. 
+      These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+      cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
+      cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+   ::= { cienaCesPortXcvrMIBNotifications 23 }
+ 
+ cienaCesPortXcvrRxPowerLowWarningNotification NOTIFICATION-TYPE
+   OBJECTS  {   cienaGlobalSeverity, 
+                cienaGlobalMacAddress,            
+                cienaCesPortXcvrNotifChassisIndex,
+                cienaCesPortXcvrNotifShelfIndex,
+                cienaCesPortXcvrNotifSlotIndex,
+                cienaCesPortXcvrNotifPortNumber
+      }
+   STATUS   current
+   DESCRIPTION
+      "A cienaCesPortXcvrRxPowerLowWarningNotification is sent if the transceiver RxPower falls below
+      the the threshold. To enable the device to send this notification: 
+      cienaCesPortXcvrRxPowerChangeTrapState, cienaCesLogicalPortConfigPortAllTrapState,
+      cienaCesPortAllTrapState needs to be set to enabled. These objects are set to enabled 
+      by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+      cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
+      and cienaCesPortXcvrNotifPortNumber."
+   ::= { cienaCesPortXcvrMIBNotifications 24 }
+
+ cienaCesPortXcvrTxPowerHighWarningNotification NOTIFICATION-TYPE
+   OBJECTS  {   cienaGlobalSeverity, 
+                cienaGlobalMacAddress,            
+                cienaCesPortXcvrNotifChassisIndex,
+                cienaCesPortXcvrNotifShelfIndex,
+                cienaCesPortXcvrNotifSlotIndex,
+                cienaCesPortXcvrNotifPortNumber
+      }
+   STATUS   current
+   DESCRIPTION
+      "A cienaCesPortXcvrTxPowerHighWarningNotification is sent if the transceiver TxPower exceeds 
+      the threshold. To enable the device to send this notification: cienaCesPortXcvrTxPowerChangeTrapState, 
+      cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled. 
+      These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+      cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
+      cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+   ::= { cienaCesPortXcvrMIBNotifications 25 }
+ 
+ cienaCesPortXcvrTxPowerLowWarningNotification NOTIFICATION-TYPE
+   OBJECTS  {   cienaGlobalSeverity, 
+                cienaGlobalMacAddress,            
+                cienaCesPortXcvrNotifChassisIndex,
+                cienaCesPortXcvrNotifShelfIndex,
+                cienaCesPortXcvrNotifSlotIndex,
+                cienaCesPortXcvrNotifPortNumber
+      }
+   STATUS   current
+   DESCRIPTION
+      "A cienaCesPortXcvrTxPowerLowWarningNotification is sent if the transceiver TxPower falls below
+      the the threshold. To enable the device to send this notification: 
+      cienaCesPortXcvrTxPowerChangeTrapState, cienaCesLogicalPortConfigPortAllTrapState,
+      cienaCesPortAllTrapState needs to be set to enabled. These objects are set to enabled 
+      by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+      cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
+      and cienaCesPortXcvrNotifPortNumber."
+   ::= { cienaCesPortXcvrMIBNotifications 26 }
+
+ END
+
+ --
+ -- CIENA-CES-PORT-XCVR-MIB
+ --

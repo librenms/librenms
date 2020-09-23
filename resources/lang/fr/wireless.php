@@ -64,7 +64,7 @@ return [
     'noise-floor' => [
         'short' => 'Bruit de fond',
         'long' => 'Bruit de fond',
-        'unit' => 'dBm/Hz',
+        'unit' => 'dBm',
     ],
     'power' => [
         'short' => 'Puissance/Signal',

@@ -3,8 +3,7 @@ group: cisco
 text: 'Cisco IOS'
 type: network
 ifXmcbc: true
-mib_dir:
-    - cisco
+mib_dir: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -12,16 +11,16 @@ over:
 icon: cisco
 discovery:
     -
-      sysDescr:
-          - 'Cisco Internetwork Operating System Software'
-          - 'IOS (tm)'
-          - 'Cisco IOS Software'
-          - 'Global Site Selector'
-      sysDescr_except:
-          - 'LINUX_IOSD'
-          - 'IOS-XE'
-          - 'IOSXE'
-          - 'CAT3K_CAA'
+        sysDescr:
+            - 'Cisco Internetwork Operating System Software'
+            - 'IOS (tm)'
+            - 'Cisco IOS Software'
+            - 'Global Site Selector'
+        sysDescr_except:
+            - 'LINUX_IOSD'
+            - 'IOS-XE'
+            - 'IOSXE'
+            - 'CAT3K_CAA'
 bad_ifXEntry:
     - cisco1941
     - cisco886Va
@@ -48,5 +47,3 @@ discovery_modules:
     cisco-pw: true
     vrf: true
     cisco-vrf-lite: true
-register_mibs:
-    ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB

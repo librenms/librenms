@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class AddForeignKeysToComponentPrefsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,8 +24,10 @@ class AddForeignKeysToComponentPrefsTable extends Migration
      */
     public function down()
     {
-        Schema::table('component_prefs', function (Blueprint $table) {
-            $table->dropForeign('component_prefs_ibfk_1');
-        });
+        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('component_prefs', function (Blueprint $table) {
+                $table->dropForeign('component_prefs_ibfk_1');
+            });
+        }
     }
 }

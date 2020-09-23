@@ -1,28 +1,39 @@
-mib: HUAWEI-ENTITY-EXTENT-MIB:HUAWEI-ENERGYMNGT-MIB:HUAWEI-STACK-MIB
+mib: HUAWEI-WAN-MIB:HUAWEI-ENTITY-EXTENT-MIB:HUAWEI-ENERGYMNGT-MIB:HUAWEI-STACK-MIB
 modules:
+    os:
+        sysDescr_regex: '/\((?<hardware>\S+) (?<version>V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/'
+        hardware:
+            - HUAWEI-ENTITY-EXTENT-MIB::hwEntityExtentMIB.6.5.0
+            - HUAWEI-DEVICE-EXT-MIB::hwProductName.0
+            - HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1
+            - HUAWEI-MIB::mlsr.20.1.1.1.3.0
+            - HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardName.9
+        serial: ENTITY-MIB::entPhysicalSerialNum.9
     processors:
-          data:
-              -
-                  oid: hwEntityStateEntry
-                  value: hwEntityCpuUsage
-                  num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.{{ $index }}'
-                  descr: '{{ $entPhysicalName }} Processor'
-                  skip_values:
-                        -
-                            oid: hwEntityOperStatus
-                            op: '!='
-                            value: 3
-                        -
-                            oid: hwEntityCpuUsageThreshold
-                            op: '='
-                            value: 0
+        data:
+            -
+                oid: hwEntityStateEntry
+                value: hwEntityCpuUsage
+                num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.{{ $index }}'
+                descr: '{{ $entPhysicalName }} Processor'
+                skip_values:
+                    -
+                        oid: hwEntityOperStatus
+                        op: '!='
+                        value: 3
+                    -
+                        oid: hwEntityCpuUsageThreshold
+                        op: '='
+                        value: 0
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - entPhysicalName
-                    - hwEntityAdminStatus
-                    - hwStackPortTable
+                -
+                    oid:
+                        - entPhysicalName
+                        - hwEntityAdminStatus
+                        - hwStackPortTable
+                        - hw3GTable
         temperature:
             data:
                 -
@@ -31,12 +42,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.5.{{ $index }}'
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
-                    skip_values: 
-                        - 
+                    skip_values:
+                        -
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
-                        - 
+                        -
                             oid: hwEntityOpticalTemperature
                             op: '<'
                             value: '-50'
@@ -47,8 +58,157 @@ modules:
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
                     skip_values: 0
+        count:
+            data:
+                -
+                    oid: hw3GTable
+                    value: hw3GBER
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.47.{{ $index }}'
+                    descr: 'Bit Error Rate'
+                    index: '3GBER-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+                -
+                    oid: hw3GTable
+                    value: hw3GUpBand
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.30.{{ $index }}'
+                    descr: 'Upstream Bandwidth'
+                    index: '3gup-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+                -
+                    oid: hw3GTable
+                    value: hw3GDownBand
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.31.{{ $index }}'
+                    descr: 'Downstream Bandwidth'
+                    index: '3gdown-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+                -
+                    oid: hw3GTable
+                    value: hw3GBytesRateSent
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.28.{{ $index }}'
+                    descr: 'Upstream Cur. Speed (bytes/s)'
+                    index: '3gupr-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+                -
+                    oid: hw3GTable
+                    value: hw3GBytesRateReceived
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.29.{{ $index }}'
+                    descr: 'Downstream Cur. Speed (bytes/s)'
+                    index: '3gdownr-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+        runtime:
+            data:
+                -
+                    oid: hw3GTable
+                    value: hw3GUpTime
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.55.{{ $index }}'
+                    descr: 'Uptime'
+                    divisor: 6000
+                    index: '3guptime-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
         dbm:
             data:
+                -
+                    oid: hw3GTable
+                    value: hw3GCurrentRSSI
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.35.{{ $index }}'
+                    descr: 'RSSI'
+                    index: 'rssi-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+                -
+                    oid: hw3GTable
+                    value: hw3GCurrentLteRSRP
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.38.{{ $index }}'
+                    descr: 'LTE RSRP'
+                    index: 'rsrp-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+                -
+                    oid: hw3GTable
+                    value: hw3GCurrentLteRSRQ
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.40.{{ $index }}'
+                    descr: 'LTE RSRQ'
+                    index: 'rsrq-{{ $index }}'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
                 -
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalRxPower
@@ -59,7 +219,7 @@ modules:
                     index: 'rx-{{ $index }}'
                     user_func: 'uw_to_dbm'
                     group: '{{ $entPhysicalName }}'
-                    skip_values: 
+                    skip_values:
                         -
                             oid: hwEntityOpticalRxPower
                             op: '<='
@@ -68,6 +228,33 @@ modules:
                             oid: hwEntityAdminStatus
                             op: '='
                             value: 12
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'rx-{{ $index }}'
+                    divisor: 100
+                    group: '{{ $entPhysicalName }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalRxPower
+                            op: '>'
+                            value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                        -
+                            oid: hwEntityOpticalLaneRxPower
+                            op: 'exists'
+                            value: true
+                        -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: 0
                 -
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalTxPower
@@ -87,6 +274,33 @@ modules:
                             oid: hwEntityAdminStatus
                             op: '='
                             value: 12
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tx-{{ $index }}'
+                    divisor: 100
+                    group: '{{ $entPhysicalName }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalTxPower
+                            op: '>'
+                            value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                        -
+                            oid: hwEntityOpticalLaneTxPower
+                            op: 'exists'
+                            value: true
+                        -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: 0
                 -
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalLaneRxPower
@@ -143,7 +357,7 @@ modules:
                             oid: hwEntityOpticalVoltage
                             op: '='
                             value: '-1'
-                        - 
+                        -
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
@@ -160,8 +374,8 @@ modules:
                         -
                             oid: hwEntityOpticalBiasCurrent
                             op: '='
-                            value: '-1' 
-                        - 
+                            value: '-1'
+                        -
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
@@ -180,17 +394,17 @@ modules:
                     index: 1
                     divisor: 1000
         state:
-             data:
+            data:
                 -
-                     oid: hwFanStatusTable
-                     value: hwEntityFanState
-                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{{ $index }}'
-                     descr: 'Slot {{ $subindex0 }} Fan {{ $subindex1 }} Status'
-                     group: Fans
-                     state_name: hwEntityFanState
-                     states:
-                         - { descr: Normal, graph: 1, value: 1, generic: 0 }
-                         - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
+                    oid: hwFanStatusTable
+                    value: hwEntityFanState
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} Fan {{ $subindex1 }} Status'
+                    group: Fans
+                    state_name: hwEntityFanState
+                    states:
+                        - { descr: Normal, graph: 1, value: 1, generic: 0 }
+                        - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
                 -
                     oid: hwStackMemberInfoTable
                     value: hwMemberStackRole
@@ -199,7 +413,70 @@ modules:
                     group: Stack
                     state_name: hwMemberStackRole
                     states:
-                         - { descr: Master, graph: 1, value: 1, generic: 0 }
-                         - { descr: Standby, graph: 1, value: 2, generic: 0 }
-                         - { descr: Slave, graph: 1, value: 3, generic: 0 }
+                        - { descr: Master, graph: 1, value: 1, generic: 0 }
+                        - { descr: Standby, graph: 1, value: 2, generic: 0 }
+                        - { descr: Slave, graph: 1, value: 3, generic: 0 }
+                -
+                    oid: hw3GTable
+                    value: hw3GModemStatus
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.11.{{ $index }}'
+                    descr: 'Current Modem Status'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    state_name: hw3GModemStatus
+                    states:
+                        - { descr: onLine, graph: 1, value: 1, generic: 0 }
+                        - { descr: offLine, graph: 1, value: 4, generic: 2 }
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+                -
+                    oid: hw3GTable
+                    value: hw3GCurrentNetworkConnection
+                    index: 'netConn-{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.34.{{ $index }}'
+                    descr: 'Current Network'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    state_name: hw3GCurrentNetworkConnection
+                    states:
+                        - { descr: '3G', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'LTE', graph: 1, value: 3, generic: 0 }
+                        - { descr: 'Unknown', graph: 1, value: 7, generic: 3 }
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''
+                -
+                    oid: hw3GTable
+                    value: hw3GConnectionStatus
+                    index: 'netConnStatus-{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.53.{{ $index }}'
+                    descr: 'Current Network Status'
+                    group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
+                    state_name: hw3GConnectionStatus
+                    states:
+                        - { descr: 'noService', graph: 1, value: 0, generic: 2 }
+                        - { descr: 'emergency', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'serviceAvailable', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'regionEmergency', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'savingStatus', graph: 1, value: 4, generic: 3 }
 
+                    skip_values:
+                        -
+                            oid: hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: hw3GDeviceSerialNumber
+                            op: '='
+                            value: ''

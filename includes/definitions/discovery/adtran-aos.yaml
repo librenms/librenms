@@ -1,7 +1,11 @@
 mib: ADTRAN-AOSCPU
 modules:
+    os:
+        hardware: ADTRAN-AOSUNIT::adAOSDeviceProductName.0
+        serial: ADTRAN-AOSUNIT::adAOSDeviceSerialNumber.0
+        version: ADTRAN-AOSUNIT::adAOSDeviceVersion.0
     processors:
-          data:
-              -
-                  oid: adGenAOSCurrentCpuUtil
-                  num_oid: '.1.3.6.1.4.1.664.5.53.1.4.1.{{ $index }}'
+        data:
+            -
+                oid: adGenAOSCurrentCpuUtil
+                num_oid: '.1.3.6.1.4.1.664.5.53.1.4.1.{{ $index }}'

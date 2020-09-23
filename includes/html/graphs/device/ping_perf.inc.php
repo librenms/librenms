@@ -12,15 +12,21 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Config;
+
 $scale_min = '0';
 
 require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = rrd_name($device['hostname'], 'ping-perf');
 
-$rrd_options .= ' DEF:ping='.$rrd_filename.':ping:AVERAGE';
+$rrd_options .= ' DEF:ping=' . $rrd_filename . ':ping:AVERAGE';
 $rrd_options .= " 'COMMENT:Milliseconds      Cur      Min     Max     Avg\\n'";
-$rrd_options .= ' LINE1.25:ping#36393D:Ping';
+if (Config::get('applied_site_style') == 'dark') {
+    $rrd_options .= ' LINE1.25:ping#63636d:Ping';
+} else {
+    $rrd_options .= ' LINE1.25:ping#36393d:Ping';
+}
 $rrd_options .= ' GPRINT:ping:LAST:%14.2lf  GPRINT:ping:AVERAGE:%6.2lf';
 $rrd_options .= " GPRINT:ping:MAX:%6.2lf  'GPRINT:ping:AVERAGE:%6.2lf\\n'";
 
@@ -29,6 +35,6 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= " DEF:pingX=$rrd_filename:ping:AVERAGE:start=$prev_from:end=$from";
     $rrd_options .= " SHIFT:pingX:$period";
     $rrd_options .= " LINE1.25:pingX#CCCCCC:'Prev Ping'\t\t";
-    $rrd_options .= " GPRINT:pingX:AVERAGE:%6.2lf";
+    $rrd_options .= ' GPRINT:pingX:AVERAGE:%6.2lf';
     $rrd_options .= " GPRINT:pingX:MAX:%6.2lf  'GPRINT:pingX:AVERAGE:%6.2lf\\n'";
 }

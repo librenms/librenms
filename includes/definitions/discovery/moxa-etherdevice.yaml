@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - ifDescr
+                -
+                    oid:
+                        - ifDescr
         power:
             data:
                 -

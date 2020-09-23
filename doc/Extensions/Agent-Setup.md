@@ -7,6 +7,10 @@ LibreNMS in combination with check_mk (found
 extended to include data about [applications](Applications.md) on the
 remote system.
 
+# Installation
+
+## Linux / BSD
+
 Make sure that systemd or xinetd is installed on the host you want to
 run the agent on.
 
@@ -68,3 +72,8 @@ monitor. Under the modules section, ensure that unix-agent is enabled.
 10: Wait for around 10 minutes and you should start seeing data in
 your graphs under Apps for the device.
 
+
+## Windows
+1. Grab version 1.2.6b5 of the check_mk agent from the check_mk github repo (exe/msi or compile it yourself depending on your usage): https://github.com/tribe29/checkmk/tree/v1.2.6b5/agents/windows
+2. Run the msi / exe
+3. Make sure your LibreNMS instance can reach TCP port 6556 on your target.

@@ -8,7 +8,7 @@ $rrdfilename = rrd_name($device['hostname'], 'ubnt-airfiber-mib');
 
 if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Metres                     Now    Min     Max\\n'";
-    $rrd_options .= ' DEF:radioLinkDistM='.$rrdfilename.':radioLinkDistM:AVERAGE ';
+    $rrd_options .= ' DEF:radioLinkDistM=' . $rrdfilename . ':radioLinkDistM:AVERAGE ';
     $rrd_options .= " LINE1:radioLinkDistM#CC0000:'Distance             ' ";
     $rrd_options .= ' GPRINT:radioLinkDistM:LAST:%3.2lf%s ';
     $rrd_options .= ' GPRINT:radioLinkDistM:MIN:%3.2lf%s ';

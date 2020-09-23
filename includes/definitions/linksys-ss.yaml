@@ -3,11 +3,11 @@ text: 'Linksys Smart Switch'
 ifname: true
 type: network
 icon: linksys
-mib_dir:
-    - linksys
+mib_dir: linksys
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.3955.1000
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.3955.1000

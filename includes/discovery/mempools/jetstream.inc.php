@@ -17,14 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 if ($device['os'] === 'jetstream') {
-    $data = snmpwalk_cache_oid($device, 'tpSysMonitorMemoryTable', array(), 'TPLINK-SYSMONITOR-MIB', 'hp');
+    $data = snmpwalk_cache_oid($device, 'tpSysMonitorMemoryTable', [], 'TPLINK-SYSMONITOR-MIB', 'hp');
     foreach ($data as $index => $item) {
         if (is_numeric($item['tpSysMonitorMemoryUtilization'])) {
             $descr = "Memory #$index";

@@ -1,0 +1,78 @@
+mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>OS\S*)? ?(?<version>\d+\.\d+\.\S*)/'
+    processors:
+        data:
+            -
+                oid: healthDeviceInfo
+                num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.16.1.1.1.14.{{ $index }}'
+                index: 0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifDescr
+                        - ifName
+                        - entPhysicalName
+        temperature:
+            data:
+                -
+                    oid: ddmInfoEntry
+                    value: ddmTemperature
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.1.{{ $index }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifName }} SFP Temperature'
+                    index: 'ddmTemperature.{{ $index }}'
+                    low_limit: -40.0
+                    high_limit: 85.0
+
+        voltage:
+            data:
+                -
+                    oid: ddmSupplyVoltage
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.6.{{ $index }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifName }} SFP Voltage'
+                    index: 'ddmSupplyVoltage.{{ $index }}'
+                    low_limit: 3.13
+                    high_limit: 3.47
+
+        current:
+            data:
+                -
+                    oid: ddmTxBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.11.{{ $index }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifName }} Tx Bias'
+                    index: 'ddmTxBiasCurrent.{{ $index }}'
+
+        dbm:
+            data:
+                -
+                    oid: ddmRxOpticalPower
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.21.{{ $index }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifName }} Rx Power'
+                    index: 'ddmRxOpticalPower.{{ $index }}'
+                    low_limit: -21.0
+                    high_limit: -3.0
+                -
+                    oid: ddmTxOutputPower
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.16.{{ $index }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifName }} Tx Power'
+                    index: 'ddmTxOutputPower.{{ $index }}'
+                    low_limit: -9.0
+                    high_limit: -3.0

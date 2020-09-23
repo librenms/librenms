@@ -8,7 +8,7 @@ over:
     - { graph: device_ucd_memory, text: 'Memory Usage' }
 discovery:
     -
-      sysDescr_regex:
-        - '/^Vyatta/'
-      sysDescr_except:
-        - 'VyOS'
+        sysDescr_regex:
+            - '/^Vyatta/'
+        sysDescr_except:
+            - 'VyOS'

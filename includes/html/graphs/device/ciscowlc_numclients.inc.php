@@ -3,14 +3,14 @@
 $rrd_filename = rrd_name($device['hostname'], 'ciscowlc');
 
 $rrd_list[0]['filename'] = $rrd_filename;
-$rrd_list[0]['descr']    = 'Clients';
-$rrd_list[0]['ds']       = 'NUMCLIENTS';
+$rrd_list[0]['descr'] = 'Clients';
+$rrd_list[0]['ds'] = 'NUMCLIENTS';
 
 $unit_text = 'Clients';
 
-$units       = '';
+$units = '';
 $total_units = '';
-$colours     = 'mixed';
+$colours = 'mixed';
 
 $scale_min = '0';
 

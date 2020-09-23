@@ -2,11 +2,15 @@
 
 $device_id = mres($vars['device_id']);
 
-$sql = " FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `S`.`storage_deleted`=0";
+$sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `S`.`storage_deleted`=0';
 $param[] = $device_id;
 
-if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `S`.`storage_descr` LIKE '%$searchPhrase%' OR `S`.`storage_perc` LIKE '%$searchPhrase%' OR `S`.`storage_perc_warn` LIKE '%$searchPhrase%')";
+if (isset($searchPhrase) && ! empty($searchPhrase)) {
+    $sql .= ' AND (`D`.`hostname` LIKE ? OR `S`.`storage_descr` LIKE ? OR `S`.`storage_perc` LIKE ? OR `S`.`storage_perc_warn` LIKE ?)';
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`storage_id`) $sql";
@@ -16,7 +20,7 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (!isset($sort) || empty($sort)) {
+if (! isset($sort) || empty($sort)) {
     $sort = '`D`.`hostname`, `S`.`storage_descr`';
 }
 
@@ -38,15 +42,15 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     $perc = round($drive['storage_perc'], 0);
     $perc_warn = round($drive['storage_perc_warn'], 0);
     $size = formatStorage($drive['storage_size']);
-    $response[] = array(
+    $response[] = [
         'storage_id' => $drive['storage_id'],
         'hostname' => generate_device_link($drive),
         'storage_descr' => $drive['storage_descr'],
-        'storage_perc' => $perc . "%",
+        'storage_perc' => $perc . '%',
         'storage_perc_warn' => $perc_warn,
-        'storage_size' => $size
-    );
+        'storage_size' => $size,
+    ];
 }
 
-$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
+$output = ['current'=>$current, 'rowCount'=>$rowCount, 'rows'=>$response, 'total'=>$total];
 echo _json_encode($output);

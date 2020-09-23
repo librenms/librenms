@@ -12,10 +12,10 @@
 // Simple hard-coded poller for Pulse Secure
 // Yes, it really can be this simple.
 
-echo 'Pulse Secure MemPool'.'\n';
+echo 'Pulse Secure MemPool' . '\n';
 
-$perc     = str_replace('"', "", snmp_get($device, "PULSESECURE-PSG-MIB::iveMemoryUtil.0", '-OvQ'));
-$memory_available = str_replace('"', "", snmp_get($device, "UCD-SNMP-MIB::memTotalReal.0", '-OvQ'));
+$perc = str_replace('"', '', snmp_get($device, 'PULSESECURE-PSG-MIB::iveMemoryUtil.0', '-OvQ'));
+$memory_available = str_replace('"', '', snmp_get($device, 'UCD-SNMP-MIB::memTotalReal.0', '-OvQ'));
 $mempool['total'] = $memory_available;
 
 if (is_numeric($perc)) {
@@ -23,5 +23,5 @@ if (is_numeric($perc)) {
     $mempool['free'] = ($memory_available - $mempool['used']);
 }
 
-echo "PERC " .$perc."%\n";
-echo "Avail " .$mempool['total']."\n";
+echo 'PERC ' . $perc . "%\n";
+echo 'Avail ' . $mempool['total'] . "\n";

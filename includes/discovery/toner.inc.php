@@ -2,13 +2,13 @@
 
 use Illuminate\Support\Str;
 
-$valid_toner = array();
+$valid_toner = [];
 
 if ($device['os_group'] == 'printer') {
     echo 'Toner: ';
 
     $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesLevel', [], 'Printer-MIB');
-    if (!empty($oids)) {
+    if (! empty($oids)) {
         $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesType', $oids, 'Printer-MIB');
         $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMaxCapacity', $oids, 'Printer-MIB');
         $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesDescription', $oids, 'Printer-MIB', null, '-OQUsa');
@@ -17,12 +17,12 @@ if ($device['os_group'] == 'printer') {
     foreach ($oids as $index => $data) {
         $last_index = substr($index, strrpos($index, '.') + 1);
 
-        $raw_toner     = $data['prtMarkerSuppliesLevel'];
-        $descr         = $data['prtMarkerSuppliesDescription'];
-        $raw_capacity  = $data['prtMarkerSuppliesMaxCapacity'];
-        $raw_toner     = $data['prtMarkerSuppliesLevel'];
-        $toner_oid     = ".1.3.6.1.2.1.43.11.1.1.9.$index";
-        $capacity_oid  = ".1.3.6.1.2.1.43.11.1.1.8.$index";
+        $raw_toner = $data['prtMarkerSuppliesLevel'];
+        $descr = $data['prtMarkerSuppliesDescription'];
+        $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
+        $raw_toner = $data['prtMarkerSuppliesLevel'];
+        $toner_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
+        $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.$index";
 
         if (empty($raw_toner)) {
             $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
@@ -64,7 +64,7 @@ if ($device['os_group'] == 'printer') {
 
     echo 'Tray Paper Level: ';
     $tray_oids = snmpwalk_cache_oid($device, 'prtInputName', [], 'Printer-MIB');
-    if (!empty($tray_oids)) {
+    if (! empty($tray_oids)) {
         $tray_oids = snmpwalk_cache_oid($device, 'prtInputCurrentLevel', $tray_oids, 'Printer-MIB');
         $tray_oids = snmpwalk_cache_oid($device, 'prtInputMaxCapacity', $tray_oids, 'Printer-MIB');
     }
@@ -75,7 +75,7 @@ if ($device['os_group'] == 'printer') {
 
         $capacity = $data['prtInputMaxCapacity'];
         $current = $data['prtInputCurrentLevel'];
-        if (!is_numeric($current) || $current == -2) {
+        if (! is_numeric($current) || $current == -2) {
             // capacity unsupported
             d_echo('Input Capacity unsupported', 'X');
             continue;
@@ -104,14 +104,14 @@ if ($device['os_group'] == 'printer') {
 d_echo("\n Checking valid toner ... \n");
 d_echo($valid_toner);
 
-$toners = dbFetchRows("SELECT * FROM toner WHERE device_id = ?", [$device['device_id']]);
+$toners = dbFetchRows('SELECT * FROM toner WHERE device_id = ?', [$device['device_id']]);
 //d_echo($toners);
 foreach ($toners as $test_toner) {
     $toner_oid = $test_toner['toner_oid'];
     $toner_type = $test_toner['toner_type'];
-    if (!$valid_toner[$toner_type][$toner_oid]) {
+    if (! $valid_toner[$toner_type][$toner_oid]) {
         echo '-';
-        dbDelete('toner', '`toner_id` = ?', array($test_toner['toner_id']));
+        dbDelete('toner', '`toner_id` = ?', [$test_toner['toner_id']]);
     }
 }
 

@@ -9,7 +9,6 @@
  * the source code distribution for details.
  */
 
-
 $version = $device['sysDescr'];
 $cnpilot_data = snmp_get_multi_oid($device, ['cambiumAPSerialNum.0', 'cambiumAPHWType.0'], '-OUQs', 'CAMBIUM-MIB');
 

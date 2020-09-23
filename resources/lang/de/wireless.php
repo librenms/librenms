@@ -64,7 +64,7 @@ return [
     'noise-floor' => [
         'short' => 'Grundrauschen',
         'long' => 'Grundrauschen',
-        'unit' => 'dBm/Hz',
+        'unit' => 'dBm',
     ],
     'power' => [
         'short' => 'Signalstärke',

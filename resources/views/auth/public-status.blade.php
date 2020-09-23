@@ -15,7 +15,7 @@
             <button class="btn btn-default pull-right" type="submit" id="ToggleLogon">@lang('Logon')</button>
             </div>
         </div>
-        <div class="panel panel-default panel-condensed">
+        <x-panel>
             <div class="table-responsive">
                 <table class="table table-condensed">
                     <tr>
@@ -32,12 +32,12 @@
                             <td><img src="{{ asset($device->icon) }}" width="32px" height="32px"></td>
                             <td class="device-name">{{ $device->displayName() }}</td>
                             <td>{{ $device->hardware }} {{ $device->features }}</td>
-                            <td>{{ $device->formatUptime(true) }}<br>{{ substr($device->location, 0, 32) }}</td>
+                            <td>{{ $device->formatDownUptime(true) }}<br>{{ substr($device->location, 0, 32) }}</td>
                         </tr>
                     @endforeach
                 </table>
             </div>
-        </div>
+        </x-panel>
     </div>
 
     <div id="public-logon" style="display:none;">

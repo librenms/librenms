@@ -1,18 +1,23 @@
 mib: FORTINET-FORTIGATE-MIB
 modules:
+    os:
+        version: FORTINET-FORTIGATE-MIB::fgSysVersion.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        hardware: ENTITY-MIB::entPhysicalModelName.1
     processors:
-          data:
-              -
-                  oid: fgSysCpuUsage
-                  num_oid: '.1.3.6.1.4.1.12356.101.4.1.3.{{ $index }}'
-                  type: fortigate-fixed
+        data:
+            -
+                oid: fgSysCpuUsage
+                num_oid: '.1.3.6.1.4.1.12356.101.4.1.3.{{ $index }}'
+                type: fortigate-fixed
     sensors:
         pre-cache:
             data:
-                -   oid:
-                      - fgVpnTunEntPhase1Name
-                      - fgVpnTunEntPhase2Name
-                      - fgVpnTunEntRemGwyIp
+                -
+                    oid:
+                        - fgVpnTunEntPhase1Name
+                        - fgVpnTunEntPhase2Name
+                        - fgVpnTunEntRemGwyIp
         state:
             data:
                 -

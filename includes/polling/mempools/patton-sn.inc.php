@@ -4,7 +4,7 @@ $oid = $mempool['mempool_index'];
 
 d_echo('Patton SN Mempool');
 
-if (!is_array($mempool_cache['patton-sn'])) {
+if (! is_array($mempool_cache['patton-sn'])) {
     d_echo('caching');
 
     $mempool_cache['patton-sn'] = [];
@@ -19,9 +19,9 @@ if ($entry['hwEntityMemSize'] < 0) {
     $entry['hwEntityMemSize'] = ($entry['hwEntityMemSize'] * -1);
 }
 
-$mempool['total'] = $entry['memAllocatedBytes'] + $entry['memFreeBytes'] ;
-$mempool['used']  = $entry['memAllocatedBytes'];
-$mempool['free']  = $entry['memFreeBytes'];
-$perc             = $entry['used']/$entry['total'] * 100;
+$mempool['total'] = $entry['memAllocatedBytes'] + $entry['memFreeBytes'];
+$mempool['used'] = $entry['memAllocatedBytes'];
+$mempool['free'] = $entry['memFreeBytes'];
+$perc = $entry['used'] / $entry['total'] * 100;
 
 d_echo($mempool);

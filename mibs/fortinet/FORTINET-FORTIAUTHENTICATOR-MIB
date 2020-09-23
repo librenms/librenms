@@ -1,0 +1,407 @@
+--
+-- MODULE-IDENTITY
+--  OrgName
+--    Fortinet, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+FORTINET-FORTIAUTHENTICATOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	fnGenTrapMsg, FnIndex, fortinet
+		FROM FORTINET-CORE-MIB
+	MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+		FROM SNMPv2-CONF
+	sysName
+		FROM SNMPv2-MIB
+	Gauge32, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, TEXTUAL-CONVENTION
+		FROM SNMPv2-TC;
+
+fnFortiAuthenticatorMib MODULE-IDENTITY
+	LAST-UPDATED "201506080000Z"
+	ORGANIZATION
+		"Fortinet Technologies, Inc."
+	CONTACT-INFO
+		"Technical Support
+		 email: support@fortinet.com
+		 http://www.fortinet.com
+		"
+	DESCRIPTION
+		"MIB module for Fortinet FortiAuthenticator devices"
+	REVISION	"201506080000Z"
+	DESCRIPTION
+		"Include Radius proxy, high availability data"
+	REVISION	"201211050000Z"
+	DESCRIPTION
+		"Initial version of FORTINET-FORTIAUTHENTICATOR-MIB."
+	::= { fortinet 113 }
+
+
+--
+-- FortiAuthenticator MIB Textual Conventions (TC)
+--
+
+FacHaState ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+		"Enumerated type for FAC High Availability states"
+	SYNTAX  INTEGER {
+		unknownOrDetermining (1),
+		clusterMaster (2),
+		clusterSlave (3),
+		standaloneMaster (4),
+		loadBalancingSlave (5),
+		disabled (255)
+	}
+
+
+--
+-- fortinet.fnFortiAuthenticatorMib
+--
+facTraps  OBJECT IDENTIFIER
+	::= { fnFortiAuthenticatorMib 0 }
+facSystem  OBJECT IDENTIFIER
+	::= { fnFortiAuthenticatorMib 1 }
+facHa  OBJECT IDENTIFIER
+	::= { facSystem 201 }
+facAuth  OBJECT IDENTIFIER
+	::= { facSystem 202 }
+
+facMIBConformance  OBJECT IDENTIFIER
+	::= { fnFortiAuthenticatorMib 600 }
+
+--
+-- fortinet.fnFortiAuthenticatorMib.facSystem
+--
+
+facSysModel  OBJECT-TYPE
+	SYNTAX          DisplayString
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "System model string"
+	::= { facSystem 1 }
+
+facSysSerial  OBJECT-TYPE
+	SYNTAX          DisplayString
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Device serial number"
+	::= { facSystem 2 }
+
+facSysVersion  OBJECT-TYPE
+	SYNTAX          DisplayString
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Device firmware version"
+	::= { facSystem 3 }
+
+facSysCpuUsage  OBJECT-TYPE
+	SYNTAX          Gauge32
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Instantaneous CPU usage"
+	::= { facSystem 4 }
+
+facSysMemUsage  OBJECT-TYPE
+	SYNTAX          Gauge32
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Instantaneous memory utilization"
+	::= { facSystem 5 }
+
+facSysLogDiskUsage  OBJECT-TYPE
+	SYNTAX          Gauge32
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Instantaneous log disk usage"
+	::= { facSystem 6 }
+
+
+-- fnFortiAuthenticatorMib.facSystem.facHa
+facHaCurrentStatus  OBJECT-TYPE
+	SYNTAX          FacHaState
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Instantaneous HA status for this node"
+	::= { facHa 1 }
+
+
+-- fnFortiAuthenticatorMib.facSystem.facAuth
+facAuthUserCount  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of local users"
+	::= { facAuth 1 }
+
+facAuthGroupCount  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of user groups"
+	::= { facAuth 2 }
+
+facFortiTokenCount  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of FortiTokens"
+	::= { facAuth 3 }
+
+facAuthUsersRemaining  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of local users that can still be added before reaching the table limit"
+	::= { facAuth 4 }
+
+facAuthGroupRemaining  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of user groups that can still be added before reaching the table limit"
+	::= { facAuth 5 }
+
+facFortiTokenRemaining  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of FortiTokens that can still be added before reaching the table limit"
+	::= { facAuth 6 }
+
+facRadiusNasCount  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius NAS"
+	::= { facAuth 7 }
+
+facRadiusNasRemaining  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius NAS that can still be added before reaching the table limit"
+	::= { facAuth 8 }
+
+facUserCertificateCount  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of user certificates"
+	::= { facAuth 9 }
+
+facRadiusLoginsTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius logins since startup"
+	::= { facAuth 10 }
+
+facRadiusLogins5Mins  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius logins in the last 5 minutes"
+	::= { facAuth 11 }
+
+facRadiusFailuresTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius login failures since startup"
+	::= { facAuth 12 }
+
+facRadiusFailures5Mins  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius login failures in the last 5 minutes"
+	::= { facAuth 13 }
+
+facRadiusAccountingTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius accounting records since startup"
+	::= { facAuth 14 }
+
+facRadiusAccounting5Mins  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius accounting records in the last 5 minutes"
+	::= { facAuth 15 }
+
+facLdapLoginsTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Ldap logins since startup"
+	::= { facAuth 16 }
+
+facLdapLogins5Mins  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Ldap logins in the last 5 minutes"
+	::= { facAuth 17 }
+
+facLdapFailuresTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Ldap login failures since startup"
+	::= { facAuth 18 }
+
+facLdapFailures5Mins  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Ldap login failures in the last 5 minutes"
+	::= { facAuth 19 }
+
+facAuthEventsTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of authentication events since startup"
+	::= { facAuth 20 }
+
+facAuthEvents5Mins  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of authentication events in the last 5 minutes"
+	::= { facAuth 21 }
+
+facAuthFailuresTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of authentication failures since startup"
+	::= { facAuth 22 }
+
+facAuthFailures5Mins  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of authentication failures in the last 5 minutes"
+	::= { facAuth 23 }
+
+facRadiusProxyInTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius accounting proxy requests received since startup"
+	::= { facAuth 24 }
+
+facRadiusProxyOutTotal  OBJECT-TYPE
+	SYNTAX          FnIndex
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Number of Radius accounting proxy requests sent since startup"
+	::= { facAuth 25 }
+
+
+--
+-- fnFortiAuthenticatorMib.facTraps
+--
+facTrapAuthUsersThreshold  NOTIFICATION-TYPE
+	OBJECTS         { facSysSerial, facAuthUsersRemaining }
+	STATUS          current
+	DESCRIPTION
+	    "The user table is nearly full."
+	::= { facTraps 100 }
+
+facTrapAuthGroupThreshold NOTIFICATION-TYPE
+	OBJECTS         { facSysSerial, facAuthGroupRemaining }
+	STATUS          current
+	DESCRIPTION
+	    "The user group table is nearly full."
+	::= { facTraps 101 }
+
+facTrapRadiusNasThreshold  NOTIFICATION-TYPE
+	OBJECTS         { facSysSerial, facRadiusNasRemaining }
+	STATUS          current
+	DESCRIPTION
+	    "The Radius NAS table is nearly full."
+	::= { facTraps 102 }
+
+facTrapAuthEventsThreshold  NOTIFICATION-TYPE
+	OBJECTS         { facSysSerial, facAuthEvents5Mins }
+	STATUS          current
+	DESCRIPTION
+	    "The Authentication request rate has exceded the configured threshhold."
+	::= { facTraps 103 }
+
+facTrapAuthFailureThreshold  NOTIFICATION-TYPE
+	OBJECTS         { facSysSerial, facAuthFailures5Mins }
+	STATUS          current
+	DESCRIPTION
+	    "The Authentication failure rate has exceded the configured threshhold."
+	::= { facTraps 104 }
+
+facTrapUserLockout  NOTIFICATION-TYPE
+	OBJECTS         { facSysSerial, sysName, fnGenTrapMsg }
+	STATUS          current
+	DESCRIPTION
+	    "A user has been locked out for repeated login failures."
+	::= { facTraps 105 }
+
+facTrapHAStatusChange  NOTIFICATION-TYPE
+	OBJECTS         { facSysSerial, sysName, facHaCurrentStatus, fnGenTrapMsg }
+	STATUS          current
+	DESCRIPTION
+	    "The FAC device's HA status has changed."
+	::= { facTraps 106 }
+
+
+--
+-- fnFortiAuthenticatorMib.facMIBConformance
+--
+facSystemConformanceGroup  OBJECT-GROUP
+	OBJECTS         { facSysModel, facSysSerial, facSysVersion,
+	                  facSysCpuUsage, facSysMemUsage, facSysLogDiskUsage,
+	                  facAuthUserCount, facAuthGroupCount, facFortiTokenCount,
+	                  facAuthUsersRemaining, facAuthGroupRemaining, facFortiTokenRemaining,
+	                  facRadiusNasCount, facRadiusNasRemaining, facUserCertificateCount,
+	                  facRadiusLoginsTotal, facRadiusLogins5Mins, facRadiusFailuresTotal, 
+	                  facRadiusFailures5Mins, facRadiusAccountingTotal, facRadiusAccounting5Mins,
+	                  facLdapLoginsTotal, facLdapLogins5Mins, facLdapFailuresTotal,
+	                  facLdapFailures5Mins, facAuthEventsTotal, facAuthEvents5Mins,
+	                  facAuthFailuresTotal, facAuthFailures5Mins, facHaCurrentStatus,
+	                  facRadiusProxyInTotal, facRadiusProxyOutTotal }
+	STATUS          current
+	DESCRIPTION     "Basic FortiAuthenticator system information"
+	::= { facMIBConformance 1 }
+
+facTrapsConformanceGroup  NOTIFICATION-GROUP
+	NOTIFICATIONS   { facTrapAuthUsersThreshold, facTrapAuthGroupThreshold,
+	                  facTrapRadiusNasThreshold, facTrapAuthEventsThreshold,
+	                  facTrapAuthFailureThreshold, facTrapUserLockout,
+	                  facTrapHAStatusChange }
+	STATUS          current
+	DESCRIPTION     "Event notifications."
+	::= { facMIBConformance 2 }
+
+facMIBCompliance  MODULE-COMPLIANCE
+	STATUS          current
+	DESCRIPTION     "Compliance statement for FortiAuthenticator MIB"
+	MODULE
+		GROUP   facSystemConformanceGroup
+		DESCRIPTION
+		    "This group is mandatory for all FortiAuthenticator appliances
+		    supporting this MIB."
+		GROUP   facTrapsConformanceGroup
+		DESCRIPTION
+		    "Traps are optional and may not be implemented on some
+		    devices."
+	::= { facMIBConformance 100 }
+
+
+END
+

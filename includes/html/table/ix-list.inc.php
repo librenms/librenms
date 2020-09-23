@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * LibreNMS PeeringDB Integration
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,37 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $asn = clean($vars['asn']);
 
-$sql    = " FROM `pdb_ix` WHERE `asn` = ?";
-$params = array($asn);
+$sql = ' FROM `pdb_ix` WHERE `asn` = ?';
+$params = [$asn];
 
-
-if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`name` LIKE '%$searchPhrase%')";
+if (isset($searchPhrase) && ! empty($searchPhrase)) {
+    $sql .= ' AND (`name` LIKE ?)';
+    $params[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(*) $sql";
 
-$total     = dbFetchCell($count_sql, $params);
+$total = dbFetchCell($count_sql, $params);
 if (empty($total)) {
     $total = 0;
 }
 
-if (!isset($sort) || empty($sort)) {
+if (! isset($sort) || empty($sort)) {
     $sort = 'name ASC';
 }
 
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low  = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - ($rowCount));
     $limit_high = $rowCount;
 }
 
@@ -58,17 +55,17 @@ $sql = "SELECT * $sql";
 
 foreach (dbFetchRows($sql, $params) as $ix) {
     $ix_id = $ix['ix_id'];
-    $response[] = array(
+    $response[] = [
         'exchange' => $ix['name'],
-        'action'   => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-peers', 'asn' => $asn, 'ixid' => $ix['ix_id'])) . "' role='button'>Show Peers</a>",
+        'action'   => "<a class='btn btn-sm btn-primary' href='" . generate_url(['page' => 'peering', 'section' => 'ix-peers', 'asn' => $asn, 'ixid' => $ix['ix_id']]) . "' role='button'>Show Peers</a>",
         'links'    => "<a href='https://peeringdb.com/ix/$ix_id' target='_blank'><i class='fa fa-database'></i></a>",
-    );
+    ];
 }
 
-$output = array(
+$output = [
     'current'  => $current,
     'rowCount' => $rowCount,
     'rows'     => $response,
     'total'    => $total,
-);
+];
 echo _json_encode($output);

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
@@ -46,10 +45,12 @@ class Python extends BaseValidation
 
         if (empty($version)) {
             $validator->fail('python3 not found', 'Install Python 3 for your system.');
+
             return; // no need to check anything else
         }
 
         $this->checkVersion($validator, $version);
+        $this->checkPipVersion($validator, $version);
         $this->checkExtensions($validator);
     }
 
@@ -60,6 +61,16 @@ class Python extends BaseValidation
         }
     }
 
+    private function checkPipVersion(Validator $validator, $version)
+    {
+        preg_match('/\(python ([0-9.]+)\)/', `pip3 --version 2>/dev/null`, $matches);
+        $pip = $matches[1];
+        $python = implode('.', array_slice(explode('.', $version), 0, 2));
+        if ($pip && version_compare($python, $pip, '!=')) {
+            $validator->fail("python3 ($python) and pip3 ($pip) versions do not match.  This likely will cause dependencies to be installed for the wrong python version.");
+        }
+    }
+
     private function checkExtensions(Validator $validator)
     {
         $pythonExtensions = '/scripts/check_requirements.py';
@@ -67,8 +78,10 @@ class Python extends BaseValidation
         $process->run();
 
         if ($process->getExitCode() !== 0) {
-            $user = Config::get('user', 'librenms');
-            if (get_current_user() !== $user) {
+            $user = \config('librenms.user');
+            $user_mismatch = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) !== $user : false;
+
+            if ($user_mismatch) {
                 $validator->warn("Could not check Python dependencies because this script is not running as $user");
             } else {
                 $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r ' . Config::get('install_dir') . '/requirements.txt');

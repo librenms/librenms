@@ -1,9 +1,14 @@
 mib: PAN-COMMON-MIB
 modules:
+    os:
+        hardware: PAN-COMMON-MIB::panChassisType.0
+        serial: PAN-COMMON-MIB::panSysSerialNumber.0
+        version: PAN-COMMON-MIB::panSysSwVersion.0
     sensors:
         pre-cache:
             data:
-                -   oid:
+                -
+                    oid:
                         - panSessionMax
                         - panVsysName
                         - panVsysMaxSessions

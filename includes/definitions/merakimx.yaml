@@ -6,5 +6,6 @@ ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
-    - sysDescr_regex:
-        - '/^Meraki MX/'
+    -
+        sysDescr_regex:
+            - '/^Meraki MX/'

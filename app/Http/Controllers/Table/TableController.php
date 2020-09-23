@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -32,7 +31,18 @@ use Illuminate\Http\Request;
 
 abstract class TableController extends PaginatedAjaxController
 {
-    protected $default_sort = [];
+    protected $model;
+
+    protected function sortFields($request)
+    {
+        if (isset($this->model)) {
+            $fields = \Schema::getColumnListing((new $this->model)->getTable());
+
+            return array_combine($fields, $fields);
+        }
+
+        return [];
+    }
 
     final protected function baseRules()
     {

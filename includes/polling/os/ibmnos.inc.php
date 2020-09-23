@@ -14,22 +14,22 @@ if (strpos($sysdescr_value, 'IBM Networking Operating System') !== false) {
     $hardware = str_replace('IBM Networking Operating System', '', $sysdescr_value);
     if (strpos($sysdescr_value, 'G8052') !== false) {
         $version = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.10.1', '-Ovq'), '" ');
-        $serial  = trim(snmp_get($device, '.1.3.6.1.4.1.26543.100.100.14.9.0', '-Ovq'), '" ');
+        $serial = trim(snmp_get($device, '.1.3.6.1.4.1.26543.100.100.14.9.0', '-Ovq'), '" ');
     }
 
     if (strpos($sysdescr_value, 'G8316') !== false) {
         $version = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.10.1', '-Ovq'), '" ');
-        $serial  = trim(snmp_get($device, '.1.3.6.1.4.1.20301.100.100.14.9.0', '-Ovq'), '" ');
+        $serial = trim(snmp_get($device, '.1.3.6.1.4.1.20301.100.100.14.9.0', '-Ovq'), '" ');
     }
 
     if (strpos($sysdescr_value, 'G8264CS') !== false) {
         $version = trim(snmp_get($device, '.1.3.6.1.4.1.20301.2.7.15.1.1.1.10.0', '-Ovq'), '" ');
-        $serial  = trim(snmp_get($device, '.1.3.6.1.4.1.20301.100.100.14.9.0', '-Ovq'), '" ');
+        $serial = trim(snmp_get($device, '.1.3.6.1.4.1.20301.100.100.14.9.0', '-Ovq'), '" ');
     }
 
     if (strpos($sysdescr_value, 'G8264-T') !== false) {
         $version = trim(snmp_get($device, '.1.3.6.1.4.1.20301.2.7.13.1.1.1.10.0', '-Ovq'), '" ');
-        $serial  = trim(snmp_get($device, '.1.3.6.1.4.1.20301.100.100.14.9.0', '-Ovq'), '" ');
+        $serial = trim(snmp_get($device, '.1.3.6.1.4.1.20301.100.100.14.9.0', '-Ovq'), '" ');
     }
 
     if (empty($version)) {
@@ -41,8 +41,8 @@ if (strpos($sysdescr_value, 'IBM Networking Operating System') !== false) {
     }
 } elseif (strpos($sysdescr_value, 'IBM Flex System Fabric') !== false) {
     $hardware = str_replace('IBM Flex System Fabric', '', $sysdescr_value);
-    $version  = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.10.1', '-Ovq'), '" ');
-    $serial   = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.11.1', '-Ovq'), '" ');
+    $version = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.10.1', '-Ovq'), '" ');
+    $serial = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.11.1', '-Ovq'), '" ');
 } elseif (strpos($sysdescr_value, 'IBM Networking OS 1/10Gb Uplink Ethernet Switch Module') !== false) {
-    $hardware = "IBM BladeCenter 1/10Gb Uplink Ethernet Switch Module";
+    $hardware = 'IBM BladeCenter 1/10Gb Uplink Ethernet Switch Module';
 }//end if

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -35,6 +34,7 @@ class SyslogController extends WidgetController
         'title' => null,
         'device' => null,
         'device_group' => null,
+        'hidenavigation' => 0,
     ];
 
     public function getSettingsView(Request $request)

@@ -1,5 +1,8 @@
 mib: OACOMMON-MIB
 modules:
+    os:
+        hardware: OACOMMON-MIB::netspireDeviceModelName.0
+        serial: OACOMMON-MIB::netSpireDeviceDeviceSerialNo.0
     processors:
         data:
             -
@@ -9,7 +12,7 @@ modules:
     sensors:
         temperature:
             data:
-                - 
+                -
                     oid: netSpireDeviceSystemTemperature
                     num_oid: '.1.3.6.1.4.1.1732.2.1.10.{{ $index }}'
                     descr: 'System Temperature'

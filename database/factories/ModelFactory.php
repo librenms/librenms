@@ -49,10 +49,38 @@ $factory->define(\App\Models\Bill::class, function (Faker\Generator $faker) {
 
 $factory->define(\App\Models\Device::class, function (Faker\Generator $faker) {
     return [
-        'hostname' => $faker->domainWord . '.' . $faker->domainName,
+        'hostname' => $faker->domainWord . '-' . $faker->domainWord . '-' . $faker->domainWord . '.' . $faker->domainName,
         'ip' => $faker->randomElement([$faker->ipv4, $faker->ipv6]),
+        'type' => $faker->randomElement([
+            'appliance',
+            'camera',
+            'collaboration',
+            'encoder',
+            'environment',
+            'firewall',
+            'loadbalancer',
+            'management',
+            'network',
+            'power',
+            'printer',
+            'proxy',
+            'sensor',
+            'server',
+            'storage',
+            'timing',
+            'wireless',
+            'workstation',
+        ]),
         'status' => $status = random_int(0, 1),
         'status_reason' => $status == 0 ? $faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
+    ];
+});
+
+$factory->define(\App\Models\DeviceGroup::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->domainWord,
+        'desc' => $faker->text(255),
+        'type' =>'static',
     ];
 });
 
@@ -132,9 +160,46 @@ $factory->define(\App\Models\Vminfo::class, function (Faker\Generator $faker) {
     ];
 });
 
+$factory->define(\App\Models\OspfNbr::class, function (Faker\Generator $faker) {
+    return [
+        'id' => $faker->randomDigit,
+        'ospfNbrIpAddr' => $faker->ipv4,
+        'ospfNbrAddressLessIndex' => $faker->randomDigit,
+        'ospfNbrRtrId' => $faker->ipv4,
+        'ospfNbrOptions' => 0,
+        'ospfNbrPriority' => 1,
+        'ospfNbrEvents' => $faker->randomDigit,
+        'ospfNbrLsRetransQLen' => 0,
+        'ospfNbmaNbrStatus' => 'active',
+        'ospfNbmaNbrPermanence' => 'dynamic',
+        'ospfNbrHelloSuppressed' => 'false',
+    ];
+});
+
+$factory->define(\App\Models\OspfPort::class, function (Faker\Generator $faker) {
+    return [
+        'id' => $faker->randomDigit,
+        'ospf_port_id' => $faker->randomDigit,
+        'ospfIfIpAddress' => $faker->ipv4,
+        'ospfAddressLessIf' => $faker->randomDigit,
+        'ospfIfAreaId' => '0.0.0.0',
+    ];
+});
+
 $factory->define(\App\Models\Component::class, function (Faker\Generator $faker) {
     return [
         'device_id' => $faker->randomDigit,
         'type' => $faker->regexify('[A-Za-z0-9]{4,20}'),
+    ];
+});
+$factory->define(\App\Models\Sensor::class, function (Faker\Generator $faker) {
+    $sensor_class = ['airflow', 'ber', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dbm', 'delay', 'eer', 'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'power', 'power_consumed', 'power_factor', 'pressure', 'quality_factor', 'runtime', 'signal', 'snr', 'state', 'temperature', 'voltage', 'waterflow'];
+    $sensor_oid = '.1.3.6.1.4.1.4115.1.4.3.3.' . $faker->numberBetween(0, 10) . '.' . $faker->numberBetween(0, 10) . '.' . $faker->numberBetween(0, 10);
+
+    return [
+        'sensor_index' => $faker->randomDigit,
+        'sensor_class' => $faker->randomElement($sensor_class),
+        'sensor_current' => $faker->randomDigit,
+        'sensor_oid' => $sensor_oid,
     ];
 });

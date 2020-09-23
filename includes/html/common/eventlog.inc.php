@@ -35,7 +35,7 @@ var eventlog_grid = $("#eventlog").bootgrid({
     post: function ()
     {
         return {
-            device: "' . (int)($vars['device']) . '",
+            device: "' . (int) ($vars['device']) . '",
             eventtype: "' . addcslashes($vars['eventtype'], '"') . '",
         };
     },

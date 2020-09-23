@@ -19,14 +19,11 @@
  * @author PipoCanaja (github.com/PipoCanaja)
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use GuzzleHttp\Client;
 
 class Api extends Transport
 {
@@ -38,6 +35,7 @@ class Api extends Transport
         $body = $this->config['api-body'];
         $method = $this->config['api-method'];
         $auth = [$this->config['api-auth-username'], $this->config['api-auth-password']];
+
         return $this->contactAPI($obj, $url, $options, $method, $auth, $headers, $body);
     }
 
@@ -48,39 +46,40 @@ class Api extends Transport
         $query = [];
 
         $method = strtolower($method);
-        $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
+        $host = explode('?', $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables for Headers;
-        foreach (preg_split("/\\r\\n|\\r|\\n/", $headers, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
-            list($u_key, $u_val) = explode('=', $current_line, 2);
+        foreach (preg_split('/\\r\\n|\\r|\\n/', $headers, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
+            [$u_key, $u_val] = explode('=', $current_line, 2);
             foreach ($obj as $p_key => $p_val) {
-                $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
+                $u_val = str_replace('{{ $' . $p_key . ' }}', $p_val, $u_val);
             }
             //store the parameter in the array for HTTP headers
             $request_heads[$u_key] = $u_val;
         }
         //get each line of key-values and process the variables for Options;
-        foreach (preg_split("/\\r\\n|\\r|\\n/", $options, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
-            list($u_key, $u_val) = explode('=', $current_line, 2);
+        foreach (preg_split('/\\r\\n|\\r|\\n/', $options, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
+            [$u_key, $u_val] = explode('=', $current_line, 2);
             // Replace the values
             foreach ($obj as $p_key => $p_val) {
-                $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
+                $u_val = str_replace('{{ $' . $p_key . ' }}', $p_val, $u_val);
             }
             //store the parameter in the array for HTTP query
             $query[$u_key] = $u_val;
         }
 
         $client = new \GuzzleHttp\Client();
-        if (isset($auth) && !empty($auth[0])) {
+        $request_opts['proxy'] = get_guzzle_proxy();
+        if (isset($auth) && ! empty($auth[0])) {
             $request_opts['auth'] = $auth;
         }
         if (count($request_heads) > 0) {
             $request_opts['headers'] = $request_heads;
         }
-        if ($method == "get") {
+        if ($method == 'get') {
             $request_opts['query'] = $query;
             $res = $client->request('GET', $host, $request_opts);
-        } elseif ($method == "put") {
+        } elseif ($method == 'put') {
             $request_opts['query'] = $query;
             $request_opts['body'] = $body;
             $res = $client->request('PUT', $host, $request_opts);
@@ -92,13 +91,15 @@ class Api extends Transport
         $code = $res->getStatusCode();
         if ($code != 200) {
             var_dump("API '$host' returned Error");
-            var_dump("Params:");
+            var_dump('Params:');
             var_dump($query);
-            var_dump("Response headers:");
+            var_dump('Response headers:');
             var_dump($res->getHeaders());
-            var_dump("Return: ".$res->getReasonPhrase());
-            return 'HTTP Status code '.$code;
+            var_dump('Return: ' . $res->getReasonPhrase());
+
+            return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -114,8 +115,8 @@ class Api extends Transport
                     'options' => [
                         'GET' => 'GET',
                         'POST' => 'POST',
-                        'PUT' => 'PUT'
-                    ]
+                        'PUT' => 'PUT',
+                    ],
                 ],
                 [
                     'title' => 'API URL',
@@ -152,12 +153,12 @@ class Api extends Transport
                     'name' => 'api-auth-password',
                     'descr' => 'Auth Password',
                     'type' => 'password',
-                ]
+                ],
             ],
             'validation' => [
                 'api-method' => 'in:GET,POST,PUT',
-                'api-url' => 'required|url'
-            ]
+                'api-url' => 'required|url',
+            ],
         ];
     }
 }

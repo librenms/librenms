@@ -1,7 +1,7 @@
 <!--
   - LibrenmsSetting.vue
   -
-  - Description-
+  -
   -
   - This program is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@
     <div :class="['form-group', 'has-feedback', setting.class, feedback]">
         <label :for="setting.name" class="col-sm-5 control-label" v-tooltip="{ content: setting.name }">
             {{ getDescription() }}
-            <span v-if="setting.units !== null">({{ setting.units }})</span>
+            <span v-if="setting.units">({{ getUnits() }})</span>
         </label>
-        <div class="col-sm-5" v-tooltip="{ content: setting.disabled ? $t('settings.readonly') : false }">
+        <div class="col-sm-5" v-tooltip="{ content: setting.disabled ? $t(this.prefix + '.readonly') : false }">
             <component :is="getComponent()"
                        :value="value"
                        :name="setting.name"
@@ -53,7 +53,9 @@
     export default {
         name: "LibrenmsSetting",
         props: {
-            'setting': {type: Object, required: true}
+            'setting': {type: Object, required: true},
+            'prefix': {type: String, default: 'settings'},
+            'id': {required: false}
         },
         data() {
             return {
@@ -63,7 +65,7 @@
         },
         methods: {
             persistValue(value) {
-                axios.put(route('settings.update', this.setting.name), {value: value})
+                axios.put(route(this.prefix + '.update', this.getRouteParams()), {value: value})
                     .then((response) => {
                         this.value = response.data.value;
                         this.$emit('setting-updated', {name: this.setting.name, value: this.value});
@@ -91,7 +93,7 @@
                 this.persistValue(value)
             }, 500),
             changeValue(value) {
-                if (['select', 'boolean'].includes(this.setting.type)) {
+                if (['select', 'boolean', 'multiple'].includes(this.setting.type)) {
                     // no need to debounce
                     this.persistValue(value);
                 } else {
@@ -99,24 +101,28 @@
                 }
                 this.value = value
             },
+            getUnits() {
+                let key = this.prefix + '.units.' + this.setting.units;
+                return this.$te(key) ? this.$t(key) : this.setting.units
+            },
             getDescription() {
-                let key = 'settings.settings.' + this.setting.name + '.description';
+                let key = this.prefix + '.settings.' + this.setting.name + '.description';
                 return (this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)) ? this.$t(key) : this.setting.name;
             },
             getHelp() {
-                let help = this.$t('settings.settings.' + this.setting.name + '.help');
+                let help = this.$t(this.prefix + '.settings.' + this.setting.name + '.help');
                 if (this.setting.overridden) {
-                    help += "</p><p>" + this.$t('settings.readonly')
+                    help += "</p><p>" + this.$t(this.prefix + '.readonly')
                 }
 
                 return help
             },
             hasHelp() {
-                var key = 'settings.settings.' + this.setting.name + '.help';
+                let key = this.prefix + '.settings.' + this.setting.name + '.help';
                 return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)
             },
             resetToDefault() {
-                axios.delete(route('settings.destroy', this.setting.name))
+                axios.delete(route(this.prefix + '.destroy', this.getRouteParams()))
                     .then((response) => {
                         this.value = response.data.value;
                         this.feedback = 'has-success';
@@ -137,6 +143,13 @@
             },
             showUndo() {
                 return !_.isEqual(this.setting.value, this.value);
+            },
+            getRouteParams() {
+                let parameters = [this.setting.name];
+                if (this.id) {
+                    parameters.unshift(this.id);
+                }
+                return parameters;
             },
             getComponent() {
                 // snake to studly

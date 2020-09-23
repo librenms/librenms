@@ -21,6 +21,7 @@ class Sensor extends DeviceRelatedModel
         'frequency'            => 'line-chart',
         'humidity'             => 'tint',
         'load'                 => 'percent',
+        'loss'                 => 'percentage',
         'power'                => 'power-off',
         'power_consumed'       => 'plug',
         'power_factor'         => 'calculator',
@@ -45,6 +46,7 @@ class Sensor extends DeviceRelatedModel
             'eer' => 'EER',
             'snr' => 'SNR',
         ]);
+
         return $nice->get($this->sensor_class, ucwords(str_replace('_', ' ', $this->sensor_class)));
     }
 

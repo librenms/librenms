@@ -17,37 +17,37 @@ use LibreNMS\Config;
 $highlight_node = $vars['highlight_node'] | 0;
 
 //Don't know where this should come from, but it is used later, so I just define it here.
-$row_colour="#ffffff";
+$row_colour = '#ffffff';
 
-$sql_array= array();
-if (!empty($device['hostname'])) {
+$sql_array = [];
+if (! empty($device['hostname'])) {
     $sql = ' AND (`D1`.`hostname`=? OR `D2`.`hostname`=?)';
-    $sql_array = array($device['hostname'], $device['hostname']);
+    $sql_array = [$device['hostname'], $device['hostname']];
     $mac_sql = ' AND `D`.`hostname` = ?';
-    $mac_array = array($device['hostname']);
+    $mac_array = [$device['hostname']];
 } else {
     $sql = ' ';
 }
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $sql .= " AND `D1`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
-    $sql .= " AND `D2`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $sql .= ' AND `D1`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
+    $sql .= ' AND `D2`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $sql_array = array_merge($sql_array, $device_ids, $device_ids);
 }
 
-$devices_by_id = array();
-$links = array();
-$link_assoc_seen = array();
-$device_assoc_seen = array();
-$ports = array();
-$devices = array();
+$devices_by_id = [];
+$links = [];
+$link_assoc_seen = [];
+$device_assoc_seen = [];
+$ports = [];
+$devices = [];
 
-$where = "";
+$where = '';
 if (is_numeric($vars['group'])) {
-    $where .= " AND D1.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $where .= ' AND D1.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $sql_array[] = $vars['group'];
-    $where .= " OR D2.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $where .= ' OR D2.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $sql_array[] = $vars['group'];
 }
 
@@ -151,90 +151,90 @@ $list = array_merge($ports, $devices);
 
 // Build the style variables we need
 
-$node_disabled_style = array(
-    'color' => array(
-        'highlight' => array(
+$node_disabled_style = [
+    'color' => [
+        'highlight' => [
             'background' => Config::get('network_map_legend.di.node'),
-        ),
+        ],
         'border' => Config::get('network_map_legend.di.border'),
         'background' => Config::get('network_map_legend.di.node'),
-    ),
-);
-$node_down_style = array(
-    'color' => array(
-        'highlight' => array(
+    ],
+];
+$node_down_style = [
+    'color' => [
+        'highlight' => [
             'background' => Config::get('network_map_legend.dn.node'),
             'border' => Config::get('network_map_legend.dn.border'),
-        ),
+        ],
         'border' => Config::get('network_map_legend.dn.border'),
         'background' => Config::get('network_map_legend.dn.node'),
-    ),
-);
-$node_highlight_style = array(
-    'color' => array(
-        'highlight' => array(
+    ],
+];
+$node_highlight_style = [
+    'color' => [
+        'highlight' => [
             'border' => Config::get('network_map_legend.highlight.border'),
-        ),
+        ],
         'border' => Config::get('network_map_legend.highlight.border'),
-    ),
+    ],
     'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
-);
-$edge_disabled_style = array(
-    'dashes' => array(8,12),
-    'color' => array(
+];
+$edge_disabled_style = [
+    'dashes' => [8, 12],
+    'color' => [
         'color' => Config::get('network_map_legend.di.edge'),
         'highlight' => Config::get('network_map_legend.di.edge'),
-    ),
-);
-$edge_down_style = array(
-    'dashes' => array(8,12),
-    'color' => array(
+    ],
+];
+$edge_down_style = [
+    'dashes' => [8, 12],
+    'color' => [
         'border' => Config::get('network_map_legend.dn.border'),
         'highlight' => Config::get('network_map_legend.dn.edge'),
         'color' => Config::get('network_map_legend.dn.edge'),
-    ),
-);
+    ],
+];
 
 // Iterate though ports and links, generating a set of devices (nodes)
 // and links (edges) that make up the topology graph.
 
 foreach ($list as $items) {
-    $local_device = array(
+    $local_device = [
         'device_id'=>$items['local_device_id'],
         'os'=>$items['local_os'],
         'hostname'=>$items['local_hostname'],
-    );
-    $remote_device = array(
+    ];
+    $remote_device = [
         'device_id'=>$items['remote_device_id'],
         'os'=>$items['remote_os'],
         'hostname'=>$items['remote_hostname'],
-    );
-    $local_port = array(
+    ];
+    $local_port = [
         'port_id'=>$items['local_port_id'],
         'device_id'=>$items['local_port_device_id'],
         'ifName'=>$items['local_ifname'],
         'ifSpeed'=>$items['local_ifspeed'],
         'ifOperStatus'=>$items['local_ifoperstatus'],
         'ifAdminStatus'=>$items['local_adminstatus'],
-    );
-    $remote_port = array(
+    ];
+    $remote_port = [
         'port_id'=>$items['remote_port_id'],
         'device_id'=>$items['remote_port_device_id'],
         'ifName'=>$items['remote_ifname'],
         'ifSpeed'=>$items['remote_ifspeed'],
         'ifOperStatus'=>$items['remote_ifoperstatus'],
         'ifAdminStatus'=>$items['remote_adminstatus'],
-    );
+    ];
 
     $local_device_id = $items['local_device_id'];
-    if (!array_key_exists($local_device_id, $devices_by_id)) {
+    if (! array_key_exists($local_device_id, $devices_by_id)) {
         $items['sysName'] = $items['local_sysName'];
-        $devices_by_id[$local_device_id] = array(
+        $devices_by_id[$local_device_id] = [
             'id'=>$local_device_id,
             'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1),
-            'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),
+            'title'=>generate_device_link($local_device, '', [], '', '', '', 0),
             'shape'=>'box',
-        );
+        ];
         if ($items['local_disabled'] != '0') {
             $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_disabled_style);
         } elseif ($items['local_status'] == '0') {
@@ -247,9 +247,9 @@ foreach ($list as $items) {
     }
 
     $remote_device_id = $items['remote_device_id'];
-    if (!array_key_exists($remote_device_id, $devices_by_id)) {
+    if (! array_key_exists($remote_device_id, $devices_by_id)) {
         $items['sysName'] = $items['remote_sysName'];
-        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(format_hostname($items, $items['remote_hostname']), 1),'title'=>generate_device_link($remote_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$remote_device_id] = ['id'=>$remote_device_id, 'label'=>shorthost(format_hostname($items, $items['remote_hostname']), 1), 'title'=>generate_device_link($remote_device, '', [], '', '', '', 0), 'shape'=>'box'];
         if ($items['remote_disabled'] != '0') {
             $devices_by_id[$remote_device_id] = array_merge($devices_by_id[$remote_device_id], $node_disabled_style);
         } elseif ($items['remote_status'] == '0') {
@@ -261,7 +261,7 @@ foreach ($list as $items) {
         }
     }
 
-    $speed = $items['local_ifspeed']/1000/1000;
+    $speed = $items['local_ifspeed'] / 1000 / 1000;
     if ($speed > 500000) {
         $width = 20;
     } else {
@@ -285,10 +285,9 @@ foreach ($list as $items) {
         'color' => [
             'border' => Config::get("network_map_legend.$link_used"),
             'highlight' => Config::get("network_map_legend.$link_used"),
-            'color' => Config::get("network_map_legend.$link_used")
-        ]
+            'color' => Config::get("network_map_legend.$link_used"),
+        ],
     ];
-
 
     if (($items['remote_ifoperstatus'] == 'down') || ($items['local_ifoperstatus'] == 'down')) {
         $link_style = $edge_down_style;
@@ -301,28 +300,28 @@ foreach ($list as $items) {
         $link_style = $edge_down_style;
     }
 
-    $link_id1 = $items['local_port_id'].':'.$items['remote_port_id'];
-    $link_id2 = $items['remote_port_id'].':'.$items['local_port_id'];
-    $device_id1 = $items['local_device_id'].':'.$items['remote_device_id'];
-    $device_id2 = $items['remote_device_id'].':'.$items['local_device_id'];
+    $link_id1 = $items['local_port_id'] . ':' . $items['remote_port_id'];
+    $link_id2 = $items['remote_port_id'] . ':' . $items['local_port_id'];
+    $device_id1 = $items['local_device_id'] . ':' . $items['remote_device_id'];
+    $device_id2 = $items['remote_device_id'] . ':' . $items['local_device_id'];
 
     // If mac is choosen to graph, ensure only one link exists between any two ports, or any two devices.
     // else ensure only one link exists between any two ports
-    if (!array_key_exists($link_id1, $link_assoc_seen) &&
-        !array_key_exists($link_id2, $link_assoc_seen) &&
-        (!in_array('mac', Config::get('network_map_items')) ||
-        (!array_key_exists($device_id1, $device_assoc_seen) &&
-        !array_key_exists($device_id2, $device_assoc_seen)))) {
+    if (! array_key_exists($link_id1, $link_assoc_seen) &&
+        ! array_key_exists($link_id2, $link_assoc_seen) &&
+        (! in_array('mac', Config::get('network_map_items')) ||
+        (! array_key_exists($device_id1, $device_assoc_seen) &&
+        ! array_key_exists($device_id2, $device_assoc_seen)))) {
         $local_port = cleanPort($local_port);
         $remote_port = cleanPort($remote_port);
         $links[] = array_merge(
-            array(
+            [
                 'from'=>$items['local_device_id'],
                 'to'=>$items['remote_device_id'],
                 'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),
-                'title' => generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=" . $items['local_port_id'] . "&amp;from=" . Config::get('time.day') . "&amp;to=" . Config::get('time.now') . "&amp;width=100&amp;height=20&amp;legend=no&amp;bg=" . str_replace("#", "", $row_colour) . "'>\n", '', 0, 1),
+                'title' => generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=" . $items['local_port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>\n", '', 0, 1),
                 'width'=>$width,
-            ),
+            ],
             $link_style
         );
     }
@@ -360,15 +359,13 @@ $('#visualization').height(height + 'px');
     // create an array with nodes
     var nodes =
     <?php
-    echo $nodes;
-    ?>
+    echo $nodes; ?>
     ;
 
     // create an array with edges
     var edges =
     <?php
-    echo $edges;
-    ?>
+    echo $edges; ?>
     ;
 
     // create a network
@@ -396,7 +393,7 @@ $('#highlight_node option[value="<?=$highlight_node?>"]').prop('selected', true)
 
     <?php
 } else {
-    print_message("No map to display, this may be because you aren't running autodiscovery or no devices are linked by mac address.");
-}
+        print_message("No map to display, this may be because you aren't running autodiscovery or no devices are linked by mac address.");
+    }
 
-$pagetitle[] = "Map";
+$pagetitle[] = 'Map';

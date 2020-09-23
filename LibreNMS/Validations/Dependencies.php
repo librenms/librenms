@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,7 +24,7 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Util\Env;
+use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
@@ -40,14 +39,16 @@ class Dependencies extends BaseValidation
      */
     public function validate(Validator $validator)
     {
-        if (Env::librenmsDocker()) {
-            $validator->ok("Installed from the official Docker image; no Composer required");
+        if (EnvHelper::librenmsDocker()) {
+            $validator->ok('Installed from the official Docker image; no Composer required');
+
             return;
         }
 
-        # if git is not installed, do not assume composer is either
-        if (!Git::repoPresent()) {
-            $validator->ok("Installed from package; no Composer required");
+        // if git is not installed, do not assume composer is either
+        if (! Git::repoPresent()) {
+            $validator->ok('Installed from package; no Composer required');
+
             return;
         }
 
@@ -58,28 +59,29 @@ class Dependencies extends BaseValidation
             $matches
         );
 
-        if (!$found) {
-            $validator->fail("No composer available, please install composer", "https://getcomposer.org/");
+        if (! $found) {
+            $validator->fail('No composer available, please install composer', 'https://getcomposer.org/');
+
             return;
         } else {
-            $validator->ok("Composer Version: " . $matches[1]);
+            $validator->ok('Composer Version: ' . $matches[1]);
         }
 
         $dep_check = shell_exec($validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev --dry-run');
         preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
-        if (!empty($dep_missing[0])) {
-            $result = ValidationResult::fail("Missing dependencies!", $validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev');
-            $result->setList("Dependencies", $dep_missing[1]);
+        if (! empty($dep_missing[0])) {
+            $result = ValidationResult::fail('Missing dependencies!', $validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev');
+            $result->setList('Dependencies', $dep_missing[1]);
             $validator->result($result);
         }
         preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
-        if (!empty($dep_outdated[0])) {
-            $result = ValidationResult::fail("Outdated dependencies", $validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev');
-            $result->setList("Dependencies", $dep_outdated[1]);
+        if (! empty($dep_outdated[0])) {
+            $result = ValidationResult::fail('Outdated dependencies', $validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev');
+            $result->setList('Dependencies', $dep_outdated[1]);
         }
 
         if (empty($dep_missing[0]) && empty($dep_outdated[0])) {
-            $validator->ok("Dependencies up-to-date.");
+            $validator->ok('Dependencies up-to-date.');
         }
     }
 }

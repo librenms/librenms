@@ -2,7 +2,7 @@ SL-PM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
-    Integer32, transmission
+    Integer32, Counter64, transmission
           FROM SNMPv2-SMI
     DisplayString, TruthValue, DateAndTime
           FROM SNMPv2-TC
@@ -44,6 +44,19 @@ SlPmType ::= TEXTUAL-CONVENTION
             native(1)  
        }
 
+SlPmL2Type ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The PM types"
+       SYNTAX       INTEGER {
+            rxPackets(1),
+            txPackets(2),
+            rxBytes(3),
+            txBytes(4),  
+            rxCrc(5),
+            txCrc(6)
+       }
+
 SlPmDirectionType ::= TEXTUAL-CONVENTION
        STATUS       current
        DESCRIPTION
@@ -63,7 +76,8 @@ SlPmIntervalType ::= TEXTUAL-CONVENTION
             day(2)   		-- day interval
        }
 
-slPmIntervals            OBJECT IDENTIFIER ::= { slPmMib 1 }
+slPmIntervals             OBJECT IDENTIFIER ::= { slPmMib 1 }
+slPmL2Intervals           OBJECT IDENTIFIER ::= { slPmMib 2 }
 
 
 -- The PM Interval Table contains various statistics
@@ -244,5 +258,121 @@ slPmServiceType OBJECT-TYPE
         "This variable indicates the XPDR service type of the port 
          during the PM interval."
     ::= { slPmIntervalEntry 14 }
+
+
+-- The Layer 2 PM Interval Table contains various statistics
+-- collected by each system over a maximum of the previous 24 hours of operation.  
+-- The past 24 hours may be broken into 96 completed 15 minute intervals.
+-- A system is required to store at least 4 completed 15 minute interval.
+-- The default value is 32 intervals.
+
+slPmL2Table OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlPmL2Entry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "The Layer 2 PM table."
+     ::= { slPmL2Intervals 1 }
+
+slPmL2Entry OBJECT-TYPE
+    SYNTAX  SlPmL2Entry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "An entry in the Layer 2 PM table."
+    INDEX   { ifIndex,            
+              slPmL2CounterType,			-- crc/...
+              slPmL2IntervalType,			-- 15min/day
+              slPmL2IntervalNumber }
+     ::= { slPmL2Table 1 }
+
+SlPmL2Entry ::=
+    SEQUENCE {
+         slPmL2CounterType		SlPmL2Type,
+         slPmL2IntervalType		SlPmIntervalType,
+         slPmL2IntervalNumber	Integer32,		-- interval 0 is for the current
+         slPmL2Count    		Counter64,
+         slPmL2ValidData 		TruthValue,
+         slPmL2Reset		   	INTEGER,
+         slPmL2StartTime		DateAndTime,
+         slPmL2ServiceType		XpdrServiceType        
+    }
+
+slPmL2CounterType OBJECT-TYPE
+    SYNTAX  SlPmL2Type
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "The PM Layer 2 counter type"
+     ::= { slPmL2Entry 1 }
+
+slPmL2IntervalType OBJECT-TYPE
+    SYNTAX  SlPmIntervalType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "The type of the PM interval 15min/day"
+     ::= { slPmL2Entry 2 }
+
+slPmL2IntervalNumber OBJECT-TYPE
+    SYNTAX  Integer32 (0..96)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "A number between 1 to 96, which identifies the
+      interval for which the set of statistics is available.
+      The interval identified by 1 is the most recently
+      completed 15 minute interval,
+      and the interval identified
+      by N is the interval immediately preceding the
+      one identified
+      by N-1."
+     ::= { slPmL2Entry 3 }
+
+slPmL2Count OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The counter associated with the number of Coding
+       Violations encountered in a particular 15-minute interval
+       in the past 24 hours."
+    ::= { slPmL2Entry 4 }
+
+slPmL2ValidData OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "This variable indicates if the data for this interval is valid."
+    ::= { slPmL2Entry 5 }
+
+slPmL2Reset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing to this object reset the PM counters in this interval."
+    ::= { slPmL2Entry 6 }
+
+slPmL2StartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which this 
+        interval of measurements began on this interface."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { slPmL2Entry 7 }
+
+slPmL2ServiceType OBJECT-TYPE
+    SYNTAX      XpdrServiceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the XPDR service type of the port 
+         during the PM interval."
+    ::= { slPmL2Entry 8 }
+
 
 END

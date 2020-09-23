@@ -1,12 +1,17 @@
 mib: CHECKPOINT-MIB
 modules:
+    os:
+        hardware: CHECKPOINT-MIB::svnApplianceProductName.0
+        serial: CHECKPOINT-MIB::svnApplianceSerialNumber.0
+        version: CHECKPOINT-MIB::svnVersion.0
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - tempertureSensorName
-                    - fanSpeedSensorName
-                    - voltageSensorName
+                -
+                    oid:
+                        - tempertureSensorName
+                        - fanSpeedSensorName
+                        - voltageSensorName
         state:
             data:
                 -

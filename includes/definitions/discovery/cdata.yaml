@@ -1,31 +1,39 @@
 mib: FD-SYSTEM-MIB:CDATA-EPON-MIB:NSCRTV-FTTX-EPON-MIB:NSCRTV-PON-TREE-EXT-MIB
 modules:
+    os:
+        hardware:
+            - .1.3.6.1.4.1.17409.2.3.1.3.1.1.7.1.0
+            - .1.3.6.1.4.1.34592.1.3.1.5.2.1.1.4.0
+        serial: .1.3.6.1.4.1.17409.2.3.1.1.13.0
+        version:
+            - .1.3.6.1.4.1.17409.2.3.1.3.1.1.9.1.0
+            - .1.3.6.1.4.1.34592.1.3.1.5.2.1.1.5.0
     processors:
         data:
             -
-                  oid: cpuUsage
-                  num_oid: '.1.3.6.1.4.1.34592.1.3.100.1.8.1.{{ $index }}'
+                oid: cpuUsage
+                num_oid: '.1.3.6.1.4.1.34592.1.3.100.1.8.1.{{ $index }}'
     sensors:
         temperature:
-           data:
+            data:
                 -
                     oid: temperature
                     num_oid: '.1.3.6.1.4.1.34592.1.3.100.1.8.6.{{ $index }}'
                     divisor: 10
                     descr: 'Temperature {{ $index }}'
         state:
-           data:
+            data:
                 -
                     oid: ponCardRunningStatus
                     num_oid: '.1.3.6.1.4.1.34592.1.3.1.5.2.1.1.7.{{ $index }}'
                     descr: 'Pon Card {{ $index }} status'
                     states:
-                         - { descr: Normal, graph: 0, value: 0, generic: 0 }
-                         - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
+                        - { descr: Normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
                 -
                     oid: sysServices
                     num_oid: '.1.3.6.1.2.1.1.7.0.{{ $index }}'
                     descr: 'System services status'
                     states:
-                         - { descr: Normal, graph: 0, value: 0, generic: 0 }
-                         - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
+                        - { descr: Normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: Abnormal, graph: 0, value: 1, generic: 2 }

@@ -6,7 +6,7 @@ if ($device['os'] != 'Snom') {
     echo ' SNMP';
 
     // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
-    $oids = array(
+    $oids = [
         'snmpInPkts',
         'snmpOutPkts',
         'snmpInBadVersions',
@@ -36,13 +36,13 @@ if ($device['os'] != 'Snom') {
         'snmpOutTraps',
         'snmpSilentDrops',
         'snmpProxyDrops',
-    );
+    ];
 
-    $data = snmpwalk_cache_oid($device, 'snmp', array(), 'SNMPv2-MIB');
+    $data = snmpwalk_cache_oid($device, 'snmp', [], 'SNMPv2-MIB');
 
     if (isset($data[0]['snmpInPkts'])) {
         $rrd_def = new RrdDefinition();
-        $fields = array();
+        $fields = [];
         foreach ($oids as $oid) {
             $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
             $fields[substr($oid, 0, 19)] = isset($data[0][$oid]) ? $data[0][$oid] : 'U';
@@ -51,8 +51,8 @@ if ($device['os'] != 'Snom') {
         $tags = compact('rrd_def');
         data_update($device, 'netstats-snmp', $tags, $fields);
 
-        $graphs['netstat_snmp']     = true;
-        $graphs['netstat_snmp_pkt'] = true;
+        $os->enableGraph('netstat_snmp');
+        $os->enableGraph('netstat_snmp_pkt');
     }
 
     unset($oids, $data, $rrd_def, $fields, $tags);

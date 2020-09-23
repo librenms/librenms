@@ -1,10 +1,14 @@
 mib: IB-PLATFORMONE-MIB
 modules:
+    os:
+        hardware: IB-PLATFORMONE-MIB::ibHardwareType.0
+        version: IB-PLATFORMONE-MIB::ibNiosVersion.0
+        serial: IB-PLATFORMONE-MIB::ibSerialNumber.0
     sensors:
         pre-cache:
             data:
-                - 
-                    oid: 
+                -
+                    oid:
                         - ibServiceName
                     snmp_flags: ['-OQUsb']
 

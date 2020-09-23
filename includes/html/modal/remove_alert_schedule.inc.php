@@ -31,8 +31,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="sched-maintenance-removal" data-target="sched-maintenance-removal">Delete</button>
                     <input type="hidden" name="del_schedule_id" id="del_schedule_id">
-                    <input type="hidden" name="type" id="type" value="schedule-maintenance">
-                    <input type="hidden" name="sub_type" id="sub_type" value="del-maintenance">
+                    <input type="hidden" name="type" value="schedule-maintenance">
+                    <input type="hidden" name="sub_type" value="del-maintenance">
                 </form>
             </div>
         </div>

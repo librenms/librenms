@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == "quanta") {
+if ($device['os'] == 'quanta') {
     d_echo('Quanta Memory:');
 
     $avail = snmp_get($device, 'agentSwitchCpuProcessMemFree.0', '-OqvU', 'NETGEAR-SWITCHING-MIB');

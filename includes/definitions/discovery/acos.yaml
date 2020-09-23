@@ -1,11 +1,15 @@
 mib: A10-AX-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+( TPS)?), ACOS (?<version>[^,]+)/'
+        serial: A10-AX-MIB::axSysSerialNumber.0
+        version: A10-AX-MIB::axSysFirmwareVersion.0
     processors:
-          data:
-              -
-                  oid: axSysCpuUsageValue
-                  num_oid: '.1.3.6.1.4.1.22610.2.4.1.3.2.1.3.{{ $index }}'
-                  descr: 'Proc #{{ $index }}'
+        data:
+            -
+                oid: axSysCpuUsageValue
+                num_oid: '.1.3.6.1.4.1.22610.2.4.1.3.2.1.3.{{ $index }}'
+                descr: 'Proc #{{ $index }}'
     sensors:
         state:
             data:

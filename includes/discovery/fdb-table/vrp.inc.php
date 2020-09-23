@@ -16,13 +16,16 @@
 
 $fdbPort_table = snmpwalk_group($device, 'hwDynFdbPort', 'HUAWEI-L2MAM-MIB');
 
-if (!empty($fdbPort_table)) {
-    echo 'HUAWEI-L2MAM-MIB:'.PHP_EOL;
+if (! empty($fdbPort_table)) {
+    echo 'HUAWEI-L2MAM-MIB:' . PHP_EOL;
     $data_oid = 'hwDynFdbPort';
     // Collect data and populate $insert
     foreach ($fdbPort_table as $mac => $data) {
         foreach ($data[$data_oid] as $vlan => $basePort) {
-            $ifIndex=$basePort[0];
+            $ifIndex = reset($basePort); // $baseport can be ['' => '119'] or ['0' => '119']
+            if (! $ifIndex) {
+                continue;
+            }
             $port = get_port_by_index_cache($device['device_id'], $ifIndex);
             $port_id = $port['port_id'];
             $mac_address = implode(array_map('zeropad', explode(':', $mac)));

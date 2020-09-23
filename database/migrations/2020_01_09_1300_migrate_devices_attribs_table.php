@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class MigrateDevicesAttribsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -16,9 +15,11 @@ class MigrateDevicesAttribsTable extends Migration
         Schema::table('devices', function (Blueprint $table) {
             $table->boolean('disable_notify')->default(0);
         });
+
         // migrate disable_notify data into devices table
-        \DB::statement("UPDATE devices d, devices_attribs da SET d.disable_notify=1  WHERE da.attrib_type='disable_notify' AND da.attrib_value=1 AND d.device_id = da.device_id;");
-        \DB::statement("DELETE FROM devices_attribs WHERE attrib_type='disable_notify' AND attrib_value=1;");
+        $devices = DB::table('devices_attribs')->where('attrib_type', 'disable_notify')->where('attrib_value', 1)->pluck('device_id');
+        DB::table('devices')->whereIn('device_id', $devices)->update(['disable_notify' => 1]);
+        DB::table('devices_attribs')->where('attrib_type', 'disable_notify')->delete();
     }
 
     /**
@@ -29,7 +30,15 @@ class MigrateDevicesAttribsTable extends Migration
     public function down()
     {
         // revert migrate disable_notify data into devices table
-        \DB::statement("INSERT INTO devices_attribs (device_id, attrib_type, attrib_value) SELECT DISTINCT d.device_id, 'disable_notify', 1 FROM devices_attribs da INNER JOIN devices d WHERE d.device_id = da.device_id AND d.disable_notify=1;");
+        $attribs = DB::table('devices')->where('disable_notify', 1)->pluck('device_id')->map(function ($device_id) {
+            return [
+                'device_id' => $device_id,
+                'attrib_type' => 'disable_notify',
+                'attrib_value' => 1,
+            ];
+        });
+        DB::table('device_attribs')->insert($attribs->all());
+
         Schema::table('devices', function (Blueprint $table) {
             $table->dropColumn('disable_notify');
         });

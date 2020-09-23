@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use App\Guards\ApiTokenGuard;
 use Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -18,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\User::class => \App\Policies\UserPolicy::class,
         \App\Models\Device::class => \App\Policies\DevicePolicy::class,
         \App\Models\DeviceGroup::class => \App\Policies\DeviceGroupPolicy::class,
+        \App\Models\PollerCluster::class => \App\Policies\PollerClusterPolicy::class,
         \App\Models\Port::class => \App\Policies\PortPolicy::class,
     ];
 
@@ -41,6 +42,7 @@ class AuthServiceProvider extends ServiceProvider
         Auth::extend('token_driver', function ($app, $name, array $config) {
             $userProvider = $app->make(TokenUserProvider::class);
             $request = $app->make('request');
+
             return new ApiTokenGuard($userProvider, $request);
         });
 

@@ -18,9 +18,8 @@
  * @author George Pantazis <gpant@eservices-greece.com>
  * @copyright 2019 George Pantazis, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
@@ -66,7 +65,7 @@ class Mattermost extends Transport
 
         set_curl_proxy($curl);
 
-        $httpheaders = array('Accept: application/json', 'Content-Type: application/json');
+        $httpheaders = ['Accept: application/json', 'Content-Type: application/json'];
         $alert_payload = json_encode($data);
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $httpheaders);
@@ -78,10 +77,12 @@ class Mattermost extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            d_echo("Mattermost Connection Error: " . $ret);
+            d_echo('Mattermost Connection Error: ' . $ret);
+
             return 'HTTP Status code ' . $code;
         } else {
-            d_echo("Mattermost message sent for " . $device);
+            d_echo('Mattermost message sent for ' . $device);
+
             return true;
         }
     }

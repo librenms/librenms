@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateAlertGroupMapTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -17,7 +16,7 @@ class CreateAlertGroupMapTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('rule_id');
             $table->unsignedInteger('group_id');
-            $table->unique(['rule_id','group_id'], 'alert_group_map_rule_id_group_id_uindex');
+            $table->unique(['rule_id', 'group_id']);
         });
     }
 

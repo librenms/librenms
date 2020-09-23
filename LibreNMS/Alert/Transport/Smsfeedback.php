@@ -18,9 +18,8 @@
  * @author Barry O'Donovan <barry@lightnet.ie>
  * @copyright 2017 Barry O'Donovan, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
@@ -29,10 +28,11 @@ class Smsfeedback extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $smsfeedback_opts['user']  = $this->config['smsfeedback-user'];
+        $smsfeedback_opts['user'] = $this->config['smsfeedback-user'];
         $smsfeedback_opts['token'] = $this->config['smsfeedback-pass'];
         $smsfeedback_opts['sender'] = $this->config['smsfeedback-sender'];
-        $smsfeedback_opts['to']    = $this->config['smsfeedback-mobiles'];
+        $smsfeedback_opts['to'] = $this->config['smsfeedback-mobiles'];
+
         return $this->contactsmsfeedback($obj, $smsfeedback_opts);
     }
 
@@ -45,15 +45,15 @@ class Smsfeedback extends Transport
             'text' => $obj['title'],
             'sender' => $opts['sender'],
         ];
-        $url    = 'http://' . $opts['user'] . ':' . $opts['token'] . '@' . 'api.smsfeedback.ru/messages/v2/send/?' . http_build_query($params);
-        $curl   = curl_init($url);
+        $url = 'http://' . $opts['user'] . ':' . $opts['token'] . '@' . 'api.smsfeedback.ru/messages/v2/send/?' . http_build_query($params);
+        $curl = curl_init($url);
 
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         $ret = curl_exec($curl);
-        if (substr($ret, 0, 8) == "accepted") {
+        if (substr($ret, 0, 8) == 'accepted') {
             return true;
         }
     }
@@ -92,7 +92,7 @@ class Smsfeedback extends Transport
                 'smsfeedback-pass'    => 'required|string',
                 'smsfeedback-mobiles' => 'required',
                 'smsfeedback-sender' => 'required|string',
-            ]
+            ],
         ];
     }
 }

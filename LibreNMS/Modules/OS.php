@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -35,31 +34,30 @@ class OS implements Module
 {
     public function discover(\LibreNMS\OS $os)
     {
+        $this->updateLocation($os);
         if ($os instanceof OSDiscovery) {
             // null out values in case they aren't filled.
-            $os->getDeviceModel()->fill([
+            $os->getDevice()->fill([
                 'hardware' => null,
                 'version' => null,
                 'features' => null,
                 'serial' => null,
                 'icon' => null,
-//            'location_id' => null, // TODO set location
             ]);
 
-            $os->discoverOS();
+            $os->discoverOS($os->getDevice());
         }
-
         $this->handleChanges($os);
     }
 
     public function poll(\LibreNMS\OS $os)
     {
-        $deviceModel = $os->getDeviceModel();
+        $deviceModel = $os->getDevice();
         if ($os instanceof OSPolling) {
             $os->pollOS();
         } else {
             // legacy poller files
-            $device = $os->getDevice();
+            global $graphs, $device;
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
                 // OS Specific
                 include base_path('/includes/polling/os/' . $device['os'] . '.inc.php');
@@ -75,9 +73,11 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
+            if (! empty($location)) {
+                $deviceModel->setLocation($location);
+            }
         }
 
-        $this->updateLocation($os, $location ?? null);
         $this->handleChanges($os);
     }
 
@@ -88,11 +88,11 @@ class OS implements Module
 
     private function handleChanges(\LibreNMS\OS $os)
     {
-        $device = $os->getDeviceModel();
+        $device = $os->getDevice();
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
-        echo trans("device.attributes.location") . ": $device->location\n";
+        echo trans('device.attributes.location') . ": $device->location\n";
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             echo \App\Observers\DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
         }
@@ -102,13 +102,13 @@ class OS implements Module
 
     private function updateLocation(\LibreNMS\OS $os, $altLocation = null)
     {
-        $device = $os->getDeviceModel();
+        $device = $os->getDevice();
         if ($device->override_sysLocation == 0) {
-            $device->setLocation($altLocation ?? snmp_get($os->getDevice(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
+            $device->setLocation(snmp_get($os->getDeviceArray(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
         }
 
         // make sure the location has coordinates
-        if (Config::get('geoloc.latlng', true) && $device->location && !$device->location->hasCoordinates()) {
+        if (Config::get('geoloc.latlng', true) && $device->location && ! $device->location->hasCoordinates()) {
             $device->location->lookupCoordinates();
             $device->location->save();
         }

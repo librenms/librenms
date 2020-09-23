@@ -9,4 +9,5 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 processor_stacked: true
 discovery:
-    - sysDescr_regex: '/^Linux.*endian/'
+    -
+        sysDescr_regex: '/^Linux.*endian/'

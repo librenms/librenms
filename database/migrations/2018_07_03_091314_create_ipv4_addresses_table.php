@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateIpv4AddressesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,7 +17,7 @@ class CreateIpv4AddressesTable extends Migration
             $table->string('ipv4_address', 32);
             $table->integer('ipv4_prefixlen');
             $table->string('ipv4_network_id', 32);
-            $table->unsignedInteger('port_id')->index('interface_id');
+            $table->unsignedInteger('port_id')->index();
             $table->string('context_name', 128)->nullable();
         });
     }

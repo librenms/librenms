@@ -18,25 +18,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-if (!is_writable(getenv('HOME'))) {
+if (! is_writable(getenv('HOME'))) {
     // set COMPOSER_HOME in case HOME isn't set or writable
     putenv("COMPOSER_HOME=$install_dir/.composer");
 }
 
 $use_https = true;
 // Set up proxy if needed, check git config for proxies too
-if ($proxy = getenv("HTTPS_PROXY") ?: getenv("https_proxy")) {
+if ($proxy = getenv('HTTPS_PROXY') ?: getenv('https_proxy')) {
     $use_https = true;
-} elseif ($proxy = getenv("HTTP_PROXY") ?: getenv("http_proxy")) {
+} elseif ($proxy = getenv('HTTP_PROXY') ?: getenv('http_proxy')) {
     $use_https = false;
 } elseif ($proxy = trim(shell_exec('git config --global --get https.proxy'))) {
     putenv("HTTPS_PROXY=$proxy");
@@ -55,7 +53,7 @@ if (php_sapi_name() == 'cli' && isset($_SERVER['TERM'])) {
 }
 
 if (is_file($install_dir . '/composer.phar')) {
-    $exec = 'php ' . $install_dir . '/composer.phar';
+    $exec = PHP_BINDIR . '/php ' . $install_dir . '/composer.phar';
 
     // self-update
     passthru("$exec self-update -q" . $extra_args);
@@ -73,12 +71,12 @@ if (is_file($install_dir . '/composer.phar')) {
         $installer_url = ($use_https ? 'https' : 'http') . '://getcomposer.org/installer';
         curl_fetch($installer_url, $proxy, $use_https, $dest);
 
-        if (!is_file($dest)) {
+        if (! is_file($dest)) {
             echo "Error: Failed to download $installer_url\n";
         } elseif (@hash_file('SHA384', $dest) === $good_sha) {
             // Installer verified
-            shell_exec("php $dest");
-            $exec = "php $install_dir/composer.phar";
+            shell_exec(PHP_BINDIR . "/php $dest");
+            $exec = PHP_BINDIR . "/php $install_dir/composer.phar";
         } else {
             echo "Error: Corrupted download, signature doesn't match for $installer_url\n";
         }
@@ -87,8 +85,8 @@ if (is_file($install_dir . '/composer.phar')) {
 }
 
 // if nothing else, use system supplied composer
-if (!$exec) {
-    $path_exec = trim(shell_exec("which composer 2> /dev/null"));
+if (! $exec) {
+    $path_exec = trim(shell_exec('which composer 2> /dev/null'));
     if ($path_exec) {
         $exec = $path_exec;
     }
@@ -99,7 +97,6 @@ if ($exec) {
 } else {
     echo "Composer not available, please manually install composer.\n";
 }
-
 
 function curl_fetch($url, $proxy, $use_https, $output = false)
 {

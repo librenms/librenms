@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Facades\Permissions;
-use App\Models\User;
 use App\Models\Device;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DevicePolicy
@@ -102,6 +102,18 @@ class DevicePolicy
      * @return mixed
      */
     public function showConfig(User $user, Device $device)
+    {
+        return $user->isAdmin();
+    }
+
+    /**
+     * Determine whether the user can update device notes.
+     *
+     * @param \App\Models\User $user
+     * @param \App\Models\Device $device
+     * @return mixed
+     */
+    public function updateNotes(User $user, Device $device)
     {
         return $user->isAdmin();
     }

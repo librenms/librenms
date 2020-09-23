@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,6 +35,11 @@ class CustomersController extends TableController
     public function searchFields($request)
     {
         return ['port_descr_descr', 'ifName', 'ifDescr', 'ifAlias', 'hostname', 'sysDescr', 'port_descr_speed', 'port_descr_notes'];
+    }
+
+    public function sortFields($request)
+    {
+        return ['port_descr_descr', 'hostname', 'ifDescr', 'port_descr_speed', 'port_descr_circuit', 'port_descr_notes'];
     }
 
     /**
@@ -79,6 +83,7 @@ class CustomersController extends TableController
 
             // add graphs row
             $rows->push($graph_row);
+
             return $rows;
         }, collect());
 

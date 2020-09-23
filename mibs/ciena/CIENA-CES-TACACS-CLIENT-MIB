@@ -1,0 +1,1495 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-TACACS-CLIENT-MIB.my
+ --
+ --
+
+ CIENA-CES-TACACS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY                   
+            FROM SNMPv2-SMI                     
+   DisplayString, RowStatus, TruthValue         
+            FROM SNMPv2-TC                                              
+   InetAddressType,InetAddress
+            FROM INET-ADDRESS-MIB
+  cienaCommon, cienaCesStatistics
+        FROM CIENA-SMI
+   CienaGlobalState, CienaStatsClear
+   		FROM CIENA-TC
+   cienaGlobalSeverity, cienaGlobalMacAddress
+           FROM CIENA-GLOBAL-MIB;
+     
+        
+ cienaCesTacacsClientMIB MODULE-IDENTITY
+            LAST-UPDATED "201706070000Z"
+            ORGANIZATION "Ciena Corp."
+            CONTACT-INFO
+            "   Mib Meister
+                7035 Ridge Road
+                Hanover, Maryland 21076
+                USA
+                Phone:  +1 800 921 1144
+                Email:  support@ciena.com"
+            DESCRIPTION
+                    "Initial creation."
+            REVISION 
+                    "201706070000Z"
+            DESCRIPTION
+                    "Updated contact info."
+            REVISION
+                    "201705310000Z"
+            DESCRIPTION
+                    "Removed references to unimplemented obects cienaCesTacacsClientGlobalAuthenticationPendingRequests
+                     and cienaCesTacacsClientAuthenticationServerPendingRequests."
+            REVISION
+                    "201604250000Z"
+            DESCRIPTION
+                    "Added cienaCesTacacsClientConnectionFailed to send out a notification when we cannot connect to a
+                     a tacacs server. Also added support for new IP types InetAddress and InetAddressType."
+
+            REVISION
+                    "201602220000Z"
+            DESCRIPTION
+                    "Deprecated cienaCesTacacsClientServerApplication, cienaCesTacacsClientAuthenticationServerApplication,
+                     cienaCesTacacsClientAuthorizationServerApplication, and cienaCesTacacsClientAccountingServerApplication,
+                     all of which were unused."
+            REVISION
+                    "201405290000Z"
+            DESCRIPTION
+                    "Corrected the range of cienaCesTacacsClientPrivilegeLevelAdmin from (2..14) to (1..13),
+                     and cienaCesTacacsClientPrivilegeLevelRW from  (3..14) to (2..14)"
+            ::= { cienaCesStatistics 2 }
+
+
+
+ TacacsString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+            "Used to repesent the TACACS authentication string"
+    SYNTAX       OCTET STRING (SIZE (2..127))
+
+ --
+ -- Node definitions
+ --
+ 
+ cienaCesTacacsClientMIBObjects OBJECT IDENTIFIER ::= { cienaCesTacacsClientMIB 1 }
+ 
+ cienaCesTacacsClient OBJECT IDENTIFIER ::= {cienaCesTacacsClientMIBObjects 1 } 
+ cienaCesTacacsClientGlobal OBJECT IDENTIFIER ::= {cienaCesTacacsClient 1}
+ cienaCesTacacsClientServer OBJECT IDENTIFIER ::= {cienaCesTacacsClient 2}
+ cienaCesTacacsClientGlobalStatistics	OBJECT IDENTIFIER ::= { cienaCesTacacsClient 3}
+ cienaCesTacacsClientAuthentication OBJECT IDENTIFIER ::= {cienaCesTacacsClient 4}
+ cienaCesTacacsClientAuthorization OBJECT IDENTIFIER ::= {cienaCesTacacsClient 5}
+ cienaCesTacacsClientAccounting   OBJECT IDENTIFIER ::= {cienaCesTacacsClient 6}
+
+
+ 
+
+ -- Notifications 
+  
+ cienaCesTacacsClientMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesTacacsClientMIB 2 } 
+ cienaCesTacacsClientMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesTacacsClientMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ cienaCesTacacsClientMIBConformance OBJECT IDENTIFIER ::= { cienaCesTacacsClientMIB 3 } 
+ cienaCesTacacsClientMIBCompliances OBJECT IDENTIFIER ::= { cienaCesTacacsClientMIBConformance 1 }          
+ cienaCesTacacsClientMIBGroups      OBJECT IDENTIFIER ::= { cienaCesTacacsClientMIBConformance 2 }
+                        
+ 
+ cienaCesTacacsClientAdminState OBJECT-TYPE     
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object administratively enables or disables the TACACS client on the device."
+     ::= { cienaCesTacacsClientGlobal 1 }
+
+ cienaCesTacacsClientOperState OBJECT-TYPE     
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the operational state of the TACACS client."
+     ::= { cienaCesTacacsClientGlobal 2 }
+
+ cienaCesTacacsClientTimeout OBJECT-TYPE
+     SYNTAX       Integer32 (1..30)
+     UNITS        "seconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "This object is the time in seconds between retransmissions
+              to the TACACS server."
+     DEFVAL { 1 }
+     ::= { cienaCesTacacsClientGlobal 3 }
+                
+ cienaCesTacacsClientRetries   OBJECT-TYPE
+     SYNTAX         Integer32 (0..3)
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "Indicates the number of times the TACACS server should be
+              tried before giving up on the server."
+     DEFVAL { 3 }
+     ::= { cienaCesTacacsClientGlobal 4 } 
+ 
+ cienaCesTacacsClientPrivilegeLevelAdmin   OBJECT-TYPE
+     SYNTAX         Integer32 (1..13)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Indicates the privilege level used for mapping a range of TACACS 
+             privilege levels to the SAOS administrative privilege level. A privilege level returned
+             by a server is compared to cienaCesTacacsClientPrivilegeLevelRW.
+             If the server privilege level is less than cienaCesTacacsClientPrivilegeLevelRW 
+             and greater than or equal to the cienaCesTacacsClientPrivilegeLevelAdmin, the SAOS 
+             privilege level is 'admin.'"
+     DEFVAL { 2 }
+     ::= { cienaCesTacacsClientGlobal 5 } 
+
+ cienaCesTacacsClientPrivilegeLevelRW   OBJECT-TYPE
+     SYNTAX         Integer32 (2..14)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Indicates the privilege level used for mapping a range of TACACS 
+             privilege levels to the SAOS super user privilege level. A privilege level returned
+             by a server is compared to cienaCesTacacsClientPrivilegeLevelDiag.
+             If the server privilege level is less than cienaCesTacacsClientPrivilegeLevelDiag 
+             and greater than or equal to the cienaCesTacacsClientPrivilegeLevelRW, the SAOS 
+             privilege level is 'superuser.'"
+     DEFVAL { 10 }
+     ::= { cienaCesTacacsClientGlobal 6 } 
+
+ cienaCesTacacsClientPrivilegeLevelDiag   OBJECT-TYPE
+     SYNTAX         Integer32 (3..15)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Indicates the privilege level used for mapping a range of TACACS 
+             privilege levels  to SAOS diagnostic privilege level. A privilege level returned
+             by a server is compared to this value. If the server privilege level is greater than 
+             or equal to the cienaCesTacacsClientDiagPrivilegeLevel,the SAOS privilege level is 'diag.'"
+     DEFVAL { 15 }
+     ::= { cienaCesTacacsClientGlobal 7 } 
+
+ cienaCesTacacsClientAuthKey OBJECT-TYPE
+     SYNTAX        TacacsString
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "The authentication key to be used for TACACS Servers.  
+             Retrieving the value of this object via SNMP returns 
+             an empty string for security reasons."
+     ::= { cienaCesTacacsClientGlobal 8 }
+
+ cienaCesTacacsClientAuthenticationAdminState OBJECT-TYPE     
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object administratively enables or disables TACACS authentication on the device."
+     DEFVAL { enabled }
+     ::= { cienaCesTacacsClientGlobal 9 }
+
+ cienaCesTacacsClientAuthorizationAdminState OBJECT-TYPE     
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object administratively enables or disables TACACS authorization on the device."
+     DEFVAL { disabled }
+     ::= { cienaCesTacacsClientGlobal 10 }
+
+ cienaCesTacacsClientAccountingAdminState OBJECT-TYPE     
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object administratively enables or disables TACACS accounting on the device."
+     DEFVAL { disabled }
+     ::= { cienaCesTacacsClientGlobal 11 }
+
+ cienaCesTacacsClientSyslogAdminState OBJECT-TYPE     
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object administratively enables or disables TACACS Syslog messages on the device."
+     DEFVAL { disabled }
+     ::= { cienaCesTacacsClientGlobal 12 } 
+     
+  cienaCesTacacsClientAccountingSession OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        off(1),
+                        on(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object enables or disables session logon and logoff logging with TACACS."
+     DEFVAL { off }
+     ::= { cienaCesTacacsClientGlobal 13 }
+
+ cienaCesTacacsClientAccountingCommand OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        off(1),
+                        on(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object enables or disables command start and stop logging."
+     DEFVAL { off }
+     ::= { cienaCesTacacsClientGlobal 14 }
+
+ cienaCesTacacsClientGlobalServers OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        off(1),
+                        on(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object enables or disables global servers."
+     DEFVAL { off }
+     ::= { cienaCesTacacsClientGlobal 15 }
+
+ cienaCesTacacsClientSearchMethod OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        priority(1),
+                        cached(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "Setting this object selects the search method."
+     DEFVAL { priority }
+     ::= { cienaCesTacacsClientGlobal 16 }
+ 
+ cienaCesTacacsClientAuthKeyUnset OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+        "Setting this object to true clears the value of 
+         cienaCesTacacsClientAuthKey. Reading this object 
+         always returns a value of false."
+     ::= { cienaCesTacacsClientGlobal 17 }
+
+  cienaCesTacacsClientKeyMinLen   OBJECT-TYPE
+     SYNTAX         Integer32 (2..64)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "Setting this object defines the minimum length for TACACS secret key."
+     DEFVAL { 8 }
+     ::= { cienaCesTacacsClientGlobal 18 } 
+
+ cienaCesTacacsClientServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesTacacsClientServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Lists the possible TACACS servers. 
+              To create an entry, specify both cienaCesTacacsClientServerStatus 
+              and cienaCesTacacsClientServerAddr using the SNMP multiple set 
+              operation."
+     ::= { cienaCesTacacsClientServer 1 }
+
+ cienaCesTacacsClientServerEntry OBJECT-TYPE
+     SYNTAX       CienaCesTacacsClientServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "TACACS server entry."
+     INDEX { cienaCesTacacsClientServerIndex}
+     ::= { cienaCesTacacsClientServerTable 1 }
+                
+ CienaCesTacacsClientServerEntry ::= SEQUENCE {
+     cienaCesTacacsClientServerIndex                        		Integer32,     
+     cienaCesTacacsClientServerAddr                            	DisplayString,     
+     cienaCesTacacsClientServerResolvedAddr                    	IpAddress,
+     cienaCesTacacsClientServerPriority                        	Integer32,
+     cienaCesTacacsClientServerAuthPort                        	Integer32,     
+     cienaCesTacacsClientServerStatus                         	 	RowStatus,     
+     cienaCesTacacsClientServerApplication                     	INTEGER,
+     cienaCesTacacsClientServerResolvedInetAddrType               InetAddressType,
+     cienaCesTacacsClientServerResolvedInetAddr                   InetAddress
+ }
+ cienaCesTacacsClientServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Specifies the index of this table."
+     ::= { cienaCesTacacsClientServerEntry 1 }
+        
+ cienaCesTacacsClientServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..64))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Host name or IP address of the TACACS server."
+     ::= { cienaCesTacacsClientServerEntry 2 }
+
+ cienaCesTacacsClientServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the resolved IP address if cienaCesTacacsClientServerAddr is set to host name.
+              If cienaCesTacacsClientServerAddr is set to IP address then cienaCesTacacsClientServerResolvedAddr 
+              contains the same information as cienaCesTacacsClientServerAddr."
+     ::= { cienaCesTacacsClientServerEntry 3 }
+ 
+  cienaCesTacacsClientServerPriority OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Specifies the priority of the TACACS servers configured on the device. 
+             This is the order in which the servers will accessed."
+     ::= { cienaCesTacacsClientServerEntry 4 } 
+
+ cienaCesTacacsClientServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+              "The destination TCP port number to which TACACS
+              messages are sent. The TACACS server is not 
+              used for authentication if this port number is 0."
+      DEFVAL { 49 }
+      ::= { cienaCesTacacsClientServerEntry 5 }
+ 
+ cienaCesTacacsClientServerApplication OBJECT-TYPE
+      SYNTAX            INTEGER {
+                                        userLogin(1),
+                                        dot1x(2),
+                                        all(3)   
+                                }
+      MAX-ACCESS        read-create
+      STATUS            deprecated
+      DESCRIPTION
+            "This object specifies how the TACACS server is used for authentication.
+             Whether this TACACS server is used for userLogin authentication or dot1x authentication 
+             or both, is decided by the value of this MIB object. Dot1x is not supported on all platforms."
+      DEFVAL    {userLogin}
+      ::= { cienaCesTacacsClientServerEntry  6}
+  
+ cienaCesTacacsClientServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+            "To create a row in this table, set this object to createAndGo(4).
+
+            To create an entry, specify both cienaCesTacacsClientServerStatus and 
+            cienaCesTacacsClientServerAddr with the SNMP multiple set operation.
+
+            To disable a TACACS server, set cienaCesTacacsClientServerStatus
+            object to the 'notInService' status."
+      ::= { cienaCesTacacsClientServerEntry 7 } 
+
+ cienaCesTacacsClientServerResolvedInetAddrType OBJECT-TYPE
+   SYNTAX     InetAddressType
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies the resolved IP address type. Used in conjunction with
+      cienaCesTacacsClientServerResolvedInetAddr.
+      When set to:
+         ipv4: cienaCesTacacsClientServerResolvedInetAddr should be compliant
+               with InetAddressIPv4
+         ipv6: cienaCesTacacsClientServerResolvedInetAddr should be compliant
+               with InetAddressIPv6."
+  ::= { cienaCesTacacsClientServerEntry 8 }
+
+ cienaCesTacacsClientServerResolvedInetAddr OBJECT-TYPE
+   SYNTAX     InetAddress
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Specifies the resolved IP address if cienaCesTacacsClientServerAddr is set to host name. 
+      If cienaCesTacacsClientServerAddr is set to IP address then cienaCesTacacsClientServerResolvedInetAddress
+      contains the same information as cienaCesTacacsClientServerAddr. This OID is used in
+      conjunction with cienaCesTacacsClientServerResolvedInetAddrType."
+  ::= { cienaCesTacacsClientServerEntry 9 }
+
+
+ cienaCesTacacsClientGlobalStatisticsTable OBJECT-TYPE
+ 	SYNTAX SEQUENCE OF CienaCesTacacsClientGlobalStatisticsEntry 
+ 	MAX-ACCESS not-accessible
+ 	STATUS current
+ 	DESCRIPTION
+ 		"TACACS global statistics table."
+ 	::= {cienaCesTacacsClientGlobalStatistics 1}     
+ 	
+ cienaCesTacacsClientGlobalStatisticsEntry OBJECT-TYPE
+ 	SYNTAX CienaCesTacacsClientGlobalStatisticsEntry
+ 	MAX-ACCESS not-accessible
+ 	STATUS current
+ 	DESCRIPTION
+ 		"TACACS global statistics entry." 
+ 	INDEX { cienaCesTacacsClientServerIndex}
+    ::= {cienaCesTacacsClientGlobalStatisticsTable 1}
+
+ CienaCesTacacsClientGlobalStatisticsEntry ::= SEQUENCE{
+  	 cienaCesTacacsClientGlobalAuthenticationAccessRequests                  	Counter32,
+     cienaCesTacacsClientGlobalAuthenticationAccessRetransmissions           	Counter32,
+     cienaCesTacacsClientGlobalAuthenticationAccessAccepts                   	Counter32,
+     cienaCesTacacsClientGlobalAuthenticationAccessRejects                   	Counter32,
+     cienaCesTacacsClientGlobalAuthenticationMalformedAccessResponses        	Counter32,
+     cienaCesTacacsClientGlobalAuthenticationBadAuthenticators               	Counter32,
+     cienaCesTacacsClientGlobalAuthenticationTimeouts                        	Counter32,
+     cienaCesTacacsClientGlobalAuthenticationUnknownTypes                    	Counter32,
+     cienaCesTacacsClientGlobalAuthenticationBadHeaderSequence               	Counter32,    
+   
+     cienaCesTacacsClientGlobalAuthorizationAccessRequests                  Counter32,
+     cienaCesTacacsClientGlobalAuthorizationAccessRetransmissions           Counter32,
+     cienaCesTacacsClientGlobalAuthorizationAccessAccepts                   Counter32,
+     cienaCesTacacsClientGlobalAuthorizationAccessRejects                   Counter32,
+     cienaCesTacacsClientGlobalAuthorizationMalformedAccessRespons        	 Counter32,
+     cienaCesTacacsClientGlobalAuthorizationBadAuthenticators               Counter32,
+     cienaCesTacacsClientGlobalAuthorizationTimeouts                        Counter32,
+     cienaCesTacacsClientGlobalAuthorizationUnknownTypes                    Counter32,  
+     cienaCesTacacsClientGlobalAuthorizationBadHeaderSequence               Counter32,  
+     
+     cienaCesTacacsClientGlobalAccountingAccessRequests                     Counter32,
+     cienaCesTacacsClientGlobalAccountingAccessRetransmissions              Counter32,
+     cienaCesTacacsClientGlobalAccountingAccessAccepts                      Counter32,
+     cienaCesTacacsClientGlobalAccountingAccessRejects                      Counter32,
+     cienaCesTacacsClientGlobalAccountingMalformedAccessResponses           Counter32,
+     cienaCesTacacsClientGlobalAccountingBadAuthenticators                  Counter32,
+     cienaCesTacacsClientGlobalAccountingTimeouts                           Counter32,
+     cienaCesTacacsClientGlobalAccountingUnknownTypes                       Counter32,  
+     cienaCesTacacsClientGlobalAccountingBadHeaderSequence                  Counter32,
+     cienaCesTacacsClientGlobalServerClearStatistics                 			 CienaStatsClear
+ 
+  }
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+ cienaCesTacacsClientGlobalAuthenticationAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets sent
+             to this server not including retransmissions."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry 1 }
+
+ cienaCesTacacsClientGlobalAuthenticationAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             retransmitted to this TACACS authentication server."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry 2 }
+
+ cienaCesTacacsClientGlobalAuthenticationAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry 3 }
+
+ cienaCesTacacsClientGlobalAuthenticationAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry  4 }
+
+ -- "Access-Response" includes an Access-Accept, Access-Challenge
+ -- or Access-Reject
+
+ cienaCesTacacsClientGlobalAuthenticationMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed TACACS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry 5 }
+
+ cienaCesTacacsClientGlobalAuthenticationBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry 6 }
+
+ cienaCesTacacsClientGlobalAuthenticationTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a request as well as a timeout."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry  7 }
+
+ cienaCesTacacsClientGlobalAuthenticationUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry  8 }
+
+ cienaCesTacacsClientGlobalAuthenticationBadHeaderSequence OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry  9}
+                
+ --  ADDED EXTRA TWAMP STATS for Authorization------------------
+ 
+  cienaCesTacacsClientGlobalAuthorizationAccessRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Request packets sent
+              to this server. This does not include retransmissions."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 10 }
+ 
+  cienaCesTacacsClientGlobalAuthorizationAccessRetransmissions OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Request packets
+              retransmitted to this TACACS authentication server."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 11 }
+ 
+  cienaCesTacacsClientGlobalAuthorizationAccessAccepts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Accept packets
+              (valid or invalid) received from this server."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 12 }
+ 
+  cienaCesTacacsClientGlobalAuthorizationAccessRejects OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Reject packets
+              (valid or invalid) received from this server."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry  13 }
+ 
+  -- "Access-Response" includes an Access-Accept, Access-Challenge
+  -- or Access-Reject
+ 
+  cienaCesTacacsClientGlobalAuthorizationMalformedAccessRespons OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of malformed TACACS Access-Response
+              packets received from this server.
+              Malformed packets include packets with
+              an invalid length. Bad authenticators or
+              signature attributes or unknown types are not
+              included as malformed access responses."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 14 }
+ 
+  cienaCesTacacsClientGlobalAuthorizationBadAuthenticators OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Response packets
+              containing invalid authenticators or signature
+              attributes received from this server."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 15 }
+ 
+ 
+  cienaCesTacacsClientGlobalAuthorizationTimeouts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of authentication timeouts to this server.
+              After a timeout the client may retry sending to the same
+              server, send to a different server, or
+              give up. A retry to the same server is counted as a
+              retransmit as well as a timeout. A send to a different
+              server is counted as a request as well as a timeout."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry  16 }
+ 
+  cienaCesTacacsClientGlobalAuthorizationUnknownTypes OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS packets of unknown type which
+              were received from this server on the authentication port."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry  17 }
+ 
+  cienaCesTacacsClientGlobalAuthorizationBadHeaderSequence OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS packets which were
+              received from this server on the authentication port
+              and dropped for some other reason."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry  18}
+                     
+      
+ --  ADDED EXTRA TWAMP STATS for Accounting------------------
+ 
+  cienaCesTacacsClientGlobalAccountingAccessRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Request packets sent
+              to this server. This does not include retransmissions."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 19 }
+ 
+  cienaCesTacacsClientGlobalAccountingAccessRetransmissions OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Request packets
+              retransmitted to this TACACS authentication server."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 20 }
+ 
+  cienaCesTacacsClientGlobalAccountingAccessAccepts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Accept packets
+              (valid or invalid) received from this server."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 21 }
+ 
+  cienaCesTacacsClientGlobalAccountingAccessRejects OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Reject packets
+              (valid or invalid) received from this server."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 22 }
+  
+  -- "Access-Response" includes an Access-Accept, Access-Challenge
+  -- or Access-Reject
+ 
+  cienaCesTacacsClientGlobalAccountingMalformedAccessResponses OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of malformed TACACS Access-Response
+              packets received from this server.
+              Malformed packets include packets with
+              an invalid length. Bad authenticators or
+              signature attributes or unknown types are not
+              included as malformed access responses."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 23 }
+ 
+  cienaCesTacacsClientGlobalAccountingBadAuthenticators OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS Access-Response packets
+              containing invalid authenticators or signature
+              attributes received from this server."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 24 }
+ 
+ 
+  cienaCesTacacsClientGlobalAccountingTimeouts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of authentication timeouts to this server.
+              After a timeout the client may retry sending to the same
+              server, send to a different server, or
+              give up. A retry to the same server is counted as a
+              retransmit as well as a timeout. A send to a different
+              server is counted as a request as well as a timeout."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry  25 }
+ 
+  cienaCesTacacsClientGlobalAccountingUnknownTypes OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS packets of unknown type which
+              were received from this server on the authentication port."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry 26}
+ 
+  cienaCesTacacsClientGlobalAccountingBadHeaderSequence OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+             "The number of TACACS packets which were
+              received from this server on the authentication port
+              and dropped for some other reason."
+       ::= { cienaCesTacacsClientGlobalStatisticsEntry  27}
+                
+  cienaCesTacacsClientGlobalServerClearStatistics OBJECT-TYPE
+      SYNTAX            CienaStatsClear
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+            "This object clears the statistics for a server."
+      DEFVAL { none }
+      ::= { cienaCesTacacsClientGlobalStatisticsEntry  28 }   
+   
+   
+   --  END OF TWAMP STATS-----------------
+  
+  cienaCesTacacsClientAuthenticationServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesTacacsClientAuthenticationServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Lists the possible TACACS servers. 
+              To create an entry, specify both cienaCesTacacsClientAuthenticationServerStatus 
+              and cienaCesTacacsClientAuthenticationServerAddr with the SNMP multiple set operation."
+     ::= { cienaCesTacacsClientAuthentication 1 }
+
+ cienaCesTacacsClientAuthenticationServerEntry OBJECT-TYPE
+     SYNTAX       CienaCesTacacsClientAuthenticationServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "TACACS authentication server entry."
+     INDEX { cienaCesTacacsClientAuthenticationServerIndex}
+     ::= { cienaCesTacacsClientAuthenticationServerTable 1 }
+                
+ CienaCesTacacsClientAuthenticationServerEntry ::= SEQUENCE {
+     cienaCesTacacsClientAuthenticationServerIndex                           Integer32,     
+     cienaCesTacacsClientAuthenticationServerAddr                            DisplayString,     
+     cienaCesTacacsClientAuthenticationServerResolvedAddr                    IpAddress,
+     cienaCesTacacsClientAuthenticationServerPriority                    	  Integer32,
+     cienaCesTacacsClientAuthenticationServerAuthPort                        Integer32,     
+     cienaCesTacacsClientAuthenticationServerAccessRequests                  Counter32,
+     cienaCesTacacsClientAuthenticationServerAccessRetransmissions           Counter32,
+     cienaCesTacacsClientAuthenticationServerAccessAccepts                   Counter32,
+     cienaCesTacacsClientAuthenticationServerAccessRejects                   Counter32,
+     cienaCesTacacsClientAuthenticationServerMalformedAccessResponses        	  Counter32,
+     cienaCesTacacsClientAuthenticationServerBadAuthenticators               Counter32,
+     cienaCesTacacsClientAuthenticationServerTimeouts                        Counter32,
+     cienaCesTacacsClientAuthenticationServerUnknownTypes                    Counter32,
+     cienaCesTacacsClientAuthenticationServerBadHeaderSequence               Counter32,    
+     cienaCesTacacsClientAuthenticationServerStatus                          RowStatus,     
+     cienaCesTacacsClientAuthenticationServerApplication                 	  INTEGER,
+     cienaCesTacacsClientAuthenticationServerClearStatistics                 CienaStatsClear
+ }
+
+ cienaCesTacacsClientAuthenticationServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the index of this table."
+     ::= { cienaCesTacacsClientAuthenticationServerEntry 1 }
+        
+ cienaCesTacacsClientAuthenticationServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..64))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Host name or IP address of the TACACS server."
+     ::= { cienaCesTacacsClientAuthenticationServerEntry 2 }
+
+ cienaCesTacacsClientAuthenticationServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the resolved IP address if cienaCesTacacsClientAuthenticationServerAddr is set to host name.
+              If cienaCesTacacsClientAuthenticationServerAddr is set to IP address, then cienaCesTacacsClientAuthenticationServerResolvedAddr 
+              contains same information as cienaCesTacacsClientAuthenticationServerAddr."
+     ::= { cienaCesTacacsClientAuthenticationServerEntry 3 }
+ 
+  cienaCesTacacsClientAuthenticationServerPriority OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the priority of TACACS servers configured on the device. 
+             This is the order in which the servers are accessed."
+     ::= { cienaCesTacacsClientAuthenticationServerEntry 4 } 
+
+ cienaCesTacacsClientAuthenticationServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The destination TCP port number to which TACACS
+              messages are sent. The TACACS server is not 
+              used for authentication if this port number is 0."
+      DEFVAL { 49 }
+      ::= { cienaCesTacacsClientAuthenticationServerEntry 5 }
+
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+ cienaCesTacacsClientAuthenticationServerAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry 6 }
+
+ cienaCesTacacsClientAuthenticationServerAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             retransmitted to this TACACS authentication server."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry 7 }
+
+ cienaCesTacacsClientAuthenticationServerAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry 8 }
+
+ cienaCesTacacsClientAuthenticationServerAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry  9 }
+
+ -- "Access-Response" includes an Access-Accept, Access-Challenge
+ -- or Access-Reject
+
+ cienaCesTacacsClientAuthenticationServerMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed TACACS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry 10 }
+
+ cienaCesTacacsClientAuthenticationServerBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry 11 }
+
+ cienaCesTacacsClientAuthenticationServerTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a request as well as a timeout."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry  13 }
+
+ cienaCesTacacsClientAuthenticationServerUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry  14 }
+
+ cienaCesTacacsClientAuthenticationServerBadHeaderSequence OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry  15}
+                
+ cienaCesTacacsClientAuthenticationServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+            "To create a row in this table, a manager must
+            set this object to either createAndGo(4).
+
+            To create an entry, specify both cienaCesTacacsClientAuthenticationServerStatus and 
+            cienaCesTacacsClientAuthenticationServerAddr with the SNMP multiple set operation. 
+
+            To disable a TACACS server, the operator can set cienaCesTacacsClientAuthenticationServerStatus
+            object to 'notInService' state."
+      ::= { cienaCesTacacsClientAuthenticationServerEntry 16 } 
+
+ cienaCesTacacsClientAuthenticationServerApplication OBJECT-TYPE
+      SYNTAX            INTEGER {
+                                        userLogin(1),
+                                        dot1x(2),
+                                        all(3)   
+                                }
+      MAX-ACCESS        read-create
+      STATUS            deprecated
+      DESCRIPTION
+            "This object specifies how the TACACS server is used for authentication.
+             Whether this TACACS server is used for userLogin authentication or dot1x authentication 
+             or both, is decided by the value of this MIB object. Dot1x is not supported on all platforms."
+      DEFVAL    {userLogin}
+      ::= { cienaCesTacacsClientAuthenticationServerEntry  17}
+
+ cienaCesTacacsClientAuthenticationServerClearStatistics OBJECT-TYPE
+      SYNTAX            CienaStatsClear
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+            "This object clears the statistics for a server."
+      DEFVAL { none }
+      ::= { cienaCesTacacsClientAuthenticationServerEntry  18}
+
+
+ cienaCesTacacsClientAuthorizationServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesTacacsClientAuthorizationServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Lists the possible TACACS servers. 
+              To create an entry, specify both cienaCesTacacsClientAuthorizationServerStatus 
+              and cienaCesTacacsClientAuthorizationServerAddr with the SNMP multiple set operation."
+     ::= { cienaCesTacacsClientAuthorization 1 }
+
+ cienaCesTacacsClientAuthorizationServerEntry OBJECT-TYPE
+     SYNTAX       CienaCesTacacsClientAuthorizationServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "TACACS authorization server entry."
+     INDEX { cienaCesTacacsClientAuthorizationServerIndex}
+     ::= { cienaCesTacacsClientAuthorizationServerTable 1 }
+                
+ CienaCesTacacsClientAuthorizationServerEntry ::= SEQUENCE {
+     cienaCesTacacsClientAuthorizationServerIndex                               Integer32,     
+     cienaCesTacacsClientAuthorizationServerAddr                            	 DisplayString,     
+     cienaCesTacacsClientAuthorizationServerResolvedAddr                    	 IpAddress,
+     cienaCesTacacsClientAuthorizationServerPriority                            Integer32,
+     cienaCesTacacsClientAuthorizationServerAuthPort                        	 Integer32,     
+     cienaCesTacacsClientAuthorizationServerAccessRequests                  	 Counter32,
+     cienaCesTacacsClientAuthorizationServerAccessRetransmissions           	 Counter32,
+     cienaCesTacacsClientAuthorizationServerAccessAccepts                   	 Counter32,
+     cienaCesTacacsClientAuthorizationServerAccessRejects                   	 Counter32,
+     cienaCesTacacsClientAuthorizationServerMalformedAccessResponses         	 Counter32,
+     cienaCesTacacsClientAuthorizationServerBadAuthenticators               	 Counter32,
+     cienaCesTacacsClientAuthorizationServerTimeouts                        	 Counter32,
+     cienaCesTacacsClientAuthorizationServerUnknownTypes                    	 Counter32,
+     cienaCesTacacsClientAuthorizationServerBadHeaderSequence               	 Counter32,    
+     cienaCesTacacsClientAuthorizationServerStatus                          	 RowStatus,     
+     cienaCesTacacsClientAuthorizationServerApplication                 	  	 INTEGER,
+     cienaCesTacacsClientAuthorizationServerClearStatistics                	 CienaStatsClear
+ }
+
+ cienaCesTacacsClientAuthorizationServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the index of this table."
+     ::= { cienaCesTacacsClientAuthorizationServerEntry 1 }
+        
+ cienaCesTacacsClientAuthorizationServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..64))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Host name or IP address of the TACACS server."
+     ::= { cienaCesTacacsClientAuthorizationServerEntry 2 }
+
+ cienaCesTacacsClientAuthorizationServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the resolved IP address if cienaCesTacacsClientAuthorizationServerAddr is set to host name.
+              If cienaCesTacacsClientAuthorizationServerAddr is set to IP address, then cienaCesTacacsClientAuthorizationServerResolvedAddr 
+              contains the same information as cienaCesTacacsClientAuthorizationServerAddr."
+     ::= { cienaCesTacacsClientAuthorizationServerEntry 3 }
+ 
+  cienaCesTacacsClientAuthorizationServerPriority OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the priority of TACACS servers configured on the device. 
+             This is the order in which the servers are accessed."
+     ::= { cienaCesTacacsClientAuthorizationServerEntry 4 } 
+
+ cienaCesTacacsClientAuthorizationServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The destination TCP port number to which TACACS
+              messages are sent. The TACACS server is not 
+              used for authentication if this port number is 0."
+      DEFVAL { 49 }
+      ::= { cienaCesTacacsClientAuthorizationServerEntry 5 }
+
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+ cienaCesTacacsClientAuthorizationServerAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry 6 }
+
+ cienaCesTacacsClientAuthorizationServerAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             retransmitted to this TACACS authentication server."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry 7 }
+
+ cienaCesTacacsClientAuthorizationServerAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry 8 }
+
+ cienaCesTacacsClientAuthorizationServerAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry  9 }
+
+ -- "Access-Response" includes an Access-Accept, Access-Challenge
+ -- or Access-Reject
+
+ cienaCesTacacsClientAuthorizationServerMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed TACACS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry 10 }
+
+ cienaCesTacacsClientAuthorizationServerBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry 11 }
+
+ cienaCesTacacsClientAuthorizationServerTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a Request as well as a timeout."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry  12 }
+
+ cienaCesTacacsClientAuthorizationServerUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry  13 }
+
+ cienaCesTacacsClientAuthorizationServerBadHeaderSequence OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry  14}
+                
+ cienaCesTacacsClientAuthorizationServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+            "To create a row in this table, a manager must
+            set this object to either createAndGo(4).
+
+            To create an entry, specify both cienaCesTacacsClientAuthorizationServerStatus 
+            and cienaCesTacacsClientAuthorizationServerAddr with the SNMP multiple set operation.
+
+            To disable a TACACS server, the operator can set the cienaCesTacacsClientAuthorizationServerStatus
+            object to 'notInService' state."
+      ::= { cienaCesTacacsClientAuthorizationServerEntry 15 } 
+
+ cienaCesTacacsClientAuthorizationServerApplication OBJECT-TYPE
+      SYNTAX            INTEGER {
+                                        userLogin(1),
+                                        dot1x(2),
+                                        all(3)   
+                                }
+      MAX-ACCESS        read-create
+      STATUS            deprecated
+      DESCRIPTION
+            "This object specifies how the TACACS server is used for authentication.
+             Whether this TACACS server is used for userLogin authentication or dot1x authentication 
+             or both, is decided by the value of this MIB object. Dot1x is not supported on all platforms."
+      DEFVAL    {userLogin}
+      ::= { cienaCesTacacsClientAuthorizationServerEntry  16}
+
+ cienaCesTacacsClientAuthorizationServerClearStatistics OBJECT-TYPE
+      SYNTAX            CienaStatsClear
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+            "This object clears the statistics for a server."
+      DEFVAL { none }
+      ::= { cienaCesTacacsClientAuthorizationServerEntry  17} 
+
+ cienaCesTacacsClientAccountingServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesTacacsClientAccountingServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Lists the possible TACACS servers. 
+              To create an entry, specify both cienaCesTacacsClientAccountingServerStatus 
+              and cienaCesTacacsClientAccountingServerAddr with the SNMP multiple set operation."
+     ::= { cienaCesTacacsClientAccounting 1 }
+
+ cienaCesTacacsClientAccountingServerEntry OBJECT-TYPE
+     SYNTAX       CienaCesTacacsClientAccountingServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "TACACS accounting server entry."
+     INDEX { cienaCesTacacsClientAccountingServerIndex}
+     ::= { cienaCesTacacsClientAccountingServerTable 1 }
+                
+ CienaCesTacacsClientAccountingServerEntry ::= SEQUENCE {
+     cienaCesTacacsClientAccountingServerIndex                       	  Integer32,     
+     cienaCesTacacsClientAccountingServerAddr                            DisplayString,     
+     cienaCesTacacsClientAccountingServerResolvedAddr                    IpAddress,
+     cienaCesTacacsClientAccountingServerPriority                        Integer32,
+     cienaCesTacacsClientAccountingServerAuthPort                        Integer32,     
+     cienaCesTacacsClientAccountingServerAccessRequests                  Counter32,
+     cienaCesTacacsClientAccountingServerAccessRetransmissions           Counter32,
+     cienaCesTacacsClientAccountingServerAccessAccepts                   Counter32,
+     cienaCesTacacsClientAccountingServerAccessRejects                   Counter32,
+     cienaCesTacacsClientAccountingServerMalformedAccessResponses        Counter32,
+     cienaCesTacacsClientAccountingServerBadAuthenticators               Counter32,
+     cienaCesTacacsClientAccountingServerTimeouts                        Counter32,
+     cienaCesTacacsClientAccountingServerUnknownTypes                    Counter32,
+     cienaCesTacacsClientAccountingServerBadHeaderSequence               Counter32,    
+     cienaCesTacacsClientAccountingServerStatus                          RowStatus,     
+     cienaCesTacacsClientAccountingServerApplication                     INTEGER,
+     cienaCesTacacsClientAccountingServerClearStatistics                 CienaStatsClear
+ }
+
+ cienaCesTacacsClientAccountingServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the index of this table."
+     ::= { cienaCesTacacsClientAccountingServerEntry 1 }
+        
+ cienaCesTacacsClientAccountingServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..64))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Host name or IP address of the TACACS server."
+     ::= { cienaCesTacacsClientAccountingServerEntry 2 }
+
+ cienaCesTacacsClientAccountingServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the resolved IP address if cienaCesTacacsClientAccountingServerAddr is set to host name.
+              If cienaCesTacacsClientAccountingServerAddr is set to IP address then cienaCesTacacsClientAccountingServerResolvedAddr 
+              contains the same information as cienaCesTacacsClientAccountingServerAddr."
+     ::= { cienaCesTacacsClientAccountingServerEntry 3 }
+ 
+  cienaCesTacacsClientAccountingServerPriority OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the priority of TACACS servers configured on the device. 
+             This is the order in which the servers are accessed."
+     ::= { cienaCesTacacsClientAccountingServerEntry 4 } 
+
+ cienaCesTacacsClientAccountingServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The destination TCP port number to which TACACS
+              messages are sent. The TACACS server is not 
+              used for authentication if this port number is 0."
+      DEFVAL { 49 }
+      ::= { cienaCesTacacsClientAccountingServerEntry 5 }
+
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+ cienaCesTacacsClientAccountingServerAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { cienaCesTacacsClientAccountingServerEntry 6 }
+
+ cienaCesTacacsClientAccountingServerAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Request packets
+             retransmitted to this TACACS authentication server."
+      ::= { cienaCesTacacsClientAccountingServerEntry 7 }
+
+ cienaCesTacacsClientAccountingServerAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesTacacsClientAccountingServerEntry 8 }
+
+ cienaCesTacacsClientAccountingServerAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesTacacsClientAccountingServerEntry  9 }
+
+ -- "Access-Response" includes an Access-Accept, Access-Challenge
+ -- or Access-Reject
+
+ cienaCesTacacsClientAccountingServerMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed TACACS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesTacacsClientAccountingServerEntry 10 }
+
+ cienaCesTacacsClientAccountingServerBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesTacacsClientAccountingServerEntry 11 }
+
+ cienaCesTacacsClientAccountingServerTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a Request as well as a timeout."
+      ::= { cienaCesTacacsClientAccountingServerEntry  12 }
+
+ cienaCesTacacsClientAccountingServerUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesTacacsClientAccountingServerEntry  13 }
+
+ cienaCesTacacsClientAccountingServerBadHeaderSequence OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of TACACS packets of which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesTacacsClientAccountingServerEntry  14}
+                
+ cienaCesTacacsClientAccountingServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+            "To create a row in this table, a manager must
+            set this object to either createAndGo(4).
+
+            To create an entry, specify both cienaCesTacacsClientAccountingServerStatus,
+            and cienaCesTacacsClientAccountingServerAddr with the SNMP multiple set operation.
+
+            To disable a TACACS server, the operator can set cienaCesTacacsClientAccountingServerStatus
+            object to the 'notInService' state."
+      ::= { cienaCesTacacsClientAccountingServerEntry 15 } 
+
+ cienaCesTacacsClientAccountingServerApplication OBJECT-TYPE
+      SYNTAX            INTEGER {
+                                        userLogin(1),
+                                        dot1x(2),
+                                        all(3)   
+                                }
+      MAX-ACCESS        read-create
+      STATUS            deprecated
+      DESCRIPTION
+            "This object specifies how the TACACS server is used for authentication.
+             Whether this TACACS server is used for userLogin authentication or dot1x authentication 
+             or both, is decided by the value of this MIB object. Dot1x is not supported on all platforms."
+      DEFVAL    {userLogin}
+      ::= { cienaCesTacacsClientAccountingServerEntry  16}
+
+ cienaCesTacacsClientAccountingServerClearStatistics OBJECT-TYPE
+      SYNTAX            CienaStatsClear
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+            "This object clears the statistics for a server."
+      DEFVAL { none }
+      ::= { cienaCesTacacsClientAccountingServerEntry  17}
+
+ cienaCesTacacsClientConnectionFailed NOTIFICATION-TYPE
+     OBJECTS { cienaGlobalSeverity, 
+               cienaGlobalMacAddress,
+               cienaCesTacacsClientServerResolvedInetAddrType,
+               cienaCesTacacsClientServerResolvedInetAddr
+             }
+     STATUS  current
+     DESCRIPTION
+         "A cienaCesTacacsClientConnectionFailed notification is sent if the
+         TACACS client is unable to contact the TACACS server."
+     ::= { cienaCesTacacsClientMIBNotifications 1 }
+ END
+
+ --
+ -- WWP-TACACS-CLIENT-MIB
+ --
+                

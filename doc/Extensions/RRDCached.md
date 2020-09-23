@@ -12,6 +12,7 @@ tune over rrdcached. To enable this set the following config:
 ```php
 $config['rrdtool_version'] = '1.5.5';
 ```
+This setting has to be the exact version of rrdtool you are running. 
 
 NOTE: This feature requires your client version of rrdtool to be 1.5.5
 or over, in addition to your rrdcached version.
@@ -39,35 +40,16 @@ Features: Supported features in the version indicated.
 It is recommended that you monitor your LibreNMS server with LibreNMS
 so you can view the disk I/O usage delta.
 
-## RRDCached installation CentOS 7
 
-1: Create `/etc/systemd/system/rrdcached.service` with this content:
+# Installation Manual for
 
-```
-[Unit]
-Description=Data caching daemon for rrdtool
-After=network.service
+1. [RRDCached installation Ubuntu 16](#rrdcached-installation-ubuntu-16)
+1. [RRDCached installation Debian Buster](#rrdcached-installation-debian-buster)
+1. [RRDCached installation Debian Stretch](#rrdcached-installation-debian-stretch)
+1. [RRDCached installation CentOS 7 or 8](#rrdcached-installation-centos-7-or-8)
+1. [RRDCached installation CentOS 6](#rrdcached-installation-centos-6)
+1. [Securing RRCached](#Securing-RRCached)
 
-[Service]
-Type=forking
-PIDFile=/run/rrdcached.pid
-ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/run/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
-
-[Install]
-WantedBy=default.target
-```
-
-2: Start rrdcached
-
-```bash
-systemctl enable --now rrdcached.service
-```
-
-3: Edit `/opt/librenms/config.php` to include:
-
-```php
-$config['rrdcached'] = "unix:/run/rrdcached.sock";
-```
 
 ## RRDCached installation Ubuntu 16
 
@@ -109,40 +91,11 @@ systemctl restart rrdcached.service
 5: Edit `/opt/librenms/config.php` to include:
 
 ```php
-$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
+$config['rrdcached'] = "unix:/run/rrdcached.sock";
 ```
 
-## RRDCached installation Debian Jessie (rrdcached 1.4.8)
-
-1: Install rrdcached
-
-```bash
-sudo apt-get install rrdcached
-```
-
-2: Edit /etc/default/rrdcached to include:
-
-```bash
-OPTS="-s librenms"
-OPTS="$OPTS -l unix:/var/run/rrdcached.sock"
-OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
-OPTS="$OPTS -b /opt/librenms/rrd/ -B"
-OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4"
-```
-
-3: Restart the rrdcached service
-
-```bash
-    systemctl restart rrdcached.service
-```
-
-4: Edit /opt/librenms/config.php to include:
-
-```php
-$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
-```
-
-## RRDCached installation Debian Stretch (rrdcached 1.6.0)
+## RRDCached installation Debian Buster
+(rrdcached 1.7.1)
 
 1: Install rrdcached
 
@@ -160,7 +113,7 @@ WRITE_THREADS=4
 BASE_PATH=/opt/librenms/rrd/
 JOURNAL_PATH=/var/lib/rrdcached/journal/
 PIDFILE=/var/run/rrdcached.pid
-SOCKFILE=/var/run/rrdcached.sock
+SOCKFILE=/run/rrdcached.sock
 SOCKGROUP=librenms
 DAEMON_GROUP=librenms
 DAEMON_USER=librenms
@@ -184,7 +137,7 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 For local RRDCached server
 
 ```php
-$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
+$config['rrdcached'] = "unix:/run/rrdcached.sock";
 ```
 
 For remote RRDCached server make sure you have network option in /var/default/rrdcached
@@ -198,6 +151,94 @@ $config['rrdcached'] = "IPADDRESS:42217";
 ```
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
+
+## RRDCached installation Debian Stretch
+(rrdcached 1.6.0)
+
+1: Install rrdcached
+
+```bash
+sudo apt-get install rrdcached
+```
+
+2; Edit /etc/default/rrdcached to include:
+
+```bash
+DAEMON=/usr/bin/rrdcached
+WRITE_TIMEOUT=1800
+WRITE_JITTER=1800
+WRITE_THREADS=4
+BASE_PATH=/opt/librenms/rrd/
+JOURNAL_PATH=/var/lib/rrdcached/journal/
+PIDFILE=/var/run/rrdcached.pid
+SOCKFILE=/run/rrdcached.sock
+SOCKGROUP=librenms
+DAEMON_GROUP=librenms
+DAEMON_USER=librenms
+BASE_OPTIONS="-B -F -R"
+```
+
+3: Fix permissions
+
+```bash
+chown librenms:librenms /var/lib/rrdcached/journal/
+```
+
+4: Restart the rrdcached service
+
+```bash
+    systemctl restart rrdcached.service
+```
+
+5: Edit /opt/librenms/config.php to include:
+
+For local RRDCached server
+
+```php
+$config['rrdcached'] = "unix:/run/rrdcached.sock";
+```
+
+For remote RRDCached server make sure you have network option in /var/default/rrdcached
+
+```bash
+NETWORK_OPTIONS="-L"
+```
+
+```php
+$config['rrdcached'] = "IPADDRESS:42217";
+```
+
+NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
+
+## RRDCached installation CentOS 7 or 8
+
+1: Create `/etc/systemd/system/rrdcached.service` with this content:
+
+```
+[Unit]
+Description=Data caching daemon for rrdtool
+After=network.service
+
+[Service]
+Type=forking
+PIDFile=/run/rrdcached.pid
+ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/run/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
+
+[Install]
+WantedBy=default.target
+```
+
+2: Start rrdcached
+
+```bash
+systemctl enable --now rrdcached.service
+```
+
+3: Edit `/opt/librenms/config.php` to include:
+
+```php
+$config['rrdcached'] = "unix:/run/rrdcached.sock";
+```
 
 ## RRDCached installation CentOS 6
 
@@ -222,7 +263,7 @@ vi /etc/yum.repos.d/rpmforge.repo
 vi /etc/sysconfig/rrdcached
 
 # Settings for rrdcached
-OPTIONS="-w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/"
+OPTIONS="-w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/run/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/"
 RRDC_USER=librenms
 
 mkdir /var/run/rrdcached
@@ -236,7 +277,7 @@ service rrdcached start
 - Edit /opt/librenms/config.php to include:
 
 ```php
-$config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
+$config['rrdcached']    = "unix:/run/rrdcached.sock";
 ```
 
 # Verify

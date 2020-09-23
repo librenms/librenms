@@ -1,8 +1,15 @@
 mib: HIK-DEVICE-MIB:HIKVISION-MIB
 modules:
+    os:
+        hardware: HIK-DEVICE-MIB::deviceType.0
+        version: HIK-DEVICE-MIB::softwVersion.0
+        features:
+            - HIK-DEVICE-MIB::videoEncode.0
+            - HIK-DEVICE-MIB::videoNetTrans.0
+        features_template: "{{ HIK-DEVICE-MIB::videoEncode.0 }}-{{ HIK-DEVICE-MIB::videoNetTrans.0 }}"
     processors:
         data:
             -
-              oid: cpuPercent
-              num_oid: '.1.3.6.1.4.1.39165.1.7.{{ $index }}'
-              index: 0
+                oid: cpuPercent
+                num_oid: '.1.3.6.1.4.1.39165.1.7.{{ $index }}'
+                index: 0

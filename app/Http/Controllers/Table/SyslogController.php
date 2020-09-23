@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -56,6 +55,11 @@ class SyslogController extends TableController
         ];
     }
 
+    public function sortFields($request)
+    {
+        return ['label', 'timestamp', 'level', 'device_id', 'program', 'msg', 'priority'];
+    }
+
     /**
      * Defines the base query for this resource
      *
@@ -83,6 +87,7 @@ class SyslogController extends TableController
         $device = $syslog->device;
 
         return [
+            'label' => $this->setLabel($syslog),
             'timestamp' => $syslog->timestamp,
             'level' => htmlentities($syslog->level),
             'device_id' => $device ? \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) : '',
@@ -91,4 +96,42 @@ class SyslogController extends TableController
             'priority' => htmlentities($syslog->priority),
         ];
     }
+
+    private function setLabel($syslog)
+    {
+        $output = "<span class='alert-status ";
+        $output .= $this->priorityLabel($syslog->priority);
+        $output .= "'>";
+        $output .= '</span>';
+
+        return $output;
+    }
+
+    /**
+     * @param int $syslog_priority
+     * @return string $syslog_priority_icon
+     */
+    private function priorityLabel($syslog_priority)
+    {
+        switch ($syslog_priority) {
+            case 'debug':
+                return 'label-default'; //Debug
+            case 'info':
+                return 'label-info'; //Informational
+            case 'notice':
+                return 'label-primary'; //Notice
+            case 'warning':
+                return 'label-warning'; //Warning
+            case 'err':
+                return 'label-danger'; //Error
+            case 'crit':
+                return 'label-danger'; //Critical
+            case 'alert':
+                return 'label-danger'; //Alert
+            case 'emerg':
+                return 'label-danger'; //Emergency
+        }
+    }
+
+    // end syslog_priority
 }

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateBillsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,8 +14,8 @@ class CreateBillsTable extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->increments('bill_id');
-            $table->text('bill_name', 65535);
-            $table->text('bill_type', 65535);
+            $table->text('bill_name');
+            $table->text('bill_type');
             $table->bigInteger('bill_cdr')->nullable();
             $table->integer('bill_day')->default(1);
             $table->bigInteger('bill_quota')->nullable();

@@ -1,10 +1,14 @@
 mib: IBOOTPDU-MIB
 modules:
+    os:
+        hardware: IBOOTPDU-MIB::deviceModelName.0
+        version: IBOOTPDU-MIB::firmwareVersion.0
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - outletTable
+                -
+                    oid:
+                        - outletTable
         temperature:
             options:
                 skip_values: [999, 99999]

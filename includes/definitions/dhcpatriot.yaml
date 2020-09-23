@@ -1,0 +1,15 @@
+os: dhcpatriot
+type: server
+group: unix
+text: 'DHCPatriot'
+ifXmcbc: true
+ifname: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        sysDescr: 'FNGi'
+processor_stacked: true

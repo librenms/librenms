@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
             return \LibreNMS\Config::get($key);
         });
         Blade::if('notconfig', function ($key) {
-            return !\LibreNMS\Config::get($key);
+            return ! \LibreNMS\Config::get($key);
         });
         Blade::if('admin', function () {
             return auth()->check() && auth()->user()->isAdmin();
@@ -79,12 +79,13 @@ class AppServiceProvider extends ServiceProvider
         $sensor_types = [];
         foreach (Sensor::getTypes() as $sensor_type) {
             $sensor_types[$sensor_type] = \App\Models\Sensor::class;
-        };
+        }
         Relation::morphMap(array_merge([
             'interface' => \App\Models\Port::class,
             'sensor' => \App\Models\Sensor::class,
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
+            'location' => \App\Models\Location::class,
         ], $sensor_types));
     }
 
@@ -105,16 +106,20 @@ class AppServiceProvider extends ServiceProvider
             switch ($engine) {
                 case 'mapquest':
                     Log::debug('MapQuest geocode engine');
+
                     return $app->make(\App\ApiClients\MapquestApi::class);
                 case 'bing':
                     Log::debug('Bing geocode engine');
+
                     return $app->make(\App\ApiClients\BingApi::class);
                 case 'openstreetmap':
                     Log::debug('OpenStreetMap geocode engine');
+
                     return $app->make(\App\ApiClients\NominatimApi::class);
                 default:
                 case 'google':
                     Log::debug('Google Maps geocode engine');
+
                     return $app->make(\App\ApiClients\GoogleMapsApi::class);
             }
         });
@@ -133,6 +138,7 @@ class AppServiceProvider extends ServiceProvider
 
         Validator::extend('ip_or_hostname', function ($attribute, $value, $parameters, $validator) {
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
+
             return IP::isValid($ip) || Validate::hostname($value);
         }, __('The :attribute must a valid IP address/network or hostname.'));
 
@@ -146,6 +152,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $validator = Validator::make([$attribute => $value], [$attribute => 'exists:' . implode(',', $parameters)]);
+
             return $validator->passes();
         }, __('validation.exists'));
     }
