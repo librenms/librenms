@@ -135,7 +135,7 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                         echo '<td>' . formatUptime(time() - $service_template['service_template_changed']) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_ignore'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_disabled'])) . '</td>';
-                        
+
                         if (Auth::user()->hasGlobalAdmin()) {
                             echo "<td>
                                     <button type='button' class='btn btn-warning btn-sm' aria-label='Apply' data-toggle='modal' data-target='#discover-service-template' data-device_group_id='{$device_group_id}' data-service_template_id='{$service_template['service_template_id']}' name='discover-service-template'><i class='fa fa-retweet' aria-hidden='true'></i></button>
