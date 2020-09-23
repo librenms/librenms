@@ -66,6 +66,7 @@ echo "
         <input name='disabled' id='disabled' type='checkbox'>
       </div>
     </div>
+    <hr>
     <center><button type='submit' name='Submit' class='btn btn-default input-sm'>Add Service Template</button></center>
   </div>
 </form>";
