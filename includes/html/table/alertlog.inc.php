@@ -67,7 +67,9 @@ if (isset($vars['min_severity'])) {
             $rules_count++;
         }
     }
-    $where .= " AND rule_id in ".dbGenPlaceholders($rules_count);
+    if ($rules_count > 0) {
+        $where .= " AND rule_id in ".dbGenPlaceholders($rules_count);
+    }
 }
 
 $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id WHERE $where";
