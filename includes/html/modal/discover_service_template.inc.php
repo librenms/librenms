@@ -29,7 +29,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <?php echo csrf_field() ?>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger danger" id="confirm-discovery-service-template"
-                                data-target="discover-service-template">Discover
+                                data-target="confirm-discover-service-template">Discover
                         </button>
                         <input type="hidden" name="device_group_id" id="device_group_id" value="">
                         <input type="hidden" name="service_template_id" id="service_template_id" value="">
