@@ -30,6 +30,10 @@ if (Config::get('discover_services')) {
             }
         }
     }
-
+    foreach (dbFetchRows('SELECT * FROM `device_groups` ORDER BY `name`') as $device_group) {
+        foreach (dbFetchRows('SELECT * FROM `services_template` WHERE `device_group_id` = ?', [$device_group[device_group_id]]) as $service_template) {
+            discover_service_template($device_group['device_group_id'], $service_template['service_template_id']);
+        }
+    }
     echo "\n";
 }
