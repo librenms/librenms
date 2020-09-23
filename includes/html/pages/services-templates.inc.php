@@ -88,9 +88,9 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
                 foreach (dbFetchRows($host_sql, $host_par) as $device_group) {
                     $device_group_id = $device_group['id'];
                     $device_group_name = $device_group['name'];
-                    //$device_sysName = $device_group['name'];
-                    //$devlink = generate_device_link($device_group, null, array('tab' => 'group'));
-                    $devlink = '<a href="/devices/group=<?=$device_group_id?>" target="_blank"><?=$device_group_name?></a>';
+                    //$devlink = generate_device_link($device_group, null, array('tab' => 'group'));                 
+                    $devlink = generate_url(['page' => 'devices', 'group' => $device_group_id]);
+
                     if ($shift == 1) {
                         array_unshift($sql_param, $device_group_id);
                         $shift = 0;
@@ -109,7 +109,7 @@ require_once 'includes/html/modal/discover_service_template.inc.php';
 
                         if ($service_template_iteration < 2 && $header) {
                             echo '<div class="panel panel-default">';
-                            echo '<div class="panel-heading"><h3 class="panel-title">' . $devlink . '</h3>' . $device_group_id . '</div>';
+                            echo '<div class="panel-heading"><h3 class="panel-title">' . $device_group_id  . '</h3>' . $devlink . '</div>';
                             echo '<div class="panel-body">';
                             echo '<table class="table table-hover table-condensed">';
                             echo '<thead>';
