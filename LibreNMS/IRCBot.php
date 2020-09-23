@@ -126,7 +126,9 @@ class IRCBot
         }
 
         foreach ($this->config['irc_external'] as $ext) {
+            $this->log("Command $ext...");
             if (($this->external[$ext] = file_get_contents('includes/ircbot/' . $ext . '.inc.php')) == '') {
+                $this->log('failed!');
                 unset($this->external[$ext]);
             }
         }
@@ -245,6 +247,12 @@ class IRCBot
             $alert = json_decode($alert, true);
             if (! is_array($alert)) {
                 return false;
+            }
+            if ($this->debug) {
+                $this->log('Alert received ' . $alert['title']);
+                $this->log('Alert state ' . $alert['state']);
+                $this->log('Alert severity ' . $alert['severity']);
+                $this->log('Alert channels ' . print_r($this->config['irc_alert_chan'], true));
             }
 
             switch ($alert['state']) {
@@ -391,9 +399,11 @@ class IRCBot
         $this->command = str_replace(':.', '', $this->command);
         $tmp = explode(':.' . $this->command . ' ', $this->data);
         $this->user = $this->getAuthdUser();
+        $this->log('isAuthd-1? ' . $this->isAuthd());
         if (! $this->isAuthd() && (isset($this->config['irc_auth']))) {
             $this->hostAuth();
         }
+        $this->log('isAuthd-2? ' . $this->isAuthd());
         if ($this->isAuthd() || trim($this->command) == 'auth') {
             $this->proceedCommand(str_replace("\n", '', trim($this->command)), trim($tmp[1]));
         }
@@ -533,7 +543,9 @@ class IRCBot
 
     private function log($msg)
     {
-        echo '[' . date('r') . '] ' . trim($msg) . "\n";
+        $log = '[' . date('r') . '] IRCbot ' . trim($msg) . "\n";
+        echo $log;
+        file_put_contents($this->config['log_dir'] . '/irc.log', $log, FILE_APPEND);
 
         return true;
     }
@@ -579,10 +591,14 @@ class IRCBot
 
     private function hostAuth()
     {
+        $this->log('HostAuth');
         global $authorizer;
         foreach ($this->config['irc_auth'] as $nms_user => $hosts) {
             foreach ($hosts as $host) {
                 $host = preg_replace("/\*/", '.*', $host);
+                if ($this->debug) {
+                    $this->log("HostAuth on irc matching $host to " . $this->getUserHost($this->data));
+                }
                 if (preg_match("/$host/", $this->getUserHost($this->data))) {
                     $user_id = LegacyAuth::get()->getUserid(mres($nms_user));
                     $user = LegacyAuth::get()->getUser($user_id);
