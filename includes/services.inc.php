@@ -193,7 +193,7 @@ function discover_service_template($device_group, $service_template)
             add_service($device, $service['type'], $service['descr'], $service['ip'], $service['params'], $service['ignore'], $service['disabled'], $service['service_template_id']);
             log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
             echo '+';
-        }    
+        }
     }
 
     echo "$service_template ";
