@@ -1,9 +1,10 @@
 <?php
 
 echo "
-<h3><span class='alert alert-info'>Add Service Template</span></h3>
 <form id='addsrv-template' name='addsrv-template' method='post' action='' class='form-horizontal' role='form'>
   " . csrf_field() . "
+  <div><h2>Add Service Template</h2></div>
+  <div class='alert alert-info'>Service Template will created for the specified Device Group.</div>
   <div class='well well-lg'>
     <div class='form-group'>
       <input type='hidden' name='addsrv-template' value='yes'>
