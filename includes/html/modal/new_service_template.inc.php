@@ -55,7 +55,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         </div>
                         <div class='col-sm-5'>
                         </div>
-                    </div>                    
+                    </div>
                     <div class="form-service-template row">
                         <label for='stype' class='col-sm-3 control-label'>Type: </label>
                         <div class="col-sm-9">
