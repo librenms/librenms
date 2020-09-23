@@ -31,6 +31,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
     $pagetitle[] = 'Add service';
 
     echo "<div class='row'>
+        <div class='col-sm-3'>
+        </div>
         <div class='col-sm-6'>";
 
     include_once 'includes/html/print-service-add.inc.php';
