@@ -30,7 +30,7 @@ class Siteboss550 extends OS
     public function discoverOS(Device $device): void
     {
         $device->version = preg_replace('/^\s*(\S+\s+\S+\s+)/', '', $device->sysDescr);
-        preg_match('/^\S+\s+\d+\s+/', $deviceModel['sysDescr'], $matches);
+        preg_match('/^\S+\s+\d+\s+/', $device->sysDescr, $matches);
         $device->hardware = trim($matches[0]);
         $device->sysName = snmp_get($this->getDeviceArray(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
     }
