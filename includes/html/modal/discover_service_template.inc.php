@@ -25,16 +25,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <p>Please confirm that you would like to discover devices and apply this service.</p>
                 </div>
                 <div class="modal-footer">
-                    <form role="form" class="remove_token_form">
-                        <?php echo csrf_field() ?>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger danger" id="confirm-discovery-service-template"
-                                data-target="confirm-discover-service-template">Discover
-                        </button>
-                        <input type="hidden" name="device_group_id" id="device_group_id" value="">
-                        <input type="hidden" name="service_template_id" id="service_template_id" value="">
-                        <input type="hidden" name="confirm" id="confirm" value="yes">
-                    </form>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger danger" id="confirm-discovery-service-template"
+                        data-target="confirm-discover-service-template">Discover
+                    </button>
+                    <input type="hidden" name="device_group_id" id="device_group_id" value="">
+                    <input type="hidden" name="service_template_id" id="service_template_id" value="">
+                    <input type="hidden" name="confirm" id="confirm" value="yes">
                 </div>
             </div>
         </div>
