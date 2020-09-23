@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,7 +25,6 @@
 namespace LibreNMS;
 
 use App\Models\Device;
-use Log;
 
 class Sping
 {
@@ -39,7 +37,7 @@ class Sping
      */
     public function __construct()
     {
-        $this->oid = "1.3.6.1.2.1.1.1.0";
+        $this->oid = '1.3.6.1.2.1.1.1.0';
         $this->timeout = (Config::get('snmp_ping_timeout', 5)) * 1000000;
         $this->retries = Config::get('snmp_ping_retries', 2);
     }
@@ -53,22 +51,22 @@ class Sping
     public function sping($device)
     {
         $response = [
-            'result' => (boolean)false,
-            'last_ping_timetaken' => (float)0.0,
+            'result' => (bool) false,
+            'last_ping_timetaken' => (float) 0.0,
             'db' => [
-                'xmt' => (int)1,
-                'rcv' => (int)0,
-                'loss' => (float)100.0,
-                'min' => (float)0.0,
-                'max' => (float)0.0,
-                'avg' =>(float)0.0
-            ]
+                'xmt' => (int) 1,
+                'rcv' => (int) 0,
+                'loss' => (float) 100.0,
+                'min' => (float) 0.0,
+                'max' => (float) 0.0,
+                'avg' =>(float) 0.0,
+            ],
         ];
 
         $version = $device['snmpver'];
         $target = Device::pollerTarget($device['hostname']);
 
-        $rtt = (boolean)false;
+        $rtt = (bool) false;
         if (strpos($version, '2c') !== false) {
             $rtt = $this->sping2c($device, $target);
         } elseif (strpos($version, '3') !== false) {
@@ -78,11 +76,11 @@ class Sping
         }
 
         if ($rtt !== false) {
-            $rtt = (Config::get('record_snmp_ping_rtt') === true ? (float)$rtt : (float)0.0);
-            $response['result'] = (boolean)true;
+            $rtt = (Config::get('record_snmp_ping_rtt') === true ? (float) $rtt : (float) 0.0);
+            $response['result'] = (bool) true;
             $response['last_ping_timetaken'] = $rtt;
-            $response['db']['rcv'] = (int)1;
-            $response['db']['loss'] = (float)0.0;
+            $response['db']['rcv'] = (int) 1;
+            $response['db']['loss'] = (float) 0.0;
             $response['db']['min'] = $rtt;
             $response['db']['max'] = $rtt;
             $response['db']['avg'] = $rtt;
@@ -93,45 +91,47 @@ class Sping
 
     private function sping1($device, $target)
     {
-        $rtt = (boolean)false;
+        $rtt = (bool) false;
         $community = $device['community'];
         $before = microtime(true);
         $sysDescr = snmpget($target, $community, $this->oid, $this->timeout, $this->retries);
         $after = microtime(true);
         if ($sysDescr !== false) {
-            $rtt = (float)(($after - $before) * 1000.0);
+            $rtt = (float) (($after - $before) * 1000.0);
         }
+
         return $rtt;
     }
 
     private function sping2c($device, $target)
     {
-        $rtt = (boolean)false;
+        $rtt = (bool) false;
         $community = $device['community'];
         $before = microtime(true);
         $sysDescr = snmp2_get($target, $community, $this->oid, $this->timeout, $this->retries);
         $after = microtime(true);
         if ($sysDescr !== false) {
-            $rtt = (float)(($after - $before) * 1000.0);
+            $rtt = (float) (($after - $before) * 1000.0);
         }
+
         return $rtt;
     }
 
     private function sping3($device, $target)
     {
-        $rtt = (boolean)false;
+        $rtt = (bool) false;
         $authname = $device['authname'];
         $authlevel = $device['authlevel'];
         $authalgo = null;
         $authpass = null;
         $cryptalgo = null;
         $cryptpass = null;
-        if ($authlevel === "authPriv") {
+        if ($authlevel === 'authPriv') {
             $authalgo = $device['authalgo'];
             $authpass = $device['authpass'];
             $cryptalgo = $device['cryptoalgo'];
             $cryptpass = $device['cryptopass'];
-        } elseif ($authlevel === "authNoPriv") {
+        } elseif ($authlevel === 'authNoPriv') {
             $authalgo = $device['authalgo'];
             $authpass = $device['authpass'];
         }
@@ -139,8 +139,9 @@ class Sping
         $sysDescr = snmp3_get($target, $authname, $authlevel, $authalgo, $authpass, $cryptalgo, $cryptpass, $this->oid, $this->timeout, $this->retries);
         $after = microtime(true);
         if ($sysDescr !== false) {
-            $rtt = (float)(($after - $before) * 1000.0);
+            $rtt = (float) (($after - $before) * 1000.0);
         }
+
         return $rtt;
     }
 }

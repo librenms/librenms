@@ -617,7 +617,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     }
 
     // Allow ping fallback, unless SNMP check for reachability is mandated
-    if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1 && !$use_snmp_ping) {
+    if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1 && ! $use_snmp_ping) {
         $additional['snmp_disable'] = 1;
         $additional['os'] = 'ping';
 

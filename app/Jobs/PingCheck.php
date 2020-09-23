@@ -35,8 +35,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
-use LibreNMS\Sping;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Sping;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -82,7 +82,7 @@ class PingCheck implements ShouldQueue
         $this->rrd_tags = ['rrd_def' => $rrd_def, 'rrd_step' => $rrd_step];
 
         $this->use_snmp_ping = Config::get('use_snmp_ping') === true ? true : false;
-        $this->use_icmp_ping = !$this->use_snmp_ping;
+        $this->use_icmp_ping = ! $this->use_snmp_ping;
 
         if ($this->use_icmp_ping) {
             // set up fping process
@@ -122,7 +122,7 @@ class PingCheck implements ShouldQueue
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
             d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
-            d_echo("Devices left in tier: " . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
+            d_echo('Devices left in tier: ' . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
         }
 
         if (\App::runningInConsole()) {
@@ -174,7 +174,7 @@ class PingCheck implements ShouldQueue
                 $this->recordData(['hostname' => $t['hostname'], 'status' => 'alive', 'rtt' => $response['last_ping_timetaken']]);
                 $this->processTier();
             } else {
-                $this->recordData(['hostname' => $t['hostname'], 'status' => 'unreachable', 'rtt' => (float)0.0]);
+                $this->recordData(['hostname' => $t['hostname'], 'status' => 'unreachable', 'rtt' => (float) 0.0]);
             }
         }
     }
@@ -281,7 +281,7 @@ class PingCheck implements ShouldQueue
             // mark up only if snmp is not down too
             $device->status = ($data['status'] == 'alive' && $device->status_reason != 'snmp');
             $device->last_ping = Carbon::now();
-            $device->last_ping_timetaken = (float)0.0;
+            $device->last_ping_timetaken = (float) 0.0;
             if (isset($data['rtt'])) {
                 if ($this->use_icmp_ping || ($this->use_snmp_ping && $this->record_snmp_ping_rtt)) {
                     $device->last_ping_timetaken = floatval($data['rtt']);
