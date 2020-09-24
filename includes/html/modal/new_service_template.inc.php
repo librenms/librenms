@@ -126,9 +126,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 // on-hide
 $('#create-service-template').on('hide.bs.modal', function (event) {
     $('#device_group_id').val('');
-    $("#device_group_id").prop("disabled", false);
     $('#stype').val('');
-    $("#stype").prop("disabled", false);
     $('#desc').val('');
     $('#ip').val('');
     $('#param').val('');
@@ -149,9 +147,7 @@ $('#create-service-template').on('show.bs.modal', function (e) {
         dataType: "json",
         success: function(output) {
             $('#device_group_id').val(output['device_group_id']);
-            $("#device_group_id").prop("disabled", true);
             $('#stype').val(output['stype']);
-            $("#stype").prop("disabled", true);
             $('#desc').val(output['desc']);
             $('#ip').val(output['ip']);
             $('#param').val(output['param']);
