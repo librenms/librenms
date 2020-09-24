@@ -23,12 +23,12 @@ if (is_numeric($service_template_id) && $service_template_id > 0) {
 
     $output = [
         'device_group_id' => $service_template[0]['device_group_id'],
-        'stype'     => $service_template[0]['service_type'],
-        'desc'      => $service_template[0]['service_desc'],
-        'ip'        => $service_template[0]['service_ip'],
-        'param'     => $service_template[0]['service_param'],
-        'ignore'    => $service_template[0]['service_ignore'],
-        'disabled'  => $service_template[0]['service_disabled'],
+        'stype'     => $service_template[0]['service_template_type'],
+        'desc'      => $service_template[0]['service_template_desc'],
+        'ip'        => $service_template[0]['service_template_ip'],
+        'param'     => $service_template[0]['service_template_param'],
+        'ignore'    => $service_template[0]['service_template_ignore'],
+        'disabled'  => $service_template[0]['service_template_disabled'],
     ];
 
     header('Content-Type: application/json');
