@@ -34,7 +34,6 @@ class TopInterfacesController extends WidgetController
 {
     protected $title = 'Top Interfaces';
     protected $defaults = [
-        'refresh' => 60,
         'interface_count' => 5,
         'time_interval' => 15,
         'interface_filter' => null,

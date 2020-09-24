@@ -34,7 +34,6 @@ class ComponentStatusController extends WidgetController
 {
     protected $title = 'Component Status';
     protected $defaults = [
-        'refresh' => 60,
         'device_group' => null,
     ];
 

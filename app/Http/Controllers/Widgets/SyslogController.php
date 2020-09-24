@@ -33,7 +33,6 @@ class SyslogController extends WidgetController
     protected $title = 'Syslog';
     protected $defaults = [
         'title' => null,
-        'refresh' => 60,
         'device' => null,
         'device_group' => null,
         'hidenavigation' => 0,

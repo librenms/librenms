@@ -31,7 +31,6 @@ use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
 use App\Models\Service;
-use App\Models\UserWidget;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -254,10 +253,7 @@ class GraphController extends WidgetController
     public function getSettings($settingsView = false)
     {
         if (is_null($this->settings)) {
-            $id = \Request::get('id');
-            $widget = UserWidget::findOrFail($id);
-            $settings = array_replace($this->defaults, (array) $widget->settings);
-            $settings['id'] = $id;
+            $settings = parent::getSettings($settingsView);
 
             // legacy data conversions
             if ($settings['graph_type'] == 'manual') {

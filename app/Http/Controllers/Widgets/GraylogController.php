@@ -34,7 +34,6 @@ class GraylogController extends WidgetController
     protected $title = 'Graylog';
     protected $defaults = [
         'title' => null,
-        'refresh' => 60,
         'stream' => null,
         'device' => null,
         'range' => null,

@@ -26,15 +26,12 @@
 namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
-use Illuminate\View\View;
-use LibreNMS\Util\Html;
 
 class NotesController extends WidgetController
 {
     protected $title = 'Notes';
     protected $defaults = [
         'title' => null,
-        'refresh' => 60,
         'notes' => null,
     ];
 

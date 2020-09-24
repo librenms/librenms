@@ -32,7 +32,6 @@ class AlertlogController extends WidgetController
     protected $title = 'Alert history';
     protected $defaults = [
         'title' => null,
-        'refresh' => 60,
         'device_id' => '',
         'state' => -1,
         'min_severity' => null,

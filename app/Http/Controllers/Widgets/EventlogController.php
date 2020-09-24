@@ -33,7 +33,6 @@ class EventlogController extends WidgetController
     protected $title = 'Eventlog';
     protected $defaults = [
         'title' => null,
-        'refresh' => 60,
         'device' => null,
         'device_group' => null,
         'eventtype' => null,

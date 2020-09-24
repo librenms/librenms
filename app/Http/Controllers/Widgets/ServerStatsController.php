@@ -33,7 +33,6 @@ class ServerStatsController extends WidgetController
     protected $title = 'Server Stats';
     protected $defaults = [
         'title' => null,
-        'refresh' => 60,
         'columnsize' => 3,
         'device' => null,
         'cpu' => 0,

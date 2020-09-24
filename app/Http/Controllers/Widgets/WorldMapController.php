@@ -26,9 +26,7 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
-use App\Models\Location;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use LibreNMS\Config;
 
 class WorldMapController extends WidgetController
@@ -39,7 +37,6 @@ class WorldMapController extends WidgetController
     {
         $this->defaults = [
             'title' => null,
-            'refresh' => 60,
             'title_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
             'init_lat' => Config::get('leaflet.default_lat', 51.4800),
             'init_lng' => Config::get('leaflet.default_lng', 0),

@@ -39,7 +39,6 @@ class GlobeController extends WidgetController
         // init defaults we need to check config, so do it in construct
         $this->defaults = [
             'title' => null,
-            'refresh' => 60,
             'markers' => Config::get('frontpage_globe.markers', 'devices'),
             'region' => Config::get('frontpage_globe.region', 'world'),
             'resolution' => Config::get('frontpage_globe.resolution', 'countries'),

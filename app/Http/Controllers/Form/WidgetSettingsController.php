@@ -35,11 +35,12 @@ class WidgetSettingsController extends Controller
     {
         $this->validate($request, [
             'settings' => 'array',
-            'settings.refresh' => 'int|min:0|max:86400'
+            'settings.refresh' => 'int|min:1'
         ]);
 
         $widget = UserWidget::with('dashboard')->findOrFail($widget_settings);
         $widget_settings = (array) $request->get('settings', []);
+        unset($widget_settings['_token']);
 
         if (! $widget->dashboard->canWrite($request->user())) {
             return response()->json([

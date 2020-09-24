@@ -46,7 +46,6 @@ class TopDevicesController extends WidgetController
     protected $title = 'Top Devices';
     protected $defaults = [
         'title' => null,
-        'refresh' => 60,
         'top_query' => 'traffic',
         'sort_order' => 'desc',
         'device_count' => 5,
