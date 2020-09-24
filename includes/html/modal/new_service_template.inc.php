@@ -75,7 +75,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class='col-sm-9'>
                                 <textarea id='desc' name='desc' class='form-control'></textarea>
                             </div>
-                            <div class='col-sm-9'>
+                            <div class='col-sm-5'>
                             </div>
                         </div>
                         <div class="form-service-template row">
