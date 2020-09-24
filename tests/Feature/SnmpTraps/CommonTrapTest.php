@@ -55,7 +55,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
 
         Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
         Log::shouldReceive('event')->once()->withArgs(function ($e_message, $e_device, $e_type) use ($device) {
-            return $e_message == 'SNMP trap received: ' &&
+            return $e_message == '' &&
                 $device->is($e_device) &&
                 $e_type == 'trap';
         });
@@ -78,7 +78,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
 
         Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
         Log::shouldReceive('event')->once()->withArgs(function ($e_message, $e_device, $e_type) use ($device) {
-            return $e_message == 'SNMP trap received: SNMPv2-MIB::someOid' &&
+            return $e_message == 'SNMPv2-MIB::someOid' &&
                 $device->is($e_device) &&
                 $e_type == 'trap';
         });

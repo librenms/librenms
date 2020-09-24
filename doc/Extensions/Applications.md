@@ -1884,7 +1884,7 @@ https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O
 3: Edit your snmpd.conf file and add:
 
 ```
-extend unbound /etc/snmp/unbound
+extend unbound /usr/bin/sudo /etc/snmp/unbound
 ```
 
 4: Restart snmpd.
