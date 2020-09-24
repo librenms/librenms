@@ -45,17 +45,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <form role="form" class="remove_token_form">
-                            <?php echo csrf_field() ?>
-                            <hr>
-                            <center><button type="submit" class="btn btn-danger danger" id="service-template-removal"
-                                    data-target="service-template-removal">Delete
-                            </button></center>
-                            <input type="hidden" name="service_template_id" id="service_template_id" value="">
-                            <input type="hidden" name="confirm" id="confirm" value="yes">
-                        </form>
-                    </div>
+                    <hr>
+                    <form role="form" class="remove_token_form">
+                        <?php echo csrf_field() ?>
+                        <center><button type="submit" class="btn btn-danger danger" id="service-template-removal"
+                                data-target="service-template-removal">Delete
+                        </button></center>
+                        <input type="hidden" name="service_template_id" id="service_template_id" value="">
+                        <input type="hidden" name="confirm" id="confirm" value="yes">
+                    </form>
                 </div>
             </div>
         </div>
