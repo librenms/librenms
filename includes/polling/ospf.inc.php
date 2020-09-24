@@ -143,7 +143,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     echo ' TOS Metrics: ';
 
     // Pull data from device
-    $ospf_tos_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfIfMetricEntry', array(), 'OSPF-MIB');
+    $ospf_tos_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfIfMetricEntry', [], 'OSPF-MIB');
     d_echo($ospf_tos_poll);
 
     $ospf_tos_metrics = collect();

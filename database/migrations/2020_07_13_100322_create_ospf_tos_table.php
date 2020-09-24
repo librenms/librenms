@@ -23,7 +23,7 @@ class CreateOspfTosTable extends Migration
             $table->integer('ospfIfMetricValue');
             $table->integer('ospfIfMetricStatus');
             $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id','ospf_port_id','context_name']);
+            $table->unique(['device_id', 'ospf_port_id', 'context_name']);
         });
     }
 
