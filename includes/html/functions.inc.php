@@ -502,8 +502,6 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
 function generate_sensor_link($args, $text = null, $type = null)
 {
-    $args = cleanPort($args);
-
     if (! $text) {
         $text = fixIfName($args['sensor_descr']);
     }
