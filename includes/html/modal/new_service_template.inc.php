@@ -12,12 +12,12 @@
  */
 
 if (Auth::user()->hasGlobalAdmin()) {
-    foreach (dbFetchRows('SELECT * FROM `device_groups` ORDER BY `name`') as $device_group) {
-        $devicegroupsform .= "<option value='" . $device_group['id'] . "'>" . $device_group['name'] . '</option>';
-    }
-    foreach (list_available_services() as $current_service) {
-        $servicesform .= "<option value='$current_service'>$current_service</option>";
-    }
+    //foreach (dbFetchRows('SELECT * FROM `device_groups` ORDER BY `name`') as $device_group) {
+    //    $devicegroupsform .= "<option value='" . $device_group['id'] . "'>" . $device_group['name'] . '</option>';
+    //}
+    //foreach (list_available_services() as $current_service) {
+    //    $servicesform .= "<option value='$current_service'>$current_service</option>";
+    //}
     // Build the types list.
     $dir = \LibreNMS\Config::get('nagios_plugins');
     if (file_exists($dir) && is_dir($dir)) {
@@ -53,8 +53,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group row">
                             <label for='device_group_id' class='col-sm-3 control-label'>Device Group: </label>
                             <div class="col-sm-9">
-                                <select name='device_group_id' class='form-control has-feedback'>
-                                    $devicegroupsform
+                                <select name='device_group_id' class='form-control input-sm'>
+                                    <?php echo $device_group_id?>
                                 </select>
                             </div>
                             <div class='col-sm-9'>
@@ -63,8 +63,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group row">
                             <label for='stype' class='col-sm-3 control-label'>Type: </label>
                             <div class="col-sm-9">
-                                <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
-                                    $servicesform
+                                <select id='stype' name='stype' placeholder='type' class='form-control input-sm'>
+                                <?php echo $stype?>
                                 </select>
                             </div>
                             <div class='col-sm-9'>
@@ -81,7 +81,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group row">
                             <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
                             <div class="col-sm-9">
-                                <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder=''/>
+                                <input type='text' id='ip' name='ip' class='form-control input-sm' placeholder=''/>
                             </div>
                             <div class='col-sm-9'>
                             </div>
@@ -89,7 +89,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group row">
                             <label for='param' class='col-sm-3 control-label'>Parameters: </label>
                             <div class="col-sm-9">
-                                <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                                <input type='text' id='param' name='param' class='form-control input-sm' placeholder=''/>
                             </div>
                             <div class='col-sm-9'>
                             </div>
@@ -126,6 +126,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 // on-hide
 $('#create-service-template').on('hide.bs.modal', function (event) {
     $('#device_group_id').val('');
+    $("#device_group_id").prop("disabled", false);
     $('#stype').val('');
     $("#stype").prop("disabled", false);
     $('#desc').val('');
