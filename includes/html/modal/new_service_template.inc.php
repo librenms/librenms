@@ -64,7 +64,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <label for='stype' class='col-sm-3 control-label'>Type: </label>
                             <div class="col-sm-9">
                                 <select id='stype' name='stype' placeholder='type' class='form-control input-sm'>
-                                <?php echo $stype?>
+                                    <?php echo $stype?>
                                 </select>
                             </div>
                             <div class='col-sm-9'>
