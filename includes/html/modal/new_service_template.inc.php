@@ -51,37 +51,47 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-service-template row">
-                            <label for='device_group_id' class='col-sm-2 control-label'>Device Group: </label>
+                            <label for='device_group_id' class='col-sm-3 control-label'>Device Group: </label>
                             <div class="col-sm-9">
                                 <select name='device_group_id' class='form-control has-feedback'>
                                     $devicegroupsform
                                 </select>
                             </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
                         <div class="form-service-template row">
-                            <label for='stype' class='col-sm-2 control-label'>Type: </label>
+                            <label for='stype' class='col-sm-3 control-label'>Type: </label>
                             <div class="col-sm-9">
                                 <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
                                     $servicesform
                                 </select>
                             </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
                         <div class='form-service-template row'>
-                            <label for='desc' class='col-sm-2 control-label'>Description: </label>
+                            <label for='desc' class='col-sm-3 control-label'>Description: </label>
                             <div class='col-sm-9'>
                                 <textarea id='desc' name='desc' class='form-control'></textarea>
                             </div>
-                        </div>
-                        <div class="form-service-template row">
-                            <label for='ip' class='col-sm-2 control-label'>IP Address: </label>
-                            <div class="col-sm-9">
-                                <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder=''/>
+                            <div class='col-sm-9'>
                             </div>
                         </div>
                         <div class="form-service-template row">
-                            <label for='param' class='col-sm-2 control-label'>Parameters: </label>
+                            <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
                             <div class="col-sm-9">
-                            <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                                <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder=''/>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
+                        </div>
+                        <div class="form-service-template row">
+                            <label for='param' class='col-sm-3 control-label'>Parameters: </label>
+                            <div class="col-sm-9">
+                                <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                            </div>
+                            <div class='col-sm-9'>
                             </div>
                         </div>
                         <div class="form-service-template row">
@@ -90,13 +100,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-service-template row">
-                            <label for='ignore' class='col-sm-2 control-label'>Ignore alert tag: </label>
+                            <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
                             <div class="col-sm-9">
                                 <input type='checkbox' id='ignore' name='ignore'>
                             </div>
                         </div>
                         <div class="form-service-template row">
-                            <label for='disabled' class='col-sm-2 control-label'>Disable polling and alerting: </label>
+                            <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
                             <div class="col-sm-9">
                                 <input type='checkbox' id='disabled' name='disabled'>
                             </div>
