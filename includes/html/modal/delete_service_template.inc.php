@@ -19,28 +19,37 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Delete">Confirm Delete</h5>
+                    <h2 class="modal-title" id="Delete">Confirm Delete</h2>
                 </div>
-                <div class="modal-body">
-                    <p>Please confirm that you would like to delete this service template.</p>
-                    <div class="form-group">
-                        <label for="service_delete" class="col-sm-4 col-md-3 control-label" title="Delete ALL Services created by this Template">Delete ALL Services created by this Template:</label>
-                        <div class="col-sm-8 col-md-9">
-                            <input type='checkbox' name='service_delete' id='service_delete'>
+                <div class='alert alert-info'>Service Template will be deleted for the specified Device Group.</div>
+                <div class='well well-lg'>
+                    <div class="modal-body">
+                        <p>Please confirm that you would like to delete this Service Template.</p>
+                        <div class="form-group row">
+                            <div class="col-sm-12 alert alert-info">
+                                <label class='control-label text-left input-sm'>Please Tick this box to remove Services from Devices, that have been created with this Template.</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="service_delete" class="col-sm-3 col-md-3 control-label" title="Delete Services">Delete Services:</label>
+                            <div class="col-sm-9 col-md-9">
+                                <input type='checkbox' name='service_delete' id='service_delete'>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <form role="form" class="remove_token_form">
-                        <?php echo csrf_field() ?>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger danger" id="service-template-removal"
-                                data-target="service-template-removal">Delete
-                        </button>
-                        <input type="hidden" name="service_template_id" id="service_template_id" value="">
-                        <input type="hidden" name="confirm" id="confirm" value="yes">
-                    </form>
-                </div>
+                    <hr>
+                    <div class="modal-footer">
+                        <form role="form" class="remove_token_form">
+                            <?php echo csrf_field() ?>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger danger" id="service-template-removal"
+                                    data-target="service-template-removal">Delete
+                            </button>
+                            <input type="hidden" name="service_template_id" id="service_template_id" value="">
+                            <input type="hidden" name="confirm" id="confirm" value="yes">
+                        </form>
+                    </div>
+                </div>    
             </div>
         </div>
     </div>
