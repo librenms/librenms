@@ -2456,6 +2456,7 @@ function lock_and_purge($table, $sql)
             }
         }
         $lock->release();
+
         return 0;
     }
 
@@ -2480,12 +2481,14 @@ function lock_and_purge_query($table, $sql, $msg)
     }
     $lock = Cache::lock($purge_name, 86000);
     if ($lock->get()) {
-        if (dbQuery($sql, array($purge_duration))) {
+        if (dbQuery($sql, [$purge_duration])) {
             printf($msg, $purge_duration);
         }
         $lock->release();
+
         return 0;
     }
+
     return -1;
 }
 

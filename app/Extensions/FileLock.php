@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -62,7 +61,7 @@ class FileLock extends Lock
             }
 
             return $this->store->put($this->key(), [
-                'owner' => $this->owner
+                'owner' => $this->owner,
             ], $this->seconds);
         });
     }
@@ -71,6 +70,7 @@ class FileLock extends Lock
     {
         return $this->atomic(function () {
             $owner = $this->store->get($this->key())['owner'] ?? null;
+
             return $owner === $this->owner ? $this->forceRelease() : false;
         });
     }
@@ -104,6 +104,7 @@ class FileLock extends Lock
                 }
             }
         }
+
         return false;
     }
 
@@ -137,6 +138,7 @@ class FileLock extends Lock
     protected function controlPath($key)
     {
         $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
+
         return config('cache.stores.file.control.path') . '/' . implode('/', $parts) . '/' . $hash;
     }
 
@@ -148,7 +150,7 @@ class FileLock extends Lock
      */
     protected function ensureControlDirectoryExists($path)
     {
-        if (!$this->store->getFilesystem()->exists(dirname($path))) {
+        if (! $this->store->getFilesystem()->exists(dirname($path))) {
             $this->store->getFilesystem()->makeDirectory(dirname($path), 0777, true, true);
         }
     }

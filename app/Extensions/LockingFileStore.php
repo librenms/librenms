@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -31,7 +30,6 @@ use Illuminate\Contracts\Cache\LockProvider;
 
 class LockingFileStore extends FileStore implements LockProvider
 {
-
     public function lock($name, $seconds = 0, $owner = null)
     {
         return new FileLock($this, $name, $seconds, $owner);

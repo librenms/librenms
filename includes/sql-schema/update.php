@@ -23,7 +23,6 @@
  * @copyright  2017-2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 if (! isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = [];
@@ -33,12 +32,12 @@ if (! isset($init_modules) && php_sapi_name() == 'cli') {
 $return = 0;
 
 // make sure the cache_locks table exists before attempting to use a db lock
-if (config('cache.default') == 'database' && !\Schema::hasTable('cache_locks')) {
+if (config('cache.default') == 'database' && ! \Schema::hasTable('cache_locks')) {
     $skip_schema_lock = true;
 }
 
 $schemaLock = Cache::lock('schema', 86000);
-if (!empty($skip_schema_lock) || $schemaLock->get()) {
+if (! empty($skip_schema_lock) || $schemaLock->get()) {
     $db_rev = get_db_schema();
 
     $migrate_opts = ['--force' => true, '--ansi' => true];
