@@ -30,9 +30,9 @@ if (Auth::user()->hasGlobalAdmin()) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h2 class="modal-title" id="Create">Services</h2>
+                <h2 class="modal-title" id="Create">Edit Service</h2>
             </div>
-            <div class='alert alert-info'>Service Template will modified for the specified Device Group.</div>
+            <div class='alert alert-info'>Service will modified for the specified Device.</div>
             <div class='well well-lg'>
                 <div class="modal-body">
                     <form method="post" role="form" id="service" class="form-horizontal service-form">
@@ -52,11 +52,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <?php echo $stype?>
                                 </select>
                             </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
                         <div class='form-service row'>
                             <label for='desc' class='col-sm-3 control-label'>Description: </label>
                             <div class='col-sm-9'>
                                 <textarea id='desc' name='desc' class='form-control'></textarea>
+                            </div>
+                            <div class='col-sm-9'>
                             </div>
                         </div>
                         <div class="form-service row">
@@ -64,11 +68,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class="col-sm-9">
                                 <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
                             </div>
+                            <div class='col-sm-9'>
+                            </div>
                         </div>
                         <div class="form-service row">
                             <label for='param' class='col-sm-3 control-label'>Parameters: </label>
                             <div class="col-sm-9">
-                            <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                                <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                            </div>
+                            <div class='col-sm-9'>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -90,9 +98,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         </div>
                         <hr>
                         <div class="form-service row">
-                            <div class="col-sm-offset-3 col-sm-9">
-                                <center><button class="btn btn-default btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button></center>
-                            </div>
+                            <center><button class="btn btn-default btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button></center>
                         </div>
                         <div class="clearfix"></div>
                     </form>
