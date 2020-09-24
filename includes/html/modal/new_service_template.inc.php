@@ -53,7 +53,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group row">
                             <label for='device_group_id' class='col-sm-3 control-label'>Device Group: </label>
                             <div class="col-sm-9">
-                                <select name='device_group_id' class='form-control input-sm'>
+                                <select id='device_group_id' name='device_group_id' class='form-control input-sm'>
                                     <?php echo $device_group_id?>
                                 </select>
                             </div>
