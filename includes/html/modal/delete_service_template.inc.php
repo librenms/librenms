@@ -14,8 +14,8 @@
 if (Auth::user()->hasGlobalAdmin()) {
     ?>
 
-    <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
+    <div class="modal fade bs-example-modal-sm" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -28,7 +28,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group row">
                             <label for='ip' class='col-sm-3 control-label'>Service Template ID: </label>
                             <div class="col-sm-9">
-                                <input type='text' id='service_template_id' name='service_template_id' class='form-control' placeholder=''/>
+                                <p><?php echo $service_template_id ?>.</p>
                             </div>
                             <div class='col-sm-9'>
                             </div>
