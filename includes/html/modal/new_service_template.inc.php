@@ -85,7 +85,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-service-template row">
-                            <div class="col-sm-12">
+                            <div class="col-sm-12 alert alert-info">
                                 <label class='control-label text-left input-sm'>Parameters may be required and will be different depending on the service check.</label>
                             </div>
                         </div>
