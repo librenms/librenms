@@ -51,8 +51,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-service-template row">
-                            <label for='device_group_id' class='col-sm-3 control-label'>Device Group: </label>
-                            <div class="col-sm-9">
+                            <label for='device_group_id' class='col-sm-2 control-label'>Device Group: </label>
+                            <div class="col-sm-5">
                                 <select name='device_group_id' class='form-control has-feedback'>
                                     $devicegroupsform
                                 </select>
@@ -101,12 +101,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <input type='checkbox' id='disabled' name='disabled'>
                             </div>
                         </div>
-                        <div class="form-service-template row">
-                            <div class="col-sm-offset-3 col-sm-9">
-                                <hr>
-                                <center><button class="btn btn-default btn-sm" type="submit" name="service-template-submit" id="service-template-submit" value="save">Save Service Template</button></center>
-                            </div>
-                        </div>
+                        <hr>
+                        <center><button class="btn btn-default btn-sm" type="submit" name="service-template-submit" id="service-template-submit" value="save">Save Service Template</button></center>
                         <div class="clearfix"></div>
                     </form>
                 </div>
