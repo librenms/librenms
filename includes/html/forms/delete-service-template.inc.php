@@ -17,7 +17,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     if (! is_numeric($vars['service_template_id'])) {
         $status = ['status' =>1, 'message' => 'No Service Template has been selected'];
     } else {
-        if (delete_service_template($vars['service_template_id'])) {
+        if (delete_service_template($vars['service_template_id'], $vars['service_delete'])) {
             $status = ['status' =>0, 'message' => 'Service Template: <i>' . $vars['service_template_id'] . ', has been deleted.</i>'];
         } else {
             $status = ['status' =>1, 'message' => 'Service Template: <i>' . $vars['service_template_id'] . ', has NOT been deleted.</i>'];

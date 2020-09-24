@@ -175,16 +175,21 @@ function edit_service_template($update = [], $service_template = null)
     return dbUpdate($update, 'services_template', '`service_template_id`=?', [$service_template]);
 }
 
-function delete_service_template($service_template = null)
+function delete_service_template($service_template = null, $service_delete = null)
 {
     if (! is_numeric($service_template)) {
         return false;
     }
-
+    if ($service_delete == true) {
+        foreach (dbFetchRows('SELECT * FROM `services` WHERE `service_template_id` = ?', [$service_template]) as $service) {
+            dbDelete('services', '`service_id` =  ?', [$service['service_id']]);
+        }
+    }
+    
     return dbDelete('services_template', '`service_template_id` =  ?', [$service_template]);
 }
 
-function discover_service_template($device_group, $service_template)
+function discover_service_template($device_group = null, $service_template = null)
 {
     $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?', [$device_group]);
     $service = service_template_get($service_template);
