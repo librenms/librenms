@@ -30,64 +30,73 @@ if (Auth::user()->hasGlobalAdmin()) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="Create">Services</h5>
+                <h2 class="modal-title" id="Create">Services</h2>
             </div>
-            <div class="modal-body">
-                <form method="post" role="form" id="service" class="form-horizontal service-form">
-                    <?php echo csrf_field() ?>
-                    <input type="hidden" name="service_id" id="service_id" value="">
-                    <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
-                    <input type="hidden" name="type" id="type" value="create-service">
-                    <div class="form-service">
-                        <div class="col-sm-12">
-                            <span id="ajax_response">&nbsp;</span>
+            <div class='alert alert-info'>Service Template will modified for the specified Device Group.</div>
+            <div class='well well-lg'>
+                <div class="modal-body">
+                    <form method="post" role="form" id="service" class="form-horizontal service-form">
+                        <?php echo csrf_field() ?>
+                        <input type="hidden" name="service_id" id="service_id" value="">
+                        <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
+                        <input type="hidden" name="type" id="type" value="create-service">
+                        <div class="form-service">
+                            <div class="col-sm-12">
+                                <span id="ajax_response">&nbsp;</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='stype' class='col-sm-3 control-label'>Type: </label>
-                        <div class="col-sm-9">
-                            <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
-                                <?php echo $stype?>
-                            </select>
+                        <div class="form-service row">
+                            <label for='stype' class='col-sm-3 control-label'>Type: </label>
+                            <div class="col-sm-9">
+                                <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
+                                    <?php echo $stype?>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class='form-service row'>
-                        <label for='desc' class='col-sm-3 control-label'>Description: </label>
-                        <div class='col-sm-9'>
-                            <textarea id='desc' name='desc' class='form-control'></textarea>
+                        <div class='form-service row'>
+                            <label for='desc' class='col-sm-3 control-label'>Description: </label>
+                            <div class='col-sm-9'>
+                                <textarea id='desc' name='desc' class='form-control'></textarea>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
-                        <div class="col-sm-9">
-                            <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
+                        <div class="form-service row">
+                            <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
+                            <div class="col-sm-9">
+                                <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='param' class='col-sm-3 control-label'>Parameters: </label>
-                        <div class="col-sm-9">
-                           <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                        <div class="form-service row">
+                            <label for='param' class='col-sm-3 control-label'>Parameters: </label>
+                            <div class="col-sm-9">
+                            <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
-                        <div class="col-sm-9">
-                            <input type='checkbox' id='ignore' name='ignore'>
+                        <div class="form-group row">
+                            <div class="col-sm-12 alert alert-info">
+                                <label class='control-label text-left input-sm'>Parameters may be required and will be different depending on the service check.</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
-                        <div class="col-sm-9">
-                            <input type='checkbox' id='disabled' name='disabled'>
+                        <div class="form-service row">
+                            <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
+                            <div class="col-sm-9">
+                                <input type='checkbox' id='ignore' name='ignore'>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-service row">
-                        <div class="col-sm-offset-3 col-sm-9">
-                            <button class="btn btn-success btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button>
+                        <div class="form-service row">
+                            <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
+                            <div class="col-sm-9">
+                                <input type='checkbox' id='disabled' name='disabled'>
+                            </div>
                         </div>
-                    </div>
-                    <div class="clearfix"></div>
-                </form>
+                        <hr>
+                        <div class="form-service row">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <center><button class="btn btn-default btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button></center>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
