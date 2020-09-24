@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Extensions\LockingFileStore;
 use App\Models\Sensor;
-use Cache;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
@@ -45,7 +43,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
         $this->app->booted('\LibreNMS\Config::load');
 
-        $this->extendFileCacheDriver();
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
@@ -158,18 +155,5 @@ class AppServiceProvider extends ServiceProvider
 
             return $validator->passes();
         }, __('validation.exists'));
-    }
-
-    protected function extendFileCacheDriver(): void
-    {
-        Cache::extend('file', function ($app) {
-            return Cache::repository(
-                new LockingFileStore(
-                    $app['files'],
-                    $app['config']->get('cache.stores.file.path'),
-                    $app['config']->get('cache.stores.file.permissions')
-                )
-            );
-        });
     }
 }
