@@ -36,8 +36,9 @@ if (Auth::user()->hasGlobalAdmin()) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="Create">Services Template</h5>
+                <h2 class="modal-title" id="Create">Edit Services Template</h2>
             </div>
+            <div class='alert alert-info'>Service Template will modified for the specified Device Group.</div>
             <div class="modal-body">
                 <form method="post" role="form" id="service-template" class="form-horizontal service-template-form">
                     <?php echo csrf_field() ?>
@@ -83,6 +84,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                         </div>
                     </div>
                     <div class="form-service-template row">
+                        <div class="col-sm-9">
+                            <label class='control-label text-left input-sm'>Parameters may be required and will be different depending on the service check.</label>
+                        </div>
+                    </div>
+                    <div class="form-service-template row">
                         <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
                         <div class="col-sm-9">
                             <input type='checkbox' id='ignore' name='ignore'>
@@ -96,7 +102,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     </div>
                     <div class="form-service-template row">
                         <div class="col-sm-offset-3 col-sm-9">
-                            <button class="btn btn-success btn-sm" type="submit" name="service-template-submit" id="service-template-submit" value="save">Save Service Template</button>
+                            <hr>
+                            <center><button class="btn btn-default btn-sm" type="submit" name="service-template-submit" id="service-template-submit" value="save">Save Service Template</button></center>
                         </div>
                     </div>
                     <div class="clearfix"></div>
