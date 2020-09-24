@@ -19,12 +19,20 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title" id="Delete">Confirm Delete</h2>
+                    <h2 class="modal-title" id="Delete">Delete Service Template</h2>
                 </div>
-                <div class='alert alert-info'>Service Template will be deleted for the specified Device Group.</div>
+                <div class='alert alert-info'>Service Template will be deleted.</div>
                 <div class='well well-lg'>
                     <div class="modal-body">
                         <p>Please confirm that you would like to delete this Service Template.</p>
+                        <div class="form-group row">
+                            <label for='ip' class='col-sm-3 control-label'>Service Template ID: </label>
+                            <div class="col-sm-9">
+                                <input type='text' id='service_template_id' name='service_template_id' class='form-control' placeholder=''/>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <div class="col-sm-12 alert alert-info">
                                 <label class='control-label text-left input-sm'>Please Tick this box to remove Services from Devices, that have been created with this Template.</label>
@@ -37,19 +45,18 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                     </div>
-                    <hr>
                     <div class="modal-footer">
                         <form role="form" class="remove_token_form">
                             <?php echo csrf_field() ?>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-danger danger" id="service-template-removal"
+                            <hr>
+                            <center><button type="submit" class="btn btn-danger danger" id="service-template-removal"
                                     data-target="service-template-removal">Delete
-                            </button>
+                            </button></center>
                             <input type="hidden" name="service_template_id" id="service_template_id" value="">
                             <input type="hidden" name="confirm" id="confirm" value="yes">
                         </form>
                     </div>
-                </div>    
+                </div>
             </div>
         </div>
     </div>
