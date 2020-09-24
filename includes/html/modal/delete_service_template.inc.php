@@ -23,7 +23,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 </div>
                 <div class="modal-body">
                     <p>Please confirm that you would like to delete this service template.</p>
-                    <div class="form-group" id="ack_section">
+                    <div class="form-group">
                         <label for="service_delete" class="col-sm-4 col-md-3 control-label" title="Delete ALL Services created by this Template">Delete ALL Services created by this Template:</label>
                         <div class="col-sm-8 col-md-9">
                             <input type='checkbox' name='service_delete' id='service_delete'>
@@ -54,6 +54,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         $('#service-template-removal').click('', function (e) {
             e.preventDefault();
             var service_template_id = $("#service_template_id").val();
+            var service_delete = $("#service_delete").val();
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
