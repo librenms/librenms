@@ -51,8 +51,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-service-template row">
-                            <label for='device_group_id' class='col-sm-3 control-label'>Device Group: </label>
-                            <div class="col-sm-5">
+                            <label for='device_group_id' class='col-sm-2 control-label'>Device Group: </label>
+                            <div class="col-sm-9">
                                 <select name='device_group_id' class='form-control has-feedback'>
                                     $devicegroupsform
                                 </select>
