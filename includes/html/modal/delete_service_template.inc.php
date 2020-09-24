@@ -26,9 +26,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <div class="modal-body">
                         <p>Please confirm that you would like to delete this Service Template.</p>
                         <div class="form-group row">
-                            <label for='ip' class='col-sm-3 control-label'>Service Template ID: </label>
+                            <label for='service_template_id' class='col-sm-3 control-label'>Service Template: </label>
                             <div class="col-sm-9">
-                                <p><?php echo $service_template_id ?>.</p>
+                                <select id='service_template_id' name='service_template_id' class='form-control input-sm'>
+                                    <?php echo $service_template_id?>
+                                </select>
                             </div>
                             <div class='col-sm-9'>
                             </div>
