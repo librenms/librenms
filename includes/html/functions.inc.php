@@ -542,11 +542,7 @@ function generate_sensor_link($args, $text = null, $type = null)
     $content .= '</div>';
 
     $url = generate_sensor_url($args);
-    if (port_permitted($args['interface_id'], $args['device_id'])) {
-        return overlib_link($url, $text, $content, null);
-    } else {
-        return fixifName($text);
-    }
+    return overlib_link($url, $text, $content, null);
 }//end generate_sensor_link()
 
 function generate_sensor_url($sensor, $vars = [])
