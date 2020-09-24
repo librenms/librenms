@@ -1,522 +1,1037 @@
 XUPS-MIB DEFINITIONS ::= BEGIN
 
--- Revised February 25, 1993
--- Revised June 21, 1993
--- Revised (Variable types of ) August 5, 1993
--- Revised August 16, 1993 - added units of measure
--- Added Event History to Alarm Group and get/set time/date.
--- Cleanup for final release.  9/3/93
-
--- Release Version 0.91 9/17/93
--- Release Version 1.00 11/16/93
-
--- Changes for Release Version 2.00  9/7/94
--- 1) Renamed UPS-MIB to XUPS-MIB and all names from upsVariable
---      to xupsVariable to avoid conflicts with RFC 1628 Standard UPS MIB names
--- 2) Renamed all traps from upsName to xupstName to avoid conflicts with
---      similar alarm names
--- 3) Added well known alarms and traps:
---      BreakerOpen, AlarmEntryAdded, AlarmEntryRemoved
--- 4) Deprecated xupsControlOutputOnTrapDelay
--- 5) Added xupsTrapControl group
--- 6) enumerated the value startTest for xupsTestBattery
--- 7) Defined oid values to use for sysObjectId
-
--- Changes for Release Version 2.10  11/1/94
--- 1) Corrected type of xupsAlarms, xupsAlarmNumEvents (Gauge)
--- 2) Defined three trap sources, which differ in their descriptions
---      of trap variables (none, Defined, defined plus Port N Interface vars)
--- 3) Clarified AlarmEvent order and numbering
-
--- Changes for Release Version 2.11  3/30/95
--- 1) Removed references to version 2.00 MIB files
--- 2) Added range declarations for appropriate objects
--- 3) Added Object IDs for new products
-
--- Changes for Release Version 2.20  8/29/96
--- 1) Corrected upper Integer range from 2147483648 to 2147483647
--- 2) Added xupsEnvironment group and its objects and alarm xupsAmbientTempBad
--- 3) Added xupsBatteryAbmStatus to monitor Advanced Battery Management status
--- 4) Added well-known alarms from RFC 1628 which weren't previously supported:
---    xupsAlarmBatteryBad, xupsOutputOffAsRequested, xupsDiagnosticTestFailed,
---    xupsCommunicationsLost, xupsUpsShutdownPending, xupsAlarmTestInProgress
--- 5) Added Defined and PortN (but not Basic) type traps for above alarms
--- 6) Added xupsControlToBypassDelay to allow Go To Bypass command.
-
--- Changes for Release Version 2.21  5/19/99
--- Renaming from Exide Electronics to Powerware Corporation
-
--- Changes for Release Version 3.00 3-Apr-02 Connectivity Systems Group,
--- Power Systems Division, Invensys
--- 1) Rolled in Receptacle Control extensions from separate file
--- 2) Added Topology group objects
--- 3) Added new var xupsOutputSource, which extends upsOutputSource
--- 4) Added new var xupsAlarmEventMsg to replace the other deprecated xAEEntry vars
-
--- Changes for Release Version 3.01 15-Aug-02 Connectivity Systems Group,
--- Powerware, Power Systems Division, Invensys
--- 1) Added new vars xupsConfigLow- and -HighOutputVoltageLimit.
-
--- Changes for Release Version 3.02 06-Oct-02 Connectivity Systems Group,
--- Powerware, Power Systems Division, Invensys
--- To support the ConnectUPS Web/SNMP card's ability to monitor an external contact,
--- the following traps were added:
--- 1) Added new trap xupstdContactAlarmActive in xupsTrapDefined
--- 2) Added new trap xupstdContactAlarmInactive in xupsTrapDefined
---
--- These are added to support the ConnectUPS Web/SNMP card's ability to monitor
--- a single contact closure (firmware and custom cable required)
-
--- Changes for Release Version 3.03 05-Feb-03 Connectivity Systems Group,
--- Powerware, Invensys Energy Systems
--- 1) To support the ability to monitor additional external contacts,
--- the var lists of the xupstdContactActiveNotice and
---      xupstdContactInactiveNotice traps were modified.
--- 2) Added new var xupsInputSource
--- 3) Added new vars xupsLoadShedSecsWithRestart and xupsRecepShedSecsWithRestart to
---      provide guaranteed correct load shedding behavior to the management software.
--- 4) Added vars to the Environmental group: xupsEnvAmbientHumidity,
---      xupsEnvRemoteTemp, and xupsEnvRemoteHumidity.
--- 5) Added xupsEnvNumContacts and the Environmental Contact Sensing Table,
---      xupsContactSenseTable.
--- 6) Updated Tech Support telephone numbers listed below.
-
--- Changes for Release Version 3.04 30-Apr-03 Connectivity Systems Group,
--- Powerware, Invensys Energy Systems
--- 1) Added new Well-Known Alarm and traps for xupsLossOfRedundancy,
---    xupsAlarmTempBad, xupsAlarmChargerFailed, xupsAlarmFanFailure,
---    xupsAlarmFuseFailure, xupsPowerSwitchBad, xupsModuleFailure,
---    xupsOnAlternatePowerSource, xupsAltPowerNotAvailable, xupsNoticeCondition
--- 2) Added new vars for Min/Max limits for Remote Temp & Humidity
--- 3) Added new W-K Alarms and traps for Min/Max limits for Remote Temp & Humidity
-
---
--- Customer Support: contact Tech Support at
---
--- Single-Phase Products: 800-356-5737 (US) or 608-565-2100
---
--- 3-Phase Products: 800-843-9433 (US) or 919-871-1800
---
-
 IMPORTS
-   enterprises, IpAddress, TimeTicks, Gauge, Counter
-FROM RFC1155-SMI
-   DisplayString, ifIndex, ifDescr
-FROM RFC1213-MIB
-   OBJECT-TYPE
-FROM RFC-1212
-   TRAP-TYPE
-FROM RFC-1215;
+    TimeTicks, Gauge32, Counter32, Integer32 
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP 
+        FROM SNMPv2-CONF
+    sysName
+        FROM RFC1213-MIB
+    eaton, xupsEnvironment
+        FROM EATON-OIDS
+    -- Need to import these EMP objects to support PowerMIB-style traps for EMP
+    xupsContactIndex, xupsContactType, xupsContactState, xupsContactDescr,
+    xupsEnvRemoteTemp, xupsEnvRemoteTempLowerLimit, xupsEnvRemoteTempUpperLimit,
+    xupsEnvRemoteHumidity, xupsEnvRemoteHumidityLowerLimit, 
+    xupsEnvRemoteHumidityUpperLimit
+        FROM EATON-EMP-MIB;
+
+xupsMIB MODULE-IDENTITY
+    LAST-UPDATED "201909270000Z"
+    ORGANIZATION "Eaton Corporation"
+    CONTACT-INFO
+        "Eaton Power Quality Technical Support (PQTS) group
+            www.eaton.com/powerxpert 
+            Technical Resource Center phone numbers 
+            United States:  1.800.843.9433 or 919.870.3028
+            Canada:  1.800.461.9166 ext. 260
+            All other countries:  Call your local service representative." 
+    DESCRIPTION
+            "Defines Eaton's proprietary PowerMIB for UPS and
+             related device data.
+
+            Copyright (C) Exide Electronics 1992-98
+            Copyright (C) Powerware Corporation 1999-2004
+            Copyright (C) Eaton Corporation (2005-)."
+
+    REVISION "201909270000Z"
+    DESCRIPTION 
+        "xupsOutputSource data can monitor the ESS mode."
+
+    REVISION "201909120000Z"
+    DESCRIPTION 
+        "Provide new data that reflects some battery alarm : xupsBatteryFailure,
+         xupsBatteryNotPresent, xupsBatteryAged, xupsBatteryLowCapacity."
+
+    REVISION "201909100000Z"
+    DESCRIPTION 
+        "Change the data xupsBatteryLastReplacedDate to read-only because the card
+         sets it automatically when the battery replacement is detected."
+
+    REVISION "201904120000Z"
+    DESCRIPTION 
+        "Provide the status of the main AC Input in xupsInputStatus.
+         Provide the status of the AC Output in xupsOutputStatus and a new trap
+         and alarm 'load not protected' in xupsOutputNotProtected." 
+
+    REVISION "201903050000Z"
+    DESCRIPTION 
+        "Provide more UPS identification data as xupsIdentPartNumber and xupsIdentSerialNumber.
+         Provide a collection xupsAgent that contains identification data of the card :
+         xupsAgentManufacturer, xupsAgentModel, xupsAgentSoftwareVersion, xupsAgentPartNumber,
+         xupsAgentSerialNumber"
+
+    REVISION "201902190000Z"
+    DESCRIPTION 
+        "To ensure consistency whith the measures done on the UPS, the data following are renamed :
+         xupsInputAverageCurrent to xupsInputTotalCurrent,
+         xupsOutputAverageCurrent to xupsOutputTotalCurrent,
+         xupsBypassAverageCurrent to xupsBypassTotalCurrent."
+
+    REVISION "201809120000Z"
+    DESCRIPTION 
+        "Add new data xupsInputId, xupsInputName, xupsInputCurrentHighPrecision in the table xupsInputTable.
+         Add new sub collection xupsInputTotal with xupsInputAverageVoltage, xupsInputAverageCurrent,
+         xupsInputTotalWatts, xupsInputTotalVA, xupsInputAveragePowerFactor inside.
+         Add new data xupsOutputId, xupsOutputName, xupsOutputCurrentHighPrecision,
+         xupsOutputPercentLoad, xupsOutputVA in the table xupsOutputTable.
+         Add new sub collection xupsOutputTotal with xupsOutputAverageVoltage, xupsOutputAverageCurrent,
+         xupsOutputTotalWatts, xupsOutputTotalVA, xupsOutputAveragePowerFactor inside.
+         Add new data xupsBypassId, xupsBypassName, xupsBypassCurrentHighPrecision,
+         xupsBypassWatts in the table xupsBypassTable.
+         Add new sub collection xupsBypassTotal with xupsBypassTotalAverageVoltage, xupsBypassAverageCurrent,
+         xupsBypassTotalWatts, xupsBypassTotalVA, xupsBypassTotalAverageFactor inside."
+
+    REVISION "201804230000Z"
+    DESCRIPTION 
+        "Add new data xupsTestTrap, xupstdTestTrap that will allow to initiate a 
+         test trap sent out from the agent to the trap receivers."
+
+    REVISION "201211261513Z"
+    DESCRIPTION 
+        "Add the identifier of measures xupsInputId, xupsOutputId and xupsBypassId,
+         respectively in the table xupsInputTable, xupsOutputTable and xupsBypassTable."
+
+    REVISION "201204030000Z"
+    DESCRIPTION 
+        "Add new data xupsOutputHourlyPowerUsage, xupsOutputCumulativePowerUsage,
+         and xupsOutputCumulativePowerUsageTimer into the collection xupsOutput.
+         Add new data xupsRecepHourlyPowerUsage, xupsRecepCumulativePowerUsage,
+         and xupsRecepCumulativePowerUsageTimer into the collection xupsRecepTable."
+
+    REVISION "201102250000Z"
+    DESCRIPTION 
+        "Add new data xupsSwitchable"
+
+    REVISION        "200810020000Z"
+    DESCRIPTION
+            "Added new values of batteryDisconnected(6), batteryUnderTest(7), 
+             and checkBattery(8)  to xupsBatteryAbmStatus."
+ 
+    REVISION        "200705030000Z"
+    DESCRIPTION
+            "Added new value of pxg(5) to xupsSendTrapType
+             for Power Xpert Gateway implementations."
+
+    REVISION        "200703130000Z"
+    DESCRIPTION
+            "Initial SNMPv2-SMI-compliant Version of PowerMIB.
+             Incorporates all revisions of the original xups
+             MIB file through Version 3.13 21-May-04."
+
+    ::= { eaton 1 }
+
+-- xupsMIB { iso org(3) dod(6) internet(1) private(4)
+--       enterprises(1) eaton(534) xupsMIB(1) }
 
 
--- Note that .534. was originally assigned to Exide Electronics
---      before it was renamed to Invensys Powerware.
+xupsIdent        OBJECT IDENTIFIER       ::= { xupsMIB 1 }
+xupsBattery      OBJECT IDENTIFIER       ::= { xupsMIB 2 }
+xupsInput        OBJECT IDENTIFIER       ::= { xupsMIB 3 }
+xupsOutput       OBJECT IDENTIFIER       ::= { xupsMIB 4 }
+xupsBypass       OBJECT IDENTIFIER       ::= { xupsMIB 5 }
+-- xupsEnvironment  OBJECT IDENTIFIER    ::= { xupsMIB 6 } - defined in EATON-OIDS
+xupsAlarm        OBJECT IDENTIFIER       ::= { xupsMIB 7 }
+xupsTest         OBJECT IDENTIFIER       ::= { xupsMIB 8 }
+xupsControl      OBJECT IDENTIFIER       ::= { xupsMIB 9 }
+xupsConfig       OBJECT IDENTIFIER       ::= { xupsMIB 10 }
+xupsTrapControl  OBJECT IDENTIFIER       ::= { xupsMIB 11 }
+xupsRecep        OBJECT IDENTIFIER       ::= { xupsMIB 12 }
+xupsTopology     OBJECT IDENTIFIER       ::= { xupsMIB 13 }
+xupsAgent        OBJECT IDENTIFIER       ::= { xupsMIB 14 }
 
-powerware       OBJECT IDENTIFIER       ::= {enterprises 534}
-xups            OBJECT IDENTIFIER       ::= {powerware 1}
-
-xupsIdent        OBJECT IDENTIFIER       ::= { xups 1 }
-xupsBattery      OBJECT IDENTIFIER       ::= { xups 2 }
-xupsInput        OBJECT IDENTIFIER       ::= { xups 3 }
-xupsOutput       OBJECT IDENTIFIER       ::= { xups 4 }
-xupsBypass       OBJECT IDENTIFIER       ::= { xups 5 }
-xupsEnvironment  OBJECT IDENTIFIER       ::= { xups 6 }
-xupsAlarm        OBJECT IDENTIFIER       ::= { xups 7 }
-xupsTest         OBJECT IDENTIFIER       ::= { xups 8 }
-xupsControl      OBJECT IDENTIFIER       ::= { xups 9 }
-xupsConfig       OBJECT IDENTIFIER       ::= { xups 10 }
-xupsTrapControl  OBJECT IDENTIFIER       ::= { xups 11 }
-xupsRecep        OBJECT IDENTIFIER       ::= { xups 12 }
-xupsTopology     OBJECT IDENTIFIER       ::= { xups 13 }
-
-
---
--- The following Object Identifiers are used to distinguish Powerware's
--- SNMP agents:
-xupsObjectId     OBJECT IDENTIFIER       ::= {powerware 2}
-
-powerwareEthernetSnmpAdapter     OBJECT IDENTIFIER   ::= {xupsObjectId 1}
-powerwareNetworkSnmpAdapterEther OBJECT IDENTIFIER   ::= {xupsObjectId 2}
-powerwareNetworkSnmpAdapterToken OBJECT IDENTIFIER   ::= {xupsObjectId 3}
-onlinetDaemon                    OBJECT IDENTIFIER   ::= {xupsObjectId 4}
-connectUPSAdapterEthernet        OBJECT IDENTIFIER   ::= {xupsObjectId 5}
-powerwareNetworkDigitalIOEther   OBJECT IDENTIFIER   ::= {xupsObjectId 6}
-connectUPSAdapterTokenRing       OBJECT IDENTIFIER   ::= {xupsObjectId 7}
-simpleSnmpAdapter                OBJECT IDENTIFIER   ::= {xupsObjectId 8}
-
+xupsInputTotal   OBJECT IDENTIFIER       ::= { xupsInput 8 }
+xupsOutputTotal   OBJECT IDENTIFIER       ::= { xupsOutput 9 }
+xupsBypassTotal   OBJECT IDENTIFIER       ::= { xupsBypass 4 }
 
 --
 -- xupsIdent group:
 --
 xupsIdentManufacturer OBJECT-TYPE
-   SYNTAX DisplayString (SIZE (0..31))
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The UPS Manufacturer Name (e.g. Powerware Corporation)."
-   ::= { xupsIdent 1}
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The UPS Manufacturer Name (e.g. Eaton Corporation)."
+    ::= { xupsIdent 1}
 
 xupsIdentModel OBJECT-TYPE
-   SYNTAX DisplayString (SIZE (0..63))
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The UPS Model (e.g. Powerware Plus Model 18)."
-   ::= {xupsIdent 2}
+    SYNTAX     DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The UPS Model (e.g. Powerware Plus Model 18)."
+    ::= {xupsIdent 2}
 
 xupsIdentSoftwareVersion OBJECT-TYPE
-   SYNTAX DisplayString (SIZE (0..63))
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The firmware revision level(s) of the UPS microcontroller(s)."
-   ::= {xupsIdent 3}
+    SYNTAX     DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The firmware revision level(s) of the UPS microcontroller(s)."
+    ::= {xupsIdent 3}
 
 xupsIdentOemCode OBJECT-TYPE
-   SYNTAX INTEGER (0..255)
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"A binary code indicating who the UPS was manufactured or labeled for.
-0 or 255 indicates Powerware itself."
-   ::= {xupsIdent 4}
+    SYNTAX     Integer32 (0..255)  
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A binary code indicating who the UPS was manufactured or labeled for.  
+         0 or 255 indicates Eaton itself."
+    ::= {xupsIdent 4}
 
+xupsIdentPartNumber  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The catalog part number of the UPS device."
+    ::= { xupsIdent 5 }
+
+xupsIdentSerialNumber  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The serial number of the UPS device."
+    ::= { xupsIdent 6 }
 
 
 --
 -- xupsBattery group:
 --
 xupsBatTimeRemaining OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS seconds
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"Battery run time in seconds before UPS turns off due
-to low battery."
-   ::= { xupsBattery 1}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Battery run time in seconds before UPS turns off due
+         to low battery."
+    ::= { xupsBattery 1}
 
 xupsBatVoltage OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS Volts DC
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"Battery voltage as reported by the UPS meters."
-   ::= {xupsBattery 2}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "Volts DC"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Battery voltage as reported by the UPS meters."
+    ::= {xupsBattery 2}
 
 xupsBatCurrent OBJECT-TYPE
-   SYNTAX INTEGER (-2147483648..2147483647)   -- UNITS Amp DC
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"Battery Current as reported by the UPS metering.
-Current is positive when discharging, negative
-when recharging the battery."
-   ::= {xupsBattery 3}
+    SYNTAX     Integer32 (-2147483648..2147483647)   
+    UNITS      "Amps DC"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Battery Current as reported by the UPS metering.
+         Current is positive when discharging, negative
+         when recharging the battery."
+    ::= {xupsBattery 3}
 
 xupsBatCapacity OBJECT-TYPE
-   SYNTAX INTEGER (0..100)    -- UNITS percent
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"Battery percent charge."
-   ::= { xupsBattery 4}
+    SYNTAX     Integer32 (0..100)
+    UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Battery percent charge."
+    ::= { xupsBattery 4}
 
 xupsBatteryAbmStatus OBJECT-TYPE
-   SYNTAX  INTEGER {
-   batteryCharging(1),
-   batteryDischarging(2),
-   batteryFloating(3),
-   batteryResting(4),
-   unknown(5)
-}
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-"Gives the status of the Advanced Battery Management;
-batteryFloating(3) status means that the charger is temporarily
-charging the battery to its float voltage; batteryResting(4) is the
-state when the battery is fully charged and none of the other actions
-(charging/discharging/floating) is being done."
-   ::= { xupsBattery 5}
+    SYNTAX  INTEGER {
+    batteryCharging(1),
+    batteryDischarging(2),
+    batteryFloating(3),
+    batteryResting(4),
+    unknown(5),
+    batteryDisconnected(6),
+    batteryUnderTest(7),
+    checkBattery(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Gives the status of the Advanced Battery Management and Battery state;
+     batteryFloating(3) status means that the charger is temporarily 
+     charging the battery to its float voltage; batteryResting(4) is the 
+     state when the battery is fully charged and none of the other actions 
+     (charging/discharging/floating) is being done.
+     checkBattery(8) indicates that the Battery state is uncertain
+     following a poor battery test result."
+    ::= { xupsBattery 5}
+
+xupsBatteryLastReplacedDate OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The date when the Batteries in this UPS were last replaced. Free text format,
+     so the preferred local date format may be used (MM/DD/YYYY, DD-Mon-YYYY, etc)."
+    ::= { xupsBattery 6}
+
+xupsBatteryFailure OBJECT-TYPE
+    SYNTAX INTEGER {
+        yes(1),
+        no(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Indicates if a battery fault detected or battery tests failed."
+    ::= { xupsBattery 7}
+
+xupsBatteryNotPresent OBJECT-TYPE
+    SYNTAX INTEGER {
+        yes(1),
+        no(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Indicates if the UPS has no battery either internal or external."
+    ::= { xupsBattery 8}
+
+xupsBatteryAged OBJECT-TYPE
+    SYNTAX INTEGER {
+        yes(1),
+        no(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Indicates if the battery is over aged."
+    ::= { xupsBattery 9}
+
+xupsBatteryLowCapacity OBJECT-TYPE
+    SYNTAX INTEGER {
+        yes(1),
+        no(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Indicates if the battery capacity is below the threshold set in the UPS."
+    ::= { xupsBattery 10}
+
 
 --
 -- xupsInput group:
 --
 xupsInputFrequency OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The utility line frequency in tenths of Hz."
-   ::= {xupsInput 1}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "0.1 Hertz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The utility line frequency in tenths of Hz."
+    ::= {xupsInput 1}
 
 xupsInputLineBads OBJECT-TYPE
-   SYNTAX Counter
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The number of times the Input was out of tolerance
-in voltage or frequency."
-   ::= {xupsInput 2}
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the Input was out of tolerance
+         in voltage or frequency."
+    ::= {xupsInput 2}
 
 xupsInputNumPhases OBJECT-TYPE
-   SYNTAX INTEGER (0..6)
-   ACCESS read-only
-   STATUS mandatory
-   ::= {xupsInput 3}
+    SYNTAX     Integer32 (0..6)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of input phases (normally 1 to 3)."
+    ::= {xupsInput 3}
 
 xupsInputTable OBJECT-TYPE
-   SYNTAX SEQUENCE OF XupsInputEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   DESCRIPTION "The Aggregate Object with number of entries equal to
-   NumPhases and including the xupsInput group."
-   ::= {xupsInput 4}
+    SYNTAX SEQUENCE OF XupsInputEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+       "A list of input table entries.  The number of entries
+        is given by the value of xupsInputNumPhases."
+    ::= {xupsInput 4}
 
 xupsInputEntry OBJECT-TYPE
-   SYNTAX XupsInputEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   DESCRIPTION "The input table entry containing the current,
-   voltage, etc."
-   INDEX { xupsInputPhase }
-   ::= { xupsInputTable 1 }
+    SYNTAX XupsInputEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "The input table entry containing the current,
+         voltage, etc. readings for one phase."
+    INDEX { xupsInputPhase }
+    ::= { xupsInputTable 1 }
 
 XupsInputEntry ::= SEQUENCE {
-   xupsInputPhase
-INTEGER,
-   xupsInputVoltage
-INTEGER,
-   xupsInputCurrent
-INTEGER,
-   xupsInputWatts
-INTEGER
-   }
+    xupsInputPhase   Integer32,
+    xupsInputVoltage Integer32,
+    xupsInputCurrent Integer32,
+    xupsInputWatts   Integer32,
+    xupsInputId      INTEGER,
+    xupsInputName    OCTET STRING,
+    xupsInputCurrentHighPrecision Integer32
+    }
 
 xupsInputPhase OBJECT-TYPE
-   SYNTAX INTEGER  (0..6)
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The number of the phase.  Serves as index for input table."
-   ::= {xupsInputEntry 1}
+    SYNTAX     Integer32  (0..6)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of the phase.  Serves as index for input table."
+    ::= {xupsInputEntry 1}
 
 xupsInputVoltage OBJECT-TYPE
-   SYNTAX INTEGER  (0..2147483647)  -- UNITS RMS Volts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The measured input voltage from the UPS meters in volts."
-   ::= {xupsInputEntry 2}
+    SYNTAX     Integer32  (0..2147483647)  
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured input voltage from the UPS meters in volts."
+    ::= {xupsInputEntry 2}
 
 xupsInputCurrent OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Amp
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The measured input current from the UPS meters in amps."
-   ::= {xupsInputEntry 3}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured input current from the UPS meters in amps."
+    ::= {xupsInputEntry 3}
 
 xupsInputWatts OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS Watts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The measured input real power in watts."
-   ::= {xupsInputEntry 4}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured input real power in watts."
+    ::= {xupsInputEntry 4}
+
+xupsInputId  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		phase1toN (1),
+		phase2toN (2),
+		phase3toN (3),
+		phase1to2 (4),
+		phase2to3 (5),
+		phase3to1 (6)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"value indicates what measurement is being stored in this table row :
+		phase1 to neutral, phase2 to neutral, phase3 to neutral,
+		phase1 to phase2, phase2 to phase3, phase3 to phase1."
+	::= { xupsInputEntry 5 }
+
+xupsInputName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the phase, example : L1/A for the phase 1."
+	::= { xupsInputEntry 6 }
+
+xupsInputCurrentHighPrecision OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS tenth of Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured input current from the UPS meters in tenth of amps."
+    ::= {xupsInputEntry 7}
 
 xupsInputSource OBJECT-TYPE
-   SYNTAX  INTEGER {
-   other(1),
-   none(2),                 -- For example, Utility failure
-   primaryUtility(3), -- Normal utility feed to the UPS
-   bypassFeed(4),           -- Bypass utility, separate from primaryUtility
-   secondaryUtility(5),     -- Secondary utility feed (on a dual AC input UPS)
-   generator(6), -- Power provided by a generator
-   flywheel(7), -- Power provided by a flywheel (not necessarily AC)
-   fuelcell(8) -- Power provided by fuel cell(s) (not necessarily AC)
-   }
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-  "The present external source of input power.  The enumeration
-      none(2) indicates that there is no external source of
-      power, for example, the UPS is On Battery (an internal source).
-      The bypassFeed(4) can only be used when the Bypass source is known
-      to be a separate utility feed than the primaryUtility(3)."
-   ::= { xupsInput 5 }
+    SYNTAX     INTEGER {
+        other(1),
+        none(2),                
+        primaryUtility(3),      
+        bypassFeed(4),          
+        secondaryUtility(5),    
+        generator(6),           
+        flywheel(7),            
+        fuelcell(8)             
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The present external source of input power.  The enumeration
+        'none(2)' indicates that there is no external source of 
+        power, for example, the UPS is On Battery (an internal source).
+		'primaryUtility' indicates the normal case of utility input power.
+        The 'bypassFeed' can only be used when the Bypass source is known
+        to be a separate utility feed than the primaryUtility(3).
+		'secondaryUtility' indicates that a secondary utility feed is supplying
+		power (on a dual AC input UPS).
+        'generator' indicates that input power is provided by a generator.
+		Note that the alternate energy sources of 'flywheel' and 'fuelcell' are 
+		not necessarily AC input sources."
+    ::= { xupsInput 5 }
 
+-- xupsDualInputStatus and xupsSecondaryInputWatch would only be present
+-- for UPSs with a secondary input source.
 
+xupsDualInputStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+        bothSourcesBad(1),      
+        primarySourceGood(2),   
+        secondarySourceGood(3), 
+        bothSourcesGood(4)      
+        }
+    MAX-ACCESS  read-only
+    STATUS      current           
+    DESCRIPTION
+       "The present status of the sources of input power in a dual source UPS.  
+        The enumeration primarySourceGood(2) indicates that the primary source
+        of power is present and within 'normal' ranges for voltage and
+        frequency, but the secondary source is either not present or not in an
+        acceptable range.
+		'secondarySourceGood' indicates that only the Secondary power feed is 
+		available and within its limits.
+        The enumeration bothSourcesGood(4) indicates that both sources are present
+        and within their respective 'normal' ranges; 
+        bothSourcesBad(1) indicates that neither source is present, or, if present, 
+        is not within acceptable ranges.
+        This object will only be implemented for UPSs with two sources of input
+        power, e.g., redundant AC feeds or a separate Bypass or Generator source.
+        The secondary source will not be an AC power source in all cases."
+    ::= { xupsInput 6 }
+
+xupsSecondaryInputWatch OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled(1),            
+        enabled(2)     
+        }
+    MAX-ACCESS  read-write
+    STATUS      current           
+    DESCRIPTION
+       "This object enables(2) or disables(1) the alarms and traps related to the
+        availability and use of the secondary input of a dual-input UPS
+        (i.e., OnAlternatePowerSource and AltPowerNotAvailable).
+        To avoid nuisance alarms and traps, this object should be set to  
+        disabled(1) when the UPS is not wired to a secondary source of power.
+        This object will only be implemented for UPSs with two sources of input
+        power, i.e., redundant AC feeds or a separate Bypass or Generator source."
+    ::= { xupsInput 7 }
+
+--
+-- xupsInputTotal group:
+--
+xupsInputAverageVoltage OBJECT-TYPE
+    SYNTAX     Integer32  (0..2147483647)  
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured input voltage from the UPS meters in volts.
+         Related to the phase 1 if the UPS is single phase,
+         either it is average of all the simple phase voltage."
+    ::= {xupsInputTotal 1}
+
+xupsInputTotalCurrent OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS tenth of Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured input current from the UPS meters in tenth of amps.
+         Related to the phase 1 if the UPS is single phase,
+         either it is average of all the simple phase current."
+    ::= {xupsInputTotal 2}
+
+xupsInputTotalWatts OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured input active power in watts.
+         Sum of all the simple phase watts."
+    ::= {xupsInputTotal 3}
+
+xupsInputTotalVA OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "VA"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured input apparent power in VA.
+         Sum of all the simple phase VA."
+    ::= {xupsInputTotal 4}
+
+xupsInputAveragePowerFactor  OBJECT-TYPE
+    SYNTAX     Integer32  
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+      "Indicates the total power factor of the input in hundredths.
+       0.92 would be returned as 92."
+    ::= { xupsInputTotal 5 }
+
+xupsInputStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+        inputBad(1),
+        inputGood(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The present status of the primary AC input of the UPS.
+        The enumeration inputGood(2) indicates that the primary source
+        of power is present and within 'normal' ranges for voltage and
+        frequency.
+        inputBad(1) indicates that neither source is present, or, if present,
+        is not within acceptable ranges."
+    ::= { xupsInput 9 }
 
 --
 -- xupsOutput group:
 --
 xupsOutputLoad OBJECT-TYPE
-   SYNTAX INTEGER (0..200)
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The UPS output load in percent of rated capacity."
-   ::= {xupsOutput 1}
+    SYNTAX     Integer32 (0..200)
+    UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The UPS output load in percent of rated capacity."
+    ::= {xupsOutput 1}
 
 xupsOutputFrequency OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The measured UPS output frequency in tenths of Hz."
-   ::= {xupsOutput 2}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "0.1 Hertz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured UPS output frequency in tenths of Hz."
+    ::= {xupsOutput 2}
 
 xupsOutputNumPhases OBJECT-TYPE
-   SYNTAX INTEGER  (0..6)
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The number of metered output phases, serves as the table
-index."
-   ::= {xupsOutput 3}
+    SYNTAX     Integer32  (0..6)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of metered output phases."
+    ::= {xupsOutput 3}
 
 xupsOutputTable OBJECT-TYPE
-   SYNTAX SEQUENCE OF XupsOutputEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   DESCRIPTION
-"The Aggregate Object with number of entries equal to NumPhases
-and including the xupsOutput group."
-   ::= {xupsOutput 4}
+    SYNTAX SEQUENCE OF XupsOutputEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of output table entries.  The number of entries
+        is given by the value of xupsOutputNumPhases."
+    ::= {xupsOutput 4}
 
 xupsOutputEntry OBJECT-TYPE
-   SYNTAX XupsOutputEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   DESCRIPTION
-"Output Table Entry containing voltage, current, etc."
-   INDEX { xupsOutputPhase }
-
-   ::= {xupsOutputTable 1}
+    SYNTAX XupsOutputEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Output Table Entry containing voltage, current, etc."
+    INDEX { xupsOutputPhase }
+    ::= {xupsOutputTable 1}
 
 XupsOutputEntry ::= SEQUENCE {
-   xupsOutputPhase
-   INTEGER,
-   xupsOutputVoltage
-   INTEGER,
-   xupsOutputCurrent
-   INTEGER,
-   xupsOutputWatts
-   INTEGER
-   }
+        xupsOutputPhase    Integer32,
+        xupsOutputVoltage  Integer32,
+        xupsOutputCurrent  Integer32,
+        xupsOutputWatts    Integer32,
+   	    xupsOutputId       INTEGER,
+   	    xupsOutputName     OCTET STRING,
+        xupsOutputCurrentHighPrecision Integer32,
+        xupsOutputPercentLoad Integer32,
+        xupsOutputVA Integer32
+        }
 
 xupsOutputPhase OBJECT-TYPE
-   SYNTAX INTEGER (0..6)
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The number {1..3} of the output phase."
-   ::= {xupsOutputEntry 1}
+    SYNTAX     Integer32 (0..6)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of the phase.  Serves as index for output table."
+    ::= {xupsOutputEntry 1}
 
 xupsOutputVoltage OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The measured output voltage from the UPS metering in volts."
-   ::= {xupsOutputEntry 2}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured output voltage from the UPS metering in volts."
+    ::= {xupsOutputEntry 2}
 
 xupsOutputCurrent OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Amp
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The measured UPS output current in amps."
-   ::= {xupsOutputEntry 3}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "RMS Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured UPS output current in amps."
+    ::= {xupsOutputEntry 3}
 
 xupsOutputWatts OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS Watts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The measured real output power in watts."
-   ::= {xupsOutputEntry 4}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured real output power in watts."
+    ::= {xupsOutputEntry 4}
+
+xupsOutputId  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		phase1toN (1),
+		phase2toN (2),
+		phase3toN (3),
+		phase1to2 (4),
+		phase2to3 (5),
+		phase3to1 (6)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"value indicates what measurement is being stored in this table row :
+		phase1 to neutral, phase2 to neutral, phase3 to neutral,
+		phase1 to phase2, phase2 to phase3, phase3 to phase1. "
+	::= { xupsOutputEntry 5 }
+
+xupsOutputName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the phase."
+	::= { xupsOutputEntry 6 }
+
+xupsOutputCurrentHighPrecision OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS tenth of Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured output current from the UPS meters in tenth of amps."
+    ::= {xupsOutputEntry 7}
+
+xupsOutputPercentLoad OBJECT-TYPE
+    SYNTAX     Integer32  (0..200)
+    UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The percentage of the UPS power capacity presently
+         being used on this output line"
+    ::= { xupsOutputEntry 8 }
+
+xupsOutputVA OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "VA"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured apparent output power in VA."
+    ::= {xupsOutputEntry 9}
 
 xupsOutputSource OBJECT-TYPE
-   SYNTAX  INTEGER {
-   other(1),
-   none(2),
-   normal(3), -- normal, single UPS module output
-   bypass(4),
-   battery(5),
-   booster(6), -- Single or Double Boost, line-interactive UPSs only
-   reducer(7), -- Buck, line-interactive UPSs only
-   parallelCapacity(8), -- normal enhanced by Parallel for Capacity operation
-   parallelRedundant(9), -- normal enhanced by Redundant Parallel operation
-   highEfficiencyMode(10) -- normal enhanced by High Efficiency mode
-   }
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-  "The present source of output power.  The enumeration
-      none(2) indicates that there is no source of output
-      power (and therefore no output power), for example,
-      the system has opened the output breaker."
-   ::= { xupsOutput  5 }
+    SYNTAX  INTEGER {
+        other(1),
+        none(2),
+        normal(3),              
+        bypass(4),
+        battery(5),
+        booster(6),             
+        reducer(7),             
+        parallelCapacity(8),    
+        parallelRedundant(9),   
+        highEfficiencyMode(10), 
+        maintenanceBypass(11),   
+        essMode(12)   
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The present source of output power.  The enumeration
+        none(2) indicates that there is no source of output
+        power (and therefore no output power), for example,
+        the system has opened the output breaker.
+		'normal', 'bypass', and 'battery' indicate those common UPS statuses.
+		'booster' and 'reducer' indicate boost or buck operation, for 
+		line-interactive UPSs only.
+		'parallelCapacity' and 'parallelRedundant' indicate a normal parallel
+		UPS system, in either Parallel for Capacity or Redundancy configuration.
+		'highEfficiencyMode' is normal but enhanced by High Efficiency mode.
+		'maintenanceBypass' indicates that the UPS is in Maintenance/Manual 
+		Bypass mode.
+		'essMode' is normal but enhanced by Energy Saver System.
+		'other' covers any other, unusual conditions."
+    ::= { xupsOutput  5 }
+
+xupsOutputHourlyPowerUsage  OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "Wh"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Units are Watt-hours.This is the energy consumed during the last hour."
+	::= { xupsOutput 6 }
+
+xupsOutputCumulativePowerUsage  OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "Wh"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Units are Watt-hours.This is the energy consumed since the last reset.
+         This object is writable so that it can be reset to 0.
+         When it is written to 0, the xupsOutputCumulativeWhTimer will be reset to 0 as well."
+	::= { xupsOutput 7 }
+
+xupsOutputCumulativePowerUsageTimer  OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Time in seconds since the cumulative power usage was last reset."
+	::= { xupsOutput 8 }
+
+--
+-- xupsOutputTotal group:
+--
+xupsOutputAverageVoltage OBJECT-TYPE
+    SYNTAX     Integer32  (0..2147483647)  
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured output voltage from the UPS meters in volts.
+         Related to the phase 1 if the UPS is single phase,
+         either it is average of all the simple phase voltage."
+    ::= {xupsOutputTotal 1}
+
+xupsOutputTotalCurrent OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS tenth of Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured output current from the UPS meters in tenth of amps.
+         Related to the phase 1 if the UPS is single phase,
+         either it is average of all the simple phase current."
+    ::= {xupsOutputTotal 2}
+
+xupsOutputTotalWatts OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured output active power in watts.
+         Sum of all the simple phase watts."
+    ::= {xupsOutputTotal 3}
+
+xupsOutputTotalVA OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "VA"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured output apparent power in VA.
+         Sum of all the simple phase VA."
+    ::= {xupsOutputTotal 4}
+
+xupsOutputAveragePowerFactor  OBJECT-TYPE
+    SYNTAX     Integer32  
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+      "Indicates the total power factor of the output in hundredths.
+       0.92 would be returned as 92."
+    ::= { xupsOutputTotal 5 }
+
+xupsOutputStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+        outputNotPowered(1),   
+        outputNotProtected(2),   
+        outputProtected(3)   
+        }
+    MAX-ACCESS  read-only
+    STATUS      current           
+    DESCRIPTION
+       "The present status of the AC output of the UPS.  
+        The enumeration outputNotPowered(1) indicates that the output is not powered.
+        outputNotProtected(2) indicates that the output is powered but not protected,
+        due to following reasons : On bypass, battery fault, or UPS internal failure
+        that makes the ups will be inoperant in case of AC input failure.
+        outputProtected(3) indicates that the output is powered and protected."
+    ::= { xupsOutput 10 }
 
 
 --
 -- xupsBypass group:
 --
 xupsBypassFrequency OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The bypass frequency in tenths of Hz."
-   ::= {xupsBypass 1}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "0.1 Hertz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The bypass frequency in tenths of Hz."
+    ::= {xupsBypass 1}
 
 xupsBypassNumPhases OBJECT-TYPE
-   SYNTAX INTEGER (0..6)
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The number of lines in the UPS bypass table."
-   ::= {xupsBypass 2}
+    SYNTAX     Integer32 (0..6)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of lines in the UPS bypass table."
+    ::= {xupsBypass 2}
 
 xupsBypassTable OBJECT-TYPE
-   SYNTAX SEQUENCE OF XupsBypassEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   ::= {xupsBypass 3}
+    SYNTAX SEQUENCE OF XupsBypassEntry
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+       "A list of bypass table entries.  The number of entries
+        is given by the value of xupsBypassNumPhases."
+    ::= {xupsBypass 3}
 
 xupsBypassEntry OBJECT-TYPE
-   SYNTAX XupsBypassEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   DESCRIPTION
-"Entry in the XUPS bypass table."
-   INDEX { xupsBypassPhase }
-   ::= {xupsBypassTable 1}
+    SYNTAX XupsBypassEntry
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "Bypass Table Entry containing voltage for each phase."
+    INDEX { xupsBypassPhase }
+    ::= {xupsBypassTable 1}
 
 XupsBypassEntry ::= SEQUENCE {
-   xupsBypassPhase
-   INTEGER,
-   xupsBypassVoltage
-   INTEGER
-   }
+        xupsBypassPhase    Integer32,
+        xupsBypassVoltage  Integer32,
+      	xupsBypassId       INTEGER,
+      	xupsBypassName     OCTET STRING,
+        xupsBypassCurrentHighPrecision Integer32,
+        xupsBypassWatts Integer32
+        }
 
 xupsBypassPhase OBJECT-TYPE
-   SYNTAX INTEGER (0..6)
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The Bypass Phase, index for the table."
-   ::= {xupsBypassEntry 1}
+    SYNTAX     Integer32 (0..6)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Bypass Phase, index for the table."
+    ::= {xupsBypassEntry 1}
 
 xupsBypassVoltage OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The measured UPS bypass voltage in volts."
-   ::= {xupsBypassEntry 2}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured UPS bypass voltage in volts."
+    ::= {xupsBypassEntry 2}
+
+xupsBypassId  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		phase1toN (1),
+		phase2toN (2),
+		phase3toN (3),
+		phase1to2 (4),
+		phase2to3 (5),
+		phase3to1 (6)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"value indicates what measurement is being stored in this table row :
+		phase1 to neutral, phase2 to neutral, phase3 to neutral,
+		phase1 to phase2, phase2 to phase3, phase3 to phase1. "
+	::= { xupsBypassEntry 3 }
+
+xupsBypassName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the phase."
+	::= { xupsBypassEntry 4 }
+
+xupsBypassCurrentHighPrecision OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS tenth of Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured bypass current from the UPS meters in tenth of amps."
+    ::= {xupsBypassEntry 5}
+
+xupsBypassWatts OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured real bypass power in watts."
+    ::= {xupsBypassEntry 6}
+
+--
+-- xupsBypassTotal group:
+--
+xupsBypassAverageVoltage OBJECT-TYPE
+    SYNTAX     Integer32  (0..2147483647)  
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured bypass voltage from the UPS meters in volts.
+         Related to the phase 1 if the UPS is single phase,
+         either it is average of all the simple phase voltage."
+    ::= {xupsBypassTotal 1}
+
+xupsBypassTotalCurrent OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS tenth of Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured bypass current from the UPS meters in tenth of amps.
+         Related to the phase 1 if the UPS is single phase,
+         either it is average of all the simple phase current."
+    ::= {xupsBypassTotal 2}
+
+xupsBypassTotalWatts OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured bypass active power in watts.
+         Sum of all the simple phase watts."
+    ::= {xupsBypassTotal 3}
+
+xupsBypassTotalVA OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "VA"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The measured output apparent power in VA.
+         Sum of all the simple phase VA."
+    ::= {xupsBypassTotal 4}
+
+xupsBypassAveragePowerFactor  OBJECT-TYPE
+    SYNTAX     Integer32  
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+      "Indicates the total power factor of the input in hundredths.
+       0.92 would be returned as 92."
+    ::= { xupsBypassTotal 5 }
 
 
 --
@@ -524,202 +1039,52 @@ xupsBypassVoltage OBJECT-TYPE
 --
 
 xupsEnvAmbientTemp OBJECT-TYPE
-   SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-      "The reading of the ambient temperature in the vicinity of the
-       UPS or SNMP agent."
-   ::= { xupsEnvironment  1 }
+    SYNTAX  Integer32 (-100..200)   
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The reading of the ambient temperature in the vicinity of the 
+        UPS or SNMP agent."
+    ::= { xupsEnvironment  1 }
 
 xupsEnvAmbientLowerLimit OBJECT-TYPE
-   SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
-   ACCESS  read-write
-   STATUS  mandatory
-   DESCRIPTION
-      "The Lower Limit of the ambient temperature; if xupsEnvAmbientTemp
-falls below this value, the xupsAmbientTempBad alarm will occur."
-   ::= { xupsEnvironment  2 }
+    SYNTAX  Integer32 (-100..200)
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Lower Limit of the ambient temperature; if xupsEnvAmbientTemp 
+        falls below this value, the xupsAmbientTempBad alarm will occur."
+    ::= { xupsEnvironment  2 }
 
 xupsEnvAmbientUpperLimit OBJECT-TYPE
-   SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
-   ACCESS  read-write
-   STATUS  mandatory
-   DESCRIPTION
-      "The Upper Limit of the ambient temperature; if xupsEnvAmbientTemp
-rises above this value, the xupsAmbientTempBad alarm will occur.
-This value should be greater than xupsEnvAmbientLowerLimit."
-   ::= { xupsEnvironment  3 }
+    SYNTAX  Integer32 (-100..200)  
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Upper Limit of the ambient temperature; if xupsEnvAmbientTemp 
+        rises above this value, the xupsAmbientTempBad alarm will occur.
+        This value should be greater than xupsEnvAmbientLowerLimit."
+    ::= { xupsEnvironment  3 }
 
 xupsEnvAmbientHumidity OBJECT-TYPE
-   SYNTAX  INTEGER (0..100)   -- UNITS %
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-      "The reading of the ambient humidity in the vicinity of the
-       UPS or SNMP agent."
-   ::= { xupsEnvironment  4 }
+    SYNTAX  Integer32 (0..100)   
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The reading of the ambient humidity in the vicinity of the 
+        UPS or SNMP agent."
+    ::= { xupsEnvironment  4 }
 
-xupsEnvRemoteTemp OBJECT-TYPE
-   SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-      "The reading of a remote temperature sensor connected to the
-       UPS or SNMP agent."
-   ::= { xupsEnvironment  5 }
-
-xupsEnvRemoteHumidity OBJECT-TYPE
-   SYNTAX  INTEGER (0..100)   -- UNITS %
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-      "The reading of a remote humidity sensor connected to the
-       UPS or SNMP agent."
-   ::= { xupsEnvironment  6 }
-
+-- 
+-- Moved the EMP-based objects, 
+-- from xupsEnvRemoteTemp to xupsEnvRemoteHumidityUpperLimit
+-- ( { xupsEnvironment  5 to 12 }, including xupsContactSenseTable,
+-- to separate file Eaton-EMP-MIB.txt
 --
--- The Environmental Contact Sensing Table
---      Contains the table for monitoring all contacts (digital
---      inputs).
---
-
-xupsEnvNumContacts OBJECT-TYPE
-   SYNTAX  INTEGER (1..1024)
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-  "The number of Contacts in the xupsContactSenseTable.
-This object indicates the number of rows in the
-xupsContactSenseTable."
-   ::= { xupsEnvironment  7 }
-
-xupsContactSenseTable OBJECT-TYPE
-   SYNTAX  SEQUENCE OF XupsContactsTableEntry
-   ACCESS  not-accessible
-   STATUS  mandatory
-   DESCRIPTION
-  "A list of Contact Sensing table entries.
-The number of entries is given by the value of
-xupsEnvNumContacts."
-   ::= { xupsEnvironment  8 }
-
-xupsContactsTableEntry OBJECT-TYPE
-   SYNTAX  XupsContactsTableEntry
-   ACCESS  not-accessible
-   STATUS  mandatory
-   DESCRIPTION
-  "An entry containing information applicable
-to a particular Contact input."
-   INDEX   { xupsContactIndex }
-   ::= { xupsContactSenseTable  1 }
-
-XupsContactsTableEntry ::=
-   SEQUENCE {
-xupsContactIndex
-   INTEGER,
-
-xupsContactType
-   INTEGER,
-
-xupsContactState
-   INTEGER,
-
-xupsContactDescr
-   DisplayString
-   }
-
-xupsContactIndex OBJECT-TYPE
-   SYNTAX  INTEGER (1..1024)
-   ACCESS  not-accessible
-   STATUS  mandatory
-   DESCRIPTION
-  "The Contact identifier; identical to the Contact Number."
-   ::= { xupsContactsTableEntry  1 }
-
-xupsContactType OBJECT-TYPE
-   SYNTAX  INTEGER {
-   normallyOpen(1),            -- or Input Normally High
-   normallyClosed(2),          -- or Input Normally Low
-   anyChange(3),               -- No normal Open/Closed state
-   notUsed(4)                  -- Contact not in service
-   }
-   ACCESS  read-write
-   STATUS  mandatory
-   DESCRIPTION
-  "The normal state for this contact.  The 'other'
-   state is the Active state for generating the xupstdContactActiveNotice
-   trap.  If anyChange(3) is selected, then this trap is sent
-       any time the contact changes to either Open or Closed.
-       No traps are sent if the Contact is set to notUsed(4).
-       In many cases, the configuration for Contacts may be done by other
-       means, so this object may be read-only."
-   ::= { xupsContactsTableEntry  2 }
-
-xupsContactState OBJECT-TYPE
-   SYNTAX  INTEGER {
-   open(1),
-   closed(2),
-   openWithNotice(3),
-   closedWithNotice(4)
-   }
-   ACCESS  read-only
-   STATUS  mandatory
-   DESCRIPTION
-  "The current state of the Contact input;
-the value is based on the open/closed input state
-and the setting for xupsContactType.
-When entering the openWithNotice(3) and closedWithNotice(4)
-       states, no entries added to the xupsAlarmTable, but
-       the xupstdContactActiveNotice trap is sent."
-   ::= { xupsContactsTableEntry  3 }
-
-xupsContactDescr OBJECT-TYPE
-   SYNTAX  DisplayString (SIZE (0..63))
-   ACCESS  read-write
-   STATUS  mandatory
-   DESCRIPTION
-  "A label identifying the Contact.  This object should be
-   set by the administrator."
-   ::= { xupsContactsTableEntry  4 }
-
-xupsEnvRemoteTempLowerLimit OBJECT-TYPE
-   SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
-   ACCESS  read-write
-   STATUS  mandatory
-   DESCRIPTION
-      "The Lower Limit of the remote temperature; if xupsEnvRemoteTemp
-falls below this value, the xupsRemoteTempBad alarm will occur."
-   ::= { xupsEnvironment  9 }
-
-xupsEnvRemoteTempUpperLimit OBJECT-TYPE
-   SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
-   ACCESS  read-write
-   STATUS  mandatory
-   DESCRIPTION
-      "The Upper Limit of the remote temperature; if xupsEnvRemoteTemp
-rises above this value, the xupsRemoteTempBad alarm will occur.
-This value should be greater than xupsEnvRemoteTempLowerLimit."
-   ::= { xupsEnvironment  10 }
-
-xupsEnvRemoteHumidityLowerLimit OBJECT-TYPE
-   SYNTAX  INTEGER (0..100)   -- UNITS %
-   ACCESS  read-write
-   STATUS  mandatory
-   DESCRIPTION
-      "The Lower Limit of the remote humidity reading; if xupsEnvRemoteHumidity
-falls below this value, the xupsRemoteHumidityBad alarm will occur."
-   ::= { xupsEnvironment  11 }
-
-xupsEnvRemoteHumidityUpperLimit OBJECT-TYPE
-   SYNTAX  INTEGER (0..100)   -- UNITS %
-   ACCESS  read-write
-   STATUS  mandatory
-   DESCRIPTION
-      "The Upper Limit of the remote humidity reading; if xupsEnvRemoteHumidity
-rises above this value, the xupsRemoteHumidityBad alarm will occur.
-This value should be greater than xupsEnvRemoteHumidityLowerLimit."
-   ::= { xupsEnvironment  12 }
 
 
 
@@ -727,61 +1092,66 @@ This value should be greater than xupsEnvRemoteHumidityLowerLimit."
 -- xupsAlarm group:
 --
 xupsAlarms OBJECT-TYPE
-   SYNTAX Gauge
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The current number of alarm conditions."
-   ::= {xupsAlarm 1}
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current number of alarm conditions."
+    ::= {xupsAlarm 1}
 
 xupsAlarmTable OBJECT-TYPE
-   SYNTAX SEQUENCE OF XupsAlarmEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   ::= {xupsAlarm 2}
+    SYNTAX SEQUENCE OF XupsAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of alarm table entries.  The number of entries
+        is given by the value of xupsAlarms.
+        Note that this table is sparsely (non-consecutively)
+        numbered and will be empty if there are no active alarms."
+    ::= {xupsAlarm 2}
 
 xupsAlarmEntry OBJECT-TYPE
-   SYNTAX XupsAlarmEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   INDEX { xupsAlarmID }
-   ::= {xupsAlarmTable 1}
+    SYNTAX XupsAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Alarm Table Entry containing descriptive information 
+         for one alarm entry."
+    INDEX { xupsAlarmID }
+    ::= {xupsAlarmTable 1}
 
 XupsAlarmEntry ::= SEQUENCE {
-   xupsAlarmID
-INTEGER,
-   xupsAlarmDescr
-OBJECT IDENTIFIER,
-   xupsAlarmTime
-TimeTicks
-   }
+        xupsAlarmID     Integer32,
+        xupsAlarmDescr  OBJECT IDENTIFIER,
+        xupsAlarmTime   TimeTicks
+        }
 
 xupsAlarmID OBJECT-TYPE
-   SYNTAX INTEGER  (1..2147483647)
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"A unique identifier for an alarm condition."
-   ::= {xupsAlarmEntry 1}
+    SYNTAX     Integer32  (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique identifier for an alarm condition."
+    ::= {xupsAlarmEntry 1}
 
 xupsAlarmDescr OBJECT-TYPE
-   SYNTAX OBJECT IDENTIFIER
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"A reference to an alarm description object.  The object
-referenced should not be accessible, but rather be used to
-provide a unique description of the alarm condition."
-   ::= {xupsAlarmEntry 2}
+    SYNTAX     OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A reference to an alarm description object.  The object
+         referenced should not be accessible, but rather be used to
+         provide a unique description of the alarm condition."
+    ::= {xupsAlarmEntry 2}
 
 xupsAlarmTime OBJECT-TYPE
-   SYNTAX TimeTicks
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The value of the MIB-II variable sysUpTime when the alarm
-condition occurred."
-   ::= {xupsAlarmEntry 3}
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of the MIB-II variable sysUpTime when the alarm
+         condition occurred."
+    ::= {xupsAlarmEntry 3}
 
 --
 -- Well known alarm conditions.
@@ -804,103 +1174,98 @@ xupsOnInverter                   OBJECT IDENTIFIER ::= {xupsAlarm 17}
 
 
 xupsAlarmNumEvents OBJECT-TYPE
-   SYNTAX Gauge
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The number of entries in the UPS event history queue."
-   ::= { xupsAlarm 18 }
+    SYNTAX     Gauge32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of entries in the UPS event history queue."
+    ::= { xupsAlarm 18 }
 
 xupsAlarmEventTable OBJECT-TYPE
-   SYNTAX SEQUENCE OF XupsAlarmEventEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   DESCRIPTION
-"A table of the UPS internal event history queue."
-   ::= { xupsAlarm 19 }
+    SYNTAX SEQUENCE OF XupsAlarmEventEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table of the UPS internal event history queue."
+    ::= { xupsAlarm 19 }
 
 xupsAlarmEventEntry OBJECT-TYPE
-   SYNTAX XupsAlarmEventEntry
-   ACCESS not-accessible
-   STATUS mandatory
-   DESCRIPTION
-"One of the entries in the UPS event history queue."
-   INDEX { xupsAlarmEventID }
-   ::= { xupsAlarmEventTable 1 }
+    SYNTAX XupsAlarmEventEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "One of the entries in the UPS event history queue."
+    INDEX { xupsAlarmEventID }
+    ::= { xupsAlarmEventTable 1 }
 
 -- The first 4 vars in the xAEEntry have been deprecated, since they resulted in
 -- a flood of difficult to interpret data.  They have been replaced by the single
 -- entry, xupsAlarmEventMsg, which gives a human-readable description of the event.
 XupsAlarmEventEntry ::= SEQUENCE {
-   xupsAlarmEventID
-INTEGER,
-   xupsAlarmEventDateAndTime
-DisplayString,
-   xupsAlarmEventKind
-INTEGER,
-   xupsAlarmEventDescr
-INTEGER,
-xupsAlarmEventMsg
-DisplayString
-   }
+        xupsAlarmEventID           Integer32,
+        xupsAlarmEventDateAndTime  DisplayString,
+        xupsAlarmEventKind         INTEGER,
+        xupsAlarmEventDescr        Integer32,
+        xupsAlarmEventMsg          DisplayString
+        }
 
 xupsAlarmEventID OBJECT-TYPE
-   SYNTAX INTEGER (1..400)
-   ACCESS read-only
-   STATUS deprecated
-   DESCRIPTION
-"A unique number that reflects the order in which the event
-occurred. The oldest event in the queue will be number 1.
-Subsequent events will be numbered 2, 3, 4, etc."
-   ::= { xupsAlarmEventEntry 1 }
+    SYNTAX     Integer32 (1..400)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A unique number that reflects the order in which the event
+         occurred. The oldest event in the queue will be number 1.
+         Subsequent events will be numbered 2, 3, 4, etc."
+    ::= { xupsAlarmEventEntry 1 }
 
 xupsAlarmEventDateAndTime OBJECT-TYPE
-   SYNTAX DisplayString (SIZE (0..22))
-   ACCESS read-only
-   STATUS deprecated
-   DESCRIPTION
-"The time and date that an event occurred as recorded in the UPS
-internal event queue.  This string will reflect the time and
-date as set in the UPS itself and will not be referenced to
-sysUpTime.  The format is MM/DD/YYYY:HH:MM:SS.  Time is 24 hour standard."
-   ::= { xupsAlarmEventEntry 2 }
+    SYNTAX     DisplayString (SIZE (0..22))
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The time and date that an event occurred as recorded in the UPS
+         internal event queue.  This string will reflect the time and
+         date as set in the UPS itself and will not be referenced to sysUpTime.
+         The format is MM/DD/YYYY:HH:MM:SS.  Time is 24 hour standard."
+    ::= { xupsAlarmEventEntry 2 }
 
 xupsAlarmEventKind OBJECT-TYPE
-   SYNTAX INTEGER {
-   occurred (1),
-   cleared (2),
-   unknown (3)
-   }
-   ACCESS read-only
-   STATUS deprecated
-   DESCRIPTION
-"Enumerated value that tells whether the event is an
-occurrence of an alarm condition or a clearing of an
-alarm condition."
-   ::= { xupsAlarmEventEntry 3 }
+    SYNTAX     INTEGER {
+        occurred (1),
+        cleared (2),
+        unknown (3)
+        }
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "Enumerated value that tells whether the event is an
+         occurrence of an alarm condition or a clearing of an
+         alarm condition."
+    ::= { xupsAlarmEventEntry 3 }
 
 xupsAlarmEventDescr OBJECT-TYPE
-   SYNTAX INTEGER  (0..2147483647)
-   ACCESS read-only
-   STATUS deprecated
-   DESCRIPTION
-"A description of the event stored in the UPS event queue.
-This description will be a sixteen bit integer value
-representing one of the defined alarms in the Powerware Binary
-Computer Mode communication specification; for example,
-a value of 0 represents the 'Inverter AC Over Voltage'
-alarm (byte 1, bit 0 in the BCM Alarm Map)."
-   ::= { xupsAlarmEventEntry 4 }
+    SYNTAX     Integer32  (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "A description of the event stored in the UPS event queue.  
+         This description will be a sixteen bit integer value 
+         representing one of the defined alarms in the Powerware Binary 
+         Computer Mode communication specification; for example,
+         a value of 0 represents the 'Inverter AC Over Voltage'
+         alarm (byte 1, bit 0 in the BCM Alarm Map)."
+    ::= { xupsAlarmEventEntry 4 }
 
 xupsAlarmEventMsg OBJECT-TYPE
-   SYNTAX DisplayString (SIZE (0..80))
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"A text string describing each entry in the Event Log.  The format of this
-text message is free (not fixed) for the operator to read; good contents
-would be a time & date stamp, the event type, and a description of the event."
-   ::= { xupsAlarmEventEntry 5 }
+    SYNTAX     DisplayString (SIZE (0..80))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A text string describing each entry in the Event Log.  The format of this
+         text message is free (not fixed) for the operator to read; good contents 
+         would be a time & date stamp, the event type, and a description of the event."
+    ::= { xupsAlarmEventEntry 5 }
 
 --
 -- More Well known alarm conditions.
@@ -935,9 +1300,9 @@ xupsPowerSwitchBad               OBJECT IDENTIFIER ::= {xupsAlarm 35}
 -- One module in a parallel or composite system has failed
 xupsModuleFailure                OBJECT IDENTIFIER ::= {xupsAlarm 36}
 
--- Two Alarms for systems with an Alternate Power Source, such as
+-- Two Alarms for systems with an Alternate Power Source, such as 
 -- Secondary utility feed (on a dual AC input UPS), generator,
--- flywheel, or fuelcell.
+-- flywheel, or fuelcell. Enabled by xupsSecondaryInputWatch.
 xupsOnAlternatePowerSource       OBJECT IDENTIFIER ::= {xupsAlarm 37}
 xupsAltPowerNotAvailable         OBJECT IDENTIFIER ::= {xupsAlarm 38}
 
@@ -949,175 +1314,281 @@ xupsNoticeCondition              OBJECT IDENTIFIER ::= {xupsAlarm 39}
 xupsRemoteTempBad                OBJECT IDENTIFIER ::= {xupsAlarm 40}
 xupsRemoteHumidityBad            OBJECT IDENTIFIER ::= {xupsAlarm 41}
 
+-- Last of the RFC1628 Well Known Alarms:
+xupsAlarmOutputBad               OBJECT IDENTIFIER ::= {xupsAlarm 42}
+xupsAlarmAwaitingPower           OBJECT IDENTIFIER ::= {xupsAlarm 43}
+
+-- Alarm for this important UPS mode
+xupsOnMaintenanceBypass          OBJECT IDENTIFIER ::= {xupsAlarm 44}
+
+-- New alarms now managed by the Network-M2 card
+xupsOutputNotProtected           OBJECT IDENTIFIER ::= {xupsAlarm 51}
 
 
 --
 -- xupsTest group:
 --
-xupsTestBattery OBJECT-TYPE
-   SYNTAX INTEGER { startTest (1) }
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"Setting this variable to startTest initiates the
-battery test.  All other set values are invalid."
-   ::= {xupsTest 1}
+
+xupsTestStart OBJECT-TYPE           
+    SYNTAX     INTEGER { 
+        testBattery (1),            
+        noTestStarted (2),          
+        testSystem (3),             
+        testSecondarySource (4),    
+        flashLightsTest (5),        
+        cancelTest (6)              
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Setting this object initiates the requested Test.
+		The test types which a UPS might support are 'testBattery', 
+		'testSystem' (a UPS General Systems test, however defined by the UPS), 
+		'testSecondarySource' (test if the Secondary power source is good on a 
+		dual input UPS), and 
+		'flashLightsTest' (start a test which flashes the UPS lights, and if 
+		available, sounds the horn to help locate the UPS).
+        If a UPS does not support the requested test, the set operation may 
+		succeed but the xupsTestBatteryStatus will end up as notSupported.
+        When read, this object indicates the last test requested via this object, 
+		if any; 'noTestStarted' could be the initial value.
+        Currently only the 'flashLightsTest' can be canceled with 'cancelTest'."
+    ::= {xupsTest 1}
 
 xupsTestBatteryStatus OBJECT-TYPE
-   SYNTAX INTEGER {
-   unknown (1),
-   passed (2),
-   failed (3),
-   inProgress (4),
-   notSupported (5),
-   inhibited (6),
-scheduled (7)
-   }
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"Reading this enumerated value gives an indication of the
-UPS Battery test status."
-   ::= {xupsTest 2}
+    SYNTAX     INTEGER {
+        unknown (1),
+        passed (2),
+        failed (3),
+        inProgress (4),
+        notSupported (5),
+        inhibited (6),
+        scheduled (7)
+        }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Reading this enumerated value gives an indication of the (last) 
+         UPS Battery test status.
+		 'inhibited' means that the battery test could not be run.
+		 'scheduled' means that the battery test could not be run at the time
+		 of request, but will be run at some later (UPS-determined) time."
+    ::= {xupsTest 2}
+
+xupsLastGeneralTest OBJECT-TYPE           
+    SYNTAX     INTEGER { 
+        noTestStarted (2),                    
+        testSystem (3),             
+        testSecondarySource (4),    
+        flashLightsTest (5)         
+        }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the last UPS test requested via xupsTestStart or by other 
+         non-SNMP means, other than for the testBattery (1) case.
+         The results of the test indicated by this object are reported in 
+         xupsLastGeneralTestResult."
+    ::= {xupsTest 3}
+
+xupsLastGeneralTestResult OBJECT-TYPE
+    SYNTAX     INTEGER {
+        unknown (1),
+        passed (2),
+        failed (3),
+        inProgress (4),
+        notSupported (5),
+        inhibited (6),
+        scheduled (7)
+        }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Reading this enumerated value gives the result of the test indicated
+         in xupsLastGeneralTest."
+    ::= {xupsTest 4}
+
+xupsTestTrap OBJECT-TYPE           
+    SYNTAX INTEGER { startTestTrap (1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      	"Setting startTestTrap to 1 will initiate a test trap 
+	       to be sent out from the agent.  All other set values are invalid."
+    ::= {xupsTest 5}
 
 
 --
 -- xupsControl group:
 --
 xupsControlOutputOffDelay OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"Setting this value to other than zero will cause the UPS
-output to turn off after the number of seconds.
-Setting it to 0 will cause an attempt to abort a pending
-shutdown."
-   ::= {xupsControl 1}
+    SYNTAX     Integer32 (0..2147483647) 
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Setting this value to other than zero will cause the UPS
+         output to turn off after the number of seconds.
+         Setting it to 0 will cause an attempt to abort a pending
+         shutdown."
+    ::= {xupsControl 1}
 
 xupsControlOutputOnDelay OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"Setting this value to other than zero will cause the UPS
-output to turn on after the number of seconds.
-Setting it to 0 will cause an attempt to abort a pending
-startup."
-   ::= {xupsControl 2}
+    SYNTAX     Integer32 (0..2147483647)    
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Setting this value to other than zero will cause the UPS
+         output to turn on after the number of seconds.
+         Setting it to 0 will cause an attempt to abort a pending
+         startup."
+    ::= {xupsControl 2}
 
 xupsControlOutputOffTrapDelay OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"When xupsControlOutputOffDelay reaches this value, a trap will
-be sent."
-   ::= {xupsControl 3}
+    SYNTAX     Integer32 (0..2147483647)    
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "When xupsControlOutputOffDelay reaches this value, a trap will
+         be sent."
+    ::= {xupsControl 3}
 
 xupsControlOutputOnTrapDelay OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS deprecated
-   DESCRIPTION
-"When xupsControlOutputOnDelay reaches this value, a
-xupsOutputOff trap will be sent."
-   ::= {xupsControl 4}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS deprecated
+    DESCRIPTION
+        "When xupsControlOutputOnDelay reaches this value, a
+         xupsOutputOff trap will be sent."
+    ::= {xupsControl 4}
 
 xupsControlToBypassDelay OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"Setting this value to other than zero will cause the UPS
-output to go to Bypass after the number of seconds.
-If the Bypass is unavailable, this may cause the UPS
-to not supply power to the load.
-Setting it to 0 will cause an attempt to abort a pending
-shutdown."
-   ::= {xupsControl 5}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Setting this value to other than zero will cause the UPS
+         output to go to Bypass after the number of seconds.
+         If the Bypass is unavailable, this may cause the UPS
+         to not supply power to the load.
+         Setting it to 0 will cause an attempt to abort a pending
+         shutdown."
+    ::= {xupsControl 5}
 
 xupsLoadShedSecsWithRestart OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"Setting this value will cause the UPS output to turn off
-after the set number of seconds, then restart (after a UPS-defined
-'down time') when the utility is again available.
-Unlike xupsControlOutputOffDelay, which might or might not,
-      this object always maps to the XCP 0x8A Load Dump & Restart command,
-      so the desired shutdown and restart behavior is guaranteed to happen.
-Once set, this command cannot be aborted.
-      This is the preferred Control object to use when performing an On
-      Battery OS Shutdown."
-   ::= {xupsControl 6}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "Setting this value will cause the UPS output to turn off 
+        after the set number of seconds, then restart (after a UPS-defined
+        'down time') when the utility is again available.  
+        Unlike xupsControlOutputOffDelay, which might or might not,
+        this object always maps to the XCP 0x8A Load Dump & Restart command,
+        so the desired shutdown and restart behavior is guaranteed to happen.
+        Once set, this command cannot be aborted.
+        This is the preferred Control object to use when performing 
+        an On Battery OS Shutdown."
+    ::= {xupsControl 6}
+
+xupsSwitchable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		switchable (1),
+		notSwitchable (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Parameter which indicates whether UPS commands received via any 
+		 communication path (aside from manual controls) are able (switchable) 
+		 or not able (notSwitchable) to control the UPS."
+	::= { xupsControl 7 }
 
 --
 -- xupsConfig group:
 --
 xupsConfigOutputVoltage OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The nominal UPS Output voltage per phase in volts."
-   ::= {xupsConfig 1}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The nominal UPS Output voltage per phase in volts."
+    ::= {xupsConfig 1}
 
 xupsConfigInputVoltage OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The nominal UPS Input voltage per phase in volts."
-   ::= {xupsConfig 2}
+    SYNTAX     Integer32 (0..2147483647)  
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The nominal UPS Input voltage per phase in volts."
+    ::= {xupsConfig 2}
 
 xupsConfigOutputWatts OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS Watts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The nominal UPS available real power output in watts."
-   ::= {xupsConfig 3}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The nominal UPS available real power output in watts."
+    ::= {xupsConfig 3}
 
 xupsConfigOutputFreq OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The nominal output frequency in tenths of Hz."
-   ::= {xupsConfig 4}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "0.1 Hertz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The nominal output frequency in tenths of Hz."
+    ::= {xupsConfig 4}
 
 xupsConfigDateAndTime OBJECT-TYPE
-   SYNTAX DisplayString (SIZE (0..22))
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"Date and time information for the UPS.  Setting this variable
-will initiate a set UPS date and time to this value.  Reading
-this variable will return the UPS time and date.  This value
-is not referenced to sysUpTime.  It is simply the clock value
-from the UPS real time clock.
-Format is as follows: MM/DD/YYYY:HH:MM:SS."
-   ::= { xupsConfig 5 }
+    SYNTAX     DisplayString (SIZE (0..22))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Date and time information for the UPS.  Setting this variable
+         will initiate a set UPS date and time to this value.  Reading
+         this variable will return the UPS time and date.  This value
+         is not referenced to sysUpTime.  It is simply the clock value
+         from the UPS real time clock.
+         Format is as follows: MM/DD/YYYY:HH:MM:SS."
+    ::= { xupsConfig 5 }
 
 xupsConfigLowOutputVoltageLimit OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The Lower limit for acceptable Output Voltage, per the UPS
-specifications."
-   ::= {xupsConfig 6}
+    SYNTAX     Integer32 (0..2147483647) 
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Lower limit for acceptable Output Voltage, per the UPS
+         specifications."
+    ::= {xupsConfig 6}
 
 xupsConfigHighOutputVoltageLimit OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-"The Upper limit for acceptable Output Voltage, per the UPS
-specifications."
-   ::= {xupsConfig 7}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "RMS Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Upper limit for acceptable Output Voltage, per the UPS
+         specifications."
+    ::= {xupsConfig 7}
+
+xupsConfigInstallDate OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..16))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The date when this UPS was installed.  Free text format, so the 
+         preferred local date format may be used (MM/DD/YYYY, DD-Mon-YYYY, etc)."
+    ::= {xupsConfig 8}
 
 
 
@@ -1125,63 +1596,86 @@ specifications."
 -- xupsTrapControl group:
 --
 xupsMaxTrapLevel OBJECT-TYPE
-   SYNTAX INTEGER {
-   none     (1),
-   critical (2),
-   major    (3),
-   allTraps (4)
-   }
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"The level of severity of traps which will be sent to the
-requesting host; individual trap receivers will have
-individual values for this variable.  Values are:
-(1) none: no traps will be sent to this host;
-(2) critical: only traps for Critical alarm conditions will
-   be sent to this host;
-(3) major: Critical and Major traps will be sent;
-(4) allTraps: all Traps will be sent to this host
-   (Critical, Major, Minor, Informational)."
-   ::= {xupsTrapControl 1}
+    SYNTAX     INTEGER {
+        none     (1),
+        critical (2),
+        major    (3),
+        minor    (4),
+        allTraps (5)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The level of severity of traps which will be sent to the
+         requesting host; individual trap receivers will have
+         individual values for this variable.  Values are:
+         (1) none: no traps will be sent to this host;
+         (2) critical: only traps for Critical alarm conditions will
+             be sent to this host;
+         (3) major: Critical and Major traps will be sent;
+         (4) minor: All levels of alarming traps will be sent: Critical, 
+             Major, and Minor
+            (This level was added in PowerMIB v3.11)
+         (5) allTraps: all Traps will be sent to this host
+            (Critical, Major, Minor, Informational)."
+    ::= {xupsTrapControl 1}
 
 xupsSendTrapType OBJECT-TYPE
-   SYNTAX INTEGER {
-   stnd     (1),
-   xups     (2),
-   stndPlus (3),
-   xupsPlus (4)
-   }
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"The type of traps which will be sent to the
-requesting host; individual trap receivers will have
-individual values for this variable.  The additional
-variables in types (3) and (4) are useful for determining
-which UPS is the source on multi-port network adapters,
-and for getting additional descriptive information.
-Types (1) through (4) are all SNMP version 1 trap PDUs.
-Values are:
-(1) stnd: Traps as defined in the Standard UPS MIB (RFC1628)
-   and Generic (MIB II) traps as defined in RFC 1215.
-(2) xups: xupsTrapDefined Traps as defined in the PowerMIB
-   and Generic (MIB II) traps as defined in RFC 1215.
-(3) stndPlus: same as stnd plus variables from the interface
-   group and, where appropriate, xupsTrapMessage.
-(4) xupsPlus: xupsTrapPortN Traps (same as xups plus
-   variables from the interface group) and,
-   for authFail, xupsTrapMessage."
-   ::= {xupsTrapControl 2}
+    SYNTAX     INTEGER {
+        stnd     (1),       
+        xups     (2),       
+        stndPlus (3),       
+        xupsPlus (4),       
+		pxg      (5)        
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The type of traps which will be sent to the
+         requesting host; individual trap receivers will have
+         individual values for this variable.  The additional
+         variables in types (3) and (4) are useful for determining
+         which UPS is the source on multi-port network adapters,
+         and for getting additional descriptive information.
+         Types (1) through (4) are all SNMP version 1 trap PDUs.
+         Values are:
+         (1) stnd: Traps as defined in the Standard UPS MIB (RFC1628)
+            and Generic (MIB II) traps as defined in RFC 1215.
+         (2) xups: xupsTrapDefined Traps as defined in the PowerMIB
+            and Generic (MIB II) traps as defined in RFC 1215.
+         (3 Deprecated) stndPlus: same as stnd plus variables from the interface
+            group and, where appropriate, xupsTrapMessage.
+         (4 Deprecated) xupsPlus: xupsTrapPortN Traps (same as xups plus 
+            variables from the interface group) and, 
+            for authFail, xupsTrapMessage.
+         (5 pxg: Traps as defined in the Power Xpert Gateway MIB
+            (PXG-MIB)."
+    ::= {xupsTrapControl 2}
 
 xupsTrapMessage OBJECT-TYPE
-   SYNTAX DisplayString (SIZE (0..79))
-   ACCESS not-accessible
-   STATUS mandatory
-   DESCRIPTION
-"A descriptive message which may be sent with traps to
-further explain the reason for the trap."
-   ::= {xupsTrapControl 3}
+    SYNTAX     DisplayString (SIZE (0..79))
+    MAX-ACCESS read-only            -- actually not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A descriptive text message which may be sent with traps to
+         further explain the reason for the trap.
+         This object is not-accessible to MIB browsers, but had to be changed to
+         read-only to satisfy SMIv2 syntax checkers since it is included in traps."
+    ::= {xupsTrapControl 3}
+
+-- An Identifier for the PowerMIB traps
+-- Used below in the section where the traps are defined
+xupsTrapSource   OBJECT IDENTIFIER       ::= {xupsTrapControl 4}
+
+xupsHeartbeatMinsInterval OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "Minutes"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "How often to send the xupstdHeartbeat trap, in units of minutes.
+         A setting of 0 disables the Heartbeat function."
+    ::= {xupsTrapControl 5}
 
 
 
@@ -1189,206 +1683,287 @@ further explain the reason for the trap."
 -- xupsRecep group:
 --
 -- (Note that the terms Receptacle, Outlet, and Load Group are used interchangeably
---  here and all mean "one of a set of controllable, power-switched outputs")
+--  here and all mean "one of a group of controllable, power-switched outputs")
 --
 xupsNumReceptacles OBJECT-TYPE
-SYNTAX INTEGER (0..64)
-ACCESS read-only
-STATUS mandatory
-   DESCRIPTION
-"The number of independently controllable Receptacles, as described in the
-xupsRecepTable."
-::= {xupsRecep 1}
-
+    SYNTAX     Integer32 (0..64)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of independently controllable Receptacles, as described in the 
+         xupsRecepTable."
+    ::= {xupsRecep 1}
+    
 xupsRecepTable OBJECT-TYPE
-SYNTAX SEQUENCE OF XupsRecepEntry
-ACCESS not-accessible
-STATUS mandatory
-DESCRIPTION "The Aggregate Object with number of entries equal to
-   NumReceptacles and including the xupsRecep group."
-::={xupsRecep 2}
-
+    SYNTAX SEQUENCE OF XupsRecepEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of receptacle table entries.  The number of entries
+        is given by the value of xupsNumReceptacles."
+    ::={xupsRecep 2}
+    
 xupsRecepEntry OBJECT-TYPE
-SYNTAX XupsRecepEntry
-ACCESS not-accessible
-STATUS mandatory
-DESCRIPTION "The Recep table entry, etc."
-INDEX { xupsRecepIndex }
-::= { xupsRecepTable 1 }
+    SYNTAX XupsRecepEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A receptacle table entry containing the status and
+         control values for one receptacle."
+    INDEX { xupsRecepIndex }
+    ::= { xupsRecepTable 1 }
 
 XupsRecepEntry ::= SEQUENCE {
-xupsRecepIndex
-INTEGER,
-xupsRecepStatus
-INTEGER,
-xupsRecepOffDelaySecs
-INTEGER,
-xupsRecepOnDelaySecs
-INTEGER,
-xupsRecepAutoOffDelay
-       INTEGER,
-xupsRecepAutoOnDelay
-       INTEGER,
-   xupsRecepShedSecsWithRestart
-       INTEGER
-}
-
+        xupsRecepIndex               Integer32,
+        xupsRecepStatus              INTEGER,
+        xupsRecepOffDelaySecs        Integer32,
+        xupsRecepOnDelaySecs         Integer32,
+        xupsRecepAutoOffDelay        Integer32,
+        xupsRecepAutoOnDelay         Integer32,
+        xupsRecepShedSecsWithRestart Integer32, 
+        xupsRecepHourlyPowerUsage    Integer32,
+        xupsRecepCumulativePowerUsage Integer32,
+        xupsRecepCumulativePowerUsageTimer Counter32
+		}
+    
 xupsRecepIndex OBJECT-TYPE
-SYNTAX INTEGER (1..64)
-ACCESS read-only
-STATUS mandatory
-DESCRIPTION
-"The number of the Receptacle. Serves as index for Receptacle table."
-::= {xupsRecepEntry 1}
-
+    SYNTAX     Integer32 (1..64)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of the Receptacle. Serves as index for Receptacle table."
+    ::= {xupsRecepEntry 1}
+    
 
 xupsRecepStatus OBJECT-TYPE
-   SYNTAX INTEGER {
-on(1), off(2), pendingOff(3), pendingOn(4), unknown(5) }
-   ACCESS read-only
-   STATUS mandatory
-   DESCRIPTION
-   "The Recep Status 1=On/Close, 2=Off/Open, 3=On w/Pending Off,
-   4=Off w/Pending ON, 5=Unknown."
-::={xupsRecepEntry 2}
-
+    SYNTAX     INTEGER {
+        on(1), off(2), pendingOff(3), pendingOn(4), unknown(5), 
+        reserved(6), failedClosed(7), failedOpen(8) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Recep Status 1=On/Close, 2=Off/Open, 3=On w/Pending Off, 
+         4=Off w/Pending ON, 5=Unknown, 6=Reserved for future, 
+         7=Failed in Closed position, 8=Failed in Open position."
+    ::={xupsRecepEntry 2}
+            
 
 xupsRecepOffDelaySecs OBJECT-TYPE
-   SYNTAX INTEGER (-1..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"The Delay until the Receptacle is turned Off.  Setting
-this value to other than -1 will cause the UPS output to
-turn off after the number of seconds (0 is immediately).
-Setting it to -1 will cause an attempt to abort a pending shutdown.
-When this object is set while the UPS is On Battery, it is not necessary
-to set xupsRecepOnDelaySecs, since the outlet will turn back on
-automatically when power is available again."
-::= {xupsRecepEntry 3}
+    SYNTAX     Integer32 (-1..2147483647) 
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "The Delay until the Receptacle is turned Off.  Setting 
+        this value to other than -1 will cause the UPS output to 
+        turn off after the number of seconds (0 is immediately).  
+        Setting it to -1 will cause an attempt to abort a pending shutdown.
+        When this object is set while the UPS is On Battery, it is not necessary
+        to set xupsRecepOnDelaySecs, since the outlet will turn back on 
+        automatically when power is available again."
+    ::= {xupsRecepEntry 3}
 
 xupsRecepOnDelaySecs OBJECT-TYPE
-   SYNTAX INTEGER (-1..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-" The Delay until the Receptacle is turned On.  Setting
-this value to other than -1 will cause the UPS output to
-turn on after the number of seconds (0 is immediately).
-Setting it to -1 will cause an attempt to abort a pending restart."
-::={xupsRecepEntry 4}
+    SYNTAX     Integer32 (-1..2147483647) 
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "The Delay until the Receptacle is turned On.  Setting 
+        this value to other than -1 will cause the UPS output to 
+        turn on after the number of seconds (0 is immediately).  
+        Setting it to -1 will cause an attempt to abort a pending restart."
+    ::={xupsRecepEntry 4}
 
 
 xupsRecepAutoOffDelay OBJECT-TYPE
-   SYNTAX INTEGER (-1..32767)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"The delay after going On Battery until the Receptacle is
-automatically turned Off.  A value of -1 means that this Output should
-never be turned Off automatically, but must be turned Off only by command.
-Values from 0 to 30 are valid, but probably innappropriate.
-The AutoOffDelay can be used to prioritize loads in the event of a prolonged
-power outage; less critical loads will turn off earlier to extend battery
-time for the more critical loads. If the utility power is restored before the
-AutoOff delay counts down to 0 on an outlet, that outlet will not turn Off."
-::= {xupsRecepEntry 5}
-
+    SYNTAX     Integer32 (-1..32767) 
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "The delay after going On Battery until the Receptacle is 
+        automatically turned Off.  A value of -1 means that this Output should 
+        never be turned Off automatically, but must be turned Off only by command.
+        Values from 0 to 30 are valid, but probably innappropriate.
+        The AutoOffDelay can be used to prioritize loads in the event of a prolonged 
+        power outage; less critical loads will turn off earlier to extend battery 
+        time for the more critical loads. If the utility power is restored before the 
+        AutoOff delay counts down to 0 on an outlet, that outlet will not turn Off."
+    ::= {xupsRecepEntry 5}
+    
 xupsRecepAutoOnDelay OBJECT-TYPE
-   SYNTAX INTEGER (-1..32767)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"Seconds delay after the Outlet is signaled to turn On before the Output is
-Automatically turned ON. A value of -1 means that this Output should never
-be turned On automatically, but only when specifically commanded to do so.
-A value of 0 means that the Receptacle should come On immediately
-at power-up or for an On command."
-::= {xupsRecepEntry 6}
+    SYNTAX     Integer32 (-1..32767)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "Seconds delay after the Outlet is signaled to turn On before the Output is
+        Automatically turned ON. A value of -1 means that this Output should never
+        be turned On automatically, but only when specifically commanded to do so.
+        A value of 0 means that the Receptacle should come On immediately
+        at power-up or for an On command."
+    ::= {xupsRecepEntry 6}
 
--- xupsRecepAutoOnDelay has three purposes:
--- 1. To coordinate the automatic startup of various outlets, when the normal
--- auto-sequencing of 1 second per outlet is not adequate. For example, they may
--- be used to power up hard disk arrays before CPU units are started.
--- 2. To force additional 'Down Time' during xupsRecepOffDelaySecs commands, for
--- equipment to be reset, when the standard 'Down Time' is not long enough.
--- 3. For the -1 value, to ensure that loads wont be powered until commanded,
+-- xupsRecepAutoOnDelay has three purposes: 
+-- 1. To coordinate the automatic startup of various outlets, when the normal 
+-- auto-sequencing of 1 second per outlet is not adequate. For example, they may 
+-- be used to power up hard disk arrays before CPU units are started. 
+-- 2. To force additional 'Down Time' during xupsRecepOffDelaySecs commands, for 
+-- equipment to be reset, when the standard 'Down Time' is not long enough. 
+-- 3. For the -1 value, to ensure that loads won't be powered until commanded, 
 -- following power-up or a xupsRecepOffDelaySecs command.
 
 xupsRecepShedSecsWithRestart OBJECT-TYPE
-   SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
-   ACCESS read-write
-   STATUS mandatory
-   DESCRIPTION
-"Setting this value will cause the UPS output to turn off
-after the set number of seconds, then restart (after a UPS-defined
-'down time') when the utility is again available.
-Unlike xupsRecepOffDelaySecs, which might or might not,
-      this object always maps to the XCP 0x8A Load Dump & Restart command,
-      so the desired shutdown and restart behavior is guaranteed to happen.
-Once set, this command cannot be aborted."
-   ::= {xupsRecepEntry 7}
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "Setting this value will cause the UPS output to turn off 
+        after the set number of seconds, then restart (after a UPS-defined
+        'down time') when the utility is again available.  
+        Unlike xupsRecepOffDelaySecs, which might or might not,
+        this object always maps to the XCP 0x8A Load Dump & Restart command,
+        so the desired shutdown and restart behavior is guaranteed to happen.
+        Once set, this command cannot be aborted."
+    ::= {xupsRecepEntry 7}
+
+xupsRecepHourlyPowerUsage  OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "Wh"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Units are Watt-hours.This is the energy consumed during the last hour."
+	::= { xupsRecepEntry 8 }
+
+xupsRecepCumulativePowerUsage  OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    UNITS      "Wh"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Units are Watt-hours.This is the energy consumed since the last reset.
+         This object is writable so that it can be reset to 0.
+         When it is written to 0, the xupsRecepCumulativePowerUsageTimer will be reset to 0 as well."
+	::= { xupsRecepEntry 9 }
+
+xupsRecepCumulativePowerUsageTimer  OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Time in seconds since the cumulative power usage was last reset."
+	::= { xupsRecepEntry 10 }
+
 
 --
 -- xupsTopology group:
 --
 xupsTopologyType OBJECT-TYPE
-SYNTAX INTEGER (0..32767)
-ACCESS read-only
-STATUS mandatory
-   DESCRIPTION
-"Value which denotes the type of UPS by its power topology.  Values are the
-same as those described in the XCP Topology block's Overall Topology field."
-::= {xupsTopology 1}
+    SYNTAX     Integer32 (0..32767)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "Value which denotes the type of UPS by its power topology.  Values are the
+        same as those described in the XCP Topology block's Overall Topology field."
+    ::= {xupsTopology 1}
 
 xupsTopoMachineCode OBJECT-TYPE
-SYNTAX INTEGER (0..32767)
-ACCESS read-only
-STATUS mandatory
-   DESCRIPTION
-"ID Value which denotes the Powerware model of the UPS for software.  Values
-are the same as those described in the XCP Configuration block's Machine Code
-field."
-::= {xupsTopology 2}
+    SYNTAX     Integer32 (0..32767)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "ID Value which denotes the Powerware model of the UPS for software.  
+        Values are the same as those described in the XCP Configuration 
+        block's Machine Code field."
+    ::= {xupsTopology 2}
 
 xupsTopoUnitNumber OBJECT-TYPE
-SYNTAX INTEGER (0..64)
-ACCESS read-only
-STATUS mandatory
-   DESCRIPTION
-"Identifies which unit and what type of data is being reported.
-A value of 0 means that this MIB information comes from the top-level system
-view (eg, manifold module or system bypass cabinet reporting total system
-output).  Standalone units also use a value of 0, since they are the 'full
-system' view.
-A value of 1 or higher indicates the number of the module in the system
-which is reporting only its own data in the PowerMIB objects."
-::= {xupsTopology 3}
+    SYNTAX     Integer32 (0..64)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "Identifies which unit and what type of data is being reported.
+        A value of 0 means that this MIB information comes from the top-level system 
+        view (eg, manifold module or system bypass cabinet reporting total system 
+        output).  Standalone units also use a value of 0, since they are the 'full 
+        system' view.
+        A value of 1 or higher indicates the number of the module in the system
+        which is reporting only its own data in the PowerMIB objects."
+    ::= {xupsTopology 3}
 
 xupsTopoPowerStrategy OBJECT-TYPE
-   SYNTAX INTEGER {
-highAlert(1), standard(2), enableHighEfficiency(3),
-immediateHighEfficiency(4) }
-ACCESS read-write
-STATUS mandatory
-   DESCRIPTION
-"Value which denotes which Power Strategy is currently set for the UPS.
-The values are:
-highAlert(1) - The UPS shall optimize its operating state to maximize its
-power-protection levels.  This mode will be held for at most 24 hours.
-standard(2) - Balanced, normal power protection strategy. UPS will not enter
-HE operating mode from this setting.
-enableHighEfficiency(3) - The UPS is enabled to enter HE operating mode to
-optimize its operating state to maximize its efficiency, when
-conditions change to permit it (as determined by the UPS).
-forceHighEfficiency(4) - If this value is permitted to be Set for this UPS,
-and if conditions permit, requires the UPS to enter High Efficiency
-mode now, without delay (for as long as utility conditions permit).
-After successfully set to forceHighEfficiency(4),
-xupsTopoPowerStrategy changes to value enableHighEfficiency(3).
-xupsOutputSource will indicate if the UPS status is actually operating in
-High Efficiency mode."
-::= {xupsTopology 4}
+    SYNTAX     INTEGER {
+        highAlert(1), standard(2), enableHighEfficiency(3),
+        immediateHighEfficiency(4) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "Value which denotes which Power Strategy is currently set for the UPS.
+        The values are:
+        highAlert(1) - The UPS shall optimize its operating state to maximize its 
+                power-protection levels.  This mode will be held for at most 24 hours.
+        standard(2) - Balanced, normal power protection strategy. UPS will not enter 
+                HE operating mode from this setting.
+        enableHighEfficiency(3) - The UPS is enabled to enter HE operating mode to 
+                optimize its operating state to maximize its efficiency, when 
+                conditions change to permit it (as determined by the UPS).
+        forceHighEfficiency(4) - If this value is permitted to be Set for this UPS,
+                and if conditions permit, requires the UPS to enter High Efficiency 
+                mode now, without delay (for as long as utility conditions permit).
+                After successfully set to forceHighEfficiency(4), 
+                xupsTopoPowerStrategy changes to value enableHighEfficiency(3).
+        xupsOutputSource will indicate if the UPS status is actually operating in 
+        High Efficiency mode."
+    ::= {xupsTopology 4}
+
+
+--
+-- xupsAgent group:
+--
+xupsAgentManufacturer OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The card agent Manufacturer Name (e.g. Eaton Corporation)."
+    ::= { xupsAgent 1}
+
+xupsAgentModel OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The card agent model"
+    ::= {xupsAgent 2}
+
+xupsAgentSoftwareVersion OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The agent firmware version."
+    ::= {xupsAgent 3}
+
+xupsAgentPartNumber  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The card agent catalog part number."
+    ::= { xupsAgent 4 }
+
+xupsAgentSerialNumber  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The card agent catalog serial number."
+    ::= { xupsAgent 5 }
+
 
 -- *************************************************************************
 -- *************************************************************************
@@ -1396,215 +1971,40 @@ High Efficiency mode."
 --
 -- Traps (xupst)
 --
--- 1) Powerware's traps are defined in this MIB for three different sources:
---      a) Basic Agents for which the trap variables have not been defined,
---              though trap variables are included with the trap PDU
---      b) Agents with exactly Defined trap variables, which may be
---              used as input to trap response macros on management stations
---      c) Agents with Defined traps including ifIndex and ifDescr,
---              which can be used to determine which UPS of a multi-port
---              agent (eg, Powerware Network SNMP Adapter) sent the trap
+-- 1) Eaton's traps have been defined in this MIB for three different sources.
 --    The trap definitions for the three sources are very similar,
 --      and use the same alarms as their triggers; their names are prefaced
 --      by xupstb, xupstd, and xupstp to distinguish the three types
+--      However, the products that the "Basic" and "Port Defined" trap types were
+--      created for have been obsoleted, so the only trap types in active use 
+--      are the "Defined" (xupstd) traps listed below
+--      The Obsolete types have been moved to file XUPS_Obsolete.mib
 --
--- 2) Trap Severity Level is given as a comment to indicate which
---      xupsMaxTrapLevel will result in this trap being sent; levels
---      are (in order): Critical, Major, Minor, Informational
+--      a) OBSOLETE - Basic Agents for which the trap variables have not been 
+--              defined, though trap variables are included with the trap PDU
+--      xupsNull         OBJECT IDENTIFIER       ::= { xupsMIB 0 }
+--      xupsTrapBasic    OBJECT IDENTIFIER       ::= { xupsNull 0 }
 --
--- 3) The following Object Identifiers are used to distinguish Powerware's
---      Trap sources:
---      a) The first is for traps without defined trap variables
-xupsNull         OBJECT IDENTIFIER       ::= { xups 0 }
-xupsTrapBasic    OBJECT IDENTIFIER       ::= { xupsNull 0 }
---      b) The second is for traps with defined variables,
---              without ifIndex & ifDescr
-xupsTrapSource   OBJECT IDENTIFIER       ::= {xupsTrapControl 4}
+
+--      b) Agents with exactly Defined trap variables, which may be
+--              used as input to trap response macros on management stations
+--      This trap type is selected by setting xupsSendTrapType to xups(2)
 xupsTrapDefined  OBJECT IDENTIFIER       ::= {xupsTrapSource 1}
---      c) The third is for traps with defined variables
---              plus ifIndex & ifDescr
-xupsTrapPortN    OBJECT IDENTIFIER       ::= {xupsTrapSource 2}
+--      Following the recommendations for coexistence between v1 traps
+--      and v2 notifications, define the snmpTrapOID base with a 0
+xupsTrapOidDefined OBJECT IDENTIFIER     ::= { xupsTrapDefined 0 }
 
-
--- ****************************************************************************
--- ****************************************************************************
 --
--- Traps from xupsTrapBasic source (xupstb):
+--      c) OBSOLETE - Agents with Defined traps including ifIndex and ifDescr,
+--              which can be used to determine which UPS of a multi-port
+--              agent (eg, Eaton Network SNMP Adapter) sent the trap
+--      This trap type was selected by setting xupsSendTrapType to xupsPlus(4)
+--      xupsTrapPortN    OBJECT IDENTIFIER       ::= {xupsTrapSource 2}
 --
-xupstbControlOff TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The UPS output power will turn off in a number of
-seconds equal to upsControlOutputOffTrapDelay."
-   --#SEVERITY CRITICAL
-   ::= 1
-
-xupstbControlOn TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The UPS output power will turn on in a number of
-seconds equal to upsControlOutputOnTrapDelay."
-   --#SEVERITY INFORMATIONAL
-   ::= 2
-
-xupstbOnBattery TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The UPS has no AC input power and is running on
-battery."
-   --#SEVERITY MAJOR
-   ::= 3
-
-xupstbLowBattery TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The UPS batteries are low.  Tied to low battery
-alarm condition."
-   --#SEVERITY CRITICAL
-   ::= 4
-
-xupstbUtilityPowerRestored TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"Input power has been restored after running on battery."
-   --#SEVERITY INFORMATIONAL
-   ::= 5
-
-xupstbReturnFromLowBattery TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The battery has recovered from a low battery condition."
-   --#SEVERITY INFORMATIONAL
-   ::= 6
-
-xupstbOutputOverload TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The ups has sensed an overload of greater than
-106 percent.  Tied to the 106% overload alarm."
-   --#SEVERITY MINOR
-   ::= 7
-
-xupstbInternalFailure TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"Some component of the ups - rectifier, inverter,
-control panel has failed.  Tied to alarms indicating failure."
-   --#SEVERITY CRITICAL
-   ::= 8
-
-xupstbBatteryDischarged TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The Battery Totally Discharged Alarm has occurred."
-   --#SEVERITY CRITICAL
-   ::= 9
-
-xupstbInverterFailure TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The ups inverter is unavailable due to an internal failure."
-   --#SEVERITY CRITICAL
-   ::= 10
-
-xupstbOnBypass TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The ups has gone on bypass for some reason."
-   --#SEVERITY CRITICAL
-   ::= 11
-
-xupstbBypassNotAvailable TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The ups bypass is unavailable"
-   --#SEVERITY MAJOR
-   ::= 12
-
-xupstbOutputOff TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The ups output is switched off."
-   --#SEVERITY CRITICAL
-   ::= 13
-
-xupstbInputFailure TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The ups input power is incorrect in voltage,
-frequency, or phase rotation."
-   --#SEVERITY MINOR
-   ::= 14
-
-xupstbBuildingAlarm TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"One of the defined building alarms has occurred."
-   --#SEVERITY MAJOR
-   ::= 15
-
-xupstbShutdownImminent TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The ups shutdown imminent alarm has occurred."
-   --#SEVERITY CRITICAL
-   ::= 16
-
-xupstbOnInverter TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"The ups is returned to utility power running the inverter
-after either a transfer to bypass or a run on battery."
-   --#SEVERITY INFORMATIONAL
-   ::= 17
-
-xupstbBreakerOpen TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"One of the UPS breakers or contactors has been opened."
-   --#SEVERITY MAJOR
-   ::= 20
-
-xupstbAlarmEntryAdded TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"An alarm not defined in the xups Well Known Alarms
-(eg, an alarm defined in RFC1628)
-has been added to the Alarm Table."
-   --#SEVERITY MAJOR
-   ::= 21
-
-xupstbAlarmEntryRemoved TRAP-TYPE
-   ENTERPRISE xupsTrapBasic
-   DESCRIPTION
-"An alarm not defined in the xups Well Known Alarms
-has been removed from the Alarm Table."
-   --#SEVERITY INFORMATIONAL
-   ::= 22
-
-
--- The following alarms do not have equivalents as Basic Traps
--- xupstbAlarmBatteryBad        ::= 23
--- xupstbOutputOffAsRequested   ::= 24
--- xupstbDiagnosticTestFailed   ::= 25
--- xupstbCommunicationsLost     ::= 26
--- xupstbUpsShutdownPending     ::= 27
--- xupstbAlarmTestInProgress    ::= 28
--- xupstbAmbientTempBad         ::= 29
--- xupstbContactActiveNotice    ::= 30
--- xupstbContactInactiveNotice  ::= 31
--- xupstbLossOfRedundancy       ::= 32
--- xupstbAlarmTempBad ::= 33
--- xupstbAlarmChargerFailed ::= 34
--- xupstbAlarmFanFailure ::= 35
--- xupstbAlarmFuseFailure ::= 36
--- xupstbPowerSwitchBad ::= 37
--- xupstbModuleFailure ::= 38
--- xupstbOnAlternatePowerSource ::= 39
--- xupstbAltPowerNotAvailable ::= 40
--- xupstbNoticeCondition ::= 41
--- xupstbRemoteTempBad          ::= 42
--- xupstbRemoteHumidityBad      ::= 43
+-- 2) Trap Severity Level is given as a comment to indicate which 
+--      xupsMaxTrapLevel will result in this trap being sent;  
+--      levels are (in order): Critical, Major, Minor, Informational
+--
 
 
 -- ****************************************************************************
@@ -1613,767 +2013,691 @@ has been removed from the Alarm Table."
 -- Traps from xupsTrapDefined source (xupstd):
 --
 
-xupstdControlOff TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The UPS output power will turn off in a number of
-seconds equal to upsControlOutputOffTrapDelay."
-   --#SEVERITY CRITICAL
-   ::= 1
+xupstdControlOff NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The UPS output power will turn off in a number of
+    seconds equal to upsControlOutputOffTrapDelay."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 1 }
 
-xupstdControlOn TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The UPS output power will turn on in a number of
-seconds equal to upsControlOutputOnTrapDelay."
-   --#SEVERITY INFORMATIONAL
-   ::= 2
+xupstdControlOn NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The UPS output power will turn on in a number of
+    seconds equal to upsControlOutputOnTrapDelay."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 2 }
 
-xupstdOnBattery TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The UPS has no AC input power and is running on
-battery."
-   --#SEVERITY MAJOR
-   ::= 3
+xupstdOnBattery NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The UPS has no AC input power and is running on 
+     battery."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 3 }
 
-xupstdLowBattery TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The UPS batteries are low.  Tied to low battery
-alarm condition."
-   --#SEVERITY CRITICAL
-   ::= 4
+xupstdLowBattery NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The UPS batteries are low.  Tied to low battery 
+    alarm condition."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 4 }
 
-xupstdUtilityPowerRestored TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"Input power has been restored after running on battery."
-   --#SEVERITY INFORMATIONAL
-   ::= 5
+xupstdUtilityPowerRestored NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "Input power has been restored after running on battery."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 5 }
 
-xupstdReturnFromLowBattery TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The battery has recovered from a low battery condition."
-   --#SEVERITY INFORMATIONAL
-   ::= 6
+xupstdReturnFromLowBattery NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The battery has recovered from a low battery condition."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 6 }
 
-xupstdOutputOverload TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The ups has sensed an overload of greater than
-106 percent.  Tied to the 106% overload alarm."
-   --#SEVERITY MINOR
-   ::= 7
+xupstdOutputOverload NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups has sensed an overload of greater than 
+     106 percent.  Tied to the 106% overload alarm."
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 7 }
 
-xupstdInternalFailure TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"Some component of the ups - rectifier, inverter,
-control panel has failed.  Tied to alarms indi-
-cating failure."
-   --#SEVERITY CRITICAL
-   ::= 8
+xupstdInternalFailure NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "Some component of the ups - rectifier, inverter,
+     control panel has failed.  Tied to alarms indi-
+     cating failure."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 8 }
 
-xupstdBatteryDischarged TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The Battery Totally Discharged Alarm has occurred."
-   --#SEVERITY CRITICAL
-   ::= 9
+xupstdBatteryDischarged NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The Battery Totally Discharged Alarm has occurred."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 9 }
 
-xupstdInverterFailure TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The ups inverter is unavailable due to an internal failure."
-   --#SEVERITY CRITICAL
-   ::= 10
+xupstdInverterFailure NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups inverter is unavailable or malfunctioning due to an internal failure."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 10 }
 
-xupstdOnBypass TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The ups has gone on bypass for some reason."
-   --#SEVERITY CRITICAL
-   ::= 11
+xupstdOnBypass NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups has gone on bypass for some reason."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 11 }
 
-xupstdBypassNotAvailable TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The ups bypass is unavailable"
-   --#SEVERITY MAJOR
-   ::= 12
+xupstdBypassNotAvailable NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups bypass is unavailable"
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 12 }
 
-xupstdOutputOff TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The ups output is switched off."
-   --#SEVERITY CRITICAL
-   ::= 13
+xupstdOutputOff NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups output is switched off."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 13 }
 
-xupstdInputFailure TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The ups input power is incorrect in voltage,
-frequency, or phase rotation."
-   --#SEVERITY MINOR
-   ::= 14
+xupstdInputFailure NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups input power is incorrect in voltage,
+     frequency, or phase rotation."
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 14 }
 
-xupstdBuildingAlarm TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"One of the defined building alarms has occurred."
-   --#SEVERITY MAJOR
-   ::= 15
+xupstdBuildingAlarm NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "One of the defined building alarms has occurred."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 15 }
 
-xupstdShutdownImminent TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The ups shutdown imminent alarm has occurred."
-   --#SEVERITY CRITICAL
-   ::= 16
+xupstdShutdownImminent NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups shutdown imminent alarm has occurred." 
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 16 }
 
-xupstdOnInverter TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The ups is returned to utility power running the inverter
-after either a transfer to bypass or a run on battery."
-   --#SEVERITY INFORMATIONAL
-   ::= 17
+xupstdOnInverter NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups is returned to utility power running the inverter 
+     after either a transfer to bypass or a run on battery."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 17 }
+    
+xupstdBreakerOpen NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "One of the UPS breakers or contactors has been opened."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 20 }
+    
+xupstdAlarmEntryAdded NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "An alarm not defined in the xups Well Known Alarms
+     (eg, an alarm defined in RFC1628)
+     has been added to the Alarm Table."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 21 }
+    
+xupstdAlarmEntryRemoved NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "An alarm not defined in the xups Well Known Alarms
+     has been removed from the Alarm Table."
+    --#SEVERITY INFORMATIONAL 
+    ::= { xupsTrapOidDefined 22 }
 
-xupstdBreakerOpen TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"One of the UPS breakers or contactors has been opened."
-   --#SEVERITY MAJOR
-   ::= 20
+xupstdAlarmBatteryBad        NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "One or more batteries have been determined to require replacement."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 23 }
 
-xupstdAlarmEntryAdded TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"An alarm not defined in the xups Well Known Alarms
-(eg, an alarm defined in RFC1628)
-has been added to the Alarm Table."
-   --#SEVERITY MAJOR
-   ::= 21
+xupstdOutputOffAsRequested   NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The UPS has shutdown as requested, i.e., the output is off."
+    --#SEVERITY INFORMATIONAL 
+    ::= { xupsTrapOidDefined 24 }
 
-xupstdAlarmEntryRemoved TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"An alarm not defined in the xups Well Known Alarms
-has been removed from the Alarm Table."
-   --#SEVERITY INFORMATIONAL
-   ::= 22
+xupstdDiagnosticTestFailed   NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The result of the last diagnostic test indicates a failure."
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 25 }
 
-xupstdAlarmBatteryBad        TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"One or more batteries have been determined to require replacement."
-   --#SEVERITY MAJOR
-   ::= 23
+xupstdCommunicationsLost     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "A problem has been encountered in the communications
+     between the agent and the UPS."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 26 }
 
-xupstdOutputOffAsRequested   TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The UPS has shutdown as requested, i.e., the output is off."
-   --#SEVERITY INFORMATIONAL
-   ::= 24
+xupstdUpsShutdownPending     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "An xupsControlOutputOffDelay countdown is underway."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 27 }
 
-xupstdDiagnosticTestFailed   TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The result of the last diagnostic test indicates a failure."
-   --#SEVERITY MINOR
-   ::= 25
-
-xupstdCommunicationsLost     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"A problem has been encountered in the communications
-between the agent and the UPS."
-   --#SEVERITY MAJOR
-   ::= 26
-
-xupstdUpsShutdownPending     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"An xupsControlOutputOffDelay countdown is underway."
-   --#SEVERITY MAJOR
-   ::= 27
-
-xupstdAlarmTestInProgress    TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"A test is in progress, as initiated and indicated by the
-Battery Test Group."
-   --#SEVERITY INFORMATIONAL
-   ::= 28
+xupstdAlarmTestInProgress    NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "A test is in progress, as initiated and indicated by the xupsTest Group.  
+     When the test is complete, one of the following traps will be sent:
+     - xupstdDiagnosticTestFailed if the test fails,
+     - xupstdDiagnosticTestPassed on success, or
+     - xupstdAlarmEntryRemoved in other cases (e.g., Test Canceled)."
+    --#SEVERITY INFORMATIONAL 
+    ::= { xupsTrapOidDefined 28 }
 
 -- Provide additional information with the AmbientTemp trap
-xupstdAmbientTempBad         TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
- xupsEnvAmbientTemp, xupsEnvAmbientLowerLimit,
- xupsEnvAmbientUpperLimit }
-   DESCRIPTION
-      "The ambient temperature, xupsEnvAmbientTemp, has fallen below
-the set lower limit, xupsEnvAmbientLowerLimit, or has risen above
-the set upper limit, xupsEnvAmbientUpperLimit."
-   --#SEVERITY MAJOR
-   ::= 29
+xupstdAmbientTempBad         NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
+                 xupsEnvAmbientTemp, xupsEnvAmbientLowerLimit, 
+                 xupsEnvAmbientUpperLimit }
+    STATUS     current
+    DESCRIPTION
+       "The ambient temperature, xupsEnvAmbientTemp, has fallen below 
+    the set lower limit, xupsEnvAmbientLowerLimit, or has risen above 
+    the set upper limit, xupsEnvAmbientUpperLimit." 
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 29 }
 
 -- Added to support the ConnectUPS Web/SNMP card's ability to monitor contact(s)
-xupstdContactActiveNotice TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsContactIndex, xupsContactType, xupsContactState, xupsContactDescr }
-   DESCRIPTION
-"The Contact indicated by xupsContactIndex is in its Active state.
-    The following are the situations that generate this trap:
-   For xupsContactType:    and     xupsContactState:
-       normallyOpen(1)     and     closedWithNotice(4)
-             normallyClosed(2)   and     openWithNotice(3)
-             anyChange(3)        and     openWithNotice(3) or closedWithNotice(4)"
-   --#SEVERITY MAJOR
-   ::= 30
+xupstdContactActiveNotice NOTIFICATION-TYPE
+    OBJECTS    { xupsContactIndex, xupsContactType, xupsContactState, xupsContactDescr }
+    STATUS     current
+    DESCRIPTION
+    "The Contact indicated by xupsContactIndex is in its Active state.
+     The following are the situations that generate this trap:
+        For xupsContactType:    and     xupsContactState: 
+            normallyOpen(1)     and     closedWithNotice(4)
+            normallyClosed(2)   and     openWithNotice(3)
+            anyChange(3)        and     openWithNotice(3) or closedWithNotice(4)"
+    --#SEVERITY MAJOR
+    ::= { xupsTrapOidDefined 30 }
 
-xupstdContactInactiveNotice TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsContactIndex, xupsContactType, xupsContactState, xupsContactDescr }
-   DESCRIPTION
-"The Contact indicated by xupsContactIndex has changed to its Inactive state."
-   --#SEVERITY INFORMATIONAL
-   ::= 31
-
-xupstdLossOfRedundancy     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"A parallel UPS system is no longer operating in N+1 redundant mode;
-      this may be due to module failure or removal, or due to overloading."
-   --#SEVERITY MINOR
-   ::= 32
-
-xupstdAlarmTempBad     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"An internal temperature is out of tolerance."
-   --#SEVERITY MAJOR
-   ::= 33
-
-xupstdAlarmChargerFailed     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"An uncorrected problem has been detected within the UPS charger subsystem."
-   --#SEVERITY MAJOR
-   ::= 34
-
-xupstdAlarmFanFailure     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The failure of one or more fans in the UPS has been detected."
-   --#SEVERITY MAJOR
-   ::= 35
-
-xupstdAlarmFuseFailure     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"The failure of one or more fuses has been detected."
-   --#SEVERITY CRITICAL
-   ::= 36
-
-xupstdPowerSwitchBad     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"A Relay, Contactor, or Breaker has failed."
-   --#SEVERITY CRITICAL
-   ::= 37
-
-xupstdModuleFailure     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"One module in a parallel or composite system has failed."
-   --#SEVERITY MAJOR
-   ::= 38
-
--- Adds xupsInputSource to its var list
-xupstdOnAlternatePowerSource     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, xupsInputSource }
-   DESCRIPTION
-"The system is being powered by its Alternate Power Source, such as a
-Secondary utility feed (on a dual AC input UPS), generator, flywheel,
-or fuelcell."
-   --#SEVERITY MINOR
-   ::= 39
-
-xupstdAltPowerNotAvailable     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"On systems with a separate alternate power source (eg, dual AC inputs),
-that alternate power source is currently not available.  This could be
-a problem if the primary power source (eg, utility) fails for a period
-of time longer than that for which the internal batteries can supply power."
-   --#SEVERITY MINOR
-   ::= 40
-
-xupstdNoticeCondition     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
-   DESCRIPTION
-"Some Notice condition exists which is not covered by the other traps.
-This is like an xupstdInternalFailure, but at a lower severity level."
-   --#SEVERITY MINOR
-   ::= 41
+xupstdContactInactiveNotice NOTIFICATION-TYPE
+    OBJECTS    { xupsContactIndex, xupsContactType, xupsContactState, xupsContactDescr }
+    STATUS     current
+    DESCRIPTION
+    "The Contact indicated by xupsContactIndex has changed to its Inactive state."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 31 }
 
 
--- Provide additional information with the RemoteTemp and RemoteHumidity traps
-xupstdRemoteTempBad         TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
- xupsEnvRemoteTemp, xupsEnvRemoteTempLowerLimit,
- xupsEnvRemoteTempUpperLimit }
-   DESCRIPTION
-      "The remote temperature, xupsEnvRemoteTemp, has fallen below
-the set lower limit, xupsEnvRemoteTempLowerLimit, or has risen above
-the set upper limit, xupsEnvRemoteTempUpperLimit."
-   --#SEVERITY MAJOR
-   ::= 42
+xupstdLossOfRedundancy     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "A parallel UPS system is no longer operating in N+1 redundant mode;
+       this may be due to module failure or removal, or due to overloading."
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 32 }
 
-xupstdRemoteHumidityBad     TRAP-TYPE
-   ENTERPRISE xupsTrapDefined
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
- xupsEnvRemoteHumidity, xupsEnvRemoteHumidityLowerLimit,
- xupsEnvRemoteHumidityUpperLimit }
-   DESCRIPTION
-      "The remote temperature, xupsEnvRemoteHumidity, has fallen below
-the set lower limit, xupsEnvRemoteHumidityLowerLimit, or has risen above
-the set upper limit, xupsEnvRemoteHumidityUpperLimit."
-   --#SEVERITY MINOR
-   ::= 43
+xupstdAlarmTempBad     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "An internal temperature is out of tolerance."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 33 }
+
+xupstdAlarmChargerFailed     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "An uncorrected problem has been detected within the UPS charger subsystem."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 34 }
+
+xupstdAlarmFanFailure     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The failure of one or more fans in the UPS has been detected."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 35 }
+
+xupstdAlarmFuseFailure     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The failure of one or more fuses has been detected."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 36 }
+
+xupstdPowerSwitchBad     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "A Relay, Contactor, or Breaker has failed."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 37 }
+
+xupstdModuleFailure     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "One module in a parallel or composite system has failed."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 38 }
+
+-- xupsInputSource added to this trap's var list
+xupstdOnAlternatePowerSource     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, xupsInputSource }
+    STATUS     current
+    DESCRIPTION
+    "The system is being powered by its Alternate Power Source, such as a 
+     Secondary utility feed (on a dual AC input UPS), generator, flywheel, 
+     or fuel cell."
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 39 }
+
+xupstdAltPowerNotAvailable     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "On systems with a separate alternate power source (eg, dual AC inputs), 
+     that alternate power source is currently not available.  This could be 
+     a problem if the primary power source (eg, utility) fails for a period 
+     of time longer than that for which the internal batteries can supply power."
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 40 }
+
+xupstdNoticeCondition     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "Some Notice condition exists which is not covered by the other traps.
+     This is like an xupstdInternalFailure, but at a lower severity level."
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 41 }
 
 
+-- Added to provide additional information with the RemoteTemp and RemoteHumidity 
+xupstdRemoteTempBad         NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
+                 xupsEnvRemoteTemp, xupsEnvRemoteTempLowerLimit, 
+                 xupsEnvRemoteTempUpperLimit }
+    STATUS     current
+    DESCRIPTION
+       "The remote temperature, xupsEnvRemoteTemp, has fallen below 
+    the set lower limit, xupsEnvRemoteTempLowerLimit, or has risen above 
+    the set upper limit, xupsEnvRemoteTempUpperLimit." 
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 42 }
 
--- ****************************************************************************
--- ****************************************************************************
+xupstdRemoteHumidityBad     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
+                 xupsEnvRemoteHumidity, xupsEnvRemoteHumidityLowerLimit, 
+                 xupsEnvRemoteHumidityUpperLimit }
+    STATUS     current
+    DESCRIPTION
+       "The remote temperature, xupsEnvRemoteHumidity, has fallen below 
+    the set lower limit, xupsEnvRemoteHumidityLowerLimit, or has risen above 
+    the set upper limit, xupsEnvRemoteHumidityUpperLimit." 
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 43 }
+
+
+xupstdHeartbeat NOTIFICATION-TYPE
+    OBJECTS    { xupsInputSource,  xupsOutputSource, xupsAlarms }
+    STATUS     current
+    DESCRIPTION
+    "A periodic status trap message.  It is sent at an interval
+    set by object xupsHeartbeatMinsInterval.
+    The included variables provide a brief statement of the UPS status."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 44 }
+
+xupstdDiagnosticTestPassed   NOTIFICATION-TYPE
+    OBJECTS    { xupsTestBatteryStatus,  xupsLastGeneralTest, xupsLastGeneralTestResult }
+    STATUS     current
+    DESCRIPTION
+    "A diagnostic test just completed, and its result is Passed.
+    The included variables provide additional information on the test."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 45 }
+
+xupstdOutputBad     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The output condition (other than OutputOverload) is out of tolerance."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 46 }
+
+xupstdAwaitingPower     NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The UPS output is off and the UPS is awaiting the return of input power."
+    --#SEVERITY MINOR 
+    ::= { xupsTrapOidDefined 47 }
+
+xupstdOnMaintenanceBypass NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The UPS has been placed on Maintenance / Manual Bypass by an operator."
+    --#SEVERITY MAJOR 
+    ::= { xupsTrapOidDefined 48 }
+
+xupstdCommEstablished  NOTIFICATION-TYPE
+    OBJECTS    { xupsIdentModel,  xupsOutputSource }
+    STATUS     current
+    DESCRIPTION
+    "This trap is sent when the SNMP agent first establishes a communication 
+     link with the UPS.
+     The included variables provide identification and UPS status information."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 49 }
+
+xupstdAgentDown  NOTIFICATION-TYPE
+    -- OBJECTS   { (none) }
+    STATUS     current
+    DESCRIPTION
+    "This trap is sent when the SNMP agent is exiting or closing down gracefully.
+     This may be triggered by a signal from the OS to stop this process.  In many
+     implementations, it will be followed quickly by a restart of this vital process."
+    --#SEVERITY MINOR
+    ::= { xupsTrapOidDefined 50 }
+
+-- New traps now managed by the Network-M2 card
+xupstdOutputNotProtected  NOTIFICATION-TYPE
+    OBJECTS    { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "The ups output is not protectet for any reason in the UPS."
+    --#SEVERITY CRITICAL 
+    ::= { xupsTrapOidDefined 51 }
+
+xupstdTestTrap  NOTIFICATION-TYPE
+    OBJECTS    { sysName, xupsTrapMessage }
+    STATUS     current
+    DESCRIPTION
+    "This trap is sent to the trap receivers to check proper reception of traps."
+    --#SEVERITY INFORMATIONAL
+    ::= { xupsTrapOidDefined 100 }
+
 --
--- Traps from xupsTrapPortN source (xupstp):
+-- Conformance-related definitions
+-- (Defined mostly to satisfy the MIB checkers.)
 --
+xupsConformance OBJECT IDENTIFIER ::= { xupsMIB 100 }
 
-xupstpControlOff TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The UPS output power will turn off in a number of
-seconds equal to upsControlOutputOffTrapDelay."
-   --#SEVERITY CRITICAL
-   ::= 1
+xupsIdentFullGroup  OBJECT-GROUP
+    OBJECTS { xupsIdentManufacturer, xupsIdentModel, 
+              xupsIdentSoftwareVersion, xupsIdentOemCode,
+              xupsIdentPartNumber, xupsIdentSerialNumber }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsIdent subgroup objects."
+    ::= { xupsConformance 2 }
 
-xupstpControlOn TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The UPS output power will turn on in a number of
-seconds equal to upsControlOutputOnTrapDelay."
-   --#SEVERITY INFORMATIONAL
-   ::= 2
+xupsBatteryFullGroup  OBJECT-GROUP
+    OBJECTS { xupsBatTimeRemaining, xupsBatVoltage, xupsBatCurrent, 
+              xupsBatCapacity, xupsBatteryAbmStatus, xupsBatteryLastReplacedDate,
+              xupsBatteryFailure, xupsBatteryNotPresent, xupsBatteryAged, xupsBatteryLowCapacity }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsBattery subgroup objects."
+    ::= { xupsConformance 3 }
 
-xupstpOnBattery TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The UPS has no AC input power and is running on
-battery."
-   --#SEVERITY MAJOR
-   ::= 3
+xupsInputFullGroup  OBJECT-GROUP
+    OBJECTS { xupsInputFrequency, xupsInputLineBads, xupsInputNumPhases, 
+              xupsInputSource, xupsDualInputStatus, xupsSecondaryInputWatch, xupsInputStatus }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsInput subgroup objects."
+    ::= { xupsConformance 4 }
 
-xupstpLowBattery TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The UPS batteries are low.  Tied to low battery
-alarm condition."
-   --#SEVERITY CRITICAL
-   ::= 4
+xupsInputTableFullGroup  OBJECT-GROUP
+    OBJECTS { xupsInputPhase, xupsInputVoltage, xupsInputCurrent, xupsInputWatts,
+              xupsInputId, xupsInputName, xupsInputCurrentHighPrecision }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsInputTable subgroup objects."
+    ::= { xupsConformance 5 }
 
-xupstpUtilityPowerRestored TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"Input power has been restored after running on battery."
-   --#SEVERITY INFORMATIONAL
-   ::= 5
+xupsOutputFullGroup  OBJECT-GROUP
+    OBJECTS { xupsOutputLoad, xupsOutputFrequency, xupsOutputNumPhases, xupsOutputSource,
+              xupsOutputHourlyPowerUsage, xupsOutputCumulativePowerUsage, xupsOutputCumulativePowerUsageTimer, xupsOutputStatus }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsOutput subgroup objects."
+    ::= { xupsConformance 6 }
 
-xupstpReturnFromLowBattery TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The battery has recovered from a low battery condition."
-   --#SEVERITY INFORMATIONAL
-   ::= 6
+xupsOutputTableFullGroup  OBJECT-GROUP
+    OBJECTS { xupsOutputPhase, xupsOutputVoltage, xupsOutputCurrent, xupsOutputWatts,
+              xupsOutputId, xupsOutputName, xupsOutputCurrentHighPrecision, xupsOutputPercentLoad, xupsOutputVA }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsOutputTable subgroup objects."
+    ::= { xupsConformance 7 }
 
-xupstpOutputOverload TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The ups has sensed an overload of greater than
-106 percent.  Tied to the 106% overload alarm."
-   --#SEVERITY MINOR
-   ::= 7
+xupsBypassFullGroup  OBJECT-GROUP
+    OBJECTS { xupsBypassFrequency, xupsBypassNumPhases, xupsBypassPhase, xupsBypassVoltage }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsBypass subgroup objects."
+    ::= { xupsConformance 8 }
 
-xupstpInternalFailure TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"Some component of the ups - rectifier, inverter,
-control panel has failed.  Tied to alarms indi-
-cating failure."
-   --#SEVERITY CRITICAL
-   ::= 8
+xupsEnvironmentFullGroup  OBJECT-GROUP
+    OBJECTS { xupsEnvAmbientTemp, xupsEnvAmbientLowerLimit, 
+              xupsEnvAmbientUpperLimit, xupsEnvAmbientHumidity }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsEnvironment subgroup objects."
+    ::= { xupsConformance 9 }
 
-xupstpBatteryDischarged TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The Battery Totally Discharged Alarm has occurred."
-   --#SEVERITY CRITICAL
-   ::= 9
+xupsAlarmFullGroup  OBJECT-GROUP
+    OBJECTS { xupsAlarms, xupsAlarmID, xupsAlarmDescr, xupsAlarmTime }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsAlarm subgroup objects."
+    ::= { xupsConformance 10 }
 
-xupstpInverterFailure TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The ups inverter is unavailable due to an internal failure."
-   --#SEVERITY CRITICAL
-   ::= 10
+xupsAlarmEventsFullGroup  OBJECT-GROUP
+    OBJECTS { xupsAlarmNumEvents, xupsAlarmEventMsg }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of Alarm/Event history subgroup objects."
+    ::= { xupsConformance 11 }
 
-xupstpOnBypass TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The ups has gone on bypass for some reason."
-   --#SEVERITY CRITICAL
-   ::= 11
+xupsTestFullGroup  OBJECT-GROUP
+    OBJECTS { xupsTestStart, xupsTestBatteryStatus, xupsLastGeneralTest,
+              xupsLastGeneralTestResult, xupsTestTrap }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsTest subgroup objects."
+    ::= { xupsConformance 12 }
 
-xupstpBypassNotAvailable TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The ups bypass is unavailable"
-   --#SEVERITY MAJOR
-   ::= 12
+xupsControlFullGroup  OBJECT-GROUP
+    OBJECTS { xupsControlOutputOffDelay, xupsControlOutputOnDelay, 
+              xupsControlOutputOffTrapDelay, xupsControlToBypassDelay, 
+              xupsLoadShedSecsWithRestart, xupsSwitchable }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsControl subgroup objects."
+    ::= { xupsConformance 13 }
 
-xupstpOutputOff TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The ups output is switched off."
-   --#SEVERITY CRITICAL
-   ::= 13
+xupsConfigFullGroup  OBJECT-GROUP
+    OBJECTS { xupsConfigOutputVoltage, xupsConfigInputVoltage, xupsConfigOutputWatts, 
+              xupsConfigOutputFreq, xupsConfigDateAndTime, xupsConfigLowOutputVoltageLimit, 
+              xupsConfigHighOutputVoltageLimit, xupsConfigInstallDate }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsConfig subgroup objects."
+    ::= { xupsConformance 14 }
 
-xupstpInputFailure TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The ups input power is incorrect in voltage,
-frequency, or phase rotation."
-   --#SEVERITY MINOR
-   ::= 14
+xupsTrapControlFullGroup  OBJECT-GROUP
+    OBJECTS { xupsMaxTrapLevel, xupsSendTrapType, xupsTrapMessage, 
+              xupsHeartbeatMinsInterval }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsTrapControl subgroup objects."
+    ::= { xupsConformance 15 }
 
-xupstpBuildingAlarm TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"One of the defined building alarms has occurred."
-   --#SEVERITY MAJOR
-   ::= 15
+xupsRecepFullGroup  OBJECT-GROUP
+    OBJECTS { xupsNumReceptacles, xupsRecepIndex, xupsRecepStatus, 
+              xupsRecepOffDelaySecs, xupsRecepOnDelaySecs, 
+              xupsRecepAutoOffDelay, xupsRecepAutoOnDelay, xupsRecepShedSecsWithRestart,
+              xupsRecepHourlyPowerUsage, xupsRecepCumulativePowerUsage, xupsRecepCumulativePowerUsageTimer }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsRecep subgroup objects."
+    ::= { xupsConformance 16 }
 
-xupstpShutdownImminent TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The ups shutdown imminent alarm has occurred."
-   --#SEVERITY CRITICAL
-   ::= 16
+xupsTopologyFullGroup  OBJECT-GROUP
+    OBJECTS { xupsTopologyType, xupsTopoMachineCode, 
+              xupsTopoUnitNumber, xupsTopoPowerStrategy }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsTopology subgroup objects."
+    ::= { xupsConformance 17 }
 
-xupstpOnInverter TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The ups is returned to utility power running the inverter
-after either a transfer to bypass or a run on battery."
-   --#SEVERITY INFORMATIONAL
-   ::= 17
+xupstdNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { xupstdControlOff, xupstdControlOn, xupstdOnBattery, xupstdLowBattery, 
+                    xupstdUtilityPowerRestored, xupstdReturnFromLowBattery, 
+                    xupstdOutputOverload, xupstdInternalFailure, xupstdBatteryDischarged, 
+                    xupstdInverterFailure, xupstdOnBypass, xupstdBypassNotAvailable, 
+                    xupstdOutputOff, xupstdInputFailure, xupstdBuildingAlarm, 
+                    xupstdShutdownImminent, xupstdOnInverter, xupstdBreakerOpen, 
+                    xupstdAlarmEntryAdded, xupstdAlarmEntryRemoved, xupstdAlarmBatteryBad, 
+                    xupstdOutputOffAsRequested, xupstdDiagnosticTestFailed, 
+                    xupstdCommunicationsLost, xupstdUpsShutdownPending, xupstdAlarmTempBad,
+                    xupstdAlarmTestInProgress, xupstdAmbientTempBad, xupstdLossOfRedundancy,  
+                    xupstdAlarmChargerFailed, xupstdAlarmFanFailure, xupstdAlarmFuseFailure, 
+                    xupstdPowerSwitchBad, xupstdModuleFailure, xupstdOnAlternatePowerSource, 
+                    xupstdAltPowerNotAvailable, xupstdNoticeCondition, xupstdHeartbeat, 
+                    xupstdDiagnosticTestPassed, xupstdOutputBad, xupstdAwaitingPower, 
+                    xupstdOnMaintenanceBypass, xupstdCommEstablished, xupstdAgentDown,
+                    xupstdOutputNotProtected, xupstdTestTrap }
+    STATUS  current
+    DESCRIPTION
+        "The Alarm and Event notifications from the xupsTrapDefined source (xupstd)."
+    ::= { xupsConformance 18 }
 
-xupstpBreakerOpen TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"One of the UPS breakers or contactors has been opened."
-   --#SEVERITY MAJOR
-   ::= 20
-
-xupstpAlarmEntryAdded TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"An alarm not defined in the xups Well Known Alarms
-(eg, an alarm defined in RFC1628)
-has been added to the Alarm Table."
-   --#SEVERITY MAJOR
-   ::= 21
-
-xupstpAlarmEntryRemoved TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"An alarm not defined in the xups Well Known Alarms
-has been removed from the Alarm Table."
-   --#SEVERITY INFORMATIONAL
-   ::= 22
-
-xupstpAlarmBatteryBad        TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"One or more batteries have been determined to require replacement."
-   --#SEVERITY MAJOR
-   ::= 23
-
-xupstpOutputOffAsRequested   TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The UPS has shutdown as requested, i.e., the output is off."
-   --#SEVERITY INFORMATIONAL
-   ::= 24
-
-xupstpDiagnosticTestFailed   TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"The result of the last diagnostic test indicates a failure."
-   --#SEVERITY MINOR
-   ::= 25
-
-xupstpCommunicationsLost     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"A problem has been encountered in the communications
-between the agent and the UPS."
-   --#SEVERITY MAJOR
-   ::= 26
-
-xupstpUpsShutdownPending     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"An xupsControlOutputOffDelay countdown is underway."
-   --#SEVERITY MAJOR
-   ::= 27
-
-xupstpAlarmTestInProgress    TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
-     ifIndex, ifDescr }
-   DESCRIPTION
-"A test is in progress, as initiated and indicated by the
-Battery Test Group."
-   --#SEVERITY INFORMATIONAL
-   ::= 28
-
--- Provide additional information with the AmbientTemp trap
-xupstpAmbientTempBad         TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
- ifIndex, ifDescr,
- xupsEnvAmbientTemp, xupsEnvAmbientLowerLimit,
- xupsEnvAmbientUpperLimit }
-   DESCRIPTION
-      "The ambient temperature, xupsEnvAmbientTemp, has fallen below
-the set lower limit, xupsEnvAmbientLowerLimit, or has risen above
-the set upper limit, xupsEnvAmbientUpperLimit."
-   --#SEVERITY MAJOR
-   ::= 29
-
--- The following alarms do not have equivalents as PortN Traps
--- xupstdContactActiveNotice    ::= 30
--- xupstdContactInactiveNotice  ::= 31
-
-xupstpLossOfRedundancy     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"A parallel UPS system is no longer operating in N+1 redundant mode;
-      this may be due to module failure or removal, or due to overloading."
-   --#SEVERITY MINOR
-   ::= 32
+xupstdEMPNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { xupstdContactActiveNotice, xupstdContactInactiveNotice, 
+                    xupstdRemoteTempBad, xupstdRemoteHumidityBad  }
+    STATUS  current
+    DESCRIPTION
+        "The EMP's Alarm and Event notifications from the xupsTrapDefined source (xupstd)."
+    ::= { xupsConformance 19 }
 
 
-xupstpAlarmTempBad     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"An internal temperature is out of tolerance."
-   --#SEVERITY MAJOR
-   ::= 33
+xupsMibFullCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+       "A compliance statement for all of everything in this MIB."
+    MODULE -- this module
+       MANDATORY-GROUPS  { xupsIdentFullGroup, xupsBatteryFullGroup, xupsInputFullGroup, 
+                           xupsInputTableFullGroup, xupsOutputFullGroup, xupsOutputTableFullGroup, 
+                           xupsBypassFullGroup, xupsEnvironmentFullGroup, xupsAlarmFullGroup, 
+                           xupsAlarmEventsFullGroup, xupsTestFullGroup, xupsControlFullGroup, 
+                           xupsConfigFullGroup, xupsTrapControlFullGroup, xupsRecepFullGroup, 
+                           xupsTopologyFullGroup, xupstdNotifyGroup, xupstdEMPNotifyGroup,
+                           xupsBypassTableFullGroup, xupsInputTotalFullGroup, xupsOutputTotalFullGroup,
+                           xupsBypassTotalFullGroup }
+    ::= { xupsConformance 20 }
 
-xupstpAlarmChargerFailed     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"An uncorrected problem has been detected within the UPS charger subsystem."
-   --#SEVERITY MAJOR
-   ::= 34
+xupsDeprecatedGroup  OBJECT-GROUP
+    OBJECTS { xupsAlarmEventDateAndTime, xupsAlarmEventKind,
+              xupsAlarmEventDescr, xupsControlOutputOnTrapDelay }
+    STATUS  deprecated
+    DESCRIPTION
+        "Contains objects which are now deprecated."
+    ::= { xupsConformance 21 }
 
-xupstpAlarmFanFailure     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"The failure of one or more fans in the UPS has been detected."
-   --#SEVERITY MAJOR
-   ::= 35
+xupsBypassTableFullGroup  OBJECT-GROUP
+    OBJECTS { xupsBypassId, xupsBypassName, xupsBypassCurrentHighPrecision, xupsBypassWatts }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsBypassTable subgroup objects."
+    ::= { xupsConformance 22 }
 
-xupstpAlarmFuseFailure     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"The failure of one or more fuses has been detected."
-   --#SEVERITY CRITICAL
-   ::= 36
+xupsInputTotalFullGroup  OBJECT-GROUP
+    OBJECTS { xupsInputAverageVoltage, xupsInputTotalCurrent, xupsInputTotalWatts,
+              xupsInputTotalVA, xupsInputAveragePowerFactor }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsInputTotal subgroup objects."
+    ::= { xupsConformance 23 }
 
-xupstpPowerSwitchBad     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"A Relay, Contactor, or Breaker has failed."
-   --#SEVERITY CRITICAL
-   ::= 37
+xupsOutputTotalFullGroup  OBJECT-GROUP
+    OBJECTS { xupsOutputAverageVoltage, xupsOutputTotalCurrent, xupsOutputTotalWatts,
+              xupsOutputTotalVA, xupsOutputAveragePowerFactor }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsOutputTotal subgroup objects."
+    ::= { xupsConformance 24 }
 
-xupstpModuleFailure     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"One module in a parallel or composite system has failed."
-   --#SEVERITY MAJOR
-   ::= 38
+xupsBypassTotalFullGroup  OBJECT-GROUP
+    OBJECTS { xupsBypassAverageVoltage, xupsBypassTotalCurrent, xupsBypassTotalWatts,
+              xupsBypassTotalVA, xupsBypassAveragePowerFactor }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsOutputTotal subgroup objects."
+    ::= { xupsConformance 25 }
 
-xupstpOnAlternatePowerSource     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, xupsInputSource,
-                 ifIndex, ifDescr }
-   DESCRIPTION
-"The system is being powered by its Alternate Power Source, such as a
-Secondary utility feed (on a dual AC input UPS), generator, flywheel,
-or fuelcell."
-   --#SEVERITY MINOR
-   ::= 39
+xupsAgentFullGroup  OBJECT-GROUP
+    OBJECTS { xupsAgentManufacturer, xupsAgentModel, 
+              xupsAgentSoftwareVersion, xupsAgentPartNumber, xupsAgentSerialNumber }
+    STATUS  current
+    DESCRIPTION
+        "The Full set of xupsAgent subgroup objects."
+    ::= { xupsConformance 26 }
 
-xupstpAltPowerNotAvailable     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"On systems with a separate alternate power source (eg, dual AC inputs),
-that alternate power source is currently not available.  This could be
-a problem if the primary power source (eg, utility) fails for a period
-of time longer than that for which the internal batteries can supply power."
-   --#SEVERITY MINOR
-   ::= 40
+    END
 
-xupstpNoticeCondition     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage, ifIndex, ifDescr }
-   DESCRIPTION
-"Some Notice condition exists which is not covered by the other traps.
-This is like an xupstpInternalFailure, but at a lower severity level."
-   --#SEVERITY MINOR
-   ::= 41
-
-
--- Provide additional information with the RemoteTemp and RemoteHumidity traps
-xupstpRemoteTempBad         TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
- ifIndex, ifDescr,
- xupsEnvRemoteTemp, xupsEnvRemoteTempLowerLimit,
- xupsEnvRemoteTempUpperLimit }
-   DESCRIPTION
-      "The remote temperature, xupsEnvRemoteTemp, has fallen below
-the set lower limit, xupsEnvRemoteTempLowerLimit, or has risen above
-the set upper limit, xupsEnvRemoteTempUpperLimit."
-   --#SEVERITY MAJOR
-   ::= 42
-
-xupstpRemoteHumidityBad     TRAP-TYPE
-   ENTERPRISE xupsTrapPortN
-   VARIABLES   { xupsAlarmID,  xupsAlarmDescr, xupsTrapMessage,
- ifIndex, ifDescr,
- xupsEnvRemoteHumidity, xupsEnvRemoteHumidityLowerLimit,
- xupsEnvRemoteHumidityUpperLimit }
-   DESCRIPTION
-      "The remote temperature, xupsEnvRemoteHumidity, has fallen below
-the set lower limit, xupsEnvRemoteHumidityLowerLimit, or has risen above
-the set upper limit, xupsEnvRemoteHumidityUpperLimit."
-   --#SEVERITY MINOR
-   ::= 43
-
-
-   END
