@@ -40,12 +40,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <input type="hidden" name="service_id" id="service_id" value="">
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
                         <input type="hidden" name="type" id="type" value="create-service">
-                        <div class="form-service">
+                        <div class="form-group">
                             <div class="col-sm-12">
                                 <span id="ajax_response">&nbsp;</span>
                             </div>
                         </div>
-                        <div class="form-service row">
+                        <div class="form-group row">
                             <label for='stype' class='col-sm-3 control-label'>Type: </label>
                             <div class="col-sm-9">
                                 <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
@@ -55,15 +55,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class='col-sm-9'>
                             </div>
                         </div>
-                        <div class='form-service row'>
+                        <div class='form-group row'>
                             <label for='desc' class='col-sm-3 control-label'>Description: </label>
                             <div class='col-sm-9'>
-                                <textarea id='desc' name='desc' class='form-control'></textarea>
+                                <textarea id='desc' name='desc' class='form-control' rows='5'></textarea>
                             </div>
                             <div class='col-sm-9'>
                             </div>
                         </div>
-                        <div class="form-service row">
+                        <div class="form-group row">
                             <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
                             <div class="col-sm-9">
                                 <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
@@ -71,7 +71,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class='col-sm-9'>
                             </div>
                         </div>
-                        <div class="form-service row">
+                        <div class="form-group row">
                             <label for='param' class='col-sm-3 control-label'>Parameters: </label>
                             <div class="col-sm-9">
                                 <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
@@ -84,20 +84,20 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <label class='control-label text-left input-sm'>Parameters may be required and will be different depending on the service check.</label>
                             </div>
                         </div>
-                        <div class="form-service row">
+                        <div class="form-group row">
                             <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
                             <div class="col-sm-9">
                                 <input type='checkbox' id='ignore' name='ignore'>
                             </div>
                         </div>
-                        <div class="form-service row">
+                        <div class="form-group row">
                             <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
                             <div class="col-sm-9">
                                 <input type='checkbox' id='disabled' name='disabled'>
                             </div>
                         </div>
                         <hr>
-                        <div class="form-service row">
+                        <div class="form-group row">
                             <center><button class="btn btn-default btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button></center>
                         </div>
                         <div class="clearfix"></div>
