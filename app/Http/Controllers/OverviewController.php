@@ -101,18 +101,15 @@ class OverviewController extends Controller
         $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
         $widgets = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
 
+        $user_list = [];
         if ($user->can('manage', User::class)) {
             $user_list = User::select(['username', 'user_id'])
                 ->where('user_id', '!=', $user->user_id)
                 ->orderBy('username')
                 ->get();
-        } else {
-            $user_list = [];
         }
 
-        $unselected_user_id = '0';
-
-        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets', 'user_list', 'unselected_user_id'));
+        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets', 'user_list'));
     }
 
     public function simple(Request $request)
