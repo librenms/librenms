@@ -12,7 +12,6 @@
  */
 
 if (Auth::user()->hasGlobalAdmin()) {
-    
     ?>
     foreach (dbFetchRows('SELECT * FROM `services_template` ORDER BY `name`') as $service_template) {
         $service_template_id .= "<option value='" . $service_template['service_template_id'] . "'>" . $service_template['service_template_name'] . '</option>';
