@@ -34,6 +34,6 @@ if (Config::get('discover_services')) {
             }
         }
     }
-    
+
     echo "\n";
 }
