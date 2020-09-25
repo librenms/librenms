@@ -196,7 +196,7 @@ function discover_service_template($device_group = null, $service_template = nul
     foreach ($device_ids as $device) {
         if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_template_id`= ? AND `device_id` = ?', [$service_template, $device])) {
             add_service($device, $services_template[0]['service_template_type'], $services_template[0]['service_template_desc'], $services_template[0]['service_template_ip'], $services_template[0]['service_template_param'], $services_template[0]['service_template_ignore'], $services_template[0]['service_template_disabled'], $services_template[0]['service_template_id'], $services_template[0]['service_template_name']);
-            log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
+            log_event('Autodiscovered service: type ' . mres($services_template), $device, 'service', 2);
             echo '+';
         }
     }
