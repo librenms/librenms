@@ -192,10 +192,10 @@ function delete_service_template($service_template = null, $service_delete = nul
 function discover_service_template($device_group = null, $service_template = null)
 {
     $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?', [$device_group]);
-    $service = service_template_get($service_template);
+    $services_template = service_template_get($service_template);
     foreach ($device_ids as $device) {
         if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_template_id`= ? AND `device_id` = ?', [$service_template, $device])) {
-            add_service($device, $service['type'], $service['descr'], $service['ip'], $service['params'], $service['ignore'], $service['disabled'], $service['service_template_id'], $service['name']);
+            add_service($device, $services_template['service_template_type'], $services_template['service_template_desc'], $services_template['service_template_ip'], $services_template['service_template_param'], $services_template['service_template_ignore'], $services_template['service_template_disabled'], $services_template['service_template_id'], $services_template['service_template_name']);
             log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
             echo '+';
         }
