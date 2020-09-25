@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 $oid = snmpwalk_cache_multi_oid($device, 'fsStatusTable', [], $pre_cache['siteboss_mibs'], null, '-OQUbs');
 

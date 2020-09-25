@@ -1,8 +1,7 @@
-<?php 
+<?php
 
 foreach ($pre_cache['esPointTable'] as $index => $entry) {
     if ($entry['esIndexPC'] == 3) {
-    
         discover_sensor(
             $valid['sensor'],
             'humidity',
