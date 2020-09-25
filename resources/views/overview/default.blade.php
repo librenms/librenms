@@ -48,19 +48,6 @@
             <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Remove Dashboard"><i class="fa fa-trash fa-fw"></i></button>
             <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="New Dashboard"><i class="fa fa-plus fa-fw"></i></button>
         </div>
-        @if (count($user_list))
-        <div class="btn-group btn-lg" style="position:absolute;right:0px;">
-            <div class="btn-group">
-            <select class="form-control" id=dashboard_copy_target name=dashboard_copy_target onchange="dashboard_copy_user_select()">
-                <option value="{{ $unselected_user_id }}"> Copy Dashboard to </option>
-            @foreach ($user_list as $user)
-                <option value="{{ $user->user_id }}"> {{ $user->username }} </option>
-            @endforeach
-            </select>
-            </div>
-            <button id="do_copy_dashboard" class="btn btn-primary" href="#copy_dash" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="Copy Dashboard"><i class="fa fa-copy fa-fw"></i></button>
-        </div>
-        @endif
         <div class="dash-collapse" id="add_dash" style="display: none;" >
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
@@ -107,6 +94,19 @@
                             </div>
                         </form>
                     </div>
+                    @if (count($user_list))
+                    <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
+                        <div class="btn-group">
+                        <select class="form-control" id=dashboard_copy_target name=dashboard_copy_target onchange="dashboard_copy_user_select()">
+                            <option value="{{ $unselected_user_id }}"> Copy Dashboard to </option>
+                        @foreach ($user_list as $user)
+                            <option value="{{ $user->user_id }}"> {{ $user->username }} </option>
+                        @endforeach
+                        </select>
+                        </div>
+                        <button id="do_copy_dashboard" class="btn btn-primary" href="#copy_dash" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="Copy Dashboard"><i class="fa fa-copy fa-fw"></i></button>
+                    </div>
+                    @endif
                 </div>
             </div>
             <!-- End Dashboard-Settings -->
@@ -505,9 +505,9 @@
         if (target_user_id == {{ $unselected_user_id }}) {
             toastr.warning('No target selected to copy Dashboard to');
         } else {
-//            if (! confirm("Do you really want to copy this Dashboard to User '" + username + "'?")) {
-//                return;
-//            }
+            if (! confirm("Do you really want to copy this Dashboard to User '" + username + "'?")) {
+                return;
+            }
 
             $.ajax({
                 type: 'POST',

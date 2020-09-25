@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
@@ -25,10 +24,10 @@
 
 namespace App\Http\Controllers\Form;
 
-use Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Dashboard;
 use App\Models\UserWidget;
+use Auth;
 use Illuminate\Http\Request;
 
 class CopyDashboardController extends Controller
@@ -37,6 +36,7 @@ class CopyDashboardController extends Controller
     {
         $target_user_id = $request->get('target_user_id');
         $dashboard_id = $request->get('dashboard_id');
+
         $dashboard = Dashboard::where(['dashboard_id' => $dashboard_id, 'user_id' => Auth::id()])->first();
 
         $success = true;
@@ -66,10 +66,10 @@ class CopyDashboardController extends Controller
         }
 
         if ($success) {
-            $status  = 'ok';
+            $status = 'ok';
             $message = 'Dashboard copied';
         } else {
-            $status  = 'error';
+            $status = 'error';
             $message = 'ERROR: Could not copy Dashboard';
         }
 
