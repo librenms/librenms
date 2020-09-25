@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.3807.1.281802",
                     "sysDescr": "S2800 FHN USP (R) Software, Version V210R220,Hw Version 1.0,Copyright (c) 2000-2012 by FiberHome Networks Co., Ltd",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "version": "V210R220",
+                    "hardware": "S2800 FHN USP",
+                    "features": "1.0",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
                     "icon": "fiberhome.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,8 +26,8 @@
                     "sysDescr": "S2800 FHN USP (R) Software, Version V210R220,Hw Version 1.0,Copyright (c) 2000-2012 by FiberHome Networks Co., Ltd",
                     "sysContact": "<private>",
                     "version": "V210R220",
-                    "hardware": "FHN S2800 V 1.0",
-                    "features": null,
+                    "hardware": "S2800 FHN USP",
+                    "features": "1.0",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,

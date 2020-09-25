@@ -8,7 +8,7 @@ if ($device['os'] == 'ies52xxM') {
         foreach ($array as $key => $value) {
             if (is_numeric($key) && is_numeric($value['memStatsCurrent'])) {
                 $perc_warn = $value['memStatsHighThreshold'];
-                discover_mempool($valid_mempool, $device, $key, 'ies52xxM-mem', 'Memory '.$key, null, null, null, $perc_warn);
+                discover_mempool($valid_mempool, $device, $key, 'ies52xxM-mem', 'Memory ' . $key, null, null, null, $perc_warn);
             }
         }
 

@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == "hpblmos") {
+if ($device['os'] == 'hpblmos') {
     d_echo('HP OA Memory info:');
     //UCD-SNMP-MIB::memAvailReal.0
     $free = intval(preg_replace('/[^0-9]+/', '', snmp_get($device, '.1.3.6.1.4.1.2021.4.6.0', '-Oqv')), 10);

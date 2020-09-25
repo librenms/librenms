@@ -3,16 +3,16 @@
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'cisco') {
-    $acc_rows = dbFetchRows('SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.port_id = I.port_id AND I.device_id = ?', array($device['device_id']));
+    $acc_rows = dbFetchRows('SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.port_id = I.port_id AND I.device_id = ?', [$device['device_id']]);
 
-    if (!empty($acc_rows)) {
-        $cip_oids = array(
+    if (! empty($acc_rows)) {
+        $cip_oids = [
             'cipMacHCSwitchedBytes',
             'cipMacHCSwitchedPkts',
-        );
-        $cip_array = array();
+        ];
+        $cip_array = [];
 
-        foreach (array_merge($cip_oids, array('cipMacSwitchedBytes', 'cipMacSwitchedPkts')) as $oid) {
+        foreach (array_merge($cip_oids, ['cipMacSwitchedBytes', 'cipMacSwitchedPkts']) as $oid) {
             echo "$oid ";
             $cip_array = snmpwalk_cache_cip($device, $oid, $cip_array, 'CISCO-IP-STAT-MIB');
         }
@@ -20,19 +20,19 @@ if ($device['os_group'] == 'cisco') {
         // Normalize cip_array
         $cip_array = array_map(function ($entries) {
             return array_map(function ($entry) {
-                $new_entry = array();
-                
-                foreach (array('Bytes', 'Pkts') as $unit) {
-                    $returned_oid = (array_key_exists('cipMacHCSwitched'.$unit, $entry)) ? 'cipMacHCSwitched' : 'cipMacSwitched';
-                    $new_value = array();
-    
-                    foreach ($entry[$returned_oid.$unit] as $key => $value) {
+                $new_entry = [];
+
+                foreach (['Bytes', 'Pkts'] as $unit) {
+                    $returned_oid = (array_key_exists('cipMacHCSwitched' . $unit, $entry)) ? 'cipMacHCSwitched' : 'cipMacSwitched';
+                    $new_value = [];
+
+                    foreach ($entry[$returned_oid . $unit] as $key => $value) {
                         $new_value[$key] = intval($value);
                     }
-    
-                    $new_entry['cipMacHCSwitched'.$unit] = $new_value;
+
+                    $new_entry['cipMacHCSwitched' . $unit] = $new_value;
                 }
-                
+
                 return $new_entry;
             }, $entries);
         }, $cip_array);
@@ -64,7 +64,7 @@ if ($device['os_group'] == 'cisco') {
 
                 // Update metrics
                 foreach ($cip_oids as $oid) {
-                    foreach (array('input', 'output') as $dir) {
+                    foreach (['input', 'output'] as $dir) {
                         $oid_dir = $oid . '_' . $dir;
                         $acc['update'][$oid_dir] = $this_ma[$oid][$dir];
                         $acc['update'][$oid_dir . '_prev'] = $acc[$oid_dir];
@@ -81,7 +81,7 @@ if ($device['os_group'] == 'cisco') {
 
                 d_echo("\n" . $acc['hostname'] . ' ' . $acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out ");
 
-                $rrd_name = array('cip', $ifIndex, $mac);
+                $rrd_name = ['cip', $ifIndex, $mac];
                 $rrd_def = RrdDefinition::make()
                     ->addDataset('IN', 'COUNTER', 0, 12500000000)
                     ->addDataset('OUT', 'COUNTER', 0, 12500000000)
@@ -89,19 +89,19 @@ if ($device['os_group'] == 'cisco') {
                     ->addDataset('POUT', 'COUNTER', 0, 12500000000);
 
                 // FIXME - use memcached to make sure these values don't go backwards?
-                $fields = array(
+                $fields = [
                     'IN' => $b_in,
                     'OUT' => $b_out,
                     'PIN' => $p_in,
                     'POUT' => $p_out,
-                );
+                ];
 
                 $tags = compact('ifIndex', 'mac', 'rrd_name', 'rrd_def');
                 data_update($device, 'cip', $tags, $fields);
 
                 if ($acc['update']) {
                     // Do Updates
-                    dbUpdate($acc['update'], 'mac_accounting', '`ma_id` = ?', array($acc['ma_id']));
+                    dbUpdate($acc['update'], 'mac_accounting', '`ma_id` = ?', [$acc['ma_id']]);
                 } //end if
             }//end if
         }//end foreach

@@ -3,8 +3,7 @@ text: 'DVB Modulator & Ampiflier'
 type: network
 icon: vigintos
 group: vigintos
-mib_dir:
-    - vigintos
+mib_dir: vigintos
 over:
     - { graph: device_temperature, text: 'Ampiflier Temperature' }
     - { graph: device_voltage, text: 'Ampiflier Voltage' }

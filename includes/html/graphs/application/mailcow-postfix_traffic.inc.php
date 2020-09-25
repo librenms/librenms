@@ -25,12 +25,12 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array = array(
-    'bytesreceived' => array('descr' => 'bytes Received', 'colour' => '4CB24C',),
-    'bytesdelivered' => array('descr' => 'bytes Delivered', 'colour' => 'BF3F3F',),
-);
+$array = [
+    'bytesreceived' => ['descr' => 'bytes Received', 'colour' => '4CB24C'],
+    'bytesdelivered' => ['descr' => 'bytes Delivered', 'colour' => 'BF3F3F'],
+];
 
 $i = 0;
 

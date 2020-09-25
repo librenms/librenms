@@ -2,8 +2,7 @@ os: infinera-groove
 text: 'Infinera Groove'
 type: network
 icon: infinera
-mib_dir:
-    - infinera
+mib_dir: infinera
 discovery_modules:
     ntp: false
     ospf: false

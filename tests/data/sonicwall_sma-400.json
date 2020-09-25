@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.8741.6",
                     "sysDescr": "SonicWall SMA 400 (8.6.0.3-11sv)",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "(Firmware 8.6.0.3-11sv / ROM 5.0.0.5)",
+                    "hardware": "SMA 400",
                     "features": null,
                     "os": "sonicwall",
                     "type": "firewall",
-                    "serial": null,
+                    "serial": "18B1697FEE2C",
                     "icon": "sonicwall.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

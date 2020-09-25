@@ -1,15 +1,15 @@
 <?php
 
 $chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.1.1.1.1.2.'; // chasEntPhysOperStatus
-$oids   = snmp_walk($device, 'chasEntPhysOperStatus', '-OQUse', 'ALCATEL-IND1-CHASSIS-MIB', 'nokia');
+$oids = snmp_walk($device, 'chasEntPhysOperStatus', '-OQUse', 'ALCATEL-IND1-CHASSIS-MIB', 'nokia');
 foreach (explode("\n", $oids) as $chas_entry) {
     preg_match('/chasEntPhysOperStatus.(.) = (.+)/', $chas_entry, $data2); // entPhysicalName.284 = "5/PS-2"
-    if (!empty($data2)) {
+    if (! empty($data2)) {
         $number = $data2[1];
         $value = $data2[2];
-        $chas_oid_index = $chas_oid.$number;
+        $chas_oid_index = $chas_oid . $number;
         $chas_current = "chasEntPhysOperStatus.$number";
-        $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7.".$number;
+        $descr_oid = '.1.3.6.1.2.1.47.1.1.1.1.7.' . $number;
         $chas_descr = snmp_get($device, $descr_oid, '-Oqv');
         $chas_state_name = 'chasEntPhysOperStatus';
         $chas_states = [
@@ -36,13 +36,13 @@ unset(
 
 foreach ($pre_cache['aos6_fan_oids'] as $index => $data) {
     if (is_array($data)) {
-        $oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.11.1.2.' . $index ;
+        $oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.11.1.2.' . $index;
         $state_name = 'alaChasEntPhysFanStatus';
         $current = $data['alaChasEntPhysFanStatus'];
-        list($revindex, $revchass, $revdata,)  = explode('.', strrev($oid), 4);
-        $chassis=strrev($revchass);
-        $indexName=strrev($revindex);
-        $descr = "Chassis-".($chassis-568). " Fan $indexName";
+        [$revindex, $revchass, $revdata,] = explode('.', strrev($oid), 4);
+        $chassis = strrev($revchass);
+        $indexName = strrev($revindex);
+        $descr = 'Chassis-' . ($chassis - 568) . " Fan $indexName";
         $states = [
             ['value' => 0, 'generic' => 1, 'graph' => 1, 'descr' => 'noStatus'],
             ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'notRunning'],

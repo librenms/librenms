@@ -20,7 +20,6 @@
  * Adva system alarm traps. This handler will log the description and a
  * description of the alarm.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -47,16 +46,16 @@ class AdvaSysAlmTrap implements SnmptrapHandler
     {
         $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
         switch ($alSeverity) {
-            case "critical":
+            case 'critical':
                 $logSeverity = 5;
                 break;
-            case "major":
+            case 'major':
                 $logSeverity = 4;
                 break;
-            case "minor":
+            case 'minor':
                 $logSeverity = 3;
                 break;
-            case "cleared":
+            case 'cleared':
                 $logSeverity = 1;
                 break;
             default:

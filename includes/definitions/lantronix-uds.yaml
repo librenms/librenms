@@ -2,8 +2,7 @@ os: lantronix-uds
 text: 'Lantronix UDS'
 type: network
 icon: lantronix
-mib_dir:
-    - lantronix
+mib_dir: lantronix
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

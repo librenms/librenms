@@ -18,5 +18,4 @@ discovery:
             - .1.3.6.1.4.1.207.1.4.144
             - .1.3.6.1.4.1.207.1.4.145
         sysDescr_except: ['AW+', 'Software (AlliedWare Plus)']
-mib_dir:
-    - allied
+mib_dir: allied

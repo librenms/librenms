@@ -2,8 +2,7 @@ os: fujitsueternusos
 text: 'Fujitsu ETERNUS'
 type: storage
 icon: fujitsu
-mib_dir:
-    - fujitsu
+mib_dir: fujitsu
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

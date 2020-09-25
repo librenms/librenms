@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
@@ -74,8 +73,8 @@ class DocsTest extends TestCase
     public function testDocExist()
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
-        $dir    = __DIR__ . '/../doc/';
-        $files  = str_replace($dir, '', rtrim(`find $dir -name '*.md'`));
+        $dir = __DIR__ . '/../doc/';
+        $files = str_replace($dir, '', rtrim(`find $dir -name '*.md'`));
 
         // check for missing pages
         collect(explode(PHP_EOL, $files))

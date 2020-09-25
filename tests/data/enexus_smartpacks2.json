@@ -7,14 +7,14 @@
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "2.5.2",
+                    "hardware": "Smartpack S",
                     "features": null,
                     "os": "enexus",
                     "type": "power",
-                    "serial": null,
+                    "serial": "999999999999",
                     "icon": "eltek.png",
-                    "location": null
+                    "location": "Site"
                 }
             ]
         },

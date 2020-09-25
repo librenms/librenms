@@ -21,7 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -33,7 +32,6 @@ use App\Models\Device;
 use App\Models\OspfNbr;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class OspfNbrStateChangeTest extends SnmpTrapTestCase
 {

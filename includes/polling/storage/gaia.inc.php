@@ -17,15 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $gaia_data = snmp_get_multi_oid($device, "multiDiskSize.{$storage['storage_index']} multiDiskUsed.{$storage['storage_index']}", '-OUQst', 'CHECKPOINT-MIB');
-$storage['size']  = $gaia_data["multiDiskSize.{$storage['storage_index']}"];
-$storage['used']   = $gaia_data["multiDiskUsed.{$storage['storage_index']}"];
-$storage['free']   = $storage['size'] - $storage['used'];
-$storage['units']  = $storage['storage_units'];
+$storage['size'] = $gaia_data["multiDiskSize.{$storage['storage_index']}"];
+$storage['used'] = $gaia_data["multiDiskUsed.{$storage['storage_index']}"];
+$storage['free'] = $storage['size'] - $storage['used'];
+$storage['units'] = $storage['storage_units'];
 unset($gaia_data);

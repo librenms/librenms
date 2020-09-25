@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.3807.1.582815",
                     "sysDescr": "S5800 FHN USP (R) Software, Version V210R240,Hw Version 2.0,Copyrig",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "version": "V210R240",
+                    "hardware": "S5800 FHN USP",
+                    "features": "2.0",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
                     "icon": "fiberhome.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,8 +26,8 @@
                     "sysDescr": "S5800 FHN USP (R) Software, Version V210R240,Hw Version 2.0,Copyrig",
                     "sysContact": "<private>",
                     "version": "V210R240",
-                    "hardware": "FHN S5800 V 2.0",
-                    "features": null,
+                    "hardware": "S5800 FHN USP",
+                    "features": "2.0",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,

@@ -10,14 +10,14 @@ $fans = trim(snmp_walk($device, $fans_oid, '-Osqn'));
 foreach (explode("\n", $fans) as $fan) {
     $fan = trim($fan);
     if ($fan) {
-        list($oid, $presence) = explode(' ', $fan, 2);
+        [$oid, $presence] = explode(' ', $fan, 2);
         if ($presence != 2) {
             $split_oid = explode('.', $oid);
             $current_id = $split_oid[(count($split_oid) - 1)];
-            $current_oid = $fan_state_oid.$current_id;
-            $descr = $fan_state_descr.$current_id;
+            $current_oid = $fan_state_oid . $current_id;
+            $descr = $fan_state_descr . $current_id;
             $state = snmp_get($device, $current_oid, '-Oqv');
-            if (!empty($state)) {
+            if (! empty($state)) {
                 $states = [
                     ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
                     ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'ok'],
@@ -42,14 +42,14 @@ $psus = trim(snmp_walk($device, $psu_oid, '-Osqn'));
 foreach (explode("\n", $psus) as $psu) {
     $psu = trim($psu);
     if ($psu) {
-        list($oid, $presence) = explode(' ', $psu, 2);
+        [$oid, $presence] = explode(' ', $psu, 2);
         if ($presence != 2) {
             $split_oid = explode('.', $oid);
             $current_id = $split_oid[(count($split_oid) - 1)];
-            $current_oid = $psu_state_oid.$current_id;
-            $descr = $psu_state_descr.$current_id;
+            $current_oid = $psu_state_oid . $current_id;
+            $descr = $psu_state_descr . $current_id;
             $state = snmp_get($device, $current_oid, '-Oqv');
-            if (!empty($state)) {
+            if (! empty($state)) {
                 $states = [
                     ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
                     ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'ok'],

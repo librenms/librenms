@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.3373.1103",
                     "sysDescr": "ALFOplus2 - SIAE Microelettronica",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "N50052  01.05.00",
+                    "hardware": "(GC8503)",
                     "features": null,
                     "os": "sm-os",
                     "type": "wireless",
                     "serial": null,
                     "icon": "siae.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "ALFOplus2 - SIAE Microelettronica",
                     "sysContact": "<private>",
                     "version": "N50052  01.05.00",
-                    "hardware": " (GC8503)",
+                    "hardware": "(GC8503)",
                     "features": null,
                     "os": "sm-os",
                     "type": "wireless",

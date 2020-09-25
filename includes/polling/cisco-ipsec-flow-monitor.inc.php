@@ -78,7 +78,7 @@ if ($device['os_group'] == 'cisco') {
             ->addDataset('NoSaFails', 'COUNTER', 0, 100000000000)
             ->addDataset('SysCapFails', 'COUNTER', 0, 100000000000);
 
-        $fields = array(
+        $fields = [
             'Tunnels'          => $data['cipSecGlobalActiveTunnels'],
             'InOctets'         => $data['cipSecGlobalInOctets'],
             'OutOctets'        => $data['cipSecGlobalOutOctets'],
@@ -100,7 +100,7 @@ if ($device['os_group'] == 'cisco') {
             'ProtocolUseFails' => $data['cipSecGlobalProtocolUseFails'],
             'NoSaFails'        => $data['cipSecGlobalNoSaFails'],
             'SysCapFails'      => $data['cipSecGlobalSysCapFails'],
-        );
+        ];
 
         $tags = compact('rrd_def');
         data_update($device, 'cipsec_flow', $tags, $fields);

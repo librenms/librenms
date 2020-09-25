@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.45.3.82.4",
                     "sysDescr": "Ethernet Routing Switch 4950GTS-PWR+     HW:02       FW:7.5.0.2   SW:v7.6.1.033 BN:33 (c) Extreme Networks",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "7.6.1.033",
+                    "hardware": "ERS-4950GTS-PWR+",
                     "features": null,
                     "os": "boss",
                     "type": "network",
                     "serial": null,
                     "icon": "extremeboss.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

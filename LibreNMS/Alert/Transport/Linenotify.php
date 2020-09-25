@@ -1,12 +1,10 @@
 <?php
 /**
  * LINE Notify Transport
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Linenotify extends Transport
@@ -14,6 +12,7 @@ class Linenotify extends Transport
     public function deliverAlert($obj, $opts)
     {
         $opts['line-notify-access-token'] = $this->config['line-notify-access-token'];
+
         return $this->contactLineNotify($obj, $opts);
     }
 
@@ -36,6 +35,7 @@ class Linenotify extends Transport
         if ($code != 200) {
             return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -47,12 +47,12 @@ class Linenotify extends Transport
                     'title' => 'Token',
                     'name' => 'line-notify-access-token',
                     'descr' => 'LINE Notify Token',
-                    'type' => 'text'
-                ]
+                    'type' => 'text',
+                ],
             ],
             'validation' => [
                 'line-notify-access-token' => 'required|string',
-            ]
+            ],
         ];
     }
 }

@@ -228,10 +228,10 @@ ensure they are used in the correct location.
 
 # Accessing configuration of a disabled/removed device
 
-When you're disabling or removing a device from LibreNMS, Oxidized
-will no longer shows it in the web interface the configuration. You
-can access directly to this information in the Git repository of
-Oxidized (if using Git to store versions).
+When you're disabling or removing a device from LibreNMS, the 
+configuration will no longer be available via the LibreNMS web interface. 
+You can gain access to these configurations directly in the Git repository of
+Oxidized (if using Git for version control).
 
 1: Check in your Oxidized where are stored your Git repositories:
 

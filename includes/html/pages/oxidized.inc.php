@@ -17,7 +17,7 @@ $pagetitle[] = 'Oxidized';
         <ul class="nav nav-tabs">
             <li class="active"><a href="#list" data-toggle="tab">Node List</a></li>
             <li><a href="#search" data-toggle="tab">Config Search</a></li>
-            <li><a href="<?php echo generate_url(array('page' => 'tools', 'tool' => 'oxidized-cfg-check')); ?>">Oxidized config validation</a></li>
+            <li><a href="<?php echo generate_url(['page' => 'tools', 'tool' => 'oxidized-cfg-check']); ?>">Oxidized config validation</a></li>
         </ul>
     </div>
     <div class="panel with-nav-tabs panel-default">
@@ -30,7 +30,7 @@ $pagetitle[] = 'Oxidized';
                             <tr>
                                 <th data-column-id="id" data-visible="false">ID</th>
                                 <th data-column-id="hostname" data-formatter="hostname" data-order="asc">Hostname</th>
-                                <th data-column-id="sysname" data-visible=" <?php echo (!Config::get('force_ip_to_sysname')  ? 'true' : 'false') ?>">SysName</th>
+                                <th data-column-id="sysname" data-visible=" <?php echo ! Config::get('force_ip_to_sysname') ? 'true' : 'false' ?>">SysName</th>
                                 <th data-column-id="last_status" data-formatter="status">Last Status</th>
                                 <th data-column-id="last_update">Last Update</th>
                                 <th data-column-id="model">Model</th>
@@ -39,7 +39,7 @@ $pagetitle[] = 'Oxidized';
                             </tr>
                             </thead>
                             <tbody>
-                            <?php get_oxidized_nodes_list();?>
+                            <?php get_oxidized_nodes_list(); ?>
                             </tbody>
                         </table>
                     </div>

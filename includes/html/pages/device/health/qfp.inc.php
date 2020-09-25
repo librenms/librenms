@@ -6,8 +6,6 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  *
- * @package    LibreNMS
- * @subpackage webui
  * @link       http://librenms.org
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
@@ -17,16 +15,16 @@
  * Get module's components for a device
  */
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], array('type' => 'cisco-qfp'));
+$components = $component->getComponents($device['device_id'], ['type' => 'cisco-qfp']);
 $components = $components[$device['device_id']];
 
 foreach ($components as $component_id => $tmp_component) {
-    $default_graph_array = array(
+    $default_graph_array = [
         'from' => \LibreNMS\Config::get('time.day'),
         'to' => \LibreNMS\Config::get('time.now'),
         'id' => $component_id,
-        'page' => 'graphs'
-    );
+        'page' => 'graphs',
+    ];
 
     /*
      * Main container for QFP component
@@ -82,8 +80,6 @@ foreach ($components as $component_id => $tmp_component) {
             </div>";
     echo "<div class='panel-body'>";
 
-
-
     /*
      * QFP Utilization (Load)
      */
@@ -108,7 +104,7 @@ foreach ($components as $component_id => $tmp_component) {
             </div>";
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
+    echo '</div></div>';
 
     /*
      * Relative QFP utilization to packets processed
@@ -122,7 +118,7 @@ foreach ($components as $component_id => $tmp_component) {
             </div>";
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
+    echo '</div></div>';
 
     /*
      * QFP Packets In/Out
@@ -136,14 +132,13 @@ foreach ($components as $component_id => $tmp_component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$packets_label}'>" . format_bi($tmp_component['packets']) . "pps</span>
+                        <span class='label {$packets_label}'>" . format_bi($tmp_component['packets']) . 'pps</span>
                     </div>
                 </h3>
-            </div>";
+            </div>';
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
-
+    echo '</div></div>';
 
     /*
      * QFP Throughput In/Out
@@ -157,13 +152,13 @@ foreach ($components as $component_id => $tmp_component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$throughput_label}'>" . format_bi($tmp_component['throughput']) . "bps</span>
+                        <span class='label {$throughput_label}'>" . format_bi($tmp_component['throughput']) . 'bps</span>
                     </div>
                 </h3>
-            </div>";
+            </div>';
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
+    echo '</div></div>';
 
     /*
      * QFP Average packet size
@@ -177,18 +172,18 @@ foreach ($components as $component_id => $tmp_component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$psize_label}'>" . ceil($tmp_component['average_packet']) . " Bytes</span>
+                        <span class='label {$psize_label}'>" . ceil($tmp_component['average_packet']) . ' Bytes</span>
                     </div>
                 </h3>
-            </div>";
+            </div>';
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
+    echo '</div></div>';
 
     /*
      * QFP Memory resources
      */
-    $mem_prec = $tmp_component['memory_used']*100/$tmp_component['memory_total'];
+    $mem_prec = $tmp_component['memory_used'] * 100 / $tmp_component['memory_total'];
     if ($mem_prec < 75) {
         $mem_label = 'label-success';
     } elseif ($mem_prec < 90) {
@@ -199,7 +194,7 @@ foreach ($components as $component_id => $tmp_component) {
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_memory';
     $text_descr = 'QFP Memory';
-    $label_text = sprintf("%sB / %sB", format_bi($tmp_component['memory_used']), format_bi($tmp_component['memory_total']));
+    $label_text = sprintf('%sB / %sB', format_bi($tmp_component['memory_used']), format_bi($tmp_component['memory_total']));
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>
@@ -209,6 +204,6 @@ foreach ($components as $component_id => $tmp_component) {
             </div>";
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
-    echo "</div></div>";
-    echo "</div></div>";
+    echo '</div></div>';
+    echo '</div></div>';
 }

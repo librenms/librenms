@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Neil Kahle <nkahle@kanren.net>
@@ -42,10 +41,9 @@ class JnxVpnPwDown implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        
         $vpnType = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnPwVpnType'));
         $vpnName = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnPwVpnName'));
-       
+
         Log::event("$vpnType on a pseudowire belonging to $vpnName has gone down", $device->device_id, 'trap', 4);
     }
 }

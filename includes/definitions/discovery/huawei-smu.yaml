@@ -1,5 +1,7 @@
 mib: HUAWEI-MIB:HUAWEI-SITE-MONITOR-MIB
 modules:
+    os:
+        version: HUAWEI-SITE-MONITOR-MIB::hwMonEquipSoftwareVersion.1
     pre-cache:
         data:
             -

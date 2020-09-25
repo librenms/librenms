@@ -21,11 +21,11 @@ if ($device['os'] === 'fiberhome-switch') {
     if (is_array($mempools_array)) {
         foreach ($mempools_array as $index => $entry) {
             if ($entry['memoryPoolTotalBytes'] != 0) {
-                d_echo($index.' '.$entry['memoryPoolIndexDescr'].' -> '.$entry['memoryPoolAllocBytesNum']."\n");
-                $usage_oid = '.1.3.6.1.4.1.3807.1.8012.1.5.4.1.7.'.$index;
-                $descr     = $entry['memoryPoolIndexDescr'];
-                $usage     = $entry['memoryPoolAllocBytesNum'];
-                if (!strstr($descr, 'No') && !strstr($usage, 'No') && $descr != '') {
+                d_echo($index . ' ' . $entry['memoryPoolIndexDescr'] . ' -> ' . $entry['memoryPoolAllocBytesNum'] . "\n");
+                $usage_oid = '.1.3.6.1.4.1.3807.1.8012.1.5.4.1.7.' . $index;
+                $descr = $entry['memoryPoolIndexDescr'];
+                $usage = $entry['memoryPoolAllocBytesNum'];
+                if (! strstr($descr, 'No') && ! strstr($usage, 'No') && $descr != '') {
                     discover_mempool($valid_mempool, $device, $index, 'fiberhome-switch', $descr, '1', null, null);
                 }
             } //end if

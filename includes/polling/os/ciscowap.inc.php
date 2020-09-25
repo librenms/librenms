@@ -5,4 +5,4 @@
 preg_match('/(.*), Cisco Small Business (.*) \((.*)\)(.*)/', $device['sysDescr'], $matches);
 
 $hardware = $matches['2'];
-$version  = $matches['3'];
+$version = $matches['3'];

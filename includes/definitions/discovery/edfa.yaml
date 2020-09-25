@@ -1,5 +1,8 @@
 mib: NSCRTV-ROOT
 modules:
+    os:
+        hardware: NSCRTV-ROOT::commonDeviceModelNumber.1
+        serial: NSCRTV-ROOT::commonDeviceSerialNumber.1
     sensors:
         state:
             data:

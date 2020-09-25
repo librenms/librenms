@@ -14,7 +14,7 @@
                     "type": "appliance",
                     "serial": null,
                     "icon": "infoblox.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

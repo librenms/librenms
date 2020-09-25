@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @author     TheGreatDoc
  */
@@ -26,7 +25,6 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Sensor;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
@@ -54,7 +52,7 @@ UPS-MIB::upsConfigLowBattTime.0 1 minutes";
         \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
         \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'upsOutputSourceState\' for device: " . $device->hostname);
 
-        $message = "UPS running on battery for 120 seconds. Estimated 100 minutes remaining";
+        $message = 'UPS running on battery for 120 seconds. Estimated 100 minutes remaining';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $trap = new Trap($trapText);

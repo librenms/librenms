@@ -72,6 +72,8 @@ alert_log:
     alert_log_device_id_index: { Name: alert_log_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     alert_log_rule_id_index: { Name: alert_log_rule_id_index, Columns: [rule_id], Unique: false, Type: BTREE }
     alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
+    alert_log_rule_id_device_id_index: { Name: alert_log_rule_id_device_id_index, Columns: [rule_id, device_id], Unique: false, Type: BTREE }
+    alert_log_rule_id_device_id_state_index: { Name: alert_log_rule_id_device_id_state_index, Columns: [rule_id, device_id, state], Unique: false, Type: BTREE }
 alert_rules:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -575,7 +577,6 @@ device_outages:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
     - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: uptime, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -40,11 +39,11 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(str_i_contains($data, 'juSt'));
         $this->assertFalse(str_i_contains($data, 'nope'));
 
-        $this->assertTrue(Str::contains($data, array('not', 'this', 'This')));
-        $this->assertFalse(Str::contains($data, array('not', 'this')));
+        $this->assertTrue(Str::contains($data, ['not', 'this', 'This']));
+        $this->assertFalse(Str::contains($data, ['not', 'this']));
 
-        $this->assertTrue(str_i_contains($data, array('not', 'thIs')));
-        $this->assertFalse(str_i_contains($data, array('not', 'anything')));
+        $this->assertTrue(str_i_contains($data, ['not', 'thIs']));
+        $this->assertFalse(str_i_contains($data, ['not', 'anything']));
     }
 
     public function testStartsWith()
@@ -54,8 +53,8 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(Str::startsWith($data, 'This'));
         $this->assertFalse(Str::startsWith($data, 'this'));
 
-        $this->assertTrue(Str::startsWith($data, array('this', 'Test', 'This')));
-        $this->assertFalse(Str::startsWith($data, array('this', 'Test')));
+        $this->assertTrue(Str::startsWith($data, ['this', 'Test', 'This']));
+        $this->assertFalse(Str::startsWith($data, ['this', 'Test']));
     }
 
     public function testEndsWith()
@@ -65,8 +64,8 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(Str::endsWith($data, 'Testing'));
         $this->assertFalse(Str::endsWith($data, 'testing'));
 
-        $this->assertTrue(Str::endsWith($data, array('this', 'Testing', 'This')));
-        $this->assertFalse(Str::endsWith($data, array('this', 'Test')));
+        $this->assertTrue(Str::endsWith($data, ['this', 'Testing', 'This']));
+        $this->assertFalse(Str::endsWith($data, ['this', 'Test']));
     }
 
     public function testRrdDescriptions()
@@ -91,11 +90,11 @@ class CommonFunctionsTest extends TestCase
         $this->assertEquals('&lt;html&gt;string&lt;/html&gt;', display('<html>string</html>'));
         $this->assertEquals('&lt;script&gt;alert("test")&lt;/script&gt;', display('<script>alert("test")</script>'));
 
-        $tmp_config = array(
+        $tmp_config = [
             'HTML.Allowed'    => 'b,iframe,i,ul,li,h1,h2,h3,h4,br,p',
             'HTML.Trusted'    => true,
             'HTML.SafeIframe' => true,
-        );
+        ];
 
         $this->assertEquals('<b>Bold</b>', display('<b>Bold</b>', $tmp_config));
         $this->assertEquals('', display('<script>alert("test")</script>', $tmp_config));
@@ -143,24 +142,23 @@ class CommonFunctionsTest extends TestCase
     {
         $this->dbSetUp();
 
-        $this->assertFalse(ResolveGlues(array('dbSchema'), 'device_id'));
+        $this->assertFalse(ResolveGlues(['dbSchema'], 'device_id'));
 
-        $this->assertSame(array('devices.device_id'), ResolveGlues(array('devices'), 'device_id'));
-        $this->assertSame(array('sensors.device_id'), ResolveGlues(array('sensors'), 'device_id'));
+        $this->assertSame(['devices.device_id'], ResolveGlues(['devices'], 'device_id'));
+        $this->assertSame(['sensors.device_id'], ResolveGlues(['sensors'], 'device_id'));
 
         // does not work right with current code
 //        $expected = array('bill_data.bill_id', 'bill_ports.port_id', 'ports.device_id');
 //        $this->assertSame($expected, ResolveGlues(array('bill_data'), 'device_id'));
 
-        $expected = array('application_metrics.app_id', "applications.device_id");
-        $this->assertSame($expected, ResolveGlues(array('application_metrics'), 'device_id'));
+        $expected = ['application_metrics.app_id', 'applications.device_id'];
+        $this->assertSame($expected, ResolveGlues(['application_metrics'], 'device_id'));
 
+        $expected = ['state_translations.state_index_id', 'sensors_to_state_indexes.sensor_id', 'sensors.device_id'];
+        $this->assertSame($expected, ResolveGlues(['state_translations'], 'device_id'));
 
-        $expected = array('state_translations.state_index_id', 'sensors_to_state_indexes.sensor_id', 'sensors.device_id');
-        $this->assertSame($expected, ResolveGlues(array('state_translations'), 'device_id'));
-
-        $expected = array('ipv4_addresses.port_id', 'ports.device_id');
-        $this->assertSame($expected, ResolveGlues(array('ipv4_addresses'), 'device_id'));
+        $expected = ['ipv4_addresses.port_id', 'ports.device_id'];
+        $this->assertSame($expected, ResolveGlues(['ipv4_addresses'], 'device_id'));
 
         $this->dbTearDown();
     }
@@ -169,11 +167,11 @@ class CommonFunctionsTest extends TestCase
     {
         $device_dns = [
             'hostname' => 'test.librenms.org',
-            'sysName' => 'Testing DNS'
+            'sysName' => 'Testing DNS',
         ];
         $device_ip = [
             'hostname' => '192.168.1.2',
-            'sysName' => 'Testing IP'
+            'sysName' => 'Testing IP',
         ];
 
         // both false

@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 if ($device['os'] === 'fabos') {
     $usage = snmp_get($device, 'swMemUsage.0', '-Ovq', 'SW-MIB');
     discover_mempool($valid_mempool, $device, 0, 'fabos', 'Memory', '1');

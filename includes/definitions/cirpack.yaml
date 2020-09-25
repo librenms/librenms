@@ -3,8 +3,7 @@ text: 'cirpack'
 type: server
 icon: cirpack
 group: cirpack
-mib_dir:
-    - cirpack
+mib_dir: cirpack
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

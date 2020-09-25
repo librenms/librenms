@@ -1,6 +1,6 @@
 <?php
 
-$ds_in  = 'read';
+$ds_in = 'read';
 $ds_out = 'written';
 
 $format = 'bytes';

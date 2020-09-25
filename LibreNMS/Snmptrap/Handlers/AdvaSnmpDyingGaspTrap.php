@@ -20,7 +20,6 @@
  * Adva SNMP Dying Gasp Trap. Trap that is sent when the Adva loses
  * power and about to shut off.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>
@@ -45,6 +44,6 @@ class AdvaSnmpDyingGaspTrap implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event("Dying Gasp received", $device->device_id, 'trap', 5);
+        Log::event('Dying Gasp received', $device->device_id, 'trap', 5);
     }
 }

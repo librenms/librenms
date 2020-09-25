@@ -12,7 +12,7 @@
 
 if ($device['os'] == 'nxos') {
     $used = snmp_get($device, '.1.3.6.1.4.1.9.9.109.1.1.1.1.12.1', '-OvQ');
-    $free  = snmp_get($device, '.1.3.6.1.4.1.9.9.109.1.1.1.1.13.1', '-OvQ');
+    $free = snmp_get($device, '.1.3.6.1.4.1.9.9.109.1.1.1.1.13.1', '-OvQ');
 
     if (is_numeric($used) && is_numeric($free)) {
         discover_mempool($valid_mempool, $device, 0, 'nxos', 'Memory', '1', null, null);

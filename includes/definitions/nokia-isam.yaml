@@ -13,8 +13,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.637.61
-mib_dir:
-    - nokia
+mib_dir: nokia
 bad_iftype:
     - aluGponOnu
     - bridge

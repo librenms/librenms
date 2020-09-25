@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Memory";
+$pagetitle[] = 'Health :: Memory';
 ?>
 
 <div class="panel panel-default panel-condensed">

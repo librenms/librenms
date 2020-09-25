@@ -17,15 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
-
-use Illuminate\Support\Str;
 
 class ApiToken extends BaseModel
 {
@@ -44,7 +41,7 @@ class ApiToken extends BaseModel
     {
         $query = self::query()->isEnabled()->where('token_hash', $token);
 
-        if (!is_null($user_id)) {
+        if (! is_null($user_id)) {
             $query->where('user_id', $user_id);
         }
 

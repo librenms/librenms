@@ -14,7 +14,7 @@
                     "type": "appliance",
                     "serial": null,
                     "icon": "gos.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

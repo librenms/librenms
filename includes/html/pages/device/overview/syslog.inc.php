@@ -7,7 +7,7 @@ if (\LibreNMS\Config::get('enable_syslog')) {
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
               <div class="panel-heading">';
-        echo '<a href="device/device='.$device['device_id'].'/tab=logs/section=syslog/"><i class="fa fa-clone fa-lg icon-theme" aria-hidden="true"></i> <strong>Recent Syslog</strong></a>';
+        echo '<a href="device/device=' . $device['device_id'] . '/tab=logs/section=syslog/"><i class="fa fa-clone fa-lg icon-theme" aria-hidden="true"></i> <strong>Recent Syslog</strong></a>';
         echo '        </div>
               <table class="table table-hover table-condensed table-striped">';
         foreach ($syslog as $entry) {
