@@ -31,7 +31,7 @@ if (Config::get('discover_services')) {
         }
     }
     foreach (dbFetchRows('SELECT `service_template_id` FROM `services_template`') as $service_template) {
-        foreach (dbFetchRows('SELECT `device_group_id` FROM `device_groups`') as $device_group) {
+        foreach (dbFetchRows('SELECT `id` FROM `device_groups`') as $device_group) {
             discover_service_template($device_group, $service_template);
         }
     }
