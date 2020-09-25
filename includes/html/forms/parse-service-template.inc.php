@@ -29,6 +29,7 @@ if (is_numeric($service_template_id) && $service_template_id > 0) {
         'param'     => $service_template[0]['service_template_param'],
         'ignore'    => $service_template[0]['service_template_ignore'],
         'disabled'  => $service_template[0]['service_template_disabled'],
+        'name'      => $service_template[0]['service_template_name'],
     ];
 
     header('Content-Type: application/json');

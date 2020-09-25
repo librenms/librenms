@@ -12,8 +12,11 @@
  */
 
 if (Auth::user()->hasGlobalAdmin()) {
+    
     ?>
-
+    foreach (dbFetchRows('SELECT * FROM `services_template` ORDER BY `name`') as $service_template) {
+        $service_template_id .= "<option value='" . $service_template['service_template_id'] . "'>" . $service_template['service_template_name'] . '</option>';
+    }
     <div class="modal fade bs-example-modal-sm" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

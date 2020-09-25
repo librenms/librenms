@@ -7,6 +7,14 @@ echo "
   <div class='alert alert-info'>Service Template will created for the specified Device Group.</div>
   <div class='well well-lg'>
     <div class='form-group'>
+      <label for='name' class='col-sm-2 control-label'>Name:</label>
+      <div class='col-sm-5'>
+        <input name='name' id='name' class='form-control input-sm'>
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <div class='form-group'>
       <input type='hidden' name='addsrv-template' value='yes'>
       <label for='device_group' class='col-sm-2 control-label'>Device Group:</label>
       <div class='col-sm-5'>

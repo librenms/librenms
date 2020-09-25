@@ -36,7 +36,7 @@ function get_service_status($device = null)
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $service_template_id = '')
+function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $service_template_id = '', $name)
 {
     if (! is_array($device)) {
         $device = device_by_id_cache($device);
@@ -46,14 +46,14 @@ function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, 
         $ip = Device::pollerTarget($device['hostname']);
     }
 
-    $insert = ['device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $service_template_id];
+    $insert = ['device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $service_template_id, 'service_name' => $name];
 
     return dbInsert($insert, 'services');
 }
 
 function service_get($device = null, $service = null)
 {
-    $sql_query = 'SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds`,`service_template_id` FROM `services` WHERE';
+    $sql_query = 'SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds`,`service_template_id`,`service_name` FROM `services` WHERE';
     $sql_param = [];
     $add = 0;
 
@@ -115,14 +115,14 @@ function discover_service($device, $service)
     echo "$service ";
 }
 
-function add_service_template($device_group, $type, $desc, $ip, $param = '', $ignore = 0, $disabled = 0)
+function add_service_template($device_group, $type, $desc, $ip, $param = '', $ignore = 0, $disabled = 0, $name)
 {
 
 //    if (!is_array($device_group)) {
 //        $device_group = device_group_by_id_cache($device_group);
 //    }
 
-    $insert = ['device_group_id' => $device_group['device_group_id'], 'service_template_ip' => $ip, 'service_template_type' => $type, 'service_template_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled];
+    $insert = ['device_group_id' => $device_group['device_group_id'], 'service_template_ip' => $ip, 'service_template_type' => $type, 'service_template_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled, 'service_template_name' => $name];
 
     return dbInsert($insert, 'services_template');
 }
@@ -159,7 +159,7 @@ function service_template_get($service_template = null)
 
     // $service is not null, get only what we want.
     */
-    $sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE `service_template_id` = ?';
+    $sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled`,`service_template_name` FROM `services_template` WHERE `service_template_id` = ?';
     $services_template = dbFetchRows($sql_query, [$service_template]);
     d_echo('Service Template Array: ' . print_r($services_template, true) . "\n");
 
@@ -195,7 +195,7 @@ function discover_service_template($device_group = null, $service_template = nul
     $service = service_template_get($service_template);
     foreach ($device_ids as $device) {
         if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_template_id`= ? AND `device_group_id` = ? AND `device_id` = ?', [$service_template, $device_group, $device])) {
-            add_service($device, $service['type'], $service['descr'], $service['ip'], $service['params'], $service['ignore'], $service['disabled'], $service['service_template_id']);
+            add_service($device, $service['type'], $service['descr'], $service['ip'], $service['params'], $service['ignore'], $service['disabled'], $service['service_template_id'], $service['name']);
             log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
             echo '+';
         }

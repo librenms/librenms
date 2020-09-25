@@ -22,10 +22,12 @@ class CreateServicesTemplateTable extends Migration
             $table->boolean('service_template_ignore');
             $table->unsignedInteger('service_template_changed')->default(0);
             $table->boolean('service_template_disabled')->default(0);
+            $table->string('service_template_name');
             //$table->index(['device_group_id'],'services_template_device_group_id_index');
         });
         Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->default(0);
+            $table->string('service_name');
         });
     }
 
@@ -40,6 +42,7 @@ class CreateServicesTemplateTable extends Migration
         Schema::table('services', function (Blueprint $table) {
             $table->dropColumn([
                 'service_template_id',
+                'service_name',
             ]);
         });
     }

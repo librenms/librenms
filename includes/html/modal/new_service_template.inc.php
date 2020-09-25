@@ -51,6 +51,14 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label for='name' class='col-sm-3 control-label'>Name: </label>
+                            <div class="col-sm-9">
+                                <input type='text' id='name' name='name' class='form-control input-sm' placeholder=''/>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label for='device_group_id' class='col-sm-3 control-label'>Device Group: </label>
                             <div class="col-sm-9">
                                 <select id='device_group_id' name='device_group_id' class='form-control input-sm'>
@@ -132,6 +140,7 @@ $('#create-service-template').on('hide.bs.modal', function (event) {
     $('#param').val('');
     $('#ignore').val('');
     $('#disabled').val('');
+    $('#name').val('');
 });
 
 // on-load
@@ -159,6 +168,7 @@ $('#create-service-template').on('show.bs.modal', function (e) {
             if ($('#disabled').attr('value') == 1) {
                 $('#disabled').prop("checked", true);
             }
+            $('#name').val(output['name']);
         }
     });
 
