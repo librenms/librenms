@@ -1,8 +1,8 @@
 <?php
 /**
- * Siteboss550.php
+ * Siteboss.php
  *
- * Asentria Siteboss 550
+ * Asentria Siteboss
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +25,13 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\OS;
 
-class Siteboss550 extends OS
+class Siteboss extends OS
 {
+    private $siteboss_mibs = 'SITEBOSS-530-STD-MIB:SITEBOSS-550-STD-MIB';
+
     public function discoverOS(Device $device): void
     {
-        $device->version = preg_replace('/^\s*(\S+\s+\S+\s+)/', '', $device->sysDescr);
-        preg_match('/^\S+\s+\d+\s+/', $device->sysDescr, $matches);
-        $device->hardware = trim($matches[0]);
-        $device->sysName = snmp_get($this->getDeviceArray(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
+        parent::discoverOS($device); // yaml
+        $device->sysName = snmp_get($this->getDeviceArray(), 'siteName.0', '-Osqnv', $this->siteboss_mibs);
     }
 }
