@@ -22,7 +22,7 @@ if (is_numeric($service_template_id) && is_numeric($device_group_id)) {
     if (discover_service_template($device_group_id, $service_template_id)) {
         $status = ['status' =>0, 'message' => 'Device Group: <i>' . $device_group_id . ', Service Template: <i>' . $service_template_id . ', has been discovered.</i>'];
     } else {
-        $status = ['status' =>1, 'message' => 'Device Group: <i>' . $device_group_id . ', Service Template: <i>' . $service_template_id . ', has NOT been discovered.</i>'];        
+        $status = ['status' =>1, 'message' => 'Device Group: <i>' . $device_group_id . ', Service Template: <i>' . $service_template_id . ', has NOT been discovered.</i>'];
     }
 }
 header('Content-Type: application/json');
