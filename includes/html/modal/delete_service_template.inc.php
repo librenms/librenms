@@ -12,9 +12,6 @@
  */
 
 if (Auth::user()->hasGlobalAdmin()) {
-    foreach (dbFetchRows('SELECT * FROM `services_template` ORDER BY `name`') as $service_template) {
-        $service_template_id .= "<option value='" . $service_template['service_template_id'] . "'>" . $service_template['service_template_name'] . '</option>';
-    }
     ?>
 
     <div class="modal fade bs-example-modal-sm" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
@@ -28,16 +25,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <div class='well well-lg'>
                     <div class="modal-body">
                         <p>Please confirm that you would like to delete this Service Template.</p>
-                        <div class="form-group row">
-                            <label for='service_template_id' class='col-sm-3 control-label'>Service Template: </label>
-                            <div class="col-sm-9">
-                                <select id='service_template_id' name='service_template_id' class='form-control input-sm'>
-                                    <?php echo $service_template_id?>
-                                </select>
-                            </div>
-                            <div class='col-sm-9'>
-                            </div>
-                        </div>
+                        <p><?php echo $service_template_name?></p>
                         <div class="form-group row">
                             <div class="col-sm-12 alert alert-info">
                                 <label class='control-label text-left input-sm'>Please Tick this box to remove Services from Devices, that have been created with this Template.</label>
@@ -67,6 +55,8 @@ if (Auth::user()->hasGlobalAdmin()) {
     <script>
         $('#confirm-delete').on('show.bs.modal', function (e) {
             service_template_id = $(e.relatedTarget).data('service_template_id');
+            $("#service_template_id").val(service_template_id);
+            service_template_name = $(e.relatedTarget).data('service_template_name');
             $("#service_template_id").val(service_template_id);
         });
 
