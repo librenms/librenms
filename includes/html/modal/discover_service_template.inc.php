@@ -26,7 +26,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger danger" id="confirm-discovery-service-template"
+                    <button type="submit" class="btn btn-danger danger" id="confirm-discover-service-template"
                         data-target="confirm-discover-service-template">Discover
                     </button>
                     <input type="hidden" name="device_group_id" id="device_group_id" value="">
