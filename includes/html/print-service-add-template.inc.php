@@ -44,9 +44,9 @@ echo "
       </div>
     </div>
     <div class='form-group'>
-      <label for='ip' class='col-sm-2 control-label'>IP Address:</label>
+      <label for='ip' class='col-sm-2 control-label'>Remote Host:</label>
       <div class='col-sm-5'>
-        <input name='ip' id='ip' class='form-control input-sm' placeholder='IP Address'>
+        <input name='ip' id='ip' class='form-control input-sm' placeholder='IP Address or Hostname'>
       </div>
       <div class='col-sm-5'>
       </div>

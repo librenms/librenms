@@ -30,7 +30,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h2 class="modal-title" id="Create">Edit Service</h2>
+                <h2 class="modal-title" id="Create">Add / Edit Service</h2>
             </div>
             <div class='alert alert-info'>Service will modified for the specified Device.</div>
             <div class='well well-lg'>
@@ -72,9 +72,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
+                            <label for='ip' class='col-sm-3 control-label'>Remote Host: </label>
                             <div class="col-sm-9">
-                                <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
+                                <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='IP Address or Hostname'/>
                             </div>
                             <div class='col-sm-9'>
                             </div>

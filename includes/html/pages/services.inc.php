@@ -174,10 +174,13 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             echo '<thead>';
                             echo '<th style="width:1%;max-width:1%;"></th>';
                             echo '<th style="width:10%;max-width: 10%;">Name</th>';
-                            echo '<th style="width:10%;max-width: 10%;">Service Type</th>';
-                            echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
-                            echo '<th style="width:15%;max-width: 15%;">Description</th>';
+                            echo '<th style="width:10%;max-width: 10%;">Check Type</th>';
+                            echo '<th style="width:10%;max-width: 15%;">Remote Host</th>';
                             echo '<th >Message</th>';
+                            echo '<th style="width:15%;max-width: 15%;">Description</th>';
+                            echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
+                            echo '<th style="width:5%;max-width: 5%;">Ignored</th>';
+                            echo '<th style="width:5%;max-width: 5%;">Disabled</th>';
                             echo '<th style="width:5%;max-width:5%;"></th>';
                             echo '</thead>';
                         }
@@ -188,9 +191,12 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo '<td><span data-toggle="tooltip" title="' . $title . '" class="alert-status ' . $label . '"></span></td>';
                         echo '<td>' . nl2br(display($service['service_name'])) . '</td>';
                         echo '<td>' . nl2br(display($service['service_type'])) . '</td>';
-                        echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
-                        echo '<td>' . nl2br(display($service['service_desc'])) . '</td>';
+                        echo '<td>' . nl2br(display($service['service_ip'])) . '</td>';
                         echo '<td>' . nl2br(display($service['service_message'])) . '</td>';
+                        echo '<td>' . nl2br(display($service['service_desc'])) . '</td>';
+                        echo '<td>' . nl2br(display($service_template['service_ignore'])) . '</td>';
+                        echo '<td>' . nl2br(display($service_template['service_disabled'])) . '</td>';
+                        echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
 
                         if (Auth::user()->hasGlobalAdmin()) {
                             echo "<td>

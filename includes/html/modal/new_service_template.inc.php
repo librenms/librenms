@@ -87,9 +87,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
+                            <label for='ip' class='col-sm-3 control-label'>Remote Host: </label>
                             <div class="col-sm-9">
-                                <input type='text' id='ip' name='ip' class='form-control input-sm' placeholder=''/>
+                                <input type='text' id='ip' name='ip' class='form-control input-sm' placeholder='IP Address or Hostname'/>
                             </div>
                             <div class='col-sm-9'>
                             </div>
