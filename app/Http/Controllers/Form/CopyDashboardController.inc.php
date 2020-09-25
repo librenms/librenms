@@ -75,7 +75,7 @@ class CopyDashboardController extends Controller
 
         return response()->json([
             'status' => $status,
-            'message' => $message
+            'message' => $message,
         ]);
     }
 }
