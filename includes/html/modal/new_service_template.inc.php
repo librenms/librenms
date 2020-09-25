@@ -69,7 +69,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='stype' class='col-sm-3 control-label'>Type: </label>
+                            <label for='stype' class='col-sm-3 control-label'>Check Type: </label>
                             <div class="col-sm-9">
                                 <select id='stype' name='stype' placeholder='type' class='form-control input-sm'>
                                     <?php echo $stype?>

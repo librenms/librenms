@@ -26,7 +26,7 @@ echo "
       </div>
     </div>
     <div class='form-group'>
-      <label for='type' class='col-sm-2 control-label'>Type:</label>
+      <label for='type' class='col-sm-2 control-label'>Check Type:</label>
       <div class='col-sm-5'>
         <select name='type' id='type' class='form-control input-sm'>
           $servicesform
