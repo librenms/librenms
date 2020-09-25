@@ -199,9 +199,8 @@ function discover_service_template($device_group = null, $service_template = nul
             log_event('Autodiscovered service: type ' . mres($services_template), $device, 'service', 2);
             echo '+';
         }
+        echo "$service_template ";
     }
-
-    echo "$service_template ";
 }
 
 function poll_service($service)
