@@ -186,7 +186,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                         echo '<tr id="row_' . $service['service_id'] . '">';
                         echo '<td><span data-toggle="tooltip" title="' . $title . '" class="alert-status ' . $label . '"></span></td>';
-                        echo '<td>' . nl2br(display($service_template['service_name'])) . '</td>';
+                        echo '<td>' . nl2br(display($service['service_name'])) . '</td>';
                         echo '<td>' . nl2br(display($service['service_type'])) . '</td>';
                         echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
                         echo '<td>' . nl2br(display($service['service_desc'])) . '</td>';
