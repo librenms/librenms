@@ -7,7 +7,6 @@ foreach ($pre_cache['esPointTable'] as $index => $entry) {
 
     // contact closures
     if ($entry['esIndexPC'] == 2 && $entry['esPointName'] != 'unnamed') {
-        
         if (! $created_contact_indexes) {
             $state_name = 'contactClosure';
             $states = [
@@ -47,7 +46,6 @@ foreach ($pre_cache['esPointTable'] as $index => $entry) {
 
         // relay outputs
         if (stripos($entry['esPointValueStr'], 'active') === true) {
-
             if (! $created_relay_indexes) {
                 $state_name = 'relayOutput';
                 $states = [
@@ -82,7 +80,6 @@ foreach ($pre_cache['esPointTable'] as $index => $entry) {
 
         // power outputs
         } elseif (stripos($entry['esPointValueStr'], 'on') === true || stripos($entry['esPointValueStr'], 'off') === true) {
-
             if (! $created_power_indexes) {
                 $state_name = 'powerOutput';
                 $states = [
@@ -118,6 +115,6 @@ foreach ($pre_cache['esPointTable'] as $index => $entry) {
 
         create_sensor_to_state_index($device, $state_name, $index);
     }
-
 }
+
 unset($created_contact_indexes, $created_relay_indexes, $created_power_indexes);
