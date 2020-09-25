@@ -194,9 +194,9 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo '<td>' . nl2br(display($service['service_ip'])) . '</td>';
                         echo '<td>' . nl2br(display($service['service_message'])) . '</td>';
                         echo '<td>' . nl2br(display($service['service_desc'])) . '</td>';
+                        echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
                         echo '<td>' . nl2br(display($service['service_ignore'])) . '</td>';
                         echo '<td>' . nl2br(display($service['service_disabled'])) . '</td>';
-                        echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
 
                         if (Auth::user()->hasGlobalAdmin()) {
                             echo "<td>
