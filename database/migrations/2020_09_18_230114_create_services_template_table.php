@@ -27,7 +27,7 @@ class CreateServicesTemplateTable extends Migration
         });
         Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->default(0);
-            $table->string('service_name');
+            $table->string('service_name')->nullable()->default(null);
         });
     }
 
