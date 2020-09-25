@@ -7,6 +7,14 @@ echo "
   <div class='alert alert-info'>Service will created for the specified Device.</div>
   <div class='well well-lg'>
     <div class='form-group'>
+      <label for='name' class='col-sm-2 control-label'>Name:</label>
+      <div class='col-sm-5'>
+        <input name='name' id='name' class='form-control input-sm'>
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <div class='form-group'>
       <input type='hidden' name='addsrv' value='yes'>
       <label for='device' class='col-sm-2 control-label'>Device:</label>
       <div class='col-sm-5'>

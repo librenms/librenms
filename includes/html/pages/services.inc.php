@@ -173,7 +173,8 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             echo '<table class="table table-hover table-condensed">';
                             echo '<thead>';
                             echo '<th style="width:1%;max-width:1%;"></th>';
-                            echo '<th style="width:10%;max-width: 10%;">Service</th>';
+                            echo '<th style="width:10%;max-width: 10%;">Name</th>';
+                            echo '<th style="width:10%;max-width: 10%;">Service Type</th>';
                             echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
                             echo '<th style="width:15%;max-width: 15%;">Description</th>';
                             echo '<th >Message</th>';
@@ -185,6 +186,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                         echo '<tr id="row_' . $service['service_id'] . '">';
                         echo '<td><span data-toggle="tooltip" title="' . $title . '" class="alert-status ' . $label . '"></span></td>';
+                        echo '<td>' . nl2br(display($service_template['service_name'])) . '</td>';
                         echo '<td>' . nl2br(display($service['service_type'])) . '</td>';
                         echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
                         echo '<td>' . nl2br(display($service['service_desc'])) . '</td>';
