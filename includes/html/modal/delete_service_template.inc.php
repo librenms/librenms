@@ -24,8 +24,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <div class='alert alert-info'>Service Template will be deleted.</div>
                 <div class='well well-lg'>
                     <div class="modal-body">
-                        <p>Please confirm that you would like to delete this Service Template.</p>
-                        <p><?php echo $service_template_name?></p>
+                        <p>Please confirm that you would like to delete:</p>
+                        <p><strong><center><?php echo $service_template_name; ?></center></strong></p>
                         <div class="form-group row">
                             <div class="col-sm-12 alert alert-info">
                                 <label class='control-label text-left input-sm'>Please Tick this box to remove Services from Devices, that have been created with this Template.</label>
@@ -53,6 +53,8 @@ if (Auth::user()->hasGlobalAdmin()) {
     </div>
 
     <script>
+
+        // on-load
         $('#confirm-delete').on('show.bs.modal', function (e) {
             service_template_id = $(e.relatedTarget).data('service_template_id');
             $("#service_template_id").val(service_template_id);
@@ -60,6 +62,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $("#service_template_name").val(service_template_name);
         });
 
+        // on-submit
         $('#service-template-removal').click('', function (e) {
             e.preventDefault();
             var service_template_id = $("#service_template_id").val();
