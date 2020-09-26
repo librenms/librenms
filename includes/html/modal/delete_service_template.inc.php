@@ -25,8 +25,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <div class='well well-lg'>
                     <div class="modal-body">
                         <p>Please confirm that you would like to delete:</p>
-                        <p>{$service_template_id}</p>
-                        <p><strong class="service_template_name"></strong></p>
+                        <?php echo $service_template_name?>
+                        <?php echo $service_template_id?>
                         <div class="form-group row">
                             <div class="col-sm-12 alert alert-info">
                                 <label class='control-label text-left input-sm'>Please Tick this box to remove Services from Devices, that have been created with this Template.</label>
@@ -35,7 +35,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group">
                             <label for="service_delete" class="col-sm-3 col-md-3 control-label" title="Delete Services">Delete Services:</label>
                             <div class="col-sm-9 col-md-9">
-                                <input type='checkbox' name='service_delete' id='service_delete' value='1'>
+                                <input type='checkbox' name='service_delete' id='service_delete'>
                             </div>
                         </div>
                     </div>
