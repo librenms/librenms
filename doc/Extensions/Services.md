@@ -25,6 +25,26 @@ where you can find the documentation for most, if not all of the plugins.
 The plugins are bundled with the pre build VM images via the package
 `monitoring-plugins` in Ubuntu and `nagios-plugins-all` in CentOS.
 
+## Service Templates
+
+Service Templates are setup exactly the same way Services are.
+They are applied devices that belong to the specified Device Group.
+
+You can use the Apply button to manually push the Service Templates.
+You can also enable discover services to have them apply on
+discover intervals.
+
+## Service Auto Discovery
+
+To automatically apply service checks that are discovered to devices
+and to automatically apply Service Templates.
+
+You need to enable the discover services within config.php with the following:
+
+```php
+$config['discover_services']           = true;
+```
+
 ## Setup
 
 Service checks is now distributed aware. If you run a distributed
@@ -70,8 +90,6 @@ via the 'Add Service' link within the device, services page.
 Note that some services (procs, inodes, load and similar) will always
 poll the local LibreNMS server it's running on, regardless of which
 device you add it to.
-
-You can also add Service Templates which are applied Device Groups.
 
 ## Performance data
 
@@ -143,6 +161,43 @@ then you can run the following command to help troubleshoot services.
 ```
 ./check-services.php -d
 ```
+
+## Related olling / Discovery Options
+
+These settings are related and should be investigated and set accordingly.
+The below values are not defaults or recommended.
+
+```php
+$config['service_poller_enabled']           = true;
+```
+```php
+$config['service_poller_workers']           = 16;
+```
+```php
+$config['service_poller_frequency']           = 300;
+```
+```php
+$config['service_poller_down_retry']           = 5;
+```
+```php
+$config['service_discovery_enabled']           = true;
+```
+```php
+$config['service_discovery_workers']           = 16;
+```
+```php
+$config['service_discovery_frequency']           = 3600;
+```
+```php
+$config['service_services_enabled']           = true;
+```
+```php
+$config['service_services_workers']           = 16;
+```
+```php
+$config['service_services_frequency']           = 60;
+```
+
 
 ## Service checks polling logic
 
