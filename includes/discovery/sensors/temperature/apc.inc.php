@@ -1,17 +1,18 @@
 <?php
 
-$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.2.2.0', '-OsqnU', '');
+// upsHighPrecBatteryTemperature
+$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.3.2.0', '-OsqnU', '');
 d_echo($oids . "\n");
 
 if ($oids) {
     echo 'APC UPS Internal ';
     [$oid,$current] = explode(' ', $oids);
-    $precision = 1;
+    $precision = 10;
     $sensorType = 'apc';
     $index = 0;
     $descr = 'Internal Temperature';
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current / $precision);
 }
 
 // Environmental monitoring on UPSes etc
