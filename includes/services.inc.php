@@ -201,9 +201,9 @@ function discover_service_template($device_group = null, $service_template = nul
             echo '+';
             $status = 0;
         } else {
-            foreach (dbFetchRows('SELECT `service_id` FROM `services` WHERE `service_template_id` = ? AND `device_id` = ? AND `service_template_changed` != ?', [$service_template, $device, $services_template[0]['service_template_changed']]) as $service_id) {
+            foreach (dbFetchRows('SELECT `service_id` FROM `services` WHERE `service_template_id` = ? AND `device_id` = ? AND `service_template_changed` != ?', [$service_template, $device, $services_template[0]['service_template_changed']]) as $service) {
                 $update = ['service_desc' => $services_template[0]['service_template_desc'], 'service_ip' => $services_template[0]['service_template_ip'], 'service_param' => $services_template[0]['service_template_param'], 'service_ignore' => $services_template[0]['service_template_ignore'], 'service_disabled' => $services_template[0]['service_template_disabled'], 'service_template_id' => $services_template[0]['service_template_id'], 'service_name' => $services_template[0]['service_template_name'], 'service_template_changed' => $services_template[0]['service_template_changed']];
-                edit_service($update, $service_id);
+                edit_service($update, $service['service_id']);
                 log_event("Updated Service: {$services_template[0]['service_template_name']} from Service Template ID: {$services_template[0]['service_template_id']}", $device, 'service', 2);
             }
             echo '+';
