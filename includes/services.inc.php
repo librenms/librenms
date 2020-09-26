@@ -193,7 +193,7 @@ function discover_service_template($device_group = null, $service_template = nul
 {
     $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?', [$device_group]);
     $services_template = service_template_get($service_template);
-    $status = 1;
+    $status = null;
     foreach ($device_ids as $device) {
         if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_template_id`= ? AND `device_id` = ?', [$service_template, $device])) {
             add_service($device, $services_template[0]['service_template_type'], $services_template[0]['service_template_desc'], $services_template[0]['service_template_ip'], $services_template[0]['service_template_param'], $services_template[0]['service_template_ignore'], $services_template[0]['service_template_disabled'], $services_template[0]['service_template_id'], $services_template[0]['service_template_name'], $services_template[0]['service_template_changed']);
@@ -212,7 +212,7 @@ function discover_service_template($device_group = null, $service_template = nul
         echo "$service_template ";
     }
 
-    return $status;
+    return (is_numeric($status));
 }
 
 function poll_service($service)
