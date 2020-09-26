@@ -212,7 +212,7 @@ function discover_service_template($device_group = null, $service_template = nul
         echo "$service_template ";
     }
 
-    return (is_numeric($status));
+    return is_numeric($status);
 }
 
 function poll_service($service)
