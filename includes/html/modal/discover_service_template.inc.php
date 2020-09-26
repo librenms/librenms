@@ -66,7 +66,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     }
                 },
                 error: function () {
-                    $("#message").html('<div class="alert alert-info">An error occurred discovering this service template.</div>');
+                    $("#message").html('<div class="alert alert-info">No Services were updated when Applying this Service Template.</div>');
                     $("#discover-service-template").modal('hide');
                 }
             });
