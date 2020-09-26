@@ -206,7 +206,7 @@ function discover_service_template($device_group = null, $service_template = nul
                 edit_service($update, $service_id);
                 log_event("Updated Service: {$services_template[0]['service_template_name']} from Service Template ID: {$services_template[0]['service_template_id']}", $device, 'service', 2);
             }
-            echo '+'
+            echo '+';
             $status = 0;
         }
         
