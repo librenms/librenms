@@ -2288,7 +2288,7 @@ function add_service_for_host(\Illuminate\Http\Request $request)
     $service_desc = $data['desc'] ? $data['desc'] : '';
     $service_param = $data['param'] ? $data['param'] : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
-    $service_ignore = $data['disable'] ? true : false; // Default false
+    $service_disable = $data['disable'] ? true : false; // Default false
     $service_name = $data['name'];
     $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $name);
     if ($service_id != false) {
