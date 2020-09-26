@@ -180,7 +180,7 @@ function delete_service_template($service_template = null, $service_delete = nul
     if (! is_numeric($service_template)) {
         return false;
     }
-    if ($service_delete == 1) {
+    if ($service_delete == true) {
         foreach (dbFetchRows('SELECT * FROM `services` WHERE `service_template_id` = ?', [$service_template]) as $service) {
             dbDelete('services', '`service_id` =  ?', [$service['service_id']]);
         }
