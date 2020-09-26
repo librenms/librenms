@@ -208,7 +208,7 @@ function discover_service_template($device_group = null, $service_template = nul
             }
             echo '+';
             $status = 0;
-        }      
+        }
         echo "$service_template ";
     }
     return $status;
