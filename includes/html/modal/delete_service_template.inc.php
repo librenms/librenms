@@ -46,6 +46,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 data-target="service-template-removal">Delete
                         </button></center>
                         <input type="hidden" name="service_template_id" id="service_template_id" value="">
+                        <input type="hidden" name="service_delete" id="service_delete" value="">
                         <input type="hidden" name="confirm" id="confirm" value="yes">
                     </form>
                 </div>
