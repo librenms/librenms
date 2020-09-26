@@ -25,8 +25,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <div class='well well-lg'>
                     <div class="modal-body">
                         <p>Please confirm that you would like to delete:</p>
-                        <?php echo $service_template_name?>
-                        <?php echo $service_template_id?>
+                        <?php echo $vars['service_template_name']; ?>
+                        <?php echo mres($vars['service_template_name']); ?>
                         <div class="form-group row">
                             <div class="col-sm-12 alert alert-info">
                                 <label class='control-label text-left input-sm'>Please Tick this box to remove Services from Devices, that have been created with this Template.</label>
