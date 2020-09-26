@@ -162,7 +162,7 @@ then you can run the following command to help troubleshoot services.
 ./check-services.php -d
 ```
 
-## Related olling / Discovery Options
+## Related Polling / Discovery Options
 
 These settings are related and should be investigated and set accordingly.
 The below values are not defaults or recommended.
@@ -197,7 +197,6 @@ $config['service_services_workers']           = 16;
 ```php
 $config['service_services_frequency']           = 60;
 ```
-
 
 ## Service checks polling logic
 
