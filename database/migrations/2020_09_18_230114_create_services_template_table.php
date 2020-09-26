@@ -28,6 +28,7 @@ class CreateServicesTemplateTable extends Migration
         Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->default(0);
             $table->string('service_name')->nullable()->default(null);
+            $table->unsignedInteger('service_template_changed')->default(0);
         });
     }
 
@@ -43,6 +44,7 @@ class CreateServicesTemplateTable extends Migration
             $table->dropColumn([
                 'service_template_id',
                 'service_name',
+                'service_template_changed',
             ]);
         });
     }

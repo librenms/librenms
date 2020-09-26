@@ -38,6 +38,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <form method="post" role="form" id="service" class="form-horizontal service-form">
                         <?php echo csrf_field() ?>
                         <input type="hidden" name="service_id" id="service_id" value="">
+                        <input type="hidden" name="service_template_id" id="service_template_id" value="">
+                        <input type="hidden" name="service_template_changed" id="service_template_changed" value="">
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
                         <input type="hidden" name="type" id="type" value="create-service">
                         <div class="form-group">
@@ -127,7 +129,9 @@ $('#create-service').on('hide.bs.modal', function (event) {
     $('#param').val('');
     $('#ignore').val('');
     $('#disabled').val('');
+    $('#service_template_id').val('');
     $('#name').val('');
+    $('#service_template_name').val('');
 });
 
 // on-load
@@ -155,7 +159,9 @@ $('#create-service').on('show.bs.modal', function (e) {
             if ($('#disabled').attr('value') == 1) {
                 $('#disabled').prop("checked", true);
             }
+            $('#service_template_id').val(output['service_template_id']);
             $('#name').val(output['name']);
+            $('#service_template_changed').val(output['service_template_changed']);
         }
     });
 
