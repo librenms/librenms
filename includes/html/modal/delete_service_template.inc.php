@@ -35,7 +35,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group">
                             <label for="service_delete" class="col-sm-3 col-md-3 control-label" title="Delete Services">Delete Services:</label>
                             <div class="col-sm-9 col-md-9">
-                                <input type='checkbox' name='service_delete' id='service_delete'>
+                                <input type='checkbox' name='service_delete' id='service_delete' value='1'>
                             </div>
                         </div>
                     </div>
