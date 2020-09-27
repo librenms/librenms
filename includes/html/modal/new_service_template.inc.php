@@ -120,7 +120,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <hr>
-                        <center><button class="btn btn-default btn-sm" type="submit" name="service-template-submit" id="service-template-submit" value="save">Save Service Template</button></center>
+                        <center><button class="btn btn-primary primary" type="submit" name="service-template-submit" id="service-template-submit" value="save">Save Service Template</button></center>
                         <div class="clearfix"></div>
                     </form>
                 </div>
