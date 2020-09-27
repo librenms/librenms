@@ -20,6 +20,8 @@ $pagetitle[] = 'Services Templates';
 require_once 'includes/html/modal/new_service_template.inc.php';
 require_once 'includes/html/modal/delete_service_template.inc.php';
 require_once 'includes/html/modal/discover_service_template.inc.php';
+require_once 'includes/html/modal/remove_service_template.inc.php';
+
 ?>
 <div class="container-fluid">
     <div class="row">
