@@ -136,7 +136,7 @@ require_once 'includes/html/modal/remove_service_template.inc.php';
                         echo '<td>' . nl2br(display($service_template['service_template_param'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_ip'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_desc'])) . '</td>';
-                        echo '<td>' . formatUptime(time() - $service_template['service_template_changed']) . '</td>';
+                        echo '<td>' . nl2br(display($service_template['service_template_changed'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_ignore'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_disabled'])) . '</td>';
 
