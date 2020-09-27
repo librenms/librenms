@@ -19,16 +19,17 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Remove">Confirm Remove Services</h5>
+                    <h2 class="modal-title" id="Remove">Confirm Remove Services</h2>
                 </div>
-                <div class="modal-body">
-                    <p>Please confirm that you would like to remove all Services created by this Service Template.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger danger" id="confirm-remove-service-template"
+                <div class='alert alert-info'>Service Template will be Removed.</div>
+                <div class='well well-lg'>
+                    <div class="modal-body">
+                        <p>Please confirm that you would like to remove all Services created by this Service Template.</p>
+                    </div>
+                    <hr>
+                    <center><button type="submit" class="btn btn-danger danger" id="confirm-remove-service-template"
                         data-target="confirm-remove-service-template">Remove
-                    </button>
+                    </button></center>
                     <input type="hidden" name="service_template_id" id="service_template_id" value="">
                     <input type="hidden" name="confirm" id="confirm" value="yes">
                 </div>
