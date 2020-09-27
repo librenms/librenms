@@ -199,7 +199,7 @@ function discover_service_template($device_group = null, $service_template = nul
             add_service($device, $services_template[0]['service_template_type'], $services_template[0]['service_template_desc'], $services_template[0]['service_template_ip'], $services_template[0]['service_template_param'], $services_template[0]['service_template_ignore'], $services_template[0]['service_template_disabled'], $services_template[0]['service_template_id'], $services_template[0]['service_template_name'], $services_template[0]['service_template_changed']);
             log_event("Added Service: {$services_template[0]['service_template_name']} from Service Template ID: {$services_template[0]['service_template_id']}", $device, 'service', 2);
             echo '+';
-            $status = 0;
+            $status = 1;
         } else {
             foreach (dbFetchRows('SELECT `service_id` FROM `services` WHERE `service_template_id` = ? AND `device_id` = ? AND `service_template_changed` != ?', [$service_template, $device, $services_template[0]['service_template_changed']]) as $service) {
                 $update = ['service_desc' => $services_template[0]['service_template_desc'], 'service_ip' => $services_template[0]['service_template_ip'], 'service_param' => $services_template[0]['service_template_param'], 'service_ignore' => $services_template[0]['service_template_ignore'], 'service_disabled' => $services_template[0]['service_template_disabled'], 'service_template_id' => $services_template[0]['service_template_id'], 'service_name' => $services_template[0]['service_template_name'], 'service_template_changed' => $services_template[0]['service_template_changed']];
@@ -207,12 +207,16 @@ function discover_service_template($device_group = null, $service_template = nul
                 log_event("Updated Service: {$services_template[0]['service_template_name']} from Service Template ID: {$services_template[0]['service_template_id']}", $device, 'service', 2);
             }
             echo '+';
-            $status = 0;
+            $status = 1;
         }
         echo "$service_template ";
     }
 
-    return is_numeric($status);
+    if (is_numeric($status)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function remove_service_template($service_template = null)
@@ -220,11 +224,17 @@ function remove_service_template($service_template = null)
     if (! is_numeric($service_template)) {
         return false;
     }
+    $status = null;
     foreach (dbFetchRows('SELECT * FROM `services` WHERE `service_template_id` = ?', [$service_template]) as $service) {
         dbDelete('services', '`service_id` =  ?', [$service['service_id']]);
+        $status = 1;
     }
 
-    return dbDelete('services_template', '`service_template_id` =  ?', [$service_template]);
+    if (is_numeric($status)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function poll_service($service)
