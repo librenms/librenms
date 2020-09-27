@@ -27,7 +27,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <p>Please confirm that you would like to discover Devices and apply this Service Template.</p>
                     </div>
                     <hr>
-                    <center><button type="submit" class="btn btn-danger danger" id="confirm-discover-service-template"
+                    <center><button type="submit" class="btn btn-success success" id="confirm-discover-service-template"
                         data-target="confirm-discover-service-template">Apply
                     </button></center>
                     <input type="hidden" name="device_group_id" id="device_group_id" value="">

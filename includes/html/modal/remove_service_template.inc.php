@@ -27,7 +27,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <p>Please confirm that you would like to remove all Services created by this Service Template.</p>
                     </div>
                     <hr>
-                    <center><button type="submit" class="btn btn-danger danger" id="confirm-remove-service-template"
+                    <center><button type="submit" class="btn btn-warning warning" id="confirm-remove-service-template"
                         data-target="confirm-remove-service-template">Remove
                     </button></center>
                     <input type="hidden" name="service_template_id" id="service_template_id" value="">
