@@ -215,6 +215,18 @@ function discover_service_template($device_group = null, $service_template = nul
     return is_numeric($status);
 }
 
+function remove_service_template($service_template = null)
+{
+    if (! is_numeric($service_template)) {
+        return false;
+    }
+    foreach (dbFetchRows('SELECT * FROM `services` WHERE `service_template_id` = ?', [$service_template]) as $service) {
+        dbDelete('services', '`service_id` =  ?', [$service['service_id']]);
+    }
+
+    return dbDelete('services_template', '`service_template_id` =  ?', [$service_template]);
+}
+
 function poll_service($service)
 {
     $update = [];
