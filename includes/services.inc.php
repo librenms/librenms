@@ -175,15 +175,13 @@ function edit_service_template($update = [], $service_template = null)
     return dbUpdate($update, 'services_template', '`service_template_id`=?', [$service_template]);
 }
 
-function delete_service_template($service_template = null, $service_delete = null)
+function delete_service_template($service_template = null)
 {
     if (! is_numeric($service_template)) {
         return false;
     }
-    if ($service_delete == 1) {
-        foreach (dbFetchRows('SELECT * FROM `services` WHERE `service_template_id` = ?', [$service_template]) as $service) {
-            dbDelete('services', '`service_id` =  ?', [$service['service_id']]);
-        }
+    foreach (dbFetchRows('SELECT * FROM `services` WHERE `service_template_id` = ?', [$service_template]) as $service) {
+        dbDelete('services', '`service_id` =  ?', [$service['service_id']]);
     }
 
     return dbDelete('services_template', '`service_template_id` =  ?', [$service_template]);

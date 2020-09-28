@@ -24,21 +24,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <div class='alert alert-info'>Service Template will be deleted.</div>
                 <div class='well well-lg'>
                     <div class="modal-body">
-                        <p>Please confirm that you would like to delete:</p>
-                        <?php echo $vars['service_template_name']; ?>
-                        <?php echo mres($vars['service_template_name']); ?>
-                        <div class="form-group row">
-                            <div class="col-sm-12 alert alert-info">
-                                <label class='control-label text-left input-sm'>Please Tick this box to remove Services from Devices, that have been created with this Template.</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="service_delete" class="col-sm-3 col-md-3 control-label" title="Delete Services">Delete Services:</label>
-                            <div class="col-sm-9 col-md-9">
-                                <input type='checkbox' name='service_delete' id='service_delete'>
-                            </div>
-                        </div>
+                        <p>Please confirm that you would like to delete:<?php echo $vars['service_template_name']; ?></p>
                     </div>
+                    <div class='alert alert-info'>All Services created by this Template will also be deleted!.</div>
                     <hr>
                     <form role="form" class="remove_token_form">
                         <?php echo csrf_field() ?>
@@ -46,7 +34,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 data-target="service-template-removal">Delete
                         </button></center>
                         <input type="hidden" name="service_template_id" id="service_template_id" value="">
-                        <input type="hidden" name="service_delete" id="service_delete" value="">
                         <input type="hidden" name="confirm" id="confirm" value="yes">
                     </form>
                 </div>
@@ -68,11 +55,10 @@ if (Auth::user()->hasGlobalAdmin()) {
         $('#service-template-removal').click('', function (e) {
             e.preventDefault();
             var service_template_id = $("#service_template_id").val();
-            var service_delete = $("#service_delete").val();
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
-                data: {type: "delete-service-template", service_template_id: service_template_id, service_delete: service_delete},
+                data: {type: "delete-service-template", service_template_id: service_template_id},
                 success: function (result) {
                     if (result.status == 0) {
                         // Yay.

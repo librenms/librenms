@@ -121,7 +121,7 @@ require_once 'includes/html/modal/remove_service_template.inc.php';
                             echo '<th style="width:10%;max-width: 15%;">Parameters</th>';
                             echo '<th style="width:10%;max-width: 15%;">Remote Host</th>';
                             echo '<th style="width:10%;max-width: 15%;">Description</th>';
-                            echo '<th style="width:10%;max-width: 10%;">Last Changed</th>';
+                            echo '<th style="width:10%;max-width: 10%;">Modified</th>';
                             echo '<th style="width:5%;max-width: 5%;">Ignored</th>';
                             echo '<th style="width:5%;max-width: 5%;">Disabled</th>';
                             echo '<th style="width:10%;max-width:10%;"></th>';
