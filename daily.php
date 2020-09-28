@@ -314,6 +314,14 @@ if ($options['f'] === 'purgeusers') {
                 $users[] = $user['user'];
             }
 
+            // Also keep users with a valid API Token
+            foreach (dbFetchRows('SELECT DISTINCT(`username`)
+                                  FROM `api_tokens`
+                                      LEFT JOIN `users` ON api_tokens.user_id=users.user_id
+                                  WHERE `username` IS NOT NULL;') as $token_user) {
+                $users[] = $token_user['username'];
+            }
+
             if (dbDelete('users', 'username NOT IN ' . dbGenPlaceholders(count($users)), $users)) {
                 echo "Removed users that haven't logged in for $purge days";
             }
