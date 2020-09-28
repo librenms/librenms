@@ -101,6 +101,7 @@ class IRCBot
             } elseif (! is_array($this->config['irc_alert_chan'])) {
                 $this->config['irc_alert_chan'] = [$this->config['irc_alert_chan']];
             }
+            $this->chan = $this->config['irc_alert_chan'];
         }
 
         if ($this->config['irc_pass']) {
