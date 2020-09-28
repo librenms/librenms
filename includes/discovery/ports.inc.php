@@ -49,6 +49,11 @@ if ($device['os'] == 'fabos') {
     require_once 'ports/brocade.inc.php';
 }
 
+//Shorten Ekinops Interfaces
+if ($device['os'] == 'ekinops') {
+    require_once 'ports/ekinops.inc.php';
+}
+
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry

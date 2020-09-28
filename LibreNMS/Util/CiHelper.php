@@ -204,22 +204,13 @@ class CiHelper
      */
     public function checkStyle()
     {
-
-        // Disabled in favor of styleci
-        echo "Style check disabled.\n";
-
-        return 0;
-
         $cs_cmd = [
-            $this->checkPhpExec('phpcs'),
-            '-n',
-            '-p',
-            '--colors',
-            '--extensions=php',
-            '--standard=misc/phpcs_librenms.xml',
+            $this->checkPhpExec('php-cs-fixer'),
+            'fix',
+            '-v',
         ];
 
-        $files = $this->flags['full'] ? ['./'] : $this->changed['php'];
+        $files = $this->flags['full'] ? [] : $this->changed['php'];
         $cs_cmd = array_merge($cs_cmd, $files);
 
         return $this->execute('style', $cs_cmd);
