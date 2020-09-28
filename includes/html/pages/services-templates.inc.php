@@ -14,6 +14,7 @@
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
+use LibreNMS\Config;
 
 $pagetitle[] = 'Services Templates';
 
@@ -136,7 +137,7 @@ require_once 'includes/html/modal/remove_service_template.inc.php';
                         echo '<td>' . nl2br(display($service_template['service_template_param'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_ip'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_desc'])) . '</td>';
-                        echo '<td>' . nl2br(display(date(Config::get('dateformat.compact'), $service_template['service_template_changed']))) . '</td>';
+                        echo '<td>' . date(Config::get('dateformat.compact'), $service_template['service_template_changed']) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_ignore'])) . '</td>';
                         echo '<td>' . nl2br(display($service_template['service_template_disabled'])) . '</td>';
 
