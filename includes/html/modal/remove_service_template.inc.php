@@ -19,9 +19,9 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title" id="Remove">Confirm Remove Services</h2>
+                    <h2 class="modal-title" id="Remove">Remove Services</h2>
                 </div>
-                <div class='alert alert-info'>Service Template will be Removed.</div>
+                <div class='alert alert-warning'>Service Template will be Removed.</div>
                 <div class='well well-lg'>
                     <div class="modal-body">
                         <p>Please confirm that you would like to remove all Services created by this Service Template.</p>

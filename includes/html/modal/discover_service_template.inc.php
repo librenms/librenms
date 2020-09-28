@@ -19,7 +19,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title" id="Discover">Confirm Apply Service Template</h2>
+                    <h2 class="modal-title" id="Discover">Apply Service Template</h2>
                 </div>
                 <div class='alert alert-info'>Service Template will be Applied.</div>
                 <div class='well well-lg'>

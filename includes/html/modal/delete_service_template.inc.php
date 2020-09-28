@@ -21,12 +21,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h2 class="modal-title" id="Delete">Delete Service Template</h2>
                 </div>
-                <div class='alert alert-info'>Service Template will be deleted.</div>
+                <div class='alert alert-warning'>Service Template will be deleted.</div>
                 <div class='well well-lg'>
                     <div class="modal-body">
                         <p>Please confirm that you would like to delete:<?php echo $vars['service_template_name']; ?></p>
                     </div>
-                    <div class='alert alert-info'>All Services created by this Template will also be deleted!.</div>
+                    <div class='alert alert-danger'>All Services created by this Template will also be deleted!.</div>
                     <hr>
                     <form role="form" class="remove_token_form">
                         <?php echo csrf_field() ?>
