@@ -25,6 +25,8 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Vlan;
+use App\Models\PortVlan;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VlansController implements DeviceTab
@@ -51,6 +53,41 @@ class VlansController implements DeviceTab
 
     public function data(Device $device): array
     {
-        return [];
+        return [
+            'vlans' => self::getVlans($device),
+            'submenu' => [
+                [
+                    ['name' => 'Basic', 'url' => ''],
+                ],
+                'Graphs' => [
+                    ['name' => 'Bits', 'url' => 'bits'],
+                    ['name' => 'Unicast Packets', 'url' => 'upkts'],
+                    ['name' => 'Non-Unicast Packets', 'url' => 'nupkts'],
+                    ['name' => 'Errors', 'url' => 'errors'],
+                ]
+            ],
+        ];
+    }
+
+    private function getVlans(Device $device)
+    {
+        // port.device needed to prevent loading device multiple times
+        $portVlan = PortVlan::where('device_id', $device->device_id)->with(['port.device', 'vlan1:vlan_vlan,vlan_name'])->has('port')->get();
+
+        foreach($portVlan as $pv) {
+            // TODO: Needed?
+            if (! $pv->untagged) {
+                if($pv->untagged == $pv->port->ifvlan) {
+                    $pv->untagged = 1;
+                }
+            }
+
+            $data[$pv->vlan][] = $pv;
+        }
+
+        // The above can be replaced with;
+        // $data = $portVlan->groupBy('vlan');
+        // if we dont need that "untagged" support.
+        return $data;
     }
 }
