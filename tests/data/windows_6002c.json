@@ -9,7 +9,7 @@
                     "sysContact": null,
                     "version": "Vista SP2 (NT 6.0)",
                     "hardware": "AMD x64",
-                    "features": null,
+                    "features": "Multiprocessor",
                     "os": "windows",
                     "type": "server",
                     "serial": null,

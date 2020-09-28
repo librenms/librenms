@@ -9,7 +9,7 @@
                     "sysContact": null,
                     "version": "Server 2012 R2 Datacenter (NT 6.3)",
                     "hardware": "AMD x64",
-                    "features": null,
+                    "features": "Multiprocessor",
                     "os": "windows",
                     "type": "server",
                     "serial": null,

@@ -9,7 +9,7 @@
                     "sysContact": null,
                     "version": "XP (NT 5.1)",
                     "hardware": "Generic x86",
-                    "features": null,
+                    "features": "Multiprocessor",
                     "os": "windows",
                     "type": "server",
                     "serial": null,

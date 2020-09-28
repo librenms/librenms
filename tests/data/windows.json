@@ -9,7 +9,7 @@
                     "sysContact": null,
                     "version": "Server 2008 R2 SP1 (NT 6.1)",
                     "hardware": "Dell PowerEdge 2650",
-                    "features": null,
+                    "features": "Multiprocessor",
                     "os": "windows",
                     "type": "server",
                     "serial": "1234567",

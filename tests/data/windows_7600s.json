@@ -9,7 +9,7 @@
                     "sysContact": null,
                     "version": "Server 2008 R2 (NT 6.1)",
                     "hardware": "Intel x64",
-                    "features": null,
+                    "features": "Multiprocessor",
                     "os": "windows",
                     "type": "server",
                     "serial": null,

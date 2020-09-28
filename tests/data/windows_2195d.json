@@ -9,7 +9,7 @@
                     "sysContact": null,
                     "version": "2000 Datacenter Server (NT 5.0)",
                     "hardware": "ProLiant ML350 Gen6",
-                    "features": null,
+                    "features": "Multiprocessor",
                     "os": "windows",
                     "type": "server",
                     "serial": "AB123456CD",
