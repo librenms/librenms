@@ -197,6 +197,7 @@ function discover_service_template($device_group = null, $service_template = nul
             add_service($device, $services_template[0]['service_template_type'], $services_template[0]['service_template_desc'], $services_template[0]['service_template_ip'], $services_template[0]['service_template_param'], $services_template[0]['service_template_ignore'], $services_template[0]['service_template_disabled'], $services_template[0]['service_template_id'], $services_template[0]['service_template_name'], $services_template[0]['service_template_changed']);
             log_event("Added Service: {$services_template[0]['service_template_name']} from Service Template ID: {$services_template[0]['service_template_id']}", $device, 'service', 2);
             echo '+';
+            echo "$service_template ";
             $status = 1;
         } else {
             foreach (dbFetchRows('SELECT `service_id` FROM `services` WHERE `service_template_id` = ? AND `device_id` = ? AND `service_template_changed` != ?', [$service_template, $device, $services_template[0]['service_template_changed']]) as $service) {
@@ -205,9 +206,10 @@ function discover_service_template($device_group = null, $service_template = nul
                 log_event("Updated Service: {$services_template[0]['service_template_name']} from Service Template ID: {$services_template[0]['service_template_id']}", $device, 'service', 2);
             }
             echo '+';
+            echo "$service_template ";
             $status = 1;
         }
-        echo "$service_template ";
+        
     }
 
     if (is_numeric($status)) {

@@ -45,7 +45,6 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         $('#confirm-remove-service-template').click('', function (e) {
             e.preventDefault();
-            var device_group_id = $("#device_group_id").val();
             var service_template_id = $("#service_template_id").val();
             $.ajax({
                 type: 'POST',
