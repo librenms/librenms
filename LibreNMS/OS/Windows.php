@@ -35,7 +35,8 @@ class Windows extends \LibreNMS\OS
     public function discoverOS(Device $device): void
     {
         if (preg_match('/Hardware: (?<hardware>.*) +- Software: .* Version (?<nt>\S+) +\(Build( Number:)? (?<build>\S+) (?<smp>\S+)/', $device->sysDescr, $matches)) {
-            $device->hardware = $this->getProcessor($matches['hardware']);
+            $device->hardware = $this->getHardware($matches['hardware']);
+            $device->features = $matches['smp'];
 
             if ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.1') {
                 $device->version = $this->getClientVersion($matches['build'], $matches['version']);
@@ -49,7 +50,7 @@ class Windows extends \LibreNMS\OS
         $this->discoverServerHardware();
     }
 
-    private function getProcessor($processor)
+    private function getHardware($processor)
     {
         preg_match('/(?<generic>\S+) Family (?<family>\d+) Model (?<model>\d+) Stepping (?<stepping>\d+)/', $processor, $matches);
 
