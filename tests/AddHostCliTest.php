@@ -100,12 +100,7 @@ class AddHostCliTest extends DBTestCase
 
     public function testSnmpV3AuthProtocol()
     {
-<<<<<<< HEAD
         $modes = array('MD5', 'SHA', 'SHA-224', 'SHA-256', 'SHA-384', 'SHA-512');
-=======
-//        $modes = array('md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224');
-        $modes = ['md5', 'sha'];
->>>>>>> 536bb8ac346d04822a365577f58bf6456062a38b
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
             $result = \Artisan::call('device:add ' . $host . ' -force -a ' . $mode . ' --v3');
@@ -113,21 +108,13 @@ class AddHostCliTest extends DBTestCase
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
-<<<<<<< HEAD
-            $this->assertEquals(strtoupper($mode), $device->authalgo, "Wrong snmp v3 password algorithm");
-=======
-            $this->assertEquals(strtoupper($mode), $device->authalgo, 'Wrong snmp v3 password algoritme');
->>>>>>> 536bb8ac346d04822a365577f58bf6456062a38b
+            $this->assertEquals(strtoupper($mode), $device->authalgo, 'Wrong snmp v3 password algorithm');
         }
     }
 
     public function testSnmpV3PrivacyProtocol()
     {
-<<<<<<< HEAD
         $modes = array('DES', 'AES', 'AES-192', 'AES-256');
-=======
-        $modes = ['des', 'aes'];
->>>>>>> 536bb8ac346d04822a365577f58bf6456062a38b
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
             $result = \Artisan::call('device:add ' . $host . ' -force -x ' . $mode . ' --v3');
