@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.311.1.1.3.1.3",
+                    "sysDescr": "Hardware: x86 Family 15 Model 2 Stepping 5 AT/AT COMPATIBLE - Software: Windows 2000 Version 5.0 (Build 2195 Multiprocessor Free)",
+                    "sysContact": null,
+                    "version": "2000 Datacenter Server (NT 5.0)",
+                    "hardware": "ProLiant ML350 Gen6",
+                    "features": "Multiprocessor",
+                    "os": "windows",
+                    "type": "server",
+                    "serial": "AB123456CD",
+                    "icon": "windows.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
