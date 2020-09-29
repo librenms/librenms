@@ -103,6 +103,100 @@ Output:
 }
 ```
 
+### `availability`
+
+Get calculated availabilites of given device.
+
+Route: `/api/v0/devices/:hostname/availability`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/availability
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "availability": [
+        {
+            "duration": 86400,
+            "availability_perc": "100.000000"
+        },
+        {
+            "duration": 604800,
+            "availability_perc": "100.000000"
+        },
+        {
+            "duration": 2592000,
+            "availability_perc": "99.946000"
+        },
+        {
+            "duration": 31536000,
+            "availability_perc": "99.994000"
+        }
+    ],
+    "count": 4
+}
+```
+
+### `outages`
+
+Get detected outages of given device.
+
+Route: `/api/v0/devices/:hostname/outages`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/outages
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "outages": [
+        {
+            "going_down": 1593194031,
+            "up_again": 1593194388
+        },
+        {
+            "going_down": 1593946507,
+            "up_again": 1593946863
+        },
+        {
+            "going_down": 1594628616,
+            "up_again": 1594628968
+        },
+        {
+            "going_down": 1594628974,
+            "up_again": 1594629339
+        },
+        {
+            "going_down": 1594638668,
+            "up_again": 1594638992
+        }
+    ],
+    "count": 5
+}
+```
+
 ### `get_graphs`
 
 Get a list of available graphs for a device, this does not include ports.

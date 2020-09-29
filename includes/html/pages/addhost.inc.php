@@ -6,7 +6,7 @@ use LibreNMS\Util\IP;
 
 $no_refresh = true;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 
     exit;
@@ -18,11 +18,11 @@ echo '<div class="row">
             <div class="col-sm-6">';
 
 // first load enabled, after that check snmp variable
-$snmp_enabled = !isset($_POST['hostname']) || isset($_POST['snmp']);
+$snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
 
-if (!empty($_POST['hostname'])) {
+if (! empty($_POST['hostname'])) {
     $hostname = clean($_POST['hostname']);
-    if (!is_valid_hostname($hostname) && !IP::isValid($hostname)) {
+    if (! is_valid_hostname($hostname) && ! IP::isValid($hostname)) {
         print_error("Invalid hostname or IP: $hostname");
     }
 
@@ -40,15 +40,15 @@ if (!empty($_POST['hostname'])) {
             $transport = 'udp';
         }
 
-        $additional = array();
-        if (!$snmp_enabled) {
+        $additional = [];
+        if (! $snmp_enabled) {
             $snmpver = 'v2c';
-            $additional = array(
+            $additional = [
                 'snmp_disable' => 1,
-                'os'           => $_POST['os'] ? mres($_POST['os_id']) : "ping",
+                'os'           => $_POST['os'] ? mres($_POST['os_id']) : 'ping',
                 'hardware'     => mres($_POST['hardware']),
-                'sysName'      => mres($_POST['sysName'])
-            );
+                'sysName'      => mres($_POST['sysName']),
+            ];
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
                 Config::set('snmp.community', [clean($_POST['community'], false)]);
@@ -57,14 +57,14 @@ if (!empty($_POST['hostname'])) {
             $snmpver = clean($_POST['snmpver']);
             print_message("Adding host $hostname communit" . (count(Config::get('snmp.community')) == 1 ? 'y' : 'ies') . ' ' . implode(', ', Config::get('snmp.community')) . " port $port using $transport");
         } elseif ($_POST['snmpver'] === 'v3') {
-            $v3 = array(
-                   'authlevel'  => clean($_POST['authlevel']),
-                   'authname'   => clean($_POST['authname'], false),
-                   'authpass'   => clean($_POST['authpass'], false),
-                   'authalgo'   => clean($_POST['authalgo']),
-                   'cryptopass' => clean($_POST['cryptopass'], false),
-                   'cryptoalgo' => clean($_POST['cryptoalgo'], false),
-                  );
+            $v3 = [
+                'authlevel'  => clean($_POST['authlevel']),
+                'authname'   => clean($_POST['authname'], false),
+                'authpass'   => clean($_POST['authpass'], false),
+                'authalgo'   => clean($_POST['authalgo']),
+                'cryptopass' => clean($_POST['cryptopass'], false),
+                'cryptoalgo' => clean($_POST['cryptoalgo'], false),
+            ];
 
             $v3_config = Config::get('snmp.v3');
             array_unshift($v3_config, $v3);
@@ -77,12 +77,12 @@ if (!empty($_POST['hostname'])) {
         }//end if
 
         $poller_group = clean($_POST['poller_group']);
-        $force_add    = ($_POST['force_add'] == 'on');
+        $force_add = ($_POST['force_add'] == 'on');
 
         $port_assoc_mode = clean($_POST['port_assoc_mode']);
         try {
             $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
-            $link = generate_device_url(array('device_id' => $device_id));
+            $link = generate_device_url(['device_id' => $device_id]);
             print_message("Device added <a href='$link'>$hostname ($device_id)</a>");
         } catch (HostUnreachableException $e) {
             print_error($e->getMessage());
@@ -164,12 +164,12 @@ $pagetitle[] = 'Add host';
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
 foreach (Config::get('snmp.transports') as $transport) {
-    echo "<option value='".$transport."'";
+    echo "<option value='" . $transport . "'";
     if ($transport == $device['transport']) {
         echo " selected='selected'";
     }
 
-    echo '>'.$transport.'</option>';
+    echo '>' . $transport . '</option>';
 }
 ?>
             </select>
@@ -181,11 +181,10 @@ foreach (Config::get('snmp.transports') as $transport) {
             <select name="port_assoc_mode" id="port_assoc_mode" class="form-control input-sm">
 <?php
 
-
 foreach (get_port_assoc_modes() as $mode) {
-    $selected = "";
+    $selected = '';
     if ($mode == Config::get('default_port_association_mode')) {
-        $selected = "selected";
+        $selected = 'selected';
     }
 
     echo "              <option value=\"$mode\" $selected>$mode</option>\n";
@@ -284,7 +283,7 @@ if (Config::get('distributed_poller') === true) {
     ';
 
     foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-        echo '<option value="'.$group['id'].'">'.$group['group_name'].'</option>';
+        echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
     }
 
     echo '
@@ -376,7 +375,7 @@ if (Config::get('distributed_poller') === true) {
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
     $("[name='force_add']").bootstrapSwitch();
 <?php
-if (!$snmp_enabled) {
+if (! $snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';
 }
 ?>

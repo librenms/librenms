@@ -5,8 +5,7 @@ type: network
 icon: dkt
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-mib_dir:
-    - dkt
+mib_dir: dkt
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.27304

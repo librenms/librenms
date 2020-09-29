@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.1166.1.31",
                     "sysDescr": "ARRIS APEX1000, VxWorks SNMPv1/v2c Agent",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "2.9.4",
+                    "hardware": "APEX1000",
                     "features": null,
                     "os": "arris-apex",
                     "type": "network",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "arris.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.18086.8",
                     "sysDescr": "DVB-T transmitter",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "SWPTTDVBTT2_P3_1_02_157 build 1441109757",
+                    "hardware": "PT3080",
                     "features": null,
                     "os": "protelevision-t1",
                     "type": "network",
-                    "serial": null,
+                    "serial": "3303302",
                     "icon": "protelevision.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

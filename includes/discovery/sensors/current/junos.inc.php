@@ -13,7 +13,7 @@
 echo 'JunOS ';
 
 $multiplier = 1;
-$divisor    = 1000000;
+$divisor = 1000000;
 foreach ($pre_cache['junos_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxDomCurrentTxLaserBiasCurrent']) && $entry['jnxDomCurrentTxLaserBiasCurrent'] != 0 && $entry['jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold'] != 0) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.6.' . $index;

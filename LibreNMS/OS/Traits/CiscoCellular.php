@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -37,9 +36,9 @@ trait CiscoCellular
      */
     public function discoverWirelessRssi()
     {
-        $sensors = array();
+        $sensors = [];
 
-        $data = snmpwalk_cache_oid($this->getDevice(), 'c3gCurrentGsmRssi', array(), 'CISCO-WAN-3G-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gCurrentGsmRssi', [], 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rssi',

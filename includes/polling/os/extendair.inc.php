@@ -17,15 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $extendair_data = snmp_get_multi_oid($device, ['serialNumber.0', 'firmwareVersion.0'], '-OQs', 'ExaltComProducts');
 
-$serial  = $extendair_data['serialNumber.0'];
+$serial = $extendair_data['serialNumber.0'];
 $version = $extendair_data['firmwareVersion.0'];
 
 unset($extendair_data);

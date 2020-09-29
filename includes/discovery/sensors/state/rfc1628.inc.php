@@ -3,7 +3,7 @@
 echo 'RFC1628 ';
 
 // Battery Status (Value : 1 unknown, 2 batteryNormal, 3 batteryLow, 4 batteryDepleted)
-$state = snmp_get($device, "upsBatteryStatus.0", "-Ovqe", 'UPS-MIB');
+$state = snmp_get($device, 'upsBatteryStatus.0', '-Ovqe', 'UPS-MIB');
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'upsBatteryStatusState';
@@ -42,7 +42,7 @@ if (is_numeric($state)) {
 }
 
 // Output Source (Value : 1 other, 2 none, 3 normal, 4 bypass, 5 battery, 6 booster, 7 reducer)
-$state = snmp_get($device, "upsOutputSource.0", "-Ovqe", 'UPS-MIB');
+$state = snmp_get($device, 'upsOutputSource.0', '-Ovqe', 'UPS-MIB');
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'upsOutputSourceState';

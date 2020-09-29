@@ -1,5 +1,7 @@
 mib: CPQPOWER-MIB
 modules:
+    os:
+        sysDescr_regex: '/firmware version (?<version>[\d.]+)/'
     sensors:
         current:
             data:

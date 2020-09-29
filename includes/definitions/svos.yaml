@@ -2,8 +2,7 @@ os: svos
 text: 'Hitachi Storage Virtualization Operating System (SVOS)'
 type: storage
 icon: hds
-mib_dir:
-    - hitachi
+mib_dir: hitachi
 discovery:
     -
         sysObjectID:

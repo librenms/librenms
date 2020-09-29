@@ -3,8 +3,7 @@ group: cisco
 text: 'Cisco Services Ready Platform'
 type: network
 icon: cisco
-mib_dir:
-    - cisco
+mib_dir: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

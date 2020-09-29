@@ -2,8 +2,7 @@ os: ionodes
 text: 'IONODES'
 type: encoder
 icon: ionodes
-mib_dir:
-    - ionodes
+mib_dir: ionodes
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

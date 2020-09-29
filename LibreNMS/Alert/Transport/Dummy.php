@@ -18,12 +18,10 @@
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Dummy extends Transport
@@ -31,6 +29,7 @@ class Dummy extends Transport
     public function deliverAlert($obj, $opts)
     {
         var_dump($obj);
+
         return true;
     }
 

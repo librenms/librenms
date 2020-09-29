@@ -9597,14 +9597,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.2.34",
                     "sysDescr": "Juniper Networks, Inc. srx3600 internet router, kernel JUNOS 12.1X46-D35.1 #0: 2015-05-14 23:47:27 UTC     builder@dagmath.juniper.net:/volume/build/junos/12.1/service/12.1X46-D35.1/obj-powerpc/junos/bsd/kernels/JUNIPER-SRX/kernel Build date: 2015-05-15",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "12.1X46-D35.1",
+                    "hardware": "Juniper SRX3600",
                     "features": null,
                     "os": "junos",
                     "type": "network",
                     "serial": null,
                     "icon": "junos.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -9615,7 +9615,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.2.34",
                     "sysDescr": "Juniper Networks, Inc. srx3600 internet router, kernel JUNOS 12.1X46-D35.1 #0: 2015-05-14 23:47:27 UTC     builder@dagmath.juniper.net:/volume/build/junos/12.1/service/12.1X46-D35.1/obj-powerpc/junos/bsd/kernels/JUNIPER-SRX/kernel Build date: 2015-05-15",
                     "sysContact": "<private>",
-                    "version": null,
+                    "version": "12.1X46-D35.1",
                     "hardware": "Juniper SRX3600",
                     "features": null,
                     "os": "junos",

@@ -11,7 +11,7 @@
  */
 
 $total = snmp_get($device, '.1.3.6.1.4.1.10002.1.1.1.1.1.0', '-OvQ');
-$free  = snmp_get($device, '.1.3.6.1.4.1.10002.1.1.1.1.2.0', '-OvQ');
+$free = snmp_get($device, '.1.3.6.1.4.1.10002.1.1.1.1.2.0', '-OvQ');
 $mempool['total'] = $total * 1024;
-$mempool['free']  = $free * 1024;
-$mempool['used']  = ($mempool['total'] - $mempool['free']);
+$mempool['free'] = $free * 1024;
+$mempool['used'] = ($mempool['total'] - $mempool['free']);

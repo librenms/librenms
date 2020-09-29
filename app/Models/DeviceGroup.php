@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -78,12 +77,12 @@ class DeviceGroup extends BaseModel
     public static function updateGroupsFor($device)
     {
         $device = ($device instanceof Device ? $device : Device::find($device));
-        if (!$device instanceof Device) {
+        if (! $device instanceof Device) {
             // could not load device
             return [
-                "attached" => [],
-                "detached" => [],
-                "updated" => [],
+                'attached' => [],
+                'detached' => [],
+                'updated' => [],
             ];
         }
 
@@ -102,6 +101,7 @@ class DeviceGroup extends BaseModel
                             ->exists();
                     } catch (\Illuminate\Database\QueryException $e) {
                         Log::error("Device Group '$device_group->name' generates invalid query: " . $e->getMessage());
+
                         return false;
                     }
                 }
@@ -122,7 +122,7 @@ class DeviceGroup extends BaseModel
      */
     public function getParser()
     {
-        return !empty($this->rules) ?
+        return ! empty($this->rules) ?
             QueryBuilderFluentParser::fromJson($this->rules) :
             QueryBuilderFluentParser::fromOld($this->pattern);
     }

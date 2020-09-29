@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -46,8 +45,8 @@ class RipeApi extends BaseApi
     {
         return $this->makeApiCall($this->whois_uri, [
             'query' => [
-                'resource' => $resource
-            ]
+                'resource' => $resource,
+            ],
         ]);
     }
 
@@ -62,8 +61,8 @@ class RipeApi extends BaseApi
     {
         return $this->makeApiCall($this->abuse_uri, [
             'query' => [
-                'resource' => $resource
-            ]
+                'resource' => $resource,
+            ],
         ]);
     }
 
@@ -81,7 +80,7 @@ class RipeApi extends BaseApi
             if (isset($response_data['status']) && $response_data['status'] == 'ok') {
                 return $response_data;
             } else {
-                throw new ApiException("RIPE API call failed", $response_data);
+                throw new ApiException('RIPE API call failed', $response_data);
             }
         } catch (RequestException $e) {
             $message = 'RIPE API call to ' . $e->getRequest()->getUri() . ' failed: ';

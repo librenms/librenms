@@ -3,8 +3,7 @@ text: 'Maipu MyPower'
 type: network
 icon: maipu
 ifname: true
-mib_dir:
-    - maipu
+mib_dir: maipu
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }

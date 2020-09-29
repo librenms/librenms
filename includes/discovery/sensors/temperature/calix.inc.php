@@ -21,11 +21,11 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
         foreach (explode("\n", $oids) as $data) {
             $data = trim($data);
             if ($data != '') {
-                list($oid)       = explode(' ', $data);
+                [$oid] = explode(' ', $data);
                 $temperature_oid = ".1.3.6.1.4.1.6321.1.2.3.4.98.2.3.1.2.$oid";
-                $descr_oid       = ".1.3.6.1.4.1.6321.1.2.3.4.98.2.3.1.6.$oid";
-                $descr           = snmp_get($device, $descr_oid, '-Oqv', '');
-                $temperature     = snmp_get($device, $temperature_oid, '-Oqv', '');
+                $descr_oid = ".1.3.6.1.4.1.6321.1.2.3.4.98.2.3.1.6.$oid";
+                $descr = snmp_get($device, $descr_oid, '-Oqv', '');
+                $temperature = snmp_get($device, $temperature_oid, '-Oqv', '');
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
@@ -41,11 +41,11 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
         foreach (explode("\n", $oids) as $data) {
             $data = trim($data);
             if ($data != '') {
-                list($oid)       = explode(' ', $data);
+                [$oid] = explode(' ', $data);
                 $temperature_oid = ".1.3.6.1.4.1.6321.1.2.3.3.98.2.3.1.2.$oid";
-                $descr_oid       = ".1.3.6.1.4.1.6321.1.2.3.3.98.2.3.1.6.$oid";
-                $descr           = snmp_get($device, $descr_oid, '-Oqv', '');
-                $temperature     = snmp_get($device, $temperature_oid, '-Oqv', '');
+                $descr_oid = ".1.3.6.1.4.1.6321.1.2.3.3.98.2.3.1.6.$oid";
+                $descr = snmp_get($device, $descr_oid, '-Oqv', '');
+                $temperature = snmp_get($device, $temperature_oid, '-Oqv', '');
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
@@ -54,7 +54,6 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
         }
     }
 
-
     if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3.2') !== false) { // E5-111
         $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-111-IESCOMMON-MIB', 'calix');
         $oids = trim($oids);
@@ -62,11 +61,11 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
         foreach (explode("\n", $oids) as $data) {
             $data = trim($data);
             if ($data != '') {
-                list($oid)       = explode(' ', $data);
+                [$oid] = explode(' ', $data);
                 $temperature_oid = ".1.3.6.1.4.1.6321.1.2.3.2.98.2.3.1.2.$oid";
-                $descr_oid       = ".1.3.6.1.4.1.6321.1.2.3.2.98.2.3.1.6.$oid";
-                $descr           = snmp_get($device, $descr_oid, '-Oqv', '');
-                $temperature     = snmp_get($device, $temperature_oid, '-Oqv', '');
+                $descr_oid = ".1.3.6.1.4.1.6321.1.2.3.2.98.2.3.1.6.$oid";
+                $descr = snmp_get($device, $descr_oid, '-Oqv', '');
+                $temperature = snmp_get($device, $temperature_oid, '-Oqv', '');
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
@@ -82,11 +81,11 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
         foreach (explode("\n", $oids) as $data) {
             $data = trim($data);
             if ($data != '') {
-                list($oid)       = explode(' ', $data);
+                [$oid] = explode(' ', $data);
                 $temperature_oid = ".1.3.6.1.4.1.6321.1.2.3.1.98.2.3.1.2.$oid";
-                $descr_oid       = ".1.3.6.1.4.1.6321.1.2.3.1.98.2.3.1.6.$oid";
-                $descr           = snmp_get($device, $descr_oid, '-Oqv', '');
-                $temperature     = snmp_get($device, $temperature_oid, '-Oqv', '');
+                $descr_oid = ".1.3.6.1.4.1.6321.1.2.3.1.98.2.3.1.6.$oid";
+                $descr = snmp_get($device, $descr_oid, '-Oqv', '');
+                $temperature = snmp_get($device, $temperature_oid, '-Oqv', '');
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 

@@ -45,6 +45,7 @@ class Outcome:
     TERMINATED = 6
 
 
+POLLER_GROUP = '0'
 VERBOSE_LEVEL = 0
 THREADS = 32
 CONFIG = {}
@@ -111,9 +112,10 @@ def scan_host(scan_ip):
             pass
 
         try:
-            arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or scan_ip]
+
+            arguments = ['/usr/bin/env', 'php', 'addhost.php', '-g', POLLER_GROUP, hostname or scan_ip]
             if args.ping:
-                arguments.insert(3, args.ping)
+                arguments.insert(5, args.ping)
             add_output = check_output(arguments)
             return Result(scan_ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
@@ -146,6 +148,9 @@ Example: """ + __file__ + """ -P 192.168.0.0/24""")
     parser.add_argument('-t', dest='threads', type=int,
                         help="How many IPs to scan at a time.  More will increase the scan speed," +
                              " but could overload your system. Default: {}".format(THREADS))
+    parser.add_argument('-g', dest='group', type=str,
+                        help="The poller group all scanned devices will be added to."
+                             " Default: The first group listed in 'distributed_poller_group', or {} if not specificed".format(POLLER_GROUP))
     parser.add_argument('-l', '--legend', action='store_true', help="Print the legend.")
     parser.add_argument('-v', '--verbose', action='count',
                         help="Show debug output. Specifying multiple times increases the verbosity.")
@@ -169,6 +174,8 @@ Example: """ + __file__ + """ -P 192.168.0.0/24""")
     except CalledProcessError as e:
         parser.error("Could not execute: {}\n{}".format(' '.join(e.cmd), e.output.decode().rstrip()))
         exit(2)
+
+    POLLER_GROUP = args.group or str(CONFIG.get('distributed_poller_group')).split(',')[0]
 
     #######################
     # Build network lists #

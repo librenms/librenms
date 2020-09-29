@@ -1,7 +1,7 @@
 <?php
 
 echo 'Ruckus Wireless: ';
-$perc = snmp_get($device, ".1.3.6.1.4.1.25053.1.1.11.1.1.1.2.0", '-OvQ');
+$perc = snmp_get($device, '.1.3.6.1.4.1.25053.1.1.11.1.1.1.2.0', '-OvQ');
 
 if (is_numeric($perc)) {
     $mempool['perc'] = $perc;

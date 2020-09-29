@@ -1,5 +1,9 @@
 mib: ASAM-SYSTEM-MIB:ASAM-EQUIP-MIB
 modules:
+    os:
+        hardware: ASAM-EQUIP-MIB::eqptHolderActualType.17
+        serial: ASAM-EQUIP-MIB::eqptHolderSerialNumber.17
+        version: ASAM-SYSTEM-MIB::swEtsiVersion.0
     processors:
         data:
             -

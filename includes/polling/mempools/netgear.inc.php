@@ -18,7 +18,7 @@ echo 'NETGEAR Memory Pool';
 
 $memory_pool = snmp_get_multi_oid($device, ['agentSwitchCpuProcessMemAvailable.0', 'agentSwitchCpuProcessMemFree.0'], '-OQUs', 'NETGEAR-SWITCHING-MIB');
 
-$mempool['free']  = $memory_pool['agentSwitchCpuProcessMemFree.0'];
-$mempool['used']  = $memory_pool['agentSwitchCpuProcessMemAvailable.0'] - $mempool['free'];
+$mempool['free'] = $memory_pool['agentSwitchCpuProcessMemFree.0'];
+$mempool['used'] = $memory_pool['agentSwitchCpuProcessMemAvailable.0'] - $mempool['free'];
 $mempool['total'] = $mempool['free'] + $mempool['used'];
-$mempool['perc']  = $mempool['used'] / $mempool['total'];
+$mempool['perc'] = $mempool['used'] / $mempool['total'];

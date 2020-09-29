@@ -21,11 +21,11 @@ if (is_array($array)) {
     echo 'Procurve : ';
     foreach ($array as $index => $mempool) {
         if (is_numeric($index) && is_numeric($mempool['hpLocalMemTotalBytes'])) {
-            discover_mempool($valid_mempool, $device, $index, 'hpLocal', 'Local Memory '.$index, null, null, null);
+            discover_mempool($valid_mempool, $device, $index, 'hpLocal', 'Local Memory ' . $index, null, null, null);
         }
 
         if (is_numeric($index) && is_numeric($mempool['hpGlobalMemTotalBytes'])) {
-            discover_mempool($valid_mempool, $device, $index, 'hpGlobal', 'Global Memory '.$index, null, null, null);
+            discover_mempool($valid_mempool, $device, $index, 'hpGlobal', 'Global Memory ' . $index, null, null, null);
         }
 
         unset($deny, $fstype, $descr, $size, $used, $units);

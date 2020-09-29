@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateGraphTypesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,7 +18,7 @@ class CreateGraphTypesTable extends Migration
             $table->string('graph_section', 32)->index();
             $table->string('graph_descr')->nullable();
             $table->integer('graph_order');
-            $table->primary(['graph_type','graph_subtype','graph_section']);
+            $table->primary(['graph_type', 'graph_subtype', 'graph_section']);
         });
     }
 

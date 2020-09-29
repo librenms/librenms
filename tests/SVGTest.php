@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -33,7 +32,6 @@ use RegexIterator;
 
 /**
  * Class SVGTest
- * @package LibreNMS\Tests
  * @group os
  */
 class SVGTest extends TestCase
@@ -82,6 +80,7 @@ class SVGTest extends TestCase
     private function getSvgFiles()
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('html/images'));
+
         return new RegexIterator($iterator, '/^.+\.svg$/i', RecursiveRegexIterator::GET_MATCH);
     }
 }

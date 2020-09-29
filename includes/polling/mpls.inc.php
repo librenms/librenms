@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  20169 Vitali Kari
  * @author     Vitali Kari <vitali.kari@gmail.com>
@@ -25,7 +24,7 @@
 
 use LibreNMS\OS;
 
-if (!$os instanceof OS) {
+if (! $os instanceof OS) {
     $os = OS::make($device);
 }
 (new \LibreNMS\Modules\Mpls())->poll($os);

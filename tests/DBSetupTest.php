@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <librenms+n@laf.io>
@@ -44,10 +43,10 @@ class DBSetupTest extends DBTestCase
         $result = Artisan::call('migrate:fresh', [
             '--seed' => true,
             '--env' => 'testing',
-            '--database' => $this->connection
+            '--database' => $this->connection,
         ]);
 
-        $this->assertSame(0, $result, "Errors loading DB Schema: " . Artisan::output());
+        $this->assertSame(0, $result, 'Errors loading DB Schema: ' . Artisan::output());
     }
 
     public function testSchemaFiles()
@@ -64,13 +63,13 @@ class DBSetupTest extends DBTestCase
         $migrated = DB::connection($this->connection)->table('migrations')->pluck('migration')->toArray();
         sort($files);
         sort($migrated);
-        $this->assertEquals($files, $migrated, "List of run migrations did not match existing migration files.");
+        $this->assertEquals($files, $migrated, 'List of run migrations did not match existing migration files.');
 
         // check legacy schema version is 1000
         $schema = DB::connection($this->connection)->table('dbSchema')
             ->orderBy('version', 'DESC')
             ->value('version');
-        $this->assertEquals(1000, $schema, "Seed not run, after seed legacy dbSchema should be 1000");
+        $this->assertEquals(1000, $schema, 'Seed not run, after seed legacy dbSchema should be 1000');
     }
 
     public function testCheckDBCollation()
@@ -108,7 +107,7 @@ class DBSetupTest extends DBTestCase
     {
         $this->assertEquals(
             'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION',
-            DB::connection($this->connection)->select(DB::raw("SELECT @@sql_mode AS mode"))[0]->mode
+            DB::connection($this->connection)->select(DB::raw('SELECT @@sql_mode AS mode'))[0]->mode
         );
     }
 

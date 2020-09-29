@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_load';
-$unit       = '%';
-$class      = 'load';
+$unit = '%';
+$class = 'load';
 
 require 'includes/html/pages/health/sensors.inc.php';

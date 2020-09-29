@@ -2,8 +2,7 @@ os: huawei-smu
 text: Huawei SMU
 type: power
 icon: huawei
-mib_dir:
-    - huawei
+mib_dir: huawei
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }

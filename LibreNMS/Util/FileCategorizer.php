@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -127,10 +126,10 @@ class FileCategorizer extends Categorizer
      */
     private function osFromClass($class)
     {
-        preg_match_all("/[A-Z][a-z0-9]*/", $class, $segments);
+        preg_match_all('/[A-Z][a-z0-9]*/', $class, $segments);
         $osname = implode('-', array_map('strtolower', $segments[0]));
         $osname = preg_replace(
-            ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/',],
+            ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/'],
             ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
             $osname
         );
@@ -138,6 +137,7 @@ class FileCategorizer extends Categorizer
         if ($os = $this->validateOs($osname)) {
             return $os;
         }
+
         return $this->validateOs(str_replace('-', '_', $osname));
     }
 }

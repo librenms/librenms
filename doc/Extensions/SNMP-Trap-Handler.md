@@ -159,16 +159,21 @@ So what value should you type in the commands below? Oddly enough, simply supply
 ### Event logging
 
 You can configure generic event logging for snmp traps.  This will log
-an event of the type trap for received traps. These events can be utilized for alerting.
+an event of the type trap for received traps. These events can be used for alerting.
+By default, only the TrapOID is logged. Buf you can enable the "detailed" variant,
+and all the data received with the trap will be logged.
 
-In config.php
+The parameter can be found in General Settings / External / SNMP Traps Integration.
+
+It can also be configured in ```config.php```
 
 ```php
-$config['snmptraps']['eventlog'] = 'unhandled';
+$config['snmptraps']['eventlog'] = 'unhandled'; //default value
+$config['snmptraps']['eventlog_detailed'] = 'false'; //default value
 ```
 
 Valid options are:
 
-- `unhandled` only unhandled traps will be logged
+- `unhandled` only unhandled traps will be logged (default value)
 - `all` log all traps
 - `none` no traps will create a generic event log (handled traps may still log events)

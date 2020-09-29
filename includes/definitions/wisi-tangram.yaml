@@ -2,8 +2,7 @@ os: wisi-tangram
 text: 'WISI Tangram'
 type: network
 icon: wisi
-mib_dir:
-    - wisi
+mib_dir: wisi
 over: []
 discovery:
     -

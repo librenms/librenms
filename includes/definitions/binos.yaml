@@ -2,8 +2,7 @@ os: binos
 text: 'Telco Systems BiNOS'
 type: network
 icon: telco-systems
-mib_dir:
-    - telco-systems/binos
+mib_dir: telco-systems/binos
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

@@ -17,17 +17,17 @@ header('Content-type: application/json');
 
 // FUA
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die(json_encode([
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin'
+        'message' => 'You need to be admin',
     ]));
 }
 
-if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']) || !isset($_POST['data'])) {
-    die(json_encode([
+if (! is_numeric($_POST['device_id']) || ! is_numeric($_POST['sensor_id']) || ! isset($_POST['data'])) {
+    exit(json_encode([
         'status' => 'error',
-        'message' => 'Invalid values given'
+        'message' => 'Invalid values given',
     ]));
 } else {
     $update = dbUpdate(
@@ -36,15 +36,15 @@ if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']) || !iss
         '`sensor_id` = ? AND `device_id` = ?',
         [$_POST['sensor_id'], $_POST['device_id']]
     );
-    if (!empty($update) || $update == '0') {
-        die(json_encode([
+    if (! empty($update) || $update == '0') {
+        exit(json_encode([
             'status' => 'ok',
-            'message' => 'Updated sensor value'
+            'message' => 'Updated sensor value',
         ]));
     } else {
-        die(json_encode([
+        exit(json_encode([
             'status' => 'error',
-            'message' => 'Failed to update sensor value'
+            'message' => 'Failed to update sensor value',
         ]));
     }
 }

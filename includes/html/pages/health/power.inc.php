@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_power';
-$unit       = 'W';
-$class      = 'power';
+$unit = 'W';
+$class = 'power';
 
 require 'includes/html/pages/health/sensors.inc.php';

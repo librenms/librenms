@@ -2,14 +2,14 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], ['app', 'mysql', $app['app_id']]);
 
-$array = array(
-          'IDBRDd' => 'Deletes',
-          'IDBRId' => 'Inserts',
-          'IDBRRd' => 'Reads',
-          'IDBRUd' => 'Updates',
-         );
+$array = [
+    'IDBRDd' => 'Deletes',
+    'IDBRId' => 'Inserts',
+    'IDBRRd' => 'Reads',
+    'IDBRUd' => 'Updates',
+];
 
 $i = 0;
 if (rrdtool_check_rrd_exists($rrd_filename)) {
@@ -28,8 +28,8 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $file";
 }
 
-$colours   = 'mixed';
-$nototal   = 0;
+$colours = 'mixed';
+$nototal = 0;
 $unit_text = 'Rows';
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

@@ -1,5 +1,9 @@
 mib: CIENA-WS-XCVR-MIB
 modules:
+    os:
+        hardware: CIENA-WS-CHASSIS-MIB::cwsChassisChassisidentificationDescription.0
+        version: CIENA-WS-SOFTWARE-MIB::cwsSoftwareStatusActiveVersion.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
     sensors:
         pre-cache:
             data:

@@ -22,7 +22,6 @@
  * @copyright  2018 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */
-use LibreNMS\RRD\RrdDefinition;
 
 $version = $device['sysDescr'];
 $hardware = 'PTP 800';

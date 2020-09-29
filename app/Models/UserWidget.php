@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Auth;
 use Illuminate\Database\Eloquent\Model;
 
 class UserWidget extends Model

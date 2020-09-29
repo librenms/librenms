@@ -4031,6 +4031,33 @@
                 "value": "url"
             }
         },
+        "snmptraps.eventlog": {
+            "default": "unhandled",
+            "group": "external",
+            "section": "snmptrapd",
+            "order": 0,
+            "type": "select",
+            "options": {
+                "none": "None",
+                "unhandled": "Only unhandled",
+                "all": "All"
+            }
+        },
+        "snmptraps.eventlog_detailed": {
+            "default": false,
+            "order": 1,
+            "group": "external",
+            "section": "snmptrapd",
+            "type": "boolean",
+            "when": {
+                "setting": "snmptraps.eventlog",
+                "operator": "in",
+                "value": [
+                    "all",
+                    "unhandled"
+                ]
+            }
+        },
         "page_refresh": {
             "default": 300,
             "type": "integer",
@@ -4483,6 +4510,13 @@
             "section": "prometheus",
             "order": 2
         },
+        "prometheus.attach_sysname": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 3
+        },
         "public_status": {
             "default": false,
             "group": "auth",
@@ -4900,6 +4934,10 @@
             "type": "integer",
             "units": "pings"
         },
+        "smokeping.probes": {
+            "default": 2,
+            "type": "integer"
+        },
         "snmp.community": {
             "group": "poller",
             "section": "snmp",
@@ -4996,14 +5034,6 @@
             "section": "binaries",
             "order": 11,
             "type": "executable"
-        },
-        "snmptraps.eventlog": {
-            "default": "unhandled",
-            "type": "select",
-            "options": {
-                "unhandled": "Unhandled Traps",
-                "all": "All Traps"
-            }
         },
         "snmpwalk": {
             "default": "/usr/bin/snmpwalk",

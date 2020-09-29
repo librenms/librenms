@@ -6,7 +6,7 @@
     <?php echo csrf_field() ?>
     <input type='hidden' name='ignoreport' value='yes'>
     <input type='hidden' name='type' value='update-ports'>
-    <input type='hidden' name='device' value='<?php echo $device['device_id'];?>'>
+    <input type='hidden' name='device' value='<?php echo $device['device_id']; ?>'>
     <div class='table-responsive'>
     <table id='edit-ports' class='table table-striped'>
         <thead>

@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.629.200.1.1.1",
                     "sysDescr": "OD-NM OD-5.10.1 (32333) (Jul 13 2016 - 08:18:22), U-Boot 2013.01.02.16-00155-gdebf., Linux kernel v3.2.78-1-12777-g012a77d (#7 Wed Mar 9 15:29:57 PST 2016), OD-NM (firmware 20.16) (00:20:1a:06:08:3f)",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "OD 5.2.1 (25684)",
+                    "hardware": "OD-16-HD",
                     "features": null,
                     "os": "mrv-od",
                     "type": "network",
-                    "serial": null,
+                    "serial": "012345EMF8K0",
                     "icon": "mrv.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
