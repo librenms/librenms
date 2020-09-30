@@ -310,15 +310,13 @@ if ($options['f'] === 'purgeusers') {
             $purge = \LibreNMS\Config::get('active_directory.users_purge');
         }
         if ($purge > 0) {
-            foreach (dbFetchRows('SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)', [$purge]) as $user) {
-                $users[] = $user['user'];
-            }
+            $users = \App\Models\AuthLog::where('datetime', '>=', \Carbon\Carbon::now()->subDays($purge))
+                ->distinct()->pluck('user')
+                ->merge(\App\Models\User::has('apiToken')->pluck('username')) // don't purge users with api tokens
+                ->unique();
 
-            // Also keep users with a valid API Token
-            $users = array_merge($users, User::has('apiToken')->pluck('username'));
-
-            if (dbDelete('users', 'username NOT IN ' . dbGenPlaceholders(count($users)), $users)) {
-                echo "Removed users that haven't logged in for $purge days";
+            if (\App\Models\User::whereNotIn('username', $users)->delete()) {
+                echo "Removed users that haven't logged in for $purge days\n";
             }
         }
     } catch (LockException $e) {
