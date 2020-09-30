@@ -315,7 +315,7 @@ if ($options['f'] === 'purgeusers') {
                 ->merge(\App\Models\User::has('apiToken')->pluck('username')) // don't purge users with api tokens
                 ->unique();
 
-            if (\App\Models\User::whereNotIn('username', $users)->delete()) {
+            if (\App\Models\User::thisAuth()->whereNotIn('username', $users)->delete()) {
                 echo "Removed users that haven't logged in for $purge days\n";
             }
         }
