@@ -217,7 +217,7 @@ class AlertSchedule extends Model
     public function __toString()
     {
         return ($this->recurring ?
-            'Recurring Alert Schedule (' . implode(',', $this->recurring_day) . ') ':
+            'Recurring Alert Schedule (' . implode(',', $this->recurring_day) . ') ' :
             'Alert Schedule ')
             . "start: $this->start end: $this->end";
     }

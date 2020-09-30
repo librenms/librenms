@@ -44,7 +44,6 @@ class TestScheduledMaintenance extends DBTestCase
         $schedule->end = Carbon::parse('9000-09-09 20:00');
         $schedule->save();
 
-
         $this->assertScheduleActive(Carbon::parse('2020-09-10 2:01'), $schedule);
         $this->assertScheduleActive(Carbon::parse('2020-09-10 2:00'), $schedule);
         $this->assertScheduleSet(Carbon::parse('2020-09-10 1:59'), $schedule);
