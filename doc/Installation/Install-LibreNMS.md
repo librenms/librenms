@@ -14,7 +14,7 @@ Connect to the server command line and follow the instructions below.
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is 7.2.5**
+**Please note currently the minimum supported PHP version is 7.2.5, but from 1 November 2020 this will be bumped to PHP 7.3**
 
 # Install Required Packages
 
@@ -39,15 +39,32 @@ Connect to the server command line and follow the instructions below.
     === "NGINX"
         ```
         dnf -y install epel-release
-        dnf install bash-completion composer cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
+        dnf module reset php
+        dnf module list php
+        dnf module enable php:7.3
+        dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
+        ```
+    Composer does not ship via the `dnf` package manager anymore, so you will have to install it "manually". To install it globally:
+        ```
+        wget https://getcomposer.org/composer-stable.phar
+        mv composer-stable.phar /usr/bin/composer
+        chmod +x /usr/bin/composer
         ```
     
     === "Apache"
         ```
         dnf -y install epel-release
-        dnf install bash-completion composer cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
+        dnf module reset php
+        dnf module list php
+        dnf module enable php:7.3
+        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
         ```
-
+    Composer does not ship via the `dnf` package manager anymore, so you will have to install it "manually". To install it globally:
+        ```
+        wget https://getcomposer.org/composer-stable.phar
+        mv composer-stable.phar /usr/bin/composer
+        chmod +x /usr/bin/composer
+        ```
 === "Debian 10"
     === "NGINX"
         ```
