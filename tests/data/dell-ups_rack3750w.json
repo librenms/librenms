@@ -457,14 +457,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.674.10902.2",
                     "sysDescr": "Dell UPS Rack 3750W High Efficiency Online HV",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "01.08 0004",
+                    "hardware": "Dell UPS Rack 3750W High Efficiency Online HV",
                     "features": null,
                     "os": "dell-ups",
                     "type": "power",
-                    "serial": null,
+                    "serial": "CN-0K804N-75162-2CH-0081-A03",
                     "icon": "dell.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -475,7 +475,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.674.10902.2",
                     "sysDescr": "Dell UPS Rack 3750W High Efficiency Online HV",
                     "sysContact": "<private>",
-                    "version": "01.08.0004",
+                    "version": "01.08 0004",
                     "hardware": "Dell UPS Rack 3750W High Efficiency Online HV",
                     "features": null,
                     "os": "dell-ups",

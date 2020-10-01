@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.259.10.1.43.101",
                     "sysDescr": "ECS2100-10T",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "R01 1.2.2.24",
+                    "hardware": "ECS2100-10T",
                     "features": null,
                     "os": "edgecos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "EC1813001458",
                     "icon": "edge-core.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

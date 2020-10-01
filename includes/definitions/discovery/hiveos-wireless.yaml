@@ -1,5 +1,11 @@
 mib: AH-SYSTEM-MIB
 modules:
+    os:
+        sysDescr_regex: '/^(?<hardware>.*), HiveOS (?<version>.*)$/'
+        hardware: AH-SYSTEM-MIB::ahDeviceMode.0
+        serial: AH-SYSTEM-MIB::ahSystemSerial.0
+        version: AH-SYSTEM-MIB::ahFirmwareVersion.0
+        version_regex: '/^(HiveOS )?(?<version>.*)/'
     sensors:
         temperature:
             data:

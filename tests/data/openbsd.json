@@ -14,7 +14,7 @@
                     "type": "server",
                     "serial": null,
                     "icon": "openbsd.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

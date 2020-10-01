@@ -13,8 +13,8 @@
 if ($device['os'] === 'hpmsm') {
     echo 'HPE MSM : ';
     $total = snmp_get($device, 'coUsInfoRamTotal.0', '-OvQU', 'COLUBRIS-USAGE-INFORMATION-MIB', 'hpmsm');
-    $used  = $total - $free;
-    $free  = snmp_get($device, 'coUsInfoRamFree.0', '-OvQU', 'COLUBRIS-USAGE-INFORMATION-MIB', 'hpmsm');
+    $used = $total - $free;
+    $free = snmp_get($device, 'coUsInfoRamFree.0', '-OvQU', 'COLUBRIS-USAGE-INFORMATION-MIB', 'hpmsm');
     if (is_numeric($total) && is_numeric($used) && is_numeric($free)) {
         discover_mempool($valid_mempool, $device, 0, 'hpmsm', 'Memory Utilization', '1', null, null);
     }

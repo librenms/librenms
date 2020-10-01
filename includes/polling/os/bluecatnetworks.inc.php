@@ -1,8 +1,6 @@
 <?php
 
-use LibreNMS\RRD\RrdDefinition;
-
-$oid_list = ['bcnSysIdOSRelease.0', 'bcnSysIdSerial.0', 'bcnSysIdPlatform.0' ];
+$oid_list = ['bcnSysIdOSRelease.0', 'bcnSysIdSerial.0', 'bcnSysIdPlatform.0'];
 
 $bcn = snmp_get_multi_oid($device, $oid_list, '-OUQs', 'BCN-SYSTEM-MIB');
 

@@ -1,5 +1,13 @@
 mib: SMARTNODE-MIB
 modules:
+    os:
+        hardware:
+            - SMARTNODE-MIB::hwRelease.0
+            - SMARTNODE-MIB::hwVersion.0
+            - SMARTNODE-MIB::productName.0
+        hardware_template: '{{ SMARTNODE-MIB::productName.0 }}, HwRel: {{ SMARTNODE-MIB::hwRelease.0 }}, HwVer: {{ SMARTNODE-MIB::hwVersion.0 }}'
+        serial: SMARTNODE-MIB::serialNumber.0
+        version: SMARTNODE-MIB::swVersion.0
     processors:
         data:
             -

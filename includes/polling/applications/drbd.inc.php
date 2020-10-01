@@ -7,13 +7,13 @@ $app_instance = $app['app_instance'];
 $app_id = $app['app_id'];
 $drbd_data = $agent_data['app'][$name][$app_instance];
 foreach (explode('|', $drbd_data) as $part) {
-    list($stat, $val) = explode('=', $part);
-    if (!empty($stat)) {
+    [$stat, $val] = explode('=', $part);
+    if (! empty($stat)) {
         $drbd[$stat] = $val;
     }
 }
 
-$rrd_name = array('app', $name, $app_instance);
+$rrd_name = ['app', $name, $app_instance];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ns', 'DERIVE', 0, 125000000000)
     ->addDataset('nr', 'DERIVE', 0, 125000000000)
@@ -27,8 +27,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('ap', 'GAUGE', 0, 125000000000)
     ->addDataset('oos', 'GAUGE', 0, 125000000000);
 
-
-$fields = array(
+$fields = [
     'ns'  => $drbd['ns'],
     'nr'  => $drbd['nr'],
     'dw'  => $drbd['dw'],
@@ -40,9 +39,9 @@ $fields = array(
     'ua'  => $drbd['ua'],
     'ap'  => $drbd['ap'],
     'oos' => $drbd['oos'],
-);
+];
 
-$tags = array('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = ['name', 'app_id', 'rrd_name', 'rrd_def'];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $drbd_data, $fields);
 

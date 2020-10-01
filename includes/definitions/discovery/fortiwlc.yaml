@@ -1,5 +1,8 @@
 mib: MERU-GLOBAL-STATISTICS-MIB
 modules:
+    os:
+        hardware: MERU-GLOBAL-STATISTICS-MIB::mwSystemGeneralModel.0
+        version: MERU-GLOBAL-STATISTICS-MIB::mwSystemGeneralVersion.0
     processors:
         data:
             -

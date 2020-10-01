@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.13464.1.3.38.3",
                     "sysDescr": "FS Switch",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "S3800-24F4S V100R001B01D001P004SP3",
+                    "hardware": "S3800-24F4S Switch Product",
                     "features": null,
                     "os": "fs-gbn",
                     "type": "network",
-                    "serial": null,
+                    "serial": "F170823DN051",
                     "icon": "fs.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

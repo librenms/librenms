@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 require 'includes/html/graphs/common.inc.php';
 
 // escape % characters
@@ -35,7 +33,7 @@ if ($unit_long == $sensor['sensor_descr']) {
 $col_w = 7 + strlen($unit);
 $sensor_descr_fixed = rrdtool_escape($sensor['sensor_descr'], 28);
 
-$rrd_options .= " COMMENT:'". str_pad($unit_long, 35) . str_pad("Cur", $col_w). str_pad("Min", $col_w) . "Max\\n'";
+$rrd_options .= " COMMENT:'" . str_pad($unit_long, 35) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . "Max\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 
 $num = '%5.2lf'; // default: float
@@ -67,11 +65,11 @@ if (isset($scale_min) && $scale_min >= 0) {
 
 if ($vars['width'] > 300) {
     if (is_numeric($sensor['sensor_limit'])) {
-        $rrd_options .= ' LINE1:'.$sensor['sensor_limit']*$factor.'#cc000060::dashes';
+        $rrd_options .= ' LINE1:' . $sensor['sensor_limit'] * $factor . '#cc000060::dashes';
     }
 
     if (is_numeric($sensor['sensor_limit_low'])) {
-        $rrd_options .= ' LINE1:'.$sensor['sensor_limit_low']*$factor.'#cc000060::dashes';
+        $rrd_options .= ' LINE1:' . $sensor['sensor_limit_low'] * $factor . '#cc000060::dashes';
     }
 }
 

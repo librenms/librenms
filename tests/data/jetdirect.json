@@ -8,13 +8,13 @@
                     "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:AAA0A00000,FN:1G11F33,SVCID:26267,PID:Purchasing Color Laser",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Color LaserJet M452nw",
                     "features": null,
                     "os": "jetdirect",
                     "type": "printer",
                     "serial": null,
                     "icon": "hp.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

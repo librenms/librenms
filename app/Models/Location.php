@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -34,9 +33,9 @@ class Location extends Model
     public $fillable = ['location', 'lat', 'lng'];
     const CREATED_AT = null;
     const UPDATED_AT = 'timestamp';
+    protected $casts = ['lat' => 'float', 'lng' => 'float'];
 
     private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
-
 
     /**
      * Set up listeners for this Model
@@ -60,7 +59,7 @@ class Location extends Model
      */
     public function hasCoordinates()
     {
-        return !(is_null($this->lat) || is_null($this->lng));
+        return ! (is_null($this->lat) || is_null($this->lng));
     }
 
     /**
@@ -79,12 +78,12 @@ class Location extends Model
      */
     public function lookupCoordinates()
     {
-        if (!$this->hasCoordinates() && $this->location) {
+        if (! $this->hasCoordinates() && $this->location) {
             $this->parseCoordinates();
 
-            if (!$this->hasCoordinates() &&
+            if (! $this->hasCoordinates() &&
                 \LibreNMS\Config::get('geoloc.latlng', true) &&
-                (!$this->id || $this->timestamp && $this->timestamp->diffInDays() > 2)
+                (! $this->id || $this->timestamp && $this->timestamp->diffInDays() > 2)
             ) {
                 $this->fetchCoordinates();
                 $this->updateTimestamps();
@@ -147,7 +146,6 @@ class Location extends Model
             $query->where('device_groups.id', $deviceGroup);
         });
     }
-
 
     // ---- Define Relationships ----
 

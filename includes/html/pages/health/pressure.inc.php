@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_pressure';
-$class      = 'pressure';
-$unit       = 'kpa';
+$class = 'pressure';
+$unit = 'kpa';
 
 require 'includes/html/pages/health/sensors.inc.php';

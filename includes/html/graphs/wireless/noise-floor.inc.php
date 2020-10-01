@@ -1,4 +1,5 @@
 <?php
+
 $scale_min = '-175';
 $scale_max = '0';
 

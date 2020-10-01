@@ -17,13 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-$rrd = rrd_name($device['hostname'], array('app', 'powerdns-recursor', $app['app_id']));
+$rrd = rrd_name($device['hostname'], ['app', 'powerdns-recursor', $app['app_id']]);
 if (rrdtool_check_rrd_exists($rrd)) {
     $rrd_filename = $rrd;
 }

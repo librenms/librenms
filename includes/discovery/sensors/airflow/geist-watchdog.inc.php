@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $value = snmp_get($device, 'climateAirflow', '-Oqv', 'GEIST-MIB-V3');
 $current_oid = '.1.3.6.1.4.1.21239.2.2.1.9.1';
 $descr = 'Airflow';

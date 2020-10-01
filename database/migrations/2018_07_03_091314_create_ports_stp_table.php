@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreatePortsStpTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -26,7 +25,7 @@ class CreatePortsStpTable extends Migration
             $table->string('designatedBridge', 32);
             $table->mediumInteger('designatedPort');
             $table->integer('forwardTransitions')->unsigned();
-            $table->unique(['device_id','port_id']);
+            $table->unique(['device_id', 'port_id']);
         });
     }
 

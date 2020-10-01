@@ -100,6 +100,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - SNMP extend, Agent
+1. [Icecast](#icecast) - SNMP extend, Agent
 1. [Mailcow-dockerized postfix](#mailcow-dockerized-postfix) - SNMP extend
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Mdadm](#mdadm) - SNMP extend
@@ -112,6 +113,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [NTP Server/NTPD](#ntp-server-aka-ntpd) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
 1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
+1. [Opensips](#opensips) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Pi-hole](#pi-hole) - SNMP extend
@@ -134,6 +136,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Unbound](#unbound) - SNMP extend, Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
+1. [Voip-monitor](#voip-monitor) - SNMP extend
 1. [ZFS](#zfs) - SNMP extend
 
 # Apache
@@ -776,6 +779,25 @@ You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
+# Icecast
+
+Shell script that reports load average/memory/open-files stats of Icecast
+## SNMP Extend
+
+1. Copy the shell script, icecast-stats.sh, to the desired host (the host must be added to LibreNMS devices) 
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/icecast-stats.sh -O /etc/snmp/icecast-stats.sh)
+```
+
+2: Make the script executable `chmod +x /etc/snmp/icecast-stats.sh`
+
+3. Verify it is working by running `/etc/snmp/icecast-stats.sh`
+
+4: Edit your snmpd.conf file (usually `/etc/snmp/icecast-stats.sh`) and add:
+
+```
+extend icecast /etc/snmp/icecast-stats.sh
+```
 # mailcow-dockerized postfix
 
 ## SNMP Extend
@@ -1141,6 +1163,26 @@ extend ogs /etc/snmp/rocks.sh
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+# Opensips
+
+Script that reports load-average/memory/open-files stats of Opensips
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/opensips-stats.sh
+   -O /etc/snmp/opensips-stats.sh`
+
+2: Make the script executable: `chmod +x /etc/snmp/opensips-stats.sh`
+
+3. Verify it is working by running `/etc/snmp/opensips-stats.sh`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend opensips /etc/snmp/opensips-stats.sh
+```
 
 # OS Updates
 
@@ -1842,7 +1884,7 @@ https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O
 3: Edit your snmpd.conf file and add:
 
 ```
-extend unbound /etc/snmp/unbound
+extend unbound /usr/bin/sudo /etc/snmp/unbound
 ```
 
 4: Restart snmpd.
@@ -1937,6 +1979,24 @@ extend sdfsinfo /etc/snmp/sdfsinfo
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+# Voip-monitor
+
+Shell script that reports cpu-load/memory/open-files files stats of Voip Monitor
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/voipmon-stats.sh
+   -O /etc/snmp/voipmon-stats.sh`
+
+2: Make the script executable: `chmod +x /etc/snmp/voipmon-stats.sh`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/voipmon-stats.sh`) and add:
+
+```
+extend voipmon /etc/snmp/voipmon-stats.sh
+```
 
 # ZFS
 

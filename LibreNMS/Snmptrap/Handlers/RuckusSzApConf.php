@@ -21,7 +21,6 @@
  * configuration of an access point. Contains a configuration ID
  * number string.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -32,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Snmptrap\Handlers\RuckusSzSeverity;
 use Log;
 
 class RuckusSzApConf implements SnmptrapHandler

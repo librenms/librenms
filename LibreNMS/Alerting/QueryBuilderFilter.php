@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -28,7 +27,6 @@ namespace LibreNMS\Alerting;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Schema;
-use Symfony\Component\Yaml\Yaml;
 
 class QueryBuilderFilter implements \JsonSerializable
 {
@@ -92,11 +90,11 @@ class QueryBuilderFilter implements \JsonSerializable
         $db_schema = $this->schema->getSchema();
         $valid_tables = array_diff(array_keys($this->schema->getAllRelationshipPaths()), self::$table_blacklist);
 
-        foreach ((array)$db_schema as $table => $data) {
+        foreach ((array) $db_schema as $table => $data) {
             $columns = array_column($data['Columns'], 'Type', 'Field');
 
             // only allow tables with a direct association to device_id
-            if (!in_array($table, $valid_tables)) {
+            if (! in_array($table, $valid_tables)) {
                 continue;
             }
 
@@ -143,7 +141,6 @@ class QueryBuilderFilter implements \JsonSerializable
         }
     }
 
-
     private function getColumnType($type)
     {
         if (Str::startsWith($type, ['varchar', 'text', 'double', 'float'])) {
@@ -172,6 +169,7 @@ class QueryBuilderFilter implements \JsonSerializable
     {
         $filter = $this->filter;
         asort($filter);
+
         return array_values($filter);
     }
 

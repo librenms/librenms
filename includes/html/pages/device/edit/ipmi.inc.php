@@ -25,7 +25,7 @@ if ($_POST['editing']) {
         }
 
         $update_message = 'Device IPMI data updated.';
-        $updated        = 1;
+        $updated = 1;
     } else {
         include 'includes/html/error-no-perm.inc.php';
     }//end if

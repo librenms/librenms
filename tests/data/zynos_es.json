@@ -26,7 +26,7 @@
                     "sysDescr": "ES-2024PWR",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "ES-2024PWR",
                     "features": null,
                     "os": "zynos",
                     "type": "network",

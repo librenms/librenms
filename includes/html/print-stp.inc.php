@@ -1,8 +1,8 @@
 <?php
 
 echo '<table class="table table-condensed table-striped table-hover">';
-$stp_raw = dbFetchRow('SELECT * FROM `stp` WHERE `device_id` = ?', array($device['device_id']));
-$stp = array (
+$stp_raw = dbFetchRow('SELECT * FROM `stp` WHERE `device_id` = ?', [$device['device_id']]);
+$stp = [
     'Root bridge'                 => ($stp_raw['rootBridge'] == 1) ? 'Yes' : 'No',
     'Bridge address (MAC)'        => $stp_raw['bridgeAddress'],
     'Protocol specification'      => $stp_raw['protocolSpecification'],
@@ -18,8 +18,8 @@ $stp = array (
     'Forward delay (s)'           => $stp_raw['forwardDelay'],
     'Bridge max age (s)'          => $stp_raw['bridgeMaxAge'],
     'Bridge hello time (s)'       => $stp_raw['bridgeHelloTime'],
-    'Bridge forward delay (s)'    => $stp_raw['bridgeForwardDelay']
-);
+    'Bridge forward delay (s)'    => $stp_raw['bridgeForwardDelay'],
+];
 foreach (array_keys($stp) as $key) {
     echo "
       <tr>

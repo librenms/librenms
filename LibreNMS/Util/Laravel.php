@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -75,7 +74,7 @@ class Laravel
 
     public static function isBooted()
     {
-        return function_exists('app') && !empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
+        return function_exists('app') && ! empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
     }
 
     public static function enableQueryDebug()
@@ -83,7 +82,7 @@ class Laravel
         static $sql_debug_enabled;
         $db = Eloquent::DB();
 
-        if ($db && !$sql_debug_enabled) {
+        if ($db && ! $sql_debug_enabled) {
             $db->listen(function (QueryExecuted $query) {
                 // collect bindings and make them a little more readable
                 $bindings = collect($query->bindings)->map(function ($item) {
@@ -139,7 +138,7 @@ class Laravel
         // set dummy path allows url helper to work and prevents full init again
         $new_uri = ($auth ? '/dummy_legacy_auth' : '/dummy_legacy_unauth');
         $request->server->set('REQUEST_URI', $new_uri);
-        
+
         // tests fail without this
         if ($request->server->get('REMOTE_ADDR') === null) {
             $request->server->set('REMOTE_ADDR', '127.0.0.1');

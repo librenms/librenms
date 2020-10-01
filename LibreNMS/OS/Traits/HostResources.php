@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -37,31 +36,31 @@ trait HostResources
      */
     public function discoverProcessors()
     {
-        echo "Host Resources: ";
-        $processors = array();
+        echo 'Host Resources: ';
+        $processors = [];
 
         try {
             $hrProcessorLoad = $this->getCacheByIndex('hrProcessorLoad', 'HOST-RESOURCES-MIB');
 
             if (empty($hrProcessorLoad)) {
                 // no hr data, return
-                return array();
+                return [];
             }
 
             $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
         } catch (\Exception $e) {
-            return array();
+            return [];
         }
 
         foreach ($hrProcessorLoad as $index => $usage) {
             $usage_oid = '.1.3.6.1.2.1.25.3.3.1.2.' . $index;
             $descr = $hrDeviceDescr[$index];
 
-            if (!is_numeric($usage)) {
+            if (! is_numeric($usage)) {
                 continue;
             }
 
-            $device = $this->getDevice();
+            $device = $this->getDeviceArray();
             if ($device['os'] == 'arista-eos' && $index == '1') {
                 continue;
             }
@@ -73,20 +72,20 @@ trait HostResources
                 $descr = 'Processor';
             } else {
                 // Make the description a bit shorter
-                $remove_strings = array(
+                $remove_strings = [
                     'GenuineIntel: ',
                     'AuthenticAMD: ',
                     'CPU ',
                     '(TM)',
                     '(R)',
-                );
+                ];
                 $descr = str_replace($remove_strings, '', $descr);
                 $descr = str_replace('  ', ' ', $descr);
             }
 
-            $old_name = array('hrProcessor', $index);
-            $new_name = array('processor', 'hr', $index);
-            rrd_file_rename($this->getDevice(), $old_name, $new_name);
+            $old_name = ['hrProcessor', $index];
+            $new_name = ['processor', 'hr', $index];
+            rrd_file_rename($this->getDeviceArray(), $old_name, $new_name);
 
             $processor = Processor::discover(
                 'hr',

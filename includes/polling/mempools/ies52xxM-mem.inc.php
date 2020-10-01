@@ -1,6 +1,6 @@
 <?php
 
-if (!is_array($mempool_cache['ies-mem'])) {
+if (! is_array($mempool_cache['ies-mem'])) {
     $mempool_cache['ies-mem'] = snmpwalk_cache_oid($device, 'memStatsTable', null, 'IES5206-MIB', 'zyxel');
     d_echo($mempool_cache);
 } else {

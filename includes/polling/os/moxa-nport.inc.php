@@ -14,4 +14,4 @@
 // SNMPv2-MIB::sysObjectID.0 = OID: SNMPv2-SMI::enterprises.8691.2.7
 // DISMAN-EVENT-MIB::sysUpTimeInstance = Timeticks: (50870289) 5 days, 21:18:22.89
 
-$hardware =  $device['sysDescr'];
+$hardware = $device['sysDescr'];

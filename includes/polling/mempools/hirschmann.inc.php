@@ -9,4 +9,4 @@ $mempool['total'] = ($mem_allocated + $mem_free);
 $mempool['used'] = $mem_allocated;
 $mempool['free'] = $mem_free;
 
-echo '(U: '.$mempool['used'].' T: '.$mempool['total'].' F: '.$mempool['free'].') ';
+echo '(U: ' . $mempool['used'] . ' T: ' . $mempool['total'] . ' F: ' . $mempool['free'] . ') ';

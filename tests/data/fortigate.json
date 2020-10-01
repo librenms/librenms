@@ -23,16 +23,16 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.15",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "v5.6.4,build1575,180425 (GA)",
+                    "hardware": "FGT_501E",
                     "features": null,
                     "os": "fortigate",
                     "type": "firewall",
-                    "serial": null,
+                    "serial": "FG5H1E5810000000",
                     "icon": "fortinet.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -41,11 +41,11 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.15",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": "<private>",
-                    "version": "v5.6.4",
+                    "version": "v5.6.4,build1575,180425 (GA)",
                     "hardware": "FGT_501E",
-                    "features": "build1575",
+                    "features": null,
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FG5H1E5810000000",
