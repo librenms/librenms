@@ -17,7 +17,7 @@ $unbound = [];
 $metrics = [];
 foreach ($lines as $line) {
     [$var,$value] = explode('=', $line);
-    $unbound[$var] = $value;
+    $unbound[strtolower($var)] = $value;
 }
 //Unbound Queries
 $rrd_name = ['app', $name, 'queries', $app_id];
@@ -41,23 +41,23 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('ANY', 'DERIVE', 0, 125000000000)
     ->addDataset('other', 'DERIVE', 0, 125000000000);
 $fields = [
-    'type0' => $unbound['num.query.type.TYPE0'],
-    'A' => $unbound['num.query.type.A'],
-    'NS' => $unbound['num.query.type.NS'],
-    'CNAME' => $unbound['num.query.type.CNAME'],
-    'SOA' => $unbound['num.query.type.SOA'],
-    'NULL' => $unbound['num.query.type.NULL'],
-    'WKS' => $unbound['num.query.type.WKS'],
-    'PTR' => $unbound['num.query.type.PTR'],
-    'MX' => $unbound['num.query.type.MX'],
-    'TXT' => $unbound['num.query.type.TXT'],
-    'AAAA' => $unbound['num.query.type.AAAA'],
-    'SRV' => $unbound['num.query.type.SRV'],
-    'NAPTR' => $unbound['num.query.type.NAPTR'],
-    'DS' => $unbound['num.query.type.DS'],
-    'DNSKEY' => $unbound['num.query.type.DNSKEY'],
-    'SPF' => $unbound['num.query.type.SPF'],
-    'ANY' => $unbound['num.query.type.ANY'],
+    'type0' => $unbound['num.query.type.type0'],
+    'A' => $unbound['num.query.type.a'],
+    'NS' => $unbound['num.query.type.ns'],
+    'CNAME' => $unbound['num.query.type.cname'],
+    'SOA' => $unbound['num.query.type.soa'],
+    'NULL' => $unbound['num.query.type.null'],
+    'WKS' => $unbound['num.query.type.wks'],
+    'PTR' => $unbound['num.query.type.ptr'],
+    'MX' => $unbound['num.query.type.mx'],
+    'TXT' => $unbound['num.query.type.txt'],
+    'AAAA' => $unbound['num.query.type.aaaa'],
+    'SRV' => $unbound['num.query.type.src'],
+    'NAPTR' => $unbound['num.query.type.naptr'],
+    'DS' => $unbound['num.query.type.ds'],
+    'DNSKEY' => $unbound['num.query.type.dnskey'],
+    'SPF' => $unbound['num.query.type.spf'],
+    'ANY' => $unbound['num.query.type.any'],
     'other' => $unbound['num.query.type.other'],
 ];
 $metrics['queries'] = $fields;
@@ -85,9 +85,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('rcodeNXDOMAIN', 'DERIVE', 0, 125000000000)
     ->addDataset('rcodeNodata', 'DERIVE', 0, 125000000000);
 $fields = [
-    'opcodeQuery' => $unbound['num.query.opcode.QUERY'],
-    'rcodeNOERROR' => $unbound['num.answer.rcode.NOERROR'],
-    'rcodeNXDOMAIN' => $unbound['num.answer.rcode.NXDOMAIN'],
+    'opcodeQuery' => $unbound['num.query.opcode.query'],
+    'rcodeNOERROR' => $unbound['num.answer.rcode.noerror'],
+    'rcodeNXDOMAIN' => $unbound['num.answer.rcode.nxdomain'],
     'rcodeNodata' => $unbound['num.answer.rcode.nodata'],
 ];
 $metrics['operations'] = $fields;
