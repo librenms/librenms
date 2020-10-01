@@ -40,7 +40,6 @@ Connect to the server command line and follow the instructions below.
         ```
         dnf -y install epel-release
         dnf module reset php
-        dnf module list php
         dnf module enable php:7.3
         dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
         ```
@@ -55,7 +54,6 @@ Connect to the server command line and follow the instructions below.
         ```
         dnf -y install epel-release
         dnf module reset php
-        dnf module list php
         dnf module enable php:7.3
         dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
         ```
