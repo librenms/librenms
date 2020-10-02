@@ -274,37 +274,59 @@ class IRCBot
 
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
-                    $this->ircRaw('PRIVMSG ' . $chan . ' :' . $severity . trim($alert['title']));
-                    if (! $this->config['irc_alert_short']) { // Only send the title if set to short
-                        foreach (explode("\n", $alert['msg']) as $line) {
-                            // We don't need to repeat the title
-                            $line = strip_tags($line);
-                            if (trim($line) != trim($alert['title'])) {
-                                $this->ircRaw('PRIVMSG ' . $chan . ' :' . $line);
-                            }
-                        }
-                    }
+                    $this->sendAlert($chan, $severity, $alert);
                 }
-            } else {
-                foreach ($this->authd as $nick => $data) {
-                    if ($data['expire'] >= time()) {
-                        $this->ircRaw('PRIVMSG ' . $nick . ' :' . $severity . trim($alert['title']));
-                        if (! $this->config['irc_alert_short']) { // Only send the title if set to short
-                            foreach (explode("\n", $alert['msg']) as $line) {
-                                // We don't need to repeat the title
-                                $line = strip_tags($line);
-                                if (trim($line) != trim($alert['title'])) {
-                                    $this->ircRaw('PRIVMSG ' . $nick . ' :' . $line);
-                                }
-                            }
-                        }
-                    }
+
+                return;
+            }//end if
+
+            foreach ($this->authd as $nick => $data) {
+                if ($data['expire'] >= time()) {
+                    $this->sendAlert($nick, $severity, $alert);
                 }
             }
-        }//end if
+        }
     }
 
     //end alertData()
+
+    private function sendAlert($sendto, $severity, $alert)
+    {
+        $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim($alert['title']));
+        if ($this->config['irc_alert_short']) {
+            // Only send the title if set to short
+
+            return;
+        }
+
+        foreach (explode("\n", $alert['msg']) as $line) {
+            $line = trim($line);
+            if (strlen($line) < 1) {
+                continue;
+            }
+            $line = $this->_html2irc($line);
+            $line = strip_tags($line);
+
+            // We don't need to repeat the title
+            if (trim($line) != trim($alert['title'])) {
+                $this->log("Sending alert $line");
+                if ($this->config['irc_floodlimit'] > 100) {
+                    $this->floodcount += strlen($line);
+                } elseif ($this->config['irc_floodlimit'] > 1) {
+                    $this->floodcount += 1;
+                }
+                if (($this->config['irc_floodlimit'] > 0) && ($this->floodcount > $this->config['irc_floodlimit'])) {
+                    $this->log('Reached floodlimit ' . $this->floodcount);
+                    $this->ircRaw('BOTFLOODCHECK');
+                    sleep(2);
+                    $this->floodcount = 0;
+                }
+                $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $line);
+            }
+        }
+    }
+
+    //end sendAlert()
 
     private function getData()
     {
@@ -995,4 +1017,43 @@ class IRCBot
     }
 
     // end _color
+
+    private function _html2irc($string)
+    {
+        $string = urldecode($string);
+        $string = preg_replace('#<b>#i', chr(2), $string);
+        $string = preg_replace('#</b>#i', chr(2), $string);
+        $string = preg_replace('#<i>#i', chr(22), $string);
+        $string = preg_replace('#</i>#i', chr(22), $string);
+        $string = preg_replace('#<u>#i', chr(31), $string);
+        $string = preg_replace('#</u>#i', chr(31), $string);
+
+        $colors = [
+            'white'     => '00',
+            'black'     => '01',
+            'blue'      => '02',
+            'green'     => '03',
+            'red'       => '04',
+            'brown'     => '05',
+            'purple'    => '06',
+            'orange'    => '07',
+            'yellow'    => '08',
+            'lightgreen' => '09',
+            'cyan'      => '10',
+            'lightcyan' => '11',
+            'lightblue' => '12',
+            'pink'      => '13',
+            'grey'      => '14',
+            'lightgrey' => '15',
+        ];
+
+        foreach ($colors as $color => $code) {
+            $string = preg_replace("#<$color>#i", chr(3) . $code, $string);
+            $string = preg_replace("#</$color>#i", chr(3), $string);
+        }
+
+        return $string;
+    }
+
+    // end _html2irc
 }//end class
