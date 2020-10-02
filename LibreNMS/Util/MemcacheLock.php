@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -41,7 +40,7 @@ class MemcacheLock implements Lock
     private function __construct($lock_name)
     {
         if (! class_exists('Memcached')) {
-            throw new LockException("Missing PHP Memcached extension, this is required for distributed polling.");
+            throw new LockException('Missing PHP Memcached extension, this is required for distributed polling.');
         }
 
         // check all config vars or fallback

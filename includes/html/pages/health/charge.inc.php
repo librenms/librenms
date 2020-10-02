@@ -15,8 +15,8 @@
  * @author     LibreNMS Contributors
 */
 
-$graph_type = "sensor_charge";
-$unit = "%";
-$class = "charge";
+$graph_type = 'sensor_charge';
+$unit = '%';
+$class = 'charge';
 
 require 'includes/html/pages/health/sensors.inc.php';

@@ -20,7 +20,6 @@
  * Ruckus ruckusSZAPConnectedTrap is sent when an access point connects
  * to a Smartzone controller.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -30,7 +29,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Handlers\RuckusSzSeverity;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 

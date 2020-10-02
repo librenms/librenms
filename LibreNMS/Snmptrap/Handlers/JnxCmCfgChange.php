@@ -22,7 +22,6 @@
  * If a commit confirmed is rolled back the source is "other" and the
  * user is "root".
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>

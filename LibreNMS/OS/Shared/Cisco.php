@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -62,12 +61,12 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
             $device->version = $regexp_result[2];
         } elseif (preg_match('/^Cisco IOS Software \[([^\]]+)\],.+Software \(([^\)]+)\), Version ([^, ]+)/', $device->sysDescr, $regexp_result)) {
             $device->features = $regexp_result[1];
-            $device->version = $regexp_result[2] . " " . $regexp_result[3];
+            $device->version = $regexp_result[2] . ' ' . $regexp_result[3];
         } elseif (preg_match('/^Cisco IOS Software.*?, .+? Software(\, )?([\s\w\d]+)? \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $device->sysDescr, $regexp_result)) {
             $device->features = $regexp_result[3];
             $device->version = $regexp_result[4];
             $hardware = $regexp_result[2];
-            $tmp = preg_split("/\\r\\n|\\r|\\n/", $device->version);
+            $tmp = preg_split('/\\r\\n|\\r|\\n/', $device->version);
             if (! empty($tmp[0])) {
                 $device->version = $tmp[0];
             }

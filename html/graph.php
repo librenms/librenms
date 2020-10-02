@@ -4,12 +4,9 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    librenms
- * @subpackage graphing
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Data\Store\Datastore;
 
 $start = microtime(true);
@@ -33,7 +30,7 @@ Datastore::terminate();
 
 if ($debug) {
     echo '<br />';
-    printf("Runtime %.3fs", microtime(true) - $start);
+    printf('Runtime %.3fs', microtime(true) - $start);
     echo '<br />';
     printStats();
 }

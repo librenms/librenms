@@ -9,7 +9,6 @@ use App\Models\Port;
 use App\Models\Service;
 use App\Models\Syslog;
 use App\Models\UserPref;
-use App\Models\UserWidget;
 use App\Models\Widget;
 use Auth;
 use Illuminate\Http\Request;
@@ -63,8 +62,8 @@ class OverviewController extends Controller
             if (isset($dashboard) && ! empty($request->dashboard)) {
                 Toastr::error(
                     "Dashboard <code>#$request->dashboard</code> does not exist! Loaded <code>
-                    " . htmlentities($dashboard->dashboard_name) . "</code> instead.",
-                    "Requested Dashboard Not Found!"
+                    " . htmlentities($dashboard->dashboard_name) . '</code> instead.',
+                    'Requested Dashboard Not Found!'
                 );
             }
         }

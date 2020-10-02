@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -47,10 +46,10 @@ class Mail extends BaseValidation
                 $run_test = 0;
             } elseif (Config::get('email_backend') == 'sendmail') {
                 if (! Config::has('email_sendmail_path')) {
-                    $validator->fail("You have selected sendmail but not configured email_sendmail_path");
+                    $validator->fail('You have selected sendmail but not configured email_sendmail_path');
                     $run_test = 0;
                 } elseif (! file_exists(Config::get('email_sendmail_path'))) {
-                    $validator->fail("The configured email_sendmail_path is not valid");
+                    $validator->fail('The configured email_sendmail_path is not valid');
                     $run_test = 0;
                 }
             } elseif (Config::get('email_backend') == 'smtp') {

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
@@ -109,8 +108,8 @@ class Ptp250 extends OS implements
         $receive = '.1.3.6.1.4.1.17713.250.11.1.0'; //"CAMBIUM-PTP250-MIB::receiveDataRate.0"
         $transmit = '.1.3.6.1.4.1.17713.250.11.2.0'; //"CAMBIUM-PTP250-MIB::transmitDataRate.0"
         $aggregate = '.1.3.6.1.4.1.17713.250.11.3.0'; //"CAMBIUM-PTP250-MIB::aggregateDataRate.0"
-        $txModulation = ".1.3.6.1.4.1.17713.250.5.9.0";
-        $rxModulation = ".1.3.6.1.4.1.17713.250.5.8.0";
+        $txModulation = '.1.3.6.1.4.1.17713.250.5.9.0';
+        $rxModulation = '.1.3.6.1.4.1.17713.250.5.8.0';
 
         return [
             new WirelessSensor(

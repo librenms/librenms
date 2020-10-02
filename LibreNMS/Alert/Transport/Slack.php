@@ -18,14 +18,11 @@
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Slack extends Transport
 {
@@ -70,8 +67,8 @@ class Slack extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
             var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump("Params: " . $alert_message); //FIXME: propper debuging
-            var_dump("Return: " . $ret); //FIXME: propper debuging
+            var_dump('Params: ' . $alert_message); //FIXME: propper debuging
+            var_dump('Return: ' . $ret); //FIXME: propper debuging
 
             return 'HTTP Status code ' . $code;
         }

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -39,7 +38,7 @@ class OSDiscoveryTest extends TestCase
     {
         parent::setUpBeforeClass();
 
-        $glob = Config::get('install_dir') . "/tests/snmpsim/*.snmprec";
+        $glob = Config::get('install_dir') . '/tests/snmpsim/*.snmprec';
 
         self::$unchecked_files = array_flip(array_map(function ($file) {
             return basename($file, '.snmprec');
@@ -90,7 +89,7 @@ class OSDiscoveryTest extends TestCase
     {
         $this->assertEmpty(
             self::$unchecked_files,
-            "Not all snmprec files were checked: " . print_r(array_keys(self::$unchecked_files), true)
+            'Not all snmprec files were checked: ' . print_r(array_keys(self::$unchecked_files), true)
         );
     }
 

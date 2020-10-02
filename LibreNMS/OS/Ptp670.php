@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
@@ -84,8 +83,8 @@ class Ptp670 extends OS implements
         $receive = '.1.3.6.1.4.1.17713.11.20.1.0'; //CAMBIUM-PTP670-MIB::receiveDataRate.0
         $transmit = '.1.3.6.1.4.1.17713.11.20.2.0'; //CAMBIUM-PTP670-MIB::transmitDataRate.0
         $aggregate = '.1.3.6.1.4.1.17713.11.20.3.0'; //CAMBIUM-PTP670-MIB::aggregateDataRate.0
-        $txModulation = ".1.3.6.1.4.1.17713.11.12.15.0";
-        $rxModulation = ".1.3.6.1.4.1.17713.11.12.14.0";
+        $txModulation = '.1.3.6.1.4.1.17713.11.12.15.0';
+        $rxModulation = '.1.3.6.1.4.1.17713.11.12.14.0';
 
         return [
             new WirelessSensor(

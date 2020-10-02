@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_dbm';
-$class      = 'dbm';
-$unit       = 'dBm';
+$class = 'dbm';
+$unit = 'dBm';
 
 require 'includes/html/pages/health/sensors.inc.php';

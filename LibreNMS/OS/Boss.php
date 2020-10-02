@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -79,7 +78,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
         $count = 1;
         foreach ($data as $index => $entry) {
             $processors[] = Processor::discover(
-                "avaya-ers",
+                'avaya-ers',
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.45.1.6.3.8.1.1.6.$index",
                 zeropad($count),

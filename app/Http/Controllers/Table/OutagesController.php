@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
@@ -26,11 +25,8 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\DeviceOutage;
-use App\Models\Eventlog;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
 use LibreNMS\Util\Url;
 
 class OutagesController extends TableController
@@ -101,7 +97,7 @@ class OutagesController extends TableController
             $output .= $duration_days . 'd ';
         }
         $output .= (new Carbon($duration))->format(Config::get('dateformat.time'));
-        $output .= "</span>";
+        $output .= '</span>';
 
         return $output;
     }
@@ -114,7 +110,7 @@ class OutagesController extends TableController
 
         $output = "<span style='display:inline;'>";
         $output .= (new Carbon($timestamp))->format(Config::get('dateformat.compact'));
-        $output .= "</span>";
+        $output .= '</span>';
 
         return $output;
     }
@@ -122,9 +118,9 @@ class OutagesController extends TableController
     private function statusLabel($outage)
     {
         if (empty($outage->up_again)) {
-            $label = "label-danger";
+            $label = 'label-danger';
         } else {
-            $label = "label-success";
+            $label = 'label-success';
         }
 
         $output = "<span class='alert-status " . $label . "'></span>";

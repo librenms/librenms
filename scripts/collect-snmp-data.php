@@ -60,7 +60,7 @@ if (isset($hostname)) {
 }
 
 if (isset($options['help']) || empty($target_os)) {
-    echo "Script to collect snmp data from devices to be used for testing.
+    echo 'Script to collect snmp data from devices to be used for testing.
 Snmp data is saved in tests/snmpsim.
 
 Usage:
@@ -75,7 +75,7 @@ Optional:
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
       --snmpsim      Run snmpsimd.py using the collected data for manual testing.
-";
+';
     exit;
 }
 
@@ -121,7 +121,7 @@ try {
 
     $prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
 
-    echo "Capturing Data: ";
+    echo 'Capturing Data: ';
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
     $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
 } catch (InvalidModuleException $e) {

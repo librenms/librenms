@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
@@ -26,7 +25,6 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Telegram extends Transport
 {
@@ -44,11 +42,11 @@ class Telegram extends Transport
         $curl = curl_init();
         set_curl_proxy($curl);
         $text = urlencode($obj['msg']);
-        $format = "";
+        $format = '';
         if ($data['format']) {
-            $format = "&parse_mode=" . $data['format'];
+            $format = '&parse_mode=' . $data['format'];
             if ($data['format'] == 'Markdown') {
-                $text = urlencode(preg_replace("/([a-z0-9]+)_([a-z0-9]+)/", "$1\_$2", $obj['msg']));
+                $text = urlencode(preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", $obj['msg']));
             }
         }
         curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/bot{$data['token']}/sendMessage?chat_id={$data['chat_id']}&text=$text{$format}"));
@@ -57,8 +55,8 @@ class Telegram extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
             var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump("Params: " . $api); //FIXME: propper debuging
-            var_dump("Return: " . $ret); //FIXME: propper debuging
+            var_dump('Params: ' . $api); //FIXME: propper debuging
+            var_dump('Return: ' . $ret); //FIXME: propper debuging
 
             return 'HTTP Status code ' . $code;
         }

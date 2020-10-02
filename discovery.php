@@ -6,8 +6,6 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    LibreNMS
- * @subpackage discovery
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
@@ -50,12 +48,12 @@ if (isset($options['h'])) {
 }//end if
 
 if (isset($options['os'])) {
-    $where .= " AND os = ?";
+    $where .= ' AND os = ?';
     $sqlparams[] = $options['os'];
 }
 
 if (isset($options['type'])) {
-    $where .= " AND type = ?";
+    $where .= ' AND type = ?';
     $sqlparams[] = $options['type'];
 }
 

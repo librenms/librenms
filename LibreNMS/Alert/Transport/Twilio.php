@@ -10,14 +10,11 @@
  * Twilio API Transport
  * @author Andy Rosen <arosen@arosen.net>
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Twilio extends Transport
 {
@@ -58,7 +55,7 @@ class Twilio extends Transport
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl, CURLOPT_USERPWD, $params["sid"] . ":" . $params["token"]);
+        curl_setopt($curl, CURLOPT_USERPWD, $params['sid'] . ':' . $params['token']);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
 
         curl_exec($curl);

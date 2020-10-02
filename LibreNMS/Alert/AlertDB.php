@@ -24,7 +24,6 @@
  * @license GPL
  *
  * Modified by:
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -32,8 +31,6 @@
 
 namespace LibreNMS\Alert;
 
-use App\Models\Device;
-use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
 class AlertDB
@@ -67,13 +64,13 @@ class AlertDB
         //Pretty-print rule to dissect easier
         $pretty = ['&&' => ' && ', '||' => ' || '];
         $rule = str_replace(array_keys($pretty), $pretty, $rule);
-        $tmp = explode(" ", $rule);
+        $tmp = explode(' ', $rule);
         $tables = [];
         foreach ($tmp as $opt) {
             if (strstr($opt, '%') && strstr($opt, '.')) {
-                $tmpp = explode(".", $opt, 2);
-                $tmpp[0] = str_replace("%", "", $tmpp[0]);
-                $tables[] = mres(str_replace("(", "", $tmpp[0]));
+                $tmpp = explode('.', $opt, 2);
+                $tmpp[0] = str_replace('%', '', $tmpp[0]);
+                $tables[] = mres(str_replace('(', '', $tmpp[0]));
                 $rule = str_replace($opt, $tmpp[0] . '.' . $tmpp[1], $rule);
             }
         }
@@ -84,7 +81,7 @@ class AlertDB
         }
         $x = sizeof($tables) - 1;
         $i = 0;
-        $join = "";
+        $join = '';
         while ($i < $x) {
             if (isset($tables[$i + 1])) {
                 $gtmp = ResolveGlues([$tables[$i + 1]], 'device_id');
@@ -92,8 +89,8 @@ class AlertDB
                     //Cannot resolve glue-chain. Rule is invalid.
                     return false;
                 }
-                $last = "";
-                $qry = "";
+                $last = '';
+                $qry = '';
                 foreach ($gtmp as $glue) {
                     if (empty($last)) {
                         [$tmp,$last] = explode('.', $glue);
@@ -107,11 +104,11 @@ class AlertDB
                         $tables[] = $tmp;
                     }
                 }
-                $join .= "( " . $qry . $tables[0] . ".device_id ) && ";
+                $join .= '( ' . $qry . $tables[0] . '.device_id ) && ';
             }
             $i++;
         }
-        $sql = "SELECT * FROM " . implode(",", $tables) . " WHERE (" . $join . "" . str_replace("(", "", $tables[0]) . ".device_id = ?) && (" . str_replace(["%", "@", "!~", "~"], ["", ".*", "NOT REGEXP", "REGEXP"], $rule) . ")";
+        $sql = 'SELECT * FROM ' . implode(',', $tables) . ' WHERE (' . $join . '' . str_replace('(', '', $tables[0]) . '.device_id = ?) && (' . str_replace(['%', '@', '!~', '~'], ['', '.*', 'NOT REGEXP', 'REGEXP'], $rule) . ')';
 
         return $sql;
     }

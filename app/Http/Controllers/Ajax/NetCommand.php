@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -75,7 +74,7 @@ class NetCommand extends Controller
                 if (Str::contains($ua, ['Chrome', 'Trident'])) {
                     $char = "\f"; // line feed
                 } else {
-                    $char = "";
+                    $char = '';
                 }
                 echo str_repeat($char, 4096);
                 echo PHP_EOL; // avoid first line mess ups due to line feed

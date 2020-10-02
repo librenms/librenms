@@ -14,9 +14,8 @@
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
 
-
 d_echo('Zyxel NWA');
-$perc = snmp_get($device, ".1.3.6.1.4.1.890.1.6.22.1.2.0", '-OvQ');
+$perc = snmp_get($device, '.1.3.6.1.4.1.890.1.6.22.1.2.0', '-OvQ');
 if (is_numeric($perc)) {
     $mempool['perc'] = $perc;
     $mempool['used'] = $perc;

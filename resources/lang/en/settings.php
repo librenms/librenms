@@ -49,6 +49,7 @@ return [
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
             'smokeping' => 'Smokeping Integration',
+            'snmptrapd' => 'SNMP Traps Integration',
         ],
         'poller' => [
             'availability' => 'Device Availability',
@@ -376,14 +377,14 @@ return [
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
-            'help' => "Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix",
+            'help' => 'Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix',
         ],
         'auth_ldap_version' => [
             'description' => 'LDAP version',
             'help' => 'LDAP version to use to talk to the server.  Usually this should be v3',
             'options' => [
-                "2" => "2",
-                "3" => "3",
+                '2' => '2',
+                '3' => '3',
             ],
         ],
         'auth_mechanism' => [
@@ -1222,6 +1223,16 @@ return [
         'snmptranslate' => [
             'description' => 'Path to snmptranslate',
         ],
+        'snmptraps' => [
+            'eventlog' => [
+                'description' => 'Create eventlog for snmptraps',
+                'help' => 'Independently of the action that may be mapped to the trap',
+            ],
+            'eventlog_detailed' => [
+                'description' => 'Enable detailed logs',
+                'help' => 'Add all OIDs received with the trap in the eventlog',
+            ],
+        ],
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
         ],
@@ -1348,11 +1359,10 @@ return [
             'description' => 'URL to smokeping',
             'help' => 'Full URL to the smokeping gui',
         ],
-
     ],
     'twofactor' => [
         'description' => 'Enable Two-Factor Auth',
-        'help' => "Enables the built in Two-Factor authentication. You must set up each account to make it active.",
+        'help' => 'Enables the built in Two-Factor authentication. You must set up each account to make it active.',
     ],
     'units' => [
         'days' => 'days',

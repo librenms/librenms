@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-echo "Cisco Nexus";
+echo 'Cisco Nexus';
 $used = snmp_get($device, '.1.3.6.1.4.1.9.9.109.1.1.1.1.12.1', '-OvQ');
 $free = snmp_get($device, '.1.3.6.1.4.1.9.9.109.1.1.1.1.13.1', '-OvQ');
 

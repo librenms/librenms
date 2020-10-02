@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -37,7 +36,7 @@ class Beagleboard extends OS implements
     {
         $oids = ['NET-SNMP-EXTEND-MIB::nsExtendOutputFull."distro"', 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."hardware"'];
         $info = snmp_get_multi($this->getDeviceArray(), $oids);
-        $device->version = str_replace("BeagleBoard.org ", "", $info['"distro"']['nsExtendOutputFull']);
+        $device->version = str_replace('BeagleBoard.org ', '', $info['"distro"']['nsExtendOutputFull']);
         $device->hardware = $info['"hardware"']['nsExtendOutputFull'];
     }
 }

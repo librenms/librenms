@@ -18,14 +18,11 @@
  * @author f0o <f0o@librenms.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Playsms extends Transport
 {
@@ -42,15 +39,15 @@ class Playsms extends Transport
 
     public static function contactPlaysms($obj, $opts)
     {
-        $data = ["u" => $opts['user'], "h" => $opts['token'], "to" => implode(',', $opts['to']), "msg" => $obj['title']];
+        $data = ['u' => $opts['user'], 'h' => $opts['token'], 'to' => implode(',', $opts['to']), 'msg' => $obj['title']];
         if (! empty($opts['from'])) {
-            $data["from"] = $opts['from'];
+            $data['from'] = $opts['from'];
         }
         $url = $opts['url'] . '&op=pv&' . http_build_query($data);
         $curl = curl_init($url);
 
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         $ret = curl_exec($curl);

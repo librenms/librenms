@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -31,17 +30,15 @@ use Date;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\AlertScheduleStatus;
 
 class AlertSchedule extends Model
 {
-    const SCHEDULE_SET = 0;
-    const SCHEDULE_ACTIVE = 2;
-    const SCHEDULE_LAPSED = 1;
-
     public $timestamps = false;
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
     protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr', 'status'];
+    protected $fillable = ['title', 'notes', 'recurring'];
 
     private $timezone;
     private $days = [
@@ -135,18 +132,18 @@ class AlertSchedule extends Model
     }
 
     /**
-     * @return int Status 0: SCHEDULE_SET, 1: SCHEDULE_LAPSED, 2: SCHEDULE_ACTIVE
+     * @return int \LibreNMS\Enum\AlertScheduleStatus
      */
     public function getStatusAttribute()
     {
         $now = Carbon::now();
 
         if ($now > $this->end) {
-            return self::SCHEDULE_LAPSED;
+            return AlertScheduleStatus::LAPSED;
         }
 
         if (! $this->recurring) {
-            return $now > $this->start ? self::SCHEDULE_ACTIVE : self::SCHEDULE_SET;
+            return $now > $this->start ? AlertScheduleStatus::ACTIVE : AlertScheduleStatus::SET;
         }
 
         // recurring
@@ -159,7 +156,7 @@ class AlertSchedule extends Model
         // check inside start and end times or outside start and end times (if we span a day)
         $active = $spans_days ? ($after_start && ($now_time < $end_time || $now_time >= $start_time)) : ($now_time >= $start_time && $now_time < $end_time);
 
-        return $active && Str::contains($this->attributes['recurring_day'], $now->format('N')) ? self::SCHEDULE_ACTIVE : self::SCHEDULE_SET;
+        return $active && Str::contains($this->attributes['recurring_day'], $now->format('N')) ? AlertScheduleStatus::ACTIVE : AlertScheduleStatus::SET;
     }
 
     // ---- Query scopes ----
@@ -178,12 +175,12 @@ class AlertSchedule extends Model
                             ->where(function ($query) use ($now) {
                                 $query->where(function ($query) use ($now) {
                                     // normal, inside one day
-                                    $query->whereTime('start', '<', DB::raw("time(`end`)"))
+                                    $query->whereTime('start', '<', DB::raw('time(`end`)'))
                                         ->whereTime('start', '<=', $now->toTimeString())
                                         ->whereTime('end', '>', $now->toTimeString());
                                 })->orWhere(function ($query) use ($now) {
                                     // outside, spans days
-                                    $query->whereTime('start', '>', DB::raw("time(`end`)"))
+                                    $query->whereTime('start', '>', DB::raw('time(`end`)'))
                                         ->where(function ($query) use ($now) {
                                             $query->whereTime('end', '<=', $now->toTimeString())
                                                 ->orWhereTime('start', '>', $now->toTimeString());
@@ -215,5 +212,13 @@ class AlertSchedule extends Model
     public function locations()
     {
         return $this->morphedByMany(\App\Models\Location::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
+    }
+
+    public function __toString()
+    {
+        return ($this->recurring ?
+            'Recurring Alert Schedule (' . implode(',', $this->recurring_day) . ') ' :
+            'Alert Schedule ')
+            . "start: $this->start end: $this->end";
     }
 }

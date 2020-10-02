@@ -18,8 +18,6 @@
  * @author f0o <f0o@devilcode.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
@@ -81,7 +79,7 @@ class Pagerduty extends Transport
 
             return $result->getReasonPhrase();
         } catch (GuzzleException $e) {
-            return "Request to PagerDuty API failed. " . $e->getMessage();
+            return 'Request to PagerDuty API failed. ' . $e->getMessage();
         }
     }
 

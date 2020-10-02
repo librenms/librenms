@@ -18,14 +18,11 @@
  * @author George Pantazis <gpant@eservices-greece.com>
  * @copyright 2019 George Pantazis, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Mattermost extends Transport
 {
@@ -80,11 +77,11 @@ class Mattermost extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            d_echo("Mattermost Connection Error: " . $ret);
+            d_echo('Mattermost Connection Error: ' . $ret);
 
             return 'HTTP Status code ' . $code;
         } else {
-            d_echo("Mattermost message sent for " . $device);
+            d_echo('Mattermost message sent for ' . $device);
 
             return true;
         }

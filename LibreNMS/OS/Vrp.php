@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -130,7 +129,7 @@ class Vrp extends OS implements
                 foreach ($ap as $r_id => $radio) {
                     $channel = $radio['hwWlanRadioWorkingChannel'];
                     $mac = $radio['hwWlanRadioMac'];
-                    $name = $apTable[$ap_id]['hwWlanApName'] . " Radio " . $r_id;
+                    $name = $apTable[$ap_id]['hwWlanApName'] . ' Radio ' . $r_id;
                     $radionum = $r_id;
                     $txpow = $radio['hwWlanRadioActualEIRP'];
                     $interference = $radio['hwWlanRadioChInterferenceRate'];
@@ -139,13 +138,13 @@ class Vrp extends OS implements
 
                     switch ($radio['hwWlanRadioFreqType']) {
                         case 1:
-                            $type = "2.4Ghz";
+                            $type = '2.4Ghz';
                             break;
                         case 2:
-                            $type = "5Ghz";
+                            $type = '5Ghz';
                             break;
                         default:
-                            $type = "unknown (huawei " . $radio['hwWlanRadioFreqType'] . ")";
+                            $type = 'unknown (huawei ' . $radio['hwWlanRadioFreqType'] . ')';
                     }
 
                     // TODO
@@ -363,7 +362,7 @@ class Vrp extends OS implements
 
         foreach ($vapInfoTable as $a_index => $ap) {
             //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
-            $a_index_oid = implode(".", array_map("hexdec", explode(":", $a_index)));
+            $a_index_oid = implode('.', array_map('hexdec', explode(':', $a_index)));
             foreach ($ap as $r_index => $radio) {
                 foreach ($radio as $s_index => $ssid) {
                     $oid = '.1.3.6.1.4.1.2011.6.139.17.1.1.1.9.' . $a_index_oid . '.' . $r_index . '.' . $s_index;

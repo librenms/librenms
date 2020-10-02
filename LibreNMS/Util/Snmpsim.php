@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -42,7 +41,7 @@ class Snmpsim
         $this->ip = $ip;
         $this->port = $port;
         $this->log = $log;
-        $this->snmprec_dir = Config::get('install_dir') . "/tests/snmpsim/";
+        $this->snmprec_dir = Config::get('install_dir') . '/tests/snmpsim/';
     }
 
     /**
@@ -160,7 +159,7 @@ class Snmpsim
         $cmd .= " --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
 
         if (is_null($this->log)) {
-            $cmd .= " --logging-method=null";
+            $cmd .= ' --logging-method=null';
         } elseif ($with_log) {
             $cmd .= " --logging-method=file:{$this->log}";
         }

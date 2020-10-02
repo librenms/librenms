@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 PipoCanaja
  * @author     PipoCanaja
@@ -26,17 +25,10 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
-use App\Models\Ipv4Address;
-use App\Models\Ipv4Network;
-use App\Models\Ipv6Address;
-use App\Models\Port;
 use App\Models\Route;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
 class RoutesTablesController extends TableController
@@ -208,9 +200,9 @@ class RoutesTablesController extends TableController
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);
         if ($device) {
             if ($device->device_id == $route_entry->device_id || in_array($route_entry->inetCidrRouteNextHop, ['127.0.0.1', '::1'])) {
-                $item['inetCidrRouteNextHop'] = Url::deviceLink($device, "localhost");
+                $item['inetCidrRouteNextHop'] = Url::deviceLink($device, 'localhost');
             } else {
-                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . "<br>(" . Url::deviceLink($device) . ")";
+                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . Url::deviceLink($device) . ')';
             }
         }
         if ($route_entry->inetCidrRouteProto && $route_entry::$translateProto[$route_entry->inetCidrRouteProto]) {

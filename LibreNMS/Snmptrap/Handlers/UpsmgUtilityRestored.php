@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 PipoCanaja
  * @author     PipoCanaja <pipocanaja@gmail.com>
@@ -42,12 +41,12 @@ class UpsmgUtilityRestored implements SnmptrapHandler
     {
         $sensor = $device->sensors()->where('sensor_type', 'upsmgInputBadStatus')->first();
         if (! $sensor) {
-            Log::warning("Snmptrap UpsmgUtilityRestored: Could not find matching sensor upsmgInputBadStatus for device: " . $device->hostname);
+            Log::warning('Snmptrap UpsmgUtilityRestored: Could not find matching sensor upsmgInputBadStatus for device: ' . $device->hostname);
 
             return;
         }
         $sensor->sensor_current = 2;
         $sensor->save();
-        Log::event("UPS power restored, state sensor " . $sensor->sensor_descr . " has changed to " . $sensor->sensor_current . ".", $device->device_id, "Power", 1);
+        Log::event('UPS power restored, state sensor ' . $sensor->sensor_descr . ' has changed to ' . $sensor->sensor_current . '.', $device->device_id, 'Power', 1);
     }
 }

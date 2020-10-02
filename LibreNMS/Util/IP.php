@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -86,12 +85,12 @@ abstract class IP
     {
         $snmpOid = str_replace(['.', '"'], ' ', $snmpOid);
         $hex = implode(
-            ":",
+            ':',
             array_map(
                 function ($dec) {
                     return sprintf('%02x', $dec);
                 },
-                explode(" ", (string) $snmpOid)
+                explode(' ', (string) $snmpOid)
             )
         );
 

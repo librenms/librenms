@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
@@ -27,7 +26,7 @@ d_echo('Hiveos-Wireless');
 $memory_oid = '1.3.6.1.4.1.26928.1.2.4.0';
 $perc = snmp_get($device, $memory_oid, '-OvQ');
 if (is_numeric($perc)) {
-    $mempool['used']  = $perc;
+    $mempool['used'] = $perc;
     $mempool['total'] = 100;
-    $mempool['free']  = 100 - $perc;
+    $mempool['free'] = 100 - $perc;
 }

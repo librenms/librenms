@@ -27,11 +27,11 @@ $colours = 'mixed';
 $unit_text = 'DOP';
 $nototal = 1;
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
-$array = array(
-    'hdop' => array('descr' => 'Horizontal'),
-    'vdop' => array('descr' => 'Vertical'),
-);
+$rrd_filename = rrd_name($device['hostname'], ['app', 'gpsd', $app['app_id']]);
+$array = [
+    'hdop' => ['descr' => 'Horizontal'],
+    'vdop' => ['descr' => 'Vertical'],
+];
 
 $i = 0;
 

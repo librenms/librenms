@@ -27,10 +27,12 @@ namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
 use Illuminate\Support\Str;
+use LibreNMS\OS\Traits\ServerHardware;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 
 class Unix extends \LibreNMS\OS
 {
+    use ServerHardware;
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
     }
@@ -40,7 +42,7 @@ class Unix extends \LibreNMS\OS
         // yaml discovery overrides this
         if ($this->hasYamlDiscovery('os')) {
             $this->discoverYamlOS($device);
-            $this->discoverDellHardware();
+            $this->discoverServerHardware();
             $this->discoverExtends($device);
 
             return;
@@ -49,43 +51,29 @@ class Unix extends \LibreNMS\OS
         preg_match('/ (\d+\.\d\S*) /', $device->sysDescr, $matches);
         $device->version = $matches[1] ?? $device->version;
         if (preg_match('/i[3-6]86/', $device->sysDescr)) {
-            $device->hardware = "Generic x86";
-        } elseif (Str::contains($device->sysDescr, "x86_64")) {
-            $device->hardware = "Generic x86 64-bit";
-        } elseif (Str::contains($device->sysDescr, "sparc32")) {
-            $device->hardware = "Generic SPARC 32-bit";
-        } elseif (Str::contains($device->sysDescr, "sparc64")) {
-            $device->hardware = "Generic SPARC 64-bit";
-        } elseif (Str::contains($device->sysDescr, "mips")) {
-            $device->hardware = "Generic MIPS";
-        } elseif (Str::contains($device->sysDescr, "armv5")) {
-            $device->hardware = "Generic ARMv5";
-        } elseif (Str::contains($device->sysDescr, "armv6")) {
-            $device->hardware = "Generic ARMv6";
-        } elseif (Str::contains($device->sysDescr, "armv7")) {
-            $device->hardware = "Generic ARMv7";
-        } elseif (Str::contains($device->sysDescr, "aarch64")) {
-            $device->hardware = "Generic ARMv8 64-bit";
-        } elseif (Str::contains($device->sysDescr, "armv")) {
-            $device->hardware = "Generic ARM";
+            $device->hardware = 'Generic x86';
+        } elseif (Str::contains($device->sysDescr, 'x86_64')) {
+            $device->hardware = 'Generic x86 64-bit';
+        } elseif (Str::contains($device->sysDescr, 'sparc32')) {
+            $device->hardware = 'Generic SPARC 32-bit';
+        } elseif (Str::contains($device->sysDescr, 'sparc64')) {
+            $device->hardware = 'Generic SPARC 64-bit';
+        } elseif (Str::contains($device->sysDescr, 'mips')) {
+            $device->hardware = 'Generic MIPS';
+        } elseif (Str::contains($device->sysDescr, 'armv5')) {
+            $device->hardware = 'Generic ARMv5';
+        } elseif (Str::contains($device->sysDescr, 'armv6')) {
+            $device->hardware = 'Generic ARMv6';
+        } elseif (Str::contains($device->sysDescr, 'armv7')) {
+            $device->hardware = 'Generic ARMv7';
+        } elseif (Str::contains($device->sysDescr, 'aarch64')) {
+            $device->hardware = 'Generic ARMv8 64-bit';
+        } elseif (Str::contains($device->sysDescr, 'armv')) {
+            $device->hardware = 'Generic ARM';
         }
 
-        $this->discoverDellHardware();
+        $this->discoverServerHardware();
         $this->discoverExtends($device);
-    }
-
-    protected function discoverDellHardware()
-    {
-        // Detect Dell hardware via OpenManage SNMP
-        $hw = snmp_get($this->getDeviceArray(), ".1.3.6.1.4.1.674.10892.1.300.10.1.9.1", "-Oqv", "MIB-Dell-10892");
-        if ($hw) {
-            $this->getDevice()->hardware = "Dell " . $hw;
-        } else {
-            $hw = trim(snmp_get($this->getDeviceArray(), 'cpqSiProductName.0', '-Oqv', 'CPQSINFO-MIB', 'hp'), '"');
-            if (! empty($hw)) {
-                $this->getDevice()->hardware = $hw;
-            }
-        }
     }
 
     protected function discoverExtends(Device $device)

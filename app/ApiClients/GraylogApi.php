@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -144,12 +143,12 @@ class GraylogApi
             $addresses = $addresses->merge($device->ipv4->pluck('ipv4_address')
                 ->filter(
                     function ($address) {
-                        return $address != "127.0.0.1";
+                        return $address != '127.0.0.1';
                     }
                 ))->merge($device->ipv6->pluck('ipv6_address')
                 ->filter(
                     function ($address) {
-                        return $address != "0000:0000:0000:0000:0000:0000:0000:0001";
+                        return $address != '0000:0000:0000:0000:0000:0000:0000:0001';
                     }
                 ));
         }

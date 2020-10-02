@@ -26,7 +26,7 @@ use LibreNMS\Enum\AlertState;
 
 class IRCBot
 {
-    private $last_activity = '';
+    private $last_activity = 0;
 
     private $data = '';
 
@@ -43,6 +43,8 @@ class IRCBot
     private $pass = '';
 
     private $nick = 'LibreNMS';
+
+    private $tempnick = null;
 
     private $chan = [];
 
@@ -61,9 +63,17 @@ class IRCBot
         'join',
     ];
 
+    private $command = '';
+
     private $external = [];
 
     private $tick = 62500;
+
+    private $j = 0;
+
+    private $socket = [];
+
+    private $floodcount = 0;
 
     public function __construct()
     {
@@ -85,22 +95,13 @@ class IRCBot
             $this->nick = $this->config['irc_nick'];
         }
 
-        if ($this->config['irc_chan']) {
-            if (is_array($this->config['irc_chan'])) {
-                $this->chan = $this->config['irc_chan'];
-            } elseif (strstr($this->config['irc_chan'], ',')) {
-                $this->chan = explode(',', $this->config['irc_chan']);
-            } else {
-                $this->chan = [$this->config['irc_chan']];
-            }
-        }
-
         if ($this->config['irc_alert_chan']) {
             if (strstr($this->config['irc_alert_chan'], ',')) {
                 $this->config['irc_alert_chan'] = explode(',', $this->config['irc_alert_chan']);
-            } else {
+            } elseif (! is_array($this->config['irc_alert_chan'])) {
                 $this->config['irc_alert_chan'] = [$this->config['irc_alert_chan']];
             }
+            $this->chan = $this->config['irc_alert_chan'];
         }
 
         if ($this->config['irc_pass']) {
@@ -126,7 +127,9 @@ class IRCBot
         }
 
         foreach ($this->config['irc_external'] as $ext) {
+            $this->log("Command $ext...");
             if (($this->external[$ext] = file_get_contents('includes/ircbot/' . $ext . '.inc.php')) == '') {
+                $this->log('failed!');
                 unset($this->external[$ext]);
             }
         }
@@ -153,6 +156,7 @@ class IRCBot
         }
 
         $this->doAuth();
+        $this->nickwait = 0;
         while (true) {
             foreach ($this->socket as $n => $socket) {
                 if (! is_resource($socket) || feof($socket)) {
@@ -162,7 +166,11 @@ class IRCBot
             }
 
             if (isset($this->tempnick)) {
-                $this->ircRaw('NICK ' . $this->nick);
+                if ($this->nickwait > 100) {
+                    $this->ircRaw('NICK ' . $this->nick);
+                    $this->nickwait = 0;
+                }
+                $this->nickwait += 1;
             }
 
             $this->getData();
@@ -174,7 +182,7 @@ class IRCBot
                 $inactive_seconds = time() - $this->last_activity;
                 $max_inactive = $this->config['irc_conn_timeout'];
                 if ($inactive_seconds > $max_inactive) {
-                    $this->log("No data from server since " . $max_inactive . " seconds. Restarting.");
+                    $this->log('No data from server since ' . $max_inactive . ' seconds. Restarting.');
                     break;
                 }
             }
@@ -212,7 +220,7 @@ class IRCBot
 
     private function read($buff)
     {
-        $r = fread($this->socket[$buff], 64);
+        $r = fread($this->socket[$buff], 8192);
         $this->buff[$buff] .= $r;
         $r = strlen($r);
         if (strstr($this->buff[$buff], "\n")) {
@@ -241,6 +249,12 @@ class IRCBot
             if (! is_array($alert)) {
                 return false;
             }
+            if ($this->debug) {
+                $this->log('Alert received ' . $alert['title']);
+                $this->log('Alert state ' . $alert['state']);
+                $this->log('Alert severity ' . $alert['severity']);
+                $this->log('Alert channels ' . print_r($this->config['irc_alert_chan'], true));
+            }
 
             switch ($alert['state']) {
                 case AlertState::WORSE:
@@ -260,37 +274,59 @@ class IRCBot
 
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
-                    $this->ircRaw('PRIVMSG ' . $chan . ' :' . $severity . trim($alert['title']));
-                    if (! $this->config['irc_alert_short']) { // Only send the title if set to short
-                        foreach (explode("\n", $alert['msg']) as $line) {
-                            // We don't need to repeat the title
-                            $line = strip_tags($line);
-                            if (trim($line) != trim($alert['title'])) {
-                                $this->ircRaw('PRIVMSG ' . $chan . ' :' . $line);
-                            }
-                        }
-                    }
+                    $this->sendAlert($chan, $severity, $alert);
                 }
-            } else {
-                foreach ($this->authd as $nick => $data) {
-                    if ($data['expire'] >= time()) {
-                        $this->ircRaw('PRIVMSG ' . $nick . ' :' . $severity . trim($alert['title']));
-                        if (! $this->config['irc_alert_short']) { // Only send the title if set to short
-                            foreach (explode("\n", $alert['msg']) as $line) {
-                                // We don't need to repeat the title
-                                $line = strip_tags($line);
-                                if (trim($line) != trim($alert['title'])) {
-                                    $this->ircRaw('PRIVMSG ' . $nick . ' :' . $line);
-                                }
-                            }
-                        }
-                    }
+
+                return;
+            }//end if
+
+            foreach ($this->authd as $nick => $data) {
+                if ($data['expire'] >= time()) {
+                    $this->sendAlert($nick, $severity, $alert);
                 }
             }
-        }//end if
+        }
     }
 
     //end alertData()
+
+    private function sendAlert($sendto, $severity, $alert)
+    {
+        $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim($alert['title']));
+        if ($this->config['irc_alert_short']) {
+            // Only send the title if set to short
+
+            return;
+        }
+
+        foreach (explode("\n", $alert['msg']) as $line) {
+            $line = trim($line);
+            if (strlen($line) < 1) {
+                continue;
+            }
+            $line = $this->_html2irc($line);
+            $line = strip_tags($line);
+
+            // We don't need to repeat the title
+            if (trim($line) != trim($alert['title'])) {
+                $this->log("Sending alert $line");
+                if ($this->config['irc_floodlimit'] > 100) {
+                    $this->floodcount += strlen($line);
+                } elseif ($this->config['irc_floodlimit'] > 1) {
+                    $this->floodcount += 1;
+                }
+                if (($this->config['irc_floodlimit'] > 0) && ($this->floodcount > $this->config['irc_floodlimit'])) {
+                    $this->log('Reached floodlimit ' . $this->floodcount);
+                    $this->ircRaw('BOTFLOODCHECK');
+                    sleep(2);
+                    $this->floodcount = 0;
+                }
+                $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $line);
+            }
+        }
+    }
+
+    //end sendAlert()
 
     private function getData()
     {
@@ -309,49 +345,49 @@ class IRCBot
                 }
             }
 
-            if (($this->config['irc_ctcp']) && (preg_match("/^:" . chr(1) . ".*/", $ex[3]))) {
+            if (($this->config['irc_ctcp']) && (preg_match('/^:' . chr(1) . '.*/', $ex[3]))) {
                 // Handle CTCP
-                $ctcp = trim(preg_replace("/[^A-Z]/", "", $ex[3]));
+                $ctcp = trim(preg_replace('/[^A-Z]/', '', $ex[3]));
                 $ctcp_reply = null;
-                $this->log("Received irc CTCP: " . $ctcp . " from " . $this->getUser($this->data));
+                $this->log('Received irc CTCP: ' . $ctcp . ' from ' . $this->getUser($this->data));
                 switch ($ctcp) {
                     case 'VERSION':
                         $ctcp_reply = chr(1) . "$ctcp " . $this->config['irc_ctcp_version'] . chr(1);
                         break;
                     case 'PING':
-                        $ctcp_reply = chr(1) . "$ctcp " . $ex[4] . " " . $ex[5] . chr(1);
+                        $ctcp_reply = chr(1) . "$ctcp " . $ex[4] . ' ' . $ex[5] . chr(1);
                         break;
                     case 'TIME':
                         $ctcp_reply = chr(1) . "$ctcp " . date('c') . chr(1);
                         break;
                 }
                 if ($ctcp_reply !== null) {
-                    $this->log("Sending irc CTCP: " . 'NOTICE ' . $this->getUser($this->data) . " :" . $ctcp_reply);
+                    $this->log('Sending irc CTCP: ' . 'NOTICE ' . $this->getUser($this->data) . ' :' . $ctcp_reply);
 
-                    return $this->ircRaw('NOTICE ' . $this->getUser($this->data) . " :" . $ctcp_reply);
+                    return $this->ircRaw('NOTICE ' . $this->getUser($this->data) . ' :' . $ctcp_reply);
                 }
             }
 
-            if (($ex[1] == 'NICK') && (preg_replace("/^:/", "", $ex[2]) == $this->nick)) {
+            if (($ex[1] == 'NICK') && (preg_replace('/^:/', '', $ex[2]) == $this->nick)) {
                 // Nickname changed successfully
                 if ($this->debug) {
-                    $this->log("Regained our real nick");
+                    $this->log('Regained our real nick');
                 }
                 unset($this->tempnick);
             }
             if (($ex[1] == 433) || ($ex[1] == 437)) {
                 // Nickname already in use / temp unavailable
                 if ($this->debug) {
-                    $this->log("Nickname already in use...");
+                    $this->log('Nickname already in use...');
                 }
-                if ($ex[2] != "*") {
+                if ($ex[2] != '*') {
                     $this->tempnick = $ex[2];
                 }
                 if (! isset($this->tempnick)) {
                     $this->tempnick = $this->nick . rand(0, 99);
                 }
                 if ($this->debug) {
-                    $this->log("Using temp nick " . $this->tempnick);
+                    $this->log('Using temp nick ' . $this->tempnick);
                 }
 
                 return $this->ircRaw('NICK ' . $this->tempnick);
@@ -386,9 +422,11 @@ class IRCBot
         $this->command = str_replace(':.', '', $this->command);
         $tmp = explode(':.' . $this->command . ' ', $this->data);
         $this->user = $this->getAuthdUser();
+        $this->log('isAuthd-1? ' . $this->isAuthd());
         if (! $this->isAuthd() && (isset($this->config['irc_auth']))) {
             $this->hostAuth();
         }
+        $this->log('isAuthd-2? ' . $this->isAuthd());
         if ($this->isAuthd() || trim($this->command) == 'auth') {
             $this->proceedCommand(str_replace("\n", '', trim($this->command)), trim($tmp[1]));
         }
@@ -528,7 +566,9 @@ class IRCBot
 
     private function log($msg)
     {
-        echo '[' . date('r') . '] ' . trim($msg) . "\n";
+        $log = '[' . date('r') . '] IRCbot ' . trim($msg) . "\n";
+        echo $log;
+        file_put_contents($this->config['log_dir'] . '/irc.log', $log, FILE_APPEND);
 
         return true;
     }
@@ -574,10 +614,14 @@ class IRCBot
 
     private function hostAuth()
     {
+        $this->log('HostAuth');
         global $authorizer;
         foreach ($this->config['irc_auth'] as $nms_user => $hosts) {
             foreach ($hosts as $host) {
-                $host = preg_replace("/\*/", ".*", $host);
+                $host = preg_replace("/\*/", '.*', $host);
+                if ($this->debug) {
+                    $this->log("HostAuth on irc matching $host to " . $this->getUserHost($this->data));
+                }
                 if (preg_match("/$host/", $this->getUserHost($this->data))) {
                     $user_id = LegacyAuth::get()->getUserid(mres($nms_user));
                     $user = LegacyAuth::get()->getUser($user_id);
@@ -656,10 +700,15 @@ class IRCBot
 
     //end _auth()
 
-    private function _reload()
+    private function _reload($params)
     {
         if ($this->user['level'] == 10) {
-            $new_config = Config::reload();
+            if ($params == 'external') {
+                $this->respond('Reloading external scripts.');
+
+                return $this->loadExternal();
+            }
+            $new_config = Config::load();
             $this->respond('Reloading configuration & defaults');
             if ($new_config != $this->config) {
                 return $this->__construct();
@@ -685,7 +734,7 @@ class IRCBot
     private function _quit($params)
     {
         if ($this->user['level'] == 10) {
-            $this->ircRaw("QUIT :Requested");
+            $this->ircRaw('QUIT :Requested');
 
             return exit();
         } else {
@@ -697,11 +746,10 @@ class IRCBot
 
     private function _help($params)
     {
-        foreach ($this->commands as $cmd) {
-            $msg .= ', ' . $cmd;
+        $msg = join(', ', $this->commands);
+        if (count($this->external) > 0) {
+            $msg .= ', ' . join(', ', array_keys($this->external));
         }
-
-        $msg = substr($msg, 2);
 
         return $this->respond("Available commands: $msg");
     }
@@ -896,8 +944,8 @@ class IRCBot
                 $status_counts = [];
                 $status_colors = [0 => 'green', 3 => 'lightblue', 1 => 'yellow', 2 => 'red'];
                 $srvcount = dbFetchCell('SELECT COUNT(*) FROM services' . $d_w);
-                $srvign = dbFetchCell("SELECT COUNT(*) FROM services WHERE service_ignore = 1" . $d_a);
-                $srvdis = dbFetchCell("SELECT COUNT(*) FROM services WHERE service_disabled = 1" . $d_a);
+                $srvign = dbFetchCell('SELECT COUNT(*) FROM services WHERE service_ignore = 1' . $d_a);
+                $srvdis = dbFetchCell('SELECT COUNT(*) FROM services WHERE service_disabled = 1' . $d_a);
                 $service_status = dbFetchRows("SELECT `service_status`, COUNT(*) AS `count` FROM `services` WHERE `service_disabled`=0 AND `service_ignore`=0 $d_a GROUP BY `service_status`");
                 $service_status = array_column($service_status, 'count', 'service_status'); // key by status
 
@@ -926,28 +974,28 @@ class IRCBot
     private function _color($text, $fg_color, $bg_color = null, $other = null)
     {
         $colors = [
-            'white' => "00",
-            'black' => "01",
-            'blue' => "02",
-            'green' => "03",
-            'red' => "04",
-            'brown' => "05",
-            'purple' => "06",
-            'orange' => "07",
-            'yellow' => "08",
-            'lightgreen' => "09",
-            'cyan' => "10",
-            'lightcyan' => "11",
-            'lightblue' => "12",
-            'pink' => "13",
-            'grey' => "14",
-            'lightgrey' => "15",
+            'white' => '00',
+            'black' => '01',
+            'blue' => '02',
+            'green' => '03',
+            'red' => '04',
+            'brown' => '05',
+            'purple' => '06',
+            'orange' => '07',
+            'yellow' => '08',
+            'lightgreen' => '09',
+            'cyan' => '10',
+            'lightcyan' => '11',
+            'lightblue' => '12',
+            'pink' => '13',
+            'grey' => '14',
+            'lightgrey' => '15',
         ];
         $ret = chr(3);
         if (array_key_exists($fg_color, $colors)) {
             $ret .= $colors[$fg_color];
             if (array_key_exists($bg_color, $colors)) {
-                $ret .= "," . $colors[$fg_color];
+                $ret .= ',' . $colors[$fg_color];
             }
         }
         switch ($other) {
@@ -969,4 +1017,43 @@ class IRCBot
     }
 
     // end _color
+
+    private function _html2irc($string)
+    {
+        $string = urldecode($string);
+        $string = preg_replace('#<b>#i', chr(2), $string);
+        $string = preg_replace('#</b>#i', chr(2), $string);
+        $string = preg_replace('#<i>#i', chr(22), $string);
+        $string = preg_replace('#</i>#i', chr(22), $string);
+        $string = preg_replace('#<u>#i', chr(31), $string);
+        $string = preg_replace('#</u>#i', chr(31), $string);
+
+        $colors = [
+            'white'     => '00',
+            'black'     => '01',
+            'blue'      => '02',
+            'green'     => '03',
+            'red'       => '04',
+            'brown'     => '05',
+            'purple'    => '06',
+            'orange'    => '07',
+            'yellow'    => '08',
+            'lightgreen' => '09',
+            'cyan'      => '10',
+            'lightcyan' => '11',
+            'lightblue' => '12',
+            'pink'      => '13',
+            'grey'      => '14',
+            'lightgrey' => '15',
+        ];
+
+        foreach ($colors as $color => $code) {
+            $string = preg_replace("#<$color>#i", chr(3) . $code, $string);
+            $string = preg_replace("#</$color>#i", chr(3), $string);
+        }
+
+        return $string;
+    }
+
+    // end _html2irc
 }//end class

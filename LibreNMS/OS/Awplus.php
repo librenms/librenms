@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -62,7 +61,7 @@ class Awplus extends OS implements OSDiscovery
             }
         }
 
-        $device->version = snmp_get($this->getDeviceArray(), "currSoftVersion.0", "-OQv", "AT-SETUP-MIB");
+        $device->version = snmp_get($this->getDeviceArray(), 'currSoftVersion.0', '-OQv', 'AT-SETUP-MIB');
         $device->serial = $serial;
         $device->hardware = $hardware;
         $device->features = $features ?? null;

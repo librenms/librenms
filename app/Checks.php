@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -66,7 +65,7 @@ class Checks
         // check php extensions
         if ($missing = self::missingPhpExtensions()) {
             self::printMessage(
-                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
+                'Missing PHP extensions.  Please install and enable them on your LibreNMS server.',
                 $missing,
                 true
             );
@@ -102,12 +101,12 @@ class Checks
             // Directory access checks
             $rrd_dir = Config::get('rrd_dir');
             if (! is_dir($rrd_dir)) {
-                Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . ">Validate your install</a>");
+                Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
             }
 
             $temp_dir = Config::get('temp_dir');
             if (! is_dir($temp_dir)) {
-                Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . ">Validate your install</a>");
+                Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
             } elseif (! is_writable($temp_dir)) {
                 Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
             }

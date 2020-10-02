@@ -17,8 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *
- * @package    LibreNMS
- * @subpackage Plugins
  * @author     LibreNMS Group
  * @link       http://librenms.org
  * @copyright  2016
@@ -32,8 +30,6 @@ use Log;
 /**
  * Handles loading of plugins
  *
- * @package    LibreNMS
- * @subpackage Plugins
  * @author     LibreNMS Group
  * @link       http://librenms.org
  * @copyright  2016

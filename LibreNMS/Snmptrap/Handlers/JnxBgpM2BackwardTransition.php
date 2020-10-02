@@ -21,7 +21,6 @@
  * when the BGP FSM moves from a higher numbered
  * state to a lower numbered state.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>

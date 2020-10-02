@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
@@ -285,20 +284,20 @@ GRAPHQL;
         $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL . PHP_EOL;
 
         if (! empty($this->changelog_users)) {
-            $tmp_markdown .= "A big thank you to the following " . count($this->changelog_users) . " contributors this last month:" . PHP_EOL . PHP_EOL;
+            $tmp_markdown .= 'A big thank you to the following ' . count($this->changelog_users) . ' contributors this last month:' . PHP_EOL . PHP_EOL;
             $tmp_markdown .= $this->formatUserList($this->changelog_users);
         }
 
         $tmp_markdown .= PHP_EOL;
 
         if (! empty($this->changelog_mergers)) {
-            $tmp_markdown .= "Thanks to maintainers and others that helped with pull requests this month:" . PHP_EOL . PHP_EOL;
+            $tmp_markdown .= 'Thanks to maintainers and others that helped with pull requests this month:' . PHP_EOL . PHP_EOL;
             $tmp_markdown .= $this->formatUserList($this->changelog_mergers) . PHP_EOL;
         }
 
         foreach ($this->changelog as $section => $items) {
             if (! empty($items)) {
-                $tmp_markdown .= "#### " . ucwords($section) . PHP_EOL;
+                $tmp_markdown .= '#### ' . ucwords($section) . PHP_EOL;
                 $tmp_markdown .= '* ' . implode('* ', $items) . PHP_EOL;
             }
         }
@@ -364,7 +363,7 @@ GRAPHQL;
             $this->createChangelog(false);
         }
 
-        $release = Requests::post($this->github . "/releases", $this->getHeaders(), json_encode([
+        $release = Requests::post($this->github . '/releases', $this->getHeaders(), json_encode([
             'tag_name' => $this->tag,
             'target_commitish' => $updated_sha,
             'body' => $this->markdown,

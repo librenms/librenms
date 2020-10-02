@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
@@ -92,7 +91,7 @@ class Template
         try {
             return view(['template' => $data['title']], $alert)->__toString();
         } catch (\Exception $e) {
-            return $data['title'] ?: view(['template' => "Template " . $data['name']], $alert)->__toString();
+            return $data['title'] ?: view(['template' => 'Template ' . $data['name']], $alert)->__toString();
         }
     }
 

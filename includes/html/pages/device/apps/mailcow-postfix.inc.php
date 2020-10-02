@@ -19,11 +19,11 @@
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
-$graphs = array(
+$graphs = [
     'mailcow-postfix_emails' => 'E-mail(s)',
     'mailcow-postfix_traffic' => 'Traffic',
     'mailcow-postfix_domains' => 'Domain(s)',
-);
+];
 
 foreach ($graphs as $key => $text) {
     $graph_type = $key;

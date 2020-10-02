@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -48,7 +47,7 @@ class YamlDiscovery
             $class = get_class($class);
         }
 
-        d_echo("YAML Discovery Data: ");
+        d_echo('YAML Discovery Data: ');
         d_echo($yaml_data);
 
         foreach ($yaml_data as $first_key => $first_yaml) {
@@ -211,7 +210,7 @@ class YamlDiscovery
         }
 
         if (! empty($device['dynamic_discovery']['modules'])) {
-            echo "Caching data: ";
+            echo 'Caching data: ';
             foreach ($device['dynamic_discovery']['modules'] as $module => $discovery_data) {
                 echo "$module ";
                 foreach ($discovery_data as $key => $data_array) {

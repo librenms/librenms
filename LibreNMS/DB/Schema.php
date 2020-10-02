@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -203,10 +202,10 @@ class Schema
     {
         $relationships = $this->getTableRelationships();
 
-        d_echo("Starting Tables: " . json_encode($tables) . PHP_EOL);
+        d_echo('Starting Tables: ' . json_encode($tables) . PHP_EOL);
         if (! empty($history)) {
             $tables = array_diff($tables, $history);
-            d_echo("Filtered Tables: " . json_encode($tables) . PHP_EOL);
+            d_echo('Filtered Tables: ' . json_encode($tables) . PHP_EOL);
         }
 
         foreach ($tables as $table) {

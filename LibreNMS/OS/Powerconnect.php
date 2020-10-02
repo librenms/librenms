@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -55,7 +54,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
             '.1.3.6.1.4.1.674.10895.3030',
             '.1.3.6.1.4.1.674.10895.3031',
         ])) {
-            d_echo("Dell Powerconnect 55xx");
+            d_echo('Dell Powerconnect 55xx');
 
             return [
                 Processor::discover(

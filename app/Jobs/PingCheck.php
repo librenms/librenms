@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -138,7 +137,7 @@ class PingCheck implements ShouldQueue
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
             d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
-            d_echo("Devices left in tier: " . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
+            d_echo('Devices left in tier: ' . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
         }
 
         if (\App::runningInConsole()) {
@@ -177,7 +176,7 @@ class PingCheck implements ShouldQueue
 
         if ($vdebug) {
             $this->tiered->each(function (Collection $tier, $index) {
-                echo "Tier $index (" . $tier->count() . "): ";
+                echo "Tier $index (" . $tier->count() . '): ';
                 echo $tier->implode('hostname', ', ');
                 echo PHP_EOL;
             });
@@ -252,7 +251,7 @@ class PingCheck implements ShouldQueue
                 // if changed, update reason
                 $device->status_reason = $device->status ? '' : 'icmp';
                 $type = $device->status ? 'up' : 'down';
-                Log::event('Device status changed to ' . ucfirst($type) . " from icmp check.", $device->device_id, $type);
+                Log::event('Device status changed to ' . ucfirst($type) . ' from icmp check.', $device->device_id, $type);
             }
 
             $device->save(); // only saves if needed (which is every time because of last_ping)

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -27,7 +26,6 @@ namespace App\Http\Controllers\Table;
 
 use App\ApiClients\GraylogApi;
 use App\Models\Device;
-use App\Models\Port;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -129,15 +127,15 @@ class GraylogController extends SimpleTableController
     private function severityLabel($severity)
     {
         $map = [
-            "0" => "label-danger",
-            "1" => "label-danger",
-            "2" => "label-danger",
-            "3" => "label-danger",
-            "4" => "label-warning",
-            "5" => "label-info",
-            "6" => "label-info",
-            "7" => "label-default",
-            ""  => "label-info",
+            '0' => 'label-danger',
+            '1' => 'label-danger',
+            '2' => 'label-danger',
+            '3' => 'label-danger',
+            '4' => 'label-warning',
+            '5' => 'label-info',
+            '6' => 'label-info',
+            '7' => 'label-default',
+            ''  => 'label-info',
         ];
         $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
 

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -158,7 +157,7 @@ trait ActiveDirectoryCommon
         foreach ($ldap_groups as $ldap_group) {
             $search_filter = "(&(memberOf:1.2.840.113556.1.4.1941:=$ldap_group)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
             if (Config::get('auth_ad_user_filter')) {
-                $search_filter = "(&" . Config::get('auth_ad_user_filter') . $search_filter . ")";
+                $search_filter = '(&' . Config::get('auth_ad_user_filter') . $search_filter . ')';
             }
             $attributes = ['samaccountname', 'displayname', 'objectsid', 'mail'];
             $search = ldap_search($connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);

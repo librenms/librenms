@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -65,6 +64,8 @@ class MakeUserController extends InstallationController implements InstallerStep
             'password' => 'required',
         ]);
 
+        $message = trans('install.user.failure');
+
         try {
             // only allow the first admin to be created
             if (! $this->complete()) {
@@ -74,7 +75,6 @@ class MakeUserController extends InstallationController implements InstallerStep
                 $user->setPassword($request->get('password'));
                 $res = $user->save();
 
-                $message = trans('install.user.failure');
                 if ($res) {
                     $message = trans('install.user.success');
                     $this->markStepComplete();

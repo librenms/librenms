@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -47,7 +46,7 @@ class FileLock implements Lock
 
         $this->name = $lock_name;
         $this->file = "$install_dir/.$lock_name.lock";
-        $this->handle = fopen($this->file, "w+");
+        $this->handle = fopen($this->file, 'w+');
     }
 
     public function __destruct()
@@ -129,7 +128,7 @@ class FileLock implements Lock
      */
     public function renew($expiration)
     {
-        echo "Unsupported";
+        echo 'Unsupported';
         // TODO: Implement renew() method.
     }
 }

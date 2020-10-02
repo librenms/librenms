@@ -15,16 +15,16 @@
 
 /* FIXME: is there a central place we can put this? */
 
-$alert_states = array(
+$alert_states = [
     // divined from librenms/alerts.php
     'recovered' => 0,
     'alerted' => 1,
     'acknowledged' => 2,
     'worse' => 3,
     'better' => 4,
-);
+];
 
-$alert_severities = array(
+$alert_severities = [
     // alert_rules.status is enum('ok','warning','critical')
     'ok' => 1,
     'warning' => 2,
@@ -32,12 +32,12 @@ $alert_severities = array(
     'ok only' => 4,
     'warning only' => 5,
     'critical only' => 6,
-);
+];
 
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
 if (defined('SHOW_SETTINGS')) {
     $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
-    $current_fired =  isset($widget_settings['fired']) ? $widget_settings['fired'] : '';
+    $current_fired = isset($widget_settings['fired']) ? $widget_settings['fired'] : '';
     $current_severity = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
     $current_state = isset($widget_settings['state']) ? $widget_settings['state'] : '';
     $current_group = isset($widget_settings['group']) ? $widget_settings['group'] : '';
@@ -85,7 +85,7 @@ if (defined('SHOW_SETTINGS')) {
         <option value="">any severity</option>';
 
     foreach ($alert_severities as $name => $val) {
-        $common_output[] = "<option value=\"$val\"" . ($current_severity == $name || $current_severity == $val ? ' selected' : '') . ">$name" . ($val > 3 ? "" : " or higher") . "</option>";
+        $common_output[] = "<option value=\"$val\"" . ($current_severity == $name || $current_severity == $val ? ' selected' : '') . ">$name" . ($val > 3 ? '' : ' or higher') . '</option>';
     }
 
     $common_output[] = '
@@ -117,7 +117,7 @@ if (defined('SHOW_SETTINGS')) {
     $common_output[] = '<option value=""' . ($current_group == '' ? ' selected' : '') . '>any group</option>';
 
     foreach (\App\Models\DeviceGroup::orderBy('name')->get(['id', 'name', 'desc']) as $group) {
-        $common_output[] = "<option value=\"$group->id\"" . (is_numeric($current_group) && $current_group == $group->id ? ' selected' : '') . ">" . $group->name . " - " . $group->desc . "</option>";
+        $common_output[] = "<option value=\"$group->id\"" . (is_numeric($current_group) && $current_group == $group->id ? ' selected' : '') . '>' . $group->name . ' - ' . $group->desc . '</option>';
     }
     $common_output[] = '
       </select>
@@ -170,7 +170,7 @@ if (defined('SHOW_SETTINGS')) {
     $proc = $widget_settings['proc'];
     $sort = $widget_settings['sort'];
 
-    $title = "Alerts";
+    $title = 'Alerts';
 
     // state can be 0 or '', be sure they are treated differently
     if (is_numeric($state)) {
@@ -193,7 +193,7 @@ if (defined('SHOW_SETTINGS')) {
     }
 
     if (is_numeric($group)) {
-        $group_row = dbFetchRow("SELECT * FROM device_groups WHERE id = ?", array($group));
+        $group_row = dbFetchRow('SELECT * FROM device_groups WHERE id = ?', [$group]);
         if ($group_row) {
             $title = "$title for " . $group_row['name'];
         }
@@ -203,12 +203,12 @@ if (defined('SHOW_SETTINGS')) {
         $sev_name = $min_severity;
         if (is_numeric($min_severity)) {
             $sev_name = array_search($min_severity, $alert_severities);
-            $title = "$title " . ($min_severity > 3 ? "" : ">") . "=$sev_name";
+            $title = "$title " . ($min_severity > 3 ? '' : '>') . "=$sev_name";
         }
     }
 
-    if (!empty($sort)) {
-        $title = "$title " . "sorted by severity (higher first)";
+    if (! empty($sort)) {
+        $title = "$title " . 'sorted by severity (higher first)';
     }
 
     $widget_settings['title'] = $title;

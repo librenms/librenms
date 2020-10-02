@@ -185,7 +185,7 @@ if ($options['f'] === 'handle_notifiable') {
             if (isset($phpver)) {
                 new_notification(
                     $error_title,
-                    "PHP version $phpver is the minimum supported version as of $eol_date.  We recommend you update to PHP a supported version of PHP (" . Php::PHP_RECOMMENDED_VERSION . " suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    "PHP version $phpver is the minimum supported version as of $eol_date.  We recommend you update to PHP a supported version of PHP (" . Php::PHP_RECOMMENDED_VERSION . ' suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.',
                     2,
                     'daily.sh'
                 );
@@ -203,7 +203,7 @@ if ($options['f'] === 'handle_notifiable') {
             if ($options['r'] === 'python3-missing') {
                 new_notification(
                     $error_title,
-                    "Python 3 is required to run LibreNMS as of May, 2020. You need to install Python 3 to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    'Python 3 is required to run LibreNMS as of May, 2020. You need to install Python 3 to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.',
                     2,
                     'daily.sh'
                 );
@@ -211,7 +211,7 @@ if ($options['f'] === 'handle_notifiable') {
             } elseif ($options['r'] === 'python3-deps') {
                 new_notification(
                     $error_title,
-                    "Python 3 dependencies are missing. You need to install them via pip3 install -r requirements.txt or system packages to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    'Python 3 dependencies are missing. You need to install them via pip3 install -r requirements.txt or system packages to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.',
                     2,
                     'daily.sh'
                 );
@@ -241,7 +241,7 @@ if ($options['f'] === 'bill_data') {
     // Deletes data older than XX months before the start of the last complete billing period
     $msg = "Deleting billing data more than %d month before the last completed billing cycle\n";
     $table = 'bill_data';
-    $sql = "DELETE bill_data
+    $sql = 'DELETE bill_data
             FROM bill_data
                 INNER JOIN (SELECT bill_id,
                     SUBDATE(
@@ -252,19 +252,19 @@ if ($options['f'] === 'bill_data') {
                             INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
                         INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
             FROM bills) q
-            ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
+            ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;';
     lock_and_purge_query($table, $sql, $msg);
 }
 
 if ($options['f'] === 'alert_log') {
     $msg = "Deleting alert_logs more than %d days that are not active\n";
     $table = 'alert_log';
-    $sql = "DELETE alert_log
+    $sql = 'DELETE alert_log
                 FROM alert_log
                 INNER JOIN alerts
                 ON alerts.device_id=alert_log.device_id AND alerts.rule_id=alert_log.rule_id
                 WHERE alerts.state=0 AND alert_log.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
-                ";
+                ';
     lock_and_purge_query($table, $sql, $msg);
 
     // alert_log older than $config['alert_log_purge'] days match now only the alert_log of active alerts
@@ -272,7 +272,7 @@ if ($options['f'] === 'alert_log') {
     // we want only to keep the last alert_log that contains the alert details
 
     $msg = "Deleting history of active alert_logs more than %d days\n";
-    $sql = "DELETE
+    $sql = 'DELETE
                     FROM alert_log
                     WHERE id IN(
                         SELECT id FROM(
@@ -287,12 +287,12 @@ if ($options['f'] === 'alert_log') {
                                 )
                         ) as c
                     )
-                ";
+                ';
     $purge_duration = Config::get('alert_log_purge');
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
-    $sql = str_replace("?", strval($purge_duration), $sql);
+    $sql = str_replace('?', strval($purge_duration), $sql);
     lock_and_purge_query($table, $sql, $msg);
 }
 
@@ -310,12 +310,13 @@ if ($options['f'] === 'purgeusers') {
             $purge = \LibreNMS\Config::get('active_directory.users_purge');
         }
         if ($purge > 0) {
-            foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", [$purge]) as $user) {
-                $users[] = $user['user'];
-            }
+            $users = \App\Models\AuthLog::where('datetime', '>=', \Carbon\Carbon::now()->subDays($purge))
+                ->distinct()->pluck('user')
+                ->merge(\App\Models\User::has('apiToken')->pluck('username')) // don't purge users with api tokens
+                ->unique();
 
-            if (dbDelete('users', "username NOT IN " . dbGenPlaceholders(count($users)), $users)) {
-                echo "Removed users that haven't logged in for $purge days";
+            if (\App\Models\User::thisAuth()->whereNotIn('username', $users)->delete()) {
+                echo "Removed users that haven't logged in for $purge days\n";
             }
         }
     } catch (LockException $e) {

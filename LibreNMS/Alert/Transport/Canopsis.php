@@ -3,7 +3,6 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Canopsis extends Transport
 {
@@ -23,12 +22,12 @@ class Canopsis extends Transport
     public function contactCanopsis($obj, $opts)
     {
         // Configurations
-        $host = $opts["host"];
-        $port = $opts["port"];
-        $user = $opts["user"];
-        $pass = $opts["pass"];
-        $vhost = $opts["vhost"];
-        $exchange = "canopsis.events";
+        $host = $opts['host'];
+        $port = $opts['port'];
+        $user = $opts['user'];
+        $pass = $opts['pass'];
+        $vhost = $opts['vhost'];
+        $exchange = 'canopsis.events';
 
         // Connection
         $conn = new \PhpAmqpLib\Connection\AMQPConnection($host, $port, $user, $pass, $vhost);
@@ -40,37 +39,37 @@ class Canopsis extends Transport
 
         // Create Canopsis event, see: https://github.com/capensis/canopsis/wiki/Event-specification
         switch ($obj['severity']) {
-            case "ok":
+            case 'ok':
                 $state = 0;
                 break;
-            case "warning":
+            case 'warning':
                 $state = 2;
                 break;
-            case "critical":
+            case 'critical':
                 $state = 3;
                 break;
             default:
                 $state = 0;
         }
         $msg_body = [
-            "timestamp" => time(),
-            "connector" => "librenms",
-            "connector_name" => "LibreNMS1",
-            "event_type" => "check",
-            "source_type" => "resource",
-            "component" => $obj['hostname'],
-            "resource" => $obj['name'],
-            "state" => $state,
-            "output" => $obj['msg'],
-            "display_name" => "librenms",
+            'timestamp' => time(),
+            'connector' => 'librenms',
+            'connector_name' => 'LibreNMS1',
+            'event_type' => 'check',
+            'source_type' => 'resource',
+            'component' => $obj['hostname'],
+            'resource' => $obj['name'],
+            'state' => $state,
+            'output' => $obj['msg'],
+            'display_name' => 'librenms',
         ];
         $msg_raw = json_encode($msg_body);
 
         // Build routing key
-        if ($msg_body['source_type'] == "resource") {
-            $msg_rk = $msg_rk . "." . $msg_body['resource'];
+        if ($msg_body['source_type'] == 'resource') {
+            $msg_rk = $msg_rk . '.' . $msg_body['resource'];
         } else {
-            $msg_rk = $msg_body['connector'] . "." . $msg_body['connector_name'] . "." . $msg_body['event_type'] . "." . $msg_body['source_type'] . "." . $msg_body['component'];
+            $msg_rk = $msg_body['connector'] . '.' . $msg_body['connector_name'] . '.' . $msg_body['event_type'] . '.' . $msg_body['source_type'] . '.' . $msg_body['component'];
         }
 
         // Publish Event

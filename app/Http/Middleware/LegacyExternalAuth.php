@@ -6,9 +6,6 @@ use App\Models\User;
 use Auth;
 use Closure;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
-use LibreNMS\Exceptions\AuthenticationException;
-use Log;
 
 class LegacyExternalAuth
 {

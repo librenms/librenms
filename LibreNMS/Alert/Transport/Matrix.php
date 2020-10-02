@@ -18,15 +18,11 @@
  * @author Raphael Dannecker (github.com/raphael247)
  * @copyright 2020 , LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
-use GuzzleHttp\Client;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Matrix extends Transport
 {
@@ -47,14 +43,14 @@ class Matrix extends Transport
         $txnid = rand(1111, 9999) . time();
 
         $server = preg_replace('/\/$/', '', $server);
-        $host = $server . "/_matrix/client/r0/rooms/" . urlencode($room) . "/send/m.room.message/" . $txnid;
+        $host = $server . '/_matrix/client/r0/rooms/' . urlencode($room) . '/send/m.room.message/' . $txnid;
 
         $request_heads['Authorization'] = "Bearer $authtoken";
-        $request_heads['Content-Type'] = "application/json";
-        $request_heads['Accept'] = "application/json";
+        $request_heads['Content-Type'] = 'application/json';
+        $request_heads['Accept'] = 'application/json';
 
         foreach ($obj as $p_key => $p_val) {
-            $message = str_replace("{{ $" . $p_key . ' }}', $p_val, $message);
+            $message = str_replace('{{ $' . $p_key . ' }}', $p_val, $message);
         }
 
         $body = ['body'=>$message, 'msgtype'=>'m.text'];
@@ -68,10 +64,10 @@ class Matrix extends Transport
         $code = $res->getStatusCode();
         if ($code != 200) {
             var_dump("Matrix '$host' returned Error");
-            var_dump("Params:");
-            var_dump("Response headers:");
+            var_dump('Params:');
+            var_dump('Response headers:');
             var_dump($res->getHeaders());
-            var_dump("Return: " . $res->getReasonPhrase());
+            var_dump('Return: ' . $res->getReasonPhrase());
 
             return 'HTTP Status code ' . $code;
         }

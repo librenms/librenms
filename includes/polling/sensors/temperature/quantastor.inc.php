@@ -17,11 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Cercel Valentin
  * @author     Cercel Valentin <crc@nuamchefazi.ro>
  */
-
 preg_match('/([0-9]+)/', $sensor_value, $temps);
 $sensor_value = $temps[0];

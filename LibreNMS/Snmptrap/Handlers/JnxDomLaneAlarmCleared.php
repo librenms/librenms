@@ -19,7 +19,6 @@
  *
  * Trap sent when a Juniper transciever lambda reaches an alert level threshold.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -29,7 +28,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Handlers\JnxDomLaneAlarmId;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 

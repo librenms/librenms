@@ -332,14 +332,14 @@ return [
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
-            'help' => "Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix",
+            'help' => 'Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix',
         ],
         'auth_ldap_version' => [
             'description' => 'LDAP version',
             'help' => 'LDAP version to use to talk to the server.  Usually this should be v3',
             'options' => [
-                "2" => "2",
-                "3" => "3",
+                '2' => '2',
+                '3' => '3',
             ],
         ],
         'auth_mechanism' => [
@@ -1266,7 +1266,7 @@ return [
     ],
     'twofactor' => [
         'description' => 'Enable Two-Factor Auth',
-        'help' => "Enables the built in Two-Factor authentication. You must set up each account to make it active.",
+        'help' => 'Enables the built in Two-Factor authentication. You must set up each account to make it active.',
     ],
     'units' => [
         'days' => 'days',

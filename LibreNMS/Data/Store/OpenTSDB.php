@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @copyright  2017 Yacine Benamsili <https://github.com/yac01/librenms.git>
@@ -84,12 +83,12 @@ class OpenTSDB extends BaseDatastore
 
         $flag = Config::get('opentsdb.co');
         $timestamp = Carbon::now()->timestamp;
-        $tmp_tags = "hostname=" . $device['hostname'];
+        $tmp_tags = 'hostname=' . $device['hostname'];
 
         foreach ($tags as $k => $v) {
             $v = str_replace([' ', ',', '='], '_', $v);
             if (! empty($v)) {
-                $tmp_tags = $tmp_tags . " " . $k . "=" . $v;
+                $tmp_tags = $tmp_tags . ' ' . $k . '=' . $v;
             }
         }
 
@@ -97,7 +96,7 @@ class OpenTSDB extends BaseDatastore
             foreach ($fields as $k => $v) {
                 $measurement = $k;
                 if ($flag == true) {
-                    $measurement = $measurement . "." . $device['co'];
+                    $measurement = $measurement . '.' . $device['co'];
                 }
 
                 $this->putData('port.' . $measurement, $timestamp, $v, $tmp_tags);
@@ -108,7 +107,7 @@ class OpenTSDB extends BaseDatastore
             }
 
             foreach ($fields as $k => $v) {
-                $tmp_tags_key = $tmp_tags . " " . "key" . "=" . $k;
+                $tmp_tags_key = $tmp_tags . ' ' . 'key' . '=' . $k;
                 $this->putData($measurement, $timestamp, $v, $tmp_tags_key);
             }
         }

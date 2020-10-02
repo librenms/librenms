@@ -14,7 +14,7 @@ if ($device['os'] == 'cdata') {
     echo 'CDATA-MEMORY-POOL: ';
 
     $total = snmp_get($device, '.1.3.6.1.4.1.34592.1.3.100.1.8.2.0', '-OvQ');
-    $free  = snmp_get($device, '.1.3.6.1.4.1.34592.1.3.100.1.8.3.0', '-OvQ');
+    $free = snmp_get($device, '.1.3.6.1.4.1.34592.1.3.100.1.8.3.0', '-OvQ');
 
     if (is_numeric($total) && is_numeric($free)) {
         discover_mempool($valid_mempool, $device, 0, 'cdata', 'Memory', '1', null, null);

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -230,7 +229,7 @@ class OS implements ProcessorDiscovery, OSDiscovery
 
         $rf = new \ReflectionClass($this);
         $name = $rf->getShortName();
-        preg_match_all("/[A-Z][a-z]*/", $name, $segments);
+        preg_match_all('/[A-Z][a-z]*/', $name, $segments);
 
         return implode('-', array_map('strtolower', $segments[0]));
     }

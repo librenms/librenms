@@ -33,7 +33,7 @@ $polled_services = 0;
 $where = '';
 if ($options['h']) {
     if (is_numeric($options['h'])) {
-        $where = "AND `S`.`device_id` = " . $options['h'];
+        $where = 'AND `S`.`device_id` = ' . $options['h'];
     } else {
         if (preg_match('/\*/', $options['h'])) {
             $where = "AND `hostname` LIKE '" . str_replace('*', '%', mres($options['h'])) . "'";
@@ -79,7 +79,7 @@ $poller_end = microtime(true);
 $poller_run = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
-$string = $argv[0] . " " . date(\LibreNMS\Config::get('dateformat.compact'))
+$string = $argv[0] . ' ' . date(\LibreNMS\Config::get('dateformat.compact'))
     . " - $polled_services services polled in $poller_time secs";
 d_echo("$string\n");
 

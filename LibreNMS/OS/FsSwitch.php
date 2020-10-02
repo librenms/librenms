@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 PipoCanaja
  * @author     PipoCanaja <pipocanaja@gmail.com>
@@ -46,11 +45,11 @@ class FsSwitch extends OS implements ProcessorDiscovery
 
         foreach ($processors_data as $index => $entry) {
             $processors[] = Processor::discover(
-                "fs-SWITCHMIB",
+                'fs-SWITCHMIB',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.27975.1.2.11.' . $index,
                 $index,
-                "CPU",
+                'CPU',
                 -1,
                 100 - $entry['ssCpuIdle']
             );

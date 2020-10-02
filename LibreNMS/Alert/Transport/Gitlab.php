@@ -18,8 +18,6 @@
  * @author Drew Hynes <drew.hynes@gmail.com>
  * @copyright 2018 Drew Hynes, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
@@ -48,17 +46,17 @@ class Gitlab extends Transport
 
             $project_id = $opts['project-id'];
             $project_key = $opts['key'];
-            $details = "Librenms alert for: " . $obj['hostname'];
+            $details = 'Librenms alert for: ' . $obj['hostname'];
             $description = $obj['msg'];
             $title = urlencode($details);
             $desc = urlencode($description);
             $url = $opts['host'] . "/api/v4/projects/$project_id/issues?title=$title&description=$desc";
             $curl = curl_init();
 
-            $data = ["title" => $details,
-                "description" => $description,
+            $data = ['title' => $details,
+                'description' => $description,
             ];
-            $postdata = ["fields" => $data];
+            $postdata = ['fields' => $data];
             $datastring = json_encode($postdata);
 
             set_curl_proxy($curl);
@@ -67,7 +65,7 @@ class Gitlab extends Transport
 
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_VERBOSE, 1);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $datastring);
@@ -76,11 +74,11 @@ class Gitlab extends Transport
             $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if ($code == 200) {
                 $gitlabout = json_decode($ret, true);
-                d_echo("Created Gitlab issue " . $gitlabout['key'] . " for " . $device);
+                d_echo('Created Gitlab issue ' . $gitlabout['key'] . ' for ' . $device);
 
                 return true;
             } else {
-                d_echo("Gitlab connection error: " . serialize($ret));
+                d_echo('Gitlab connection error: ' . serialize($ret));
 
                 return false;
             }

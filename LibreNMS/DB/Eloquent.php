@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -29,7 +28,6 @@ use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Events\Dispatcher;
-use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Laravel;
 
 class Eloquent
@@ -131,18 +129,18 @@ class Eloquent
     public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
     {
         \Config::set("database.connections.$name", [
-            "driver" => "mysql",
-            "host" => $db_host,
-            "port" => $db_port,
-            "database" => $db_name,
-            "username" => $db_user,
-            "password" => $db_pass,
-            "unix_socket" => $db_socket,
-            "charset" => "utf8",
-            "collation" => "utf8_unicode_ci",
-            "prefix" => "",
-            "strict" => true,
-            "engine" => null,
+            'driver' => 'mysql',
+            'host' => $db_host,
+            'port' => $db_port,
+            'database' => $db_name,
+            'username' => $db_user,
+            'password' => $db_pass,
+            'unix_socket' => $db_socket,
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
         ]);
         \Config::set('database.default', $name);
     }

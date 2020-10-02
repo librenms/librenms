@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,13 +35,13 @@ class Aix extends OS implements OSDiscovery
         $aix_descr = explode("\n", $device->sysDescr);
         // AIX standard snmp deamon
         if ($aix_descr[1]) {
-            $device->serial = explode("Processor id: ", $aix_descr[1])[1];
-            $aix_long_version = explode(" version: ", $aix_descr[2])[1];
-            [$device->version, $aix_version_min] = array_map('intval', explode(".", $aix_long_version));
+            $device->serial = explode('Processor id: ', $aix_descr[1])[1];
+            $aix_long_version = explode(' version: ', $aix_descr[2])[1];
+            [$device->version, $aix_version_min] = array_map('intval', explode('.', $aix_long_version));
         // AIX net-snmp
         } else {
-            [, , $aix_version_min, $device->version, $device->serial] = explode(" ", $aix_descr[0]);
+            [, , $aix_version_min, $device->version, $device->serial] = explode(' ', $aix_descr[0]);
         }
-        $device->version .= "." . $aix_version_min;
+        $device->version .= '.' . $aix_version_min;
     }
 }

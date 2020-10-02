@@ -22,14 +22,14 @@ if (isset($_REQUEST['search'])) {
 
         if (! Auth::user()->hasGlobalRead()) {
             $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-            $perms_sql = "`D`.`device_id` IN " . dbGenPlaceholders(count($device_ids));
+            $perms_sql = '`D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
         } else {
             $device_ids = [];
-            $perms_sql = "1";
+            $perms_sql = '1';
         }
 
         if ($_REQUEST['type'] == 'group') {
-            foreach (dbFetchRows("SELECT id,name FROM device_groups WHERE name LIKE ?", ["%$search%"]) as $group) {
+            foreach (dbFetchRows('SELECT id,name FROM device_groups WHERE name LIKE ?', ["%$search%"]) as $group) {
                 if ($_REQUEST['map']) {
                     $results[] = [
                         'name'     => 'g:' . $group['name'],
@@ -42,7 +42,7 @@ if (isset($_REQUEST['search'])) {
 
             exit(json_encode($results));
         } elseif ($_REQUEST['type'] == 'alert-rules') {
-            foreach (dbFetchRows("SELECT name FROM alert_rules WHERE name LIKE ?", ["%$search%"]) as $rules) {
+            foreach (dbFetchRows('SELECT name FROM alert_rules WHERE name LIKE ?', ["%$search%"]) as $rules) {
                 $results[] = ['name' => $rules['name']];
             }
 
@@ -50,8 +50,8 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'device') {
             // Device search
 
-            $query = "SELECT *, `D`.`device_id` AS `device_id` FROM `devices` as `D`
-                      LEFT JOIN `locations` AS `L` ON `L`.`id` = `D`.`location_id`";
+            $query = 'SELECT *, `D`.`device_id` AS `device_id` FROM `devices` as `D`
+                      LEFT JOIN `locations` AS `L` ON `L`.`id` = `D`.`location_id`';
 
             // user depending limitation
             if (! Auth::user()->hasGlobalRead()) {
@@ -63,40 +63,40 @@ if (isset($_REQUEST['search'])) {
             }
 
             // search filter
-            $query_filter .= "`D`.`hostname` LIKE ?
+            $query_filter .= '`D`.`hostname` LIKE ?
                               OR `L`.`location` LIKE ?
                               OR `D`.`sysName` LIKE ?
                               OR `D`.`purpose` LIKE ?
-                              OR `D`.`notes` LIKE ?";
+                              OR `D`.`notes` LIKE ?';
             $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", "%$search%",
                 "%$search%", "%$search%", ]);
 
             if (\LibreNMS\Util\IPv4::isValid($search, false)) {
-                $query .= " LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
-                                LEFT JOIN `ipv4_addresses` AS `V4` ON `V4`.`port_id` = `P`.`port_id`";
-                $query_filter .= " OR `V4`.`ipv4_address` LIKE ?
+                $query .= ' LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
+                                LEFT JOIN `ipv4_addresses` AS `V4` ON `V4`.`port_id` = `P`.`port_id`';
+                $query_filter .= ' OR `V4`.`ipv4_address` LIKE ?
                                        OR `D`.`overwrite_ip` LIKE ?
-                                       OR `D`.`ip` = ? ";
+                                       OR `D`.`ip` = ? ';
                 $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", inet_pton($search)]);
             } elseif (\LibreNMS\Util\IPv6::isValid($search, false)) {
-                $query .= " LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
-                                LEFT JOIN `ipv6_addresses` AS `V6` ON `V6`.`port_id` = `P`.`port_id`";
-                $query_filter .= " OR `V6`.`ipv6_address` LIKE ?
+                $query .= ' LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
+                                LEFT JOIN `ipv6_addresses` AS `V6` ON `V6`.`port_id` = `P`.`port_id`';
+                $query_filter .= ' OR `V6`.`ipv6_address` LIKE ?
                                        OR `D`.`overwrite_ip` LIKE ?
-                                       OR `D`.`ip` = ? ";
+                                       OR `D`.`ip` = ? ';
                 $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", inet_pton($search)]);
             } elseif (ctype_xdigit($mac_search = str_replace([':', '-', '.'], '', $search))) {
-                $query .= " LEFT JOIN `ports` as `M` on `M`.`device_id` = `D`.`device_id`";
-                $query_filter .= " OR `M`.`ifPhysAddress` LIKE ? ";
+                $query .= ' LEFT JOIN `ports` as `M` on `M`.`device_id` = `D`.`device_id`';
+                $query_filter .= ' OR `M`.`ifPhysAddress` LIKE ? ';
                 $query_args_list[] = "%$mac_search%";
             }
 
             // result limitation
             $query_args_list[] = $limit;
             $results = dbFetchRows($query .
-                                   " WHERE " . $query_filter .
-                                   " GROUP BY `D`.`hostname`
-                                     ORDER BY `D`.`hostname` LIMIT ?", $query_args_list);
+                                   ' WHERE ' . $query_filter .
+                                   ' GROUP BY `D`.`hostname`
+                                     ORDER BY `D`.`hostname` LIMIT ?', $query_args_list);
 
             if (count($results)) {
                 $found = 1;
@@ -140,7 +140,7 @@ if (isset($_REQUEST['search'])) {
             // Search ports
             if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
-                    "SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ? ORDER BY ifDescr LIMIT ?",
+                    'SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ? ORDER BY ifDescr LIMIT ?',
                     ["%$search%", "%$search%", "%$search%", $limit]
                 );
             } else {
@@ -341,12 +341,12 @@ if (isset($_REQUEST['search'])) {
             // Device search
             if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
-                    "SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` WHERE `bill_name` LIKE ? OR `bill_notes` LIKE ? LIMIT ?",
+                    'SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` WHERE `bill_name` LIKE ? OR `bill_notes` LIKE ? LIMIT ?',
                     ["%$search%", "%$search%", $limit]
                 );
             } else {
                 $results = dbFetchRows(
-                    "SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` INNER JOIN `bill_perms` ON `bills`.bill_id = `bill_perms`.bill_id WHERE `bill_perms`.user_id = ? AND (`bill_name` LIKE ? OR `bill_notes` LIKE ?) LIMIT ?",
+                    'SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` INNER JOIN `bill_perms` ON `bills`.bill_id = `bill_perms`.bill_id WHERE `bill_perms`.user_id = ? AND (`bill_name` LIKE ? OR `bill_notes` LIKE ?) LIMIT ?',
                     [Auth::id(), "%$search%", "%$search%", $limit]
                 );
             }

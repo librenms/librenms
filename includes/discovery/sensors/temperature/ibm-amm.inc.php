@@ -14,13 +14,13 @@ $oid = '.1.3.6.1.4.1.2.3.51.2.2.1.1.2.0'; // BLADE-MIB::mmTemp.0
 $mmtemp = snmp_get($device, $oid, '-Oqv');
 
 preg_match('/[\d\.]+/', $mmtemp, $temp_response);
-if (!empty($temp_response[0])) {
+if (! empty($temp_response[0])) {
     $mmtemp = $temp_response[0];
 }
 
 d_echo($mmtemp);
 
-if (!empty($mmtemp)) {
+if (! empty($mmtemp)) {
     $descr = 'Management module temperature';
     $divisor = 1;
     $current = $mmtemp;
@@ -31,13 +31,13 @@ $oid = '.1.3.6.1.4.1.2.3.51.2.2.1.5.1.0'; // BLADE-MIB::frontPanelTemp.0
 $fptemp = snmp_get($device, $oid, '-Oqv');
 
 preg_match('/[\d\.]+/', $fptemp, $temp_response);
-if (!empty($temp_response[0])) {
+if (! empty($temp_response[0])) {
     $fptemp = $temp_response[0];
 }
 
 d_echo($fptemp);
 
-if (!empty($fptemp)) {
+if (! empty($fptemp)) {
     $descr = 'Front panel temperature';
     $divisor = 1;
     $current = $fptemp;

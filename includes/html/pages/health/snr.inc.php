@@ -16,7 +16,7 @@
 */
 
 $graph_type = 'sensor_snr';
-$class      = 'snr';
-$unit       = 'dB';
+$class = 'snr';
+$unit = 'dB';
 
 require 'includes/html/pages/health/sensors.inc.php';

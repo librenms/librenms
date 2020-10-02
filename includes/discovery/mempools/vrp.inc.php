@@ -15,16 +15,16 @@ if ($device['os'] == 'vrp') {
     if (is_array($mempools_array)) {
         foreach ($mempools_array as $index => $entry) {
             if ($entry['hwEntityMemSize'] != 0 || $entry['hwEntityMemSizeMega'] != 0) {
-                d_echo($index.' '.$entry['hwEntityBomEnDesc'].' -> '.$entry['hwEntityMemUsage'].' -> '.$entry['hwEntityMemSize']."\n");
+                d_echo($index . ' ' . $entry['hwEntityBomEnDesc'] . ' -> ' . $entry['hwEntityMemUsage'] . ' -> ' . $entry['hwEntityMemSize'] . "\n");
 
-                $usage_oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.'.$index;
-                $descr     = $entry['entPhysicalName'];
+                $usage_oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.' . $index;
+                $descr = $entry['entPhysicalName'];
                 if (empty($descr)) {
                     $descr = $entry['hwEntityBomEnDesc'];
                 }
-                $descr    .= " Memory";
-                $usage     = $entry['hwEntityMemUsage'];
-                if (!strstr($descr, 'No') && !strstr($usage, 'No') && $descr != '') {
+                $descr .= ' Memory';
+                $usage = $entry['hwEntityMemUsage'];
+                if (! strstr($descr, 'No') && ! strstr($usage, 'No') && $descr != '') {
                     discover_mempool($valid_mempool, $device, $index, 'vrp', $descr, '1', null, null);
                 }
             } //end if

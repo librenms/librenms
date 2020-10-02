@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -34,11 +33,6 @@ use SplFileInfo;
 
 /**
  * Class MibTest
- * @package LibreNMS\Tests
- *
- * Tests mib files for errors.
- * Will not be run by default, use --group=mibs to test.
- * You may test specific directories or files by specifying them with filter. Example: --filter=@RFC1284-MIB
  */
 class MibTest extends TestCase
 {
@@ -51,7 +45,7 @@ class MibTest extends TestCase
      */
     public function testMibDirectory($dir)
     {
-        $output = shell_exec("snmptranslate -M +" . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
+        $output = shell_exec('snmptranslate -M +' . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
         $this->assertEmpty($errors, "MIBs in $dir have errors!\n$errors");
@@ -120,7 +114,7 @@ class MibTest extends TestCase
         $file_path = "$path/$file";
         $highlighted_file = $console_color->convert("%r$file_path%n");
 
-        $output = shell_exec("snmptranslate -M +" . Config::get('mib_dir') . ":$path -m +$mib_name SNMPv2-MIB::system 2>&1");
+        $output = shell_exec('snmptranslate -M +' . Config::get('mib_dir') . ":$path -m +$mib_name SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
         $this->assertEmpty($errors, "$highlighted_file has errors!\n$errors");
@@ -179,7 +173,7 @@ class MibTest extends TestCase
     {
         // extract the mib name (tried regex, but was too complex and I had to read the whole file)
         $mib_name = null;
-        if ($handle = fopen($file, "r")) {
+        if ($handle = fopen($file, 'r')) {
             $header = '';
             while (($line = fgets($handle)) !== false) {
                 $trimmed = trim($line);

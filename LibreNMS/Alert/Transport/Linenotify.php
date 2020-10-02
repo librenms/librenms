@@ -1,14 +1,11 @@
 <?php
 /**
  * LINE Notify Transport
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Enum\AlertState;
 
 class Linenotify extends Transport
 {

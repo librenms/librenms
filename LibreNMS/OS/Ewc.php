@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 James Andrewartha
  * @author     James Andrewartha <trs80@ucc.asn.au>
@@ -161,7 +160,7 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.18.' . $index,
                 'ewc',
                 $index . 'Retx',
-                "Retransmits ($name radio " . explode('.', $index)[1] . ")"
+                "Retransmits ($name radio " . explode('.', $index)[1] . ')'
             );
         }
 
@@ -249,7 +248,7 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.9.' . $index,
                 'ewc',
                 $index,
-                "RSS ($name radio " . explode('.', $index)[1] . ")"
+                "RSS ($name radio " . explode('.', $index)[1] . ')'
             );
         }
 
@@ -276,7 +275,7 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.13.' . $index,
                 'ewc',
                 $index,
-                "SNR ($name radio " . explode('.', $index)[1] . ")"
+                "SNR ($name radio " . explode('.', $index)[1] . ')'
             );
         }
 
@@ -303,7 +302,7 @@ class Ewc extends OS implements
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.5.' . $index,
                 'ewc',
                 $index,
-                "Utilization ($name radio " . explode('.', $index)[1] . ")"
+                "Utilization ($name radio " . explode('.', $index)[1] . ')'
             );
         }
 

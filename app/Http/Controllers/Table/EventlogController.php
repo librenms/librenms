@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -113,7 +112,7 @@ class EventlogController extends TableController
         $output .= $this->severityLabel($eventlog->severity);
         $output .= " eventlog-status'></span><span style='display:inline;'>";
         $output .= (new Carbon($eventlog->datetime))->format(Config::get('dateformat.compact'));
-        $output .= "</span>";
+        $output .= '</span>';
 
         return $output;
     }
@@ -126,17 +125,17 @@ class EventlogController extends TableController
     {
         switch ($eventlog_severity) {
             case Alert::OK:
-                return "label-success"; //OK
+                return 'label-success'; //OK
             case Alert::INFO:
-                return "label-info"; //Informational
+                return 'label-info'; //Informational
             case Alert::NOTICE:
-                return "label-primary"; //Notice
+                return 'label-primary'; //Notice
             case Alert::WARNING:
-                return "label-warning"; //Warning
+                return 'label-warning'; //Warning
             case Alert::ERROR:
-                return "label-danger"; //Critical
+                return 'label-danger'; //Critical
             default:
-                return "label-default"; //Unknown
+                return 'label-default'; //Unknown
         }
     }
 

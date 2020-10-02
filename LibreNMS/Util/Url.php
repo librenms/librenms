@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -350,7 +349,7 @@ class Url
         $urlargs = [];
 
         foreach ($args as $key => $arg) {
-            $urlargs[] = $key . "=" . urlencode($arg);
+            $urlargs[] = $key . '=' . urlencode($arg);
         }
 
         if (Config::get('enable_lazy_load', true)) {
@@ -445,15 +444,15 @@ class Url
      */
     public static function portLinkDisplayClass($port)
     {
-        if ($port->ifAdminStatus == "down") {
-            return "interface-admindown";
+        if ($port->ifAdminStatus == 'down') {
+            return 'interface-admindown';
         }
 
-        if ($port->ifAdminStatus == "up" && $port->ifOperStatus != "up") {
-            return "interface-updown";
+        if ($port->ifAdminStatus == 'up' && $port->ifOperStatus != 'up') {
+            return 'interface-updown';
         }
 
-        return "interface-upup";
+        return 'interface-upup';
     }
 
     /**
@@ -465,11 +464,11 @@ class Url
     public static function sensorLinkDisplayClass($sensor)
     {
         if ($sensor->sensor_current > $sensor->sensor_limit) {
-            return "sensor-high";
+            return 'sensor-high';
         }
 
         if ($sensor->sensor_current < $sensor->sensor_limit_low) {
-            return "sensor-low";
+            return 'sensor-low';
         }
 
         return 'sensor-ok';
@@ -487,7 +486,7 @@ class Url
         $possibilities = [$icon];
 
         if ($os) {
-            if ($os == "linux") {
+            if ($os == 'linux') {
                 // first, prefer the first word of $feature
                 $distro = Str::before(strtolower(trim($feature)), ' ');
                 $possibilities[] = "$distro.svg";

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -56,7 +55,7 @@ class RrdDefinition
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {
         if (empty($name)) {
-            d_echo("DS must be set to a non-empty string.");
+            d_echo('DS must be set to a non-empty string.');
         }
 
         $name = $this->escapeName($name);

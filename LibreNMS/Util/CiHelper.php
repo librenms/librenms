@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -205,21 +204,14 @@ class CiHelper
      */
     public function checkStyle()
     {
-
-        // Disabled in favor of styleci
-        echo "Style check disabled.\n";
-        return 0;
-
         $cs_cmd = [
-            $this->checkPhpExec('phpcs'),
-            '-n',
-            '-p',
-            '--colors',
-            '--extensions=php',
-            '--standard=misc/phpcs_librenms.xml',
+            $this->checkPhpExec('php-cs-fixer'),
+            '--config=.php_cs',
+            'fix',
+            '-v',
         ];
 
-        $files = $this->flags['full'] ? ['./'] : $this->changed['php'];
+        $files = $this->flags['full'] ? [] : $this->changed['php'];
         $cs_cmd = array_merge($cs_cmd, $files);
 
         return $this->execute('style', $cs_cmd);
@@ -465,7 +457,7 @@ class CiHelper
         }
 
         echo "Running composer install to install developer dependencies.\n";
-        passthru("scripts/composer_wrapper.php install");
+        passthru('scripts/composer_wrapper.php install');
 
         if (is_executable($path)) {
             return $path;
@@ -494,7 +486,7 @@ class CiHelper
         }
 
         // check system
-        $system_path = rtrim(exec("which pylint 2>/dev/null"));
+        $system_path = rtrim(exec('which pylint 2>/dev/null'));
         if (is_executable($system_path)) {
             return $system_path;
         }

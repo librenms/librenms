@@ -10,8 +10,6 @@
  * @author GitStoph <https://github.com/GitStoph>
  * @copyright 2019 GitStoph
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
@@ -75,9 +73,9 @@ class Alerta extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 201) {
             var_dump("API '$host' returned Error");
-            var_dump("Params: " . $alert_message);
-            var_dump("Return: " . $ret);
-            var_dump("Headers: " . $headers);
+            var_dump('Params: ' . $alert_message);
+            var_dump('Return: ' . $ret);
+            var_dump('Headers: ' . $headers);
 
             return 'HTTP Status code ' . $code;
         }

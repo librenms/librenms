@@ -12,10 +12,10 @@ if (Config::get('enable_bgp')) {
         include Config::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php";
     }
 
-    if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
+    if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
     } else {
-        $vrfs_lite_cisco = array(array('context_name'=>''));
+        $vrfs_lite_cisco = [['context_name'=>'']];
     }
 
     $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
@@ -25,7 +25,7 @@ if (Config::get('enable_bgp')) {
         if (is_numeric($bgpLocalAs)) {
             echo "AS$bgpLocalAs ";
             if ($bgpLocalAs != $device['bgpLocalAs']) {
-                dbUpdate(array('bgpLocalAs' => $bgpLocalAs), 'devices', 'device_id=?', array($device['device_id']));
+                dbUpdate(['bgpLocalAs' => $bgpLocalAs], 'devices', 'device_id=?', [$device['device_id']]);
                 echo 'Updated AS ';
             }
 
@@ -38,7 +38,7 @@ if (Config::get('enable_bgp')) {
                 $peers_data = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
             } elseif ($device['os_group'] === 'cisco') {
                 $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB');
-                $peer2 = !empty($peers_data);
+                $peer2 = ! empty($peers_data);
             }
 
             if (empty($peers_data)) {
@@ -48,7 +48,7 @@ if (Config::get('enable_bgp')) {
         } else {
             echo 'No BGP on host';
             if ($device['bgpLocalAs']) {
-                dbUpdate(array('bgpLocalAs' => array('NULL')), 'devices', 'device_id=?', array($device['device_id']));
+                dbUpdate(['bgpLocalAs' => ['NULL']], 'devices', 'device_id=?', [$device['device_id']]);
                 echo ' (Removed ASN) ';
             }
         }
@@ -56,9 +56,9 @@ if (Config::get('enable_bgp')) {
         $peerlist = build_bgp_peers($device, $peers_data, $peer2);
 
         // Process discovered peers
-        if (!empty($peerlist)) {
-            $af_data = array();
-            $af_list = array();
+        if (! empty($peerlist)) {
+            $af_data = [];
+            $af_list = [];
 
             foreach ($peerlist as $peer) {
                 $peer['astext'] = get_astext($peer['as']);
@@ -68,10 +68,10 @@ if (Config::get('enable_bgp')) {
                 if (empty($af_data)) {
                     if ($device['os_group'] == 'cisco') {
                         if ($peer2 === true) {
-                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
+                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', [], 'CISCO-BGP4-MIB');
                         }
                         if (empty($af_data)) {
-                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
+                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', [], 'CISCO-BGP4-MIB');
                             $peer2 = false;
                         }
                     } elseif ($device['os_group'] === 'arista') {
@@ -80,62 +80,62 @@ if (Config::get('enable_bgp')) {
                 }
 
                 // build the list
-                if (!empty($af_data)) {
+                if (! empty($af_data)) {
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
 
-                if (!$bgp4_mib && $device['os'] == 'junos') {
+                if (! $bgp4_mib && $device['os'] == 'junos') {
                     $afis['ipv4'] = 'ipv4';
                     $afis['ipv6'] = 'ipv6';
-                    $afis[25]     = 'l2vpn';
-                    $safis[1]     = 'unicast';
-                    $safis[2]     = 'multicast';
-                    $safis[3]     = 'unicastAndMulticast';
-                    $safis[4]     = 'labeledUnicast';
-                    $safis[5]     = 'mvpn';
-                    $safis[65]    = 'vpls';
-                    $safis[70]    = 'evpn';
-                    $safis[128]   = 'vpn';
-                    $safis[132]   = 'rtfilter';
-                    $safis[133]   = 'flow';
+                    $afis[25] = 'l2vpn';
+                    $safis[1] = 'unicast';
+                    $safis[2] = 'multicast';
+                    $safis[3] = 'unicastAndMulticast';
+                    $safis[4] = 'labeledUnicast';
+                    $safis[5] = 'mvpn';
+                    $safis[65] = 'vpls';
+                    $safis[70] = 'evpn';
+                    $safis[128] = 'vpn';
+                    $safis[132] = 'rtfilter';
+                    $safis[133] = 'flow';
 
-                    if (!isset($j_peerIndexes)) {
+                    if (! isset($j_peerIndexes)) {
                         $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                         d_echo($j_bgp);
                         foreach ($j_bgp as $index => $entry) {
                             $peer_index = $entry['jnxBgpM2PeerIndex'];
                             try {
                                 $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr']);
-                                d_echo("peerindex for " . $ip->getFamily() . " $ip is $peer_index\n");
-                                $j_peerIndexes[(string)$ip] = $peer_index;
+                                d_echo('peerindex for ' . $ip->getFamily() . " $ip is $peer_index\n");
+                                $j_peerIndexes[(string) $ip] = $peer_index;
                             } catch (InvalidIpException $e) {
                                 d_echo("Unable to parse IP for peer $peer_index: " . $entry['jnxBgpM2PeerRemoteAddr'] . PHP_EOL);
                             }
                         }
                     }
 
-                    if (!isset($j_afisafi)) {
+                    if (! isset($j_afisafi)) {
                         $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                         foreach (array_keys($j_prefixes) as $key) {
-                            list($index,$afisafi) = explode('.', $key, 2);
-                            $j_afisafi[$index][]  = $afisafi;
+                            [$index,$afisafi] = explode('.', $key, 2);
+                            $j_afisafi[$index][] = $afisafi;
                         }
                     }
 
                     foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] as $afisafi) {
-                        list ($afi,$safi)     = explode('.', $afisafi);
-                        $afi                  = $afis[$afi];
-                        $safi                 = $safis[$safi];
+                        [$afi,$safi] = explode('.', $afisafi);
+                        $afi = $afis[$afi];
+                        $safi = $safis[$safi];
                         $af_list[$peer['ip']][$afi][$safi] = 1;
                         add_cbgp_peer($device, $peer, $afi, $safi);
                     }
                 }
 
-                $af_query = "SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=? AND context_name=?";
+                $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=? AND context_name=?';
                 foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'], $device['context_name']]) as $entry) {
-                    $afi  = $entry['afi'];
+                    $afi = $entry['afi'];
                     $safi = $entry['safi'];
-                    if (!$af_list[$entry['bgpPeerIdentifier']][$afi][$safi]) {
+                    if (! $af_list[$entry['bgpPeerIdentifier']][$afi][$safi]) {
                         dbDelete(
                             'bgpPeers_cbgp',
                             '`device_id`=? AND `bgpPeerIdentifier`=? AND context_name=? AND afi=? AND safi=?',
@@ -153,7 +153,7 @@ if (Config::get('enable_bgp')) {
         // clean up peers
         $params = [$device['device_id'], $device['context_name']];
         $query = 'device_id=? AND context_name=?';
-        if (!empty($peerlist)) {
+        if (! empty($peerlist)) {
             $query .= ' AND bgpPeerIdentifier NOT IN ' . dbGenPlaceholders(count($peerlist));
             $params = array_merge($params, array_column($peerlist, 'ip'));
         }
@@ -178,7 +178,7 @@ if (Config::get('enable_bgp')) {
     );
     $existing_contexts = array_column($vrfs_lite_cisco, 'context_name');
     foreach ($contexts as $context) {
-        if (!in_array($context, $existing_contexts)) {
+        if (! in_array($context, $existing_contexts)) {
             dbDelete('bgpPeers', 'device_id=? and context_name=?', [$device['device_id'], $context]);
             dbDelete('bgpPeers_cbgp', 'device_id=? and context_name=?', [$device['device_id'], $context]);
             echo '-';

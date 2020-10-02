@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -84,11 +83,10 @@ class DevCheckCommand extends LnmsCommand
 
         $this->helper->setFlags(Arr::only($this->options(), ['quiet', 'commands', 'fail-fast', 'full']));
 
-        $all = $check == 'all' || $check == 'ci';
-        $this->helper->enable('style', $all || $check === 'style');
-        $this->helper->enable('lint', $all || $check === 'lint');
-        $this->helper->enable('unit', $all || $check === 'unit');
-        $this->helper->enable('web', $all || $check === 'web');
+        $this->helper->enable('style', $check == 'all' || $check === 'style');
+        $this->helper->enable('lint', $check == 'all' || $check == 'ci' || $check === 'lint');
+        $this->helper->enable('unit', $check == 'all' || $check == 'ci' || $check === 'unit');
+        $this->helper->enable('web', $check == 'ci' || $check === 'web');
 
         if ($os = $this->option('os')) {
             $this->helper->setFlags(['style_enable' => false, 'lint_enable' => false, 'unit_enable' => true, 'web_enable' => false]);

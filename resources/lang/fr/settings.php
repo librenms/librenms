@@ -4,6 +4,7 @@ return [
     'readonly' => 'Dejà configuré dans config.php, le supprimer avant de pouvoir l\'éditer ici',
     'groups' => [
         'alerting' => 'Alertes',
+        'api' => 'API',
         'authorization' => 'Autorisation',
         'auth' => 'Comptes et Utilisateurs',
         'external' => 'Modules Externes',
@@ -19,6 +20,9 @@ return [
             'general' => 'Réglages généraux d\'Alertes',
             'email' => 'Options des emails',
             'rules' => 'Réglages généraux des Règles d\'Alertes',
+        ],
+        'api' => [
+            'cors' => 'CORS',
         ],
         'auth' => [
             'general' => 'Réglages généraux d\'Accès',
@@ -42,6 +46,8 @@ return [
             'peeringdb' => 'Intégration PeeringDB',
             'nfsen' => 'Intégration NfSen',
             'unix-agent' => 'Intégration Unix-Agent',
+            'smokeping' => 'Intégration Smokeping',
+            'snmptrapd' => 'Intégration des traps SNMP',
         ],
         'poller' => [
             'distributed' => 'Sondeurs distribués',
@@ -325,8 +331,8 @@ return [
             'description' => 'Version LDAP',
             'help' => 'Version LDAP à utiliser pour parler au serveur, en général v3.',
             'options' => [
-                "2" => "2",
-                "3" => "3",
+                '2' => '2',
+                '3' => '3',
             ],
         ],
         'auth_mechanism' => [
@@ -872,6 +878,16 @@ return [
         'snmptranslate' => [
             'description' => 'Chemin vers `snmptranslate`',
         ],
+        'snmptraps' => [
+            'eventlog' => [
+                'description' => 'Journaliser les traps SNMP',
+                'help' => 'En plus de toute action déjà effectuée',
+            ],
+            'eventlog_detailed' => [
+                'description' => 'Journalisation détaillée',
+                'help' => 'Ajouter tous les OIDs recus dans le trap',
+            ],
+        ],
         'snmpwalk' => [
             'description' => 'Chemin vers `snmpwalk`',
         ],
@@ -973,7 +989,7 @@ return [
     ],
     'twofactor' => [
         'description' => 'Activer l\'Autentification à deux facteurs',
-        'help' => "Active le mécanisme interne à deux facteurs. Chaque compte utilisateur doit ensuite être configuré.",
+        'help' => 'Active le mécanisme interne à deux facteurs. Chaque compte utilisateur doit ensuite être configuré.',
     ],
     'units' => [
         'days' => 'jours',

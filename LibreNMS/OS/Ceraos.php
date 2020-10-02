@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -63,7 +62,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
             }
         }
 
-        $device->features = $num_radios . " radios in unit";
+        $device->features = $num_radios . ' radios in unit';
     }
 
     public function discoverWirelessXpi()
@@ -152,7 +151,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.7.4.1.1.7.' . $index,
                 'ceraos-tx',
                 $index,
-                $ifNames[$index] . " TX Bitrate",
+                $ifNames[$index] . ' TX Bitrate',
                 $data['genEquipRadioMRMCCurrTxBitrate'],
                 1000
             );
@@ -166,7 +165,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.7.4.1.1.11.' . $index,
                 'ceraos-rx',
                 $index,
-                $ifNames[$index] . " RX Bitrate",
+                $ifNames[$index] . ' RX Bitrate',
                 $data['genEquipRadioMRMCCurrRxBitrate'],
                 1000
             );
@@ -195,7 +194,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.7.1.1.3.' . $index,
                 'ceraos',
                 $index,
-                $ifNames[$index] . " Defected Blocks",
+                $ifNames[$index] . ' Defected Blocks',
                 $data['genEquipRadioStatusDefectedBlocks']
             );
         }
@@ -254,7 +253,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.5.1.1.3.' . $index,
                 'ceraos-tx',
                 $index,
-                $ifNames[$index] . " TX Level",
+                $ifNames[$index] . ' TX Level',
                 $data['genEquipRfuStatusTxLevel']
             );
         }
@@ -267,7 +266,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.5.1.1.2.' . $index,
                 'ceraos-rx',
                 $index,
-                $ifNames[$index] . " RX Level",
+                $ifNames[$index] . ' RX Level',
                 $data['genEquipRfuStatusRxLevel']
             );
         }

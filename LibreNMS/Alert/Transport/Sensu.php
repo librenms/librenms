@@ -17,8 +17,6 @@
  * @author Adam Bishop <adam@omega.org.uk>
  * @copyright 2020 Adam Bishop, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
@@ -67,7 +65,7 @@ class Sensu extends Transport
         try {
             return $this->contactSensu($obj, $sensu_opts);
         } catch (GuzzleException $e) {
-            return "Sending event to Sensu failed: " . $e->getMessage();
+            return 'Sending event to Sensu failed: ' . $e->getMessage();
         }
     }
 

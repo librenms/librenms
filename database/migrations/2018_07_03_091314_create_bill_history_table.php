@@ -38,7 +38,7 @@ class CreateBillHistoryTable extends Migration
         });
 
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            \DB::statement("ALTER TABLE `bill_history` CHANGE `pdf` `pdf` longblob NULL ;");
+            \DB::statement('ALTER TABLE `bill_history` CHANGE `pdf` `pdf` longblob NULL ;');
         }
     }
 

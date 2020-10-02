@@ -9,6 +9,6 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
- 
+
 preg_match('/Foundry Networks (.*)/', $device['sysDescr'], $data);
 $hardware = $data[1];

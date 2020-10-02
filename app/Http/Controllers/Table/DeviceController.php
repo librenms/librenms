@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -75,7 +74,7 @@ class DeviceController extends TableController
             'hostname' => 'hostname',
             'hardware' => 'hardware',
             'os' => 'os',
-            'uptime' => \DB::raw("IF(`status` = 1, `uptime`, `last_polled` - NOW())"),
+            'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
         ];
     }
