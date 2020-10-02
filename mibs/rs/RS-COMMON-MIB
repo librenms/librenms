@@ -1,0 +1,144 @@
+-- **********************************************************************
+-- **********************************************************************
+-- **
+-- **  COPYRIGHT      (c) 2006 Rohde & Schwarz GmbH & Co. KG
+-- **                          Muehldorfstrasse 15
+-- **    R & S                 81671 Muenchen
+-- **
+-- ** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- **
+-- **  MODULE         RS-COMMON-MIB.my
+-- **  
+-- **  DESCRIPTION    Rohde & Schwarz common SNMP mib
+-- **
+-- **  HISTORY        06/24/2005 Christian Hoelzl
+-- **                 first version
+-- ** +-iso(1)
+-- **   +-org(3)
+-- **     +-dod(6)
+-- **       +-internet(1)
+-- **         +-private(4)
+-- **           +-enterprises(1)
+-- **             +-rs(2566)
+-- **               +-rsCommon(123)
+-- **               +-rsProduct(127)
+-- **               | +-rsProdBroadcast(1)
+-- **               |   +-rsProdBroadcastMeasurement(1)
+-- **               |   +-rsProdBroadcastTransmitter(2)
+-- **               |
+-- **               +-rsRequirements(131)
+-- **               +-rsExperimental(137)
+-- **               +-rsCapabilities(139)
+-- **               +-rsRegistration(149)
+-- **                 +-rsRegModules(1)
+-- **                 +-rsRegBroadcast(2)
+-- **                   +-rsRegBroadcastMeasurement(1)
+-- **                   +-rsRegBroadcastTransmitter(2)
+-- ** 
+-- **
+-- **********************************************************************
+-- **********************************************************************
+
+  RS-COMMON-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS enterprises, OBJECT-IDENTITY, MODULE-IDENTITY FROM SNMPv2-SMI;
+
+    rsRoot MODULE-IDENTITY
+        LAST-UPDATED "200605170840Z" -- Mai 17th 2006 at 08:40 GMT
+        ORGANIZATION 
+		        "Rohde&Schwarz GmbH & Co.KG"
+        CONTACT-INFO 
+		        "Rohde & Schwarz GmbH & Co. KG
+		         Muehldorfstrasse 15
+		         81671 Munich
+		         Germany"
+	      DESCRIPTION 
+            "The root OID of Rohde&Schwarz GmbH & Co.KG"
+        REVISION "200605170840Z" -- Mai 17th 2006 at 08:40 GMT
+	      DESCRIPTION 
+            "MODULE-IDENTITY added to RS-COMMON-MIB"
+        ::= { enterprises 2566 }
+
+    rsCommon OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for common object and event definitions."
+        ::= { rsRoot 113 }
+
+    rsProducts OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for products."
+        ::= { rsRoot 127 }
+
+    rsProdBroadcast OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for broadcast products."
+        ::= { rsProducts 1 }
+
+    rsProdBroadcastMeasurement OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for broadcast measurement products."
+        ::= { rsProdBroadcast 1 }
+
+    rsProdBroadcastTransmitter OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for broadcast transmitter products."
+        ::= { rsProdBroadcast 2 }
+
+    rsRequirements OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for management application requirements."
+        ::= { rsRoot 131 }
+
+    rsExperimental OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for experimental definitions."
+        ::= { rsRoot 137 }
+
+    rsCapabilities OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for agent capabilities."
+        ::= { rsRoot 139 }
+
+    rsRegistration OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for registrations."
+        ::= { rsRoot 149 }
+
+    rsRegModules OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "Sub-tree for modules registrations."
+        ::= { rsRegistration 1 }
+    
+    rsRegBroadcast OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "currently not used"
+        ::= { rsRegistration 2 }
+
+    rsRegBroadcastMeasurement OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "currently not used"
+        ::= { rsRegBroadcast 1 }
+
+    rsRegBroadcastTransmitter OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION 
+            "currently not used"
+        ::= { rsRegBroadcast 2 }
+
+    END
+
+--
+-- RS-COMMON-MIB.my
+--

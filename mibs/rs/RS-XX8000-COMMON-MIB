@@ -1,0 +1,2533 @@
+-- *****************************************************************************
+-- *****************************************************************************
+-- **
+-- **  COPYRIGHT      (c) 2006 Rohde & Schwarz GmbH & Co. KG
+-- **                          Muehldorfstrasse 15
+-- **    R & S                 D-81671 Muenchen
+-- **
+-- *****************************************************************************
+-- **
+-- **  MODULE         RS-XX8000-COMMON-MIB
+-- **  
+-- **  DESCRIPTION    Rohde & Schwarz SNMP
+-- **
+-- **  HISTORY        
+-- **                 2006-11-20 hue - initial version
+-- **                 2007-03-14 hue - enhanced logbook messages (TC)
+-- **                 2007-05-16 hue - added logbook messages (TC) for XV703
+-- **                 2007-09-04 sr  - added logbook messages for PumpUnit and 
+-- **                                  logbook messages (TC) for MediaFLO
+-- **                 2007-10-02 sr  - extend trapSinkTable
+-- **                                - extend LogbookEntryMessagesOST (2 new 
+-- **                                  messages for PumpUnit)
+-- **                 2007-12-17 sr  - update LogbookEntryMessagesNSU
+-- **                                - update LogbookEntryMessagesNetCCU
+-- **                                - new TCs: ProdInfoModuleNameTv and 
+-- **                                  ProdInfoModuleNameFm
+-- **                 2008-02-06 sr  - update LogbookEntryMessagesExcMediaFLO
+-- **                                - add transmitterConfig with dateTime
+-- **                                - new TCs: TimeOfDay and NoValue
+-- **                 2008-02-11 hu  - update LogbookEntryMessagesExcATV
+-- **                                - new TC: LockState
+-- **                 2008-02-18 sr  - add A8 to IndexTransmitter
+-- **                 2008-04-23 ks  - new TC EqualizerCalibrationState
+-- **                            sr  - new TC LogbookEntryMessagesExcTv
+-- **                                - remove LogbookEntryMessagesExcMediaFLO
+-- **                 2008-04-30 ks  - LogbookEntryMessagesExcTv extended
+-- **                 2008-05-13 hu  - added TrapHandling under snmpConfig
+-- **                 2008-06-02 sr  - LogbookEntryMessagesExcTv extended
+-- **                 2008-06-09 sr  - dateTime with UTC values
+-- **                                - LogbookMaxEntryNumber: range to max 255
+-- **                 2008-06-16 sr  - new TC 'TvStandard'
+-- **                 2008-07-23 sr  - new TC 'AtvStandard'
+-- **                            hu  - obsoleted TC LogbookEntryMessagesExcATV 
+-- **                                  and DVB -> use LogbookEntryMessagesExcTv
+-- **                 2008-09-03 sr  - eventHistoryModule: additional values for
+-- **                                  pump and antenna
+-- **                 2008-09-30 ks  - NTP configuration
+-- **                 2008-10-10 sr  - eventHistoryTable with new index 'eventHistoryTxIdx'
+-- **                 2008-12-12 sr  - new: swMaintenance and eventTx,
+-- **                                - rackExtCoolingWarning renamed to rackGpiWarning
+-- **                                - rackExtCoolingFault renamed to rackGpiFault
+-- **                 2009-02-10 ks  - add to eventHistoryModule: gps, dvbRecMon, gpParIOsr
+-- **                            sr  - LogbookEntryMessagesExcTv updated
+-- **                 2008-03-13 ks  - reserveInputLost added to LogbookEntryMessagesExcTv
+-- **                                - rackProbeNotCalibrated added to LogbookEntryMessagesOST
+-- **                                - update LogbookEntryMessagesNSU
+-- **                                - update LogbookEntryMessagesNetCCU
+-- **                 2008-04-30 ks  - Sx801 messages added to LogbookEntryMessagesExcTv
+-- **                 2008-06-03 ks  - intPwrSupply, extPwrSupply, rackTemperatureWarning added
+-- **                 2008-06-26 ks  - new textual convention InputSource
+-- **                 2008-09-10 ks  - new value "inconsistent" for textual convention TvStandard
+-- **                                - additional values for LogbookEntryMessagesNetCCU
+-- **                 2009-12-08 ks  - excSFNIdleRegulation, excInput1Available, excInput2Available,
+-- **                                  excInput1LPAvailable, excInput2LPAvailable added to LogbookEntryMessagesExcTv
+-- **                 2010-01-11 ks  - xlxInputStepProtection, excNoSfnData, excNoMobileDtvContent added
+-- **                 2010-05-06 ks  - ntpSyncFailed added
+-- **                 2010-05-11 ks  - indexProgram added
+-- **                 2011-02-23 ks  - trapSinkInformUnacknowledged obsoleted
+-- **                 2011-05-11 ks  - FailDelayMode, FailDelayStatus added
+-- **
+-- *****************************************************************************
+-- *****************************************************************************
+
+    RS-XX8000-COMMON-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            rsProdBroadcastTransmitter, rsRegModules            
+                FROM RS-COMMON-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, 
+            OBJECT-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DateAndTime, TruthValue, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+        rsXx8000MibModule MODULE-IDENTITY 
+            LAST-UPDATED "201105110800Z"		-- May 11, 2011 at 08:00 GMT
+            ORGANIZATION 
+                "Rohde&Schwarz GmbH & Co. KG"
+            CONTACT-INFO 
+                "Torsten Huebscher
+                Department 7TS2
+                Broadcasting Division
+                Muehldorfstrasse 15
+                81671 Munich, Germany
+                torsten.huebscher@rohde-schwarz.com"
+            DESCRIPTION 
+                "This MIB defines general objects of XX8000 transmitting systems from Rohde & Schwarz.
+                
+                Use this MIB for things all transmitters support via SNMP, e.g.:
+                - product information
+                - installation / configuration issues (trapsinks, managers aso.)
+                
+                The following MIBs are related to this:
+                - RS-COMMON-MIB         - mandatory for this MIB."
+            REVISION "201105110800Z"		-- May 11, 2011 at 08:00 GMT
+            DESCRIPTION 
+                "FailDelayMode, FailDelayStatus added"
+            REVISION "201102230800Z"		-- February 23, 2011 at 08:00 GMT
+            DESCRIPTION 
+                "trapSinkInformUnacknowledged obsoleted"
+            REVISION "201005060800Z"		-- May 06, 2010 at 08:00 GMT
+            DESCRIPTION 
+                "ntpSyncFailed, indexProgram added"
+            REVISION "200912080800Z"		-- December 08, 2009 at 08:00 GMT
+            DESCRIPTION 
+                "excSFNIdleRegulation, excInput1Available, excInput2Available,
+                excInput1LPAvailable, excInput2LPAvailable added to
+                LogbookEntryMessagesExcTv"
+            REVISION "200909100800Z"		-- September 10, 2009 at 08:00 GMT
+            DESCRIPTION 
+                "new value 'inconsistent' for textual convention TvStandard
+                additional values for LogbookEntryMessagesNetCCU"
+            REVISION "200906260900Z"		-- June 26, 2009 at 09:00 GMT
+            DESCRIPTION 
+                "new textual convention InputSource"
+            REVISION "200906030900Z"		-- June 03, 2009 at 09:00 GMT
+            DESCRIPTION 
+                "intPwrSupply, extPwrSupply added to LogbookEntryMessagesNetCCU;
+                rackTemperatureWarning added to LogbookEntryMessagesOST"
+            REVISION "200904300900Z"		-- April 30, 2009 at 09:00 GMT
+            DESCRIPTION 
+                "Sx801 messages added to LogbookEntryMessagesExcTv"
+            REVISION "200903130900Z"		-- March 13, 2009 at 09:00 GMT
+            DESCRIPTION 
+                "reserveInputLost added to LogbookEntryMessagesExcTv
+                rackProbeNotCalibrated added to LogbookEntryMessagesOST
+                update LogbookEntryMessagesNSU
+                update LogbookEntryMessagesNetCCU"
+            REVISION "200902101600Z"		-- February 10, 2009 at 16:00 GMT
+            DESCRIPTION 
+                "add to eventHistoryModule: gps, dvbRecMon, gpParIO
+                LogbookEntryMessagesExcTv updated"
+            REVISION "200812121400Z"		-- December 12, 2008 at 14:00 GMT
+            DESCRIPTION 
+                "new: swMaintenance and eventTx,
+                rackExtCoolingWarning renamed to rackGpiWarning
+                rackExtCoolingFault renamed to rackGpiFault"
+            REVISION "200810200900Z"		-- October 20, 2008 at 09:00 GMT
+            DESCRIPTION 
+                "LogbookEntryMessagesNSU:
+                antennaRedundancySumWarning(196)
+                tcbTxBPowerSupply(197)
+                txBPosition(198)
+                antennaRedundancySumFault(226)
+                LogbookEntryMessagesNetCCU:
+                monitorFaultExcA(107)
+                monitorFaultExcA(108)"
+            REVISION "200810100900Z"		-- October 10, 2008 at 09:00 GMT
+            DESCRIPTION 
+                "eventHistoryTable with new index 'eventHistoryTxIdx'"
+            REVISION "200809300900Z"		-- September 30, 2008 at 09:00 GMT
+            DESCRIPTION 
+                "NTP configuration"
+            REVISION "200809030900Z"		-- September 03, 2008 at 09:00 GMT
+            DESCRIPTION 
+                "eventHistoryModule: additional values for pump and antenna"
+            REVISION "200807231530Z"		-- July 23, 2008 at 15:30 GMT
+            DESCRIPTION 
+                "- new TC 'AtvStandard'
+                - obsoleted TC LogbookEntryMessagesExcATV and DVB
+                  -> use LogbookEntryMessagesExcTv"
+            REVISION "200806160900Z"		-- June 16, 2008 at 09:00 GMT
+            DESCRIPTION 
+                "new TC 'TvStandard'"
+            REVISION "200806100800Z"		-- June 10, 2008 at 08:00 GMT
+            DESCRIPTION 
+                "dateTime with UTC values
+                LogbookMaxEntryNumber: range to max 255"
+            REVISION "200806021030Z"		-- June 02, 2008 at 10:30 GMT
+            DESCRIPTION 
+                "LogbookEntryMessagesExcTv extended"
+            REVISION "200805131500Z"		-- May 13, 2008 at 15:00 GMT
+            DESCRIPTION 
+                "LogbookEntryMessagesExcTv extended
+                added TrapHandling under snmpConfig"
+            REVISION "200804231100Z"		-- April 23, 2008 at 11:00 GMT
+            DESCRIPTION 
+                "new TC EqualizerCalibrationState
+                new TC LogbookEntryMessagesExcTv
+                remove LogbookEntryMessagesExcMediaFLO"
+            REVISION "200802181330Z"		-- February 18, 2008 at 13:30 GMT
+            DESCRIPTION 
+                "add A8 to IndexTransmitter"
+            REVISION "200802111200Z"		-- February 11, 2008 at 12:00 GMT
+            DESCRIPTION 
+                "updated LogbookEntryMessagesExcATV, added LockState"
+            REVISION "200802061200Z"		-- February 06, 2008 at 12:00 GMT
+            DESCRIPTION 
+                "update LogbookEntryMessagesExcMediaFLO
+                add transmitterConfig with dateTime
+                new TCs: TimeOfDay and NoValue"
+            REVISION "200712171200Z"		-- December 17, 2007 at 12:00 GMT
+            DESCRIPTION 
+                "update LogbookEntryMessagesNSU
+                update LogbookEntryMessagesNetCCU
+                new TCs: ProdInfoModuleNameTv and ProdInfoModuleNameFm"
+            REVISION "200710021000Z"		-- October 02, 2007 at 10:00 GMT
+            DESCRIPTION 
+                "extend trapSinkTable
+                extend LogbookEntryMessagesOST (2 new messages for PumpUnit)"
+            REVISION "200709041300Z"		-- September 04, 2007 at 13:00 GMT
+            DESCRIPTION 
+                "Added logbook messages for PumpUnit and 
+                logbook messages (TC) for MediaFLO."
+            REVISION "200706291000Z"		-- June 29, 2007 at 10:00 GMT
+            DESCRIPTION 
+                "Enhanced logbook messages for ExcFM."
+            REVISION "200705161000Z"		-- May 16, 2007 at 10:00 GMT
+            DESCRIPTION 
+                "Added logbook messages (TC) for XV703 transposers."
+            REVISION "200703141000Z"		-- March 14, 2007 at 10:00 GMT
+            DESCRIPTION 
+                "Enhanced logbook messsages for ExcDVB and ExcFM (TextualConvention)."
+            REVISION "200612211000Z"		-- December 21, 2006 at 10:00 GMT
+            DESCRIPTION 
+                "Added IndexAB for easier handling of exciterA/B and outputstageA/B in other MIBs."
+            REVISION "200611201000Z"		-- November 20, 2006 at 10:00 GMT
+            DESCRIPTION 
+                "This is the initial version."
+            ::= { rsRegModules 163 }
+
+        
+    
+--
+-- Textual conventions
+--
+    
+        ReadableString ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "255a"
+            STATUS current
+            DESCRIPTION 
+                "An octet string containing a human-readable string.  This
+                string may have originally been encoded as specified
+                in EN 300 468 Annex A, but this is not a requirement.
+                
+                To maintain generality, the information is represented
+                using the ISO/IEC IS 10646-1 character set, encoded as an
+                octet string using the UTF-8 transformation format
+                described in RFC2279.
+                
+                Control codes are interpreted as specified in EN 300 468
+                Annex A, section A.1.  The interpretation of other control
+                codes is undefined.
+                
+                For information encoded in 7-bit US-ASCII, the UTF-8
+                encoding is identical to the US-ASCII encoding.
+                
+                UTF-8 may require multiple bytes to represent a single
+                character/code point; thus the length of this object in
+                octets may be different from the number of characters
+                encoded.  Similarly, size constraints refer to the number
+                of encoded octets, not the number of characters represented
+                by an encoding."
+            SYNTAX OCTET STRING (SIZE (0..255))
+
+        FloatingPoint ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "FloatingPoint provides a way of representing non-integer
+                numbers in SNMP. Numbers are represented as a string of
+                ASCII characters in the natural way. So for example, '3',
+                '3.142' and '0.3142E1' are all valid numbers.
+                
+                The syntax for the string is as follows.  [] enclose an
+                optional element, | is the separator for a set of
+                alternatives.  () enclose syntax which is to be viewed
+                as a unit.
+                
+                FloatingPoint ::= [Sign]
+                                  (Float1 | Float2 | DigitSequence)
+                                  [ExponentPart]
+                
+                Float1        ::= DigitSequence '.' [DigitSequence]
+                Float2        ::= '.' DigitSequence
+                DigitSequence ::= Digit [DigitSequence]
+                
+                ExponentPart  ::= ('e' | 'E') [Sign] DigitSequence
+                
+                Digit         ::= '0'..'9'
+                Sign          ::= '+' | '-'"
+            SYNTAX OCTET STRING (SIZE (1..63))
+
+        TimeOfDay ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "1d:1d:1d"
+            STATUS current
+            DESCRIPTION 
+                "A time of day specification.
+                
+                 octets  contents    range
+                 ------  --------    -----
+                   1      hour       0..23
+                   2      minute     0..59
+                   3      second     0..59
+                
+                For example, 1:30:17 PM would be displayed as 13:30:17.
+                
+                The second can be omitted.
+                "
+            SYNTAX OCTET STRING (SIZE (2 | 3))
+
+        EventMask ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Enables / Disables this event.
+                enable(1)  --> active, will be sent in case the event occurs
+                disable(2) --> inactive, will not be sent in case the event occurs."
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+
+        EventPriority ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The priority of the event.
+                Users can freely set this value in range 0..255."
+            SYNTAX Integer32 (0..255)
+
+        EventClass ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "These are the levels of events a transmitter has.
+                Info(3): Are events which only inform about changes, e.g. 'local/remote'
+                  or 'reboot of the control unit'. They don't affect the transmission.
+                Warning(2): Are minor problems which do not influence transmission itself,
+                  but may cause a bigger problem when no action is taken, e.g.
+                  'RF Loop Program'. Warnings may appear and disappear without the need
+                  of acknowledgment.
+                Fault(1): Have a direct impact on the transmission, e.g.
+                  'failure power supply'. Faults never disappear without acknowledgment."
+            SYNTAX INTEGER
+                {
+                fault(1),
+                warning(2),
+                info(3)
+                }
+
+        EventState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The current state of an event:
+                    active(1)   --> event is active (coming)
+                    inactive(2) --> event is inactive (going)
+                This is used in all logbooks and in all event handling tables."
+            SYNTAX INTEGER
+                {
+                active(1),
+                inactive(2)
+                }
+
+        EventMaxEntryNumber ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The maximum number of events.
+                This is used in other MIBs as a placeholder."
+            SYNTAX Integer32 (1..999)
+
+        SwitchOnOff ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This is for all on/off-switches."
+            SYNTAX INTEGER
+                {
+                on(1),
+                off(2)
+                }
+
+        Trigger ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Trigger for starting a certain action.
+                idle(1)    --> ready, do nothing
+                trigger(2) --> do now
+                
+                A GET will always return idle(1). 
+                A SET idle(1) will return NO_ERROR without doing anything."
+            SYNTAX INTEGER
+                {
+                idle(1),
+                trigger(2)
+                }
+
+        LogbookEntryMessagesNetCCU ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Inserted information in the logbook of NetCCU."
+            SYNTAX INTEGER
+                {
+                local(3),
+                rfOn(4),
+                excAutoReady(6),
+                excAutoChanged(7),
+                ostAutoReady(8),
+                ostAutoChanged(9),
+                rfOnSound1(10),
+                rfOnSound2(11),
+                activeExcA(12),
+                activeExcB(13),
+                activeOstA(14),
+                activeOstB(15),
+                rfOnVision(16),
+                rfOnActiveExc(17),
+                rfOnDLoad(18),
+                rfOkDLoad(19),
+                swBackupStarted(20),
+                swBackupDone(21),
+                swBackupFailed(22),
+                swRestoreStarted(23),
+                swRestoreDone(24),
+                swRestoreFailed(25),
+                optionKeyExpired(30),
+                txModeSwitchOverStarted(37),
+                txModeSwitchOverEnded(38),
+                reboot(40),
+                rfLoopProgram(41),
+                rfLoopReserve(42),
+                rfWarning(43),
+                reflectionWarning(44),
+                intPwrSupply(45),
+                extPwrSupply(46),
+                rfVisionWarning(47),
+                rfSound1Warning(48),
+                rfSound2Warning(49),
+                fanFault(51),
+                sumWarningRec(52),
+                sumWarningExcA(53),
+                sumWarningExcB(54),
+                sumWarningOstA(55),
+                sumWarningOstB(56),
+                rfDLoadWarning(57),
+                rfDLoadReflection(58),
+                receiverConnect(59),
+                receiverSumFault(60),
+                txModeInconsistent(61),
+                boardTemperatureWarning(62),
+                optionKeyWillExpire(70),
+                powerSupply(81),
+                rfFail(82),
+                reflectionFault(83),
+                boardTemperature(84),
+                excSwitch(85),
+                ostSwitch(86),
+                connectionExcA(87),
+                connectionExcB(88),
+                connectionOstA(89),
+                connectionOstB(90),
+                rfVision(91),
+                rfSound1Fault(92),
+                rfSound2Fault(93),
+                connectionRec(95),
+                summaryFaultRec(96),
+                summaryFaultExcA(97),
+                summaryFaultExcB(98),
+                summaryFaultOstA(99),
+                summaryFaultOstB(100),
+                rfDLoadFault(101),
+                rfDLoadReflectionFault(102),
+                apaConnect(103),
+                absorber(104),
+                monitorFaultExcA(107),
+                monitorFaultExcB(108),
+                txModeSwitchOverFailed(109)
+                }
+
+        LogbookEntryMessagesExcTv ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Inserted information in the logbook of TV exciters."
+            SYNTAX INTEGER
+                {
+                excReboot(0),
+                excSumFault(1),
+                excSumWarning(2),
+                excLocal(3),
+                excExciterOn(4),
+                excRfOk(5),
+                excNoInput(6),
+                excReference(7),
+                excRfOn(8),
+                excMute(9),
+                excRelieveReq(10),
+                excSwDiag(11),
+                excOneFan(12),
+                excNoCCUComm(13),
+                excSwUpdated(14),
+                excBiosUpdated(15),
+                excPowerSupply(16),
+                excTemperature(17),
+                excFans(18),
+                excHwMainboard(19),
+                excHwCfCard(20),
+                excOutputOpen(21),
+                excRebootRqst(22),
+                excHwEEPROM(23),
+                excWatchdog(24),
+                excRfFail(25),
+                excLoopOpen(26),
+                excNoFPGA(27),
+                excCarrierLock(28),
+                excInputFail(30),
+                excOptionExpired(37),
+                excOptionWillEnd(38),
+                excFPGAConfig(40),
+                excHwIIFBoard(41),
+                excHwRfBoard(42),
+                excHwSynth1(43),
+                excHwSynth2(44),
+                excHwSynth3(45),
+                excMuteAudio1(46),
+                excMuteAudio2(47),
+                excVideoInp1(48),
+                excVideoInp2(49),
+                excVideoInpAct(50),
+                excRfOutExcV(51),
+                excRfOutAntV(52),
+                excRfOutExcA1(53),
+                excRfOutAntA1(54),
+                excRfOutExcA2(55),
+                excRfOutAntA2(56),
+                excClippingAntInp(57),
+                excNoHeadroomAnt(58),
+                excAudioMode(59),
+                excWhiteLine(60),
+                excWhiteLineLnAmp(61),
+                excWhiteLineLnAmpW(62),
+                excSyncCheck(63),
+                excWhiteLimiter(64),
+                excDevLimAud1(65),
+                excDevLimAud2(66),
+                excVideoInpClip(67),
+                excAud1InpClip(68),
+                excAud2InpClip(69),
+                excNICAM728Data(70),
+                excNICAM728Carr(71),
+                excAud2OutClip(72),
+                excRfMonFail(73),
+                excRfVideoFail(74),
+                excRfAudio1Fail(75),
+                excRfAudio2Fail(76),
+                excAudioLoopOpen(77),
+                excVideoLoopOpen(78),
+                excTestMode(100),
+                excExtRefFail(101),
+                excExtRefWeak(102),
+                excExtPPSFail(103),
+                excInputSwitched(104),
+                excInputFail2(105),
+                excWrongDatarate(106),
+                excFifoOverUnderflow(107),
+                excDelayChanged(108),
+                excSFNDelay(109),
+                excNoMIP(110),
+                excWrongMFArrivalTime(111),
+                excExtPPSAsynchron(112),
+                excPacketUnlock(113),
+                excMaxDelayChanged(114),
+                excReferenceAbsent(115),
+                excNoPPS(116),
+                excRfFailAmplifier(117),
+                excWarningAmplifier(118),
+                excAmpOverflow(119),
+                excModError(120),
+                excFLOModErr(121),
+                excInput1(122),
+                excInput2(123),
+                excInput1LP(124),
+                excInput2LP(125),
+                excNoReserveAvailable(126),
+                excSynthesizerUnlocked(127),
+                excSFNIdleRegulation(128),
+                excAmpVSWR(170),
+                excAmpTempWarn(171),
+                excAmpTempFault(172),
+                excAmpRegulation(173),
+                excAmpTransistor(174),
+                excAmpReducedPower(175),
+                excHWAmpEEPROM(176),
+                excRFWarningAmp(177),
+                excModSfnRAMInitErr(180),
+                excModTransportErr(181),
+                excModFIFOParErr(182),
+                excModFIFOSeqErr(183),
+                excModSfnBufEmpty(184),
+                excModSfnBufFull(185),
+                excModSsfMultiple(186),
+                excModSsfMissing(187),
+                excModLofTS1(188),
+                excModLofTS2(189),
+                excModCoreStall(190),
+                excModIqInactive(191),
+                excModMtiVersErr(192),
+                excModCoreReset(193),
+                excModConfigChanged(194),
+                excSFNBuffer(195),
+                excModIdleMode(196),
+                excSFNBufferTooEmpty(197),
+                excModMemError(198),
+                excSfnBufferTooFull(199),
+                excMissingSIP(205),
+                excTCLevelOutOfRange(210),
+                excTCLevelOverflow(211),
+                excInputFail3(212),
+                excInputWarning(213),
+                excEchoWarning(214),
+                xlxInputStepProtection(215),
+                excExt1PPSReference(220),
+                excInt1PPSReference(221),
+                exc5MHzReference(222),
+                exc10MHzReference(223),
+                excPrecorrectionSetupInfo(230),
+                excPrecorrectionSetupFail(231),
+                excFramecounter(240),
+                excMissingIIP(241),
+                excPSUOvertemp(250),
+                excPowerSupplyWarning(251),
+                excNSUConnected(256),
+                excMonHWError(260),
+                excRecvRxAUXHWError(261),
+                excRecvHWError(262),
+                excMonNoFrontendLock(263),
+                excRecvAUXNoFrontendLock(264),
+                excRecvNoFrontendLock(265),
+                excMonBadInputSignal(266),
+                excRecvAUXBadInputSignal(267),
+                excRecvBadInputSignal(268),
+                excMonNoInputSignal(269),
+                excRecvAUXWarningInputSignal(270),
+                excRecvWarningInputSignal(271),
+                excMonAUXHWError(272),
+                excMonAUXNoFrontendLock(273),
+                excMonAUXBadInputSignal(274),
+                excMonitorNoInputFail(280),
+                excNoSfnData(300),
+                excNoMobileDtvContent(301),
+                excInput1Available(320),
+                excInput2Available(321),
+                excInput1LPAvailable(322),
+                excInput2LPAvailable(323),
+                excRfTest(400),
+                excPRBSInsertion(401),
+                excTestEnsemble(402),
+                excInvalidTII(403),
+                excTIITransmission(404),
+                excTxModeChange(405),
+                excTIIChange(406),
+                excNullTIST(407),
+                excTISTJitter(408),
+                excTS1FrameLock(409),
+                excTS2FrameLock(410),
+                excCrcViolationRateTooHigh(411),
+                excSeamlessReady(412),
+                excTestFIC(413),
+                dvbt2NoL1Present(500),
+                dvbt2InvalidConfiguration(501),
+                dvbT2UnsupportedConfiguration(502),
+                dvbt2BandwidthMismatch(503),
+                iqHeader1Integrity(550),
+                iqHeader2Integrity(551),
+                iqHeader1Issues(552),
+                iqHeader2Issues(553),
+                iqInputRegulation(554),
+                iqWrongConfiguration(555),
+                iqTseMute(556),
+                iqInputOrder(557),
+                sx801PowerFail7Vpositive(600),
+                sx801PowerFail7Vnegative(601),
+                sx801PowerFail12V(602),
+                preAmpTemperatureFault(603),
+                preAmpRFFault(604),
+                parIoExcLink(605),
+                parIoTxLink(606),
+                parIoGpIoLink(607),
+                rfBoardRFFault(608),
+                sx801PhaseError(640),
+                sx801ReflectionWarning(641),
+                sx801ReflectionFault(642),
+                sx801RfWarning(643),
+                sx801AmplShutdown(644),
+                sx801PA1Supply1TooHot(650),
+                sx801PA1Supply2TooHot(651),
+                sx801PA1ReserveSupplyTooHot(652),
+                sx801PA1Supply1Fail(653),
+                sx801PA1Supply2Fail(654),
+                sx801PA1ReserveSupplyFail(655),
+                sx801PA1AcFail(656),
+                sx801PA1BlowerFail(657),
+                sx801PA1TransistorFail(658),
+                sx801PA1DriverFail(659),
+                sx801PA1RfInFail(660),
+                sx801PA1Reflection(661),
+                sx801PA1VSWR(662),
+                sx801PA1PowerFail(663),
+                sx801PA1Regulation(664),
+                sx801PA1Temperature(665),
+                sx801PA1Communication(666),
+                sx801PA1Update(667),
+                sx801PA2Supply1TooHot(675),
+                sx801PA2Supply2TooHot(676),
+                sx801PA2ReserveSupplyTooHot(677),
+                sx801PA2Supply1Fail(678),
+                sx801PA2Supply2Fail(679),
+                sx801PA2ReserveSupplyFail(680),
+                sx801PA2AcFail(681),
+                sx801PA2BlowerFail(682),
+                sx801PA2TransistorFail(683),
+                sx801PA2DriverFail(684),
+                sx801PA2RfInFail(685),
+                sx801PA2Reflection(686),
+                sx801PA2VSWR(687),
+                sx801PA2PowerFail(688),
+                sx801PA2Regulation(689),
+                sx801PA2Temperature(690),
+                sx801PA2Communication(691),
+                sx801PA2Update(692),
+                pa3Supply1TooHot(700),
+                pa3Supply2TooHot(701),
+                pa3ReserveSupplyTooHot(702),
+                pa3Supply1Fault(703),
+                pa3Supply2Fault(704),
+                pa3ReserveSupplyFault(705),
+                pa3ACFault(706),
+                pa3BlowerFault(707),
+                pa3TransistorFault(708),
+                pa3DriverFault(709),
+                pa3RFinFault(710),
+                pa3Reflection(711),
+                pa3VSWR(712),
+                pa3PowerFault(713),
+                pa3Regulation(714),
+                pa3Temperature(715),
+                pa3Communication(716),
+                pa3Update(717),
+                pa4Supply1TooHot(725),
+                pa4Supply2TooHot(726),
+                pa4ReserveSupplyTooHot(727),
+                pa4Supply1Fault(728),
+                pa4Supply2Fault(729),
+                pa4ReserveSupplyFault(730),
+                pa4ACFault(731),
+                pa4BlowerFault(732),
+                pa4TransistorFault(733),
+                pa4DriverFault(734),
+                pa4RFinFault(735),
+                pa4Reflection(736),
+                pa4VSWR(737),
+                pa4PowerFault(738),
+                pa4Regulation(739),
+                pa4Temperature(740),
+                pa4Communication(741),
+                pa4Update(742),
+                tse800NoConnect(770),
+                tse800Warning(771),
+                tse800Fault(772),
+                automaticOn(800),
+                automaticFault(801),
+                autoCtrlExcActive(802),
+                autoPrgmExcActive(803),
+                changeoverByUser(804),
+                changeoverByAuto(805),
+                automaticReady(806),
+                autoPrgmExcNoConnect(807),
+                autoPrgmExcFault(808)
+                }
+
+        LogbookEntryMessagesExcDVB ::= TEXTUAL-CONVENTION
+            STATUS obsolete
+            DESCRIPTION 
+                "Inserted information in the logbook of DVB exciters.
+                
+                This is obsolete! Please use LogbookEntryMessagesExcTv!"
+            SYNTAX INTEGER
+                {
+                excReboot(0),
+                excSummaryFault(1),
+                excSummaryWarning(2),
+                excLocal(3),
+                excOn(4),
+                excRfOk(5),
+                excNoInput(6),
+                excReferenceFail(7),
+                excRfOn(8),
+                excMute(9),
+                excFanWarning(12),
+                excNoCommunicationToNetCCU(13),
+                excPowerSupply(16),
+                excBoardTemperature(17),
+                excFanFault(18),
+                excSelfTest(19),
+                excHwCfCard(20),
+                excOutputOpen(21),
+                excHwEeprom(23),
+                excRfFail(25),
+                excLoop(26),
+                excCarrierLock(28),
+                excInputFault(30),
+                excOptionExpired(37),
+                excOptionExpires(38),
+                excHwFpgaConfig(40),
+                excHwIifBoard(41),
+                excHwRfBoard(42),
+                excHwSynth1(43),
+                excHwSynth2(44),
+                excHwSynth3(45),
+                excTestMode(100),
+                excExtRefFail(101),
+                excExtRefWeak(102),
+                excExtPPSFail(103),
+                excWrongConfig(104),
+                excInputFail(105),
+                excWrongDatarate(106),
+                excFifoWarning(107),
+                excExtDelayChanged(108),
+                excWrongDelay(109),
+                excNoMIP(110),
+                excWrongMFArrivalTime(111),
+                excExtPPSAsynchron(112),
+                excPacketUnlock(113),
+                excMaxDelayChanged(114),
+                excNoReference(115),
+                excNoPPS(116),
+                excRfFailAmplifier(117),
+                excWarningAmplifier(118),
+                excOverflowAmplifier(119),
+                excSynthUnlock(127)
+                }
+
+        LogbookEntryMessagesExcFM ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Inserted information in the logbook of FM exciters."
+            SYNTAX INTEGER
+                {
+                excReboot(0),
+                excSummaryFault(1),
+                excSummaryWarning(2),
+                excLocal(3),
+                excOn(4),
+                excRfOk(5),
+                excNoInput(6),
+                excReferenceFail(7),
+                excRfOn(8),
+                excMute(9),
+                excNoCommunicationToNetCCU(13),
+                excBiosUpdated(15),
+                excPowerSupply(16),
+                excOutputOpen(21),
+                excEEPROMError(23),
+                excRfFail(25),
+                excLoop(26),
+                excFPGANotLoaded(27),
+                excCarrierLock(28),
+                excInputFault(30),
+                ostSummaryFault(32),
+                excSoftFault(33),
+                ostSoftFault(34),
+                ostSummaryWarning(36),
+                excOptionKeyExpired(37),
+                excOptionKeyWarning(38),
+                excTemperatureWarning(41),
+                excTemperatureFault(42),
+                excRfUnitFault(43),
+                excFan1NotOk(47),
+                excFan2NotOk(48),
+                excMainPLLUnlocked(49),
+                excMainUPCUnlocked(50),
+                excMainCLKUnlocked(51),
+                exc12VFanWarning(67),
+                exc12VRackControllerWarning(71),
+                excInfoFrequencyChanged(81),
+                excLevelAESLeftTooLow(84),
+                excLevelAESRightTooLow(85),
+                excLevelMPXTooLow(86),
+                excNoDataInput(87),
+                excLevelAFLeftTooLow(88),
+                excLevelAFRightTooLow(89),
+                excLevelAUX1TooLow(90),
+                excLevelAUX2TooLow(91),
+                excLevelAUX3TooLow(92),
+                excLevelAESLeftTooHigh(93),
+                excLevelAESRightTooHigh(94),
+                excLevelMPXTooHigh(95),
+                excLevelAFLeftTooHigh(97),
+                excLevelAFRightTooHigh(98),
+                excLevelAUX1TooHigh(99),
+                excLevelAUX2TooHigh(100),
+                excLevelAUX3TooHigh(101),
+                excAESNoClock(102),
+                excAESParityBiphaseError(103),
+                excAESStateNotValid(104),
+                excInpCh1NotOk(105),
+                excInpCh2NotOk(106),
+                excInpCh1Active(107),
+                excInpCh2Active(108),
+                excInpAutomaticActive(109),
+                recSummaryWarning(110),
+                recSummaryFault(111),
+                ostRfPresent(112),
+                recRfWarning(113),
+                recCarrierNotPresent(114),
+                recNoConnection(115),
+                ostRfWarn(116),
+                ostRfFault(117),
+                ostNoInput(118),
+                recRfFault(119),
+                recRfPresent(120),
+                ostPowerRegulationActive(121),
+                ostTemperatureWarning(122),
+                ostSwrWarning(123),
+                ostSwrFault(124),
+                ostNoConnection(125)
+                }
+
+        LogbookEntryMessagesOST ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Inserted information in the logbook of outputstage."
+            SYNTAX INTEGER
+                {
+                ostRfOn(42),
+                ostRfOk(43),
+                ostRfReduced(44),
+                ostNoInput(45),
+                ostRfWarning(46),
+                ostReflectionWarning(47),
+                ostRackWarning(48),
+                ostCoolingWarning(49),
+                ostRfFail(50),
+                ostReflectionFault(51),
+                ostACFault(52),
+                ostCoolingFault(53),
+                ostCommunicationFault(54),
+                rackLinkOk(58),
+                rackOn(59),
+                reducedRfExcA(60),
+                reducedRfExcB(61),
+                rackGpiWarning(62),
+                rackFan1Fault(63),
+                rackFan2Fault(64),
+                rackCoolingSumWarning(65),
+                rackAmplifierSumFault(66),
+                rackGpiFault(67),
+                rackTemperatureFault(68),
+                rackACFault(69),
+                rackCoolingSumFault(70),
+                rackTempFaultAbs1(71),
+                rackTempFaultAbs2(72),
+                rackDCFault(73),
+                ampNumberDiffers(76),
+                ampOn(77),
+                ampDCOk(78),
+                ampACOk(79),
+                ampRfInFail(80),
+                ampRfFail(81),
+                ampReflectionFault(82),
+                ampTemperatureFault(83),
+                ampFanFault(84),
+                ampTransistorFault(85),
+                pucFault(86),
+                pucWarning(87),
+                pucLink(88),
+                pucFan1Link(89),
+                pucFan2Link(90),
+                pucFan3Link(91),
+                pucFan4Link(92),
+                pucPump1Link(93),
+                pucPump2Link(94),
+                pucOn(95),
+                pucFan1(96),
+                pucFan2(97),
+                pucFan3(98),
+                pucFan4(99),
+                pucPump1(100),
+                pucPump2(101),
+                pucPressure(102),
+                pucMaintenance(103),
+                pucConfig(104),
+                pucFan1Fault(105),
+                pucFan2Fault(106),
+                pucFan3Fault(107),
+                pucFan4Fault(108),
+                pucPump1Fault(109),
+                pucPump2Fault(110),
+                pucPressureFault(111),
+                pucFilter(117),
+                pucPuOff(118),
+                rackProbeNotCalibrated(119),
+                rackTemperatureWarning(120),
+                rackSumFault(121),
+                rackAbsorberFault(122),
+                rackOvervoltageProtection(123),
+                psu1Fault(124),
+                psu2Fault(125),
+                psuRFault(126),
+                ampDriverFault(127),
+                ctxPowerFault(128),
+                ampRegulationFault(129)
+                }
+
+        LogbookEntryMessagesNSU ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Inserted information in the logbook of Nplus1-Switchoverunit."
+            SYNTAX INTEGER
+                {
+                local(3),
+                automaticOn(5),
+                automaticReady(6),
+                automaticChangeover(7),
+                swBackupStarted(10),
+                program1RfOn(11),
+                program2RfOn(12),
+                program3RfOn(13),
+                program4RfOn(14),
+                program5RfOn(15),
+                program6RfOn(16),
+                program7RfOn(17),
+                program8RfOn(18),
+                programReserveRfOn(19),
+                swBackupDone(20),
+                txA1ToDummyLoad(21),
+                txA2ToDummyLoad(22),
+                txA3ToDummyLoad(23),
+                txA4ToDummyLoad(24),
+                txA5ToDummyLoad(25),
+                txA6ToDummyLoad(26),
+                txA7ToDummyLoad(27),
+                txA8ToDummyLoad(28),
+                txBToDummyLoad(29),
+                optionkeyExpired(30),
+                txA1Local(31),
+                txA2Local(32),
+                txA3Local(33),
+                txA4Local(34),
+                txA5Local(35),
+                txA6Local(36),
+                txA7Local(37),
+                txA8Local(38),
+                txBLocal(39),
+                reboot(40),
+                txA1SumWarning(41),
+                txA2SumWarning(42),
+                txA3SumWarning(43),
+                txA4SumWarning(44),
+                txA5SumWarning(45),
+                txA6SumWarning(46),
+                txA7SumWarning(47),
+                txA8SumWarning(48),
+                txBSumWarning(49),
+                swBackupFailed(50),
+                txA1NoConnect(51),
+                txA2NoConnect(52),
+                txA3NoConnect(53),
+                txA4NoConnect(54),
+                txA5NoConnect(55),
+                txA6NoConnect(56),
+                txA7NoConnect(57),
+                txA8NoConnect(58),
+                txBNoConnect(59),
+                swRestoreStarted(60),
+                txA1SumFault(61),
+                txA2SumFault(62),
+                txA3SumFault(63),
+                txA4SumFault(64),
+                txA5SumFault(65),
+                txA6SumFault(66),
+                txA7SumFault(67),
+                txA8SumFault(68),
+                txBSumFault(69),
+                swRestoreDone(70),
+                swRestoreFailed(80),
+                connBoardTxA1Updating(81),
+                connBoardTxA2Updating(82),
+                connBoardTxA3Updating(83),
+                connBoardTxA4Updating(84),
+                connBoardTxA5Updating(85),
+                connBoardTxA6Updating(86),
+                connBoardTxA7Updating(87),
+                connBoardTxA8Updating(88),
+                connBoardTxBUpdating(89),
+                inputSwitchUpdating(90),
+                connBoardTxA1SumWarning(91),
+                connBoardTxA2SumWarning(92),
+                connBoardTxA3SumWarning(93),
+                connBoardTxA4SumWarning(94),
+                connBoardTxA5SumWarning(95),
+                connBoardTxA6SumWarning(96),
+                connBoardTxA7SumWarning(97),
+                connBoardTxA8SumWarning(98),
+                connBoardTxBSumWarning(99),
+                inputSwitchSumWarning(100),
+                fanFault(101),
+                sumWngRCV(102),
+                rcvNoConnect(103),
+                sumFltRCV(104),
+                optionkeyWillExpire(105),
+                powerSupply(106),
+                boardTemperature(107),
+                automaticFault(108),
+                rcvNoConnectx(109),
+                sumFltRCVx(110),
+                connBoardTxA1SumFault(111),
+                connBoardTxA2SumFault(112),
+                connBoardTxA3SumFault(113),
+                connBoardTxA4SumFault(114),
+                connBoardTxA5SumFault(115),
+                connBoardTxA6SumFault(116),
+                connBoardTxA7SumFault(117),
+                connBoardTxA8SumFault(118),
+                connBoardTxBSumFault(119),
+                inputSwitchSumFault(120),
+                outputSwitch(122),
+                inputSwitchChangeOver(123),
+                txBParameterSet(124),
+                antennaRedundancySumWarning(196),
+                tcbTxBPowerSupply(197),
+                txBPosition(198),
+                intPwrSupply(200),
+                extPwrSupply(201),
+                antennaRedundancySumFault(226)
+                }
+
+        LogbookEntryMessagesXV703 ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Inserted information in the logbook of XV703 transposers."
+            SYNTAX INTEGER
+                {
+                noNetCCUConnection(0),
+                summaryFault(1),
+                summaryWarning(2),
+                local(3),
+                on(4),
+                ok(5),
+                fanWarning(7),
+                rfOn(8),
+                updatedBIOS(9),
+                powerSupply(10),
+                boardTemperature(11),
+                fanFault(12),
+                reboot(14),
+                loopOpen(15),
+                noConnection(16),
+                ampFail(17),
+                ifrPllFail(18),
+                rfiPllFail(19),
+                refFreqFail(20),
+                pInFail(21),
+                rfFail(22)
+                }
+
+        LogbookEntrySlope ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "These are the information which are inserted in the logbook."
+            SYNTAX INTEGER
+                {
+                set(1),
+                reset(2)
+                }
+
+        LogbookMaxEntryNumber ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The maximum number of entries in a logbook. 
+                This is used in other MIBs as a placeholder."
+            SYNTAX Integer32 (0..255)
+
+        IndexTransmitter ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This is used for Nplus1 systems to indicate a transmitter (physical view).
+                TransmitterB(1) is the reserve transmitter, transmitterA1(2) to transmitterA8(9) are the main transmitter.
+                In difference to the logical view, transmitterB(1) has special parameters available."
+            SYNTAX INTEGER
+                {
+                transmitterB(1),
+                transmitterA1(2),
+                transmitterA2(3),
+                transmitterA3(4),
+                transmitterA4(5),
+                transmitterA5(6),
+                transmitterA6(7),
+                transmitterA7(8),
+                transmitterA8(9)
+                }
+
+        IndexRack ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This is used for systems with more than 1 rack to display a designated rack."
+            SYNTAX Integer32 (1..10)
+
+        IndexAmplifier ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This is used to display a designated amplifier."
+            SYNTAX Integer32 (1..10)
+
+        IndexProgram ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This is used for Nplus1 systems to indicate a program sent out (logical view).
+                ProgramRes(1) is the reserve program, program1(2) to program8(9) are the main programs.
+                In difference to the physical view, programRes(1) has no special parameters available. Furthermore it has no priority."
+            SYNTAX INTEGER
+                {
+                programRes(1),
+                program1(2),
+                program2(3),
+                program3(4),
+                program4(5),
+                program5(6),
+                program6(7),
+                program7(8),
+                program8(9)
+                }
+
+        IndexAB ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The value for the module A (exciterA, outputstageA) or 
+                B (exciterB, outputstageB) for alarms.
+                This is a helper column."
+            SYNTAX INTEGER
+                {
+                a(1),
+                b(2)
+                }
+
+        ProdInfoModuleNameTv ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The product information module names for TV."
+            SYNTAX INTEGER
+                {
+                exciter(1),
+                exciterMainboard(2),
+                exciterInputInterface(3),
+                exciterRfBoard(4),
+                exciterSynth1(5),
+                exciterSynth2(6),
+                exciterSynth3(7),
+                netCCU(50),
+                rackcontroller(100),
+                amplifier(101)
+                }
+
+        ProdInfoModuleNameFm ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The product information module names for FM."
+            SYNTAX INTEGER
+                {
+                exciter(1),
+                exciterMainboard(2),
+                exciterBootprog(3),
+                exciterBootload(4),
+                exciterOs(5),
+                exciterFpga(6),
+                netCCU(50),
+                rackcontroller(100),
+                amplifier(101)
+                }
+
+        ProdInfoModuleNameNsu ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The product information module names for NSU."
+            SYNTAX INTEGER { tcBoard(70) }
+
+        LogbookEntryMessagesExcATV ::= TEXTUAL-CONVENTION
+            STATUS obsolete
+            DESCRIPTION 
+                "Inserted information in the logbook of ATV exciters.
+                
+                This is obsolete! Please use LogbookEntryMessagesExcTv!"
+            SYNTAX INTEGER
+                {
+                reboot(0),
+                summaryFault(1),
+                summaryWarning(2),
+                local(3),
+                exciterOn(4),
+                rfOk(5),
+                noInput(6),
+                reference(7),
+                rfOn(8),
+                mute(9),
+                relieveReq(10),
+                oneFan(12),
+                noCcuComm(13),
+                swUpdated(14),
+                biosUpdated(15),
+                powerSupply(16),
+                temperature(17),
+                fans(18),
+                hwMainboard(19),
+                hwCfCard(20),
+                outputOpen(21),
+                hwEEPROM(23),
+                rfFail(25),
+                loopOpen(26),
+                noFPGA(27),
+                carrierLock(28),
+                inputFail(30),
+                optionExpired(37),
+                optionWillEnd(38),
+                fpgaConfig(40),
+                hwIifBoard(41),
+                hwRfBoard(42),
+                hwSynth1(43),
+                hwSynth2(44),
+                hwSynth3(45),
+                muteAudio1(46),
+                muteAudio2(47),
+                videoInput1(48),
+                videoInput2(49),
+                videoInputAct(50),
+                rfOutExcV(51),
+                rfOutAntV(52),
+                rfOutExcA1(53),
+                rfOutAntA1(54),
+                rfOutExcA2(55),
+                rfOutAntA2(56),
+                clippingAntennaInput(57),
+                noHeadroomAntenna(58),
+                audioMode(59),
+                whiteLine(60),
+                whiteLineLnAmp(61),
+                whiteLineLnAmpW(62),
+                syncCheck(63),
+                whiteLimiter(64),
+                devLimAud1(65),
+                devLimAud2(66),
+                videoInputClipping(67),
+                aud1InpClip(68),
+                aud2InpClip(69),
+                nicam728Data(70),
+                nicam728Carr(71),
+                aud2OutClip(72),
+                rfMonFail(73),
+                rfVideoFail(74),
+                rfAudio1Fail(75),
+                rfAudio2Fail(76),
+                audioLoopOpen(77),
+                videoLoopOpen(78),
+                testMode(100),
+                extRefFail(101),
+                extRefWeak(102),
+                extPpsFail(103),
+                wrongConfig(104),
+                wrongDatarate(106),
+                fifoOverUnderFlow(107),
+                delayChanged(108),
+                wrongDelay(109),
+                noMIP(110),
+                wrongMfArrivalTime(111),
+                packetUnlock(113),
+                maxDelayChanged(114),
+                referenceAbsent(115),
+                noPPS(116),
+                rfFailAmplifier(117),
+                warningAmplifier(118),
+                amplifierOverflow(119),
+                synthesizerUnlocked(127)
+                }
+
+        LockState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This is for carrier locking."
+            SYNTAX INTEGER
+                {
+                locked(1),
+                unlocked(2)
+                }
+
+        EqualizerCalibrationState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "possible precorrection equalizer calibration states"
+            SYNTAX INTEGER
+                {
+                inactive(1),
+                active(2),
+                warning(3),
+                fail(4)
+                }
+
+        TvStandard ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The TV standards.
+                The value 'inconsistent' cannot be written.
+                It is shown only when switching from one standard to another in between."
+            SYNTAX INTEGER
+                {
+                atv(1),
+                dvb(2),
+                atsc(3),
+                dtmb(4),
+                mediaFLO(5),
+                test(6),
+                dab(7),
+                isdbt(8),
+                dvbt2(9),
+                inconsistent(100)
+                }
+
+        AtvStandard ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The ATV standards."
+            SYNTAX INTEGER
+                {
+                bg(1),
+                m(2),
+                m1(3),
+                n(4),
+                dk(5),
+                i(6),
+                i1(7),
+                dkfm2(8),
+                l(9),
+                k1(10),
+                h(11),
+                b(12),
+                g(13)
+                }
+
+        InputSource ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "input source selection type"
+            SYNTAX INTEGER
+                {
+                bnc(1),
+                rx(2),
+                sat(3),
+                ip(4),
+                reserved(5),
+                tp(6),
+                vf(7),
+                t2Mi(8),
+                iq(9)
+                }
+
+        Sx801AmplifierState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            SYNTAX INTEGER
+                {
+                off(1),
+                warning(2),
+                ok(3),
+                unknown(4)
+                }
+
+        FailDelayMode ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The mode how fail delay is handled.
+                always(1) - the fail delay action is always carried out after
+                            the user specified fail delay time.
+                ifQualified(2) - the fail delay action is carried out after
+                            the user specified fail delay time
+                            only if the FailDelayStatus is ok(3).
+                            Otherwise (Fail DelayStatus warning(2)) 30 minutes after GPS was lost
+                            a reference fault is signaled and the input is muted."
+            SYNTAX INTEGER
+                {
+                always(1),
+                ifQualified(2)
+                }
+
+        FailDelayStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The current state of time drift prediction.
+                off(1) - not used
+                warning(2) - Availability of GPS not sufficient for time drift prediction
+                ok(3) - Time drift prediction is functional."
+            SYNTAX INTEGER
+                {
+                off(1),
+                warning(2),
+                ok(3)
+                }
+
+    
+--
+-- Node definitions
+--
+    
+        rsXx8000 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION 
+                "The subtree for all transmitters of series 8000."
+            ::= { rsProdBroadcastTransmitter 167 }
+
+        
+        rsXx8000Common OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION 
+                "This is the subtree for values which every equipement of series 8000 suports."
+            ::= { rsXx8000 1 }
+
+        
+-- *****************************************************************************
+-- **          object definitions
+-- *****************************************************************************
+        rsXx8000CommonObjs OBJECT IDENTIFIER ::= { rsXx8000Common 1 }
+
+        
+-- *****************************************************************************
+-- **          product information
+-- *****************************************************************************
+        productInformation OBJECT IDENTIFIER ::= { rsXx8000CommonObjs 1 }
+
+        
+        serialNumber OBJECT-TYPE
+            SYNTAX ReadableString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The serial number of the device."
+            ::= { productInformation 2 }
+
+        
+        identNumberSW OBJECT-TYPE
+            SYNTAX ReadableString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Rohde&Schwarz identification number of the software, for example 2094.2090.02."
+            ::= { productInformation 3 }
+
+        
+        versionNumberSW OBJECT-TYPE
+            SYNTAX ReadableString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Rohde&Schwarz revision number of the software, for example 1.2.1."
+            ::= { productInformation 4 }
+
+        
+        identNumberHW OBJECT-TYPE
+            SYNTAX ReadableString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Rohde&Schwarz identification number of the hardware, for example 2095.8007.02 (NetCCU)."
+            ::= { productInformation 5 }
+
+        
+        versionNumberHW OBJECT-TYPE
+            SYNTAX ReadableString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Rohde&Schwarz revision number (product index) of the hardware, for example 03.03."
+            ::= { productInformation 6 }
+
+        
+-- *****************************************************************************
+-- **          SNMP configuration
+-- *****************************************************************************
+        snmpConfig OBJECT IDENTIFIER ::= { rsXx8000CommonObjs 2 }
+
+        
+        trapSinkTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF TrapSinkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is for configuration of trapsinks - the IP-addresses where traps/informs are sent to.
+                
+                This table gives you possibility for easier remote configuration of trapsinks.
+                Another way, which is predefined by IETF, is to use the MIBs SNMP-TARGET and SNMP-NOTIFICATION."
+            ::= { snmpConfig 2 }
+
+        
+        trapSinkEntry OBJECT-TYPE
+            SYNTAX TrapSinkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a trapsink."
+            INDEX { trapSinkNumber }
+            ::= { trapSinkTable 1 }
+
+        
+        TrapSinkEntry ::=
+            SEQUENCE { 
+                trapSinkNumber
+                    Integer32,
+                trapSinkVersion
+                    INTEGER,
+                trapSinkAddress
+                    IpAddress,
+                trapSinkPort
+                    Integer32,
+                trapSinkCommunity
+                    ReadableString,
+                trapSinkInformRetry
+                    Integer32,
+                trapSinkInformTimeout
+                    Integer32,
+                trapSinkInformUnacknowledged
+                    Integer32,
+                trapSinkUse
+                    TruthValue
+             }
+
+        trapSinkNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..5)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The arbitrary number in the list."
+            ::= { trapSinkEntry 1 }
+
+        
+        trapSinkVersion OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                v1Trap(1),
+                v2Trap(2),
+                v2Inform(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The SNMP-version of sent out alarm. 
+                1: v1Trap
+                2: v2Trap
+                3: v2Inform"
+            ::= { trapSinkEntry 2 }
+
+        
+        trapSinkAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The IP-Address of the SNMP manager to which the alarms are sent to."
+            ::= { trapSinkEntry 3 }
+
+        
+        trapSinkPort OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The port of the SNMP manager to which the alarms are sent to."
+            ::= { trapSinkEntry 4 }
+
+        
+        trapSinkCommunity OBJECT-TYPE
+            SYNTAX ReadableString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "community used in alarm"
+            ::= { trapSinkEntry 5 }
+
+        
+        trapSinkInformRetry OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "only used for informs:
+                number of times to resend the inform"
+            ::= { trapSinkEntry 6 }
+
+        
+        trapSinkInformTimeout OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            UNITS "seconds"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "only used for informs:
+                timeout between retries"
+            ::= { trapSinkEntry 7 }
+
+        
+        trapSinkInformUnacknowledged OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "only used for informs:
+                maximum number of waiting informs
+                if this is reached, the oldest pending inform is discarded"
+            ::= { trapSinkEntry 8 }
+
+        
+        trapSinkUse OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "on/off-switch for this sink"
+            ::= { trapSinkEntry 9 }
+
+        
+        sendTestTrap OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "1: idle
+                2: Agent generates the trap 'testTrap', which is useful when checking the
+                   connection between agent (NetCCU) and your trapsink."
+            ::= { snmpConfig 3 }
+
+        
+        irtTrapsAllOn OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This switches all IRT-traps on - traps for all events are sent out.
+                
+                In detail, this means in the IRT-MIBs under branches *EventEnable all
+                OIDs are set to 1.
+                
+                Caution!
+                Setting this value influences remote controlling of devices.
+                Too many alarms may flood your network. Use this only for testing - for 
+                operation, we suggest switch on only a few important traps."
+            ::= { snmpConfig 4 }
+
+        
+        irtTrapsAllOff OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This switches all IRT-traps off - no traps are sent out.
+                
+                In detail, this means in the IRT-MIBs under branches *EventEnable all
+                OIDs are set to 2.
+                
+                Note: This is typically set when using only R&S-MIBs 
+                and you don't need IRT-MIBs."
+            ::= { snmpConfig 5 }
+
+        
+        rsTrapsAllOn OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This switches all R&S-traps on - traps for all events (info, warning, fault) are sent out.
+                
+                In detail, this means in the R&S-MIBs under *Events - Events*Table in
+                column event*Mask all OIDs are set to 1.
+                
+                Caution!
+                Enabling all traps is not recommended!
+                
+                Caution!
+                Setting this value influences remote controlling of devices!
+                Too many alarms may flood your network. Use this only for testing - for 
+                operation, we suggest switch on only a few important traps.
+                
+                Caution!
+                This enables absolutely all R&S alarms!
+                Make sure you can handle it (network speed, routers, firewalls, NOC database performance etc.)."
+            ::= { snmpConfig 6 }
+
+        
+        rsTrapsAllOff OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This switches all R&S-traps off - no traps are sent out.
+                
+                In detail, this means in the R&S-MIBs under *Events - Events*Table in
+                column event*Mask all OIDs are set to 2.
+                
+                Note: This is typically set when using only IRT-MIBs 
+                and you don't need R&S-MIBs."
+            ::= { snmpConfig 7 }
+
+        
+        rsTrapsAllFaultsOn OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This switches all R&S-traps for faults on - traps for all 'faults' are sent out.
+                
+                In detail, this means in the R&S-MIBs under *Events - Events*Table in
+                column event*Mask all 'fault'-OIDs are set to '1'.
+                These traps include the value 'fault(1)' in binding 'eventAlarmClass'.
+                
+                Note: This is the recommended setting when using R&S-MIBs. It gives you an 
+                overview of the device state."
+            ::= { snmpConfig 8 }
+
+        
+        rsTrapsAllFaultsOff OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This switches all R&S-traps for faults off - no traps for 'faults' are sent out.
+                
+                In detail, this means in the R&S-MIBs under *Events - Events*Table in
+                column event*Mask all 'fault'-OIDs are set to '2'.
+                These traps include the value 'fault(1)' in binding 'eventAlarmClass'."
+            ::= { snmpConfig 9 }
+
+        
+        rsTrapsAllWarningsOn OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This switches all R&S-traps for warnings on - traps for all 'warnings' are sent out.
+                
+                In detail, this means in the R&S-MIBs under *Events - Events*Table in
+                column event*Mask all 'warning'-OIDs are set to '1'.
+                These traps include the value 'warning(2)' in binding 'eventAlarmClass'.
+                
+                Note: This is the recommended setting when using R&S-MIBs and you want much more 
+                informations from the device than only faults. 
+                
+                Caution!
+                This enables lots of alarms. 
+                Make sure you can handle it (network speed, NOC database performance etc.)..."
+            ::= { snmpConfig 10 }
+
+        
+        rsTrapsAllWarningsOff OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This switches all R&S-traps for warnings off - no traps for 'warnings' are sent out.
+                
+                In detail, this means in the R&S-MIBs under *Events - Events*Table in
+                column event*Mask all 'warning'-OIDs are set to '2'.
+                These traps include the value 'warning(2)' in binding 'eventAlarmClass'."
+            ::= { snmpConfig 11 }
+
+        
+        transmitterConfig OBJECT IDENTIFIER ::= { rsXx8000CommonObjs 3 }
+
+        
+        dateTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The date and time for the transmitter.
+                
+                Notes: Deci-seconds different from 0 are ignored.
+                       The range of distance from UTC is -12h..+14h.
+                       Omitting the optional UTC fields in a set-request results in keeping the 
+                       old UTC offset values."
+            ::= { transmitterConfig 1 }
+
+        
+        ntp OBJECT IDENTIFIER ::= { transmitterConfig 2 }
+
+        
+        ntpMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                disabled(2),
+                stepAdjust(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Configures the working mode of the NTP client.
+                disabled: no ntp synchronisation will be done
+                step: the time will synchronized every NTP sync-time
+                unknown: NTP mode is currently not determinable. This value must not be written."
+            ::= { ntp 1 }
+
+        
+        ntpSyncTimeInterval OBJECT-TYPE
+            SYNTAX Integer32 (6..1440)
+            UNITS "minute"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set the intervall, how often the NTP client will be synchronized to the NTP server. 
+                Note: this is useful in step mode only ."
+            ::= { ntp 2 }
+
+        
+        ntpServerAddrTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF NtpServerAddrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table with server adresses.
+                Currently maximal one entry is allowed."
+            ::= { ntp 3 }
+
+        
+        ntpServerAddrEntry OBJECT-TYPE
+            SYNTAX NtpServerAddrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a ntpServerAddrTable."
+            INDEX { ntpServerAddrIdx }
+            ::= { ntpServerAddrTable 1 }
+
+        
+        NtpServerAddrEntry ::=
+            SEQUENCE { 
+                ntpServerAddrIdx
+                    Integer32,
+                ntpServerAddress
+                    ReadableString
+             }
+
+        ntpServerAddrIdx OBJECT-TYPE
+            SYNTAX Integer32 (1)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "index for table entry."
+            ::= { ntpServerAddrEntry 1 }
+
+        
+        ntpServerAddress OBJECT-TYPE
+            SYNTAX ReadableString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "host name or IP address of server."
+            ::= { ntpServerAddrEntry 2 }
+
+        
+        ntpState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                disabled(2),
+                enabled(3),
+                notRunning(4),
+                syncFailed(5),
+                synchronizing(6),
+                syncOk(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Shows the actual state of the NTP synchronisation."
+            ::= { ntp 4 }
+
+        
+        ntpLastSync OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date/time of the last successful synchronisation."
+            ::= { ntp 5 }
+
+        
+        swMaintenance OBJECT IDENTIFIER ::= { transmitterConfig 5 }
+
+        
+        restart OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Restart the software of transmitter's control unit."
+            ::= { swMaintenance 1 }
+
+        
+        swUpdate OBJECT IDENTIFIER ::= { swMaintenance 5 }
+
+        
+        swUpdateStart OBJECT-TYPE
+            SYNTAX Trigger
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Start software update tool at transmitter side in manual mode. The PC tool can only connect
+                to transmitter's control unit if the software update tool on the transmitter is started."
+            ::= { swUpdate 2 }
+
+        
+        swUpdateMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                manual(1),
+                permanent(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Run mode of the software update tool at the transmitter side.
+                manual:    Software update can be started with the Start button. It will stop automaticly after
+                           an idle period of 90 seconds.
+                permanent: Software update is always running and will never stop."
+            ::= { swUpdate 3 }
+
+        
+        swUpdateDeviceName OBJECT-TYPE
+            SYNTAX ReadableString (SIZE (0..30))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Device Name is dedicated to this control unit. It will be shown in the software update tool on the PC to differ devices."
+            ::= { swUpdate 4 }
+
+        
+        swUpdateDeviceGroup OBJECT-TYPE
+            SYNTAX ReadableString (SIZE (0..30))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Device Group can be used to separate devices in large networks.
+                It must match the Device Group in software update tool on the PC."
+            ::= { swUpdate 5 }
+
+        
+-- *****************************************************************************
+-- **          event definitions
+-- *****************************************************************************
+        rsXx8000CommonEvents OBJECT IDENTIFIER ::= { rsXx8000Common 2 }
+
+        
+        rsXx8000EventsV2 OBJECT IDENTIFIER ::= { rsXx8000CommonEvents 0 }
+
+        
+        testTrap NOTIFICATION-TYPE
+            OBJECTS { serialNumber, counterEvents }
+            STATUS current
+            DESCRIPTION 
+                "This trap is sent to check whether the trapsink is receiving any traps 
+                from this agent. To trigger this trap, set 'sendTestTrap' to '2'."
+            ::= { rsXx8000EventsV2 1 }
+
+        
+        eventTx OBJECT IDENTIFIER ::= { rsXx8000EventsV2 10 }
+
+        
+        eventsTxV2 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION 
+                "Compatibility to SMIv1."
+            ::= { eventTx 0 }
+
+        
+        swUpdateStarted NOTIFICATION-TYPE
+            OBJECTS { eventAlarmPriority, eventAlarmClass, eventEvent }
+            STATUS current
+            DESCRIPTION 
+                "Software update started.
+                The PC tool can only connect to transmitter's control unit if the software
+                update tool on the transmitter is started. It uses the network 17 (TCP and UDP)."
+            ::= { eventsTxV2 1 }
+
+        
+        ntpSyncFailed NOTIFICATION-TYPE
+            OBJECTS { eventAlarmPriority, eventAlarmClass, eventEvent }
+            STATUS current
+            DESCRIPTION 
+                "NTP synchronisation failed."
+            ::= { eventsTxV2 2 }
+
+        
+        eventsTxTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF EventsTxEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains necessary information for handling alarms. 
+                For each alarm you have the following information: 
+                - name (get),
+                - mask to enable/disable sending out (set/get),
+                - priority (set/get) and 
+                - the current state (get only)."
+            ::= { eventTx 1 }
+
+        
+        eventsTxEntry OBJECT-TYPE
+            SYNTAX EventsTxEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An event entry always consists of 3 values:
+                - name: an enumerated list of all possible notifications
+                - mask: the corresponding mask (enable/disable)
+                - priority: the corresponding priority (value in range 0..255)
+                - event: the event itself (active/inactive)"
+            INDEX { eventTxNameIdx }
+            ::= { eventsTxTable 1 }
+
+        
+        EventsTxEntry ::=
+            SEQUENCE { 
+                eventTxNameIdx
+                    EventMaxEntryNumber,
+                eventTxName
+                    INTEGER,
+                eventTxMask
+                    EventMask,
+                eventTxPriority
+                    EventPriority,
+                eventTxEvent
+                    EventState
+             }
+
+        eventTxNameIdx OBJECT-TYPE
+            SYNTAX EventMaxEntryNumber
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event number as integer.
+                This is a helper column and therefore not-accessible."
+            ::= { eventsTxEntry 1 }
+
+        
+        eventTxName OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                swUpdateStarted(1),
+                ntpSyncFailed(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The event number as integer and the value as readable text.
+                The enumeration correlates with the notifications under eventsTxV2."
+            ::= { eventsTxEntry 2 }
+
+        
+        eventTxMask OBJECT-TYPE
+            SYNTAX EventMask
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "See TextualConvention for details."
+            ::= { eventsTxEntry 3 }
+
+        
+        eventTxPriority OBJECT-TYPE
+            SYNTAX EventPriority
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "See TextualConvention for details."
+            ::= { eventsTxEntry 4 }
+
+        
+        eventTxEvent OBJECT-TYPE
+            SYNTAX EventState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "See TextualConvention for details."
+            ::= { eventsTxEntry 5 }
+
+        
+        eventHistory OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION 
+                "Information about sent out events."
+            ::= { rsXx8000CommonEvents 1 }
+
+        
+        counterEvents OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of traps sent out.
+                This is an increasing value."
+            ::= { eventHistory 1 }
+
+        
+        eventHistoryTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF EventHistoryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of the last 100 messages sent out."
+            ::= { eventHistory 2 }
+
+        
+        eventHistoryEntry OBJECT-TYPE
+            SYNTAX EventHistoryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An event entry."
+            INDEX { eventHistoryNumber }
+            ::= { eventHistoryTable 1 }
+
+        
+        EventHistoryEntry ::=
+            SEQUENCE { 
+                eventHistoryNumber
+                    Integer32,
+                eventHistoryModule
+                    INTEGER,
+                eventHistoryEvent
+                    Integer32,
+                eventHistoryEventState
+                    EventState,
+                eventHistoryEventDate
+                    DateAndTime,
+                eventHistoryTx
+                    IndexTransmitter
+             }
+
+        eventHistoryNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The trap number."
+            ::= { eventHistoryEntry 1 }
+
+        
+        eventHistoryModule OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                switchoverUnit(1),
+                netccu(2),
+                exciterA(3),
+                exciterB(4),
+                outputstageA(5),
+                outputstageB(6),
+                dvbReceiver(7),
+                pumpA(8),
+                pumpB(9),
+                antenna(10),
+                gps(11),
+                dvbRecMon(12),
+                gpParIO(13),
+                program(14)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This column indicates the physical module the corresponding message is for."
+            ::= { eventHistoryEntry 2 }
+
+        
+        eventHistoryEvent OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This column indicates the event.
+                In correlation with column eventHistoryModule, you can see the name of the event here.
+                For this, you need to have a look at the event definitions of the corresponding MIB.
+                
+                Example: 
+                For a DVB transmitter an entry in eventHistoryModule is netccu(2) and 
+                the value in eventHistoryEvent is 1.
+                A look at eventsTxV2 of RS-XX8000-DVB-TX-MIB shows, 1 is txSummaryFault."
+            ::= { eventHistoryEntry 3 }
+
+        
+        eventHistoryEventState OBJECT-TYPE
+            SYNTAX EventState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "See TextualConvention for details."
+            ::= { eventHistoryEntry 4 }
+
+        
+        eventHistoryEventDate OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This column indicates the date and time of the event."
+            ::= { eventHistoryEntry 5 }
+
+        
+        eventHistoryTx OBJECT-TYPE
+            SYNTAX IndexTransmitter
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The transmitter index in case of NTx or Np1 systems.
+                For variants with one transmitter only (SingleTx) this index is always transmitterB(1)."
+            ::= { eventHistoryEntry 101 }
+
+        
+-- The following objects are ment only for internal use. 
+-- They are used to store values for notification bindings.
+        eventMapObjects OBJECT IDENTIFIER ::= { rsXx8000CommonEvents 3 }
+
+        
+        eventAlarmPriority OBJECT-TYPE
+            SYNTAX EventPriority
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This OID holds the value for the priority when sending out a notification."
+            ::= { eventMapObjects 1 }
+
+        
+        eventAlarmClass OBJECT-TYPE
+            SYNTAX EventClass
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "See TextualConvention for details."
+            ::= { eventMapObjects 2 }
+
+        
+        eventEvent OBJECT-TYPE
+            SYNTAX EventState
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This OID holds the value for the event itself when sending out a notification."
+            ::= { eventMapObjects 3 }
+
+        
+        indexTransmitter OBJECT-TYPE
+            SYNTAX IndexTransmitter
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This OID holds the value for the transmitter when sending out a notification."
+            ::= { eventMapObjects 4 }
+
+        
+        indexAB OBJECT-TYPE
+            SYNTAX IndexAB
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This OID holds the value for the module A (exciterA, outputstageA) or 
+                B (exciterB, outputstageB) when sending out a notification."
+            ::= { eventMapObjects 5 }
+
+        
+        indexRack OBJECT-TYPE
+            SYNTAX IndexRack
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This OID holds the value for the rack when sending out a notification."
+            ::= { eventMapObjects 6 }
+
+        
+        indexAmplifier OBJECT-TYPE
+            SYNTAX IndexAmplifier
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This OID holds the value for the amplifier when sending out a notification."
+            ::= { eventMapObjects 7 }
+
+        
+        indexProgram OBJECT-TYPE
+            SYNTAX IndexProgram
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object holds the value for the program when sending out a notification."
+            ::= { eventMapObjects 8 }
+
+        
+-- *****************************************************************************
+-- **          conformance statements
+-- *****************************************************************************
+        rsXx8000CommonConf OBJECT IDENTIFIER ::= { rsXx8000Common 3 }
+
+        
+        rsXx8000CommonGroups OBJECT IDENTIFIER ::= { rsXx8000CommonConf 1 }
+
+        
+        groupNotifyTest NOTIFICATION-GROUP
+            NOTIFICATIONS { testTrap }
+            STATUS current
+            DESCRIPTION 
+                "test notifications."
+            ::= { rsXx8000CommonGroups 1 }
+
+        
+        groupNotify NOTIFICATION-GROUP
+            NOTIFICATIONS { swUpdateStarted }
+            STATUS current
+            DESCRIPTION 
+                "notifications for all transmitters."
+            ::= { rsXx8000CommonGroups 2 }
+
+        
+        groupEventTest OBJECT-GROUP
+            OBJECTS { sendTestTrap }
+            STATUS current
+            DESCRIPTION 
+                "The objects sent with testTrap."
+            ::= { rsXx8000CommonGroups 6 }
+
+        
+        groupEventHistory OBJECT-GROUP
+            OBJECTS { counterEvents, eventHistoryModule, eventHistoryEvent, eventHistoryEventState, eventHistoryEventDate, 
+                eventHistoryTx }
+            STATUS current
+            DESCRIPTION 
+                "Contains all objects from 'eventHistory'."
+            ::= { rsXx8000CommonGroups 8 }
+
+        
+        groupEventObjects OBJECT-GROUP
+            OBJECTS { eventTxName, eventTxMask, eventTxPriority, eventTxEvent, eventAlarmPriority, 
+                eventAlarmClass, eventEvent, indexTransmitter, indexAB, indexRack, 
+                indexAmplifier, indexProgram }
+            STATUS current
+            DESCRIPTION 
+                "Contains all objects from 'eventMapObjects'."
+            ::= { rsXx8000CommonGroups 9 }
+
+        
+        groupProductInformation OBJECT-GROUP
+            OBJECTS { serialNumber, identNumberSW, versionNumberSW, identNumberHW, versionNumberHW
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Contains all objects from 'productInformation' (R&S typeplate)."
+            ::= { rsXx8000CommonGroups 11 }
+
+        
+        groupSnmpConfig OBJECT-GROUP
+            OBJECTS { trapSinkVersion, trapSinkAddress, trapSinkPort, trapSinkCommunity, trapSinkInformRetry, 
+                trapSinkInformTimeout, trapSinkUse, irtTrapsAllOn, irtTrapsAllOff, rsTrapsAllOn, 
+                rsTrapsAllOff, rsTrapsAllFaultsOn, rsTrapsAllFaultsOff, rsTrapsAllWarningsOn, rsTrapsAllWarningsOff
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Contains all objects from 'snmpConfig'."
+            ::= { rsXx8000CommonGroups 12 }
+
+        
+        groupTransmitterConfig OBJECT-GROUP
+            OBJECTS { dateTime }
+            STATUS current
+            DESCRIPTION 
+                "objects from 'transmitterConfig'."
+            ::= { rsXx8000CommonGroups 13 }
+
+        
+        groupNTP OBJECT-GROUP
+            OBJECTS { ntpMode, ntpSyncTimeInterval, ntpServerAddress, ntpState, ntpLastSync
+                 }
+            STATUS current
+            DESCRIPTION 
+                "objects from 'ntp'"
+            ::= { rsXx8000CommonGroups 14 }
+
+        
+        groupSwMaintenance OBJECT-GROUP
+            OBJECTS { restart, swUpdateStart, swUpdateMode, swUpdateDeviceName, swUpdateDeviceGroup
+                 }
+            STATUS current
+            DESCRIPTION 
+                "objects from 'swMaintenance'"
+            ::= { rsXx8000CommonGroups 15 }
+
+        
+        groupNotifyNTP NOTIFICATION-GROUP
+            NOTIFICATIONS { ntpSyncFailed }
+            STATUS current
+            DESCRIPTION 
+                "Notifications from the NTP client."
+            ::= { rsXx8000CommonGroups 16 }
+
+        
+        groupObsoletedObjects OBJECT-GROUP
+            OBJECTS { trapSinkInformUnacknowledged }
+            STATUS obsolete
+            DESCRIPTION 
+                "Description."
+            ::= { rsXx8000CommonGroups 17 }
+
+        
+        rsXx8000CommonCompls OBJECT IDENTIFIER ::= { rsXx8000CommonConf 2 }
+
+        
+        xx8000BasicCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for XX8000 entities which implement this MIB module."
+            MODULE -- this module
+                MANDATORY-GROUPS { groupNotifyTest, groupNotify, groupEventTest, groupEventHistory, groupEventObjects, 
+                    groupProductInformation, groupSnmpConfig, groupTransmitterConfig, groupSwMaintenance }
+                GROUP groupNTP
+                    DESCRIPTION 
+                        "only for transmitters with NetCCU"
+                GROUP groupNotifyNTP
+                    DESCRIPTION 
+                        "only for transmitters with NetCCU"
+            ::= { rsXx8000CommonCompls 1 }
+
+        
+    
+    END

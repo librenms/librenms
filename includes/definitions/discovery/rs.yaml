@@ -1,0 +1,113 @@
+mib: RS-COMMON-MIB:RS-XX8000-COMMON-MIB:RS-XX8000-DVB-TX-MIB:IRT-DVBT-SINGLETRANSMITTER-MIB
+modules:
+    os:
+        hardware: SNMPv2-MIB::sysDescr.0
+        serial: RS-XX8000-COMMON-MIB::serialNumber.0
+        version: RS-XX8000-COMMON-MIB::versionNumberSW.0
+    sensors:
+        power:
+            data:
+                -
+                    oid: forwardPower
+                    value: forwardPower
+                    descr: 'Output Power'
+                    num_oid: '.1.3.6.1.4.1.2566.127.1.2.167.4.1.2.5.{{ $index }}'
+                    index: 'forwardPower.{{ $index }}'
+                -
+                    oid: reflectedPower
+                    value: reflectedPower
+                    descr: 'Reflected Power'
+                    num_oid: '.1.3.6.1.4.1.2566.127.1.2.167.4.1.2.6.{{ $index }}'
+                    index: 'reflectedPower.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: dvbSTTransmitterOpMode
+                    value: dvbSTTransmitterOpMode
+                    descr: 'Transmitter Operational Mode'
+                    num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.3.{{ $index }}'
+                    index: 'dvbSTTransmitterOpMode.{{ $index }}'
+                    state_name: dvbSTTransmitterOpMode
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 0, graph: 0, descr: ON }
+                        - { value: 2, generic: 1, graph: 0, descr: OFF }
+                -
+                    oid: dvbSTRFPresent
+                    value: dvbSTRFPresent
+                    descr: 'Output Power'
+                    num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.4.{{ $index }}'
+                    index: 'dvbSTRFPresent.{{ $index }}'
+                    state_name: dvbSTRFPresent
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 0, graph: 0, descr: Present }
+                        - { value: 2, generic: 1, graph: 0, descr: 'Not Present' }
+                -
+                    oid: dvbSTFault
+                    value: dvbSTFault
+                    descr: 'Fault status'
+                    num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.6.{{ $index }}'
+                    index: 'dvbSTFault.{{ $index }}'
+                    state_name: dvbSTFault
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 2, graph: 0, descr: Fault }
+                        - { value: 2, generic: 0, graph: 0, descr: OK }
+                -
+                    oid: dvbSTWarning
+                    value: dvbSTWarning
+                    descr: 'Warning status'
+                    num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.7.{{ $index }}'
+                    index: 'dvbSTWarning.{{ $index }}'
+                    state_name: dvbSTWarning
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 1, graph: 0, descr: Warning }
+                        - { value: 2, generic: 0, graph: 0, descr: OK }
+                -
+                    oid: dvbSTInput1OK
+                    value: dvbSTInput1OK
+                    descr: 'Input 1'
+                    num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.8.{{ $index }}'
+                    index: 'dvbSTInput1OK.{{ $index }}'
+                    state_name: dvbSTInput1OK
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 0, graph: 0, descr: Ok }
+                        - { value: 2, generic: 1, graph: 0, descr: 'No Signal' }
+                -
+                    oid: dvbSTInput2OK
+                    value: dvbSTInput2OK
+                    descr: 'Input 2'
+                    num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.9.{{ $index }}'
+                    index: 'dvbSTInput2OK.{{ $index }}'
+                    state_name: dvbSTInput2OK
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 0, graph: 0, descr: Ok }
+                        - { value: 2, generic: 1, graph: 0, descr: 'No Signal' }
+                -
+                    oid: dvbSTLocalMode
+                    value: dvbSTLocalMode
+                    descr: 'Configuration Mode'
+                    num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.10.{{ $index }}'
+                    index: 'dvbSTLocalMode.{{ $index }}'
+                    state_name: dvbSTLocalMode
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 0, graph: 0, descr: Local }
+                        - { value: 2, generic: 0, graph: 0, descr: Remote }
+                -
+                    oid: dvbSTActiveInput
+                    value: dvbSTActiveInput
+                    descr: 'Active Input'
+                    num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.11.{{ $index }}'
+                    index: 'dvbSTActiveInput.{{ $index }}'
+                    state_name: dvbSTActiveInput
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Input 1' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Input 2' }
+                        - { value: 2, generic: 0, graph: 0, descr: Seamless }
+                        - { value: 2, generic: 0, graph: 0, descr: HierarchicalModulation }
