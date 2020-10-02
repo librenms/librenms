@@ -116,7 +116,7 @@ def scan_host(scan_ip):
 
             arguments = ['/usr/bin/env', 'php', 'addhost.php', '-g', POLLER_GROUP, '-G', WITHIN_POLLER_GROUPS, hostname or scan_ip]
             if args.ping:
-                arguments.insert(5, args.ping)
+                arguments.insert(len(arguments) - 1, args.ping)
             add_output = check_output(arguments)
             return Result(scan_ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
