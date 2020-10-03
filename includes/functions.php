@@ -1503,7 +1503,7 @@ function device_has_ip($ip, $within_poller_groups = [])
             ->get();
     }
     if (isset($ip_addresses)) {
-        $ip_addresses = $ip_addresses->filter(function($ip_address) {
+        $ip_addresses = $ip_addresses->filter(function ($ip_address) {
             return isset($ip_address->port);
         });
         if (! empty($within_poller_groups)) {
