@@ -787,7 +787,7 @@ class IRCBot
         if (strlen($params[1]) > 0) {
             $hostname = preg_replace("/[^A-z0-9\.\-]/", '', $params[1]);
         }
-        $hostname = $hostname . "%";
+        $hostname = $hostname . '%';
         if ($this->user['level'] < 5) {
             $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname . '" and eventlog.device_id IN (' . implode(',', $this->user['devices']) . ') ORDER BY `event_id` DESC LIMIT ' . (int) $num);
         } else {
