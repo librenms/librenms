@@ -101,6 +101,7 @@ class IRCBot
             } elseif (! is_array($this->config['irc_alert_chan'])) {
                 $this->config['irc_alert_chan'] = [$this->config['irc_alert_chan']];
             }
+            $this->chan = $this->config['irc_alert_chan'];
         }
 
         if ($this->config['irc_pass']) {
@@ -276,10 +277,6 @@ class IRCBot
 
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
-                    if ($this->debug) {
-                        $this->log('Alert sent ' . $alert['title']);
-                        $this->log('Alert chan ' . $chan);
-                    }
                     $this->sendAlert($chan, $severity, $alert);
                     $this->ircRaw('BOTFLOODCHECK');
                 }
@@ -290,7 +287,7 @@ class IRCBot
                     }
                 }
             }
-        }//end if
+        }
     }
 
     //end alertData()
@@ -1055,4 +1052,43 @@ class IRCBot
     }
 
     // end _color
+
+    private function _html2irc($string)
+    {
+        $string = urldecode($string);
+        $string = preg_replace('#<b>#i', chr(2), $string);
+        $string = preg_replace('#</b>#i', chr(2), $string);
+        $string = preg_replace('#<i>#i', chr(22), $string);
+        $string = preg_replace('#</i>#i', chr(22), $string);
+        $string = preg_replace('#<u>#i', chr(31), $string);
+        $string = preg_replace('#</u>#i', chr(31), $string);
+
+        $colors = [
+            'white'     => '00',
+            'black'     => '01',
+            'blue'      => '02',
+            'green'     => '03',
+            'red'       => '04',
+            'brown'     => '05',
+            'purple'    => '06',
+            'orange'    => '07',
+            'yellow'    => '08',
+            'lightgreen' => '09',
+            'cyan'      => '10',
+            'lightcyan' => '11',
+            'lightblue' => '12',
+            'pink'      => '13',
+            'grey'      => '14',
+            'lightgrey' => '15',
+        ];
+
+        foreach ($colors as $color => $code) {
+            $string = preg_replace("#<$color>#i", chr(3) . $code, $string);
+            $string = preg_replace("#</$color>#i", chr(3), $string);
+        }
+
+        return $string;
+    }
+
+    // end _html2irc
 }//end class
