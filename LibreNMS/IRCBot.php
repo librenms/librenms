@@ -779,19 +779,19 @@ class IRCBot
     private function _log($params)
     {
         $num = 1;
-        $hostname = "";
-        $params = explode(" ", $params);
+        $hostname = '';
+        $params = explode(' ', $params);
         if ($params[0] > 1) {
             $num = $params[0];
         }
         if (strlen($params[1]) > 0) {
-            $hostname = preg_replace("/[^A-z0-9\.\-]/", "", $params[1]);
+            $hostname = preg_replace("/[^A-z0-9\.\-]/", '', $params[1]);
         }
         $hostname = $hostname . "%";
         if ($this->user['level'] < 5) {
-            $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname  . '" and eventlog.device_id IN (' . implode(',', $this->user['devices']) . ') ORDER BY `event_id` DESC LIMIT ' . (int) $num);
+            $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname . '" and eventlog.device_id IN (' . implode(',', $this->user['devices']) . ') ORDER BY `event_id` DESC LIMIT ' . (int) $num);
         } else {
-            $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname  . '" ORDER BY `event_id` DESC LIMIT ' . (int) $num);
+            $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname . '" ORDER BY `event_id` DESC LIMIT ' . (int) $num);
         }
 
         foreach ($tmp as $logline) {
