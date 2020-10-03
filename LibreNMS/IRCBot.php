@@ -779,35 +779,39 @@ class IRCBot
     private function _log($params)
     {
         $num = 1;
-        if ($params > 1) {
-            $num = $params;
+        $hostname = "";
+        $params = explode(" ", $params);
+        if ($params[0] > 1) {
+            $num = $params[0];
         }
-
+        if (strlen($params[1]) > 0) {
+            $hostname = preg_replace("/[^A-z0-9\.\-]/", "", $params[1]);
+        }
+        $hostname = $hostname . "%";
         if ($this->user['level'] < 5) {
-            $tmp = dbFetchRows('SELECT `event_id`,`device_id`,`datetime`,`message`,`type` FROM `eventlog` WHERE `device_id` IN (' . implode(',', $this->user['devices']) . ') ORDER BY `event_id` DESC LIMIT ' . (int) $num);
+            $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname  . '" and eventlog.device_id IN (' . implode(',', $this->user['devices']) . ') ORDER BY `event_id` DESC LIMIT ' . (int) $num);
         } else {
-            $tmp = dbFetchRows('SELECT `event_id`,`device_id`,`datetime`,`message`,`type` FROM `eventlog` ORDER BY `event_id` DESC LIMIT ' . (int) $num);
+            $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname  . '" ORDER BY `event_id` DESC LIMIT ' . (int) $num);
         }
 
-        foreach ($tmp as $device) {
-            $hostid = dbFetchRow('SELECT `hostname` FROM `devices` WHERE `device_id` = ' . $device['device_id']);
-            $response = $device['datetime'] . ' ';
+        foreach ($tmp as $logline) {
+            $response = $logline['datetime'] . ' ';
             $response .= $this->_color($hostid['hostname'], null, null, 'bold') . ' ';
             if ($this->config['irc_alert_utf8']) {
-                if (preg_match('/critical alert/', $device['message'])) {
-                    $response .= preg_replace('/critical alert/', $this->_color('critical alert', 'red'), $device['message']) . ' ';
-                } elseif (preg_match('/warning alert/', $device['message'])) {
-                    $response .= preg_replace('/warning alert/', $this->_color('warning alert', 'yellow'), $device['message']) . ' ';
-                } elseif (preg_match('/recovery/', $device['message'])) {
-                    $response .= preg_replace('/recovery/', $this->_color('recovery', 'green'), $device['message']) . ' ';
+                if (preg_match('/critical alert/', $logline['message'])) {
+                    $response .= preg_replace('/critical alert/', $this->_color('critical alert', 'red'), $logline['message']) . ' ';
+                } elseif (preg_match('/warning alert/', $logline['message'])) {
+                    $response .= preg_replace('/warning alert/', $this->_color('warning alert', 'yellow'), $logline['message']) . ' ';
+                } elseif (preg_match('/recovery/', $logline['message'])) {
+                    $response .= preg_replace('/recovery/', $this->_color('recovery', 'green'), $logline['message']) . ' ';
                 } else {
-                    $response .= $device['message'] . ' ';
+                    $response .= $logline['message'] . ' ';
                 }
             } else {
-                $response .= $device['message'] . ' ';
+                $response .= $logline['message'] . ' ';
             }
-            if ($device['type'] != 'NULL') {
-                $response .= $device['type'] . ' ';
+            if ($logline['type'] != 'NULL') {
+                $response .= $logline['type'] . ' ';
             }
             if ($this->config['irc_floodlimit'] > 100) {
                 $this->floodcount += strlen($response);
@@ -822,7 +826,7 @@ class IRCBot
             $this->respond($response);
         }
 
-        if (! $hostid) {
+        if (! $tmp) {
             $this->respond('Nothing to see, maybe a bug?');
         }
 
