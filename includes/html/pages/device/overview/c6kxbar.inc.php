@@ -10,7 +10,7 @@ echo '<i class="fa fa-arrows fa-lg icon-theme" aria-hidden="true"></i> <strong>C
 echo '          </div>
     <table class="table table-hover table-condensed table-striped">';
 
-if (!isset($entity_state)) {
+if (! isset($entity_state)) {
     $entity_state = get_dev_entity_state($device['device_id']);
 }
 foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
