@@ -17,19 +17,18 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
-* @package    LibreNMS
 * @link       http://librenms.org
 * @copyright  2020 Dan Baker, Lancaster-Lebanon IU13
 */
 
 // These hardware platforms either have a broken IF-MIB or have excessively long caching of values
-$bad_HC_counter_devices = array (
-    "170-5170-905",
-    "154-8700-930"
-);
+$bad_HC_counter_devices = [
+    '170-5170-905',
+    '154-8700-930',
+];
 
 if (in_array($device['hardware'], $bad_HC_counter_devices)) {
-    $ciena_pm = snmpwalk_cache_oid($device, 'cienaCesPmExtendedTxRxStatisticsBinEntry', array(), 'CIENA-CES-PM');
+    $ciena_pm = snmpwalk_cache_oid($device, 'cienaCesPmExtendedTxRxStatisticsBinEntry', [], 'CIENA-CES-PM');
 
     d_echo($ciena_pm);
 
@@ -41,17 +40,17 @@ if (in_array($device['hardware'], $bad_HC_counter_devices)) {
         $nms_index = $index - 900000;
 
         if (isset($port_stats[$nms_index])) {
-            $port_stats[$nms_index]['ifHCInOctets']         = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxBytes'];
-            $port_stats[$nms_index]['ifHCInUcastPkts']      = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxPkts'];
-            $port_stats[$nms_index]['ifHCInMulticastPkts']  = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxMcastPkts'];
-            $port_stats[$nms_index]['ifHCInBroadcastPkts']  = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxBcastPkts'];
-            $port_stats[$nms_index]['ifHCOutOctets']        = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinTxBytes'];
-            $port_stats[$nms_index]['ifHCOutUcastPkts']     = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinTxPkts'];
+            $port_stats[$nms_index]['ifHCInOctets'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxBytes'];
+            $port_stats[$nms_index]['ifHCInUcastPkts'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxPkts'];
+            $port_stats[$nms_index]['ifHCInMulticastPkts'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxMcastPkts'];
+            $port_stats[$nms_index]['ifHCInBroadcastPkts'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxBcastPkts'];
+            $port_stats[$nms_index]['ifHCOutOctets'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinTxBytes'];
+            $port_stats[$nms_index]['ifHCOutUcastPkts'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinTxPkts'];
             $port_stats[$nms_index]['ifHCOutMulticastPkts'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinTxMcastPkts'];
             $port_stats[$nms_index]['ifHCOutBroadcastPkts'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinTxBcastPkts'];
-            $port_stats[$nms_index]['ifInErrors']           = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxCrcErrorPkts'];
-            $port_stats[$nms_index]['ifOutErrors']          = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinTxCrcErrorPkts'];
-            $port_stats[$nms_index]['ifInDiscards']         = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinInDiscards'];
+            $port_stats[$nms_index]['ifInErrors'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinRxCrcErrorPkts'];
+            $port_stats[$nms_index]['ifOutErrors'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinTxCrcErrorPkts'];
+            $port_stats[$nms_index]['ifInDiscards'] = $ciena_pm_entry['cienaCesPmExtendedTxRxStatsBinInDiscards'];
         }
     }
 }
