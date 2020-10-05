@@ -681,7 +681,7 @@ function createHost(
     $device = array_merge($device, $v3);  // merge v3 settings
 
     if ($force_add !== true) {
-        $device['os'] = Core::detectOS($device, true);
+        $device['os'] = Core::detectOS($device);
 
         $snmphost = snmp_get($device, 'sysName.0', '-Oqv', 'SNMPv2-MIB');
         if (host_exists($host, $snmphost)) {

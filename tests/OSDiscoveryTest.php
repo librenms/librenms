@@ -106,7 +106,7 @@ class OSDiscoveryTest extends TestCase
         $debug = true;
         $vdebug = true;
         ob_start();
-        $os = Core::detectOS($this->genDevice($community), true);
+        $os = Core::detectOS($this->genDevice($community));
         $output = ob_get_contents();
         ob_end_clean();
 

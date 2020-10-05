@@ -34,7 +34,7 @@ sysObjectID: $full_sysObjectID
 
 ");
 
-        $os = Core::detectOS($device, true);
+        $os = Core::detectOS($device);
         $continue = 'n';
         if ($os != 'generic') {
             $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");
