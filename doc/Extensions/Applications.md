@@ -786,7 +786,7 @@ Shell script that reports load average/memory/open-files stats of Icecast
 
 1. Copy the shell script, icecast-stats.sh, to the desired host (the host must be added to LibreNMS devices) 
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/icecast-stats.sh -O /etc/snmp/icecast-stats.sh)
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/icecast-stats.sh -O /etc/snmp/icecast-stats.sh
 ```
 
 2: Make the script executable `chmod +x /etc/snmp/icecast-stats.sh`
@@ -1884,7 +1884,7 @@ https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O
 3: Edit your snmpd.conf file and add:
 
 ```
-extend unbound /etc/snmp/unbound
+extend unbound /usr/bin/sudo /etc/snmp/unbound
 ```
 
 4: Restart snmpd.

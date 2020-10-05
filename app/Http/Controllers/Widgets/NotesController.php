@@ -25,7 +25,6 @@
 namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class NotesController extends WidgetController
 {

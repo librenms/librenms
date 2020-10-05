@@ -4,6 +4,7 @@ return [
     'readonly' => 'Dejà configuré dans config.php, le supprimer avant de pouvoir l\'éditer ici',
     'groups' => [
         'alerting' => 'Alertes',
+        'api' => 'API',
         'authorization' => 'Autorisation',
         'auth' => 'Comptes et Utilisateurs',
         'external' => 'Modules Externes',
@@ -19,6 +20,9 @@ return [
             'general' => 'Réglages généraux d\'Alertes',
             'email' => 'Options des emails',
             'rules' => 'Réglages généraux des Règles d\'Alertes',
+        ],
+        'api' => [
+            'cors' => 'CORS',
         ],
         'auth' => [
             'general' => 'Réglages généraux d\'Accès',
@@ -42,6 +46,8 @@ return [
             'peeringdb' => 'Intégration PeeringDB',
             'nfsen' => 'Intégration NfSen',
             'unix-agent' => 'Intégration Unix-Agent',
+            'smokeping' => 'Intégration Smokeping',
+            'snmptrapd' => 'Intégration des traps SNMP',
         ],
         'poller' => [
             'distributed' => 'Sondeurs distribués',
@@ -871,6 +877,16 @@ return [
         ],
         'snmptranslate' => [
             'description' => 'Chemin vers `snmptranslate`',
+        ],
+        'snmptraps' => [
+            'eventlog' => [
+                'description' => 'Journaliser les traps SNMP',
+                'help' => 'En plus de toute action déjà effectuée',
+            ],
+            'eventlog_detailed' => [
+                'description' => 'Journalisation détaillée',
+                'help' => 'Ajouter tous les OIDs recus dans le trap',
+            ],
         ],
         'snmpwalk' => [
             'description' => 'Chemin vers `snmpwalk`',

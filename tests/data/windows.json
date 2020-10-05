@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.311.1.1.3.1.2",
+                    "sysDescr": "Hardware: Intel64 Family 6 Model 26 Stepping 4 AT/AT COMPATIBLE - Software: Windows Version 6.1 (Build 7601 Multiprocessor Free)",
+                    "sysContact": null,
+                    "version": "Server 2008 R2 SP1 (NT 6.1)",
+                    "hardware": "Dell PowerEdge 2650",
+                    "features": "Multiprocessor",
+                    "os": "windows",
+                    "type": "server",
+                    "serial": "1234567",
+                    "icon": "windows.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
