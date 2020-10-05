@@ -542,6 +542,7 @@ function generate_sensor_link($args, $text = null, $type = null)
     $content .= '</div>';
 
     $url = generate_sensor_url($args);
+
     return overlib_link($url, $text, $content, null);
 }//end generate_sensor_link()
 
