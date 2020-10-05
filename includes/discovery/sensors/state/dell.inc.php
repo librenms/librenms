@@ -16,7 +16,7 @@ $tables = [
     ['memoryDeviceTable', '.1.3.6.1.4.1.674.10892.1.1100.50.1.5.', 'memoryDeviceStatus', 'memoryDeviceLocationName', 'MIB-Dell-10892'],
     ['powerSupplyTable', '.1.3.6.1.4.1.674.10892.1.600.12.1.5.', 'powerSupplyStatus', 'powerSupplyLocationName', 'MIB-Dell-10892'],
     ['intrusionTable', '.1.3.6.1.4.1.674.10892.1.300.70.1.5.', 'intrusionStatus', 'Intrusion', 'MIB-Dell-10892'],
-    ['controllerTable', '.1.3.6.1.4.1.674.10893.1.20.130.1.1.5.', 'controllerState', 'controllerName', 'StorageManagement-MIB','dell'],
+    ['controllerTable', '.1.3.6.1.4.1.674.10893.1.20.130.1.1.5.', 'controllerState', 'controllerName', 'StorageManagement-MIB', 'dell'],
     ['arrayDiskTable', '.1.3.6.1.4.1.674.10893.1.20.130.4.1.4.', 'arrayDiskState', 'arrayDiskName', 'StorageManagement-MIB', 'dell'],
     ['virtualDiskTable', '.1.3.6.1.4.1.674.10893.1.20.140.1.1.4.', 'virtualDiskState', 'virtualDiskDeviceName', 'StorageManagement-MIB', 'dell'],
     ['batteryTable', '.1.3.6.1.4.1.674.10893.1.20.130.15.1.4.', 'batteryState', 'batteryName', 'StorageManagement-MIB', 'dell'],
