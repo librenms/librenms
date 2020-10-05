@@ -1498,27 +1498,26 @@ function fix_integer_value($value)
 function device_has_ip($ip, $within_poller_groups = [])
 {
     if (IPv6::isValid($ip)) {
-        $ip_address = \App\Models\Ipv6Address::query()
+        $ip_addresses = \App\Models\Ipv6Address::query()
             ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
-            ->whereNotNull('port')
+            ->whereNotNull('port_id')
             ->with('port.device')
-            ->when(! empty($within_poller_groups), function($query, $within_poller_groups) use ($within_poller_groups) {
-                return $query->whereIn('port.device.polller_group', $within_poller_groups);
-            })
-            ->first();
+            ->get();
     } elseif (IPv4::isValid($ip)) {
-        $ip_address = \App\Models\Ipv4Address::query()
+        $ip_addresses = \App\Models\Ipv4Address::query()
             ->where('ipv4_address', $ip)
-            ->whereNotNull('port')
+            ->whereNotNull('port_id')
             ->with('port.device')
-            ->when(! empty($within_poller_groups), function($query, $within_poller_groups) use ($within_poller_groups) {
-                return $query->whereIn('port.device.polller_group', $within_poller_groups);
-            })
-            ->first();
+            ->get();
     }
 
-    if (isset($ip_address)) {
-        return $ip_address->port->device;
+    if (isset($ip_addresses)) {
+        if (! empty($within_poller_groups)) {
+            $ip_addresses = $ip_addresses->filter(function ($ip_address) use ($within_poller_groups) {
+                    return in_array($ip_address->port->device->poller_group, $within_poller_groups);
+            });
+        }
+        return $ip_addresses->first()->port->device;
     }
 
     return false; // not an ipv4 or ipv6 address...
