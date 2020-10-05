@@ -1,8 +1,8 @@
 <?php
 /**
- * YamlTest.php
+ * YamlSchemaTest.php
  *
- * -Description-
+ * Verifies yaml files conform to the schema definitions
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,14 @@ use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlTest extends TestCase
+class YamlSchemaTest extends TestCase
 {
+    private $excluded = [
+        '/includes/definitions/default.yaml',
+        '/includes/definitions/generic.yaml',
+        '/includes/definitions/ping.yaml',
+    ];
+
     public function testConfigSchema()
     {
         $this->validateFileAgainstSchema('/misc/config_definitions.json', '/misc/config_schema.json');
@@ -78,6 +84,10 @@ class YamlTest extends TestCase
 
         return collect(glob($pattern))
             ->reduce(function ($array, $file) {
+                if (Str::contains($file, $this->excluded)) {
+                    return $array;
+                }
+
                 $name = basename($file);
                 $array[$name] = $file;
 

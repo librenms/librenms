@@ -2,6 +2,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Modules\Core;
 
 $init_modules = [''];
 require __DIR__ . '/../includes/init.php';
@@ -33,7 +34,7 @@ sysObjectID: $full_sysObjectID
 
 ");
 
-        $os = getHostOS($device);
+        $os = Core::detectOS($device, true);
         $continue = 'n';
         if ($os != 'generic') {
             $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");
@@ -171,7 +172,7 @@ Usage:
     -o This is the OS name, i.e ios, nxos, eos
     -t This is the OS type, i.e network, power, etc
     -v The vendor name in lower case, i.e cisco, arista
-    
+
 Example:
 ./scripts/new-os.php -h 44 -o new-eos
 
