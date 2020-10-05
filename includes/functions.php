@@ -523,7 +523,6 @@ function delete_device($id)
  * @param bool $force_add add even if the device isn't reachable
  * @param string $port_assoc_mode snmp field to use to determine unique ports
  * @param array $additional an array with additional parameters to take into consideration when adding devices
- * @param array $within_poller_groups if set, will only check for devices within specified poller groups
  *
  * @return int returns the device_id of the added device
  *
@@ -534,8 +533,12 @@ function delete_device($id)
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [], $within_poller_groups = [])
+function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
 {
+    $within_poller_groups = [];
+    if (isset($additional['within_poller_groups'])) {
+        $within_poller_groups = $additional['within_poller_groups'];
+    }
     // Test Database Exists
     if (host_exists($host, null, $within_poller_groups)) {
         throw new HostExistsException("Already have host $host");
@@ -593,7 +596,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach (Config::get('snmp.v3') as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode, $overwrite_ip);
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
+                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip, $additional);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . '/' . $v3['authlevel']);
                 }
@@ -604,7 +607,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode, $overwrite_ip);
 
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, $community, $snmpver, $port, $transport, [], $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
+                    return createHost($host, $community, $snmpver, $port, $transport, [], $poller_group, $port_assoc_mode, $force_add, $overwrite_ip, $additonal);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
                 }
@@ -764,12 +767,15 @@ function createHost(
     $force_add = false,
     $overwrite_ip = null,
     $additional = [],
-    $within_poller_groups = []
 ) {
     $host = trim(strtolower($host));
 
     $poller_group = getpollergroup($poller_group);
 
+    $within_poller_groups = [];
+    if (isset($additional['within_poller_groups'])) {
+        $within_poller_groups = $additional['within_poller_groups'];
+    }
     /* Get port_assoc_mode id if necessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
@@ -1492,29 +1498,27 @@ function fix_integer_value($value)
 function device_has_ip($ip, $within_poller_groups = [])
 {
     if (IPv6::isValid($ip)) {
-        $ip_addresses = \App\Models\Ipv6Address::query()
+        $ip_address = \App\Models\Ipv6Address::query()
             ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
+            ->whereNotNull('port')
             ->with('port.device')
-            ->get();
+            ->when(! empty($within_poller_groups), function($query, $within_poller_groups) {
+                return $query->whereIn('port.device.polller_group', $within_poller_groups)
+            })
+            ->first();
     } elseif (IPv4::isValid($ip)) {
-        $ip_addresses = \App\Models\Ipv4Address::query()
+        $ip_address = \App\Models\Ipv4Address::query()
             ->where('ipv4_address', $ip)
+            ->whereNotNull('port')
             ->with('port.device')
-            ->get();
+            ->when(! empty($within_poller_groups), function($query, $within_poller_groups) {
+                return $query->whereIn('port.device.polller_group', $within_poller_groups)
+            })
+            ->first();
     }
-    if (isset($ip_addresses)) {
-        $ip_addresses = $ip_addresses->filter(function ($ip_address) {
-            return isset($ip_address->port);
-        });
-        if (! empty($within_poller_groups)) {
-            $ip_addresses = $ip_addresses->filter(function ($ip_address) use ($within_poller_groups) {
-                return in_array($ip_address->port->device->poller_group, $within_poller_groups);
-            });
-        }
 
-        if (! empty($ip_addresses)) {
-            return $ip_addresses->first()->port->device;
-        }
+    if (isset($ip_address)) {
+        return $ip_address->port->device;
     }
 
     return false; // not an ipv4 or ipv6 address...

@@ -204,8 +204,12 @@ if (! empty($argv[1])) {
         }
     }//end if
 
+    if (isset($options['G'])) {
+        $additional['within_poller_groups'] = $within_poller_groups;
+    }
+
     try {
-        $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional, $within_poller_groups);
+        $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
         $device = device_by_id_cache($device_id);
         echo "Added device {$device['hostname']} ($device_id)\n";
         exit(0);
