@@ -766,7 +766,7 @@ function createHost(
     $port_assoc_mode = 'ifIndex',
     $force_add = false,
     $overwrite_ip = null,
-    $additional = [],
+    $additional = []
 ) {
     $host = trim(strtolower($host));
 
