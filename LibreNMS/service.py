@@ -683,13 +683,13 @@ class Service:
         except FileNotFoundError as e:
             error("Log file not found! {}".format(e))
             return
-
-        if self.config.watchdog_enabled:
-            if logfile_mdiff > self.config.poller.frequency:
+        
+        if logfile_mdiff > self.config.poller.frequency:
+            if self.config.watchdog_enabled:
                 critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
                 self.restart()
             else:
-                info("Watchdog is disabled. - service would have been restarted")
+                info("Watchdog is disabled")
         else:
             info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
