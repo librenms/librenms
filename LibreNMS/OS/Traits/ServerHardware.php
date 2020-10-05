@@ -85,7 +85,10 @@ trait ServerHardware
         }
 
         $device = $this->getDevice();
-        $device->hardware = $hw['SUPERMICRO-SD5-MIB::mbProductName.1'] ?? $device->hardware;
+        if (! empty($hw['SUPERMICRO-SD5-MIB::mbProductName.1'])) {
+            $device->hardware 'Supermicro ' . = $hw['SUPERMICRO-SD5-MIB::mbProductName.1'];
+        }
+
         $device->serial = $hw['SUPERMICRO-SD5-MIB::mbSerialNumber.1'] ?? $device->serial;
 
         return true;
