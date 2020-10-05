@@ -461,6 +461,6 @@ class Ironware extends Foundry
             'snFastIronStackICX7750Switch' => 'Brocade ICX 7750 Switch stack',
         ];
 
-        $this->getDevice()->hardware = array_str_replace($rewrite_ironware_hardware, $this->getDevice()->hardware);;
+        $this->getDevice()->hardware = array_str_replace($rewrite_ironware_hardware, $this->getDevice()->hardware);
     }
 }
