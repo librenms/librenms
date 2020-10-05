@@ -292,6 +292,7 @@ class IRCBot
 
     private function sendAlert($sendto, $severity, $alert)
     {
+	$sendto = explode(' ', $sendto)[0];
         $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim($alert['title']));
         if ($this->config['irc_alert_short']) {
             // Only send the title if set to short
