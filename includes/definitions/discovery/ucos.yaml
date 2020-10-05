@@ -1,5 +1,8 @@
 mib: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
 modules:
+    os:
+        hardware_mib: CISCO-PRODUCTS-MIB
+        version: SYSAPPL-MIB::sysApplInstallPkgVersion.1
     sensors:
         pre-cache:
             data:
