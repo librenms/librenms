@@ -1514,7 +1514,7 @@ function device_has_ip($ip, $within_poller_groups = [])
     if (isset($ip_addresses)) {
         if (! empty($within_poller_groups)) {
             $ip_addresses = $ip_addresses->filter(function ($ip_address) use ($within_poller_groups) {
-                    return in_array($ip_address->port->device->poller_group, $within_poller_groups);
+                return in_array($ip_address->port->device->poller_group, $within_poller_groups);
             });
         }
         return $ip_addresses->first()->port->device;
