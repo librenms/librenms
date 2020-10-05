@@ -1502,7 +1502,7 @@ function device_has_ip($ip, $within_poller_groups = [])
             ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
             ->whereNotNull('port')
             ->with('port.device')
-            ->when(! empty($within_poller_groups), function($query, $within_poller_groups) {
+            ->when(! empty($within_poller_groups), function($query, $within_poller_groups) use ($within_poller_groups) {
                 return $query->whereIn('port.device.polller_group', $within_poller_groups);
             })
             ->first();
@@ -1511,7 +1511,7 @@ function device_has_ip($ip, $within_poller_groups = [])
             ->where('ipv4_address', $ip)
             ->whereNotNull('port')
             ->with('port.device')
-            ->when(! empty($within_poller_groups), function($query, $within_poller_groups) {
+            ->when(! empty($within_poller_groups), function($query, $within_poller_groups) use ($within_poller_groups) {
                 return $query->whereIn('port.device.polller_group', $within_poller_groups);
             })
             ->first();
