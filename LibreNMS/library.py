@@ -26,6 +26,8 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 # Logging functions ########################################################
+# The following logging functions are
+# (C) 2019-2020 Orsiris de Jong under BSD 3-Clause license
 
 FORMATTER = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
 
@@ -103,6 +105,7 @@ def logger_get_logger(log_file=None, temp_log_file=None, debug=False):
                 _logger.warning('Failed to use log file [%s], %s.', log_file, err_output)
     return _logger
 
+# End of Logging functions #################################################
 
 # Generic functions ########################################################
 
@@ -115,6 +118,8 @@ def command_runner(command, valid_exit_codes=None, timeout=300, shell=False, enc
     Whenever we can, we need to avoid shell=True in order to preseve better security
     Runs system command, returns exit code and stdout/stderr output, and logs output on error
     valid_exit_codes is a list of codes that don't trigger an error
+    
+    (C) 2019-2020 Orsiris de Jong under BSD 3-Clause license
     """
 
     # Set default values for kwargs
