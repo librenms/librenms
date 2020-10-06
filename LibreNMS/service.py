@@ -25,7 +25,7 @@ from uuid import uuid1
 
 try:
     from systemd.daemon import notify
-except:
+except ImportError:
     pass
 
 
@@ -680,7 +680,8 @@ class Service:
 
     def logfile_watchdog(self):
         # notify systemd service watchdog service
-        notify("WATCHDOG=1")
+        if 'notify' in systemd.daemon:
+            notify("WATCHDOG=1")
 
         try:
             # check that lofgile has been written to within last poll period
