@@ -1,0 +1,15 @@
+os: gigabyte-bmc
+type: server
+group: unix
+mib_dir: gigabyte-bmc
+text: 'GIGABYTE-BMC'
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+discovery:
+    -
+      snmpget:
+          oid: .1.3.6.1.4.1.15370.550.2.0 #minPasswordLength, value set by GIGABYTE, cannot be changed.
+          op: 'contains'
+          value: '8'

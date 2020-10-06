@@ -1,0 +1,748 @@
+---------------------------------------------------------------------------
+--
+-- Title: Systems Management Instrumentation MIB of GIGABYTE-BMC
+--
+-- Version: 0.0.2
+--
+-- Release Date: 2020.04.15
+--
+-- Description: This MIB defines MIB objects that make system instrumentation
+-- data available to SNMP management applications.
+--
+-- Copyright (c) GIGA-BYTE TECHNOLOGY CO., LTD
+-- All Rights Reserved.
+--
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+-- Begin MIB
+---------------------------------------------------------------------------
+
+GIGABYTE-BMC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE,
+    Integer32, Opaque,
+    enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+	;
+    Float ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "A single precision floating-point number.  The semantics
+            and encoding are identical for type 'single' defined in
+            IEEE Standard for Binary Floating-Point,
+            ANSI/IEEE Std 754-1985.
+            The value is restricted to the BER serialization of
+            the following ASN.1 type:
+        FLOATTYPE ::= [120] IMPLICIT FloatType
+            (note: the value 120 is the sum of '30'h and '48'h)
+            The BER serialization of the length for values of
+            this type must use the definite length, short
+            encoding form.
+
+            For example, the BER serialization of value 123
+            of type FLOATTYPE is '9f780442f60000'h.  (The tag
+            is '9f78'h; the length is '04'h; and the value is
+            '42f60000'h.) The BER serialization of value
+            '9f780442f60000'h of data type Opaque is
+            '44079f780442f60000'h. (The tag is '44'h; the length
+            is '07'h; and the value is '9f780442f60000'h.)"
+        SYNTAX Opaque (SIZE (7))
+
+systemMIB MODULE-IDENTITY
+    LAST-UPDATED "202007100000Z"
+    ORGANIZATION "GIGA-BYTE TECHNOLOGY CO., LTD"
+    CONTACT-INFO "pj.sun@gigabyte.com"
+    DESCRIPTION  "For MegaRAC SP-X/OpenBMC"
+::= { enterprises 15370 }
+
+GBTString  ::= DisplayString (SIZE (0..128))
+GBTInteger ::= INTEGER (1..1024)
+GBTFloat   ::= Float
+GBTBoolean ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
+
+accountConfiguration OBJECT IDENTIFIER ::= { systemMIB 550 }
+networkConfiguration OBJECT IDENTIFIER ::= { systemMIB 551 }
+systemInformation    OBJECT IDENTIFIER ::= { systemMIB 552 }
+powerManagement      OBJECT IDENTIFIER ::= { systemMIB 553 }
+sensorReading        OBJECT IDENTIFIER ::= { systemMIB 554 }
+eventLog             OBJECT IDENTIFIER ::= { systemMIB 555 }
+
+-------------------------------------------------------------------------------
+-- OID Format: .1.3.6.1.4.1.15370.550.<a>
+-------------------------------------------------------------------------------
+maxPasswordLength OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { accountConfiguration 1 }
+minPasswordLength OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { accountConfiguration 2 }
+accountCollection OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AccountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    ::= { accountConfiguration 3 }
+AccountEntry ::=
+    SEQUENCE {
+        accountIndex    GBTInteger,
+        accountName     GBTString,
+        accountPassword GBTString,
+        accountEnabled  GBTBoolean,
+        accountLocked   GBTBoolean,
+        accountRoleId   GBTString
+    }
+accountEntry OBJECT-TYPE
+    SYNTAX     AccountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    INDEX        { accountIndex }    
+    ::= { accountCollection 1 }
+accountIndex OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { accountEntry 1 }
+accountName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { accountEntry 2 }
+accountPassword OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { accountEntry 3 }
+accountEnabled OBJECT-TYPE
+    SYNTAX     GBTBoolean
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { accountEntry 4 }
+accountLocked OBJECT-TYPE
+    SYNTAX     GBTBoolean
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { accountEntry 5 }
+accountRoleId OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { accountEntry 6 }
+roleCollection OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RoleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    ::= { accountConfiguration 4 }
+RoleEntry ::=
+    SEQUENCE {
+        roleIndex        GBTInteger,
+        roleId           GBTString,
+        rolePrivileges   GBTString,
+        roleName         GBTString,
+        roleIsPredefined GBTBoolean
+    }
+roleEntry OBJECT-TYPE
+    SYNTAX     RoleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    INDEX        { roleIndex }
+    ::= { roleCollection 1 }
+roleIndex OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { roleEntry 1 }
+roleId OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { roleEntry 2 }
+rolePrivileges OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { roleEntry 3 }
+roleName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { roleEntry 4 }
+roleIsPredefined OBJECT-TYPE
+    SYNTAX     GBTBoolean
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { roleEntry 5 }
+
+-------------------------------------------------------------------------------
+-- OID Format: .1.3.6.1.4.1.15370.551.<a>
+-------------------------------------------------------------------------------
+ethernetName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 1 }
+ethernetDescription OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 2 }
+ethernetStatus OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 3 }
+ethernetInterfaceEnabled OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 4 }
+ethernetPermanentMACAddress OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 5 }
+ethernetMACAddress OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 6 }
+ethernetSpeedMbps OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 7 }
+ethernetFullDuplex OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 8 }
+ethernetMTUSize OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 9 }
+ethernetHostName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { networkConfiguration 10 }
+ethernetVLAN OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 11 }
+ethernetIpv4Addresses OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { networkConfiguration 12 }
+ethernetIpv4SubnetMask OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { networkConfiguration 13 }
+ethernetIpv4AddressOrigin OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { networkConfiguration 14 }
+ethernetIpv4Gateway OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { networkConfiguration 15 }
+ethernetIpv6Addresses OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { networkConfiguration 16 }
+ethernetIpv6PrefixLength OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { networkConfiguration 17 }
+ethernetIpv6AddressOrigin OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { networkConfiguration 18 }
+ethernetLinkStatus OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { networkConfiguration 19 }
+
+-------------------------------------------------------------------------------
+-- OID Format: .1.3.6.1.4.1.15370.552.<a>
+-------------------------------------------------------------------------------
+systemFRU OBJECT IDENTIFIER ::= { systemInformation 1 }
+fruName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 1 }
+fruDescription OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 2 }
+fruSystemType OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 3 }
+fruAssetTag OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 4 }
+fruManafacturer OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 5 }
+fruModel OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 6 }
+fruSKU OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 7 }
+fruSerialNumber OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 8 }
+fruPartNumber OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 9 }
+fruUUID OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 10 }
+fruBIOSVersion OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { systemFRU 11 }
+
+processorCollection OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ProcessorEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    ::= { systemInformation 2 }
+ProcessorEntry ::=
+    SEQUENCE {
+        processorIndex        GBTInteger,
+        processorName         GBTString,
+        processorescription   GBTString,
+        processorSocket       GBTString,
+        processorType         GBTString,
+        processorArchitecture GBTString,
+        processorManufacturer GBTString,
+        processorModel        GBTString,
+        processorMaxSpeedMHz  GBTFloat,
+        processorTotalCores   GBTInteger,
+        processorTotalThreads GBTInteger
+    }
+processorEntry OBJECT-TYPE
+    SYNTAX     ProcessorEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    INDEX        { processorIndex }       
+    ::= { processorCollection 1 }
+processorIndex OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 1 }
+processorName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 2 }
+processorescription OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 3 }
+processorSocket OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 4 }
+processorType OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 5 }
+processorArchitecture OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 6 }
+processorManufacturer OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 7 }
+processorModel OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 8 }
+processorMaxSpeedMHz OBJECT-TYPE
+    SYNTAX     GBTFloat
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 9 }
+processorTotalCores OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 10 }
+processorTotalThreads OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { processorEntry 11 }
+
+memoryCollection OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MemoryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    ::= { systemInformation 3 }
+MemoryEntry ::=
+    SEQUENCE {
+        memoryIndex           GBTInteger,
+        memoryName            GBTString,
+        memoryDescription     GBTString,
+        memoryType            GBTString,
+        memoryDeviceType      GBTString,
+        memoryCapacity        GBTFloat,
+        memoryDataWidth       GBTInteger,
+        memoryBusWidth        GBTInteger,
+        memoryManufacturer    GBTString,
+        memorySerialNumber    GBTString,
+        memoryPartNumber      GBTString,
+        memorySpeed           GBTFloat,
+        memoryDeciveLocator   GBTString,
+        memoryErrorCorrection GBTString
+    }
+memoryEntry OBJECT-TYPE
+    SYNTAX     MemoryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    INDEX        { memoryIndex }     
+    ::= { memoryCollection 1 }
+memoryIndex OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 1 }
+memoryName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 2 }
+memoryDescription OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 3 }
+memoryType OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 4 }
+memoryDeviceType OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 5 }
+memoryCapacity OBJECT-TYPE
+    SYNTAX     GBTFloat
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 6 }
+memoryDataWidth OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 7 }
+memoryBusWidth OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 8 }
+memoryManufacturer OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 9 }
+memorySerialNumber OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 10 }
+memoryPartNumber OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 11 }
+memorySpeed OBJECT-TYPE
+    SYNTAX     GBTFloat
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 12 }
+memoryDeciveLocator OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 13 }
+memoryErrorCorrection OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { memoryEntry 14 }
+
+storageCollection OBJECT-TYPE
+    SYNTAX     SEQUENCE OF StorageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    ::= { systemInformation 4 }
+StorageEntry ::=
+    SEQUENCE {
+        storageIndex       GBTInteger,
+        storageName        GBTString,
+        storageStatus      GBTString,
+        storageDescription GBTString
+    } 
+storageEntry OBJECT-TYPE
+    SYNTAX     StorageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    INDEX        { storageIndex }
+    ::= { storageCollection 1 }
+storageIndex OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { storageEntry 1 }
+storageName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { storageEntry 2 }
+storageStatus OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { storageEntry 3 }
+storageDescription OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { storageEntry 4 }
+
+-------------------------------------------------------------------------------
+-- OID Format: .1.3.6.1.4.1.15370.553.<a>
+-------------------------------------------------------------------------------
+powerState OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { powerManagement 1 }
+powerConsumed OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { powerManagement 2 }
+powerMinConsumed OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { powerManagement 3 }
+powerMaxConsumed OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { powerManagement 4 }
+powerAverageConsumed OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { powerManagement 5 }
+powerControl OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { powerManagement 6 }
+limitState OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { powerManagement 7 }
+limitInWatts OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { powerManagement 8 }
+limitException OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { powerManagement 9 }
+limitCorrectionInMs OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { powerManagement 10 }
+
+-------------------------------------------------------------------------------
+-- OID Format: .1.3.6.1.4.1.15370.554.1.<a>
+-------------------------------------------------------------------------------
+sensorCollection OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SensorEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    ::= { sensorReading 1 }
+SensorEntry ::=
+    SEQUENCE {
+        sensorIndex  GBTInteger,
+        sensorName   GBTString,
+        sensorNumber GBTInteger,
+        sensorValue  GBTFloat,
+        sensorUpperThresholdNonCritical GBTFloat,
+        sensorUpperThresholdCritical    GBTFloat,
+        sensorLowerThresholdNonCritical GBTFloat,
+        sensorLowerThresholdCritical    GBTFloat
+    }    
+sensorEntry OBJECT-TYPE
+    SYNTAX     SensorEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    INDEX        { sensorIndex }  
+    ::= { sensorCollection 1 }    
+sensorIndex OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { sensorEntry 1 }
+sensorName OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { sensorEntry 2 }
+sensorNumber OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { sensorEntry 3 }
+sensorValue OBJECT-TYPE
+    SYNTAX     GBTFloat
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { sensorEntry 4 }
+sensorUpperThresholdNonCritical OBJECT-TYPE
+    SYNTAX     GBTFloat
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { sensorEntry 5 }
+sensorUpperThresholdCritical OBJECT-TYPE
+    SYNTAX     GBTFloat
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { sensorEntry 6 }
+sensorLowerThresholdNonCritical OBJECT-TYPE
+    SYNTAX     GBTFloat
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { sensorEntry 7 }
+sensorLowerThresholdCritical OBJECT-TYPE
+    SYNTAX     GBTFloat
+    MAX-ACCESS read-write
+    STATUS     current
+    ::= { sensorEntry 8 }
+
+-------------------------------------------------------------------------------
+-- OID Format: .1.3.6.1.4.1.15370.555.1.<a>
+-------------------------------------------------------------------------------
+logClear OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS write-only
+    STATUS     current
+    ::= { eventLog 1 }
+logCollection OBJECT-TYPE
+    SYNTAX     SEQUENCE OF LogEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    ::= { eventLog 2 }
+LogEntry ::=
+    SEQUENCE {
+        logIndex          GBTInteger,
+        logSeverity       GBTString,
+        logEventTimestamp GBTString,
+        logEventType      GBTString,
+        logSensorType     GBTString,
+        logSensorNumber   GBTInteger,
+        logMessage        GBTString
+    }
+logEntry OBJECT-TYPE
+    SYNTAX     LogEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    INDEX        { logIndex }    
+    ::= { logCollection 1 }
+logIndex OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { logEntry 1 }
+logSeverity OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { logEntry 2 }
+logEventTimestamp OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { logEntry 3 }
+logEventType OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { logEntry 4 }
+logSensorType OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { logEntry 5 }
+logSensorNumber OBJECT-TYPE
+    SYNTAX     GBTInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { logEntry 6 }
+logMessage OBJECT-TYPE
+    SYNTAX     GBTString
+    MAX-ACCESS read-only
+    STATUS     current
+    ::= { logEntry 7 }
+
+END
+
