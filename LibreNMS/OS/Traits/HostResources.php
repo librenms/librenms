@@ -24,10 +24,30 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Models\Mempool;
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 
 trait HostResources
 {
+    private $hrStorage;
+    private $memoryStorageTypes = [
+        'hrStorageVirtualMemory',
+        'hrStorageRam',
+    ];
+    private $ignoreMemoryDescr = [
+        'MALLOC',
+        'UMA',
+        'procfs',
+        '/proc',
+    ];
+    private $memoryDescrWarn = [
+        'Physical memory' => 99,
+        'Real Memory' => 99,
+        'Virtual memory' => 95,
+        'Swap space' => 10,
+    ];
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -106,5 +126,62 @@ trait HostResources
         }
 
         return $processors;
+    }
+
+    public function discoverMempools()
+    {
+        $storage_array = $this->getHrStorage();
+
+        if (is_array($storage_array)) {
+            echo 'hrStorage : ';
+            return collect($storage_array)->filter(function ($storage) {
+                return in_array($storage['hrStorageType'], $this->memoryStorageTypes)
+                    && ! Str::contains($storage['hrStorageDescr'], $this->ignoreMemoryDescr);
+            })->map(function ($storage, $index) {
+                $size = ($storage['hrStorageSize'] * $storage['hrStorageAllocationUnits']);
+                $used = ($storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits']);
+                return new Mempool([
+                    'mempool_index' => $index,
+                    'entPhysicalIndex' => null,
+                    'hrDeviceIndex' => $index,
+                    'mempool_type' => 'hrstorage',
+                    'mempool_precision' => $storage['hrStorageAllocationUnits'],
+                    'mempool_descr' => $storage['hrStorageDescr'],
+                    'mempool_perc' => $used / $size * 100,
+                    'mempool_free' => $size - $used,
+                    'mempool_total' => $size,
+                    'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
+                ]);
+            });
+        }
+
+        return [];
+    }
+
+    public function pollMempools()
+    {
+        $mempools = $this->getDevice()->mempools;
+        $oids = $mempools->pluck('hrDeviceIndex')->map(function ($index) {
+            return ".1.3.6.1.2.1.25.2.3.1.6.$index";
+        });
+        $data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
+
+        return $mempools->each(function (Mempool $mempool) use ($data) {
+            $oid = ".1.3.6.1.2.1.25.2.3.1.6.$mempool->hrDeviceIndex";
+            if (isset($data[$oid])) {
+                $used = $data[$oid] * $mempool->mempool_precision;
+                $mempool->mempool_perc = $mempool->mempool_total / $used * 100;
+                $mempool->mempool_free = $mempool->mempool_total - $used;
+            }
+        });
+    }
+
+    private function getHrStorage()
+    {// hrStorageTable
+        if ($this->hrStorage === null) {
+            $this->hrStorage = snmpwalk_cache_oid($this->getDeviceArray(), 'hrStorageEntry', [], 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
+        }
+
+        return $this->hrStorage;
     }
 }

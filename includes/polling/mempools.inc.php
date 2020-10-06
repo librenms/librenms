@@ -1,6 +1,15 @@
 <?php
 
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+
+if (! $os instanceof OS) {
+    $os = OS::make($device);
+}
+(new \LibreNMS\Modules\Mempools())->poll($os);
+
+
+return;
 
 foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', [$device['device_id']]) as $mempool) {
     echo 'Mempool ' . $mempool['mempool_descr'] . ': ';
