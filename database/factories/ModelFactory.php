@@ -203,3 +203,16 @@ $factory->define(\App\Models\Sensor::class, function (Faker\Generator $faker) {
         'sensor_oid' => $sensor_oid,
     ];
 });
+
+$factory->define(\App\Models\AlertSchedule::class, function (Faker\Generator $faker) {
+    return [
+        'title' => $faker->name,
+        'notes' => $faker->text,
+        'recurring' => 0,
+    ];
+});
+$factory->state(\App\Models\AlertSchedule::class, 'recurring', function ($faker) {
+    return [
+        'recurring' => 1,
+    ];
+});

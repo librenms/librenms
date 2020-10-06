@@ -86,6 +86,7 @@ abstract class WidgetController extends Controller
     /**
      * Get the settings (with defaults applied)
      *
+     * @param bool $settingsView
      * @return array
      */
     public function getSettings($settingsView = false)
@@ -93,6 +94,7 @@ abstract class WidgetController extends Controller
         if (is_null($this->settings)) {
             $id = \Request::get('id');
             $widget = UserWidget::find($id);
+            $this->defaults['refresh'] = $this->defaults['refresh'] ?? 60;
             $this->settings = array_replace($this->defaults, $widget ? (array) $widget->settings : []);
             $this->settings['id'] = $id;
 

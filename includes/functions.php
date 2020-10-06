@@ -19,6 +19,7 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Fping;
+use LibreNMS\Modules\Core;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
@@ -156,119 +157,6 @@ function logfile($string)
     $fd = fopen(Config::get('log_file'), 'a');
     fputs($fd, $string . "\n");
     fclose($fd);
-}
-
-/**
- * Detect the os of the given device.
- *
- * @param array $device device to check
- * @param bool $fetch fetch sysDescr and sysObjectID fresh from the device
- * @return string the name of the os
- * @throws Exception
- */
-function getHostOS($device, $fetch = true)
-{
-    if ($fetch) {
-        $device['sysDescr'] = snmp_get($device, 'SNMPv2-MIB::sysDescr.0', '-Ovq');
-        $device['sysObjectID'] = snmp_get($device, 'SNMPv2-MIB::sysObjectID.0', '-Ovqn');
-    }
-
-    d_echo("| {$device['sysDescr']} | {$device['sysObjectID']} | \n");
-
-    $deferred_os = [
-        'freebsd',
-        'linux',
-    ];
-
-    // check yaml files
-    $os_defs = Config::get('os');
-    foreach ($os_defs as $os => $def) {
-        if (isset($def['discovery']) && ! in_array($os, $deferred_os)) {
-            foreach ($def['discovery'] as $item) {
-                if (checkDiscovery($device, $item, $def['mib_dir'] ?? null)) {
-                    return $os;
-                }
-            }
-        }
-    }
-
-    // check include files
-    $os = null;
-    $pattern = Config::get('install_dir') . '/includes/discovery/os/*.inc.php';
-    foreach (glob($pattern) as $file) {
-        include $file;
-        if (isset($os)) {
-            return $os;
-        }
-    }
-
-    // check deferred os
-    foreach ($deferred_os as $os) {
-        if (isset($os_defs[$os]['discovery'])) {
-            foreach ($os_defs[$os]['discovery'] as $item) {
-                if (checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null)) {
-                    return $os;
-                }
-            }
-        }
-    }
-
-    return 'generic';
-}
-
-/**
- * Check an array of conditions if all match, return true
- * sysObjectID if sysObjectID starts with any of the values under this item
- * sysDescr if sysDescr contains any of the values under this item
- * sysDescr_regex if sysDescr matches any of the regexes under this item
- * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
- *
- * Appending _except to any condition will invert the match.
- *
- * @param array $device
- * @param array $array Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
- * @param string|array $mibdir MIB directory for evaluated OS
- * @return bool the result (all items passed return true)
- */
-function checkDiscovery($device, $array, $mibdir)
-{
-    // all items must be true
-    foreach ($array as $key => $value) {
-        if ($check = Str::endsWith($key, '_except')) {
-            $key = substr($key, 0, -7);
-        }
-
-        if ($key == 'sysObjectID') {
-            if (Str::startsWith($device['sysObjectID'], $value) == $check) {
-                return false;
-            }
-        } elseif ($key == 'sysDescr') {
-            if (Str::contains($device['sysDescr'], $value) == $check) {
-                return false;
-            }
-        } elseif ($key == 'sysDescr_regex') {
-            if (preg_match_any($device['sysDescr'], $value) == $check) {
-                return false;
-            }
-        } elseif ($key == 'sysObjectID_regex') {
-            if (preg_match_any($device['sysObjectID'], $value) == $check) {
-                return false;
-            }
-        } elseif ($key == 'snmpget') {
-            $get_value = snmp_get(
-                $device,
-                $value['oid'],
-                $value['options'] ?? '-Oqv',
-                $value['mib'] ?? null,
-                $value['mib_dir'] ?? $mibdir
-            );
-            if (compare_var($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
-                return false;
-            }
-        }
-    }
-
-    return true;
 }
 
 /**
@@ -802,7 +690,7 @@ function createHost(
     $device = array_merge($device, $v3);  // merge v3 settings
 
     if ($force_add !== true) {
-        $device['os'] = getHostOS($device);
+        $device['os'] = Core::detectOS($device);
 
         $snmphost = snmp_get($device, 'sysName.0', '-Oqv', 'SNMPv2-MIB');
         if (host_exists($host, $snmphost, $within_poller_groups)) {

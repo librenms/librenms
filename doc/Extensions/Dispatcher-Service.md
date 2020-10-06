@@ -22,6 +22,7 @@ behaviour only found in Python3.4+.
   install. MySQLclient can also be used, but does require compilation.
 - python-dotenv .env loader
 - redis-py 3.0+ and Redis 5.0+ server (if using distributed polling)
+- psutil
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
 
@@ -196,7 +197,7 @@ First, enable SCL's on your system:
 Then install and configure the runtime and service:
 
 ```
-# yum install rh-python36 epel-release
+# yum install gcc rh-python36 rh-python36-python-devel epel-release
 # yum --enablerepo=remi install redis
 # vi /opt/librenms/config.php
 # vi /etc/redis.conf
