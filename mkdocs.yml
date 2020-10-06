@@ -26,9 +26,7 @@ markdown_extensions:
 plugins:
   - search
   - exclude:
-      glob:
-        - General/Changelogs/*
-        - General/Changelog.md
+      glob: General/Changelogs/*
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
