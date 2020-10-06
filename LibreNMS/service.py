@@ -22,7 +22,12 @@ from time import sleep
 from socket import gethostname
 from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_DFL
 from uuid import uuid1
-from systemd.daemon import notify
+
+try:
+    from systemd.daemon import notify
+except:
+    pass
+
 
 
 class ServiceConfig:
