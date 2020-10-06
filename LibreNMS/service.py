@@ -680,7 +680,7 @@ class Service:
 
     def logfile_watchdog(self):
         # notify systemd service watchdog service
-        if has_imported("systemd.daemon"):
+        if 'systemd.daemon' in sys.modules:
             notify("WATCHDOG=1")
 
         try:
