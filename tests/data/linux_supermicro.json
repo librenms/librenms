@@ -8,7 +8,7 @@
                     "sysDescr": "Linux hostname 4.9.0-8-amd64 #1 SMP Debian 4.9.110-3+deb9u4 (2018-08-21) x86_64",
                     "sysContact": null,
                     "version": "4.9.0-8-amd64",
-                    "hardware": "X9SRL-F",
+                    "hardware": "Supermicro X9SRL-F",
                     "features": null,
                     "os": "linux",
                     "type": "server",
