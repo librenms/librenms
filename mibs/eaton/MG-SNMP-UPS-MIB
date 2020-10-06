@@ -13,6 +13,14 @@ MG-SNMP-UPS-MIB DEFINITIONS ::= BEGIN
 -- Author:      MGE UPS SYSTEMS - PV
 -- Release:     V1.7 AC - Add compatibility with SMI V2  
 
+-- Date:        December 19, 2006
+-- Author:      MGE UPS SYSTEMS
+-- Release:     V1.7 AD - Add traps 65 and 66 about Redundancy
+
+-- Date:        August 21, 2012
+-- Author:      EATON POWER QUALITY
+-- Release:     V1.7 AE - Add traps 67 and 68 about Protection Lost
+
 IMPORTS
         enterprises,IpAddress,TimeTicks
                 FROM RFC1155-SMI
@@ -2735,6 +2743,38 @@ upsmgEnvironInput2Open TRAP-TYPE
                 "Input #2 is Open."
        --#SEVERITY INFORMATIONAL
 ::= 64
+
+-- AD Release on 2006/12/19 : Traps 65 and 66 added about redundancy.
+
+upsRedundancyLost TRAP-TYPE
+        ENTERPRISE upsmgTraps
+        DESCRIPTION
+                "Redundancy Lost." 
+       --#SEVERITY MAJOR
+::= 65
+
+upsRedundancyOK TRAP-TYPE
+        ENTERPRISE upsmgTraps
+        DESCRIPTION
+                "Redundancy Recovered."
+       --#SEVERITY INFORMATIONAL
+::= 66
+
+-- AE Release on 2012/08/21 : Traps 67 and 68 added about protection lost.
+
+upsProtectionLost TRAP-TYPE
+        ENTERPRISE upsmgTraps
+        DESCRIPTION
+                "Protection Lost." 
+       --#SEVERITY MAJOR
+::= 67
+
+upsProtectionOK TRAP-TYPE
+        ENTERPRISE upsmgTraps
+        DESCRIPTION
+                "Protection Recovered."
+       --#SEVERITY INFORMATIONAL
+::= 68
 
 
 
