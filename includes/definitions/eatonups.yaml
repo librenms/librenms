@@ -3,7 +3,7 @@ text: 'Eaton UPS'
 group: ups
 type: power
 icon: eaton
-mib_dir: ups
+mib_dir: eaton
 over:
     - { graph: device_voltage, text: Voltage }
     - { graph: device_current, text: Current }

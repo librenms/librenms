@@ -77,7 +77,7 @@ class OverviewController extends Controller
 
         $data = $dashboard
             ->widgets()
-            ->select(['user_widget_id', 'users_widgets.widget_id', 'title', 'widget', 'col', 'row', 'size_x', 'size_y', 'refresh'])
+            ->select(['user_widget_id', 'users_widgets.widget_id', 'title', 'widget', 'col', 'row', 'size_x', 'size_y', 'refresh', 'settings'])
             ->join('widgets', 'widgets.widget_id', '=', 'users_widgets.widget_id')
             ->get();
 
@@ -96,7 +96,7 @@ class OverviewController extends Controller
 
         $bare = $request->bare;
         $data = serialize(json_encode($data));
-        $dash_config = unserialize(stripslashes($data));
+        $dash_config = unserialize($data);
         $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
         $widgets = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
 

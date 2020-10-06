@@ -67,13 +67,11 @@ that the device doesn't support ifXEntry and to ignore it:
      - cisco2811
 ```
 
-`mib_dir`: You can use this to specify the additional directories to
-look in for MIBs:
+`mib_dir`: You can use this to specify an additional directory to
+look in for MIBs. An array is not accepted, only one directory may be specified.
 
 ```yaml
-mib_dir:
-    - juniper
-    - cisco
+mib_dir: juniper
 ```
 
 `poller_modules`: This is a list of poller modules to either enable
@@ -157,6 +155,7 @@ more complex collection is required.
 - `<field>` specify an oid or list of oids to attempt to pull the data from, the first non-empty response will be used
 - `<field>_regex` parse the value out of the returned oid data, must use a named group
 - `<field>_template` combine multiple oid results together to create a final string value.  The result is trimmed.
+- `hardware_mib` MIB used to translate sysObjectID to get hardware. hardware_regex can process the result.
 
 ```yaml
 modules:

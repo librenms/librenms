@@ -15,7 +15,7 @@ use App\Models\Device;
 use LibreNMS\Exceptions\HostUnreachableException;
 use Symfony\Component\Process\Process;
 
-Artisan::command('device:rename 
+Artisan::command('device:rename
     {old hostname : ' . __('The existing hostname, IP, or device id') . '}
     {new hostname : ' . __('The new hostname or IP') . '}
 ', function () {
@@ -150,10 +150,10 @@ Artisan::command('device:remove
 })->describe('Remove a device');
 
 Artisan::command('update', function () {
-    (new Process(base_path('daily.sh')))->setTty(true)->run();
+    (new Process([base_path('daily.sh')]))->setTty(true)->run();
 })->describe(__('Update LibreNMS and run maintenance routines'));
 
-Artisan::command('poller:ping 
+Artisan::command('poller:ping
     {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
 ', function () {
 //    PingCheck::dispatch(new PingCheck($this->argument('groups')));

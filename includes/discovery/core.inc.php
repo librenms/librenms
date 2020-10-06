@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Modules\Core;
 use LibreNMS\OS;
 
 $snmpdata = snmp_get_multi_oid($device, ['sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OUQn', 'SNMPv2-MIB');
@@ -18,7 +19,7 @@ foreach ($deviceModel->getDirty() as $attribute => $value) {
 }
 
 // detect OS
-$deviceModel->os = getHostOS($device, false);
+$deviceModel->os = Core::detectOS($device, false);
 
 if ($deviceModel->isDirty('os')) {
     Log::event('Device OS changed: ' . $deviceModel->getOriginal('os') . ' -> ' . $deviceModel->os, $deviceModel, 'system', 3);

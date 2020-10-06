@@ -3,7 +3,7 @@ text: 'Ubiquiti Edgepower'
 type: power
 icon: ubiquiti
 nobulk: true
-group: ubnt
+mib_dir: ubnt
 over:
     - { graph: device_current, text: 'Current' }
     - { graph: device_voltage, text: 'Voltage' }

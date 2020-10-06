@@ -488,7 +488,7 @@
               '</span>'+
               '</header>'+
               '<div class="widget_body" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
-              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+data.refresh+',\''+data.widget+'\');\<\/script\>'+
+              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+',\''+data.widget+'\');\<\/script\>'+
               '</li>';
 
         if (data.hasOwnProperty('col') && data.hasOwnProperty('row')) {
@@ -574,6 +574,7 @@
                 if (data.status === 'ok') {
                     $("#widget_title_"+id).html(data.title);
                     $widget_body.html(data.html).parent().data('settings', data.show_settings);
+                    $widget_body.html(data.html).parent().data('refresh', data.settings.refresh);
                 } else {
                     $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
@@ -590,16 +591,18 @@
         });
     }
 
-    function grab_data(id,refresh, data_type) {
-        if( $("#widget_body_"+id).parent().data('settings') == 0 ) {
+    function grab_data(id, data_type) {
+        var parent = $("#widget_body_"+id).parent();
+
+        if( parent.data('settings') == 0 ) {
             widget_reload(id, data_type);
         }
-        new_refresh = refresh * 1000;
+
         setTimeout(function() {
-            grab_data(id,refresh,data_type);
-        },
-        new_refresh);
+            grab_data(id, data_type);
+        }, (parent.data('refresh') > 0 ? parent.data('refresh') : 60) * 1000);
     }
+
     $('#new-widget').popover();
 
     @if (empty($dashboard->dashboard_id) && $default_dash == 0)
