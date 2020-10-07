@@ -199,9 +199,8 @@ availability:
     - { Field: availability_perc, Type: 'decimal(9,6)', 'Null': false, Extra: '', Default: '0.000000' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [availability_id], Unique: true, Type: BTREE }
-    availability_device_id_index: { Name: availability_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     availability_device_id_duration_unique: { Name: availability_device_id_duration_unique, Columns: [device_id, duration], Unique: true, Type: BTREE }
-
+    availability_device_id_index: { Name: availability_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 bgpPeers:
   Columns:
     - { Field: bgpPeer_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -339,6 +338,20 @@ bill_port_counters:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id, bill_id], Unique: true, Type: BTREE }
+cache:
+  Columns:
+    - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: value, Type: text, 'Null': false, Extra: '' }
+    - { Field: expiration, Type: int, 'Null': false, Extra: '' }
+  Indexes:
+    cache_key_unique: { Name: cache_key_unique, Columns: [key], Unique: true, Type: BTREE }
+cache_locks:
+  Columns:
+    - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: owner, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: expiration, Type: int, 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [key], Unique: true, Type: BTREE }
 callback:
   Columns:
     - { Field: callback_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -572,14 +585,6 @@ device_groups:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_groups_name_unique: { Name: device_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }
-device_outages:
-  Columns:
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
-  Indexes:
-    device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-    device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
 device_group_device:
   Columns:
     - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -591,6 +596,14 @@ device_group_device:
   Constraints:
     device_group_device_device_group_id_foreign: { name: device_group_device_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
     device_group_device_device_id_foreign: { name: device_group_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+device_outages:
+  Columns:
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
+  Indexes:
+    device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
+    device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 device_perf:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
