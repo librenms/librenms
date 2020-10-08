@@ -15,6 +15,7 @@ class PortVlan extends PortRelatedModel
                 $value = 1;
             }
         }
+
         return $value;
     }
 }
