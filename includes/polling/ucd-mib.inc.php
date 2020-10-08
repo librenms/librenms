@@ -134,13 +134,8 @@ if (is_numeric($ss['ssCpuRawSteal'])) {
 
 $snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memAvailReal.0', 'memSysAvail.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
 
-if (isset($snmpdata[0]['memSysAvail'])) {
+if (is_array($snmpdata[0])) {
     [$memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
-    foreach (array_keys($snmpdata[0]) as $key) {
-        $$key = $snmpdata[0][$key];
-    }
-} else if (is_array($snmpdata[0])) {
-    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memSysAvail, $_, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
     foreach (array_keys($snmpdata[0]) as $key) {
         $$key = $snmpdata[0][$key];
     }
@@ -169,6 +164,11 @@ if (is_numeric($memTotalReal) && is_numeric($memSysAvail) && is_numeric($memTota
         'buffered'     => $memBuffer,
         'cached'       => $memCached,
     ];
+        
+    if isset($memSysAvail) {
+        $rrd_def->addDataset('sysavail', 'GAUGE', 0, 10000000000);
+        $fields['sysavail'] = $memSysAvail;
+    }
 
     $tags = compact('rrd_def');
     data_update($device, 'ucd_mem', $tags, $fields);
@@ -203,5 +203,5 @@ if (is_numeric($load_raw[2]['laLoadInt'])) {
 }
 
 unset($ss, $load_raw, $snmpdata);
-unset($memTotalSwap, $memAvailSwap, $memTotalReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached);
+unset($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached);
 unset($key, $collect_oids, $rrd_name, $rrd_def, $oid);
