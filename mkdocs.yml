@@ -70,6 +70,7 @@ nav:
       - Network Map: Extensions/Network-Map.md
       - Syslog: Extensions/Syslog.md
       - Dashboards: Extensions/Dashboards.md
+      - Supermicro: Extensions/Supermicro.md
   - 5. Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md
