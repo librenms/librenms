@@ -165,7 +165,7 @@ if (is_numeric($memTotalReal) && is_numeric($memSysAvail) && is_numeric($memTota
         'cached'       => $memCached,
     ];
         
-    if isset($memSysAvail) {
+    if (isset($memSysAvail)) {
         $rrd_def->addDataset('sysavail', 'GAUGE', 0, 10000000000);
         $fields['sysavail'] = $memSysAvail;
     }
