@@ -119,20 +119,28 @@ if (is_numeric($ss['ssCpuRawSteal'])) {
 // Poll mem for load memory utilisation stats on UNIX-like hosts running UCD/Net-SNMPd
 // UCD-SNMP-MIB::memIndex.0 = INTEGER: 0
 // UCD-SNMP-MIB::memErrorName.0 = STRING: swap
-// UCD-SNMP-MIB::memTotalSwap.0 = INTEGER: 32762248 kB
-// UCD-SNMP-MIB::memAvailSwap.0 = INTEGER: 32199396 kB
-// UCD-SNMP-MIB::memTotalReal.0 = INTEGER: 8187696 kB
-// UCD-SNMP-MIB::memAvailReal.0 = INTEGER: 1211056 kB
-// UCD-SNMP-MIB::memTotalFree.0 = INTEGER: 33410452 kB
+// UCD-SNMP-MIB::memTotalSwap.0 = INTEGER: 4194300 kB
+// UCD-SNMP-MIB::memAvailSwap.0 = INTEGER: 4194300 kB
+// UCD-SNMP-MIB::memTotalReal.0 = INTEGER: 32807668 kB
+// UCD-SNMP-MIB::memAvailReal.0 = INTEGER: 5716888 kB
+// UCD-SNMP-MIB::memTotalFree.0 = INTEGER: 9911188 kB
 // UCD-SNMP-MIB::memMinimumSwap.0 = INTEGER: 16000 kB
-// UCD-SNMP-MIB::memBuffer.0 = INTEGER: 104388 kB
-// UCD-SNMP-MIB::memCached.0 = INTEGER: 2595556 kB
+// UCD-SNMP-MIB::memShared.0 = INTEGER: 136948 kB
+// UCD-SNMP-MIB::memBuffer.0 = INTEGER: 3854844 kB
+// UCD-SNMP-MIB::memCached.0 = INTEGER: 9548296 kB
+// UCD-SNMP-MIB::memSysAvail.0 = Counter64: 18846876 kB
 // UCD-SNMP-MIB::memSwapError.0 = INTEGER: noError(0)
 // UCD-SNMP-MIB::memSwapErrorMsg.0 = STRING:
 
-$snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memSysAvail.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
-if (is_array($snmpdata[0])) {
-    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
+$snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memAvailReal.0', 'memSysAvail.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
+
+if (isset($snmpdata[0]['memSysAvail'])) {
+    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
+    foreach (array_keys($snmpdata[0]) as $key) {
+        $$key = $snmpdata[0][$key];
+    }
+} else if (is_array($snmpdata[0])) {
+    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memSysAvail, $_, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
     foreach (array_keys($snmpdata[0]) as $key) {
         $$key = $snmpdata[0][$key];
     }
