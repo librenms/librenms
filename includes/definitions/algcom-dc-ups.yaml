@@ -1,0 +1,15 @@
+os: algcom-dc-ups
+text: 'ALGCOM DC UPS'
+type: power
+icon: algcom
+
+over:
+        #    - { graph: outputVoltage, text: 'DC-Bus-regulated-output' }
+        #    - { graph: outputCurrent, text: 'DC-Bus-current' }
+        #    - { graph: batteryVoltage, text: 'Battery-Bus-voltage' }
+        #    - { graph: batteryCurrent, text: 'Battery-Bus-current' }
+
+discovery:
+    - sysObjectID:
+            - .1.3.6.1.4.1.49136
+mib_dir: algcom
