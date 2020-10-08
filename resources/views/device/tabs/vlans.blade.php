@@ -4,8 +4,8 @@
     <table class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th style="width: 150px;">Vlan number</th>
-                <th style="width: 250px;">Vlan Name</th>
+                <th style="width: 150px;">VLAN Number</th>
+                <th style="width: 250px;">VLAN Name</th>
                 <th>Ports</th>
             </tr>
         </thead>
