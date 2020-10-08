@@ -72,7 +72,16 @@ class VlansController implements DeviceTab
     private function getVlans(Device $device)
     {
         // port.device needed to prevent loading device multiple times
-        $portVlan = PortVlan::where('device_id', $device->device_id)->with(['port.device', 'vlans:vlan_vlan,vlan_name'])->has('port')->get();
+        $portVlan = PortVlan::where('ports_vlans.device_id', $device->device_id)
+            ->join('vlans', function ($join) {                    
+                $join
+                ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
+                ->on('vlans.device_id','=', 'ports_vlans.device_id');
+            })
+            ->with(['port.device'])
+            ->select('ports_vlans.*', 'vlans.vlan_name')
+            ->get();
+
         $data = $portVlan->groupBy('vlan');
         
         return $data;
