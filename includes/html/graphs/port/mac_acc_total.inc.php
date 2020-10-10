@@ -35,10 +35,10 @@ if ($stat == 'pkts') {
 }//end if
 
 $accs = dbFetchRows(
-    "SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) AS bps,
+    'SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) AS bps,
         (M.cipMacHCSwitchedPkts_input_rate + M.cipMacHCSwitchedPkts_output_rate) AS pps
         FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.port_id = ?
-        AND I.port_id = M.port_id AND D.device_id = I.device_id ORDER BY ? DESC LIMIT 0,?",
+        AND I.port_id = M.port_id AND D.device_id = I.device_id ORDER BY ? DESC LIMIT 0,?',
     [$port, $sort, $topn]
 );
 
@@ -65,7 +65,7 @@ foreach ($accs as $acc) {
                 $name = $peer['hostname'] . ' ' . makeshortif($peer['ifDescr']) . ' (' . $mac . ')';
             }
 
-            if (dbFetchCell("SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", [$acc['device_id'], $addy['ipv4_address']])) {
+            if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $addy['ipv4_address']])) {
                 $peer_info = dbFetchRow('SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $addy['ipv4_address']]);
                 $name .= ' - AS' . $peer_info['bgpPeerRemoteAs'];
             }
