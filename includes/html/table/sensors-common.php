@@ -102,7 +102,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
             $overlib_content .= '<br>';
         }
         $overlib_content .= str_replace('"', "\\'", generate_graph_tag($graph_array));
-        $even = !$even;
+        $even = ! $even;
     }
 
     $overlib_content .= '</div>';
