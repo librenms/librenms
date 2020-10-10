@@ -1,19 +1,9 @@
 <?php
 
-$port = mres($_GET['id']);
-if ($_GET['stat']) {
-    $stat = mres($_GET['stat']);
-} else {
-    $stat = 'bits';
-}
-
-$sort = mres($_GET['sort']);
-
-if (is_numeric($_GET['topn'])) {
-    $topn = $_GET['topn'];
-} else {
-    $topn = '10';
-}
+$port = $_GET['id'];
+$stat = $_GET['stat'] ?: 'bits';
+$sort = in_array($_GET['sort'], ['in', 'out', 'both']) ? $_GET['sort'] : 'in';
+$topn = is_numeric($_GET['topn']) ? $_GET['topn'] : '10';
 
 require 'includes/html/graphs/common.inc.php';
 
@@ -48,8 +38,8 @@ $accs = dbFetchRows(
     "SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) AS bps,
         (M.cipMacHCSwitchedPkts_input_rate + M.cipMacHCSwitchedPkts_output_rate) AS pps
         FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.port_id = ?
-        AND I.port_id = M.port_id AND D.device_id = I.device_id ORDER BY $sort DESC LIMIT 0," . $topn,
-    [$port]
+        AND I.port_id = M.port_id AND D.device_id = I.device_id ORDER BY ? DESC LIMIT 0,?",
+    [$port, $sort, $topn]
 );
 
 $pluses = '';
@@ -61,6 +51,7 @@ foreach ($accs as $acc) {
     if (rrdtool_check_rrd_exists($this_rrd)) {
         $mac = formatmac($acc['mac']);
         $name = $mac;
+
         $addy = dbFetchRow('SELECT * FROM ipv4_mac where mac_address = ? AND port_id = ?', [$acc['mac'], $acc['port_id']]);
 
         if ($addy) {
@@ -74,7 +65,7 @@ foreach ($accs as $acc) {
                 $name = $peer['hostname'] . ' ' . makeshortif($peer['ifDescr']) . ' (' . $mac . ')';
             }
 
-            if (dbFetchCell("SELECT count(*) FROM bgpPeers WHERE device_id = '" . $acc['device_id'] . "' AND bgpPeerIdentifier = ?", [$addy['ipv4_address']])) {
+            if (dbFetchCell("SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", [$acc['device_id'], $addy['ipv4_address']])) {
                 $peer_info = dbFetchRow('SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $addy['ipv4_address']]);
                 $name .= ' - AS' . $peer_info['bgpPeerRemoteAs'];
             }
