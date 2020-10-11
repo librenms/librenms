@@ -95,9 +95,14 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $link = generate_url(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => $group, 'metric' => $sensor['sensor_class']]);
 
     $overlib_content = '<div style="width: 580px;"><span class="overlib-text">' . $sensor['hostname'] . ' - ' . $sensor['sensor_descr'] . '</span>';
+    $even = true;
     foreach (['day', 'week', 'month', 'year'] as $period) {
         $graph_array['from'] = Config::get("time.$period");
+        if ($even) {
+            $overlib_content .= '<br>';
+        }
         $overlib_content .= str_replace('"', "\\'", generate_graph_tag($graph_array));
+        $even = ! $even;
     }
 
     $overlib_content .= '</div>';
@@ -112,7 +117,6 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor, $translations);
-
     $response[] = [
         'hostname'         => generate_device_link($sensor),
         'sensor_descr'     => overlib_link($link, $sensor['sensor_descr'], $overlib_content, null),
