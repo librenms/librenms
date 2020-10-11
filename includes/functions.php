@@ -2050,7 +2050,7 @@ function device_is_up($device, $record_perf = false)
             $type = 'up';
             $reason = $device['status_reason'];
 
-            $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL', [$device['device_id']]);
+            $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]);
             if (! empty($going_down)) {
                 $up_again = time() - $uptime;
                 if ($up_again <= $going_down) {
@@ -2060,8 +2060,8 @@ function device_is_up($device, $record_perf = false)
                 dbUpdate(
                     ['device_id' => $device['device_id'], 'up_again' => $up_again],
                     'device_outages',
-                    'device_id=? and up_again is NULL',
-                    [$device['device_id']]
+                    'device_id=? and going_down=? and up_again is NULL',
+                    [$device['device_id'], $going_down]
                 );
             }
         } else {
