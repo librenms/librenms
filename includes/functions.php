@@ -2059,7 +2059,8 @@ function device_is_up($device, $record_perf = false)
                 }
                 dbUpdate(
                     ['device_id' => $device['device_id'], 'up_again' => $up_again],
-                    'device_outages','device_id=? and going_down=? and up_again is NULL',
+                    'device_outages',
+                    'device_id=? and going_down=? and up_again is NULL',
                     [$device['device_id'], $going_down]
                 );
             }
