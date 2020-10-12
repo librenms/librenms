@@ -19,9 +19,11 @@ class AddPrimaryKeyLoadbalancerVservers extends Migration
      */
     public function up()
     {
-        Schema::table('loadbalancer_vservers', function (Blueprint $table) {
-            $table->bigIncrements('id')->first();
-        });
+        if (! Schema::hasColumn('loadbalancer_vservers', 'id')) {
+            Schema::table('loadbalancer_vservers', function (Blueprint $table) {
+                $table->bigIncrements('id')->first();
+            });
+        }
     }
 
     /**

@@ -19,9 +19,11 @@ class AddPrimaryKeyBillPorts extends Migration
      */
     public function up()
     {
-        Schema::table('bill_ports', function (Blueprint $table) {
-            $table->bigIncrements('id')->first();
-        });
+        if (! Schema::hasColumn('bill_ports', 'id')) {
+            Schema::table('bill_ports', function (Blueprint $table) {
+                $table->bigIncrements('id')->first();
+            });
+        }
     }
 
     /**

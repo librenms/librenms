@@ -19,9 +19,11 @@ class AddPrimaryKeyIpv4Mac extends Migration
      */
     public function up()
     {
-        Schema::table('ipv4_mac', function (Blueprint $table) {
-            $table->bigIncrements('id')->first();
-        });
+        if (! Schema::hasColumn('ipv4_mac', 'id')) {
+            Schema::table('ipv4_mac', function (Blueprint $table) {
+                $table->bigIncrements('id')->first();
+            });
+        }
     }
 
     /**

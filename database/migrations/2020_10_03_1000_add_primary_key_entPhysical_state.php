@@ -19,9 +19,11 @@ class AddPrimaryKeyEntphysicalState extends Migration
      */
     public function up()
     {
-        Schema::table('entPhysical_state', function (Blueprint $table) {
-            $table->bigIncrements('id')->first();
-        });
+        if (! Schema::hasColumn('entPhysical_state', 'id')) {
+            Schema::table('entPhysical_state', function (Blueprint $table) {
+                $table->bigIncrements('id')->first();
+            });
+        }
     }
 
     /**

@@ -19,9 +19,11 @@ class AddPrimaryKeyPortsPerms extends Migration
      */
     public function up()
     {
-        Schema::table('ports_perms', function (Blueprint $table) {
-            $table->bigIncrements('id')->first();
-        });
+        if (! Schema::hasColumn('ports_perms', 'id')) {
+            Schema::table('ports_perms', function (Blueprint $table) {
+                $table->bigIncrements('id')->first();
+            });
+        }
     }
 
     /**

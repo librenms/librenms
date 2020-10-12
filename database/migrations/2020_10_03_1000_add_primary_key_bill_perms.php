@@ -19,9 +19,11 @@ class AddPrimaryKeyBillPerms extends Migration
      */
     public function up()
     {
-        Schema::table('bill_perms', function (Blueprint $table) {
-            $table->bigIncrements('id')->first();
-        });
+        if (! Schema::hasColumn('bill_perms', 'id')) {
+            Schema::table('bill_perms', function (Blueprint $table) {
+                $table->bigIncrements('id')->first();
+            });
+        }
     }
 
     /**

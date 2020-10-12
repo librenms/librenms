@@ -19,9 +19,11 @@ class AddPrimaryKeyJuniatmvp extends Migration
      */
     public function up()
     {
-        Schema::table('juniAtmVp', function (Blueprint $table) {
-            $table->bigIncrements('id')->first();
-        });
+        if (! Schema::hasColumn('juniAtmVp', 'id')) {
+            Schema::table('juniAtmVp', function (Blueprint $table) {
+                $table->bigIncrements('id')->first();
+            });
+        }
     }
 
     /**
