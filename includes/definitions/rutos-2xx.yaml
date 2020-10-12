@@ -12,8 +12,8 @@ over:
 processor_stacked: true
 discovery:
     -
-        sysObjectID:
-            - .1.3.6.1.4.1.8072.3.2.10
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        sysDescr: Teltonika
         snmpget:
             oid: .1.3.6.1.4.1.48690.2.14.0
             op: starts

@@ -22,6 +22,7 @@ behaviour only found in Python3.4+.
   install. MySQLclient can also be used, but does require compilation.
 - python-dotenv .env loader
 - redis-py 3.0+ and Redis 5.0+ server (if using distributed polling)
+- psutil
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
 
@@ -73,7 +74,7 @@ DB_PASSWORD=
 
 ## Distributed Polling Configuration
 
-Once you have your Redis database set up, configure it in the .env file on each node.
+Once you have your Redis database set up, configure it in the .env file on each node. Configure the redis cache driver for distributed locking.
 
 ```dotenv
 REDIS_HOST=127.0.0.1
@@ -85,6 +86,8 @@ REDIS_SENTINEL_SERVICE=myservice
 REDIS_DB=0
 #REDIS_PASSWORD=
 #REDIS_TIMEOUT=60
+
+CACHE_DRIVER=redis
 ```
 
 ## Basic Configuration
@@ -196,7 +199,7 @@ First, enable SCL's on your system:
 Then install and configure the runtime and service:
 
 ```
-# yum install rh-python36 epel-release
+# yum install gcc rh-python36 rh-python36-python-devel epel-release
 # yum --enablerepo=remi install redis
 # vi /opt/librenms/config.php
 # vi /etc/redis.conf

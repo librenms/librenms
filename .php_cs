@@ -126,6 +126,9 @@ $rules = [
 
 $finder = Finder::create()
     ->in(__DIR__)
+    ->exclude('storage')
+    ->exclude('bootstrap/cache')
+    ->exclude('vendor')
     ->name('*.php')
     ->notName('*.blade.php')
     ->ignoreDotFiles(true)

@@ -23,7 +23,10 @@ markdown_extensions:
             lang: php
             options:
               startinline: true
-
+plugins:
+  - search
+  - exclude:
+      glob: General/Changelogs/*
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
@@ -67,6 +70,7 @@ nav:
       - Network Map: Extensions/Network-Map.md
       - Syslog: Extensions/Syslog.md
       - Dashboards: Extensions/Dashboards.md
+      - Supermicro: Extensions/Supermicro.md
   - 5. Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md

@@ -32,8 +32,7 @@ class Ucos extends \LibreNMS\OS
 {
     public function discoverOS(Device $device): void
     {
-        $device->hardware = snmp_translate($device->sysObjectID, 'CISCO-PRODUCTS-MIB', null, null, $this->getDeviceArray()) ?: null;
-        $device->version = snmp_get($this->getDeviceArray(), 'SYSAPPL-MIB::sysApplInstallPkgVersion.1', '-Oqv') ?: null;
+        parent::discoverOS($device); // yaml
 
         $applist = snmp_walk($this->getDeviceArray(), 'SYSAPPL-MIB::sysApplInstallPkgProductName', '-OQv');
         if (Str::contains($applist, 'Cisco Unified CCX Database')) {
