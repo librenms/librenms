@@ -238,7 +238,7 @@
                                                                    aria-hidden="true"></i> @lang('All Services')</a>
                             </li>
                             <li><a href="{{ url('services-templates') }}"><i class="fa fa-cogs fa-fw fa-lg"
-                                                                   aria-hidden="true"></i> @lang('All Services Templates')</a>
+                                                                   aria-hidden="true"></i> @lang('Services Templates')</a>
                             </li>
                             @if($service_counts['warning'] || $service_counts['critical'])
                                 <li role="presentation" class="divider"></li>
@@ -259,8 +259,6 @@
                                 <li role="presentation" class="divider"></li>
                             <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                                  aria-hidden="true"></i> @lang('Add Service')</a></li>
-                            <li><a href="{{ url('addsrv-template') }}"><i class="fa fa-plus fa-fw fa-lg"
-                                                                 aria-hidden="true"></i> @lang('Add Service Template')</a></li>
                             @endadmin
                         </ul>
                     </li>
