@@ -37,12 +37,10 @@ class ServiceTemplate extends DeviceRelatedModel  implements Keyable
      * @param Builder $query
      * @return Builder
      */
-    public function scopeIsOk($query)
+    public function getServiceTemplate($query, $service_template_id)
     {
         return $query->where([
-            ['service_ignore', '=', 0],
-            ['service_disabled', '=', 0],
-            ['service_status', '=', 0],
+            ['service_template_id', '=', $service_template_id],
         ]);
     }
 
@@ -50,7 +48,7 @@ class ServiceTemplate extends DeviceRelatedModel  implements Keyable
      * @param Builder $query
      * @return Builder
      */
-    public function scopeIsCritical($query)
+    public function disoverServiceTemplate($query, $device_group, $service_template)
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -63,7 +61,7 @@ class ServiceTemplate extends DeviceRelatedModel  implements Keyable
      * @param Builder $query
      * @return Builder
      */
-    public function scopeIsWarning($query)
+    public function deleteServiceTemplate($query, $service_template_id)
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -76,7 +74,7 @@ class ServiceTemplate extends DeviceRelatedModel  implements Keyable
      * @param Builder $query
      * @return Builder
      */
-    public function scopeIsIgnored($query)
+    public function removeServiceTemplate($query, $service_template_id)
     {
         return $query->where([
             ['service_ignore', '=', 1],

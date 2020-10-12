@@ -1,13 +1,13 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Create Device Group'))
+@section('title', __('Create Service Template'))
 
 @section('content')
     <div class="container">
         <div class="row">
             <form action="{{ route('services-templates.store') }}" method="POST" role="form"
                   class="form-horizontal services-templates-form col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 col-sm-12">
-                <legend>@lang('Create Device Group')</legend>
+                <legend>@lang('Create Service Template')</legend>
                 @csrf
 
                 @include('services-templates.form')

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Device;
+use App\Models\ServiceTemplate;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
