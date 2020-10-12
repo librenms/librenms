@@ -19,19 +19,18 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title" id="Delete">Delete Service</h2>
+                    <h5 class="modal-title" id="Delete">Confirm Delete</h5>
                 </div>
-                <div class='alert alert-info'>Service will be deleted.</div>
-                <div class='well well-lg'>
-                    <div class="modal-body">
-                        <p>Please confirm that you would like to delete this service.</p>
-                    </div>
-                    <hr>
+                <div class="modal-body">
+                    <p>Please confirm that you would like to delete this service.</p>
+                </div>
+                <div class="modal-footer">
                     <form role="form" class="remove_token_form">
                         <?php echo csrf_field() ?>
-                        <center><button type="submit" class="btn btn-danger danger" id="service-removal"
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger danger" id="service-removal"
                                 data-target="service-removal">Delete
-                        </button></center>
+                        </button>
                         <input type="hidden" name="service_id" id="service_id" value="">
                         <input type="hidden" name="confirm" id="confirm" value="yes">
                     </form>

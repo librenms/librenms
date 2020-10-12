@@ -1,6 +1,6 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Edit Device Group'))
+@section('title', __('Edit Service Template'))
 
 @section('content')
     <div class="container">
