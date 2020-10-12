@@ -68,7 +68,7 @@ class VlansController implements DeviceTab
         ];
     }
 
-    private function getVlans(Device $device)
+    private static function getVlans(Device $device)
     {
         // port.device needed to prevent loading device multiple times
         $portVlan = PortVlan::where('ports_vlans.device_id', $device->device_id)
