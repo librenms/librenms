@@ -29,13 +29,11 @@ use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
-use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\ServerHardware;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 
 class Unix extends \LibreNMS\OS implements MempoolsDiscovery, MempoolsPolling
 {
-    use HostResources;
     use ServerHardware;
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;

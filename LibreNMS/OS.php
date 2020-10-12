@@ -30,20 +30,24 @@ use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 
-class OS implements ProcessorDiscovery, OSDiscovery
+class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, MempoolsPolling
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
+        HostResources::pollMempools as pollHrMempools;
     }
     use UcdResources {
         UcdResources::discoverProcessors as discoverUcdProcessors;
+        UcdResources::pollMempools as pollUcdMempools;
     }
     use YamlOSDiscovery;
 
@@ -283,6 +287,16 @@ class OS implements ProcessorDiscovery, OSDiscovery
         }
 
         return $processors;
+    }
+
+    /**
+     * Poll UCD and HOST-RECOURCES mempools
+     * @return \Illuminate\Support\Collection|void
+     */
+    public function pollMempools()
+    {
+        $this->pollUcdMempools();
+        return $this->pollHrMempools();
     }
 
     public function getDiscovery()

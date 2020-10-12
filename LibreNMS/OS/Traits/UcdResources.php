@@ -25,6 +25,7 @@
 namespace LibreNMS\OS\Traits;
 
 use LibreNMS\Device\Processor;
+use LibreNMS\RRD\RrdDefinition;
 
 trait UcdResources
 {
@@ -48,5 +49,50 @@ trait UcdResources
                 -1
             ),
         ];
+    }
+
+    public function pollMempools()
+    {
+        $snmpdata = snmp_get_multi($this->getDeviceArray(), [
+            'memTotalSwap.0',
+            'memAvailSwap.0',
+            'memTotalReal.0',
+            'memAvailReal.0',
+            'memTotalFree.0',
+            'memShared.0',
+            'memBuffer.0',
+            'memCached.0',
+            'memSysAvail.0',
+        ], '-OQUs', 'UCD-SNMP-MIB');
+
+        if (! empty($snmpdata[0])) {
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('totalswap', 'GAUGE', 0)
+                ->addDataset('availswap', 'GAUGE', 0)
+                ->addDataset('totalreal', 'GAUGE', 0)
+                ->addDataset('availreal', 'GAUGE', 0)
+                ->addDataset('totalfree', 'GAUGE', 0)
+                ->addDataset('shared', 'GAUGE', 0)
+                ->addDataset('buffered', 'GAUGE', 0)
+                ->addDataset('cached', 'GAUGE', 0)
+                ->addDataset('available', 'GAUGE', 0);
+
+            $fields = [
+                'totalswap'    => $snmpdata[0]['memTotalSwap'],
+                'availswap'    => $snmpdata[0]['memAvailSwap'],
+                'totalreal'    => $snmpdata[0]['memTotalReal'],
+                'availreal'    => $snmpdata[0]['memAvailReal'],
+                'totalfree'    => $snmpdata[0]['memTotalFree'],
+                'shared'       => $snmpdata[0]['memShared'],
+                'buffered'     => $snmpdata[0]['memBuffer'],
+                'cached'       => $snmpdata[0]['memCached'],
+                'available'    => $snmpdata[0]['memSysAvail'],
+            ];
+
+            $tags = compact('rrd_def');
+            data_update($this->getDeviceArray(), 'ucd_mem', $tags, $fields);
+
+            $this->enableGraph('ucd_memory');
+        }
     }
 }

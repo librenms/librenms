@@ -134,12 +134,14 @@ trait HostResources
 
         if (is_array($storage_array)) {
             echo 'hrStorage : ';
+
             return collect($storage_array)->filter(function ($storage) {
                 return in_array($storage['hrStorageType'], $this->memoryStorageTypes)
                     && ! Str::contains($storage['hrStorageDescr'], $this->ignoreMemoryDescr);
             })->map(function ($storage, $index) {
                 $size = ($storage['hrStorageSize'] * $storage['hrStorageAllocationUnits']);
                 $used = ($storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits']);
+
                 return new Mempool([
                     'mempool_index' => $index,
                     'entPhysicalIndex' => null,

@@ -8,7 +8,6 @@ if (! $os instanceof OS) {
 }
 (new \LibreNMS\Modules\Mempools())->poll($os);
 
-
 return;
 
 foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', [$device['device_id']]) as $mempool) {
