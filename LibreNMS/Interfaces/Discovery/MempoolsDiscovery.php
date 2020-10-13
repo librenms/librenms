@@ -28,10 +28,10 @@ namespace LibreNMS\Interfaces\Discovery;
 interface MempoolsDiscovery
 {
     /**
-     * Discover an a array of mempool models.
+     * Discover a Collection of Mempool models.
      * Will be keyed by mempool_type and mempool_index
      *
-     * @return \App\Models\Mempool[]
+     * @return \Illuminate\Support\Collection \App\Models\Mempool
      */
     public function discoverMempools();
 }

@@ -24,6 +24,7 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Models\Mempool;
 use LibreNMS\Device\Processor;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -51,9 +52,41 @@ trait UcdResources
         ];
     }
 
-    public function pollMempools()
+    public function discoverMempools()
     {
-        $snmpdata = snmp_get_multi($this->getDeviceArray(), [
+        $mempools = collect();
+        $data = snmp_get_multi($this->getDeviceArray(), [
+            'memTotalSwap.0',
+            'memAvailSwap.0',
+            'memTotalReal.0',
+            'memAvailReal.0',
+            'memSysAvail.0',
+        ], '-OQUs', 'UCD-SNMP-MIB');
+
+        if (isset($data[0]['memTotalSwap']) && (isset($data[0]['memAvailReal']) || isset($data[0]['memSysAvail']))) {
+            $mempools->push((new Mempool([
+                'mempool_index' => 1,
+                'mempool_type' => 'ucd',
+                'mempool_precision' => 1024,
+                'mempool_descr' => 'System',
+            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memSysAvail'] ?? $data[0]['memAvailReal']));
+        }
+
+        if (isset($data[0]['memTotalSwap']) && isset($data[0]['memAvailSwap'])) {
+            $mempools->push((new Mempool([
+                'mempool_index' => 2,
+                'mempool_type' => 'ucd',
+                'mempool_precision' => 1024,
+                'mempool_descr' => 'Swap',
+            ]))->fillUsage(null, $data[0]['memTotalSwap'], $data[0]['memAvailSwap']));
+        }
+
+        return $mempools;
+    }
+
+    public function pollMempools($mempools)
+    {
+        $data = snmp_get_multi($this->getDeviceArray(), [
             'memTotalSwap.0',
             'memAvailSwap.0',
             'memTotalReal.0',
@@ -65,7 +98,13 @@ trait UcdResources
             'memSysAvail.0',
         ], '-OQUs', 'UCD-SNMP-MIB');
 
-        if (! empty($snmpdata[0])) {
+        if (! empty($data[0])) {
+            // update DB
+            optional($mempools->firstWhere('mempool_descr', 'Swap'))
+                ->fillUsage(null, $data[0]['memTotalSwap'], $data[0]['memAvailSwap']);
+            optional($mempools->firstWhere('mempool_descr', 'System'))
+                ->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memSysAvail'] ?? $data[0]['memAvailReal']);
+
             $rrd_def = RrdDefinition::make()
                 ->addDataset('totalswap', 'GAUGE', 0)
                 ->addDataset('availswap', 'GAUGE', 0)
@@ -78,15 +117,15 @@ trait UcdResources
                 ->addDataset('available', 'GAUGE', 0);
 
             $fields = [
-                'totalswap'    => $snmpdata[0]['memTotalSwap'],
-                'availswap'    => $snmpdata[0]['memAvailSwap'],
-                'totalreal'    => $snmpdata[0]['memTotalReal'],
-                'availreal'    => $snmpdata[0]['memAvailReal'],
-                'totalfree'    => $snmpdata[0]['memTotalFree'],
-                'shared'       => $snmpdata[0]['memShared'],
-                'buffered'     => $snmpdata[0]['memBuffer'],
-                'cached'       => $snmpdata[0]['memCached'],
-                'available'    => $snmpdata[0]['memSysAvail'],
+                'totalswap'    => $data[0]['memTotalSwap'],
+                'availswap'    => $data[0]['memAvailSwap'],
+                'totalreal'    => $data[0]['memTotalReal'],
+                'availreal'    => $data[0]['memAvailReal'],
+                'totalfree'    => $data[0]['memTotalFree'],
+                'shared'       => $data[0]['memShared'],
+                'buffered'     => $data[0]['memBuffer'],
+                'cached'       => $data[0]['memCached'],
+                'available'    => $data[0]['memSysAvail'],
             ];
 
             $tags = compact('rrd_def');
@@ -94,5 +133,7 @@ trait UcdResources
 
             $this->enableGraph('ucd_memory');
         }
+
+        return $mempools;
     }
 }

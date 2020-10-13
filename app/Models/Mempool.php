@@ -17,12 +17,48 @@ class Mempool extends DeviceRelatedModel implements Keyable
         'mempool_precision',
         'mempool_descr',
         'mempool_perc',
+        'mempool_perc_oid',
+        'memppol_used',
+        'mempool_used_oid',
         'mempool_free',
+        'mempool_free_oid',
         'mempool_total',
+        'mempool_total_oid',
         'mempool_perc_warn',
         'mempool_largestfree',
         'mempool_lowestfree',
     ];
+
+    public function fillUsage($used = null, $total = null, $free = null, $percent = null)
+    {
+        $this->mempool_total = $this->calculateTotal($total, $used, $free);
+        $this->mempool_used = $used * $this->mempool_precision;
+        $this->mempool_free = $free * $this->mempool_precision;
+        $this->mempool_perc = $percent;
+
+        if (! $this->mempool_total) {
+            // could not calculate total, can't calculate other values
+            return $this;
+        }
+
+        if ($used === null) {
+            $this->mempool_used = $free !== null
+                ? $this->mempool_total - $this->mempool_free
+                : $this->mempool_total * ($percent / 100);
+        }
+
+        if ($free === null) {
+            $this->mempool_free = $used !== null
+                ? $this->mempool_total - $this->mempool_used
+                : $this->mempool_total * (1 - ($percent / 100));
+        }
+
+        if ($percent == null) {
+            $this->mempool_perc = $this->mempool_used / $this->mempool_total * 100;
+        }
+
+        return $this;
+    }
 
     public function setMempoolPercAttribute($percent)
     {
@@ -32,5 +68,18 @@ class Mempool extends DeviceRelatedModel implements Keyable
     public function getCompositeKey()
     {
         return "$this->mempool_type-$this->mempool_index";
+    }
+
+    private function calculateTotal($total, $used, $free)
+    {
+        if ($total !== null) {
+            return $total * $this->mempool_precision;
+        }
+
+        if ($used !== null && $free !== null) {
+            return ($used + $free) * $this->mempool_precision;
+        }
+
+        return $this->mempool_total; // don't change the value it may have been set in discovery
     }
 }

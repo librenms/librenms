@@ -43,10 +43,12 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, Mempools
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
+        HostResources::discoverMempools as discoverHrMempools;
         HostResources::pollMempools as pollHrMempools;
     }
     use UcdResources {
         UcdResources::discoverProcessors as discoverUcdProcessors;
+        UcdResources::discoverMempools as discoverUcdMempools;
         UcdResources::pollMempools as pollUcdMempools;
     }
     use YamlOSDiscovery;
@@ -289,14 +291,29 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, Mempools
         return $processors;
     }
 
-    /**
-     * Poll UCD and HOST-RECOURCES mempools
-     * @return \Illuminate\Support\Collection|void
-     */
-    public function pollMempools()
+    public function discoverMempools()
     {
-        $this->pollUcdMempools();
-        return $this->pollHrMempools();
+        return $this->discoverUcdMempools()->merge($this->discoverHrMempools());
+    }
+
+    /**
+     * Poll HOST-RESOURCES-MIB and UCD-MIB
+     *
+     * @param \Illuminate\Support\Collection $mempools
+     * @return \Illuminate\Support\Collection
+     */
+    public function pollMempools($mempools)
+    {
+        $partition = $mempools->partition('mempool_type');
+
+        if ($partition->has('ucd')) {
+            $this->pollUcdMempools($partition->get('ucd'));
+        }
+        if ($partition->has('hrstorage')) {
+            $this->pollHrMempools($partition->get('hrstroage'));
+        }
+
+        return $mempools;
     }
 
     public function getDiscovery()

@@ -50,10 +50,10 @@ class Mempools implements Module
     public function poll(OS $os)
     {
         if ($os instanceof MempoolsPolling) {
-            $mempools = $os->pollMempools();
+            $mempools = $os->pollMempools($os->getDevice()->mempools);
 
             $mempools->each(function (Mempool $mempool) use ($os) {
-                echo "Mempool $mempool->mempool_descr: $mempool->mempool_perc%\n";
+                echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc%\n";
 
                 $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
                 $rrd_def = RrdDefinition::make()
@@ -74,6 +74,6 @@ class Mempools implements Module
 
     public function cleanup(OS $os)
     {
-        // TODO: Implement cleanup() method.
+        $os->getDevice()->mempools()->delete();
     }
 }
