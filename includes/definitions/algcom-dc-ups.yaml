@@ -4,10 +4,9 @@ type: power
 icon: algcom
 
 over:
-        #    - { graph: outputVoltage, text: 'DC-Bus-regulated-output' }
-        #    - { graph: outputCurrent, text: 'DC-Bus-current' }
-        #    - { graph: batteryVoltage, text: 'Battery-Bus-voltage' }
-        #    - { graph: batteryCurrent, text: 'Battery-Bus-current' }
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_temperature, text: Temperature }
 
 discovery:
     - sysObjectID:

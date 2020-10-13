@@ -7,112 +7,187 @@ modules:
         voltage:
                 data:
                    -
-
                      oid: outputVoltage
-                     num_oid: '.1.3.6.1.4.1.49136.1.1.1.{{$index}}'
+                     num_oid: '.1.3.6.1.4.1.49136.1.1.1.{{ $index }}'
                      divisor: 10
-                     descr: 'DC regulated Bus Voltage'
-                   
+                     descr: 'DC Voltage'
+                     low_limit: 43
+                     low_warn_limit: 44
+                     high_warn_limit: 55
+                     high_limit: 56
+                     group: Power
+                     index: outputVoltage
                    -
-                   
                      oid: batteryVoltage
-                     num_oid: '.1.3.6.1.4.1.49136.1.2.1.{{$index}}'
+                     num_oid: '.1.3.6.1.4.1.49136.1.2.1.{{ $index }}'
                      divisor: 10
-                     descr: 'Battery Bus Voltage'
-                   
+                     descr: 'Battery Voltage'
+                     low_limit: 43
+                     low_warn_limit: 44
+                     high_warn_limit: 55
+                     high_limit: 56
+                     group: Power
+                     index: batteryVoltage
                    -
-                   
                      oid: supplyVoltage
-                     num_oid: '.1.3.6.1.4.1.49136.1.6.1.{{$index}}'
+                     num_oid: '.1.3.6.1.4.1.49136.1.6.1.{{ $index }}'
                      divisor: 10
-                     descr: 'AC Mains Voltage (Optional)'
-                   
+                     descr: 'AC Voltage (Optional)'
+                     group: Power
+                     index: supplyVoltage
                    -
-                   
                      oid: btst-volt-i
-                     num_oid: '.1.3.6.1.4.1.49136.1.8.5.{{$index}}'
+                     num_oid: '.1.3.6.1.4.1.49136.1.8.5.{{ $index }}'
                      divisor: 10
-                     descr: 'Battery test initial voltage'
-                   
+                     descr: 'Bat-test start'
+                     group: Power
+                     index: btst-volt-i
                    -
-                   
                      oid: btst-volt-f
-                     num_oid: '.1.3.6.1.4.1.49136.1.8.7.{{$index}}'
+                     num_oid: '.1.3.6.1.4.1.49136.1.8.7.{{ $index }}'
                      divisor: 10
-                     descr: 'Battery test final voltage'
-     
+                     descr: 'Bat-test end'
+                     group: Power
+                     index: btst-volt-f
         current:
                 data:
                     -
-
                       oid: outputCurrent
-                      num_oid: '.1.3.6.1.4.1.49136.1.1.2.{{$index}}'
-                      divisor: 10
-                      descr: 'Total AC/DC output current'
-
+                      num_oid: '.1.3.6.1.4.1.49136.1.1.2.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Total output current'
+                      high_warn_limit: 8
+                      high_limit: 9
+                      index: outputCurrent
                     -
-
                       oid: batteryCurrent
-                      num_oid: '.1.3.6.1.4.1.49136.1.2.2.{{$index}}'
-                      divisor: 10
+                      num_oid: '.1.3.6.1.4.1.49136.1.2.2.{{ $index }}'
+                      divisor: 1000
                       descr: 'Battery Bus current'
-
+                      low_limit: '-8'
+                      low_warn_limit: '-9'
+                      high_warn_limit: 8
+                      high_limit: 9
+                      index: batteryCurrent
                     -
-
                       oid: btst-amp-i
-                      num_oid: '.1.3.6.1.4.1.49136.1.8.6.{{$index}}'
-                      divisor: 10
-                      descr: 'Battery test initial current'
+                      num_oid: '.1.3.6.1.4.1.49136.1.8.6.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Bat-test initial'
+                      index: btst-amp-i
                     -
-
                       oid: btst-amp-f
-                      num_oid: '.1.3.6.1.4.1.49136.1.8.8.{{$index}}'
-                      divisor: 10
-                      descr: 'Battery test final current'
-                                         
-
-
-
+                      num_oid: '.1.3.6.1.4.1.49136.1.8.8.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Bat-test final'
+                      index: btst-amp-f
         temperature:
                 data:
                     -
-
                       oid: innerTemperature
-                      num_oid: '.1.3.6.1.4.1.49136.1.4.1.{{$index}}'
-                      divisor: 10
+                      num_oid: '.1.3.6.1.4.1.49136.1.4.1.{{ $index }}'
+                      multiplier: 1
                       descr: 'Internal temperature'
-
+                      index: innerTemperature
                     -
-
                       oid: outerTemperature
-                      num_oid: '.1.3.6.1.4.1.49136.1.4.2.{{$index}}'
-                      divisor: 10
+                      num_oid: '.1.3.6.1.4.1.49136.1.4.2.{{ $index }}'
+                      multiplier: 1
                       descr: 'External probe temperature'
-
+                      index: outerTemperature
                     -
-
                       oid: heatSinkTemperature
-                      num_oid: '.1.3.6.1.4.1.49136.1.4.3.{{$index}}'
-                      divisor: 10
-                      descr: 'AC/DC Heatsink temperature'
-
-
+                      num_oid: '.1.3.6.1.4.1.49136.1.4.3.{{ $index }}'
+                      multiplier: 1
+                      descr: 'Heatsink temperature'
+                      index: heatSinkTemperature
         state:
                 data:
                     -
-
                       oid: chargerStatus
                       num_oid: '.1.3.6.1.4.1.49136.1.2.3.{{ $index }}'
                       descr: 'Charger Status'
+                      index: chargerStatus
                       states:
-                        - { descr: BATTERY_DISCONNECTED, graph: 1, value: 0, generic: 0 }
-                        - { descr: WRONG_BATTERY_VOLTAGE, graph: 1, value: 1, generic: 0 }
-                        - { descr: DISCHARGING, graph: 1, value: 2, generic: 0 }
-                        - { descr: CHARGING_BULK, graph: 1, value: 3, generic: 0 }
-                        - { descr: CHARGING_ABSORBTION, graph: 1, value: 4, generic: 0 }
-                        - { descr: CHARGING_FLOAT, graph: 1, value: 5, generic: 0 }
-                        - { descr: CRITICAL_LOW_VOLTAGE, graph: 1, value: 6, generic: 0 }
-                        - { descr: BATTERY_UNDER_TEST, graph: 1, value: 7, generic: 0 }
-
+                        - { graph: 1, value: 0, generic: 2, descr: BATTERY_DISCONNECTED }
+                        - { graph: 1, value: 1, generic: 2, descr: WRONG_BATTERY_VOLTAGE }
+                        - { graph: 1, value: 2, generic: 1, descr: DISCHARGING }
+                        - { graph: 1, value: 3, generic: 0, descr: CHARGING_BULK }
+                        - { graph: 1, value: 4, generic: 0, descr: CHARGING_ABSORBTION }
+                        - { graph: 1, value: 5, generic: 0, descr: CHARGING_FLOAT }
+                        - { graph: 1, value: 6, generic: 2, descr: CRITICAL_LOW_VOLTAGE }
+                        - { graph: 1, value: 7, generic: 0, descr: BATTERY_UNDER_TEST }
+                    -
+                      oid: alarmOnBattery
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.1.{{ $index }}'
+                      descr: 'Operation Mode'
+                      index: alarmOnBattery
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: AC }
+                        - { graph: 1, value: 1, generic: 1, descr: BATTERY }
+                    -
+                      oid: acFail
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.2.{{ $index }}'
+                      descr: 'AC Power'
+                      index: acFail
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: OK }
+                        - { graph: 1, value: 1, generic: 1, descr: FAIL }
+                    -
+                      oid: batteryCharging
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.3.{{ $index }}'
+                      descr: 'Charging'
+                      index: batteryCharging
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: NO }
+                        - { graph: 1, value: 1, generic: 0, descr: YES }
+                    -
+                      oid: batteryDischarging
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.4.{{ $index }}'
+                      descr: 'Discharging'
+                      index: batteryDischarging
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: NO }
+                        - { graph: 1, value: 1, generic: 0, descr: YES }
+                    -
+                      oid: overheat
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.5.{{ $index }}'
+                      descr: 'Temperature Status'
+                      index: overheat
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: OK }
+                        - { graph: 1, value: 1, generic: 2, descr: OVERHEAT }
+                    -
+                      oid: overload
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.6.{{ $index }}'
+                      descr: 'Load Capacity'
+                      index: overload
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: OK }
+                        - { graph: 1, value: 1, generic: 2, descr: OVERLOAD }
+                    -
+                      oid: fanAfail
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.7.{{ $index }}'
+                      descr: 'Fan A'
+                      index: fanAfail
+                      states:
+                        - { graph: 0, value: 0, generic: 0, descr: OK }
+                        - { graph: 0, value: 1, generic: 2, descr: FAIL }
+                    -
+                      oid: fanBfail
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.8.{{ $index }}'
+                      descr: 'Fan B'
+                      index: fanBfail
+                      states:
+                        - { graph: 0, value: 0, generic: 0, descr: OK }
+                        - { graph: 0, value: 1, generic: 2, descr: FAIL }
+        count:
+                data:
+                    -
+                      oid: upTime
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.11.{{ $index }}'
+                      descr: 'Horimeter'
+                      multiplier: 1
+                      index: upTime
 
 
