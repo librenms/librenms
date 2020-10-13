@@ -291,4 +291,14 @@ class YamlDiscovery
 
         return false;
     }
+
+    public static function oidToNumeric($oid, $device = null, $mib = 'ALL', $mibdir = null)
+    {
+        return self::oidIsNumeric($oid) ? $oid : snmp_translate($oid, $mib, $mibdir, null, $device);
+    }
+
+    public static function oidIsNumeric($oid)
+    {
+        return (bool) preg_match('/^[.\d]+$/', $oid);
+    }
 }

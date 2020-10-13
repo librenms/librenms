@@ -880,5 +880,5 @@ function get_device_max_repeaters($device)
  */
 function oid_is_numeric($oid)
 {
-    return (bool) preg_match('/^[.\d]+$/', $oid);
+    return \LibreNMS\Device\YamlDiscovery::oidIsNumeric($oid);
 }

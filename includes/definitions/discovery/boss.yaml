@@ -1,0 +1,10 @@
+modules:
+    mempools:
+        data:
+            -
+                total: S5-CHASSIS-MIB::s5ChasUtilMemoryTotalMB
+                avail: S5-CHASSIS-MIB::s5ChasUtilMemoryAvailableMB
+                descr: 'Unit {{ $count }} memory'
+                precision: 1048576
+                index: '.{{ $index }}'
+                type: avaya-ers

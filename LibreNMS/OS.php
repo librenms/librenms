@@ -26,6 +26,7 @@ namespace LibreNMS;
 
 use App\Models\Device;
 use App\Models\DeviceGraph;
+use App\Models\Mempool;
 use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
@@ -37,6 +38,7 @@ use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\UcdResources;
+use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 
 class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, MempoolsPolling
@@ -52,6 +54,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, Mempools
         UcdResources::pollMempools as pollUcdMempools;
     }
     use YamlOSDiscovery;
+    use YamlMempoolsDiscovery;
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
@@ -293,6 +296,10 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, Mempools
 
     public function discoverMempools()
     {
+        if ($this->hasYamlDiscovery('mempools')) {
+            return $this->discoverYamlMempools();
+        }
+
         return $this->discoverUcdMempools()->merge($this->discoverHrMempools());
     }
 
@@ -304,25 +311,37 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, Mempools
      */
     public function pollMempools($mempools)
     {
-        $partition = $mempools->partition('mempool_type');
+        $grouped = $mempools->groupBy(function (Mempool $mempool) {
+            if ($mempool->mempool_type == 'ucd' || $mempool->mempool_type == 'hrstorage') {
+                return $mempool->mempool_type;
+            }
+            return 'yaml';
+        });
 
-        if ($partition->has('ucd')) {
-            $this->pollUcdMempools($partition->get('ucd'));
+        if ($grouped->has('ucd')) {
+            $this->pollUcdMempools($grouped->get('ucd'));
         }
-        if ($partition->has('hrstorage')) {
-            $this->pollHrMempools($partition->get('hrstroage'));
+        if ($grouped->has('hrstorage')) {
+            $this->pollHrMempools($grouped->get('hrstroage'));
+        }
+        if ($grouped->has('yaml')) {
+            $this->pollYamlMempools($grouped->get('yaml'));
         }
 
         return $mempools;
     }
 
-    public function getDiscovery()
+    public function getDiscovery($module = null)
     {
         if (! array_key_exists('dynamic_discovery', $this->device)) {
             $file = base_path('/includes/definitions/discovery/' . $this->getName() . '.yaml');
             if (file_exists($file)) {
                 $this->device['dynamic_discovery'] = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
             }
+        }
+
+        if ($module) {
+            return $this->device['dynamic_discovery']['modules'][$module] ?? [];
         }
 
         return $this->device['dynamic_discovery'] ?? [];

@@ -53,7 +53,14 @@ class Mempools implements Module
             $mempools = $os->pollMempools($os->getDevice()->mempools);
 
             $mempools->each(function (Mempool $mempool) use ($os) {
-                echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc%\n";
+                $used = format_bi($mempool->mempool_used);
+                $total = format_bi($mempool->mempool_total);
+                echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc% $used / $total\n";
+                $mempool->save();
+
+                if ($mempool->mempool_type == 'ucd') {
+                    return; // has it's own rrd format
+                }
 
                 $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
                 $rrd_def = RrdDefinition::make()
@@ -66,8 +73,6 @@ class Mempools implements Module
 
                 $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def');
                 data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
-
-                $mempool->save();
             });
         }
     }
