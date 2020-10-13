@@ -160,8 +160,8 @@ function service_template_get($service_template = null)
 
     // $service is not null, get only what we want.
     */
-    #$sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled`,`service_template_name`,`service_template_changed` FROM `services_template` WHERE `service_template_id` = ?';
-    #$services_template = dbFetchRows($sql_query, [$service_template]);
+    //$sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled`,`service_template_name`,`service_template_changed` FROM `services_template` WHERE `service_template_id` = ?';
+    //$services_template = dbFetchRows($sql_query, [$service_template]);
     $services_template = getServiceTemplate($service_template);
     d_echo('Service Template Array: ' . print_r($services_template, true) . "\n");
 
