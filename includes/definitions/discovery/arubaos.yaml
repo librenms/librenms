@@ -2,6 +2,15 @@ mib: ARUBA-MIB:WLSX-SYSTEMEXT-MIB
 modules:
     os:
         sysDescr_regex: '/(\(MODEL: (?<hardware>.+)\),)? Version (?<version>\S+)/'
+    mempools:
+        data:
+            -
+                total: WLSX-SWITCH-MIB::sysXMemorySize
+                used: WLSX-SWITCH-MIB::sysXMemoryUsed
+                free: WLSX-SWITCH-MIB::sysXMemoryFree
+                precision: 1024
+                type: arubaos
+                index: 0
     processors:
         data:
             -

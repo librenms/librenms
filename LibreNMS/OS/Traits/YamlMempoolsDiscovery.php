@@ -32,35 +32,38 @@ trait YamlMempoolsDiscovery
 {
     private $mempoolsData = [];
     private $mempoolsFields = [
-        'total' => 'total',
-        'free' => 'avail',
-        'used' => 'used',
-        'perc' => 'percent',
+        'total',
+        'free',
+        'used',
+        'perc',
     ];
+    private $mempoolsPrefetch = [];
 
     public function discoverYamlMempools()
     {
         $mempools = collect();
         $mempools_yaml = $this->getDiscovery('mempools');
 
+        foreach ($mempools_yaml['pre-cache']['oids'] ?? [] as $oid) {
+            $this->mempoolsPrefetch = snmpwalk_cache_oid($this->getDeviceArray(), $oid, $this->mempoolsPrefetch, null, null, '-OQUb');
+        }
+
         foreach ($mempools_yaml['data'] as $yaml) {
-            $oids = [];
-            foreach ($this->mempoolsFields as $db_field => $yaml_field) {
-                $oids[$db_field] = $this->fetchData($yaml, $yaml_field);
-            }
+            $oids = $this->fetchData($yaml);
+            $snmp_data = array_merge_recursive($this->mempoolsPrefetch, $this->mempoolsData);
 
             $count = 1;
             foreach ($this->mempoolsData as $index => $data) {
                 $mempools->push((new Mempool([
-                    'mempool_index' => YamlDiscovery::replaceValues('index', $index, $count, $yaml, $this->mempoolsData),
+                    'mempool_index' => YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data),
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
-                    'mempool_descr' => YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $this->mempoolsData),
+                    'mempool_descr' => isset($yaml['descr']) ? YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data) : 'Memory',
                     'mempool_total_oid' => isset($oids['total']) ? "{$oids['total']}.$index" : null,
                     'mempool_free_oid' => isset($oids['free']) ? "{$oids['free']}.$index" : null,
                     'mempool_used_oid' => isset($oids['used']) ? "{$oids['used']}.$index" : null,
                     'mempool_perc_oid' => isset($oids['perc']) ? "{$oids['perc']}.$index" : null,
-                ]))->fillUsage($data[$yaml['used']] ?? null, $data[$yaml['total']] ?? null, $data[$yaml['avail']] ?? null, $data[$yaml['percent']] ?? null));
+                ]))->fillUsage($data[$yaml['used']] ?? null, $data[$yaml['total']] ?? null, $data[$yaml['free']] ?? null, $data[$yaml['percent']] ?? null));
                 $count++;
             }
         }
@@ -93,15 +96,20 @@ trait YamlMempoolsDiscovery
     /**
      * @param array $yaml item yaml definition
      * @param string $value field from yaml
-     * @return string|null oid base name for field
+     * @return array oids for fields
      */
-    private function fetchData($yaml, $value)
+    private function fetchData($yaml)
     {
-        if (isset($yaml[$value])) {
-            $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml[$value], $this->mempoolsData, null, null, '-OQU');
-            return YamlDiscovery::oidToNumeric($yaml[$value], $this->getDeviceArray());
+        $oids = [];
+        $this->mempoolsData = []; // clear data from previous mempools
+
+        foreach ($this->mempoolsFields as $value) {
+            if (isset($yaml[$value])) {
+                $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml[$value], $this->mempoolsData, null, null, '-OQUb');
+                $oids[$value] = YamlDiscovery::oidToNumeric($yaml[$value], $this->getDeviceArray());
+            }
         }
 
-        return null;
+        return $oids;
     }
 }

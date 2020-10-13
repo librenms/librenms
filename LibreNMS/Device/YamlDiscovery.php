@@ -107,6 +107,14 @@ class YamlDiscovery
         return $items;
     }
 
+    /**
+     * @param string $name Name of the field in yaml
+     * @param string $index index in the snmp table
+     * @param int $count current count of snmp table entries
+     * @param array $data yaml data
+     * @param array $pre_cache snmp data fetched from device
+     * @return mixed|string|string[]|null
+     */
     public static function replaceValues($name, $index, $count, $data, $pre_cache)
     {
         $value = static::getValueFromData($name, $index, $data, $pre_cache);
@@ -130,7 +138,7 @@ class YamlDiscovery
             $value = str_replace($search, $replace, $data[$name]);
 
             // search discovery data for values
-            $value = preg_replace_callback('/{{ \$([a-zA-Z0-9\-.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
+            $value = preg_replace_callback('/{{ \$?([a-zA-Z0-9\-.:]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
                 if (is_null($replace)) {
                     d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
@@ -169,12 +177,14 @@ class YamlDiscovery
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
 
+        if (isset($pre_cache[$index][$name])) {
+            return $pre_cache[$index][$name];
+        }
+
         if (isset($pre_cache[$name])) {
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
                     return $pre_cache[$name][$index][$name];
-                } elseif (isset($pre_cache[$index][$name])) {   //probably makes no sense here
-                    return $pre_cache[$index][$name];           //same
                 } elseif (isset($pre_cache[$name][$index])) {
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
