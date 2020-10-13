@@ -35,7 +35,7 @@ trait YamlMempoolsDiscovery
         'total',
         'free',
         'used',
-        'perc',
+        'percent_used',
     ];
     private $mempoolsPrefetch = [];
 
@@ -69,12 +69,13 @@ trait YamlMempoolsDiscovery
                     'mempool_total_oid' => isset($oids['total']) ? "{$oids['total']}.$index" : null,
                     'mempool_free_oid' => isset($oids['free']) ? "{$oids['free']}.$index" : null,
                     'mempool_used_oid' => isset($oids['used']) ? "{$oids['used']}.$index" : null,
-                    'mempool_perc_oid' => isset($oids['perc']) ? "{$oids['perc']}.$index" : null,
+                    'mempool_perc_oid' => isset($oids['percent_used']) ? "{$oids['percent_used']}.$index" : null,
+                    'mempool_perc_warn' => $yaml['warn_percent'] ?? 90,
                 ]))->fillUsage(
                     $data[$yaml['used']] ?? null,
                     $data[$yaml['total']] ?? (is_numeric($yaml['total']) ? $yaml['total'] : null), // allow hard-coded value
                     $data[$yaml['free']] ?? null,
-                    $data[$yaml['perc']] ?? null
+                    $data[$yaml['percent_used']] ?? null
                 ));
                 $count++;
             }

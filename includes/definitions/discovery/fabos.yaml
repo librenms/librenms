@@ -1,5 +1,10 @@
 mib: SW-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: 100
+                percent_used: SW-MIB::swMemUsage
     processors:
         data:
             -

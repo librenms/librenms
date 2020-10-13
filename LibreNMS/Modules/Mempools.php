@@ -53,9 +53,14 @@ class Mempools implements Module
             $mempools = $os->pollMempools($os->getDevice()->mempools);
 
             $mempools->each(function (Mempool $mempool) use ($os) {
-                $used = format_bi($mempool->mempool_used);
-                $total = format_bi($mempool->mempool_total);
-                echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc% $used / $total\n";
+                echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc%";
+                if ($mempool->mempool_total != 100) {
+                    $used = format_bi($mempool->mempool_used);
+                    $total = format_bi($mempool->mempool_total);
+                    echo "$used / $total";
+                }
+                echo PHP_EOL;
+
                 $mempool->save();
 
                 if ($mempool->mempool_type == 'ucd') {

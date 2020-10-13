@@ -4,7 +4,7 @@ modules:
         data:
             -
                 oid: GEPON-OLT-COMMON-MIB::mgrCardInfoTable
-                perc: GEPON-OLT-COMMON-MIB::mgrCardMemUtil
+                percent_used: GEPON-OLT-COMMON-MIB::mgrCardMemUtil
                 total: 268435456
                 descr: 'Hswa {{ $index }} Memory'
                 skip_values:
