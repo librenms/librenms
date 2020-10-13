@@ -54,8 +54,15 @@ trait YamlMempoolsDiscovery
 
             $count = 1;
             foreach ($this->mempoolsData as $index => $data) {
+                foreach ($yaml['skip_values'] ?? [] as $skip_entry) {
+                    if (YamlDiscovery::canSkipItem($skip_entry['value'], $index, $skip_entry, [], $snmp_data)) {
+                        echo 's';
+                        continue 2;
+                    }
+                }
+
                 $mempools->push((new Mempool([
-                    'mempool_index' => YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data),
+                    'mempool_index' => YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data) ?: $index,
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
                     'mempool_descr' => isset($yaml['descr']) ? YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data) : 'Memory',
@@ -63,10 +70,17 @@ trait YamlMempoolsDiscovery
                     'mempool_free_oid' => isset($oids['free']) ? "{$oids['free']}.$index" : null,
                     'mempool_used_oid' => isset($oids['used']) ? "{$oids['used']}.$index" : null,
                     'mempool_perc_oid' => isset($oids['perc']) ? "{$oids['perc']}.$index" : null,
-                ]))->fillUsage($data[$yaml['used']] ?? null, $data[$yaml['total']] ?? null, $data[$yaml['free']] ?? null, $data[$yaml['percent']] ?? null));
+                ]))->fillUsage(
+                    $data[$yaml['used']] ?? null,
+                    $data[$yaml['total']] ?? (is_numeric($yaml['total']) ? $yaml['total'] : null), // allow hard-coded value
+                    $data[$yaml['free']] ?? null,
+                    $data[$yaml['perc']] ?? null
+                ));
                 $count++;
             }
         }
+
+        dump($mempools->toArray());
 
         return $mempools;
     }
@@ -103,9 +117,15 @@ trait YamlMempoolsDiscovery
         $oids = [];
         $this->mempoolsData = []; // clear data from previous mempools
 
+        if (isset($yaml['oid'])) {
+            $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml['oid'], $this->mempoolsData, null, null, '-OQUb');
+        }
+
         foreach ($this->mempoolsFields as $value) {
-            if (isset($yaml[$value])) {
-                $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml[$value], $this->mempoolsData, null, null, '-OQUb');
+            if (isset($yaml[$value]) && ! is_numeric($yaml[$value])) { // allow for hard-coded values
+                if (empty($yaml['oid'])) { // if table given, skip individual oids
+                    $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml[$value], $this->mempoolsData, null, null, '-OQUb');
+                }
                 $oids[$value] = YamlDiscovery::oidToNumeric($yaml[$value], $this->getDeviceArray());
             }
         }
