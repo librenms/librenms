@@ -25,7 +25,7 @@ class ServiceTemplateController extends Controller
         $this->authorize('manage', ServiceTemplate::class);
 
         return view('service-template.index', [
-            'service_templates' => ServiceTemplate::orderBy('service_template_name')->withCount('device_groups')->get(),
+            'service_templates' => ServiceTemplate::orderBy('service_template_name')->get(),
         ]);
     }
 
