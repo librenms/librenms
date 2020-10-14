@@ -162,6 +162,7 @@ function delete_service_template($service_template = null)
         return false;
     }
     remove_service_template($service_template);
+    
     return dbDelete('services_template', '`service_template_id` =  ?', [$service_template]);
 }
 
