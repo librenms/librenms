@@ -25,7 +25,7 @@ class ServiceTemplateController extends Controller
         $this->authorize('manage', ServiceTemplate::class);
 
         return view('service-template.index', [
-            'service_templates' => ServiceTemplate::orderBy('system_template_name')->withCount('device_groups')->get(),
+            'service_templates' => ServiceTemplate::orderBy('service_template_name')->withCount('device_groups')->get(),
         ]);
     }
 
@@ -66,7 +66,7 @@ class ServiceTemplateController extends Controller
         $serviceTemplate = ServiceTemplate::make($request->only(['service_template_name', 'device_group_id', 'service_template_type', 'service_template_param', 'service_template_ip', 'service_template_desc', 'service_template_changed', 'service_template_disabled', 'service_template_ignore']));
         $serviceTemplate->save();
 
-        Toastr::success(__('Service Template :system_template_name created', ['system_template_name' => $serviceTemplate->service_template_name]));
+        Toastr::success(__('Service Template :service_template_name created', ['service_template_name' => $serviceTemplate->service_template_name]));
 
         return redirect()->route('service-templates.index');
     }
@@ -128,7 +128,7 @@ class ServiceTemplateController extends Controller
         if ($serviceTemplate->isDirty() || $devices_updated) {
             try {
                 if ($serviceTemplate->save() || $devices_updated) {
-                    Toastr::success(__('Service Template :system_template_name updated', ['system_template_name' => $serviceTemplate->system_template_name]));
+                    Toastr::success(__('Service Template :service_template_name updated', ['service_template_name' => $serviceTemplate->service_template_name]));
                 } else {
                     Toastr::error(__('Failed to save'));
 
@@ -156,7 +156,7 @@ class ServiceTemplateController extends Controller
     {
         $serviceTemplate->delete();
 
-        Toastr::success(__('Service Template :system_template_name deleted', ['system_template_name' => $serviceTemplate->system_template_name]));
+        Toastr::success(__('Service Template :service_template_name deleted', ['service_template_name' => $serviceTemplate->service_template_name]));
 
         return redirect()->route('service-templates.index');
     }
