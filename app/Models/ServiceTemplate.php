@@ -21,7 +21,7 @@ class ServiceTemplate extends Model implements Keyable
         'service_template_changed',
         'service_template_message',
         'service_template_disabled',
-        'service_template_name'
+        'service_template_name',
     ];
 
     // ---- Helper Functions ----
