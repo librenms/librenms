@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Device;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Toastr;
 
 class ServiceTemplateController extends Controller
@@ -126,7 +124,7 @@ class ServiceTemplateController extends Controller
         ]);
 
         $serviceTemplate->fill($request->only(['service_template_name', 'device_group_id', 'service_template_type', 'service_template_param', 'service_template_ip', 'service_template_desc', 'service_template_changed', 'service_template_ignore', 'service_template_disable']));
-            
+
         if ($serviceTemplate->isDirty() || $devices_updated) {
             try {
                 if ($serviceTemplate->save() || $devices_updated) {
