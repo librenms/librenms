@@ -2000,6 +2000,8 @@ function device_is_up($device, $record_perf = false)
     $device_perf = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = ['NOW()'];
+    $maintenance = DeviceCache::get($device['device_id'])->isUnderMaintenance();
+    $mode = Config::get('graphing.availability_ignore_maintenance');
 
     if ($record_perf === true && can_ping_device($device['attribs'])) {
         $trace_debug = [];
@@ -2025,15 +2027,28 @@ function device_is_up($device, $record_perf = false)
         if ($device['snmp_disable'] || isSNMPable($device)) {
             $response['status'] = '1';
             $response['status_reason'] = '';
-        } else {
+        }
+        else {
             echo 'SNMP Unreachable';
             $response['status'] = '0';
-            $response['status_reason'] = 'snmp';
+            if ($maintenance && $mode) {
+                // Scheduled maintenance, device not responding to snmp
+                $response['status_reason'] = 'snmp (maintenance)';
+            }
+            else {
+                $response['status_reason'] = 'snmp';
+            }
         }
     } else {
         echo 'Unpingable';
         $response['status'] = '0';
-        $response['status_reason'] = 'icmp';
+        if($maintenance && $mode) {
+            // Scheduled maintenance, device not responding to icmp
+            $response['status_reason'] = 'icmp (maintenance)';
+        }
+        else {
+            $response['status_reason'] = 'icmp';
+        }
     }
 
     if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason']) {
@@ -2068,9 +2083,12 @@ function device_is_up($device, $record_perf = false)
             $type = 'down';
             $reason = $response['status_reason'];
 
+            // use current time as a starting point when an outage starts
             $data = ['device_id' => $device['device_id'],
-                'going_down' => strtotime($device['last_polled']), ];
-            dbInsert($data, 'device_outages');
+                'going_down' => time(), ];
+            if ( (! $maintenance && $mode) || ($maintenance && ! $mode) || (! $maintenance && ! $mode)) {
+                    dbInsert($data, 'device_outages');
+            }
         }
 
         log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
