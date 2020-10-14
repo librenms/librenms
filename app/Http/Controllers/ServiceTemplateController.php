@@ -68,7 +68,7 @@ class ServiceTemplateController extends Controller
 
         Toastr::success(__('Service Template :service_template_name created', ['service_template_name' => $serviceTemplate->service_template_name]));
 
-        return redirect()->route('service-templates.index');
+        return redirect()->route('services-templates.index');
     }
 
     /**
@@ -143,7 +143,7 @@ class ServiceTemplateController extends Controller
             Toastr::info(__('No changes made'));
         }
 
-        return redirect()->route('service-templates.index');
+        return redirect()->route('services-templates.index');
     }
 
     /**
@@ -158,6 +158,6 @@ class ServiceTemplateController extends Controller
 
         Toastr::success(__('Service Template :service_template_name deleted', ['service_template_name' => $serviceTemplate->service_template_name]));
 
-        return redirect()->route('service-templates.index');
+        return redirect()->route('services-templates.index');
     }
 }
