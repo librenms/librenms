@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class ServiceTemplate extends DeviceRelatedModel implements Keyable
+class ServiceTemplate extends Model implements Keyable
 {
     public $timestamps = false;
     protected $primaryKey = 'service_template_id';
@@ -21,6 +21,7 @@ class ServiceTemplate extends DeviceRelatedModel implements Keyable
         'service_template_changed',
         'service_template_message',
         'service_template_disabled',
+        'service_template_name'
     ];
 
     // ---- Helper Functions ----
