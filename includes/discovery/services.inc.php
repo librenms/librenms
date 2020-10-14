@@ -1,13 +1,13 @@
 <?php
 
 use LibreNMS\Config;
-use App\Models\ServiceTemplate;
 
-if (Config::get('discover_services')) {
-    // Autodiscover Service Templates
-    foreach (dbFetchRows('SELECT `service_template_id`, `device_group_id` FROM `services_template`') as $service_template) {
-        discover_service_template($service_template['device_group_id'], $service_template['service_template_id']);
+if (Config::get('discover_services_templates')) {
+    foreach (DB::table('services_template')->pluck('service_template_id') as $service_template) {
+        discover_service_template($service_template['service_template_id']);
     }
+}
+if (Config::get('discover_services')) {
     // FIXME: use /etc/services?
     $known_services = [
         22  => 'ssh',

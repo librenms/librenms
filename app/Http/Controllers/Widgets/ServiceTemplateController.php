@@ -113,8 +113,8 @@ class ServiceTemplateController extends Controller
                     $query->where('service_template_id', '!=', $serviceTemplate->service_template_id);
                 }),
             ],
-            'service_template_type' => 'required|in:dynamic,static',
             'device_group_id' => 'integer',
+            'service_template_type' => 'string',
             'service_template_param' => 'string',
             'service_template_ip' => 'string',
             'service_template_desc' => 'string',

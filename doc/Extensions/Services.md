@@ -36,13 +36,23 @@ discover intervals.
 
 ## Service Auto Discovery
 
-To automatically apply service checks that are discovered to devices
-and to automatically apply Service Templates.
+To automatically create services for devices with available checks.
 
 You need to enable the discover services within config.php with the following:
 
 ```php
 $config['discover_services']           = true;
+```
+
+## Service Templates Auto Discovery
+
+To automatically create services for devices with configured
+Service Templates.
+
+You need to enable the discover services within config.php with the following:
+
+```php
+$config['discover_services_templates']           = true;
 ```
 
 ## Setup
