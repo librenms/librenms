@@ -116,46 +116,6 @@ function discover_service($device, $service)
     echo "$service ";
 }
 
-function service_template_get($service_template = null)
-{
-    /* NOT SURE THIS IS REQUIRED
-    $sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled` FROM `services_template` WHERE';
-    $sql_param = [];
-    $add = 0;
-
-    d_echo('SQL Query: ' . $sql_query);
-    if (! is_null($service_template)) {
-        // Add a service filter to the SQL query.
-        $sql_query .= ' `service_template_id` = ? AND';
-        $sql_param[] = $service_template;
-        $add++;
-    }
-    if (! is_null($device_group)) {
-        // Add a device filter to the SQL query.
-        $sql_query .= ' `device_group_id` = ? AND';
-        $sql_param[] = $device_group;
-        $add++;
-    }
-
-    if ($add == 0) {
-        // No filters, remove " WHERE" -6
-        $sql_query = substr($sql_query, 0, strlen($sql_query) - 6);
-    } else {
-        // We have filters, remove " AND" -4
-        $sql_query = substr($sql_query, 0, strlen($sql_query) - 4);
-    }
-    d_echo('SQL Query: ' . $sql_query);
-
-    // $service is not null, get only what we want.
-    */
-    //$sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled`,`service_template_name`,`service_template_changed` FROM `services_template` WHERE `service_template_id` = ?';
-    //$services_template = dbFetchRows($sql_query, [$service_template]);
-    $services_template = ServiceTemplate::getServiceTemplate($service_template);
-    d_echo('Service Template Array: ' . print_r($services_template, true) . "\n");
-
-    return $services_template;
-}
-
 function delete_service_template($service_template = null)
 {
     if (! is_numeric($service_template)) {
@@ -168,7 +128,7 @@ function delete_service_template($service_template = null)
 
 function discover_service_template($service_template = null)
 {
-    $services_template = service_template_get($service_template);
+    $services_template = ServiceTemplate::getServiceTemplate($service_template);
     $status = null;
     foreach (DB::table('device_group_device')->where('device_group_id', $services_template[0]['device_group_id'])->pluck('device_id') as $device) {
         foreach (DB::table('services')->where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template[0]['service_template_changed'])->pluck('service_id') as $service) {
