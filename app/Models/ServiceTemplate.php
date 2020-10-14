@@ -37,48 +37,10 @@ class ServiceTemplate extends DeviceRelatedModel implements Keyable
      * @param Builder $query
      * @return Builder
      */
-    public function getServiceTemplate($query, $service_template_id)
+    public function getServiceTemplate($service_template_id)
     {
         return $query->where([
             ['service_template_id', '=', $service_template_id],
-        ]);
-    }
-
-    /**
-     * @param Builder $query
-     * @return Builder
-     */
-    public function disoverServiceTemplate($query, $device_group, $service_template)
-    {
-        return $query->where([
-            ['service_ignore', '=', 0],
-            ['service_disabled', '=', 0],
-            ['service_status', '=', 2],
-        ]);
-    }
-
-    /**
-     * @param Builder $query
-     * @return Builder
-     */
-    public function deleteServiceTemplate($query, $service_template_id)
-    {
-        return $query->where([
-            ['service_ignore', '=', 0],
-            ['service_disabled', '=', 0],
-            ['service_status', '=', 1],
-        ]);
-    }
-
-    /**
-     * @param Builder $query
-     * @return Builder
-     */
-    public function removeServiceTemplate($query, $service_template_id)
-    {
-        return $query->where([
-            ['service_ignore', '=', 1],
-            ['service_disabled', '=', 0],
         ]);
     }
 

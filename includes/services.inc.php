@@ -109,23 +109,11 @@ function delete_service($service = null)
 function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
-        add_service($device, $service, "$service Monitoring (Default)", null, null, 0, 0, 0, "AUTO: $service", 0);
+        add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service", 0);
         log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
         echo '+';
     }
     echo "$service ";
-}
-
-function add_service_template($device_group, $type, $desc, $ip, $param = '', $ignore = 0, $disabled = 0, $name)
-{
-
-//    if (!is_array($device_group)) {
-//        $device_group = device_group_by_id_cache($device_group);
-//    }
-
-    $insert = ['device_group_id' => $device_group['device_group_id'], 'service_template_ip' => $ip, 'service_template_type' => $type, 'service_template_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_template_desc' => $desc, 'service_template_param' => $param, 'service_template_ignore' => $ignore, 'service_template_disabled' => $disabled, 'service_template_name' => $name];
-
-    return dbInsert($insert, 'services_template');
 }
 
 function service_template_get($service_template = null)
@@ -162,19 +150,10 @@ function service_template_get($service_template = null)
     */
     //$sql_query = 'SELECT `service_template_id`,`device_group_id`,`service_template_ip`,`service_template_type`,`service_template_desc`,`service_template_param`,`service_template_ignore`,`service_template_changed`,`service_template_disabled`,`service_template_name`,`service_template_changed` FROM `services_template` WHERE `service_template_id` = ?';
     //$services_template = dbFetchRows($sql_query, [$service_template]);
-    $services_template = getServiceTemplate($service_template);
+    $services_template = ServiceTemplate::getServiceTemplate($service_template);
     d_echo('Service Template Array: ' . print_r($services_template, true) . "\n");
 
     return $services_template;
-}
-
-function edit_service_template($update = [], $service_template = null)
-{
-    if (! is_numeric($service_template)) {
-        return false;
-    }
-
-    return dbUpdate($update, 'services_template', '`service_template_id`=?', [$service_template]);
 }
 
 function delete_service_template($service_template = null)
@@ -182,26 +161,22 @@ function delete_service_template($service_template = null)
     if (! is_numeric($service_template)) {
         return false;
     }
-    foreach (dbFetchRows('SELECT * FROM `services` WHERE `service_template_id` = ?', [$service_template]) as $service) {
-        dbDelete('services', '`service_id` =  ?', [$service['service_id']]);
-    }
-
+    remove_service_template($service_template);
     return dbDelete('services_template', '`service_template_id` =  ?', [$service_template]);
 }
 
 function discover_service_template($device_group = null, $service_template = null)
 {
-    $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?', [$device_group]);
     $services_template = service_template_get($service_template);
     $status = null;
-    foreach ($device_ids as $device) {
-        foreach (dbFetchRows('SELECT `service_id` FROM `services` WHERE `service_template_id` = ? AND `device_id` = ? AND `service_template_changed` != ?', [$service_template, $device, $services_template[0]['service_template_changed']]) as $service) {
+    foreach (DB::table('device_group_device')->where('device_group_id', $device_group)-pluck('device_id') as $device) {
+        foreach (DB::table('services')->where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template[0]['service_template_changed'])->pluck('service_id') as $service) {
             $update = ['service_desc' => $services_template[0]['service_template_desc'], 'service_ip' => $services_template[0]['service_template_ip'], 'service_param' => $services_template[0]['service_template_param'], 'service_ignore' => $services_template[0]['service_template_ignore'], 'service_disabled' => $services_template[0]['service_template_disabled'], 'service_template_id' => $services_template[0]['service_template_id'], 'service_name' => $services_template[0]['service_template_name'], 'service_template_changed' => $services_template[0]['service_template_changed']];
             edit_service($update, $service['service_id']);
             log_event("Updated Service: {$services_template[0]['service_template_name']} from Service Template ID: {$services_template[0]['service_template_id']}", $device, 'service', 2);
             $status = 1;
         }
-        if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_template_id`= ? AND `device_id` = ?', [$service_template, $device])) {
+        if (! DB::raw('COUNT(service_id)')->from('services')->where('service_template_id', $service_template)->where('device_id', $device)) {
             add_service($device, $services_template[0]['service_template_type'], $services_template[0]['service_template_desc'], $services_template[0]['service_template_ip'], $services_template[0]['service_template_param'], $services_template[0]['service_template_ignore'], $services_template[0]['service_template_disabled'], $services_template[0]['service_template_id'], $services_template[0]['service_template_name'], $services_template[0]['service_template_changed']);
             log_event("Added Service: {$services_template[0]['service_template_name']} from Service Template ID: {$services_template[0]['service_template_id']}", $device, 'service', 2);
             $status = 1;
@@ -221,8 +196,8 @@ function remove_service_template($service_template = null)
         return false;
     }
     $status = null;
-    foreach (dbFetchRows('SELECT * FROM `services` WHERE `service_template_id` = ?', [$service_template]) as $service) {
-        dbDelete('services', '`service_id` =  ?', [$service['service_id']]);
+    foreach (DB::table('services')->where('service_template_id', $service_template)-pluck('service_id') as $service_id) {
+        dbDelete('services', '`service_id` =  ?', $service_id);
         $status = 1;
     }
 
