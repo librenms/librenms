@@ -237,9 +237,6 @@
                             <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg"
                                                                    aria-hidden="true"></i> @lang('All Services')</a>
                             </li>
-                            <li><a href="{{ url('services-templates') }}"><i class="fa fa-cogs fa-fw fa-lg"
-                                                                   aria-hidden="true"></i> @lang('Services Templates')</a>
-                            </li>
                             @if($service_counts['warning'] || $service_counts['critical'])
                                 <li role="presentation" class="divider"></li>
                                 @if($service_counts['warning'])
@@ -257,6 +254,11 @@
                             @endif
                             @admin
                                 <li role="presentation" class="divider"></li>
+                            @can('manage', \App\Models\ServiceTemplate::class)
+                                <li><a href="{{ url('services-templates') }}"><i class="fa fa-cogs fa-fw fa-lg"
+                                                                    aria-hidden="true"></i> @lang('Services Templates')</a>
+                                </li>
+                            @endcan
                             <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                                  aria-hidden="true"></i> @lang('Add Service')</a></li>
                             @endadmin
