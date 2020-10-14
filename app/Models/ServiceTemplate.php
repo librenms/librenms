@@ -21,7 +21,6 @@ class ServiceTemplate extends DeviceRelatedModel implements Keyable
         'service_template_changed',
         'service_template_message',
         'service_template_disabled',
-        'service_template_ds',
     ];
 
     // ---- Helper Functions ----
@@ -39,7 +38,7 @@ class ServiceTemplate extends DeviceRelatedModel implements Keyable
      */
     public function getServiceTemplate($service_template_id)
     {
-        return $query->where([
+        return $service_template_id->where([
             ['service_template_id', '=', $service_template_id],
         ]);
     }
