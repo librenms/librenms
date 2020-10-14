@@ -54,7 +54,7 @@ class ServiceTemplateController extends Controller
         $this->validate($request, [
             'service_template_name' => 'required|string|unique:service_templates',
             'device_group_id' => 'integer',
-            'service_template_type' => 'required|in:dynamic,static',
+            'service_template_type' => 'string',
             'service_template_param' => 'string',
             'service_template_ip' => 'string',
             'service_template_desc' => 'string',

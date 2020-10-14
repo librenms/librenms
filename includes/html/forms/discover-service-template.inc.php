@@ -16,10 +16,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
 }
 
 $service_template_id = $vars['service_template_id'];
-$device_group_id = $vars['device_group_id'];
 
-if (is_numeric($service_template_id) && is_numeric($device_group_id)) {
-    if (discover_service_template($device_group_id, $service_template_id)) {
+if (is_numeric($service_template_id)) {
+    if (discover_service_template($service_template_id)) {
         $status = ['status' =>0, 'message' => 'Services for Service Template: <i>' . $service_template_id . ', have been created or updated.</i>'];
     } else {
         $status = ['status' =>1, 'message' => 'Services for Service Template: <i>' . $service_template_id . ', have NOT been created or updated.</i>'];

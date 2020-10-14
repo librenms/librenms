@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use App\Models\ServiceTemplate;
 
 if (Config::get('discover_services')) {
     // Autodiscover Service Templates
