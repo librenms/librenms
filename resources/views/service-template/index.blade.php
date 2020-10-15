@@ -6,7 +6,10 @@
     <div class="container-fluid">
         <x-panel id="manage-services-templates-panel">
             <x-slot name="title">
-                <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Services Templates')
+                <span class="fa-stack" aria-hidden="true">
+                    <i class="fa fa-square fa-stack-2x"></i>
+                    <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
+                </span> @lang('Services Templates')
             </x-slot>
 
             <div class="row">
