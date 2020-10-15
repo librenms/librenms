@@ -10,14 +10,14 @@
                 <legend>@lang('Create Service Template')</legend>
                 <div class='alert alert-info'>Service Template will created for the specified Device Group.</div>
                 @csrf
-
-                @include('service-template.form')
-
-                <div class="form-group">
-                    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-sm-offset-2">
-                        <button type="submit" class="btn btn-primary">@lang('Save')</button>
-                        <a type="button" class="btn btn-danger"
-                           href="{{ route('services.templates.index') }}">@lang('Cancel')</a>
+                <div class='well well-lg'>
+                    @include('service-template.form')
+                    <div class="form-group">
+                        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-sm-offset-2">
+                            <button type="submit" class="btn btn-primary">@lang('Save')</button>
+                            <a type="button" class="btn btn-danger"
+                            href="{{ route('services.templates.index') }}">@lang('Cancel')</a>
+                        </div>
                     </div>
                 </div>
             </form>
