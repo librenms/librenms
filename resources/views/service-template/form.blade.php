@@ -41,7 +41,7 @@
 <div class="form-group @if($errors->has('ip')) has-error @endif">
     <label for="ip" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Remote Host')</label>
     <div class="col-sm-9 col-md-10">
-        <input type="text" class="form-control" id="service_template_ip" name="service_template_ip" value="{{ old('ip', $service_template->service_template_ip) }}">
+        <input type="text" class="form-control" id="service_template_ip" name="service_template_ip" value="{{ old('service_template_ip', $service_template->service_template_ip) }}">
         <span class="help-block">{{ $errors->first('ip') }}</span>
     </div>
 </div>
