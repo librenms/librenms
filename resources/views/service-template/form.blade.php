@@ -1,7 +1,7 @@
 <div class="form-group @if($errors->has('name')) has-error @endif">
     <label for="name" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Name')</label>
     <div class="col-sm-9 col-md-10">
-        <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $service_template->service_template_name) }}">
+        <input type="text" class="form-control" id="service_template_name" name="service_template_name" value="{{ old('name', $service_template->service_template_name) }}">
         <span class="help-block">{{ $errors->first('name') }}</span>
     </div>
 </div>
