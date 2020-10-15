@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\OspfArea;
 use App\Models\OspfInstance;
@@ -9,13 +8,10 @@ use App\Models\OspfPort;
 use App\Models\OspfTos;
 use LibreNMS\RRD\RrdDefinition;
 
-$device_model = Device::find($device['device_id']);
-
-if (key_exists('vrf_lite_cisco', $device) && ($device['vrf_lite_cisco'] != '')) {
-    $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-} else {
-    $vrfs_lite_cisco = [['context_name' => null]];
-}
+$device_model = DeviceCache::getPrimary();
+$vrfs_lite_cisco = empty($device['vrf_lite_cisco'])
+    ? [['context_name' => null]]
+    : $device['vrf_lite_cisco'];
 
 foreach ($vrfs_lite_cisco as $vrf_lite) {
     $device['context_name'] = $vrf_lite['context_name'];
