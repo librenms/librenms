@@ -18,6 +18,7 @@
                     </a>
                 </div>
             </div>
+            @csrf
             @foreach($device_groups as $device_group)
                 <x-panel id="manage-services-templates-panel-dg" title="{{ __('Device Group:') }} {{ $device_group->name }}">
                     <div class="table-responsive">

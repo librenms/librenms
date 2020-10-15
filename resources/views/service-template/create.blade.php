@@ -7,7 +7,7 @@
         <div class="row">
             <form action="{{ route('services.templates.store') }}" method="POST" role="form"
                   class="form-horizontal services-templates-form col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 col-sm-12">
-                <legend>@lang('Create Service Template')</legend>
+                <legend><h2>@lang('Create Service Template')</h2></legend>
                 <div class='alert alert-info'>Service Template will created for the specified Device Group.</div>
                 @csrf
                 <div class='well well-lg'>
