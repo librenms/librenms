@@ -2039,7 +2039,8 @@ function device_is_up($device, $record_perf = false)
                 $response['status_reason'] = 'snmp';
             }
         }
-    } else {
+    } 
+    else {
         echo 'Unpingable';
         $response['status'] = '0';
         if($maintenance && $mode) {
@@ -2079,7 +2080,8 @@ function device_is_up($device, $record_perf = false)
                     [$device['device_id'], $going_down]
                 );
             }
-        } else {
+        }
+        else {
             $type = 'down';
             $reason = $response['status_reason'];
 
