@@ -13,11 +13,11 @@
                 <div class='well well-lg'>
                     @include('service-template.form')
                     <div class="form-group">
-                        <center><div class="col-sm-9 col-sm-offset-3 col-md-10 col-sm-offset-2">
-                            <button type="submit" class="btn btn-primary">@lang('Save')</button>
+                        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-sm-offset-2">
+                        <center><button type="submit" class="btn btn-primary">@lang('Save')</button>
                             <a type="button" class="btn btn-danger"
-                            href="{{ route('services.templates.index') }}">@lang('Cancel')</a>
-                        </div></center>
+                            href="{{ route('services.templates.index') }}">@lang('Cancel')</a></center>
+                        </div>
                     </div>
                 </div>
             </form>
