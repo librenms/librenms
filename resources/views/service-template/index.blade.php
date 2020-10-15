@@ -11,14 +11,13 @@
                     <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
                 </span> @lang('Services Templates')
             </x-slot>
-            <div class="row">
+            <div class="row" style="padding-bottom: 16px;">
                 <div class="col-md-12">
                     <a type="button" class="btn btn-success" href="{{ route('services.templates.create') }}">
                         <i class="fa fa-plus"></i> @lang('New Service Template')
                     </a>
                 </div>
             </div>
-            @csrf
             @foreach($device_groups as $device_group)
                 <x-panel id="manage-services-templates-panel-dg" title="{{ __('Device Group:') }} {{ $device_group->name }}">
                     <div class="table-responsive">
