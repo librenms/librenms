@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DeviceGroup;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use LibreNMS\Alerting\QueryBuilderFilter;
+use LibreNMS\Services;
 use Toastr;
 
 class ServiceTemplateController extends Controller
@@ -18,26 +19,27 @@ class ServiceTemplateController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function index()
     {
-        $this->authorize('manage', ServiceTemplate::class);
-
         return view('service-template.index', [
             'service_templates' => ServiceTemplate::orderBy('service_template_name')->get(),
+            'device_groups' => DeviceGroup::orderBy('name')->get(),
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function create()
     {
         return view('service-template.create', [
             'service_template' => new ServiceTemplate(),
+            'device_groups' => DeviceGroup::orderBy('name')->get(),
+            'services' => Services::list(),
             //'filters' => json_encode(new QueryBuilderFilter('group')),
             //FIXME do i need the above?
         ]);
@@ -47,7 +49,7 @@ class ServiceTemplateController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function store(Request $request)
     {
@@ -63,19 +65,29 @@ class ServiceTemplateController extends Controller
             'service_template_ignore' => 'integer',
         ]);
 
-        $serviceTemplate = ServiceTemplate::make($request->only(['service_template_name', 'device_group_id', 'service_template_type', 'service_template_param', 'service_template_ip', 'service_template_desc', 'service_template_changed', 'service_template_disabled', 'service_template_ignore']));
+        $serviceTemplate = ServiceTemplate::make($request->only([
+            'service_template_name',
+            'device_group_id',
+            'service_template_type',
+            'service_template_param',
+            'service_template_ip',
+            'service_template_desc',
+            'service_template_changed',
+            'service_template_disabled',
+            'service_template_ignore',
+        ]));
         $serviceTemplate->save();
 
         Toastr::success(__('Service Template :service_template_name created', ['service_template_name' => $serviceTemplate->service_template_name]));
 
-        return redirect()->route('services-templates.index');
+        return redirect()->route('services.templates.index');
     }
 
     /**
      * Display the specified resource.
      *
      * @param \App\Models\ServiceTemplate $serviceTemplate
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show(ServiceTemplate $serviceTemplate)
     {
@@ -86,7 +98,7 @@ class ServiceTemplateController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param \App\Models\ServiceTemplate $serviceTemplate
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function edit(ServiceTemplate $serviceTemplate)
     {
@@ -101,7 +113,7 @@ class ServiceTemplateController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param \App\Models\ServiceTemplate $serviceTemplate
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function update(Request $request, ServiceTemplate $serviceTemplate)
     {
@@ -143,14 +155,14 @@ class ServiceTemplateController extends Controller
             Toastr::info(__('No changes made'));
         }
 
-        return redirect()->route('services-templates.index');
+        return redirect()->route('services.templates.index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param \App\Models\ServiceTemplate $serviceTemplate
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function destroy(ServiceTemplate $serviceTemplate)
     {
@@ -158,6 +170,6 @@ class ServiceTemplateController extends Controller
 
         Toastr::success(__('Service Template :service_template_name deleted', ['service_template_name' => $serviceTemplate->service_template_name]));
 
-        return redirect()->route('services-templates.index');
+        return redirect()->route('services.templates.index');
     }
 }

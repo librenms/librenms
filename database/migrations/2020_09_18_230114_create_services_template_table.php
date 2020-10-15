@@ -12,7 +12,7 @@ class CreateServicesTemplateTable extends Migration
      */
     public function up()
     {
-        Schema::create('services_template', function (Blueprint $table) {
+        Schema::create('service_templates', function (Blueprint $table) {
             $table->increments('service_template_id');
             $table->unsignedInteger('device_group_id')->index();
             $table->text('service_template_ip');
@@ -23,7 +23,6 @@ class CreateServicesTemplateTable extends Migration
             $table->unsignedInteger('service_template_changed')->default(0);
             $table->boolean('service_template_disabled')->default(0);
             $table->string('service_template_name');
-            //$table->index(['device_group_id'],'services_template_device_group_id_index');
         });
         Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->default(0);

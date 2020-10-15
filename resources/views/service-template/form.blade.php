@@ -22,8 +22,8 @@
     <label for="type" class="control-label col-sm-3 col-md-2">@lang('Check Type')</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="stype" name="stype[]" multiple>
-            @foreach(list_available_services() as $current_service)
-                <option value="{{ $current_service }}" selected>{{ $current_service() }}</option>
+            @foreach($services as $current_service)
+                <option value="{{ $current_service }}" selected>{{ $current_service }}</option>
             @endforeach
         </select>
         <span class="help-block">{{ $errors->first('type') }}</span>
