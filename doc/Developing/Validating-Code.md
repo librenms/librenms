@@ -23,6 +23,14 @@ Now install the dependencies we require:
 
 `./composer.phar install`
 
+You may want to install regarding PHP extensions if you see something like
+
+> The requested PHP extension ext-xml * is missing from your system. Install or enable PHP's xml extension.
+
+by running:
+
+`apt install php-mbstring php-xml php-curl php-zip`
+
 Once composer is installed you can now run the code validation script:
 
 `./lnms dev:check`
