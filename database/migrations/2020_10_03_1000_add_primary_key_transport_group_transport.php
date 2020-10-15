@@ -21,7 +21,7 @@ class AddPrimaryKeyTransportGroupTransport extends Migration
     {
         if (! Schema::hasColumn('transport_group_transport', 'id')) {
             Schema::table('transport_group_transport', function (Blueprint $table) {
-                $table->bigIncrements('id')->first();
+                $table->id()->first();
             });
         }
     }
