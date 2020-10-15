@@ -1,8 +1,5 @@
 mib: ALGPOWER-v2-MIB
 modules:
-    os:
-        sysDescr_regex: '/ALGCOM/'
-        
     sensors:
         voltage:
                 data:
