@@ -53,10 +53,10 @@
                                                 <i
                                                     class="fa fa-minus" aria-hidden="true"></i></button>
                                             <a type="button" title="@lang('edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
-                                            href="{{ route('services.templates.edit', $service_template->id) }}">
+                                            href="{{ route('services.templates.edit', $service_template->service_template_id) }}">
                                                 <i class="fa fa-pencil" aria-hidden="true"></i></a>
                                             <button type="button" class="btn btn-danger btn-sm" title="@lang('delete Service Template')" aria-label="@lang('Delete')"
-                                                    onclick="delete_st(this, '{{ $service_template->name }}', '{{ route('services.templates.destroy', $service_template->id) }}')">
+                                                    onclick="delete_st(this, '{{ $service_template->service_template_name }}', '{{ route('services.templates.destroy', $service_template->service_template_id) }}')">
                                                 <i
                                                     class="fa fa-trash" aria-hidden="true"></i></button>
                                         </td>
