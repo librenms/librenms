@@ -14,6 +14,7 @@ $rrd_options .= " 'DEF:atotalfree=$rrd_filename:totalfree:AVERAGE'";
 $rrd_options .= " 'DEF:ashared=$rrd_filename:shared:AVERAGE'";
 $rrd_options .= " 'DEF:abuffered=$rrd_filename:buffered:AVERAGE'";
 $rrd_options .= " 'DEF:acached=$rrd_filename:cached:AVERAGE'";
+$rrd_options .= " 'DEF:sysavail=$rrd_filename:sysavail:AVERAGE'";
 $rrd_options .= " 'CDEF:totalswap=atotalswap,1024,*'";
 $rrd_options .= " 'CDEF:availswap=aavailswap,1024,*'";
 $rrd_options .= " 'CDEF:totalreal=atotalreal,1024,*'";
@@ -22,9 +23,10 @@ $rrd_options .= " 'CDEF:totalfree=atotalfree,1024,*'";
 $rrd_options .= " 'CDEF:shared=ashared,1024,*'";
 $rrd_options .= " 'CDEF:buffered=abuffered,1024,*'";
 $rrd_options .= " 'CDEF:cached=acached,1024,*'";
+$rrd_options .= " 'CDEF:sysavail=sysavail,1024,*'";
 $rrd_options .= " 'CDEF:usedreal=totalreal,availreal,-'";
 $rrd_options .= " 'CDEF:usedswap=totalswap,availswap,-'";
-$rrd_options .= " 'CDEF:trueused=usedreal,cached,buffered,shared,-,-,-'";
+$rrd_options .= " 'CDEF:trueused=usedreal,cached,sysavail,buffered,shared,-,-,-'";
 $rrd_options .= " 'CDEF:true_perc=trueused,totalreal,/,100,*'";
 
 $rrd_options .= " 'CDEF:swrl_perc=usedswap,totalreal,/,100,*'";
@@ -35,9 +37,10 @@ $rrd_options .= " 'CDEF:real_percf=100,real_perc,-'";
 $rrd_options .= " 'CDEF:shared_perc=shared,totalreal,/,100,*'";
 $rrd_options .= " 'CDEF:buffered_perc=buffered,totalreal,/,100,*'";
 $rrd_options .= " 'CDEF:cached_perc=cached,totalreal,/,100,*'";
+$rrd_options .= " 'CDEF:sysavail_perc=sysavail,totalreal,/,100,*'";
 
 $rrd_options .= " 'CDEF:cusedswap=usedswap,-1,*'";
-$rrd_options .= " 'CDEF:cdeftot=availreal,shared,buffered,usedreal,cached,usedswap,+,+,+,+,+'";
+$rrd_options .= " 'CDEF:cdeftot=availreal,shared,buffered,usedreal,cached,sysavail,usedswap,+,+,+,+,+'";
 $rrd_options .= " 'COMMENT:Bytes         Current   Average   Maximum\\n'";
 
 $rrd_options .= " 'LINE1:usedreal#d0b080:'";
@@ -76,6 +79,7 @@ $rrd_options .= " 'LINE1:usedreal#d0b080:'";
 $rrd_options .= " 'AREA:shared#afeced:'";
 $rrd_options .= " 'AREA:buffered#cc0000::STACK'";
 $rrd_options .= " 'AREA:cached#ffaa66::STACK'";
+$rrd_options .= " 'AREA:sysavail#05a167::STACK'";
 
 $rrd_options .= " 'LINE1.25:shared#008fea:Shared   '";
 $rrd_options .= " 'GPRINT:shared:LAST:%6.2lf%sB'";
@@ -94,6 +98,13 @@ $rrd_options .= " 'GPRINT:cached:LAST:%6.2lf%sB'";
 $rrd_options .= " 'GPRINT:cached:AVERAGE:%6.2lf%sB'";
 $rrd_options .= " 'GPRINT:cached:MAX:%6.2lf%sB'";
 $rrd_options .= " 'GPRINT:cached_perc:LAST:%3.0lf%%\\n'";
+
+
+$rrd_options .= " 'LINE1.25:sysavail#05a167:Available   :STACK'";
+$rrd_options .= " 'GPRINT:sysavail:LAST:%6.2lf%sB'";
+$rrd_options .= " 'GPRINT:sysavail:AVERAGE:%6.2lf%sB'";
+$rrd_options .= " 'GPRINT:sysavail:MAX:%6.2lf%sB'";
+$rrd_options .= " 'GPRINT:sysavail:LAST:%3.0lf%%\\n'";
 
 $rrd_options .= " 'LINE1:totalreal#050505:'";
 $rrd_options .= " 'LINE1:totalreal#050505:Total'";
