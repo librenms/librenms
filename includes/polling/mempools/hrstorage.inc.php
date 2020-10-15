@@ -12,10 +12,12 @@ if (! is_array($storage_cache['hrstorage'])) {
 
 $entry = $storage_cache['hrstorage'][$mempool['mempool_index']];
 $mempool['units'] = $entry['hrStorageAllocationUnits'];
+$has_avail = false;  // sysAvail based calculation when available
 
 if ($mempool['mempool_index'] == 1 && isset($storage_cache['hrstorage'][11])) {  // Phisical memory && sysAvail field exists
     $availEntry = $storage_cache['hrstorage'][11];
     $mempool['free'] = $availEntry['hrStorageSize'] * $mempool['units'];
+    $has_avail = true;
 } else {
     $mempool['used'] = ($entry['hrStorageUsed'] * $mempool['units']);
 }
@@ -26,7 +28,7 @@ if ($device['sysObjectID'] == '.1.3.6.1.4.1.12325.1.1.2.1.1') { // bsnmpd based 
     $mempool['total'] = ($entry['hrStorageSize'] * $mempool['units']);
 }
 
-if (array_key_exists('free', $mempool)) {
+if ($has_avail) {
     $mempool['used'] = $mempool['total'] - $mempool['free'];
 } else {
     $mempool['free'] = $mempool['total'] - $mempool['used'];
