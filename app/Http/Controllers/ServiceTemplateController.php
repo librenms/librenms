@@ -23,7 +23,7 @@ class ServiceTemplateController extends Controller
      */
     public function index()
     {
-        return view('service-template.index', [
+        return view('services.templates.index', [
             'service_templates' => ServiceTemplate::orderBy('service_template_name')->get(),
             'device_groups' => DeviceGroup::orderBy('name')->get(),
         ]);
@@ -36,7 +36,7 @@ class ServiceTemplateController extends Controller
      */
     public function create()
     {
-        return view('service-template.create', [
+        return view('services.templates.create', [
             'service_template' => new ServiceTemplate(),
             'device_groups' => DeviceGroup::orderBy('name')->get(),
             'services' => Services::list(),
@@ -91,7 +91,7 @@ class ServiceTemplateController extends Controller
      */
     public function show(ServiceTemplate $serviceTemplate)
     {
-        return redirect(url('/services-templates/=' . $serviceTemplate->service_template_id));
+        return redirect(url('/services/templates/=' . $serviceTemplate->service_template_id));
     }
 
     /**
@@ -102,7 +102,7 @@ class ServiceTemplateController extends Controller
      */
     public function edit(ServiceTemplate $serviceTemplate)
     {
-        return view('service-template.edit', [
+        return view('services.templates.edit', [
             'service_template' => $serviceTemplate,
             //'filters' => json_encode(new QueryBuilderFilter('group')),
         ]);
