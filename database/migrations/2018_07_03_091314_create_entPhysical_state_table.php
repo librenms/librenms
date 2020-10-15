@@ -13,7 +13,7 @@ class CreateEntPhysicalStateTable extends Migration
     public function up()
     {
         Schema::create('entPhysical_state', function (Blueprint $table) {
-            $table->bigIncrements(id);
+            $table->id();
             $table->unsignedInteger('device_id');
             $table->string('entPhysicalIndex', 64);
             $table->string('subindex', 64)->nullable();
