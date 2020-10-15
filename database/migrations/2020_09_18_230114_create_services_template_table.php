@@ -38,7 +38,7 @@ class CreateServicesTemplateTable extends Migration
      */
     public function down()
     {
-        Schema::drop('services_template');
+        Schema::drop('service_templates');
         Schema::table('services', function (Blueprint $table) {
             $table->dropColumn([
                 'service_template_id',

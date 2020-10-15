@@ -3,7 +3,7 @@
 use LibreNMS\Config;
 
 if (Config::get('discover_services_templates')) {
-    foreach (DB::table('services_template')->pluck('service_template_id') as $service_template) {
+    foreach (DB::table('service_templates')->pluck('service_template_id') as $service_template) {
         discover_service_template($service_template['service_template_id']);
     }
 }

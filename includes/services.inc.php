@@ -123,7 +123,7 @@ function delete_service_template($service_template = null)
     }
     remove_service_template($service_template);
 
-    return dbDelete('services_template', '`service_template_id` =  ?', [$service_template]);
+    return dbDelete('service_templates', '`service_template_id` =  ?', [$service_template]);
 }
 
 function discover_service_template($service_template = null)
