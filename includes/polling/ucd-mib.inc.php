@@ -132,18 +132,11 @@ if (is_numeric($ss['ssCpuRawSteal'])) {
 // UCD-SNMP-MIB::memSwapError.0 = INTEGER: noError(0)
 // UCD-SNMP-MIB::memSwapErrorMsg.0 = STRING:
 
-$snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memAvailReal.0', 'memSysAvail.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
-
-if (is_array($snmpdata[0])) {
-    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
-    foreach (array_keys($snmpdata[0]) as $key) {
-        $$key = $snmpdata[0][$key];
-    }
-}
+$snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memAvailReal.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0', 'memSysAvail.0'], '-OQUs', 'UCD-SNMP-MIB');
 
 $snmpdata = $snmpdata[0];
 
-if (is_numeric($memTotalReal) && is_numeric($memSysAvail) && is_numeric($memTotalFree)) {
+if (is_numeric($snmpdata[2]) && is_numeric($snmpdata[3]) && is_numeric($snmpdata[5])) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('totalswap', 'GAUGE', 0, 10000000000)
         ->addDataset('availswap', 'GAUGE', 0, 10000000000)
@@ -155,19 +148,19 @@ if (is_numeric($memTotalReal) && is_numeric($memSysAvail) && is_numeric($memTota
         ->addDataset('cached', 'GAUGE', 0, 10000000000);
 
     $fields = [
-        'totalswap'    => $memTotalSwap,
-        'availswap'    => $memAvailSwap,
-        'totalreal'    => $memTotalReal,
-        'availreal'    => $memSysAvail,
-        'totalfree'    => $memTotalFree,
-        'shared'       => $memShared,
-        'buffered'     => $memBuffer,
-        'cached'       => $memCached,
+        'totalswap'    => $snmpdata[0],
+        'availswap'    => $snmpdata[1],
+        'totalreal'    => $snmpdata[2],
+        'availreal'    => $snmpdata[3],
+        'totalfree'    => $snmpdata[4],
+        'shared'       => $snmpdata[5],
+        'buffered'     => $snmpdata[6],
+        'cached'       => $snmpdata[7],
     ];
         
     if (isset($memSysAvail)) {
         $rrd_def->addDataset('sysavail', 'GAUGE', 0, 10000000000);
-        $fields['sysavail'] = $memSysAvail;
+        $fields['sysavail'] = $snmpdata[8];
     }
 
     $tags = compact('rrd_def');
@@ -203,5 +196,4 @@ if (is_numeric($load_raw[2]['laLoadInt'])) {
 }
 
 unset($ss, $load_raw, $snmpdata);
-unset($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memSysAvail, $memTotalFree, $memShared, $memBuffer, $memCached);
-unset($key, $collect_oids, $rrd_name, $rrd_def, $oid);
+unset($collect_oids, $rrd_name, $rrd_def, $oid);
