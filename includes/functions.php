@@ -2001,6 +2001,7 @@ function device_is_up($device, $record_perf = false)
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = ['NOW()'];
     $maintenance = DeviceCache::get($device['device_id'])->isUnderMaintenance();
+    $mode = Config::get('graphing.availability_ignore_maintenance');
 
     if ($record_perf === true && can_ping_device($device['attribs'])) {
         $trace_debug = [];
@@ -2030,8 +2031,8 @@ function device_is_up($device, $record_perf = false)
         else {
             echo 'SNMP Unreachable';
             $response['status'] = '0';
-            if ($maintenance) {
-                // Scheduled maintenance, device not responding to icmp
+            if ($maintenance && $mode) {
+                // Scheduled maintenance, device not responding to snmp
                 $response['status_reason'] = 'snmp (maintenance)';
             }
             else {
@@ -2041,7 +2042,7 @@ function device_is_up($device, $record_perf = false)
     } else {
         echo 'Unpingable';
         $response['status'] = '0';
-        if($maintenance) {
+        if($maintenance && $mode) {
             // Scheduled maintenance, device not responding to icmp
             $response['status_reason'] = 'icmp (maintenance)';
         }
@@ -2084,7 +2085,7 @@ function device_is_up($device, $record_perf = false)
 
             $data = ['device_id' => $device['device_id'],
                 'going_down' => strtotime($device['last_polled']), ];
-            if (! $maintenance) {
+            if ( (! $maintenance || $mode) || $maintenance && ! $mode) {
                     dbInsert($data, 'device_outages');
             }
         }

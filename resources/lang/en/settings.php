@@ -688,6 +688,10 @@ return [
                 'description' => 'Duration',
                 'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)',
             ],
+            'graphing.availability_ignore_maintenance' => [
+                'description' => 'Devices are always available in maintenance mode',
+                'help' => 'Disables the creation of outages while devices are in maintenance mode.',
+            ]
         ],
         'graylog' => [
             'base_uri' => [
