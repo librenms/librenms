@@ -77,4 +77,5 @@
 </div>
 
 <script>
+$("[type='checkbox']").bootstrapSwitch('offColor','danger');
 </script>
