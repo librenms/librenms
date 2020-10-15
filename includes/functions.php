@@ -2086,7 +2086,7 @@ function device_is_up($device, $record_perf = false)
             // use current time as starting point when an outage starts
             $data = ['device_id' => $device['device_id'],
                 'going_down' => time(), ];
-            if ( (! $maintenance && $mode) || ($maintenance && ! $mode) ) {
+            if ( (! $maintenance && $mode) || ($maintenance && ! $mode) || (! $maintenance && ! $mode)) {
                     dbInsert($data, 'device_outages');
             }
         }
