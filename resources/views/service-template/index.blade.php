@@ -11,7 +11,6 @@
                     <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
                 </span> @lang('Services Templates')
             </x-slot>
-
             <div class="row">
                 <div class="col-md-12">
                     <a type="button" class="btn btn-success" href="{{ route('services.templates.create') }}">
@@ -20,7 +19,7 @@
                 </div>
             </div>
             @foreach($device_groups as $device_group)
-                <x-panel id="manage-services-templates-panel-dg" title="{{ __('Device Group:') }} ({{ $device_group->name }})">
+                <x-panel class="fa fa-th fa-fw fa-lg" id="manage-services-templates-panel-dg" title="{{ __('Device Group:') }} {{ $device_group->name }}">
                     <div class="table-responsive">
                         <table id="manage-services-templates-table" class="table table-condensed table-hover">
                             <thead>
