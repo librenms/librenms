@@ -21,7 +21,7 @@ class AddPrimaryKeyProcesses extends Migration
     {
         if (! Schema::hasColumn('processes', 'id')) {
             Schema::table('processes', function (Blueprint $table) {
-                $table->bigIncrements('id')->first();
+                $table->id()->first();
             });
         }
     }
