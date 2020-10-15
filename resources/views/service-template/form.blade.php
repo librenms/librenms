@@ -21,9 +21,9 @@
 <div class="form-group @if($errors->has('type')) has-error @endif">
     <label for="type" class="control-label col-sm-3 col-md-2">@lang('Check Type')</label>
     <div class="col-sm-9 col-md-10">
-        <select class="form-control" id="stype" name="stype[]">
+        <select class="form-control" id="stype" name="stype">
             @foreach($services as $current_service)
-                <option value="{{ $current_service }}" selected>{{ $current_service }}</option>
+                <option value="{{ $current_service }}">{{ $current_service }}</option>
             @endforeach
         </select>
         <span class="help-block">{{ $errors->first('type') }}</span>
