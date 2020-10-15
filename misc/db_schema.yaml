@@ -1726,7 +1726,7 @@ services:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     services_device_id_index: { Name: services_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-services_template:
+service_templates:
   Columns:
     - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
