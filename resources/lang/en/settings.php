@@ -691,7 +691,7 @@ return [
             'availability_ignore_maintenance' => [
                 'description' => 'Devices are always available in maintenance mode',
                 'help' => 'Disables the creation of outages while devices are in maintenance mode.',
-            ]
+            ],
         ],
         'graylog' => [
             'base_uri' => [
