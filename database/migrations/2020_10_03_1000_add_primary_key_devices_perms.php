@@ -21,7 +21,7 @@ class AddPrimaryKeyDevicesPerms extends Migration
     {
         if (! Schema::hasColumn('devices_perms', 'id')) {
             Schema::table('devices_perms', function (Blueprint $table) {
-                $table->bigIncrements('id')->first();
+                $table->id()->first();
             });
         }
     }
