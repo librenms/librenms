@@ -20,7 +20,6 @@ class ServiceTemplate extends Model implements Keyable
         'service_template_ignore',
         'service_template_status',
         'service_template_changed',
-        'service_template_message',
         'service_template_disabled',
         'service_template_name',
     ];
