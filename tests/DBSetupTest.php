@@ -105,7 +105,7 @@ class DBSetupTest extends DBTestCase
 
     public function testSqlMode()
     {
-        $result = DB::connection($this->connection)->select(DB::raw("SELECT @@innodb_version AS version, @@sql_mode AS mode"))[0];
+        $result = DB::connection($this->connection)->select(DB::raw('SELECT @@innodb_version AS version, @@sql_mode AS mode'))[0];
         $version = $result->version;
         $mode = $result->mode;
 
@@ -122,7 +122,6 @@ class DBSetupTest extends DBTestCase
             );
         }
     }
-
 
     public function testValidateSchema()
     {

@@ -2244,7 +2244,7 @@ function dump_db_schema($connection = null)
                 $constraint_name = $constraints['name'][$i];
 
                 // MySQL 8 fix, remove RESTRICT from extra columns, it's the default.
-                $constraints['extra'][$i] = trim(str_replace(["ON UPDATE RESTRICT", "ON DELETE RESTRICT"], null, $constraints['extra'][$i]));
+                $constraints['extra'][$i] = trim(str_replace(['ON UPDATE RESTRICT', 'ON DELETE RESTRICT'], null, $constraints['extra'][$i]));
 
                 $output[$table]['Constraints'][$constraint_name] = [
                     'name' => $constraint_name,
