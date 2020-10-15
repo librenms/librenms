@@ -31,6 +31,10 @@ by running:
 
 `apt install php-mbstring php-xml php-curl php-zip`
 
+You'll also need `pip3` installed on your machine to install the dependencies:
+
+`apt install python3-pip`
+
 Once composer is installed you can now run the code validation script:
 
 `./lnms dev:check`
