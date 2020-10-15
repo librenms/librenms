@@ -1740,7 +1740,7 @@ service_templates:
     - { Field: service_template_name, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_template_id], Unique: true, Type: BTREE }
-    services_template_device_group_id_index: { Name: services_template_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
+    services_template_device_group_id_index: { Name: service_template_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
 session:
   Columns:
     - { Field: session_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
