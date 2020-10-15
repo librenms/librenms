@@ -2086,6 +2086,8 @@ function device_is_up($device, $record_perf = false)
             $data = ['device_id' => $device['device_id'],
                 'going_down' => strtotime($device['last_polled']), ];
             if ( (! $maintenance && $mode) || ($maintenance && ! $mode) ) {
+                    echo("Maintenance status: " . $maintenance);
+                    echo("Mode status: " . $mode);
                     dbInsert($data, 'device_outages');
             }
         }
