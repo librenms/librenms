@@ -689,8 +689,8 @@ return [
                 'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)',
             ],
             'availability_ignore_maintenance' => [
-                'description' => 'Devices are always available while in maintenance mode',
-                'help' => 'Disables the creation of outages for devices which are in maintenance mode.',
+                'description' => 'Scheduled maintenance does not affect availability',
+                'help' => 'Disables the creation of outages and decreasing of availability for devices which are in maintenance mode.',
             ],
         ],
         'graylog' => [
