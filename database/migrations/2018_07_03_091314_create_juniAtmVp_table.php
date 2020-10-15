@@ -13,7 +13,7 @@ class CreateJuniAtmVpTable extends Migration
     public function up()
     {
         Schema::create('juniAtmVp', function (Blueprint $table) {
-            $table->bigIncrements(id);
+            $table->id();
             $table->unsignedInteger('juniAtmVp_id');
             $table->unsignedInteger('port_id')->index();
             $table->unsignedInteger('vp_id');
