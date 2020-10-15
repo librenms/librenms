@@ -19,6 +19,11 @@ class OverviewController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'dashboard' => 'integer',
+            'bare' => 'nullable|in:yes',
+        ]);
+
         $view = Config::get('front_page');
 
         if (view()->exists("overview.custom.$view")) {

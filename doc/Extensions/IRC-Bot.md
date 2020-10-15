@@ -138,7 +138,7 @@ Send your reply/ies via `$this->respond($string)`.
 
 A more detailed documentation of the functions and variables available
 for extensions can be found at [IRC-Bot
-Extensions](IRC-Bot-Extensions);
+Extensions](IRC-Bot-Extensions.md);
 
 Confused? Here an Echo-Example:
 

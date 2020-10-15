@@ -9,7 +9,7 @@ applications:
         order_by: metric
 arp-table:
     ipv4_mac:
-        excluded_fields: [device_id, port_id]
+        excluded_fields: [id, device_id, port_id]
         order_by: ipv4_mac.context_name, ipv4_mac.ipv4_address, ipv4_mac.mac_address
 bgp-peers:
     bgpPeers:

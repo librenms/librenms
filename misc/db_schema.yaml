@@ -320,13 +320,19 @@ bill_history:
     bill_history_bill_id_index: { Name: bill_history_bill_id_index, Columns: [bill_id], Unique: false, Type: BTREE }
 bill_perms:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 bill_ports:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: bill_port_autoadded, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 bill_port_counters:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -562,9 +568,11 @@ devices_group_perms:
     devices_group_perms_user_id_index: { Name: devices_group_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 devices_perms:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     devices_perms_user_id_index: { Name: devices_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 device_graphs:
   Columns:
@@ -670,6 +678,7 @@ entPhysical:
     entphysical_device_id_index: { Name: entphysical_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 entPhysical_state:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: entPhysicalIndex, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: subindex, Type: varchar(64), 'Null': true, Extra: '' }
@@ -677,6 +686,7 @@ entPhysical_state:
     - { Field: key, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: value, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id_index: { Name: device_id_index, Columns: [device_id, entPhysicalIndex], Unique: false, Type: BTREE }
 eventlog:
   Columns:
@@ -743,12 +753,14 @@ ipv4_addresses:
     ipv4_addresses_port_id_index: { Name: ipv4_addresses_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv4_mac:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ipv4_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ipv4_mac_mac_address_index: { Name: ipv4_mac_mac_address_index, Columns: [mac_address], Unique: false, Type: BTREE }
     ipv4_mac_port_id_index: { Name: ipv4_mac_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv4_networks:
@@ -780,11 +792,13 @@ ipv6_networks:
     PRIMARY: { Name: PRIMARY, Columns: [ipv6_network_id], Unique: true, Type: BTREE }
 juniAtmVp:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: juniAtmVp_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: vp_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: vp_descr, Type: varchar(32), 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     juniatmvp_port_id_index: { Name: juniatmvp_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 links:
   Columns:
@@ -814,11 +828,13 @@ loadbalancer_rservers:
     PRIMARY: { Name: PRIMARY, Columns: [rserver_id], Unique: true, Type: BTREE }
 loadbalancer_vservers:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: classmap_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: classmap, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: serverstate, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     loadbalancer_vservers_device_id_index: { Name: loadbalancer_vservers_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 locations:
   Columns:
@@ -1524,8 +1540,11 @@ ports_nac:
     ports_nac_port_id_mac_address_index: { Name: ports_nac_port_id_mac_address_index, Columns: [port_id, mac_address], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 ports_stack:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1608,6 +1627,7 @@ ports_vlans:
     ports_vlans_device_id_port_id_vlan_unique: { Name: ports_vlans_device_id_port_id_vlan_unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
 processes:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: pid, Type: int, 'Null': false, Extra: '' }
     - { Field: vsz, Type: int, 'Null': false, Extra: '' }
@@ -1616,6 +1636,7 @@ processes:
     - { Field: user, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: command, Type: text, 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     processes_device_id_index: { Name: processes_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 processors:
   Columns:
@@ -1888,8 +1909,11 @@ toner:
     toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 transport_group_transport:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: transport_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 ucd_diskio:
   Columns:
     - { Field: diskio_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
