@@ -12,12 +12,13 @@
                 @csrf
                 <div class='well well-lg'>
                     @include('service-template.form')
-                    <center><div class="form-group">
-                        <button type="submit" class="btn btn-primary">@lang('Save')</button>
+                    <div class="form-group">
+                    <hr>
+                        <center><button type="submit" class="btn btn-primary">@lang('Save')</button>
                             <a type="button" class="btn btn-danger"
                             href="{{ route('services.templates.index') }}">@lang('Cancel')</a>
-                        </div>
-                    </div></center>
+                        </center>
+                    </div>
                 </div>
             </form>
         </div>
