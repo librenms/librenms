@@ -17,7 +17,7 @@ if ($mempool['mempool_index'] == 1 && isset($storage_cache['hrstorage'][11])) { 
     $availEntry = $storage_cache['hrstorage'][11];
     $mempool['free'] = $availEntry['hrStorageSize'] * $mempool['units'];
 } else {
-    $mempool['used']  = ($entry['hrStorageUsed'] * $mempool['units']);
+    $mempool['used'] = ($entry['hrStorageUsed'] * $mempool['units']);
 }
 
 if ($device['sysObjectID'] == '.1.3.6.1.4.1.12325.1.1.2.1.1') { // bsnmpd based devices, like FreeBSD, opnsense, pfsense ...

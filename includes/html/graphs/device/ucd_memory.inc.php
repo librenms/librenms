@@ -99,7 +99,6 @@ $rrd_options .= " 'GPRINT:cached:AVERAGE:%6.2lf%sB'";
 $rrd_options .= " 'GPRINT:cached:MAX:%6.2lf%sB'";
 $rrd_options .= " 'GPRINT:cached_perc:LAST:%3.0lf%%\\n'";
 
-
 $rrd_options .= " 'LINE1.25:sysavail#05a167:Available   :STACK'";
 $rrd_options .= " 'GPRINT:sysavail:LAST:%6.2lf%sB'";
 $rrd_options .= " 'GPRINT:sysavail:AVERAGE:%6.2lf%sB'";
