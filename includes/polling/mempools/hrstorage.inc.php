@@ -13,7 +13,7 @@ if (! is_array($storage_cache['hrstorage'])) {
 $entry = $storage_cache['hrstorage'][$mempool['mempool_index']];
 $mempool['units'] = $entry['hrStorageAllocationUnits'];
 
-if ($mempool['mempool_index'] == 1) {  // Phisical memory
+if ($mempool['mempool_index'] == 1 && isset($storage_cache['hrstorage'][11])) {  // Phisical memory && sysAvail field exists
     $availEntry = $storage_cache['hrstorage'][11];
     $mempool['free'] = $availEntry['hrStorageSize'] * $mempool['units'];
 } else {

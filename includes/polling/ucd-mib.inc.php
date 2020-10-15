@@ -158,7 +158,7 @@ if (is_numeric($snmpdata[2]) && is_numeric($snmpdata[3]) && is_numeric($snmpdata
         'cached'       => $snmpdata[7],
     ];
         
-    if (isset($memSysAvail)) {
+    if (isset($snmpdata[8])) {
         $rrd_def->addDataset('sysavail', 'GAUGE', 0, 10000000000);
         $fields['sysavail'] = $snmpdata[8];
     }
