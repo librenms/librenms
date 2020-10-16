@@ -2027,15 +2027,13 @@ function device_is_up($device, $record_perf = false)
         if ($device['snmp_disable'] || isSNMPable($device)) {
             $response['status'] = '1';
             $response['status_reason'] = '';
-        }
-        else {
+        } else {
             echo 'SNMP Unreachable';
             $response['status'] = '0';
             if ($maintenance && $consider_maintenance) {
                 // Scheduled maintenance, device not responding to snmp
                 $response['status_reason'] = 'snmp (maintenance)';
-            }
-            else {
+            } else {
                 $response['status_reason'] = 'snmp';
             }
         }
@@ -2046,8 +2044,7 @@ function device_is_up($device, $record_perf = false)
         if($maintenance && $consider_maintenance) {
             // Scheduled maintenance, device not responding to icmp
             $response['status_reason'] = 'icmp (maintenance)';
-        }
-        else {
+        } else {
             $response['status_reason'] = 'icmp';
         }
     }
@@ -2080,8 +2077,7 @@ function device_is_up($device, $record_perf = false)
                     [$device['device_id'], $going_down]
                 );
             }
-        }
-        else {
+        } else {
             $type = 'down';
             $reason = $response['status_reason'];
 
