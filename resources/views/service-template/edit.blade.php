@@ -12,7 +12,7 @@
                 {{ method_field('PUT') }}
                 @csrf
                 <div class='well well-lg'>
-                    @include('service-template.resources.views.service-template.resources.views.service-templates.form')
+                    @include('service-template.form')
                     <div class="form-group">
                         <center><div class="col-sm-9 col-sm-offset-3 col-md-10 col-sm-offset-2">
                             <button type="submit" class="btn btn-primary">@lang('Save')</button>
