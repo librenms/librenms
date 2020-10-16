@@ -202,7 +202,7 @@ proc4ops 59 0 0 0 2 0 0 0 0 0 402 3 0 0 0 0 3 0 0 0 0 0 0 403 0 1 0 1 0 0 0 0 0 
 */
 
 $keys_nfs_server = [
-    'rc' => ['th_hits', 'th_misses', 'th_nocache'],
+    'rc' => ['rc_hits', 'rc_misses', 'rc_nocache'],
     'fh' => ['fh_lookup', 'fh_anon', 'fh_ncachedir', 'fh_ncachenondir', 'fh_stale'],
     'io' => ['io_read', 'io_write'],
     'th' => ['th_threads', 'th_fullcnt', 'th_range01', 'th_range02', 'th_range03', 'th_range04', 'th_range05', 'th_range06', 'th_range07', 'th_range08', 'th_range09', 'th_range10'],
