@@ -20,7 +20,11 @@ class CreateServicesTemplateTable extends Migration
             $table->text('desc');
             $table->text('param');
             $table->boolean('ignore')->default(0);
-            $table->unsignedInteger('changed')->default(0);
+            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+                $table->timestamp('changed')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
+            } else {
+                $table->timestamp('changed')->useCurrent();
+            }
             $table->boolean('disabled')->default(0);
             $table->string('name');
         });
