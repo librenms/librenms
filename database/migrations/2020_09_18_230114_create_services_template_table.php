@@ -13,16 +13,16 @@ class CreateServicesTemplateTable extends Migration
     public function up()
     {
         Schema::create('service_templates', function (Blueprint $table) {
-            $table->increments('service_template_id');
+            $table->increments('id');
             $table->unsignedInteger('device_group_id')->index();
-            $table->text('service_template_ip');
-            $table->string('service_template_type');
-            $table->text('service_template_desc');
-            $table->text('service_template_param');
-            $table->boolean('service_template_ignore');
-            $table->unsignedInteger('service_template_changed')->default(0);
-            $table->boolean('service_template_disabled')->default(0);
-            $table->string('service_template_name');
+            $table->text('ip');
+            $table->string('type');
+            $table->text('desc');
+            $table->text('param');
+            $table->boolean('ignore');
+            $table->unsignedInteger('changed')->default(0);
+            $table->boolean('disabled')->default(0);
+            $table->string('name');
         });
         Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->default(0);

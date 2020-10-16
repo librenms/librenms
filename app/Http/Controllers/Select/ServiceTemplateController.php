@@ -35,14 +35,14 @@ class ServiceTemplateController extends SelectController
 
     protected function baseQuery($request)
     {
-        return ServiceTemplate::hasAccess($request->user())->select('service_template_id', 'service_template_name');
+        return ServiceTemplate::hasAccess($request->user())->select('id', 'name');
     }
 
     public function formatItem($service_template)
     {
         return [
-            'id' => $service_template->service_template_id,
-            'text' => $service_template->service_template_name,
+            'id' => $service_template->id,
+            'text' => $service_template->name,
         ];
     }
 }

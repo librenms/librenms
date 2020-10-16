@@ -80,7 +80,7 @@
                 $.ajax({
                     type: 'POST',
                     url: 'ajax_form.php',
-                    data: { type: "discover-service-template", service_template_id: id },
+                    data: { type: "discover-service-template", id: id },
                     dataType: "json",
                     success: function(data){
                         if(data['status'] == 'ok') {
@@ -100,7 +100,7 @@
                 $.ajax({
                     type: 'POST',
                     url: 'ajax_form.php',
-                    data: { type: "remove-service-template", service_template_id: id },
+                    data: { type: "remove-service-template", id: id },
                     dataType: "json",
                     success: function(data){
                         if(data['status'] == 'ok') {
@@ -120,7 +120,7 @@
                 $.ajax({
                     type: 'POST',
                     url: 'ajax_form.php',
-                    data: { type: "delete-service-template", service_template_id: id },
+                    data: { type: "delete-service-template", id: id },
                     dataType: "json",
                     success: function(data){
                         if(data['status'] == 'ok') {

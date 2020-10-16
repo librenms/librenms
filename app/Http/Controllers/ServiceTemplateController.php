@@ -24,7 +24,7 @@ class ServiceTemplateController extends Controller
     public function index()
     {
         return view('service-template.index', [
-            'service_templates' => ServiceTemplate::orderBy('service_template_name')->get(),
+            'service_templates' => ServiceTemplate::orderBy('name')->get(),
             'device_groups' => DeviceGroup::orderBy('name')->get(),
         ]);
     }
@@ -54,31 +54,31 @@ class ServiceTemplateController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'service_template_name' => 'required|string|unique:service_templates',
+            'name' => 'required|string|unique:service_templates',
             'device_group_id' => 'integer',
-            'service_template_type' => 'string',
-            'service_template_param' => 'string',
-            'service_template_ip' => 'string',
-            'service_template_desc' => 'string',
-            'service_template_changed' => 'integer',
-            'service_template_disabled' => 'integer',
-            'service_template_ignore' => 'integer',
+            'type' => 'string',
+            'param' => 'string',
+            'ip' => 'string',
+            'desc' => 'string',
+            'changed' => 'integer',
+            'disabled' => 'integer',
+            'ignore' => 'integer',
         ]);
 
         $serviceTemplate = ServiceTemplate::make($request->only([
-            'service_template_name',
+            'name',
             'device_group_id',
-            'service_template_type',
-            'service_template_param',
-            'service_template_ip',
-            'service_template_desc',
-            'service_template_changed',
-            'service_template_disabled',
-            'service_template_ignore',
+            'type',
+            'param',
+            'ip',
+            'desc',
+            'changed',
+            'disabled',
+            'ignore',
         ]));
         $serviceTemplate->save();
 
-        Toastr::success(__('Service Template :service_template_name created', ['service_template_name' => $serviceTemplate->service_template_name]));
+        Toastr::success(__('Service Template :name created', ['name' => $serviceTemplate->name]));
 
         return redirect()->route('services.templates.index');
     }
@@ -91,7 +91,7 @@ class ServiceTemplateController extends Controller
      */
     public function show(ServiceTemplate $serviceTemplate)
     {
-        return redirect(url('/services-templates/=' . $serviceTemplate->service_template_id));
+        return redirect(url('/services/templates/=' . $serviceTemplate->id));
     }
 
     /**
@@ -118,29 +118,29 @@ class ServiceTemplateController extends Controller
     public function update(Request $request, ServiceTemplate $serviceTemplate)
     {
         $this->validate($request, [
-            'service_template_name' => [
+            'name' => [
                 'required',
                 'string',
                 Rule::unique('service_templates')->where(function ($query) use ($serviceTemplate) {
-                    $query->where('service_template_id', '!=', $serviceTemplate->service_template_id);
+                    $query->where('id', '!=', $serviceTemplate->id);
                 }),
             ],
             'device_group_id' => 'integer',
-            'service_template_type' => 'string',
-            'service_template_param' => 'string',
-            'service_template_ip' => 'string',
-            'service_template_desc' => 'string',
-            'service_template_changed' => 'integer',
-            'service_template_disabled' => 'integer',
-            'service_template_ignore' => 'integer',
+            'type' => 'string',
+            'param' => 'string',
+            'ip' => 'string',
+            'desc' => 'string',
+            'changed' => 'integer',
+            'disabled' => 'integer',
+            'ignore' => 'integer',
         ]);
 
-        $serviceTemplate->fill($request->only(['service_template_name', 'device_group_id', 'service_template_type', 'service_template_param', 'service_template_ip', 'service_template_desc', 'service_template_changed', 'service_template_ignore', 'service_template_disable']));
+        $serviceTemplate->fill($request->only(['name', 'device_group_id', 'type', 'param', 'ip', 'desc', 'changed', 'ignore', 'disable']));
 
         if ($serviceTemplate->isDirty() || $devices_updated) {
             try {
                 if ($serviceTemplate->save() || $devices_updated) {
-                    Toastr::success(__('Service Template :service_template_name updated', ['service_template_name' => $serviceTemplate->service_template_name]));
+                    Toastr::success(__('Service Template :name updated', ['name' => $serviceTemplate->name]));
                 } else {
                     Toastr::error(__('Failed to save'));
 
@@ -168,7 +168,7 @@ class ServiceTemplateController extends Controller
     {
         $serviceTemplate->delete();
 
-        Toastr::success(__('Service Template :service_template_name deleted', ['service_template_name' => $serviceTemplate->service_template_name]));
+        Toastr::success(__('Service Template :name deleted', ['name' => $serviceTemplate->name]));
 
         return redirect()->route('services.templates.index');
     }
