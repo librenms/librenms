@@ -19,7 +19,7 @@ class CreateServicesTemplateTable extends Migration
             $table->string('type');
             $table->text('desc');
             $table->text('param');
-            $table->boolean('ignore');
+            $table->boolean('ignore')->default(0);
             $table->unsignedInteger('changed')->default(0);
             $table->boolean('disabled')->default(0);
             $table->string('name');

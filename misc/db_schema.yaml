@@ -1734,7 +1734,7 @@ service_templates:
     - { Field: type, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: desc, Type: text, 'Null': false, Extra: '' }
     - { Field: param, Type: text, 'Null': false, Extra: '' }
-    - { Field: ignore, Type: tinyint, 'Null': false, Extra: '' }
+    - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: changed, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
