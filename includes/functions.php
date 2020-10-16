@@ -2041,7 +2041,7 @@ function device_is_up($device, $record_perf = false)
     else {
         echo 'Unpingable';
         $response['status'] = '0';
-        if($maintenance && $consider_maintenance) {
+        if ($maintenance && $consider_maintenance) {
             // Scheduled maintenance, device not responding to icmp
             $response['status_reason'] = 'icmp (maintenance)';
         } else {
@@ -2081,7 +2081,7 @@ function device_is_up($device, $record_perf = false)
             $type = 'down';
             $reason = $response['status_reason'];
 
-            if ( ! $consider_maintenance || (!$maintenance && $consider_maintenance)) {
+            if (! $consider_maintenance || (! $maintenance && $consider_maintenance)) {
                 // use current time as a starting point when an outage starts
                 $data = ['device_id' => $device['device_id'],
                     'going_down' => time(), ];
