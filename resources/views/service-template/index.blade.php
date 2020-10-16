@@ -36,29 +36,29 @@
                             </thead>
                             <tbody>
                                 @foreach($service_templates as $service_template)
-                                    <tr id="row_{{ $service_template->service_template_id }}">
-                                        <td>{{ $service_template->service_template_name }}</td>
-                                        <td>{{ $service_template->service_template_type }}</td>
-                                        <td>{{ $service_template->service_template_param }}</td>
-                                        <td>{{ $service_template->service_template_ip }}</td>
-                                        <td>{{ $service_template->service_template_desc }}</td>
-                                        <td>{{ $service_template->service_template_changed }}</td>
-                                        <td>{{ $service_template->service_template_ignore }}</td>
-                                        <td>{{ $service_template->service_template_disabled }}</td>
+                                    <tr id="row_{{ $service_template->id }}">
+                                        <td>{{ $service_template->name }}</td>
+                                        <td>{{ $service_template->type }}</td>
+                                        <td>{{ $service_template->param }}</td>
+                                        <td>{{ $service_template->ip }}</td>
+                                        <td>{{ $service_template->desc }}</td>
+                                        <td>{{ $service_template->changed }}</td>
+                                        <td>{{ $service_template->ignore }}</td>
+                                        <td>{{ $service_template->disabled }}</td>
                                         <td>
                                             <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
-                                                    onclick="discover_st(this, '{{ $service_template->service_template_id }}')">
+                                                    onclick="discover_st(this, '{{ $service_template->id }}')">
                                                 <i
                                                     class="fa fa-plus" aria-hidden="true"></i></button>
                                             <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Apply')"
-                                                    onclick="remove_st(this, '{{ $service_template->service_template_id }}')">
+                                                    onclick="remove_st(this, '{{ $service_template->id }}')">
                                                 <i
                                                     class="fa fa-minus" aria-hidden="true"></i></button>
                                             <a type="button" title="@lang('edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
-                                            href="{{ route('services.templates.edit', $service_template->service_template_id) }}">
+                                            href="{{ route('services.templates.edit', $service_template->id) }}">
                                                 <i class="fa fa-pencil" aria-hidden="true"></i></a>
                                             <button type="button" class="btn btn-danger btn-sm" title="@lang('delete Service Template')" aria-label="@lang('Delete')"
-                                                    onclick="delete_st(this, '{{ $service_template->service_template_name }}', '{{ route('services.templates.destroy', $service_template->service_template_id) }}')">
+                                                    onclick="delete_st(this, '{{ $service_template->name }}', '{{ route('services.templates.destroy', $service_template->id) }}')">
                                                 <i
                                                     class="fa fa-trash" aria-hidden="true"></i></button>
                                         </td>
@@ -75,12 +75,12 @@
 
 @section('scripts')
     <script>
-        function discover_st(button, service_template_id) {
+        function discover_st(button, id) {
             if (confirm('@lang('Are you sure you want to create Services for ')' + name + '?')) {
                 $.ajax({
                     type: 'POST',
                     url: 'ajax_form.php',
-                    data: { type: "discover-service-template", service_template_id: service_template_id },
+                    data: { type: "discover-service-template", service_template_id: id },
                     dataType: "json",
                     success: function(data){
                         if(data['status'] == 'ok') {
@@ -95,12 +95,12 @@
                 });
             }
         }
-        function remove_st(button, service_template_id) {
+        function remove_st(button, id) {
             if (confirm('@lang('Are you sure you want to remove all Services created by ')' + name + '?')) {
                 $.ajax({
                     type: 'POST',
                     url: 'ajax_form.php',
-                    data: { type: "remove-service-template", service_template_id: service_template_id },
+                    data: { type: "remove-service-template", service_template_id: id },
                     dataType: "json",
                     success: function(data){
                         if(data['status'] == 'ok') {
@@ -115,12 +115,12 @@
                 });
             }
         }
-        function delete_st(button, service_template_id) {
+        function delete_st(button, id) {
             if (confirm('@lang('Are you sure you want to delete AND remove all Services created by ')' + name + '?')) {
                 $.ajax({
                     type: 'POST',
                     url: 'ajax_form.php',
-                    data: { type: "delete-service-template", service_template_id: service_template_id },
+                    data: { type: "delete-service-template", service_template_id: id },
                     dataType: "json",
                     success: function(data){
                         if(data['status'] == 'ok') {
