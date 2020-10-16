@@ -1270,7 +1270,7 @@
             ],
             "type": "array"
         },
-        "graphing.availability_ignore_maintenance": {
+        "graphing.availability_consider_maintenance": {
             "group": "poller",
             "section": "availability",
             "order": 2,

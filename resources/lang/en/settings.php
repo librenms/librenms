@@ -688,7 +688,7 @@ return [
                 'description' => 'Duration',
                 'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)',
             ],
-            'availability_ignore_maintenance' => [
+            'availability_consider_maintenance' => [
                 'description' => 'Scheduled maintenance does not affect availability',
                 'help' => 'Disables the creation of outages and decreasing of availability for devices which are in maintenance mode.',
             ],
