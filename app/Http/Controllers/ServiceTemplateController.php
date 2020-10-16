@@ -131,8 +131,8 @@ class ServiceTemplateController extends Controller
             'ip' => 'string',
             'desc' => 'string',
             'changed' => 'integer',
-            //'disabled' => 'integer',
-            //'ignore' => 'integer',
+            'disabled' => 'nullable|integer',
+            'ignore' => 'nullable|integer',
         ]);
 
         $serviceTemplate->fill($request->only(['name', 'device_group_id', 'type', 'param', 'ip', 'desc', 'changed', 'ignore', 'disable']));
