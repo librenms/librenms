@@ -423,10 +423,8 @@ function delete_device($id)
  */
 function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
 {
-    $within_poller_groups = [];
-    if (isset($additional['within_poller_groups'])) {
-        $within_poller_groups = $additional['within_poller_groups'];
-    }
+    $within_poller_groups = $additional['within_poller_groups'] ?? [];
+
     // Test Database Exists
     if (host_exists($host, null, $within_poller_groups)) {
         throw new HostExistsException("Already have host $host");
