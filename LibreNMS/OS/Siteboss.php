@@ -25,7 +25,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\OS;
 
-class Siteboss530 extends OS
+class Siteboss extends OS
 {
     public function discoverOS(Device $device): void
     {

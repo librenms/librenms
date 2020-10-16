@@ -1,13 +1,13 @@
-os: siteboss530
+os: siteboss
 text: 'Asentria SiteBoss'
 type: server
 icon: siteboss
-group: siteboss
+group: asentria
+mib_dir: asentria
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-mib_dir: asentria
 discovery:
     -
         sysObjectID:
