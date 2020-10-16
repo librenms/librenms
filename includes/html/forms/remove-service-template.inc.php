@@ -15,13 +15,13 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
 
-$service_template_id = $vars['service_template_id'];
+$id = $vars['id'];
 
-if (is_numeric($service_template_id)) {
-    if (remove_service_template($service_template_id)) {
-        $status = ['status' =>0, 'message' => 'Service Template: <i>' . $service_template_id . ', has been removed from Services.</i>'];
+if (is_numeric($id)) {
+    if (remove_service_template($id)) {
+        $status = ['status' =>0, 'message' => 'Service Template: <i>' . $id . ', has been removed from Services.</i>'];
     } else {
-        $status = ['status' =>1, 'message' => 'Service Template: <i>' . $service_template_id . ', has NOT been removed from Services.</i>'];
+        $status = ['status' =>1, 'message' => 'Service Template: <i>' . $id . ', has NOT been removed from Services.</i>'];
     }
 }
 header('Content-Type: application/json');

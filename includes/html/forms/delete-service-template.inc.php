@@ -14,13 +14,13 @@
 if (! Auth::user()->hasGlobalAdmin()) {
     $status = ['status' =>1, 'message' => 'ERROR: You need to be admin to delete services templates'];
 } else {
-    if (! is_numeric($vars['service_template_id'])) {
+    if (! is_numeric($vars['id'])) {
         $status = ['status' =>1, 'message' => 'No Service Template has been selected'];
     } else {
-        if (delete_service_template($vars['service_template_id'])) {
-            $status = ['status' =>0, 'message' => 'Service Template: <i>' . $vars['service_template_id'] . ', has been deleted.</i>'];
+        if (delete_service_template($vars['id'])) {
+            $status = ['status' =>0, 'message' => 'Service Template: <i>' . $vars['id'] . ', has been deleted.</i>'];
         } else {
-            $status = ['status' =>1, 'message' => 'Service Template: <i>' . $vars['service_template_id'] . ', has NOT been deleted.</i>'];
+            $status = ['status' =>1, 'message' => 'Service Template: <i>' . $vars['id'] . ', has NOT been deleted.</i>'];
         }
     }
 }
