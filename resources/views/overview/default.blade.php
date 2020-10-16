@@ -94,7 +94,7 @@
                             </div>
                         </form>
                     </div>
-                    @if (count($user_list))
+                    @if (count($user_list) and auth()->user()->isAdmin())
                     <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
@@ -485,6 +485,7 @@
         });
     }
 
+@if (auth()->user()->isAdmin())
     function dashboard_copy_user_select() {
         var button_disabled = true;
         if (document.getElementById("dashboard_copy_target").value > 0) {
@@ -525,6 +526,7 @@
             dashboard_copy_user_select();
         }
     }
+@endif
 
     function widget_dom(data) {
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
