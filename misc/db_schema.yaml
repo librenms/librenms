@@ -1735,7 +1735,7 @@ service_templates:
     - { Field: desc, Type: text, 'Null': false, Extra: '' }
     - { Field: param, Type: text, 'Null': false, Extra: '' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: changed, Type: 'int unsigned', 'Null': false, , Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
+    - { Field: changed, Type: 'timestamp', 'Null': false, , Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
