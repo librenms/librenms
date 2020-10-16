@@ -2037,8 +2037,7 @@ function device_is_up($device, $record_perf = false)
                 $response['status_reason'] = 'snmp';
             }
         }
-    } 
-    else {
+    } else {
         echo 'Unpingable';
         $response['status'] = '0';
         if ($maintenance && $consider_maintenance) {
