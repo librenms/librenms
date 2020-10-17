@@ -128,16 +128,16 @@ function delete_service_template($service_template = null)
 
 function discover_service_template($service_template = null)
 {
-    $services_template = ServiceTemplate::getServiceTemplate($service_template);
+    $services_template = ServiceTemplate::find($id);
     $status = null;
     foreach (DB::table('device_group_device')->where('device_group_id', $services_template[0]['device_group_id'])->pluck('device_id') as $device) {
-        foreach (DB::table('services')->where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template[0]['changed'])->pluck('service_id') as $service) {
+        foreach (Service::where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template[0]['changed'])->pluck('service_id') as $service) {
             $update = ['service_desc' => $services_template[0]['desc'], 'service_ip' => $services_template[0]['ip'], 'service_param' => $services_template[0]['param'], 'service_ignore' => $services_template[0]['ignore'], 'service_disabled' => $services_template[0]['disabled'], 'service_template_id' => $services_template[0]['id'], 'service_name' => $services_template[0]['name'], 'service_template_changed' => $services_template[0]['changed']];
             edit_service($update, $service['service_id']);
             log_event("Updated Service: {$services_template[0]['name']} from Service Template ID: {$services_template[0]['id']}", $device, 'service', 2);
             $status = 1;
         }
-        if (! DB::raw('COUNT(service_id)')->from('services')->where('service_template_id', $service_template)->where('device_id', $device)) {
+        if (! Service::where('service_template_id', $service_template)->where('device_id', $device)->count()) {
             add_service($device, $services_template[0]['type'], $services_template[0]['desc'], $services_template[0]['ip'], $services_template[0]['param'], $services_template[0]['ignore'], $services_template[0]['disabled'], $services_template[0]['id'], $services_template[0]['name'], $services_template[0]['changed']);
             log_event("Added Service: {$services_template[0]['name']} from Service Template ID: {$services_template[0]['id']}", $device, 'service', 2);
             $status = 1;
@@ -156,17 +156,8 @@ function remove_service_template($service_template = null)
     if (! is_numeric($service_template)) {
         return false;
     }
-    $status = null;
-    foreach (DB::table('services')->where('service_template_id', $service_template)->pluck('service_id') as $service_id) {
-        dbDelete('services', '`service_id` =  ?', $service_id);
-        $status = 1;
-    }
-
-    if (is_numeric($status)) {
-        return true;
-    } else {
-        return false;
-    }
+    
+    return Service::where('service_template_id', $service_template)->delete();
 }
 
 function poll_service($service)
