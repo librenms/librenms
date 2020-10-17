@@ -29,6 +29,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     });
     Route::prefix('services')->name('services.')->group(function () {
         Route::resource('templates', 'ServiceTemplateController');
+        Route::post('remove', 'ServiceTemplateController@remove')->name('templates.remove');
     });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
