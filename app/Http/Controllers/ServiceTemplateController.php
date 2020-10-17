@@ -144,7 +144,7 @@ class ServiceTemplateController extends Controller
                 Toastr::error(__('Failed to save'));
 
                 return redirect()->back()->withInput();
-            } 
+            }
         } else {
             Toastr::info(__('No changes made'));
         }
