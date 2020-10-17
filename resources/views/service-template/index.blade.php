@@ -128,7 +128,7 @@
                         toastr.success(msg);
                     },
                     error: function () {
-                        toastr.error('@lang('The device group could not be deleted')');
+                        toastr.error('@lang('The Service Template could not be deleted')');
                     }
                 });
             }
