@@ -152,7 +152,21 @@ class ServiceTemplateController extends Controller
 
         return redirect()->route('services.templates.index');
     }
+/**
+     * Remove the specified resource from storage.
+     *
+     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function remove(ServiceTemplate $serviceTemplate)
+    {
+        Service::where('service_template_id', $serviceTemplate)->delete();
+        
+        Toastr::success(__('Service Template :name removed', ['name' => $serviceTemplate->name]));
 
+        return redirect()->route('services.templates.index');
+    }
+    
     /**
      * Remove the specified resource from storage.
      *

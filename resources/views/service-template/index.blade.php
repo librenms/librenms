@@ -52,7 +52,7 @@
                                                     <i
                                                         class="fa fa-plus" aria-hidden="true"></i></button>
                                                 <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Apply')"
-                                                        onclick="remove_st(this, '{{ $service_template->id }}')">
+                                                        onclick="remove_st(this, '{{ $service_template->name }}', '{{ route('services.templates.remove', $service_template->id) }}')">
                                                     <i
                                                         class="fa fa-minus" aria-hidden="true"></i></button>
                                                 <a type="button" title="@lang('edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
@@ -98,24 +98,22 @@
             }
         }
         function remove_st(button, id) {
+            var index = button.parentNode.parentNode.rowIndex;
             if (confirm('@lang('Are you sure you want to remove all Services created by ')' + name + '?')) {
                 $.ajax({
-                    type: 'POST',
-                    url: 'ajax_form.php',
-                    data: { type: "remove-service-template", id: id },
-                    dataType: "json",
-                    success: function(data){
-                        if(data['status'] == 'ok') {
-                            toastr.success(data['message']);
-                        } else {
-                            toastr.error(data['message']);
-                        }
+                    url: url,
+                    type: 'DELETE',
+                    success: function (msg) {
+                        document.getElementById("manage-services-table").deleteRow(index);
+                        toastr.success(msg);
                     },
-                    error:function(){
-                        toastr.error('No Services were removed for this Service Template');
+                    error: function () {
+                        toastr.error('@lang('No Services for this Service Template were deleted')');
                     }
                 });
             }
+
+            return false;
         }
         function delete_st(button, id) {
             var index = button.parentNode.parentNode.rowIndex;

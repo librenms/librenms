@@ -43,7 +43,7 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can view any services template.
      *
-     * @param  \App\User $user
+     * @param  \App\Models\User $user
      * @return mixed
      */
     public function viewAny(User $user)
