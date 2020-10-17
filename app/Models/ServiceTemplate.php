@@ -38,7 +38,7 @@ class ServiceTemplate extends Model implements Keyable
      * @param ServiceTemplate|int $id
      * @return array
      */
-    public static function getServiceTemplate($id)
+    public static function getServiceTemplate($id, User $user)
     {
         return $id->where([
             ['id', '=', $id],
