@@ -31,13 +31,6 @@ class ServiceTemplate extends Model implements Keyable
         return $this->id . '-' . $this->device_group_id;
     }
 
-    public static function getServiceTemplate($query)
-    {
-        return $query->where([
-            ['id', '=', $query],
-        ]);
-    }
-
     public function scopeHasAccess($query, User $user)
     {
         if ($user->hasGlobalRead()) {

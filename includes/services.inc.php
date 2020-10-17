@@ -130,7 +130,7 @@ function discover_service_template($service_template = null)
 {
     $services_template = ServiceTemplate::find($id);
     $status = null;
-    foreach (DB::table('device_group_device')->where('device_group_id', $services_template[0]['device_group_id'])->pluck('device_id') as $device) {
+    foreach (Device::inDeviceGroup($services_template[0]['device_group_id'])->pluck('device_id') as $device) {
         foreach (Service::where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template[0]['changed'])->pluck('service_id') as $service) {
             $update = ['service_desc' => $services_template[0]['desc'], 'service_ip' => $services_template[0]['ip'], 'service_param' => $services_template[0]['param'], 'service_ignore' => $services_template[0]['ignore'], 'service_disabled' => $services_template[0]['disabled'], 'service_template_id' => $services_template[0]['id'], 'service_name' => $services_template[0]['name'], 'service_template_changed' => $services_template[0]['changed']];
             edit_service($update, $service['service_id']);
