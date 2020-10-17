@@ -91,7 +91,7 @@ class ServiceTemplateController extends Controller
      */
     public function show(ServiceTemplate $serviceTemplate)
     {
-        return redirect(url('/services/templates/=' . $serviceTemplate->id));
+        return redirect(url('/services/template=' . $serviceTemplate->id));
     }
 
     /**
@@ -137,9 +137,9 @@ class ServiceTemplateController extends Controller
 
         $serviceTemplate->fill($request->only(['name', 'device_group_id', 'type', 'param', 'ip', 'desc', 'changed', 'ignore', 'disable']));
 
-        if ($serviceTemplate->isDirty() || $devices_updated) {
+        if ($serviceTemplate->isDirty()) {
             try {
-                if ($serviceTemplate->save() || $devices_updated) {
+                if ($serviceTemplate->save()) {
                     Toastr::success(__('Service Template :name updated', ['name' => $serviceTemplate->name]));
                 } else {
                     Toastr::error(__('Failed to save'));

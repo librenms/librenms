@@ -44,6 +44,15 @@ class ServiceTemplate extends Model implements Keyable
         ]);
     }
 
+    public function scopeHasAccess($query, User $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        return $query->whereIn('id', Permissions::serviceTemplatesForUser($user));
+    }
+
     /**
      * @param Builder $query
      * @return Builder
