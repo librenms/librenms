@@ -190,7 +190,7 @@ class Permissions
      * @param \App\Models\User|int $user
      * @return \Illuminate\Support\Collection
      */
-    public static function serviceTemplatesForUser($user = null)
+    public function serviceTemplatesForUser($user = null)
     {
         return $this->getServiceTemplatePermissions($user)
             ->where('user_id', $this->getUserId($user))

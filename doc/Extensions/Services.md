@@ -31,10 +31,11 @@ Service Templates within LibreNMS provides the same ability as Nagios
 does with Host Groups. Known as Device Groups in LibreNMS.
 They are applied devices that belong to the specified Device Group.
 
-Use the Apply buttons to manually create Services for the Service Template.
+Use the Apply buttons to manually create or update Services for the Service
+Template.
 Use the Remove buttons to manually remove Services for the Service Template.
 
-When you Edit a Service Template, and hit Apply, all relevant changes are
+After you Edit a Service Template, and then use Apply, all relevant changes are
 pushed to existing Services previously created.
 
 You can also enable Service Templates Auto Discovery to have Services
