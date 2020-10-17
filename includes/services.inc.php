@@ -131,16 +131,16 @@ function discover_service_template($service_template = null)
 {
     $services_template = ServiceTemplate::find($service_template);
     $status = null;
-    foreach (Device::inDeviceGroup($services_template[0]['device_group_id'])->pluck('device_id') as $device) {
-        foreach (Service::where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template[0]['changed'])->pluck('service_id') as $service) {
-            $update = ['service_desc' => $services_template[0]['desc'], 'service_ip' => $services_template[0]['ip'], 'service_param' => $services_template[0]['param'], 'service_ignore' => $services_template[0]['ignore'], 'service_disabled' => $services_template[0]['disabled'], 'service_template_id' => $services_template[0]['id'], 'service_name' => $services_template[0]['name'], 'service_template_changed' => $services_template[0]['changed']];
+    foreach (Device::inDeviceGroup($services_template['device_group_id'])->pluck('device_id') as $device) {
+        foreach (Service::where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template['changed'])->pluck('service_id') as $service) {
+            $update = ['service_desc' => $services_template['desc'], 'service_ip' => $services_template['ip'], 'service_param' => $services_template['param'], 'service_ignore' => $services_template['ignore'], 'service_disabled' => $services_template['disabled'], 'service_template_id' => $services_template['id'], 'service_name' => $services_template['name'], 'service_template_changed' => $services_template['changed']];
             edit_service($update, $service['service_id']);
-            log_event("Updated Service: {$services_template[0]['name']} from Service Template ID: {$services_template[0]['id']}", $device, 'service', 2);
+            log_event("Updated Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
             $status = 1;
         }
         if (! Service::where('service_template_id', $service_template)->where('device_id', $device)->count()) {
-            add_service($device, $services_template[0]['type'], $services_template[0]['desc'], $services_template[0]['ip'], $services_template[0]['param'], $services_template[0]['ignore'], $services_template[0]['disabled'], $services_template[0]['id'], $services_template[0]['name'], $services_template[0]['changed']);
-            log_event("Added Service: {$services_template[0]['name']} from Service Template ID: {$services_template[0]['id']}", $device, 'service', 2);
+            add_service($device, $services_template['type'], $services_template['desc'], $services_template['ip'], $services_template['param'], $services_template['ignore'], $services_template['disabled'], $services_template['id'], $services_template['name'], $services_template['changed']);
+            log_event("Added Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
             $status = 1;
         }
     }
