@@ -31,17 +31,10 @@ class ServiceTemplate extends Model implements Keyable
         return $this->id . '-' . $this->device_group_id;
     }
 
-    // ---- Query Scopes ----
-    /**
-     * Update the device groups for the given device or device_id
-     *
-     * @param ServiceTemplate|int $id
-     * @return array
-     */
-    public static function getServiceTemplate($id, User $user)
+    public static function getServiceTemplate($query)
     {
-        return $id->where([
-            ['id', '=', $id],
+        return $query->where([
+            ['id', '=', $query],
         ]);
     }
 
