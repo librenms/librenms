@@ -190,7 +190,7 @@ class Permissions
      * @param \App\Models\User|int $user
      * @return \Illuminate\Support\Collection
      */
-    public function serviceTemplatesForUser($user = null)
+    public static function serviceTemplatesForUser($user = null)
     {
         return $this->getServiceTemplatePermissions($user)
             ->where('user_id', $this->getUserId($user))
@@ -249,7 +249,7 @@ class Permissions
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function getServiceTemplatePermissions()
+    public function getServiceTemplatePermissions()
     {
         if (is_null($this->serviceTemplatePermissions)) {
             $this->serviceTemplatePermissions = DB::table('service_templates')->get();
