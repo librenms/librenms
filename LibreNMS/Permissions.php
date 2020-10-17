@@ -185,6 +185,19 @@ class Permissions
     }
 
     /**
+     * Get a list of id of all service templates the user can access
+     *
+     * @param \App\Models\User|int $user
+     * @return \Illuminate\Support\Collection
+     */
+    public function serviceTemplatesForUser($user = null)
+    {
+        return $this->getServiceTemplatePermissions($user)
+            ->where('user_id', $this->getUserId($user))
+            ->pluck('id');
+    }
+
+    /**
      * Get the cached data for device permissions.  Use helpers instead.
      *
      * @param \App\Models\User|int $user
@@ -232,15 +245,17 @@ class Permissions
     }
 
     /**
-     * Get a list of id of all service templates the user can access
+     * Get the cached data for port permissions.  Use helpers instead.
      *
-     * @param \App\Models\User|int $user
      * @return \Illuminate\Support\Collection
      */
-    public function serviceTemplatesForUser($user = null)
+    public function getServiceTemplatePermissions()
     {
-        return $this->getServiceTemplatePermissions($user)
-            ->pluck('id');
+        if (is_null($this->serviceTemplatePermissions)) {
+            $this->portPermissions = DB::table('service_templates')->get();
+        }
+
+        return $this->portPermissions;
     }
 
     /**
