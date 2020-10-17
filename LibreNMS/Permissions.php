@@ -37,6 +37,7 @@ class Permissions
     private $portPermissions;
     private $billPermissions;
     private $deviceGroupMap;
+    private $serviceTemplatePermissions;
 
     /**
      * Check if a device can be accessed by user (non-global read/admin)
