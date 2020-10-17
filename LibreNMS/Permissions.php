@@ -232,6 +232,18 @@ class Permissions
     }
 
     /**
+     * Get a list of id of all service templates the user can access
+     *
+     * @param \App\Models\User|int $user
+     * @return \Illuminate\Support\Collection
+     */
+    public function serviceTemplatesForUser($user = null)
+    {
+        return $this->getServiceTemplatePermissions($user)
+            ->pluck('id');
+    }
+
+    /**
      * @param $user
      * @return int|null
      */
