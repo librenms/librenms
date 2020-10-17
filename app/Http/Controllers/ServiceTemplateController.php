@@ -138,19 +138,13 @@ class ServiceTemplateController extends Controller
         $serviceTemplate->fill($request->only(['name', 'device_group_id', 'type', 'param', 'ip', 'desc', 'changed', 'ignore', 'disable']));
 
         if ($serviceTemplate->isDirty()) {
-            try {
-                if ($serviceTemplate->save()) {
-                    Toastr::success(__('Service Template :name updated', ['name' => $serviceTemplate->name]));
-                } else {
-                    Toastr::error(__('Failed to save'));
+            if ($serviceTemplate->save()) {
+                Toastr::success(__('Service Template :name updated', ['name' => $serviceTemplate->name]));
+            } else {
+                Toastr::error(__('Failed to save'));
 
-                    return redirect()->back()->withInput();
-                }
-            } catch (\Illuminate\Database\QueryException $e) {
-                return redirect()->back()->withInput()->withErrors([
-                    'rules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
-                ]);
-            }
+                return redirect()->back()->withInput();
+            } 
         } else {
             Toastr::info(__('No changes made'));
         }
