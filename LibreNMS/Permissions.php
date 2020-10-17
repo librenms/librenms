@@ -245,17 +245,17 @@ class Permissions
     }
 
     /**
-     * Get the cached data for port permissions.  Use helpers instead.
+     * Get the cached data for service template permissions.  Use helpers instead.
      *
      * @return \Illuminate\Support\Collection
      */
     public function getServiceTemplatePermissions()
     {
         if (is_null($this->serviceTemplatePermissions)) {
-            $this->portPermissions = DB::table('service_templates')->get();
+            $this->serviceTemplatePermissions = DB::table('service_templates')->get();
         }
 
-        return $this->portPermissions;
+        return $this->serviceTemplatePermissions;
     }
 
     /**
