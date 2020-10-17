@@ -102,7 +102,7 @@
             if (confirm('@lang('Are you sure you want to remove all Services created by ')' + name + '?')) {
                 $.ajax({
                     url: url,
-                    type: 'DELETE',
+                    type: 'POST',
                     success: function (msg) {
                         document.getElementById("manage-services-table").deleteRow(index);
                         toastr.success(msg);
