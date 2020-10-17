@@ -129,7 +129,7 @@ function delete_service_template($service_template = null)
 
 function discover_service_template($service_template = null)
 {
-    $services_template = ServiceTemplate::find($service_template);
+    $services_template = ServiceTemplate::get($service_template);
     $status = null;
     foreach (Device::inDeviceGroup($services_template['device_group_id'])->pluck('device_id') as $device) {
         foreach (Service::where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template['changed'])->pluck('service_id') as $service) {
