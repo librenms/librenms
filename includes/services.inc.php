@@ -156,7 +156,7 @@ function remove_service_template($service_template = null)
     if (! is_numeric($service_template)) {
         return false;
     }
-    
+
     return Service::where('service_template_id', $service_template)->delete();
 }
 
