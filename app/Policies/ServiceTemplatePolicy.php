@@ -99,6 +99,18 @@ class ServiceTemplatePolicy
     }
 
     /**
+     * Determine whether the user can remove the services for the template.
+     *
+     * @param \App\Models\User $user
+     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @return mixed
+     */
+    public function remove(User $user, ServiceTemplate $serviceTemplate)
+    {
+        return false;
+    }
+
+    /**
      * Determine whether the user can permanently delete the services template.
      *
      * @param \App\Models\User $user

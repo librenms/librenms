@@ -249,7 +249,7 @@ class Permissions
      *
      * @return \Illuminate\Support\Collection
      */
-    public function getServiceTemplatePermissions()
+    public static function getServiceTemplatePermissions()
     {
         if (is_null($this->serviceTemplatePermissions)) {
             $this->serviceTemplatePermissions = DB::table('service_templates')->get();

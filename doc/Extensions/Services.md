@@ -27,12 +27,29 @@ The plugins are bundled with the pre build VM images via the package
 
 ## Service Templates
 
-Service Templates are setup exactly the same way Services are.
+Service Templates within LibreNMS provides the same ability as Nagios
+does with Host Groups. Known as Device Groups in LibreNMS.
 They are applied devices that belong to the specified Device Group.
 
-You can use the Apply button to manually push the Service Templates.
-You can also enable discover services to have them apply on
-discover intervals.
+Use the Apply buttons to manually create Services for the Service Template.
+Use the Remove buttons to manually remove Services for the Service Template.
+
+When you Edit a Service Template, and hit Apply, all relevant changes are
+pushed to existing Services previously created.
+
+You can also enable Service Templates Auto Discovery to have Services
+added / removed / updated on regular discover intervals.
+
+When a Device is a member of multiple Device Groups, templates from
+all of those Device Groups are applied.
+
+If a Device is added or removed from a Device Group, when the Apply button
+is used or Auto Discovery runs Services will be added / removed as
+appropriate.
+
+**Service Templates are tied into Device Groups, you need at least
+one Device Group to be able to add Service Templates - You can define a
+dummy one. The Device Group does not need members to add Service Templates.**
 
 ## Service Auto Discovery
 
