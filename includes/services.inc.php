@@ -129,7 +129,6 @@ function delete_service_template($service_template = null)
 function discover_service_template($service_template = null)
 {
     $services_template = ServiceTemplate::getServiceTemplate($service_template);
-
     $status = null;
     foreach (DB::table('device_group_device')->where('device_group_id', $services_template[0]['device_group_id'])->pluck('device_id') as $device) {
         foreach (DB::table('services')->where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template[0]['changed'])->pluck('service_id') as $service) {
