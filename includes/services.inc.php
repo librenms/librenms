@@ -117,16 +117,6 @@ function discover_service($device, $service)
     echo "$service ";
 }
 
-function delete_service_template($service_template = null)
-{
-    if (! is_numeric($service_template)) {
-        return false;
-    }
-    remove_service_template($service_template);
-
-    return dbDelete('service_templates', '`id` =  ?', [$service_template]);
-}
-
 function discover_service_template($service_template = null)
 {
     $services_template = ServiceTemplate::find($service_template);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DeviceGroup;
+use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -160,6 +161,7 @@ class ServiceTemplateController extends Controller
      */
     public function destroy(ServiceTemplate $serviceTemplate)
     {
+        Service::where('service_template_id', $serviceTemplate)->delete();
         $serviceTemplate->delete();
 
         Toastr::success(__('Service Template :name deleted', ['name' => $serviceTemplate->name]));

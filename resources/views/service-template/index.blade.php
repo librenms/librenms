@@ -118,24 +118,22 @@
             }
         }
         function delete_st(button, id) {
+            var index = button.parentNode.parentNode.rowIndex;
             if (confirm('@lang('Are you sure you want to delete AND remove all Services created by ')' + name + '?')) {
                 $.ajax({
-                    type: 'POST',
-                    url: 'ajax_form.php',
-                    data: { type: "delete-service-template", id: id },
-                    dataType: "json",
-                    success: function(data){
-                        if(data['status'] == 'ok') {
-                            toastr.success(data['message']);
-                        } else {
-                            toastr.error(data['message']);
-                        }
+                    url: url,
+                    type: 'DELETE',
+                    success: function (msg) {
+                        document.getElementById("manage-service-templates-table").deleteRow(index);
+                        toastr.success(msg);
                     },
-                    error:function(){
-                        toastr.error('An error occurred deleting this Service Template');
+                    error: function () {
+                        toastr.error('@lang('The device group could not be deleted')');
                     }
                 });
             }
+
+            return false;
         }
     </script>
 @endsection
