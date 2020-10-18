@@ -118,7 +118,7 @@
                 });
             }
         }
-        function remove_st(button, name, id) {
+        function remove_st(button, name, id, url) {
             if (confirm('@lang('Are you sure you want to remove all Services created by ')' + name + '?')) {
                 $.ajax({
                     url: url,
@@ -134,7 +134,7 @@
 
             return false;
         }
-        function delete_st(button, name, id) {
+        function delete_st(button, name, id, url) {
             var index = button.parentNode.parentNode.rowIndex;
             if (confirm('@lang('Are you sure you want to delete AND remove all Services created by ')' + name + '?')) {
                 $.ajax({
