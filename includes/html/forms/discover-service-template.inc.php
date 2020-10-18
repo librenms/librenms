@@ -19,9 +19,9 @@ $id = $vars['id'];
 
 if (is_numeric($id)) {
     if (discover_service_template($id)) {
-        $status = ['status' =>0, 'message' => 'Services for Service Template: <i>' . $id . ', have been created or updated.</i>'];
+        $status = ['status' =>0, 'message' => 'Services for Service Template: <i>' . $id . ', created or updated.</i>'];
     } else {
-        $status = ['status' =>1, 'message' => 'Services for Service Template: <i>' . $id . ', have NOT been created or updated.</i>'];
+        $status = ['status' =>1, 'message' => 'No Services for Service Template: <i>' . $id . ', created or updated.</i>'];
     }
 }
 header('Content-Type: application/json');
