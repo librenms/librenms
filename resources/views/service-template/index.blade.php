@@ -16,9 +16,10 @@
                     <a type="button" class="btn btn-primary" href="{{ route('services.templates.create') }}">
                         <i class="fa fa-plus"></i> @lang('New Service Template')
                     </a>
-                    <a type="button" class="btn btn-success" href="{{ route('services.templates.discover') }}">
-                        <i class="fa fa-refresh"></i> @lang('Apply Service Templates')
-                    </a>
+                    <button type="button" title="@lang('Apply Service Templates')" class="btn btn-success" aria-label="@lang('Apply Service Templates')"
+                            onclick="discover_st(this, '{{ 'All' }}', '{{ route('services.templates.discover') }}')">
+                        <i
+                            class="fa fa-refresh" aria-hidden="true"></i> @lang('New Service Template')</button>
                 </div>
             </div>
             @foreach($device_groups as $device_group)
@@ -54,7 +55,7 @@
                                             <td>{{ $service_template->disabled }}</td>
                                             <td>
                                                 <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
-                                                        onclick="discover_st(this, '{{ $service_template->id }}')">
+                                                        onclick="apply_st(this, '{{ $service_template->id }}')">
                                                     <i
                                                         class="fa fa-refresh" aria-hidden="true"></i></button>
                                                 <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Apply')"
@@ -83,7 +84,7 @@
 
 @section('scripts')
     <script>
-        function discover_st(button, id) {
+        function apply_st(button, id) {
             if (confirm('@lang('Are you sure you want to create Services for ')' + name + '?')) {
                 $.ajax({
                     type: 'POST',
@@ -103,8 +104,21 @@
                 });
             }
         }
+        function discover_st(button, id) {
+            if (confirm('@lang('Are you sure you want to Apply All Service Templates?')')) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    success: function (msg) {
+                        toastr.success(msg);
+                    },
+                    error:function(){
+                        toastr.error('No Services were updated when Applying this Service Template');
+                    }
+                });
+            }
+        }
         function remove_st(button, id) {
-            var index = button.parentNode.parentNode.rowIndex;
             if (confirm('@lang('Are you sure you want to remove all Services created by ')' + name + '?')) {
                 $.ajax({
                     url: url,
