@@ -19,7 +19,7 @@
                     <button type="button" title="@lang('Apply Service Templates')" class="btn btn-success" aria-label="@lang('Apply Service Templates')"
                             onclick="discover_st(this, '{{ 'All' }}', '{{ route('services.templates.discover') }}')">
                         <i
-                            class="fa fa-refresh" aria-hidden="true"></i> @lang('New Service Template')</button>
+                            class="fa fa-refresh" aria-hidden="true"></i> @lang('Apply Service Templates')</button>
                 </div>
             </div>
             @foreach($device_groups as $device_group)
