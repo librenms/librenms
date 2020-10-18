@@ -19,7 +19,10 @@
                 </div>
             </div>
             @foreach($device_groups as $device_group)
-                <x-panel id="manage-services-templates-panel-dg" title="{{ __('Device Group:') }} {{ $device_group->name }}">
+                <x-panel id="manage-services-templates-panel-dg">
+                    <x-slot name="title">
+                        <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang($device_group->name)
+                    </x-slot>
                     <div class="table-responsive">
                         <table id="manage-services-templates-table" class="table table-condensed table-hover">
                             <thead>
