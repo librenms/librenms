@@ -87,28 +87,6 @@ trait YamlMempoolsDiscovery
     }
 
     /**
-     * @param \Illuminate\Support\Collection $mempools
-     */
-    public function pollYamlMempools($mempools)
-    {
-        // fetch all data
-        $oids = $mempools->map->only(['mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid'])
-            ->flatten()->filter()->unique()->values()->all();
-        $data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
-
-        $mempools->each(function (Mempool $mempool) use ($data) {
-            $mempool->fillUsage(
-                $data[$mempool->mempool_used_oid] ?? null,
-                $data[$mempool->mempool_total_oid] ?? null,
-                $data[$mempool->mempool_free_oid] ?? null,
-                $data[$mempool->mempool_perc_oid] ?? null
-            );
-        });
-
-        return $mempools;
-    }
-
-    /**
      * @param array $yaml item yaml definition
      * @param string $value field from yaml
      * @return array oids for fields

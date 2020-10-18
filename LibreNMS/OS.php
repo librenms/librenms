@@ -26,7 +26,6 @@ namespace LibreNMS;
 
 use App\Models\Device;
 use App\Models\DeviceGraph;
-use App\Models\Mempool;
 use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
@@ -34,24 +33,21 @@ use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
-use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 
-class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, MempoolsPolling
+class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
         HostResources::discoverMempools as discoverHrMempools;
-        HostResources::pollMempools as pollHrMempools;
     }
     use UcdResources {
         UcdResources::discoverProcessors as discoverUcdProcessors;
         UcdResources::discoverMempools as discoverUcdMempools;
-        UcdResources::pollMempools as pollUcdMempools;
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
@@ -301,34 +297,6 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery, Mempools
         }
 
         return $this->discoverUcdMempools()->merge($this->discoverHrMempools());
-    }
-
-    /**
-     * Poll HOST-RESOURCES-MIB and UCD-MIB
-     *
-     * @param \Illuminate\Support\Collection $mempools
-     * @return \Illuminate\Support\Collection
-     */
-    public function pollMempools($mempools)
-    {
-        $grouped = $mempools->groupBy(function (Mempool $mempool) {
-            if ($mempool->mempool_type == 'ucd' || $mempool->mempool_type == 'hrstorage') {
-                return $mempool->mempool_type;
-            }
-            return 'yaml';
-        });
-
-        if ($grouped->has('ucd')) {
-            $this->pollUcdMempools($grouped->get('ucd'));
-        }
-        if ($grouped->has('hrstorage')) {
-            $this->pollHrMempools($grouped->get('hrstroage'));
-        }
-        if ($grouped->has('yaml')) {
-            $this->pollYamlMempools($grouped->get('yaml'));
-        }
-
-        return $mempools;
     }
 
     public function getDiscovery($module = null)

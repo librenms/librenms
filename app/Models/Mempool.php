@@ -12,7 +12,6 @@ class Mempool extends DeviceRelatedModel implements Keyable
     protected $fillable = [
         'mempool_index',
         'entPhysicalIndex',
-        'hrDeviceIndex',
         'mempool_type',
         'mempool_precision',
         'mempool_descr',

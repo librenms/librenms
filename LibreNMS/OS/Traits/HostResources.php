@@ -142,27 +142,12 @@ trait HostResources
         })->map(function ($storage, $index) {
             return (new Mempool([
                 'mempool_index' => $index,
-                'hrDeviceIndex' => $index,
                 'mempool_type' => 'hrstorage',
                 'mempool_precision' => $storage['hrStorageAllocationUnits'],
                 'mempool_descr' => $storage['hrStorageDescr'],
                 'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
+                'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
             ]))->fillUsage($storage['hrStorageUsed'], $storage['hrStorageSize']);
-        });
-    }
-
-    public function pollMempools($mempools)
-    {
-        $oids = $mempools->pluck('hrDeviceIndex')->map(function ($index) {
-            return ".1.3.6.1.2.1.25.2.3.1.6.$index";
-        });
-        $data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
-
-        return $mempools->each(function (Mempool $mempool) use ($data) {
-            $oid = ".1.3.6.1.2.1.25.2.3.1.6.$mempool->hrDeviceIndex";
-            if (isset($data[$oid])) {
-                $mempool->fillUsage($data[$oid]);
-            }
         });
     }
 

@@ -84,7 +84,7 @@ trait UcdResources
         return $mempools;
     }
 
-    public function pollMempools($mempools)
+    public function pollUcdMempools($mempools)
     {
         $data = snmp_get_multi($this->getDeviceArray(), [
             'memTotalSwap.0',
