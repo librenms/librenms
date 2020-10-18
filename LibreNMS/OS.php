@@ -296,7 +296,12 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
             return $this->discoverYamlMempools();
         }
 
-        return $this->discoverUcdMempools()->merge($this->discoverHrMempools());
+        $mempools = $this->discoverHrMempools();
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        return $this->discoverUcdMempools();
     }
 
     public function getDiscovery($module = null)
