@@ -63,7 +63,7 @@ trait UcdResources
             'memSysAvail.0',
         ], '-OQUs', 'UCD-SNMP-MIB');
 
-        if (isset($data[0]['memTotalSwap']) && (isset($data[0]['memAvailReal']) || isset($data[0]['memSysAvail']))) {
+        if ($this->oidValid($data, 'memTotalReal') && ($this->oidValid($data, 'memAvailReal') || $this->oidValid($data, 'memSysAvail'))) {
             $mempools->push((new Mempool([
                 'mempool_index' => 1,
                 'mempool_type' => 'ucd',
@@ -72,7 +72,7 @@ trait UcdResources
             ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memSysAvail'] ?? $data[0]['memAvailReal']));
         }
 
-        if (isset($data[0]['memTotalSwap']) && isset($data[0]['memAvailSwap'])) {
+        if ($this->oidValid($data, 'memTotalSwap') && $this->oidValid($data, 'memAvailSwap')) {
             $mempools->push((new Mempool([
                 'mempool_index' => 2,
                 'mempool_type' => 'ucd',
@@ -135,5 +135,10 @@ trait UcdResources
         }
 
         return $mempools;
+    }
+
+    private function oidValid($data, $oid)
+    {
+        return isset($data[0][$oid]) && $data[0][$oid] !== 'NULL';
     }
 }

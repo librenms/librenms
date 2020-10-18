@@ -49,7 +49,7 @@ class Mempools implements Module
 
     public function poll(OS $os)
     {
-        [$ucd, $mempools] = $os->getDevice()->mempools
+        [$ucd, $other] = $os->getDevice()->mempools
             ->partition('mempool_type', 'ucd');
 
         // poll UCD if exists.
@@ -57,24 +57,26 @@ class Mempools implements Module
             $os->pollUcdMempools($ucd);
         }
 
-        if ($mempools->isEmpty()) {
-            return; // no mempools
+        if ($other->isNotEmpty()) {
+            $os instanceof MempoolsPolling
+                ? $os->pollMempools($other)
+                : $this->defaultPolling($os, $other);
         }
 
-        $mempools = $os instanceof MempoolsPolling
-            ? $os->pollMempools($mempools)
-            : $this->defaultPolling($os, $mempools);
-
-        $mempools->each(function (Mempool $mempool) use ($os) {
+        $os->getDevice()->mempools->each(function (Mempool $mempool) use ($os) {
             echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc%";
             if ($mempool->mempool_total != 100) {
                 $used = format_bi($mempool->mempool_used);
                 $total = format_bi($mempool->mempool_total);
-                echo "$used / $total";
+                echo "  $used / $total";
             }
             echo PHP_EOL;
 
             $mempool->save();
+
+            if ($mempool->mempool_type == 'ucd') {
+                return; // ucd has it's own rrd format
+            }
 
             $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
             $rrd_def = RrdDefinition::make()

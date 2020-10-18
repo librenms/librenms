@@ -532,14 +532,17 @@
                 {
                     "mempool_index": "10",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
                     "mempool_precision": 4096,
                     "mempool_descr": "/dev/hd6",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 4,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 23101440,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.10",
+                    "mempool_free": 513769472,
+                    "mempool_free_oid": null,
+                    "mempool_total": 536870912,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -548,14 +551,17 @@
                 {
                     "mempool_index": "11",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
                     "mempool_precision": 4096,
                     "mempool_descr": "System RAM",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 53,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 2275934208,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.11",
+                    "mempool_free": 2019033088,
+                    "mempool_free_oid": null,
+                    "mempool_total": 4294967296,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -563,42 +569,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "10",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "/dev/hd6",
-                    "mempool_perc": 4,
-                    "mempool_used": 23101440,
-                    "mempool_free": 513769472,
-                    "mempool_total": 536870912,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "11",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "System RAM",
-                    "mempool_perc": 53,
-                    "mempool_used": 2275934208,
-                    "mempool_free": 2019033088,
-                    "mempool_total": 4294967296,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "storage": {
         "discovery": {
