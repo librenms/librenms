@@ -2045,12 +2045,14 @@ function device_is_up($device, $record_perf = false)
     }
 
     if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason'] || $state_update_again) {
-        dbUpdate(
-            ['status' => $response['status'], 'status_reason' => $response['status_reason']],
-            'devices',
-            'device_id=?',
-            [$device['device_id']]
-        );
+        if(!$state_update_again) {
+            dbUpdate(
+                ['status' => $response['status'], 'status_reason' => $response['status_reason']],
+                'devices',
+                'device_id=?',
+                [$device['device_id']]
+            );
+        }
 
         if ($response['status']) {
             $type = 'up';
