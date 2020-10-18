@@ -60,7 +60,7 @@
                                                 <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Apply')"
                                                         onclick="remove_st(this, '{{ $service_template->name }}', '{{ route('services.templates.remove', $service_template->id) }}')">
                                                     <i
-                                                        class="fa fa-minus" aria-hidden="true"></i></button>
+                                                        class="fa fa-ban" aria-hidden="true"></i></button>
                                                 <a type="button" title="@lang('edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
                                                 href="{{ route('services.templates.edit', $service_template->id) }}">
                                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
@@ -91,7 +91,7 @@
                     data: { type: "discover-service-template", id: id },
                     dataType: "json",
                     success: function(data){
-                        if(data['status'] == '1') {
+                        if(data['status'] == 'ok') {
                             toastr.success(data['message']);
                         } else {
                             toastr.error(data['message']);
