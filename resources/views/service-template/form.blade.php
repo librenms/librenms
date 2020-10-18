@@ -11,7 +11,7 @@
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="device_group_id" name="device_group_id">
             @foreach($device_groups as $device_group)
-                <option value="{{ $device_group->id }}" @if($current_service === {{ old('device_group_id', $service_template->device_group_id) }} selected @endif>{{ $device_group->name }}</option>
+                <option value="{{ $device_group->id }}" @if($current_service == $service_template->device_group_id) selected @endif>{{ $device_group->name }}</option>
             @endforeach
         </select>
         <span class="help-block">{{ $errors->first('device_group_id') }}</span>
@@ -23,7 +23,7 @@
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="type" name="type">
             @foreach($services as $current_service)
-                <option value="{{ $current_service }}" @if($current_service === {{ old('type', $service_template->type) }} selected @endif>{{ $current_service }}</option>
+                <option value="{{ $current_service }}" @if($current_service == $service_template->type) selected @endif>{{ $current_service }}</option>
             @endforeach
         </select>
         <span class="help-block">{{ $errors->first('type') }}</span>
