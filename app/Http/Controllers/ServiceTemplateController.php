@@ -178,7 +178,7 @@ class ServiceTemplateController extends Controller
      */
     public function remove(ServiceTemplate $serviceTemplate)
     {
-        Service::where('service_template_id', $serviceTemplate)->delete();
+        Service::where('service_template_id', $serviceTemplate->id)->delete();
 
         $msg = __('Service Template :name removed', ['name' => $serviceTemplate->name]);
 
@@ -193,7 +193,7 @@ class ServiceTemplateController extends Controller
      */
     public function destroy(ServiceTemplate $serviceTemplate)
     {
-        Service::where('service_template_id', $serviceTemplate)->delete();
+        Service::where('service_template_id', $serviceTemplate->id)->delete();
         $serviceTemplate->delete();
 
         $msg = __('Service Template :name deleted', ['name' => $serviceTemplate->name]);
