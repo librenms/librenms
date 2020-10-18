@@ -163,7 +163,7 @@ class ServiceTemplateController extends Controller
         foreach (Service::find('service_templates')->pluck('id') as $service_template) {
             discover_service_template($service_template['id']);
         }
-        
+
         return redirect()->route('services.templates.index');
     }
     /**
