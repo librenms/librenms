@@ -25,6 +25,7 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
+use Closure;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 
@@ -34,6 +35,7 @@ trait HostResources
     private $memoryStorageTypes = [
         'hrStorageVirtualMemory',
         'hrStorageRam',
+        'hrStorageOther',
     ];
     private $ignoreMemoryDescr = [
         'MALLOC',
@@ -41,9 +43,14 @@ trait HostResources
         'procfs',
         '/proc',
     ];
+    private $validOtherMemory = [
+        'Memory buffers',
+        'Cached memory',
+        'Shared memory',
+    ];
     private $memoryDescrWarn = [
         'Physical memory' => 99,
-        'Real Memory' => 99,
+        'Real memory' => 99,
         'Virtual memory' => 95,
         'Swap space' => 10,
     ];
@@ -136,22 +143,33 @@ trait HostResources
             return collect();
         }
 
-        return collect($storage_array)->filter(function ($storage) {
-            return in_array($storage['hrStorageType'], $this->memoryStorageTypes)
-                && ! Str::contains($storage['hrStorageDescr'], $this->ignoreMemoryDescr);
-        })->map(function ($storage, $index) {
-            return (new Mempool([
-                'mempool_index' => $index,
-                'mempool_type' => 'hrstorage',
-                'mempool_precision' => $storage['hrStorageAllocationUnits'],
-                'mempool_descr' => $storage['hrStorageDescr'],
-                'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
-                'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
-            ]))->fillUsage($storage['hrStorageUsed'], $storage['hrStorageSize']);
-        });
+        return collect($storage_array)->filter(Closure::fromCallable([$this, 'memValid']))
+            ->map(function ($storage, $index) {
+                return (new Mempool([
+                    'mempool_index' => $index,
+                    'mempool_type' => 'hrstorage',
+                    'mempool_precision' => $storage['hrStorageAllocationUnits'],
+                    'mempool_descr' => $storage['hrStorageDescr'],
+                    'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
+                    'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
+                ]))->fillUsage($storage['hrStorageUsed'], $storage['hrStorageSize']);
+            });
     }
 
-    private function getHrStorage()
+    protected function memValid($storage)
+    {
+        if (! in_array($storage['hrStorageType'], $this->memoryStorageTypes)) {
+            return false;
+        }
+
+        if ($storage['hrStorageType'] == 'hrStorageOther' && ! in_array($storage['hrStorageDescr'], $this->validOtherMemory)) {
+            return false;
+        }
+
+        return ! Str::contains($storage['hrStorageDescr'], $this->ignoreMemoryDescr);
+    }
+
+    protected function getHrStorage()
     {// hrStorageTable
         if ($this->hrStorage === null) {
             $this->hrStorage = snmpwalk_cache_oid($this->getDeviceArray(), 'hrStorageEntry', [], 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
