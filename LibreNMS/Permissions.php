@@ -193,7 +193,7 @@ class Permissions
      */
     public function serviceTemplatesForUser($user = null)
     {
-        return $this->getServiceTemplatePermissions($user)
+        return $this->getServiceTemplatePermissions()
             ->where('user_id', $this->getUserId($user))
             ->pluck('id');
     }
