@@ -13,8 +13,11 @@
             </x-slot>
             <div class="row" style="padding-bottom: 16px;">
                 <div class="col-md-12">
-                    <a type="button" class="btn btn-success" href="{{ route('services.templates.create') }}">
+                    <a type="button" class="btn btn-primary" href="{{ route('services.templates.create') }}">
                         <i class="fa fa-plus"></i> @lang('New Service Template')
+                    </a>
+                    <a type="button" class="btn btn-success" href="{{ route('services.templates.discover') }}">
+                        <i class="fa fa-refresh"></i> @lang('Apply Service Templates')
                     </a>
                 </div>
             </div>
@@ -53,7 +56,7 @@
                                                 <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
                                                         onclick="discover_st(this, '{{ $service_template->id }}')">
                                                     <i
-                                                        class="fa fa-plus" aria-hidden="true"></i></button>
+                                                        class="fa fa-refresh" aria-hidden="true"></i></button>
                                                 <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Apply')"
                                                         onclick="remove_st(this, '{{ $service_template->name }}', '{{ route('services.templates.remove', $service_template->id) }}')">
                                                     <i

@@ -152,7 +152,20 @@ class ServiceTemplateController extends Controller
 
         return redirect()->route('services.templates.index');
     }
-
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function discover()
+    {
+        foreach (Service::find('service_templates')->pluck('id') as $service_template) {
+            discover_service_template($service_template['id']);
+        }
+        
+        return redirect()->route('services.templates.index');
+    }
     /**
      * Remove the specified resource from storage.
      *
