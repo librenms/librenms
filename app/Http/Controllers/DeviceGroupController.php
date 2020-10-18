@@ -179,6 +179,6 @@ class DeviceGroupController extends Controller
 
         $msg = __('Device Group :name deleted', ['name' => $deviceGroup->name]);
 
-        return response ($msg, 200);
+        return response($msg, 200);
     }
 }
