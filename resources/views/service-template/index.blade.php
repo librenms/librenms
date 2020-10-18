@@ -84,7 +84,7 @@
 
 @section('scripts')
     <script>
-        function apply_st(button, id) {
+        function apply_st(button, name, id) {
             if (confirm('@lang('Are you sure you want to create Services for ')' + name + '?')) {
                 $.ajax({
                     type: 'POST',
@@ -118,7 +118,7 @@
                 });
             }
         }
-        function remove_st(button, id) {
+        function remove_st(button, name, id) {
             if (confirm('@lang('Are you sure you want to remove all Services created by ')' + name + '?')) {
                 $.ajax({
                     url: url,
@@ -134,7 +134,7 @@
 
             return false;
         }
-        function delete_st(button, id) {
+        function delete_st(button, name, id) {
             var index = button.parentNode.parentNode.rowIndex;
             if (confirm('@lang('Are you sure you want to delete AND remove all Services created by ')' + name + '?')) {
                 $.ajax({
