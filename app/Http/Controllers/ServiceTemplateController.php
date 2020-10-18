@@ -165,7 +165,9 @@ class ServiceTemplateController extends Controller
             discover_service_template($service_template['id']);
         }
 
-        return redirect()->route('services.templates.index');
+        $msg = __('All Service Templates applied');
+
+        return response($msg, 200);
     }
 
     /**
@@ -178,9 +180,9 @@ class ServiceTemplateController extends Controller
     {
         Service::where('service_template_id', $serviceTemplate)->delete();
 
-        Toastr::success(__('Service Template :name removed', ['name' => $serviceTemplate->name]));
+        $msg = __('Service Template :name removed', ['name' => $serviceTemplate->name]);
 
-        return redirect()->route('services.templates.index');
+        return response($msg, 200);
     }
 
     /**
@@ -194,8 +196,8 @@ class ServiceTemplateController extends Controller
         Service::where('service_template_id', $serviceTemplate)->delete();
         $serviceTemplate->delete();
 
-        Toastr::success(__('Service Template :name deleted', ['name' => $serviceTemplate->name]));
+        $msg = __('Service Template :name deleted', ['name' => $serviceTemplate->name]);
 
-        return redirect()->route('services.templates.index');
+        return response($msg, 200);
     }
 }
