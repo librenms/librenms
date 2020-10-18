@@ -49,10 +49,13 @@ trait HostResources
         'Shared memory',
     ];
     private $memoryDescrWarn = [
+        'Cached memory' => 0,
+        'Memory buffers' => 0,
         'Physical memory' => 99,
         'Real memory' => 99,
-        'Virtual memory' => 95,
+        'Shared memory' => 0,
         'Swap space' => 10,
+        'Virtual memory' => 95,
     ];
 
     /**
