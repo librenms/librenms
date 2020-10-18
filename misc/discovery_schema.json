@@ -426,14 +426,14 @@
         "skip_values": {
             "anyOf": [
                 {
-                    "type": "integer"
+                    "type": "number"
                 },
                 {
                     "type": "array",
                     "items": {
                         "anyOf": [
                             {
-                                "type": "integer"
+                                "type": "number"
                             },
                             {
                                 "type": "object",
@@ -445,9 +445,9 @@
                                         "$ref": "#/definitions/comparison"
                                     },
                                     "value": {
-                                        "type": ["boolean", "integer", "string", "array"],
+                                        "type": ["boolean", "number", "string", "array"],
                                         "items": {
-                                            "type": ["integer", "string"]
+                                            "type": ["number", "string"]
                                         }
                                     }
                                 },
