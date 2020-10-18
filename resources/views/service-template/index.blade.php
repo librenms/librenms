@@ -91,7 +91,7 @@
                     data: { type: "discover-service-template", id: id },
                     dataType: "json",
                     success: function(data){
-                        if(data['status'] == 'ok') {
+                        if(data['status'] == '1') {
                             toastr.success(data['message']);
                         } else {
                             toastr.error(data['message']);
@@ -110,7 +110,6 @@
                     url: url,
                     type: 'POST',
                     success: function (msg) {
-                        document.getElementById("manage-services-table").deleteRow(index);
                         toastr.success(msg);
                     },
                     error: function () {
