@@ -92,7 +92,7 @@ class ServiceTemplateController extends Controller
      */
     public function show(ServiceTemplate $serviceTemplate)
     {
-        return redirect(url('/services/template=' . $serviceTemplate->id));
+        return redirect(url('/services/templates/' . $serviceTemplate->id));
     }
 
     /**
