@@ -155,6 +155,7 @@ trait HostResources
                     'mempool_descr' => $storage['hrStorageDescr'],
                     'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
                     'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
+                    'mempool_total_oid' => $storage['hrStorageType'] == 'hrStorageOther' ? ".1.3.6.1.2.1.25.2.3.1.5.$index" : null, // variable size
                 ]))->fillUsage($storage['hrStorageUsed'], $storage['hrStorageSize']);
             });
     }
