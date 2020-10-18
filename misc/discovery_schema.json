@@ -382,6 +382,46 @@
                 "data"
             ]
         },
+        "skip_values": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "oid": {
+                                        "type": "string"
+                                    },
+                                    "op": {
+                                        "$ref": "#/definitions/comparison"
+                                    },
+                                    "value": {
+                                        "type": ["boolean", "integer", "string", "array"],
+                                        "items": {
+                                            "type": ["integer", "string"]
+                                        }
+                                    }
+                                },
+                                "additionalProperties": false,
+                                "required": [
+                                    "oid",
+                                    "op",
+                                    "value"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
         "data": {
             "type": "array",
             "items": {
