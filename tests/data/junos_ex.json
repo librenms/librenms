@@ -216,14 +216,17 @@
                 {
                     "mempool_index": "7.1.0.0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "junos",
                     "mempool_precision": 1,
                     "mempool_descr": "FPC: EX3400-48T @ 0/*/*",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 13,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 265814016,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1778909184,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2044723200,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -232,14 +235,17 @@
                 {
                     "mempool_index": "9.1.0.0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "junos",
                     "mempool_precision": 1,
                     "mempool_descr": "Routing Engine 0",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 13,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 265814016,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1778909184,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2044723200,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -247,42 +253,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "7.1.0.0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "junos",
-                    "mempool_precision": 1,
-                    "mempool_descr": "FPC: EX3400-48T @ 0/*/*",
-                    "mempool_perc": 13,
-                    "mempool_used": 265814016,
-                    "mempool_free": 1778909184,
-                    "mempool_total": 2044723200,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "9.1.0.0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "junos",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Routing Engine 0",
-                    "mempool_perc": 13,
-                    "mempool_used": 265814016,
-                    "mempool_free": 1778909184,
-                    "mempool_total": 2044723200,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

@@ -3923,14 +3923,17 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "gwd",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 11,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 29,
+                    "mempool_used_oid": null,
+                    "mempool_free": 227,
+                    "mempool_free_oid": null,
+                    "mempool_total": 256,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -3938,26 +3941,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "gwd",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 11,
-                    "mempool_used": 29,
-                    "mempool_free": 227,
-                    "mempool_total": 256,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

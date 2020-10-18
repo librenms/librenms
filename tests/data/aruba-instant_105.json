@@ -1152,14 +1152,17 @@
                 {
                     "mempool_index": "BT0489813",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "aruba-instant",
                     "mempool_precision": 1,
                     "mempool_descr": "24:de:c6:c3:50:a4 [BT0489813]",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 60,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 77750272,
+                    "mempool_used_oid": null,
+                    "mempool_free": 50995200,
+                    "mempool_free_oid": null,
+                    "mempool_total": 128745472,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -1168,14 +1171,17 @@
                 {
                     "mempool_index": "BT0490379",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "aruba-instant",
                     "mempool_precision": 1,
                     "mempool_descr": "24:de:c6:c3:52:da [BT0490379]",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 60,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 77750272,
+                    "mempool_used_oid": null,
+                    "mempool_free": 50995200,
+                    "mempool_free_oid": null,
+                    "mempool_total": 128745472,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -1183,42 +1189,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "BT0489813",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "aruba-instant",
-                    "mempool_precision": 1,
-                    "mempool_descr": "24:de:c6:c3:50:a4 [BT0489813]",
-                    "mempool_perc": 60,
-                    "mempool_used": 77750272,
-                    "mempool_free": 50995200,
-                    "mempool_total": 128745472,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "BT0490379",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "aruba-instant",
-                    "mempool_precision": 1,
-                    "mempool_descr": "24:de:c6:c3:52:da [BT0490379]",
-                    "mempool_perc": 60,
-                    "mempool_used": 77750272,
-                    "mempool_free": 50995200,
-                    "mempool_total": 128745472,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

@@ -23825,14 +23825,17 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fs-gbn",
                     "mempool_precision": 1,
                     "mempool_descr": "ARM Cortex-A9, 400MHz Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 44,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 234881024,
+                    "mempool_used_oid": null,
+                    "mempool_free": 301989888,
+                    "mempool_free_oid": null,
+                    "mempool_total": 536870912,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -23840,25 +23843,6 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fs-gbn",
-                    "mempool_precision": 1,
-                    "mempool_descr": "ARM Cortex-A9, 400MHz Memory",
-                    "mempool_perc": 44,
-                    "mempool_used": 234881024,
-                    "mempool_free": 301989888,
-                    "mempool_total": 536870912,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

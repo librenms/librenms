@@ -6705,14 +6705,17 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "dlink",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 59,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 59,
+                    "mempool_used_oid": null,
+                    "mempool_free": 41,
+                    "mempool_free_oid": null,
+                    "mempool_total": 100,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -6720,26 +6723,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "dlink",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 59,
-                    "mempool_used": 59,
-                    "mempool_free": 41,
-                    "mempool_total": 100,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "vlans": {
         "discovery": {

@@ -8233,14 +8233,17 @@
                 {
                     "mempool_index": "1.dram",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "dlink",
                     "mempool_precision": 1,
                     "mempool_descr": "Dram Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 28,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 72997,
+                    "mempool_used_oid": null,
+                    "mempool_free": 189144,
+                    "mempool_free_oid": null,
+                    "mempool_total": 262144,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -8249,14 +8252,17 @@
                 {
                     "mempool_index": "1.flash",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "dlink",
                     "mempool_precision": 1,
                     "mempool_descr": "Flash Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 97,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 28978,
+                    "mempool_used_oid": null,
+                    "mempool_free": 959,
+                    "mempool_free_oid": null,
+                    "mempool_total": 29937,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -8264,42 +8270,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1.dram",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "dlink",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Dram Memory",
-                    "mempool_perc": 28,
-                    "mempool_used": 72997,
-                    "mempool_free": 189144,
-                    "mempool_total": 262144,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "1.flash",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "dlink",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Flash Memory",
-                    "mempool_perc": 97,
-                    "mempool_used": 28978,
-                    "mempool_free": 959,
-                    "mempool_total": 29937,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

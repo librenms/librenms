@@ -51864,9 +51864,7 @@
         "discovery": {
             "mempools": []
         },
-        "poller": {
-            "mempools": []
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

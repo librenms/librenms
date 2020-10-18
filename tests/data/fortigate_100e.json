@@ -3495,14 +3495,17 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fortigate",
                     "mempool_precision": 1,
                     "mempool_descr": "Main Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 22,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 684875,
+                    "mempool_used_oid": null,
+                    "mempool_free": 2428193,
+                    "mempool_free_oid": null,
+                    "mempool_total": 3113068,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -3510,26 +3513,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fortigate",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Main Memory",
-                    "mempool_perc": 22,
-                    "mempool_used": 684875,
-                    "mempool_free": 2428193,
-                    "mempool_total": 3113068,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

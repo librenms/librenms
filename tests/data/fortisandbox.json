@@ -1355,14 +1355,17 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fortisandbox",
                     "mempool_precision": 1000,
                     "mempool_descr": "Physical Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 23,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 3776397600,
+                    "mempool_used_oid": null,
+                    "mempool_free": 12642722400,
+                    "mempool_free_oid": null,
+                    "mempool_total": 16419120000,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -1370,25 +1373,6 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fortisandbox",
-                    "mempool_precision": 1000,
-                    "mempool_descr": "Physical Memory",
-                    "mempool_perc": 23,
-                    "mempool_used": 3776397600,
-                    "mempool_free": 12642722400,
-                    "mempool_total": 16419120000,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }
