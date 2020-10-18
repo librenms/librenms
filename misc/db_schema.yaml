@@ -1730,10 +1730,10 @@ service_templates:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ip, Type: text, 'Null': false, Extra: '' }
+    - { Field: ip, Type: text, 'Null': true, Extra: '' }
     - { Field: type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: desc, Type: text, 'Null': false, Extra: '' }
-    - { Field: param, Type: text, 'Null': false, Extra: '' }
+    - { Field: desc, Type: text, 'Null': true, Extra: '' }
+    - { Field: param, Type: text, 'Null': true, Extra: '' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: changed, Type: 'timestamp', 'Null': false, , Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }

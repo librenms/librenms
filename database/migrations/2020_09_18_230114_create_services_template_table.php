@@ -15,10 +15,10 @@ class CreateServicesTemplateTable extends Migration
         Schema::create('service_templates', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('device_group_id')->index();
-            $table->text('ip');
+            $table->text('ip')->nullable()->default(null);;
             $table->string('type');
-            $table->text('desc');
-            $table->text('param');
+            $table->text('desc')->nullable()->default(null);;
+            $table->text('param')->nullable()->default(null);;
             $table->boolean('ignore')->default(0);
             if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
                 $table->timestamp('changed')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
