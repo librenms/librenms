@@ -1,8 +1,10 @@
 mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB
 modules:
     mempools:
-        used: TIMETRA-SYSTEM-MIB::sgiMemoryUsed
-        free: TIMETRA-SYSTEM-MIB::sgiMemoryAvailable
+        data:
+            -
+                used: TIMETRA-SYSTEM-MIB::sgiMemoryUsed
+                free: TIMETRA-SYSTEM-MIB::sgiMemoryAvailable
     os:
         version:
             - TIMETRA-SYSTEM-MIB::sgiSwMajorVersion.0

@@ -8,6 +8,63 @@
         "modules": {
             "type": "object",
             "properties": {
+                "mempools": {
+                    "type": "object",
+                    "properties": {
+                        "pre-cache": {"$ref": "#/definitions/pre-cache"},
+                        "data": {
+                            "type": "array",
+                            "items": {
+                                "properties": {
+                                    "descr": {
+                                        "type": "string"
+                                    },
+                                    "free": {
+                                        "type": "string"
+                                    },
+                                    "index": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "oid": {
+                                        "type": "string"
+                                    },
+                                    "percent_used": {
+                                        "type": "string"
+                                    },
+                                    "precision": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "skip_values": {
+                                        "$ref": "#/definitions/skip_values"
+                                    },
+                                    "total": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "used": {
+                                        "type": "string"
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "data"
+                    ]
+                },
                 "os": {
                     "type": "object",
                     "properties": {
@@ -98,44 +155,7 @@
                                         "type": "string"
                                     },
                                     "skip_values": {
-                                        "anyOf": [
-                                            {
-                                                "type": "integer"
-                                            },
-                                            {
-                                                "type": "array",
-                                                "items": {
-                                                    "anyOf": [
-                                                        {
-                                                            "type": "integer"
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "oid": {
-                                                                    "type": "string"
-                                                                },
-                                                                "op": {
-                                                                    "$ref": "#/definitions/comparison"
-                                                                },
-                                                                "value": {
-                                                                    "type": ["boolean", "integer", "string", "array"],
-                                                                    "items": {
-                                                                        "type": ["integer", "string"]
-                                                                    }
-                                                                }
-                                                            },
-                                                            "additionalProperties": false,
-                                                            "required": [
-                                                                "oid",
-                                                                "op",
-                                                                "value"
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            }
-                                        ]
+                                        "$ref": "#/definitions/skip_values"
                                     },
                                     "entPhysicalIndex": {
                                         "type": "string"
@@ -367,6 +387,27 @@
         "modules"
     ],
     "definitions": {
+        "pre-cache": {
+            "type": "object",
+            "properties": {
+                "oids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "snmp_flags": {
+                    "type": [
+                        "string",
+                        "array"
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "oids"
+            ]
+        },
         "sensor": {
             "type": "object",
             "properties": {

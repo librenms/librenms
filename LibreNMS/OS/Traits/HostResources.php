@@ -52,7 +52,7 @@ trait HostResources
         'Cached memory' => 0,
         'Memory buffers' => 0,
         'Physical memory' => 99,
-        'Real memory' => 99,
+        'Real memory' => 90,
         'Shared memory' => 0,
         'Swap space' => 10,
         'Virtual memory' => 95,

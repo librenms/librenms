@@ -1,5 +1,10 @@
 mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: ALCATEL-IND1-SYSTEM-MIB::systemHardwareMemorySize
+
     os:
         sysDescr_regex: '/(?<hardware>OS\S*)? ?(?<version>\d+\.\d+\.\S*)/'
     processors:
