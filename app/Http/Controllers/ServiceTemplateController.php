@@ -152,6 +152,7 @@ class ServiceTemplateController extends Controller
 
         return redirect()->route('services.templates.index');
     }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -166,6 +167,7 @@ class ServiceTemplateController extends Controller
 
         return redirect()->route('services.templates.index');
     }
+
     /**
      * Remove the specified resource from storage.
      *
