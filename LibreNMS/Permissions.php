@@ -87,7 +87,7 @@ class Permissions
     }
 
     /**
-     * Check if a bill can be accessed by user (non-global read/admin)
+     * Check if a service template can be accessed by user (non-global read/admin)
      * If no user is given, use the logged in user
      *
      * @param \App\Models\ServiceTemplate|int $service_template
