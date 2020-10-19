@@ -84,6 +84,14 @@ $factory->define(\App\Models\DeviceGroup::class, function (Faker\Generator $fake
     ];
 });
 
+$factory->define(\App\Models\ServiceTemplate::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->domainWord,
+        'desc' => $faker->text(255),
+        'type' =>'static',
+    ];
+});
+
 $factory->define(\App\Models\Port::class, function (Faker\Generator $faker) {
     return [
         'ifIndex' => $faker->unique()->numberBetween(),
