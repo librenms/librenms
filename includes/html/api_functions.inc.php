@@ -2369,7 +2369,7 @@ function discover_service_templates(Illuminate\Http\Request $request)
 {
     $template = $request->route('id');
     $changes = 0;
-    $status = nul;
+    $status = null;
     if ($template) {
         $status = discover_service_template($template);
         if ($status === 1) {
