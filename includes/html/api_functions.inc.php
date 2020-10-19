@@ -2325,19 +2325,19 @@ function discover_service_templates(\Illuminate\Http\Request $request)
     $template = $request->route('id');
 
     if ($template) {
-        $status = discover_service_template($template)
-        if ($status === 1)) {
+        $status = discover_service_template($template);
+        if ($status === 1) {
             return api_success(202, 'No Service changes were made');
         }
     } else {
         foreach (Service::find('service_templates')->pluck('id') as $service_template) {
             $changes = 0;
             $status = discover_service_template($service_template['id']);
-            if (status === 0) { 
+            if (status === 0) {
                 $changes = 1;
             }
         }
-        if ($changes === 0)) {
+        if ($changes === 0) {
             return api_success(202, 'No Service changes were made');
         }
     }

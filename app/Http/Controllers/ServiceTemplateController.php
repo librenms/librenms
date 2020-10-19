@@ -162,7 +162,7 @@ class ServiceTemplateController extends Controller
     public function discover()
     {
         discover_service_templates();
-        
+
         $msg = __('All Service Templates applied');
 
         return response($msg, 200);
