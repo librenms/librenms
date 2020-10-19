@@ -90,7 +90,7 @@ $factory->define(\App\Models\ServiceTemplate::class, function (Faker\Generator $
         'desc' => $faker->text(255),
         'type' => $faker->text(255),
         'device_group_id' => $faker->randomDigit,
-        'ip' => $faker->ipv4,
+        'ip' => $faker->text(255),
         'param' => $faker->text(255),
         'ignore' => $faker->numberBetween(0, 1),
         'changed' => $faker->unixTime,
