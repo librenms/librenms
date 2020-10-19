@@ -2390,7 +2390,6 @@ function discover_service_templates(Illuminate\Http\Request $request)
 }
 
 function add_service_for_host(Illuminate\Http\Request $request)
-
 {
     $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
