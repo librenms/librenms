@@ -26,6 +26,7 @@ namespace LibreNMS\Device;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 
@@ -302,9 +303,29 @@ class YamlDiscovery
         return false;
     }
 
+    /**
+     * Translate an oid to numeric format (if already numeric, return as-is)
+     *
+     * @param string $oid
+     * @param array|null $device
+     * @param string $mib
+     * @param string|null $mibdir
+     * @return string numeric oid
+     * @throws \LibreNMS\Exceptions\InvalidOidException
+     */
     public static function oidToNumeric($oid, $device = null, $mib = 'ALL', $mibdir = null)
     {
-        return self::oidIsNumeric($oid) ? $oid : snmp_translate($oid, $mib, $mibdir, null, $device);
+        if (self::oidIsNumeric($oid)) {
+            return $oid;
+        }
+
+        $numeric_oid = snmp_translate($oid, $mib, $mibdir, null, $device);
+
+        if (empty($numeric_oid)) {
+            throw new InvalidOidException("Unable to translate oid $oid");
+        }
+
+        return $numeric_oid;
     }
 
     public static function oidIsNumeric($oid)

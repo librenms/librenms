@@ -81,15 +81,15 @@ trait YamlMempoolsDiscovery
             }
         }
 
-        dump($mempools->toArray());
+//        dump($mempools->toArray());
 
         return $mempools;
     }
 
     /**
      * @param array $yaml item yaml definition
-     * @param string $value field from yaml
      * @return array oids for fields
+     * @throws \LibreNMS\Exceptions\InvalidOidException
      */
     private function fetchData($yaml)
     {
@@ -100,12 +100,12 @@ trait YamlMempoolsDiscovery
             $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml['oid'], $this->mempoolsData, null, null, '-OQUb');
         }
 
-        foreach ($this->mempoolsFields as $value) {
-            if (isset($yaml[$value]) && ! is_numeric($yaml[$value])) { // allow for hard-coded values
+        foreach ($this->mempoolsFields as $field) {
+            if (isset($yaml[$field]) && ! is_numeric($yaml[$field])) { // allow for hard-coded values
                 if (empty($yaml['oid'])) { // if table given, skip individual oids
-                    $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml[$value], $this->mempoolsData, null, null, '-OQUb');
+                    $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml[$field], $this->mempoolsData, null, null, '-OQUb');
                 }
-                $oids[$value] = YamlDiscovery::oidToNumeric($yaml[$value], $this->getDeviceArray());
+                $oids[$field] = YamlDiscovery::oidToNumeric($yaml[$field], $this->getDeviceArray());
             }
         }
 

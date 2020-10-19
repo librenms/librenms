@@ -4,6 +4,8 @@ modules:
         data:
             -
                 total: ALCATEL-IND1-SYSTEM-MIB::systemHardwareMemorySize
+                percent_used: ALCATEL-IND1-HEALTH-MIB::healthDeviceMemoryLatest
+                descr: 'Device Memory'
 
     os:
         sysDescr_regex: '/(?<hardware>OS\S*)? ?(?<version>\d+\.\d+\.\S*)/'
