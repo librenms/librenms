@@ -22,12 +22,18 @@ if (in_array($device['hardware'], ['GS1900-48', 'GS1900-24'])) {
 
     foreach ($fdbPort_table as $index => $port_data) {
         // Let's remove the wrong data in the index
-        $ifindex = $port_data['Q-BRIDGE-MIB::dot1qTpFdbPort'];
-        $vlan = preg_replace('/([0-9]+)\.6\..*/', '$1', $index);
-        $mac_address = implode(array_map('zeropad', array_map('dechex', explode('.', preg_replace('/([0-9]+)\.6\.(.*)/', '$2', $index)))));
-        $port = get_port_by_index_cache($device['device_id'], $ifindex);
+
+        // We'll assume that 1st element is vlan, and last 6 are mac. This will remove the '6' in between them and be safe in case they
+        // fix the Q-BRIDGE implementation
+        $indexes = explode('.', $index);
+        $vlan = $indexes[0]; //1st element
+        $mac_address = implode(array_map('zeropad', array_map('dechex', array_splice($indexes, -6, 6)))); //last 6 elements
+
+        $port = get_port_by_index_cache($device['device_id'], $port_data['Q-BRIDGE-MIB::dot1qTpFdbPort']);
         $port_id = $port && $port['port_id'] ? $port['port_id'] : 0;
+
         $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+
         d_echo("vlan $vlan (id $vlan_id) mac $mac_address port $port_id\n");
         $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
     }
