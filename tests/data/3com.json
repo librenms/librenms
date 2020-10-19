@@ -56,7 +56,7 @@
         "discovery": {
             "mempools": [
                 {
-                    "mempool_index": "65536",
+                    "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "3com",
                     "mempool_precision": 1,
