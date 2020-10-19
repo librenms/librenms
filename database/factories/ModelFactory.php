@@ -88,7 +88,7 @@ $factory->define(\App\Models\ServiceTemplate::class, function (Faker\Generator $
     return [
         'name' => $faker->domainWord,
         'desc' => $faker->text(255),
-        'type' =>'static',
+        'type' => $faker->text(255),
         'device_group_id' => $faker->randomDigit,
         'ip' => $faker->ipv4,
         'param' => $faker->text(255),
