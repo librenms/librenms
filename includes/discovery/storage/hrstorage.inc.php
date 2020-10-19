@@ -3,7 +3,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 
-$hrstorage_array = snmpwalk_cache_oid($device, 'hrStorageEntry', null, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES:NetWare-Host-Ext-MIB');
+$hrstorage_array = $os->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
 
 if (is_array($hrstorage_array)) {
     echo 'hrStorage : ';

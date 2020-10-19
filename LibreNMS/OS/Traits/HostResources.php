@@ -140,7 +140,7 @@ trait HostResources
 
     public function discoverMempools()
     {
-        $hr_storage = $this->getCacheTable('hrStorageEntry', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
+        $hr_storage = $this->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
 
         if (! is_array($hr_storage)) {
             return collect();
