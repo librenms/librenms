@@ -27,6 +27,7 @@ namespace LibreNMS;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\ServiceTemplate;
 use App\Models\User;
 use Auth;
 use DB;
@@ -82,6 +83,22 @@ class Permissions
         return $this->getBillPermissions()
             ->where('user_id', $this->getUserId($user))
             ->where('bill_id', $this->getBillId($bill))
+            ->isNotEmpty();
+    }
+
+    /**
+     * Check if a bill can be accessed by user (non-global read/admin)
+     * If no user is given, use the logged in user
+     *
+     * @param \App\Models\ServiceTemplate|int $service_template
+     * @param \App\Models\User|int $user
+     * @return bool
+     */
+    public function canAccessServiceTemplate($service_template, $user = null)
+    {
+        return $this->getServiceTemplatePermissions()
+            ->where('user_id', $this->getUserId($user))
+            ->where('id', $this->getServiceTemplateId($service_template))
             ->isNotEmpty();
     }
 
@@ -293,6 +310,15 @@ class Permissions
     private function getBillId($bill)
     {
         return $bill instanceof Bill ? $bill->bill_id : (is_numeric($bill) ? (int) $bill : 0);
+    }
+
+    /**
+     * @param $service_template
+     * @return int
+     */
+    private function getServiceTemplateId($service_template)
+    {
+        return $service_template instanceof ServiceTemplate ? $service_template->id : (is_numeric($service_template) ? (int) $service_template : 0);
     }
 
     /**
