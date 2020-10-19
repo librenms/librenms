@@ -29,9 +29,9 @@ use LibreNMS\Validator;
 
 class Php extends BaseValidation
 {
-    const PHP_MIN_VERSION = '7.2.5';
-    const PHP_MIN_VERSION_DATE = 'May, 2020';
-    const PHP_RECOMMENDED_VERSION = '7.3';
+    const PHP_MIN_VERSION = '7.3';
+    const PHP_MIN_VERSION_DATE = 'November, 2020';
+    const PHP_RECOMMENDED_VERSION = '7.4';
 
     /**
      * Validate this module.

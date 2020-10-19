@@ -211,6 +211,7 @@ LibreNMS contributors:
 - Joel Kociolek <joel@kociolek.org> (lejoko)
 - Rémy Jacquin <remy@remyj.fr> (remyj38)
 - PipoCanaja <pipocanaja@gmail.com> [pipocanaja](https://github.com/pipocanaja/)
+- Thomas Berberich <sourcehhdoctor@gmail.com> [SourceDoctor](https://github.com/SourceDoctor/)
 - Tim de Boer <tim+github@tim427.net> (tim427)
 - Pavle Obradovic <pobradovic08@gmail.com> (pobradovic08)
 - Jason Cheng <sanyu3u@gmail.com> (jasoncheng7115)

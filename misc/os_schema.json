@@ -41,7 +41,8 @@
                     "sysDescr_regex": {"$ref": "#/definitions/regex_group"},
                     "sysDescr_regex_except": {"$ref": "#/definitions/regex_group"},
                     "snmpget": {"$ref": "#/definitions/snmpget"},
-                    "snmpget_except": {"$ref": "#/definitions/snmpget"}
+                    "snmpget_except": {"$ref": "#/definitions/snmpget"},
+                    "snmpwalk": {"$ref": "#/definitions/snmpget"}
                 },
                 "minProperties": 1,
                 "additionalProperties": false
@@ -426,7 +427,8 @@
     "required": [
         "os",
         "text",
-        "type"
+        "type",
+        "discovery"
     ],
     "definitions": {
         "string_group": {

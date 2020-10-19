@@ -32,6 +32,9 @@
                         "version_regex": {
                             "type": "string"
                         },
+                        "hardware_mib": {
+                            "type": "string"
+                        },
                         "hardware_regex": {
                             "type": "string"
                         },

@@ -83,11 +83,10 @@ class DevCheckCommand extends LnmsCommand
 
         $this->helper->setFlags(Arr::only($this->options(), ['quiet', 'commands', 'fail-fast', 'full']));
 
-        $all = $check == 'all' || $check == 'ci';
-        $this->helper->enable('style', $all || $check === 'style');
-        $this->helper->enable('lint', $all || $check === 'lint');
-        $this->helper->enable('unit', $all || $check === 'unit');
-        $this->helper->enable('web', $all || $check === 'web');
+        $this->helper->enable('style', $check == 'all' || $check === 'style');
+        $this->helper->enable('lint', $check == 'all' || $check == 'ci' || $check === 'lint');
+        $this->helper->enable('unit', $check == 'all' || $check == 'ci' || $check === 'unit');
+        $this->helper->enable('web', $check == 'ci' || $check === 'web');
 
         if ($os = $this->option('os')) {
             $this->helper->setFlags(['style_enable' => false, 'lint_enable' => false, 'unit_enable' => true, 'web_enable' => false]);

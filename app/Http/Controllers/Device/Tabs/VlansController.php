@@ -25,6 +25,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\PortVlan;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VlansController implements DeviceTab
@@ -51,6 +52,37 @@ class VlansController implements DeviceTab
 
     public function data(Device $device): array
     {
-        return [];
+        return [
+            'vlans' => self::getVlans($device),
+            'submenu' => [
+                [
+                    ['name' => 'Basic', 'url' => ''],
+                ],
+                'Graphs' => [
+                    ['name' => 'Bits', 'url' => 'bits'],
+                    ['name' => 'Unicast Packets', 'url' => 'upkts'],
+                    ['name' => 'Non-Unicast Packets', 'url' => 'nupkts'],
+                    ['name' => 'Errors', 'url' => 'errors'],
+                ],
+            ],
+        ];
+    }
+
+    private static function getVlans(Device $device)
+    {
+        // port.device needed to prevent loading device multiple times
+        $portVlan = PortVlan::where('ports_vlans.device_id', $device->device_id)
+            ->join('vlans', function ($join) {
+                $join
+                ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
+                ->on('vlans.device_id', 'ports_vlans.device_id');
+            })
+            ->with(['port.device'])
+            ->select('ports_vlans.*', 'vlans.vlan_name')
+            ->get();
+
+        $data = $portVlan->groupBy('vlan');
+
+        return $data;
     }
 }

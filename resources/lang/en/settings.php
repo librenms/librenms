@@ -49,6 +49,7 @@ return [
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
             'smokeping' => 'Smokeping Integration',
+            'snmptrapd' => 'SNMP Traps Integration',
         ],
         'poller' => [
             'availability' => 'Device Availability',
@@ -1222,6 +1223,16 @@ return [
         'snmptranslate' => [
             'description' => 'Path to snmptranslate',
         ],
+        'snmptraps' => [
+            'eventlog' => [
+                'description' => 'Create eventlog for snmptraps',
+                'help' => 'Independently of the action that may be mapped to the trap',
+            ],
+            'eventlog_detailed' => [
+                'description' => 'Enable detailed logs',
+                'help' => 'Add all OIDs received with the trap in the eventlog',
+            ],
+        ],
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
         ],
@@ -1348,7 +1359,6 @@ return [
             'description' => 'URL to smokeping',
             'help' => 'Full URL to the smokeping gui',
         ],
-
     ],
     'twofactor' => [
         'description' => 'Enable Two-Factor Auth',

@@ -226,7 +226,9 @@ class Permissions
         $user_id = $this->getUserId($user);
 
         if (! isset($this->devicePermissions[$user_id])) {
-            $this->devicePermissions[$user_id] = DB::table('devices_perms')->where('user_id', $user_id)
+            $this->devicePermissions[$user_id] = DB::table('devices_perms')
+                ->select(['user_id', 'device_id'])
+                ->where('user_id', $user_id)
                 ->union($this->getDeviceGroupPermissionsQuery()->where('user_id', $user_id))
                 ->get();
         }
@@ -242,7 +244,9 @@ class Permissions
     public function getPortPermissions()
     {
         if (is_null($this->portPermissions)) {
-            $this->portPermissions = DB::table('ports_perms')->get();
+            $this->portPermissions = DB::table('ports_perms')
+                ->select(['user_id', 'port_id'])
+                ->get();
         }
 
         return $this->portPermissions;
@@ -256,7 +260,8 @@ class Permissions
     public function getBillPermissions()
     {
         if (is_null($this->billPermissions)) {
-            $this->billPermissions = DB::table('bill_perms')->get();
+            $this->billPermissions = DB::table('bill_perms')
+                ->select(['user_id', 'bill_id'])->get();
         }
 
         return $this->billPermissions;

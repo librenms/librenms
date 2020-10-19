@@ -24,11 +24,10 @@
 
 namespace LibreNMS\Tests;
 
-use const false;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Modules\Core;
 use LibreNMS\Util\OS;
-use const true;
 
 class OSDiscoveryTest extends TestCase
 {
@@ -107,7 +106,7 @@ class OSDiscoveryTest extends TestCase
         $debug = true;
         $vdebug = true;
         ob_start();
-        $os = getHostOS($this->genDevice($community));
+        $os = Core::detectOS($this->genDevice($community));
         $output = ob_get_contents();
         ob_end_clean();
 
