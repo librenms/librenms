@@ -14,6 +14,7 @@
  */
 
 if (in_array($device['hardware'], ['GS1900-48', 'GS1900-24'])) {
+    echo 'Zyxel GS1900 Q-BRIDGE:' . PHP_EOL;
     // These devices do not provide a proper Q-BRIDGE reply (there is a ".6." index between VLAN and MAC)
     // <vlanid>.6.<mac1>.<mac2>.<mac3>.<mac4>.<mac5>.<mac6>
     // We need to manually handle this here
