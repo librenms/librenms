@@ -2320,6 +2320,31 @@ function get_service_templates(\Illuminate\Http\Request $request)
     return api_success($templates->makeHidden('pivot')->toArray(), 'templates', 'Found ' . $templates->count() . ' service templates');
 }
 
+function discover_service_templates(\Illuminate\Http\Request $request)
+{
+    $template = $request->route('id');
+
+    if ($template) {
+        $status = discover_service_template($template)
+        if ($status === 1)) {
+            return api_success(202, 'No Service changes were made');
+        }
+    } else {
+        foreach (Service::find('service_templates')->pluck('id') as $service_template) {
+            $changes = 0;
+            $status = discover_service_template($service_template['id']);
+            if (status === 0) { 
+                $changes = 1;
+            }
+        }
+        if ($changes === 0)) {
+            return api_success(202, 'No Service changes were made');
+        }
+    }
+
+    return api_success(200, 'Service changes were made');
+}
+
 function add_service_for_host(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');

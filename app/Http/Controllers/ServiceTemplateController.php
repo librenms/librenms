@@ -161,10 +161,8 @@ class ServiceTemplateController extends Controller
      */
     public function discover()
     {
-        foreach (Service::find('service_templates')->pluck('id') as $service_template) {
-            discover_service_template($service_template['id']);
-        }
-
+        discover_service_templates();
+        
         $msg = __('All Service Templates applied');
 
         return response($msg, 200);
