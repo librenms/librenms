@@ -62,7 +62,7 @@ trait YamlMempoolsDiscovery
                 }
 
                 $mempools->push((new Mempool([
-                    'mempool_index' => YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data) ?: $index,
+                    'mempool_index' => isset($yaml['index']) ? YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data) : $index,
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
                     'mempool_descr' => isset($yaml['descr']) ? YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data) : 'Memory',

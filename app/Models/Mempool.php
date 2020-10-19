@@ -17,7 +17,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         'mempool_descr',
         'mempool_perc',
         'mempool_perc_oid',
-        'memppol_used',
+        'mempool_used',
         'mempool_used_oid',
         'mempool_free',
         'mempool_free_oid',
