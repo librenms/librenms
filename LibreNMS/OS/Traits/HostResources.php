@@ -140,13 +140,13 @@ trait HostResources
 
     public function discoverMempools()
     {
-        $storage_array = $this->getHrStorage();
+        $hr_storage = $this->getCacheTable('hrStorageEntry', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
 
-        if (! is_array($storage_array)) {
+        if (! is_array($hr_storage)) {
             return collect();
         }
 
-        return collect($storage_array)->filter(Closure::fromCallable([$this, 'memValid']))
+        return collect($hr_storage)->filter(Closure::fromCallable([$this, 'memValid']))
             ->map(function ($storage, $index) {
                 return (new Mempool([
                     'mempool_index' => $index,
@@ -171,14 +171,5 @@ trait HostResources
         }
 
         return ! Str::contains($storage['hrStorageDescr'], $this->ignoreMemoryDescr);
-    }
-
-    protected function getHrStorage()
-    {// hrStorageTable
-        if ($this->hrStorage === null) {
-            $this->hrStorage = snmpwalk_cache_oid($this->getDeviceArray(), 'hrStorageEntry', [], 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
-        }
-
-        return $this->hrStorage;
     }
 }
