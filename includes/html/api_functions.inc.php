@@ -18,6 +18,7 @@ use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
+use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
@@ -2367,7 +2368,8 @@ function get_service_templates(\Illuminate\Http\Request $request)
 function discover_service_templates(Illuminate\Http\Request $request)
 {
     $template = $request->route('id');
-
+    $changes = 0;
+    $status = nul;
     if ($template) {
         $status = discover_service_template($template);
         if ($status === 1) {
@@ -2375,9 +2377,8 @@ function discover_service_templates(Illuminate\Http\Request $request)
         }
     } else {
         foreach (Service::find('service_templates')->pluck('id') as $service_template) {
-            $changes = 0;
-            $status = discover_service_template($service_template['id']);
-            if (status === 0) {
+            $status = discover_service_template($service_template);
+            if ($status === 0) {
                 $changes = 1;
             }
         }
