@@ -31,7 +31,6 @@ use LibreNMS\Component;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\OS;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -62,6 +61,7 @@ class ModuleTestHelper
         'vrf' => ['ports', 'vrf'],
         'mpls' => ['ports', 'vrf', 'mpls'],
         'nac' => ['ports', 'nac'],
+        'ospf' => ['ports', 'ospf'],
         'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
     ];
 
