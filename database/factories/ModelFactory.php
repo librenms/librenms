@@ -89,6 +89,13 @@ $factory->define(\App\Models\ServiceTemplate::class, function (Faker\Generator $
         'name' => $faker->domainWord,
         'desc' => $faker->text(255),
         'type' =>'static',
+        'device_group_id' => $faker->randomDigit,
+        'ip' => $faker->ipv4,
+        'param' => $faker->text(255),
+        'ignore' => $faker->numberBetween(0, 1),
+        'changed' => $faker->unixTime,
+        'disabled' => $faker->numberBetween(0, 1),
+
     ];
 });
 
