@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\ServiceTemplate;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use App\Facades\Permissions;
 
 class ServiceTemplatePolicy
 {
