@@ -26,7 +26,7 @@ GUI "Type" dropdown list.
 ## Setup
 
 Service checks are now distributable if you run a distributed
-setup. To leverage this, use the `dispatcher` service. Alternatively,
+setup. To leverage this, use the `dispatch` service. Alternatively,
 you could also replace `check-services.php` with `services-wrapper.py` in 
 cron instead to run across all polling nodes. 
 
