@@ -87,11 +87,11 @@ $factory->define(\App\Models\DeviceGroup::class, function (Faker\Generator $fake
 $factory->define(\App\Models\ServiceTemplate::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->domainWord,
-        'desc' => $faker->text(255),
+        'desc' => $faker->text(),
         'type' => $faker->text(255),
         'device_group_id' => $faker->randomDigit,
-        'ip' => $faker->text(255),
-        'param' => $faker->text(255),
+        'ip' => $faker->text(),
+        'param' => $faker->text(),
         'ignore' => $faker->numberBetween(0, 1),
         'changed' => $faker->unixTime,
         'disabled' => $faker->numberBetween(0, 1),
