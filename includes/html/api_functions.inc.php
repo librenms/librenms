@@ -2354,11 +2354,11 @@ function add_service_template_for_device_group(Illuminate\Http\Request $request)
     return api_success($serviceTemplate->id, 'id', 'Service Template ' . $serviceTemplate->name . ' created', 201);
 }
 
-function get_service_templates(\Illuminate\Http\Request $request)
+function get_service_templates(Illuminate\Http\Request $request)
 {
     $templates = ServiceTemplate::query()->hasAccess(Auth::user())->orderBy('name')->get();
 
-    if ($groups->isEmpty()) {
+    if ($templates->isEmpty()) {
         return api_error(404, 'No service templates found');
     }
 
