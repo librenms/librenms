@@ -90,15 +90,15 @@ class Permissions
      * Check if a service template can be accessed by user (non-global read/admin)
      * If no user is given, use the logged in user
      *
-     * @param \App\Models\ServiceTemplate|int $service_template
+     * @param \App\Models\ServiceTemplate|int $serviceTemplate
      * @param \App\Models\User|int $user
      * @return bool
      */
-    public function canAccessServiceTemplate($service_template, $user = null)
+    public function canAccessServiceTemplate($serviceTemplate, $user = null)
     {
         return $this->getServiceTemplatePermissions()
             ->where('user_id', $this->getUserId($user))
-            ->where('id', $this->getServiceTemplateId($service_template))
+            ->where('id', $this->getServiceTemplateId($serviceTemplate))
             ->isNotEmpty();
     }
 
@@ -313,12 +313,12 @@ class Permissions
     }
 
     /**
-     * @param $service_template
+     * @param $serviceTemplate
      * @return int
      */
-    private function getServiceTemplateId($service_template)
+    private function getServiceTemplateId($serviceTemplate)
     {
-        return $service_template instanceof ServiceTemplate ? $service_template->id : (is_numeric($service_template) ? (int) $service_template : 0);
+        return $serviceTemplate instanceof ServiceTemplate ? $serviceTemplate->id : (is_numeric($serviceTemplate) ? (int) $serviceTemplate : 0);
     }
 
     /**
