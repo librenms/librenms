@@ -188,7 +188,6 @@ Create a file called `/etc/rsyslog.d/30-librenms.conf`and add the following depe
 
 === "Legacy"
     ```
-    bash
     # Feed syslog messages to librenms
     $ModLoad omprog
     $template librenms,"%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY%    %timegenerated:8:25%||%msg%||%programname%\n"
