@@ -2368,7 +2368,6 @@ function get_service_templates(Illuminate\Http\Request $request)
 function discover_service_templates()
 {
     $changes = 0;
-    $status = null;
 
     foreach (Service::find('service_templates')->pluck('id') as $service_template) {
         $status = discover_service_template($service_template);
