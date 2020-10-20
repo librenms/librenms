@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DefaultAlertTemplateSeeder extends Seeder
 {
@@ -42,7 +43,7 @@ class DefaultAlertTemplateSeeder extends Seeder
 
         $existing = DB::table('alert_templates')->pluck('name');
 
-        \DB::table('alert_templates')->insert(array_filter($templates, function ($entry) use ($existing) {
+        DB::table('alert_templates')->insert(array_filter($templates, function ($entry) use ($existing) {
             return ! $existing->contains($entry['name']);
         }));
     }
