@@ -44,6 +44,11 @@ class Mempools implements Module
             $mempools = $os->discoverMempools();
             ModuleModelObserver::observe('\App\Models\Mempool');
             $this->syncModels($os->getDevice(), 'mempools', $mempools);
+
+            echo PHP_EOL;
+            $mempools->each(function ($mempool) {
+                $this->printMempool($mempool);
+            });
         }
     }
 
@@ -64,13 +69,7 @@ class Mempools implements Module
         }
 
         $os->getDevice()->mempools->each(function (Mempool $mempool) use ($os) {
-            echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc%";
-            if ($mempool->mempool_total != 100) {
-                $used = format_bi($mempool->mempool_used);
-                $total = format_bi($mempool->mempool_total);
-                echo "  $used / $total";
-            }
-            echo PHP_EOL;
+            $this->printMempool($mempool);
 
             $mempool->save();
 
@@ -119,5 +118,16 @@ class Mempools implements Module
     public function cleanup(OS $os)
     {
         $os->getDevice()->mempools()->delete();
+    }
+
+    private function printMempool(Mempool $mempool)
+    {
+        echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc%";
+        if ($mempool->mempool_total != 100) {
+            $used = format_bi($mempool->mempool_used);
+            $total = format_bi($mempool->mempool_total);
+            echo "  $used / $total";
+        }
+        echo PHP_EOL;
     }
 }
