@@ -123,7 +123,7 @@ if (! Auth::user()->hasGlobalRead()) {
                 echo "<tr bgcolor='$dev_colour'><td width=150><a href='";
                 echo generate_url(
                     ['page' => 'device'],
-                    ['tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf', 'device' => $device['device_id']]
+                    ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']
                 );
                 echo "'>" . $device['hostname'] . '</a> ';
 
