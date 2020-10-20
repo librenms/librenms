@@ -2369,7 +2369,7 @@ function discover_service_templates()
 {
     $changes = 0;
     $status = null;
-    
+
     foreach (Service::find('service_templates')->pluck('id') as $service_template) {
         $status = discover_service_template($service_template);
         if ($status === 0) {
@@ -2379,7 +2379,7 @@ function discover_service_templates()
     if ($changes == 0) {
         return api_success(202, 'No Service changes were made');
     }
-    
+
     return api_success(200, 'Service changes were made');
 }
 
