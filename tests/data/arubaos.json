@@ -21180,7 +21180,7 @@
                     "mempool_free": 352522240,
                     "mempool_free_oid": ".1.3.6.1.4.1.14823.2.2.1.1.1.11.1.4.1",
                     "mempool_total": 779042816,
-                    "mempool_total_oid": ".1.3.6.1.4.1.14823.2.2.1.1.1.11.1.2.1",
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,

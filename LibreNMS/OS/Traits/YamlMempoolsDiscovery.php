@@ -66,7 +66,6 @@ trait YamlMempoolsDiscovery
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
                     'mempool_descr' => isset($yaml['descr']) ? YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data) : 'Memory',
-                    'mempool_total_oid' => isset($oids['total']) ? "{$oids['total']}.$index" : null,
                     'mempool_free_oid' => isset($oids['free']) ? "{$oids['free']}.$index" : null,
                     'mempool_used_oid' => isset($oids['used']) ? "{$oids['used']}.$index" : null,
                     'mempool_perc_oid' => isset($oids['percent_used']) ? "{$oids['percent_used']}.$index" : null,
