@@ -115,6 +115,10 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
 
     public function discoverMempools()
     {
+        if ($this->hasYamlDiscovery('mempools')) {
+            return parent::discoverMempools(); // yaml
+        }
+
         $mempools = collect();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 
