@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DefaultWidgetSeeder extends Seeder
 {
@@ -108,7 +109,7 @@ class DefaultWidgetSeeder extends Seeder
 
         $existing = DB::table('widgets')->pluck('widget');
 
-        \DB::table('widgets')->insert(array_filter($widgets, function ($entry) use ($existing) {
+        DB::table('widgets')->insert(array_filter($widgets, function ($entry) use ($existing) {
             return ! $existing->contains($entry['widget']);
         }));
     }

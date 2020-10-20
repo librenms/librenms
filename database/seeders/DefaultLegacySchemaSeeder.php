@@ -25,6 +25,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DefaultLegacySchemaSeeder extends Seeder
 {
@@ -37,8 +38,8 @@ class DefaultLegacySchemaSeeder extends Seeder
     {
         // insert version 1000 to prevent legacy schema code from running.
         // additionally prevents seeder from being run again by build-base.php / includes/sql-schema/update.php.
-        if (! \DB::table('dbSchema')->exists()) {
-            \DB::table('dbSchema')->insert(['version' => 1000]);
+        if (! DB::table('dbSchema')->exists()) {
+            DB::table('dbSchema')->insert(['version' => 1000]);
         }
     }
 }
