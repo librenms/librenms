@@ -24,8 +24,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-
 class UserPref extends BaseModel
 {
     public $timestamps = false;
