@@ -29,11 +29,14 @@ use Carbon\CarbonImmutable;
 use Date;
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertScheduleStatus;
 
 class AlertSchedule extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';

@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Sensor extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
     protected static $icons = [
