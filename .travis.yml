@@ -16,7 +16,7 @@ jobs:
   - php: 7.3
     dist: bionic
     env: SKIP_UNIT_CHECK=1
-  - php: 7.2
+  - php: 7.3
     dist: bionic
     env: SKIP_STYLE_CHECK=1 SKIP_WEB_CHECK=1 EXECUTE_BUILD_DOCS=true
 
