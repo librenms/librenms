@@ -17,7 +17,7 @@
                         <i class="fa fa-plus"></i> @lang('New Service Template')
                     </a>
                     <button type="button" title="@lang('Apply Service Templates')" class="btn btn-success" aria-label="@lang('Apply Service Templates')"
-                            onclick="discover_st(this, '{{ 'All' }}', '{{ route('services.templates.discover') }}')">
+                            onclick="discover_st(this, '{{ route('services.templates.discover') }}')">
                         <i
                             class="fa fa-refresh" aria-hidden="true"></i> @lang('Apply Service Templates')</button>
                 </div>
@@ -104,7 +104,7 @@
                 });
             }
         }
-        function discover_st(button, id) {
+        function discover_st(button, url) {
             if (confirm('@lang('Are you sure you want to Apply All Service Templates?')')) {
                 $.ajax({
                     url: url,

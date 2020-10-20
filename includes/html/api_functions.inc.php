@@ -2365,28 +2365,21 @@ function get_service_templates(Illuminate\Http\Request $request)
     return api_success($templates->makeHidden('pivot')->toArray(), 'templates', 'Found ' . $templates->count() . ' service templates');
 }
 
-function discover_service_templates(Illuminate\Http\Request $request)
+function discover_service_templates()
 {
-    $template = $request->route('id');
     $changes = 0;
     $status = null;
-    if ($template) {
-        $status = discover_service_template($template);
-        if ($status === 1) {
-            return api_success(202, 'No Service changes were made');
-        }
-    } else {
-        foreach (Service::find('service_templates')->pluck('id') as $service_template) {
-            $status = discover_service_template($service_template);
-            if ($status === 0) {
-                $changes = 1;
-            }
-        }
-        if ($changes === 0) {
-            return api_success(202, 'No Service changes were made');
+    
+    foreach (Service::find('service_templates')->pluck('id') as $service_template) {
+        $status = discover_service_template($service_template);
+        if ($status === 0) {
+            $changes = 1;
         }
     }
-
+    if ($changes == 0) {
+        return api_success(202, 'No Service changes were made');
+    }
+    
     return api_success(200, 'Service changes were made');
 }
 
