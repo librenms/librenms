@@ -91,15 +91,13 @@
             "/vendor/laravel/laravel/app/",
             "/html/plugins"
         ],
-        "classmap": [
-            "database/seeds",
-            "database/factories"
-        ],
         "psr-4": {
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
             "LibreNMS\\Plugins\\": "html/plugins",
-            "LibreNMS\\Tests\\": "tests"
+            "LibreNMS\\Tests\\": "tests",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
             "includes/helpers.php"
