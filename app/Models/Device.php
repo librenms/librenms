@@ -5,6 +5,7 @@ namespace App\Models;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -18,7 +19,7 @@ use Permissions;
 
 class Device extends BaseModel
 {
-    use PivotEventTrait;
+    use PivotEventTrait, HasFactory;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
