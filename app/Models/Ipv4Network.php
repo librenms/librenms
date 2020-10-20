@@ -25,9 +25,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Ipv4Network extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'ipv4_network_id';
 

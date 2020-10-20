@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Events\UserCreated;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use LibreNMS\Authentication\LegacyAuth;
@@ -11,7 +12,7 @@ use Permissions;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasFactory;
 
     protected $primaryKey = 'user_id';
     protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
