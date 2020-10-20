@@ -28,8 +28,8 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Date;
 use DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertScheduleStatus;
 
