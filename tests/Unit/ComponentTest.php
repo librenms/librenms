@@ -37,7 +37,7 @@ class ComponentTest extends DBTestCase
 
     public function testDeleteComponent()
     {
-        $target = factory(\App\Models\Component::class)->create();
+        $target = \App\Models\Component::factory()->create();
 
         $this->assertTrue(\App\Models\Component::where('id', $target->id)->exists(), 'Failed to create component, this shouldn\'t happen');
 
@@ -54,7 +54,7 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentsOptionsType()
     {
-        $target = factory(\App\Models\Component::class)->create();
+        $target = \App\Models\Component::factory()->create();
         $component = new Component();
 
         $actual = $component->getComponents($target->device_id, ['type' => $target->type]);
@@ -66,8 +66,8 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentsOptionsFilterNotIgnore()
     {
-        factory(\App\Models\Component::class)->create(['device_id' => 1, 'ignore' => 1]);
-        $target = factory(\App\Models\Component::class)->times(2)->create(['device_id' => 1, 'ignore' => 0]);
+        \App\Models\Component::factory()->create(['device_id' => 1, 'ignore' => 1]);
+        $target = \App\Models\Component::factory()->times(2)->create(['device_id' => 1, 'ignore' => 0]);
         $component = new Component();
 
         $actual = $component->getComponents(1, ['filter' => ['ignore' => ['=', 0]]]);
@@ -77,10 +77,10 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentsOptionsComplex()
     {
-        factory(\App\Models\Component::class)->create(['label' => 'Search Phrase']);
-        factory(\App\Models\Component::class)->times(2)->create(['label' => 'Something Else']);
-        $target = factory(\App\Models\Component::class)->times(2)->create(['label' => 'Search Phrase']);
-        factory(\App\Models\Component::class)->create(['label' => 'Search Phrase']);
+        \App\Models\Component::factory()->create(['label' => 'Search Phrase']);
+        \App\Models\Component::factory()->times(2)->create(['label' => 'Something Else']);
+        $target = \App\Models\Component::factory()->times(2)->create(['label' => 'Search Phrase']);
+        \App\Models\Component::factory()->create(['label' => 'Search Phrase']);
         $component = new Component();
 
         $options = [
@@ -106,9 +106,9 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentCount()
     {
-        factory(\App\Models\Component::class)->times(2)->create(['device_id' => 1, 'type' => 'three']);
-        factory(\App\Models\Component::class)->create(['device_id' => 2, 'type' => 'three']);
-        factory(\App\Models\Component::class)->create(['device_id' => 2, 'type' => 'one']);
+        \App\Models\Component::factory()->times(2)->create(['device_id' => 1, 'type' => 'three']);
+        \App\Models\Component::factory()->create(['device_id' => 2, 'type' => 'three']);
+        \App\Models\Component::factory()->create(['device_id' => 2, 'type' => 'one']);
 
         $component = new Component();
         $this->assertEquals(['three' => 3, 'one' => 1], $component->getComponentCount());
@@ -119,7 +119,7 @@ class ComponentTest extends DBTestCase
     public function testSetComponentPrefs()
     {
         // Nightmare function, no where near exhaustive
-        $base = factory(\App\Models\Component::class)->create();
+        $base = \App\Models\Component::factory()->create();
         $component = new Component();
 
         \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: null_val, was added with value: ", $base->device_id, 'component', 3, $base->id]);
@@ -182,7 +182,7 @@ class ComponentTest extends DBTestCase
         $this->assertEquals(0, $component->createStatusLogEntry(434242, 0, 'failed'), 'incorrectly added log');
 
         $message = Str::random(8);
-        $model = factory(\App\Models\Component::class)->create();
+        $model = \App\Models\Component::factory()->create();
         $log_id = $component->createStatusLogEntry($model->id, 1, $message);
         $this->assertNotEquals(0, $log_id, ' failed to create log');
 

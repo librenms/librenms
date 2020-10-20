@@ -35,8 +35,8 @@ class JnxLdpSesTest extends SnmpTrapTestCase
 {
     public function testJnxLdpSesDownTrap()
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create();
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
         $device->ports()->save($port);
 
         $trapText = "$device->hostname
@@ -59,8 +59,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testJnxLdpSesUpTrap()
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create();
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
         $device->ports()->save($port);
 
         $trapText = "$device->hostname
