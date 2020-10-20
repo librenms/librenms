@@ -81,7 +81,7 @@ class SmokepingCliTest extends DBTestCase
 
     private $instance = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         // We need an app instance available for these tests to load the translation machinary
         $this->app = $this->createApplication();
