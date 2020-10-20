@@ -11,12 +11,10 @@
 |
  */
 
-
-
 namespace Database\Factories\User;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Util\IPv4;
 
 class ModelFactory extends Factory
