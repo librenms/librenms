@@ -25,8 +25,7 @@ class ServiceTemplateController extends Controller
     public function index()
     {
         return view('service-template.index', [
-            'service_templates' => ServiceTemplate::orderBy('name')->get(),
-            'device_groups' => DeviceGroup::orderBy('name')->get(),
+            'device_groups' => DeviceGroup::with('serviceTemplates')->orderBy('name')->get(),
         ]);
     }
 

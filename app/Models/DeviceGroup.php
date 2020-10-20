@@ -154,4 +154,9 @@ class DeviceGroup extends BaseModel
     {
         return $this->belongsToMany(\App\Models\User::class, 'devices_group_perms', 'device_group_id', 'user_id');
     }
+
+    public function serviceTemplates()
+    {
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'device_group_device', 'device_group_id');
+    }
 }
