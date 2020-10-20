@@ -91,7 +91,7 @@ class UserPref extends BaseModel
      * @param  \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function setKeysForSaveQuery(Builder $query)
+    protected function setKeysForSaveQuery($query)
     {
         $keys = $this->getKeyName();
         if (! is_array($keys)) {
