@@ -201,7 +201,7 @@ class User extends Authenticatable
 
     public function servicesTemplates()
     {
-        return $this->hasMany(\App\Models\ServiceTemplate::class, 'user_id');
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_perms', 'user_id', 'service_template_id');
     }
 
     public function ports()
