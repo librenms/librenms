@@ -43,6 +43,7 @@ $chromatic_dispersion = dbFetchCell("select count(*) from sensors WHERE sensor_c
 $ber = dbFetchCell("select count(*) from sensors WHERE sensor_class='ber' AND device_id = ?", [$device['device_id']]);
 $eer = dbFetchCell("select count(*) from sensors WHERE sensor_class='eer' AND device_id = ?", [$device['device_id']]);
 $waterflow = dbFetchCell("select count(*) from sensors WHERE sensor_class='waterflow' AND device_id = ?", [$device['device_id']]);
+$percent = dbFetchCell("select count(*) from sensors WHERE sensor_class='percent' AND device_id = ?", [$device['device_id']]);
 
 unset($datas);
 $datas[] = 'overview';
@@ -174,6 +175,10 @@ if ($loss) {
     $datas[] = 'loss';
 }
 
+if ($percent) {
+    $datas[] = 'percent';
+}
+
 $type_text['overview'] = 'Overview';
 $type_text['charge'] = 'Battery Charge';
 $type_text['temperature'] = 'Temperature';
@@ -207,6 +212,7 @@ $type_text['eer'] = 'Energy Efficiency Ratio';
 $type_text['waterflow'] = 'Water Flow Rate';
 $type_text['loss'] = 'Loss';
 $type_text['qfp'] = 'QFP';
+$type_text['percent'] = 'Percent';
 
 $link_array = [
     'page'   => 'device',

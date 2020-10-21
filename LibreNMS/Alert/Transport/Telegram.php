@@ -58,7 +58,7 @@ class Telegram extends Transport
             var_dump('Params: ' . $api); //FIXME: propper debuging
             var_dump('Return: ' . $ret); //FIXME: propper debuging
 
-            return 'HTTP Status code ' . $code;
+            return 'HTTP Status code ' . $code . ', Body ' . $ret;
         }
 
         return true;
