@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ec1cb5ce5c532964ea49274e306ad01",
+    "content-hash": "18127495c7948b186d2dfbcd7735d8ab",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -467,16 +467,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "2.11.2",
+            "version": "2.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "b88a45cbc395e850b2d958dcd7b9d49d09ff23e0"
+                "reference": "fb5d5f2f26babf8dce217b1eb88300c22bb703a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/b88a45cbc395e850b2d958dcd7b9d49d09ff23e0",
-                "reference": "b88a45cbc395e850b2d958dcd7b9d49d09ff23e0",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/fb5d5f2f26babf8dce217b1eb88300c22bb703a4",
+                "reference": "fb5d5f2f26babf8dce217b1eb88300c22bb703a4",
                 "shasum": ""
             },
             "require": {
@@ -570,7 +570,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-10-19T02:01:37+00:00"
+            "time": "2020-10-20T14:36:48+00:00"
         },
         {
             "name": "doctrine/event-manager",
@@ -1559,16 +1559,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.11.0",
+            "version": "v8.11.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "243b376c0d80da12bcf7d21ea857c0a609b21f7a"
+                "reference": "8d1f25fb8d124d5a24df9714ed8d481c43f9efe6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/243b376c0d80da12bcf7d21ea857c0a609b21f7a",
-                "reference": "243b376c0d80da12bcf7d21ea857c0a609b21f7a",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/8d1f25fb8d124d5a24df9714ed8d481c43f9efe6",
+                "reference": "8d1f25fb8d124d5a24df9714ed8d481c43f9efe6",
                 "shasum": ""
             },
             "require": {
@@ -1718,7 +1718,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-10-20T14:10:54+00:00"
+            "time": "2020-10-20T20:12:53+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -6301,25 +6301,36 @@
         },
         {
             "name": "wpb/string-blade-compiler",
-            "version": "dev-master",
+            "version": "6.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TerrePorter/StringBladeCompiler.git",
-                "reference": "1263244e4256206c2bfd61ba9477b9254622ad9a"
+                "reference": "743707837189ccfe06d5269c7009af0260a5070e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TerrePorter/StringBladeCompiler/zipball/1263244e4256206c2bfd61ba9477b9254622ad9a",
-                "reference": "1263244e4256206c2bfd61ba9477b9254622ad9a",
+                "url": "https://api.github.com/repos/TerrePorter/StringBladeCompiler/zipball/743707837189ccfe06d5269c7009af0260a5070e",
+                "reference": "743707837189ccfe06d5269c7009af0260a5070e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "laravel/framework": "^6.0|^7.0|^8.0",
+                "php": "^7.2"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Wpb\\String_Blade_Compiler\\StringBladeServiceProvider"
+                    ],
+                    "aliases": {
+                        "StringBlade": "Wpb\\String_Blade_Compiler\\Facades\\StringBlade"
+                    }
+                }
+            },
             "autoload": {
-                "psr-0": {
-                    "Wpb\\StringBladeCompiler\\": "src/"
+                "psr-4": {
+                    "Wpb\\String_Blade_Compiler\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -6332,13 +6343,13 @@
                     "email": "tporter@webpage-builders.com"
                 }
             ],
-            "description": "Render Blade templates from string",
+            "description": "Laravel Blade String Compiler, render string as blade templates",
             "keywords": [
                 "blade",
                 "compiler",
                 "laravel"
             ],
-            "time": "2015-02-22T15:41:09+00:00"
+            "time": "2020-09-16T16:14:42+00:00"
         },
         {
             "name": "xjtuwangke/passwordhash",
@@ -10318,7 +10329,6 @@
     "stability-flags": {
         "darkghosthunter/larapoke": 20,
         "oriceon/toastr-5-laravel": 20,
-        "wpb/string-blade-compiler": 20,
         "xjtuwangke/passwordhash": 20
     },
     "prefer-stable": false,
