@@ -38,6 +38,7 @@ the values we expect to see the data in:
 | temperature                     | C                           |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
+| percent                         | %                           |
 
 #### Simple health discovery
 
@@ -456,6 +457,7 @@ Chromatic_dispersion:
 Ber:
 Eer:
 Waterflow:
+Percent:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]
