@@ -1762,6 +1762,14 @@ services:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     services_device_id_index: { Name: services_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+service_templates_perms:
+  Columns:
+    - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [service_template_id, user_id], Unique: true, Type: BTREE }
+    service_templates_perms_service_template_id_index: { Name: service_templates_perms_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
+    service_templates_perms_user_id_index: { Name: service_templates_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 service_templates:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

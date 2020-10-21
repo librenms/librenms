@@ -275,7 +275,9 @@ class Permissions
     public function getServiceTemplatePermissions()
     {
         if (is_null($this->serviceTemplatePermissions)) {
-            $this->serviceTemplatePermissions = DB::table('service_templates')->get();
+            $this->serviceTemplatePermissions = DB::table('service_templates_perms')
+            ->select(['user_id', 'service_template_id'])
+            ->get();
         }
 
         return $this->serviceTemplatePermissions;

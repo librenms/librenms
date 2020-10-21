@@ -33,6 +33,11 @@ class CreateServicesTemplateTable extends Migration
             $table->string('service_name')->nullable()->default(null);
             $table->unsignedInteger('service_template_changed')->default(0);
         });
+        Schema::create('service_templates_perms', function (Blueprint $table) {
+            $table->id()->first();
+            $table->unsignedInteger('user_id')->index();
+            $table->unsignedInteger('service_template_id');
+        });
     }
 
     /**
@@ -50,5 +55,6 @@ class CreateServicesTemplateTable extends Migration
                 'service_template_changed',
             ]);
         });
+        Schema::drop('service_templates_perms');
     }
 }
