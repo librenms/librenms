@@ -42,6 +42,25 @@ class ServiceTemplate extends Model implements Keyable
     }
 
     /**
+     * Check if user can access this device.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canAccess($user)
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->hasGlobalRead()) {
+            return true;
+        }
+
+        return Permissions::canAccessServiceTemplate($this->id, $user->user_id);
+    }
+
+    /**
      * @param Builder $query
      * @return Builder
      */

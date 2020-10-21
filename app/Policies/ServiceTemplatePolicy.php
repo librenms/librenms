@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\ServiceTemplate;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -10,26 +11,19 @@ class ServiceTemplatePolicy
 {
     use HandlesAuthorization;
 
-    public function before($user, $ability)
-    {
-        if ($user->isAdmin()) {
-            return true;
-        }
-    }
-
     /**
-     * Determine whether the user can manage services templates.
+     * Determine whether the user can view any service templates.
      *
      * @param \App\Models\User $user
-     * @return bool
+     * @return mixed
      */
-    public function manage(User $user)
+    public function viewAny(User $user)
     {
-        return false;
+        return $user->hasGlobalRead();
     }
 
     /**
-     * Determine whether the user can view the services template.
+     * Determine whether the user can view the service template.
      *
      * @param \App\Models\User $user
      * @param \App\Models\ServiceTemplate $serviceTemplate
@@ -37,33 +31,22 @@ class ServiceTemplatePolicy
      */
     public function view(User $user, ServiceTemplate $serviceTemplate)
     {
-        return false;
+        return $this->viewAny($user) || Permissions::canAccessServiceTemplate($serviceTemplate, $user);
     }
 
     /**
-     * Determine whether the user can view any services template.
-     *
-     * @param  \App\Models\User $user
-     * @return mixed
-     */
-    public function viewAny(User $user)
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can create services templates.
+     * Determine whether the user can create service templates.
      *
      * @param \App\Models\User $user
      * @return mixed
      */
     public function create(User $user)
     {
-        return false;
+        return $user->hasGlobalAdmin();
     }
 
     /**
-     * Determine whether the user can update the services template.
+     * Determine whether the user can update the service template.
      *
      * @param \App\Models\User $user
      * @param \App\Models\ServiceTemplate $serviceTemplate
@@ -71,11 +54,11 @@ class ServiceTemplatePolicy
      */
     public function update(User $user, ServiceTemplate $serviceTemplate)
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
-     * Determine whether the user can delete the services template.
+     * Determine whether the user can delete the service template.
      *
      * @param \App\Models\User $user
      * @param \App\Models\ServiceTemplate $serviceTemplate
@@ -83,11 +66,11 @@ class ServiceTemplatePolicy
      */
     public function delete(User $user, ServiceTemplate $serviceTemplate)
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
-     * Determine whether the user can restore the services template.
+     * Determine whether the user can restore the service template.
      *
      * @param \App\Models\User $user
      * @param \App\Models\ServiceTemplate $serviceTemplate
@@ -95,23 +78,11 @@ class ServiceTemplatePolicy
      */
     public function restore(User $user, ServiceTemplate $serviceTemplate)
     {
-        return false;
+        return $user->hasGlobalAdmin();
     }
 
     /**
-     * Determine whether the user can remove the services for the template.
-     *
-     * @param \App\Models\User $user
-     * @param \App\Models\ServiceTemplate $serviceTemplate
-     * @return mixed
-     */
-    public function remove(User $user, ServiceTemplate $serviceTemplate)
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the services template.
+     * Determine whether the user can permanently delete the service template.
      *
      * @param \App\Models\User $user
      * @param \App\Models\ServiceTemplate $serviceTemplate
@@ -119,6 +90,31 @@ class ServiceTemplatePolicy
      */
     public function forceDelete(User $user, ServiceTemplate $serviceTemplate)
     {
-        return false;
+        return $user->isAdmin();
+    }
+
+    /**
+     * Determine whether the user can view the stored configuration of the service template
+     * from Oxidized or Rancid
+     *
+     * @param \App\Models\User $user
+     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @return mixed
+     */
+    public function showConfig(User $user, ServiceTemplate $serviceTemplate)
+    {
+        return $user->isAdmin();
+    }
+
+    /**
+     * Determine whether the user can update service template notes.
+     *
+     * @param \App\Models\User $user
+     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @return mixed
+     */
+    public function updateNotes(User $user, ServiceTemplate $serviceTemplate)
+    {
+        return $user->isAdmin();
     }
 }
