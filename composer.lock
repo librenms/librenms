@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4389f49396c63fa97f39a7fb849f9312",
+    "content-hash": "da041241928d2324788ffb2accf1a739",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -6114,50 +6114,6 @@
                 "source": "https://github.com/librenms/StringBladeCompiler/tree/laravel-7-and-autoload-blade-custom-directives"
             },
             "time": "2020-07-10T19:15:25+00:00"
-        },
-        {
-            "name": "xjtuwangke/passwordhash",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:xjtuwangke/passwordhash.git",
-                "reference": "a7bcd9705add858cd496bdd8cdc9bbed231e8bb3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/xjtuwangke/passwordhash/zipball/a7bcd9705add858cd496bdd8cdc9bbed231e8bb3",
-                "reference": "a7bcd9705add858cd496bdd8cdc9bbed231e8bb3",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Phpass": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Public Domain"
-            ],
-            "authors": [
-                {
-                    "name": "Solar Designer",
-                    "email": "solar@openwall.com",
-                    "homepage": "http://openwall.com/phpass/"
-                }
-            ],
-            "description": "Portable PHP password hashing framework",
-            "homepage": "http://github.com/xjtuwangke/passwordhash/",
-            "keywords": [
-                "blowfish",
-                "crypt",
-                "password",
-                "security"
-            ],
-            "time": "2012-08-31T00:00:00+00:00"
         }
     ],
     "packages-dev": [
@@ -9748,8 +9704,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "oriceon/toastr-5-laravel": 20,
-        "wpb/string-blade-compiler": 20,
-        "xjtuwangke/passwordhash": 20
+        "wpb/string-blade-compiler": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
