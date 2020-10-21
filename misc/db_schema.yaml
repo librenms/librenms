@@ -604,17 +604,6 @@ device_group_device:
   Constraints:
     device_group_device_device_group_id_foreign: { name: device_group_device_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
     device_group_device_device_id_foreign: { name: device_group_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
-device_group_service_template:
-  Columns:
-    - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [device_group_id, service_template_id], Unique: true, Type: BTREE }
-    device_group_service_template_device_group_id_index: { Name: device_group_service_template_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
-    device_group_service_template_service_template_id_index: { Name: device_group_service_template_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
-  Constraints:
-    device_group_service_template_device_group_id_foreign: { name: device_group_service_template_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
-    device_group_service_template_service_template_id_foreign: { name: device_group_service_template_service_template_id_foreign, foreign_key: service_template_id, table: devices, key: service_template_id, extra: 'ON DELETE CASCADE' }
 device_outages:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1788,14 +1777,6 @@ service_templates:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     service_templates_device_group_id_index: { Name: service_templates_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
-service_templates_perms:
-  Columns:
-    - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [service_template_id, user_id], Unique: true, Type: BTREE }
-    service_templates_perms_service_template_id_index: { Name: service_templates_perms_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
-    service_templates_perms_user_id_index: { Name: service_templates_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 session:
   Columns:
     - { Field: session_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
