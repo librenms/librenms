@@ -42,8 +42,8 @@ if (Auth::user()->hasGlobalAdmin()) {
     <?php
 
 // Create list of transport
-    $transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
-    $transports_list = array();
+    $transport_dir = Config::get('install_dir') . '/LibreNMS/Alert/Transport';
+    $transports_list = [];
     foreach (scandir($transport_dir) as $transport) {
         $transport = strstr($transport, '.', true);
         if (empty($transport)) {
@@ -52,9 +52,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         $transports_list[] = $transport;
     }
     foreach ($transports_list as $transport) {
-        echo '<option value="'.strtolower($transport).'-form">'.$transport.'</option>';
-    }
-    ?>
+        echo '<option value="' . strtolower($transport) . '-form">' . $transport . '</option>';
+    } ?>
                                 </select>
                             </div>
                         </div>
@@ -69,19 +68,19 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     $switches = []; // store names of bootstrap switches
     foreach ($transports_list as $transport) {
-        $class = 'LibreNMS\\Alert\\Transport\\'.$transport;
+        $class = 'LibreNMS\\Alert\\Transport\\' . $transport;
 
-        if (!method_exists($class, 'configTemplate')) {
+        if (! method_exists($class, 'configTemplate')) {
             // Skip since support has not been added
             continue;
         }
-    
-        echo '<form method="post" role="form" id="'.strtolower($transport).'-form" class="form-horizontal transport">';
+
+        echo '<form method="post" role="form" id="' . strtolower($transport) . '-form" class="form-horizontal transport">';
         echo csrf_field();
-        echo '<input type="hidden" name="transport-type" id="transport-type" value="'.strtolower($transport).'">';
-   
-        $tmp = call_user_func($class.'::configTemplate');
-    
+        echo '<input type="hidden" name="transport-type" id="transport-type" value="' . strtolower($transport) . '">';
+
+        $tmp = call_user_func($class . '::configTemplate');
+
         foreach ($tmp['config'] as $item) {
             if ($item['type'] !== 'hidden') {
                 echo '<div class="form-group" title="' . $item['descr'] . '">';
@@ -137,8 +136,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         echo '</div>';
         echo '</div>';
         echo '</form>';
-    }
-    ?>
+    } ?>
                 </div>
             </div>
         </div>
@@ -207,7 +205,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("#is_default").bootstrapSwitch('state', false);
                 
                 // Turn on all switches in form
-                var switches = <?php echo json_encode($switches);?>;
+                var switches = <?php echo json_encode($switches); ?>;
                 $.each(switches, function(name, state) {
                     $("input[name="+name+"]").bootstrapSwitch('state', state);
                 });

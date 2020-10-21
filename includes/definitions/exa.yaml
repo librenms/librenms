@@ -4,8 +4,7 @@ type: network
 ifname: true
 empty_ifdescr: true
 icon: calix
-mib_dir:
-    - calix
+mib_dir: calix
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

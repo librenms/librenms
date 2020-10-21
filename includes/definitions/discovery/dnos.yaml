@@ -1,5 +1,19 @@
 mib: DELL-NETWORKING-CHASSIS-MIB:DELL-NETWORKING-IF-EXTENSION-MIB
 modules:
+    os:
+        sysDescr_regex:
+            - '/Software Version: (?<version>\S+)/'
+            - '/Series: (?<hardware>\S+)/'
+        hardware: Dell-Vendor-MIB::productIdentificationDisplayName.0
+        features:
+            - Dell-Vendor-MIB::productIdentificationDescription.0
+            - DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitDescription.1
+        version:
+            - Dell-Vendor-MIB::productIdentificationVersion.0
+            - DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitCodeVersion.1
+        serial:
+            - Dell-Vendor-MIB::productIdentificationSerialNumber.0
+            - DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitSerialNumber.1
     processors:
         data:
             -

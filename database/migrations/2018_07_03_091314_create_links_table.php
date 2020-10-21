@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateLinksTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,10 +24,9 @@ class CreateLinksTable extends Migration
             $table->string('remote_port', 128);
             $table->string('remote_platform', 256)->nullable();
             $table->string('remote_version', 256);
-            $table->index(['local_device_id','remote_device_id'], 'local_device_id');
+            $table->index(['local_device_id', 'remote_device_id'], 'local_device_id');
         });
     }
-
 
     /**
      * Reverse the migrations.

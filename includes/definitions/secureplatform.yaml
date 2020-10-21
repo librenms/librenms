@@ -2,8 +2,7 @@ os: secureplatform
 text: 'CheckPoint SecurePlatform'
 type: firewall
 icon: checkpoint
-mib_dir:
-    - checkpoint
+mib_dir: checkpoint
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

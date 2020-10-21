@@ -25,14 +25,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.1588.2.1.1.1",
                     "sysDescr": "Fibre Channel Switch.",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "v8.1.2g",
+                    "hardware": "Brocade 6520 Switch",
                     "features": null,
                     "os": "fabos",
                     "type": "network",
                     "serial": null,
                     "icon": "brocade.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

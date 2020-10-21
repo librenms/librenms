@@ -16,7 +16,7 @@
     </table>
     <input type='hidden' name='component' value='yes'>
     <input type='hidden' name='type' value='component'>
-    <input type='hidden' name='device' value='<?php echo $device['device_id'];?>'>
+    <input type='hidden' name='device' value='<?php echo $device['device_id']; ?>'>
 </form>
 <script>
     // Waiting for the document to be ready.

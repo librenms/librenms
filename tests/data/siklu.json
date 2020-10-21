@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.31926",
                     "sysDescr": "EH-1200TL",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "3.7.6.24444 2018-07-19 15:13:12",
+                    "hardware": "EH-1200TL",
                     "features": null,
                     "os": "siklu",
                     "type": "wireless",
-                    "serial": null,
+                    "serial": "F410060602",
                     "icon": "siklu.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

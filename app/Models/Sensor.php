@@ -34,6 +34,7 @@ class Sensor extends DeviceRelatedModel
         'temperature'          => 'thermometer-three-quarters',
         'voltage'              => 'bolt',
         'waterflow'            => 'tint',
+        'percent'              => 'percent',
     ];
 
     // ---- Helper Functions ----
@@ -46,6 +47,7 @@ class Sensor extends DeviceRelatedModel
             'eer' => 'EER',
             'snr' => 'SNR',
         ]);
+
         return $nice->get($this->sensor_class, ucwords(str_replace('_', ' ', $this->sensor_class)));
     }
 

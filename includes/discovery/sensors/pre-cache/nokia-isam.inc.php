@@ -15,7 +15,7 @@ $slotTable = [
     '4360' => 'lt:1/1/6/',
     '4361' => 'lt:1/1/7/',
     '4362' => 'lt:1/1/8/',
-    '4481' => '4481' // FIXME define this
+    '4481' => '4481', // FIXME define this
 ];
 $pre_cache['nokiaIsamSlot'] = snmpwalk_cache_multi_oid($device, 'eqptBoardContainerOffset', [], 'ASAM-EQUIP-MIB', 'nokia');
 $pre_cache['nokiaIsamSlot'] = snmpwalk_cache_multi_oid($device, 'eqptBoardIfSlotId', $pre_cache['nokiaIsamSlot'], 'ASAM-EQUIP-MIB', 'nokia');
@@ -29,7 +29,7 @@ $portTable = [
     '257' => 'xfp:1',
     '258' => 'xfp:2',
     '259' => 'xfp:3',
-    '260' => 'xfp:4'
+    '260' => 'xfp:4',
 ];
 
 // dbm pre cache
@@ -41,22 +41,22 @@ foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
         } else {
             $pre_cache['nokiaIsamSfpPort'][$slotId][$portId]['numBasedPort'] = $portId;
         }
-        $oId = '.'.$slotId.'.'.$portId;
+        $oId = '.' . $slotId . '.' . $portId;
         $oIds = [
-            'sfpDiagRxPower'.$oId,
-            'sfpDiagTxPower'.$oId,
-            'sfpDiagRSSIRxPowerAlmLow'.$oId,
-            'sfpDiagRSSIRxPowerAlmHigh'.$oId,
-            'sfpDiagRSSIRxPowerWarnLow'.$oId,
-            'sfpDiagRSSIRxPowerWarnHigh'.$oId,
-            'sfpDiagRSSITxPowerAlmLow'.$oId,
-            'sfpDiagRSSITxPowerAlmHigh'.$oId,
-            'sfpDiagRSSITxPowerWarnLow'.$oId,
-            'sfpDiagRSSITxPowerWarnHigh'.$oId
+            'sfpDiagRxPower' . $oId,
+            'sfpDiagTxPower' . $oId,
+            'sfpDiagRSSIRxPowerAlmLow' . $oId,
+            'sfpDiagRSSIRxPowerAlmHigh' . $oId,
+            'sfpDiagRSSIRxPowerWarnLow' . $oId,
+            'sfpDiagRSSIRxPowerWarnHigh' . $oId,
+            'sfpDiagRSSITxPowerAlmLow' . $oId,
+            'sfpDiagRSSITxPowerAlmHigh' . $oId,
+            'sfpDiagRSSITxPowerWarnLow' . $oId,
+            'sfpDiagRSSITxPowerWarnHigh' . $oId,
         ];
         if ($port['sfpDiagAvailable'] == 'noError') {
             $twopart_value = snmp_get_multi($device, $oIds, '-OQUs', 'SFP-MIB', 'nokia', []);
-            foreach ($twopart_value[$slotId.'.'.$portId] as $index => $value) {
+            foreach ($twopart_value[$slotId . '.' . $portId] as $index => $value) {
                 $value = str_replace(' dBm', '', $value);
                 if (is_numeric($value)) {
                     $pre_cache['nokiaIsamSfpPort'][$slotId][$portId][$index] = $value;

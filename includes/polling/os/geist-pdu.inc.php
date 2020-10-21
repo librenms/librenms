@@ -17,11 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
-$version  = snmp_get($device, 'productVersion.0', '-Oqv', 'GEIST-MIB-V3');
+$version = snmp_get($device, 'productVersion.0', '-Oqv', 'GEIST-MIB-V3');
 $hardware = snmp_get($device, 'productHardware.0', '-Oqv', 'GEIST-MIB-V3');

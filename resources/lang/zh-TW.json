@@ -1,4 +1,7 @@
 {
+    "Ignore tag": "已忽略標記",
+    "Device Groups Dependencies": "裝置群組相依性",
+    "Outages": "中斷",
     "Device Status": "裝置狀態",
     "alert-disabled": "警報已停用",
     "maintenance": "維護",

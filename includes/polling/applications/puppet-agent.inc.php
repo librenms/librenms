@@ -1,6 +1,7 @@
 <?php
-use LibreNMS\Exceptions\JsonAppMissingKeysException;
+
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'puppet-agent';
@@ -12,57 +13,57 @@ try {
 } catch (JsonAppMissingKeysException $e) {
     $puppet_agent_data = $e->getParsedJson();
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
     return;
 }
-
 
 $puppet_changes = $puppet_agent_data['changes'];
 $puppet_events = $puppet_agent_data['events'];
 $puppet_resources = $puppet_agent_data['resources'];
 $puppet_time = $puppet_agent_data['time'];
 
-$metrics = array();
+$metrics = [];
 
 //
 // Changes Processing
 //
-$rrd_name = array('app', $name, $app_id, 'changes');
+$rrd_name = ['app', $name, $app_id, 'changes'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('total', 'GAUGE', 0);
 
-$fields = array(
+$fields = [
     'total' => $puppet_changes['total'],
-);
+];
 $metrics['changes'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // Events Processing
 //
-$rrd_name = array('app', $name, $app_id, 'events');
+$rrd_name = ['app', $name, $app_id, 'events'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('success', 'GAUGE', 0)
     ->addDataset('failure', 'GAUGE', 0)
     ->addDataset('total', 'GAUGE', 0);
 
-$fields = array(
+$fields = [
     'success' => $puppet_events['success'],
     'failure' => $puppet_events['failure'],
     'total' => $puppet_events['total'],
-);
+];
 $metrics['events'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // Resources Processing
 //
-$rrd_name = array('app', $name, $app_id, 'resources');
+$rrd_name = ['app', $name, $app_id, 'resources'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('changed', 'GAUGE', 0)
     ->addDataset('corrective_change', 'GAUGE', 0)
@@ -74,7 +75,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('skipped', 'GAUGE', 0)
     ->addDataset('total', 'GAUGE', 0);
 
-$fields = array(
+$fields = [
     'changed' => $puppet_resources['changed'],
     'corrective_change' => $puppet_resources['corrective_change'],
     'failed' => $puppet_resources['failed'],
@@ -84,16 +85,16 @@ $fields = array(
     'scheduled' => $puppet_resources['scheduled'],
     'skipped' => $puppet_resources['skipped'],
     'total' => $puppet_resources['total'],
-);
+];
 $metrics['resources'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // Time Processing
 //
-$rrd_name = array('app', $name, $app_id, 'time');
+$rrd_name = ['app', $name, $app_id, 'time'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('catalog_application', 'GAUGE', 0)
     ->addDataset('config_retrieval', 'GAUGE', 0)
@@ -105,7 +106,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('transaction_evaluation', 'GAUGE', 0)
     ->addDataset('total', 'GAUGE', 0);
 
-$fields = array(
+$fields = [
     'catalog_application' => $puppet_time['catalog_application'],
     'config_retrieval' => $puppet_time['config_retrieval'],
     'convert_catalog' => $puppet_time['convert_catalog'],
@@ -115,25 +116,25 @@ $fields = array(
     'schedule' => $puppet_time['schedule'],
     'transaction_evaluation' => $puppet_time['transaction_evaluation'],
     'total' => $puppet_time['total'],
-);
+];
 $metrics['time'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // Last Rung Processing
 //
-$rrd_name = array('app', $name, $app_id, 'last_run');
+$rrd_name = ['app', $name, $app_id, 'last_run'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('last_run', 'GAUGE', 0);
 
-$fields = array(
-    'last_run' => round(intval($puppet_time['last_run'])/60, 0), # diff seconds to minutes
-);
+$fields = [
+    'last_run' => round(intval($puppet_time['last_run']) / 60, 0), // diff seconds to minutes
+];
 $metrics['last_run'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 update_application($app, $output, $metrics);

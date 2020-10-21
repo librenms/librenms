@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.3955.1000.3.18.2",
                     "sysDescr": "LGS318P 18-Port Gigabit PoE+ Smart Switch",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "SW: 1.1.1.9, FW: 1.0.0.5",
+                    "hardware": "LGS318P V02",
                     "features": null,
                     "os": "linksys-ss",
                     "type": "network",
-                    "serial": null,
+                    "serial": "14A10C95808734",
                     "icon": "linksys.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

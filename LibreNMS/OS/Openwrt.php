@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -23,7 +22,9 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
@@ -32,12 +33,22 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class Openwrt extends OS implements
+    OSDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
+    /**
+     * Retrieve basic information about the OS / device
+     */
+    public function discoverOS(Device $device): void
+    {
+        $device->version = explode(' ', trim(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'))[1];
+        $device->hardware = trim(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2021.7890.2.101.1', '-Osqnv'), '"');
+    }
+
     /**
      * Retrieve (and explode to array) list of network interfaces, and desired display name in LibreNMS.
      * This information is returned from the wireless device (router / AP) - as SNMP extend, with the name "interfaces".
@@ -47,12 +58,13 @@ class Openwrt extends OS implements
     private function getInterfaces()
     {
         // Need to use PHP_EOL, found newline (\n) not near as reliable / consistent! And this is as PHP says it should be done.
-        $interfaces = explode(PHP_EOL, snmp_get($this->getDevice(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
-        $arrIfaces = array();
+        $interfaces = explode(PHP_EOL, snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
+        $arrIfaces = [];
         foreach ($interfaces as $interface) {
-            list($k, $v) = explode(',', $interface);
+            [$k, $v] = explode(',', $interface);
             $arrIfaces[$k] = $v;
         }
+
         return $arrIfaces;
     }
 
@@ -69,7 +81,7 @@ class Openwrt extends OS implements
     private function getSensorData($type, $query = '', $system = false, $stats = false)
     {
         // Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
-        $sensors = array();
+        $sensors = [];
         $interfaces = $this->getInterfaces();
         $count = 1;
 
@@ -141,6 +153,7 @@ class Openwrt extends OS implements
     {
         $txrate = $this->getSensorData('rate', '-tx', false, true);
         $rxrate = $this->getSensorData('rate', '-rx', false, true);
+
         return array_merge($txrate, $rxrate);
     }
 

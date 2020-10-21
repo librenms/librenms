@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -53,8 +52,8 @@ foreach (Device::pluck('hostname') as $index => $hostname) {
     }
 }
 
-$rrd_options .= " CDEF:poller=" . implode(',', $cdef);
-$rrd_options .= " CDEF:avgpol=poller," . count($cdef) .",/";
+$rrd_options .= ' CDEF:poller=' . implode(',', $cdef);
+$rrd_options .= ' CDEF:avgpol=poller,' . count($cdef) . ',/';
 $rrd_options .= " 'COMMENT:Seconds      Cur     Min     Max     Avg     Avg device\\n'";
 $rrd_options .= ' LINE1.25:poller#36393D:Poller';
 $rrd_options .= ' GPRINT:poller:LAST:%6.2lf  GPRINT:poller:MIN:%6.2lf';
@@ -62,10 +61,10 @@ $rrd_options .= ' GPRINT:poller:MAX:%6.2lf  GPRINT:poller:AVERAGE:%6.2lf';
 $rrd_options .= " 'GPRINT:avgpol:AVERAGE:%6.2lf\\n'";
 if ($_GET['previous'] == 'yes') {
     $rrd_options .= " COMMENT:' \\n'";
-    $rrd_options .= " CDEF:pollerX=" . implode(',', $cdefX);
-    $rrd_options .= " CDEF:avgpolX=pollerX," . count($cdefX) .",/";
+    $rrd_options .= ' CDEF:pollerX=' . implode(',', $cdefX);
+    $rrd_options .= ' CDEF:avgpolX=pollerX,' . count($cdefX) . ',/';
     $rrd_options .= " LINE1.25:pollerX#CCCCCC:'Prev Poller'\t";
-    $rrd_options .= " GPRINT:pollerX:MIN:%6.2lf";
+    $rrd_options .= ' GPRINT:pollerX:MIN:%6.2lf';
     $rrd_options .= ' GPRINT:pollerX:MAX:%6.2lf  GPRINT:pollerX:AVERAGE:%6.2lf';
     $rrd_options .= " 'GPRINT:avgpolX:AVERAGE:%6.2lf\\n'";
 }

@@ -3,10 +3,18 @@ text: 'Ubiquiti AirFiber LTU'
 type: wireless
 icon: ubiquiti
 nobulk: true
-group: ubnt
+mib_dir: ubnt
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_wireless_rate, text: 'Wireless Rate' }
     - { graph: device_processor, text: 'CPU Usage' }
 poller_modules:
     wifi: true
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        sysDescr: Linux
+        snmpget:
+            oid: UBNT-AFLTU-MIB::afLTUFirmwareVersion.0
+            op: '!='
+            value: false

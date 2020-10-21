@@ -14,13 +14,13 @@
 // mpMemStatsTotal 1.3.6.1.4.1.1872.2.5.1.2.8.1.0
 // mpMemStatsFree 1.3.6.1.4.1.1872.2.5.1.2.8.3.0
 
-$total = snmp_get($device, ".1.3.6.1.4.1.1872.2.5.1.2.8.1.0", '-OvQ');
-$free = snmp_get($device, ".1.3.6.1.4.1.1872.2.5.1.2.8.3.0", '-OvQ');
+$total = snmp_get($device, '.1.3.6.1.4.1.1872.2.5.1.2.8.1.0', '-OvQ');
+$free = snmp_get($device, '.1.3.6.1.4.1.1872.2.5.1.2.8.3.0', '-OvQ');
 $perc = ($total / $free) * 100;
 $used = ($total - $free);
 if (is_numeric($used) && is_numeric($free) && is_numeric($perc)) {
     $mempool['total'] = $total;
-    $mempool['free']  = $free;
-    $mempool['used']  = $used;
-    $mempool['perc']  = $perc;
+    $mempool['free'] = $free;
+    $mempool['used'] = $used;
+    $mempool['perc'] = $perc;
 }

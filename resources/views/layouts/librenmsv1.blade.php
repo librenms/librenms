@@ -17,7 +17,7 @@
         <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}" />
     @endif
 
-    <link rel="manifest" href="{{ asset('images/manifest.json') }}">
+    <link rel="manifest" href="{{ asset('images/manifest.json') }}" crossorigin="use-credentials">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
     <meta name="theme-color" content="#ffffff">

@@ -18,8 +18,6 @@
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Frontpage
  */
 
 use Auth;
@@ -42,9 +40,9 @@ if (Config::get('map.engine', 'leaflet') == 'leaflet') {
     $group_radius = Config::get('leaflet.group_radius', 80);
     $tile_url = Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org');
     $show_status = [0, 1];
-    $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.1f", $init_zoom);
-    $temp_output .= 'var map = L.map(\'leaflet-map\', { zoomSnap: 0.1 } ).setView('.$map_init.');
-L.tileLayer(\'//'.$tile_url.'/{z}/{x}/{y}.png\', {
+    $map_init = '[' . $init_lat . ', ' . $init_lng . '], ' . sprintf('%01.1f', $init_zoom);
+    $temp_output .= 'var map = L.map(\'leaflet-map\', { zoomSnap: 0.1 } ).setView(' . $map_init . ');
+L.tileLayer(\'//' . $tile_url . '/{z}/{x}/{y}.png\', {
     attribution: \'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors\'
 }).addTo(map);
 
@@ -82,15 +80,15 @@ var greenMarker = L.AwesomeMarkers.icon({
 
     // Checking user permissions
     if (Auth::user()->hasGlobalRead()) {
-    // Admin or global read-only - show all devices
+        // Admin or global read-only - show all devices
         $sql = "SELECT DISTINCT(`device_id`),`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                 LEFT JOIN `locations` ON `devices`.`location_id`=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
                 AND `status` IN " . dbGenPlaceholders(count($show_status)) .
-                " ORDER BY `status` ASC, `hostname`";
+                ' ORDER BY `status` ASC, `hostname`';
         $param = $show_status;
     } else {
-    // Normal user - grab devices that user has permissions to
+        // Normal user - grab devices that user has permissions to
         $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
 
         $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
@@ -98,8 +96,8 @@ var greenMarker = L.AwesomeMarkers.icon({
                 LEFT JOIN `locations` ON `devices`.location_id=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
                 AND `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids)) .
-                " AND `status` IN " . dbGenPlaceholders(count($show_status)) .
-                " ORDER BY `status` ASC, `hostname`";
+                ' AND `status` IN ' . dbGenPlaceholders(count($show_status)) .
+                ' ORDER BY `status` ASC, `hostname`';
         $param = array_merge($device_ids, $show_status);
     }
 
@@ -124,9 +122,9 @@ var greenMarker = L.AwesomeMarkers.icon({
                 $z_offset = 10000;  // move marker to foreground
             }
         }
-        $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getIcon($map_devices)."\" width=\"32\" height=\"32\" alt=\"\"> ".format_hostname($map_devices)."</a>';
-var tooltip = '".format_hostname($map_devices)."';
-var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: tooltip, icon: $icon, zIndexOffset: $z_offset});
+        $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . '"><img src="' . getIcon($map_devices) . '" width="32" height="32" alt=""> ' . format_hostname($map_devices) . "</a>';
+var tooltip = '" . format_hostname($map_devices) . "';
+var marker = L.marker(new L.LatLng(" . $map_devices['lat'] . ', ' . $map_devices['lng'] . "), {title: tooltip, icon: $icon, zIndexOffset: $z_offset});
 marker.bindPopup(title);
     markers.addLayer(marker);\n";
     }
@@ -171,11 +169,11 @@ marker.bindPopup(title);
               AND ll.lng IS NOT NULL
               AND rl.lat IS NOT NULL
               AND rl.lng IS NOT NULL
-              AND ld.status IN " . dbGenPlaceholders(count($show_status)) . "
-              AND rd.status IN " . dbGenPlaceholders(count($show_status)) . "
+              AND ld.status IN " . dbGenPlaceholders(count($show_status)) . '
+              AND rd.status IN ' . dbGenPlaceholders(count($show_status)) . '
             GROUP BY
               left_id, right_id, ll.lat, ll.lng, rl.lat, rl.lng
-                  ";
+                  ';
             $param = array_merge($show_status, $show_status);
         } else {
             $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
@@ -217,28 +215,28 @@ marker.bindPopup(title);
               AND ll.lng IS NOT NULL
               AND rl.lat IS NOT NULL
               AND rl.lng IS NOT NULL
-              AND ld.status IN " . dbGenPlaceholders(count($show_status)) . "
-              AND rd.status IN " . dbGenPlaceholders(count($show_status)) . "
-              AND ld.device_id IN " . dbGenPlaceholders(count($device_ids)) . "
-              AND rd.device_id IN " . dbGenPlaceholders(count($device_ids)) . "
+              AND ld.status IN " . dbGenPlaceholders(count($show_status)) . '
+              AND rd.status IN ' . dbGenPlaceholders(count($show_status)) . '
+              AND ld.device_id IN ' . dbGenPlaceholders(count($device_ids)) . '
+              AND rd.device_id IN ' . dbGenPlaceholders(count($device_ids)) . '
             GROUP BY
               left_id, right_id, ll.lat, ll.lng, rl.lat, rl.lng
-                  ";
+                  ';
             $param = array_merge($show_status, $show_status, $device_ids, $device_ids);
         }
 
         foreach (dbFetchRows($sql, $param) as $link) {
             $icon = 'greenMarker';
             $z_offset = 0;
-    
-            $speed = $link['link_capacity']/1000;
+
+            $speed = $link['link_capacity'] / 1000;
             if ($speed > 500000) {
                 $width = 20;
             } else {
                 $width = round(0.77 * pow($speed, 0.25));
             }
-    
-            $link_used = max($link["link_out_usage_pct"], $link["link_in_usage_pct"]);
+
+            $link_used = max($link['link_out_usage_pct'], $link['link_in_usage_pct']);
             $link_used = round(2 * $link_used, -1) / 2;
             if ($link_used > 100) {
                 $link_used = 100;
@@ -247,19 +245,17 @@ marker.bindPopup(title);
                 $link_used = 0;
             }
             $link_color = Config::get("network_map_legend.$link_used");
-    
-            $temp_output .= "var marker = new L.Polyline([new L.LatLng(". $link["left_lat"] .", ". $link["left_lng"] ."), new L.LatLng(". $link["right_lat"] .", ". $link["right_lng"] .")], {
-                color: '". $link_color ."',
-                weight: ". $width .",
+
+            $temp_output .= 'var marker = new L.Polyline([new L.LatLng(' . $link['left_lat'] . ', ' . $link['left_lng'] . '), new L.LatLng(' . $link['right_lat'] . ', ' . $link['right_lng'] . ")], {
+                color: '" . $link_color . "',
+                weight: " . $width . ',
                 opacity: 0.8,
                 smoothFactor: 1
             });
             markers.addLayer(marker);
-            ";
+            ';
         }
     }
-
-
 
     $temp_output .= 'map.addLayer(markers);
 map.scrollWheelZoom.disable();

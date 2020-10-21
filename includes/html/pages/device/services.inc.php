@@ -23,14 +23,14 @@ $services = service_get($device['device_id']);
 require_once 'includes/html/modal/new_service.inc.php';
 require_once 'includes/html/modal/delete_service.inc.php';
 
-if (!$vars['view']) {
+if (! $vars['view']) {
     $vars['view'] = 'basic';
 }
 
-$menu_options = array(
+$menu_options = [
     'basic' => 'Basic',
     'details' => 'Details',
-);
+];
 
 echo '<br>';
 echo '<div class="panel panel-default">';
@@ -48,7 +48,7 @@ foreach ($menu_options as $option => $text) {
         echo '<span class="pagemenu-selected">';
     }
 
-    echo generate_link($text, $vars, array('view' => $option));
+    echo generate_link($text, $vars, ['view' => $option]);
     if ($vars['view'] == $option) {
         echo '</span>';
     }

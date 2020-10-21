@@ -1,5 +1,9 @@
 mib: ES4552BH2-MIB
 modules:
+    os:
+        hardware: ES4552BH2-MIB::swModelNumber.1
+        serial: ES4552BH2-MIB::swSerialNumber.1
+        version: ES4552BH2-MIB::swOpCodeVer.1
     sensors:
         pre-cache:
             data:

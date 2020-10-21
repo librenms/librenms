@@ -5,7 +5,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.105",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
@@ -14,7 +14,7 @@
                     "type": "firewall",
                     "serial": null,
                     "icon": "fortinet.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

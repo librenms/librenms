@@ -2,8 +2,7 @@ os: barracudawafirewall
 text: 'Barracuda Web Application Firewall'
 type: firewall
 icon: barracuda
-mib_dir:
-    - barracuda
+mib_dir: barracuda
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

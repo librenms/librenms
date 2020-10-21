@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.534.6.6.6",
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "01.01.01",
+                    "hardware": "DBQ145412",
                     "features": null,
                     "os": "eatonpdu",
                     "type": "power",
-                    "serial": null,
+                    "serial": "ADO3051266",
                     "icon": "eaton.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

@@ -1,5 +1,7 @@
 mib: TRAPEZE-NETWORKS-SYSTEM-MIB
 modules:
+    os:
+        sysDescr_regex: '/Juniper Networks, Inc (?<hardware>\S+) (?<version>\S+)/'
     processors:
         data:
             -

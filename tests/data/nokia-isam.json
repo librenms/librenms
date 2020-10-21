@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.637.61.1",
                     "sysDescr": "R5.7.02a NFXS-E FANT-F NOKIA ISAM Copyright (c) 2016 Nokia. All rights reserved. All use subject to applicable license agreement. Nokia and Alcatel-Lucent are registered trademarks of Nokia Corporation.",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "R5.7.02a",
+                    "hardware": "NFXS-E",
                     "features": null,
                     "os": "nokia-isam",
                     "type": "network",
-                    "serial": null,
+                    "serial": "FH1819A01A1",
                     "icon": "nokia.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

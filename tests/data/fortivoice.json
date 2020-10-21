@@ -14,7 +14,7 @@
                     "type": "firewall",
                     "serial": null,
                     "icon": "fortinet.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

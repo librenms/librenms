@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,9 +35,9 @@ class Rrd extends BaseDatastore
 {
     private $disabled = false;
 
-    /** @var Proc $sync_process */
+    /** @var Proc */
     private $sync_process;
-    /** @var Proc $async_process */
+    /** @var Proc */
     private $async_process;
     private $rrd_dir;
     private $version;
@@ -57,9 +56,9 @@ class Rrd extends BaseDatastore
         $this->rra = Config::get(
             'rrd_rra',
             'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
-            ' RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 ' .
-            ' RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 ' .
-            ' RRA:LAST:0.5:1:1440 '
+            ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
+            ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
+            ' RRA:LAST:0.5:1:2016 '
         );
         $this->version = Config::get('rrdtool_version', '1.4');
     }
@@ -92,18 +91,17 @@ class Rrd extends BaseDatastore
 
         $cwd = Config::get('rrd_dir');
 
-        if (!$this->isSyncRunning()) {
+        if (! $this->isSyncRunning()) {
             $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
         }
 
-        if ($dual_process && !$this->isAsyncRunning()) {
+        if ($dual_process && ! $this->isAsyncRunning()) {
             $this->async_process = new Proc($command, $descriptor_spec, $cwd);
             $this->async_process->setSynchronous(false);
         }
 
         return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
     }
-
 
     public function isSyncRunning()
     {
@@ -147,7 +145,7 @@ class Rrd extends BaseDatastore
     {
         $rrd_name = isset($tags['rrd_name']) ? $tags['rrd_name'] : $measurement;
         $step = isset($tags['rrd_step']) ? $tags['rrd_step'] : $this->step;
-        if (!empty($tags['rrd_oldname'])) {
+        if (! empty($tags['rrd_oldname'])) {
             self::renameFile($device, $tags['rrd_oldname'], $rrd_name);
         }
 
@@ -164,13 +162,14 @@ class Rrd extends BaseDatastore
             // filter out data not in the definition
             $fields = array_filter($fields, function ($key) use ($rrd_def) {
                 $valid = $rrd_def->isValidDataset($key);
-                if (!$valid) {
+                if (! $valid) {
                     Log::warning("RRD warning: unused data sent $key");
                 }
+
                 return $valid;
             }, ARRAY_FILTER_USE_KEY);
 
-            if (!$this->checkRrdExists($rrd)) {
+            if (! $this->checkRrdExists($rrd)) {
                 $newdef = "--step $step $rrd_def $this->rra";
                 $this->command('create', $rrd, $newdef);
             }
@@ -196,7 +195,7 @@ class Rrd extends BaseDatastore
         if (is_array($data)) {
             $values[] = 'N';
             foreach ($data as $v) {
-                if (!is_numeric($v)) {
+                if (! is_numeric($v)) {
                     $v = 'U';
                 }
 
@@ -204,18 +203,21 @@ class Rrd extends BaseDatastore
             }
 
             $data = implode(':', $values);
+
             return $this->command('update', $filename, $data);
         } else {
             return 'Bad options passed to rrdtool_update';
         }
-    } // rrdtool_update
+    }
+
+    // rrdtool_update
 
     /**
      * Modify an rrd file's max value and trim the peaks as defined by rrdtool
      *
      * @param string $type only 'port' is supported at this time
      * @param string $filename the path to the rrd file
-     * @param integer $max the new max value
+     * @param int $max the new max value
      * @return bool
      */
     public function tune($type, $filename, $max)
@@ -241,15 +243,18 @@ class Rrd extends BaseDatastore
                 'INBROADCASTPKTS',
                 'OUTBROADCASTPKTS',
                 'INMULTICASTPKTS',
-                'OUTMULTICASTPKTS'
+                'OUTMULTICASTPKTS',
             ];
         }
         if (count($fields) > 0) {
-            $options = "--maximum " . implode(":$max --maximum ", $fields) . ":$max";
+            $options = '--maximum ' . implode(":$max --maximum ", $fields) . ":$max";
             $this->command('tune', $filename, $options);
         }
+
         return true;
-    } // rrdtool_tune
+    }
+
+    // rrdtool_tune
 
     /**
      * Generates a filename for a proxmox cluster rrd
@@ -263,7 +268,7 @@ class Rrd extends BaseDatastore
     {
         $pmxcdir = join('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
         // this is not needed for remote rrdcached
-        if (!is_dir($pmxcdir)) {
+        if (! is_dir($pmxcdir)) {
             mkdir($pmxcdir, 0775, true);
         }
 
@@ -294,12 +299,14 @@ class Rrd extends BaseDatastore
     {
         $oldrrd = self::name($device['hostname'], $oldname);
         $newrrd = self::name($device['hostname'], $newname);
-        if (is_file($oldrrd) && !is_file($newrrd)) {
+        if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
-                log_event("Renamed $oldrrd to $newrrd", $device, "poller", 1);
+                log_event("Renamed $oldrrd to $newrrd", $device, 'poller', 1);
+
                 return true;
             } else {
-                log_event("Failed to rename $oldrrd to $newrrd", $device, "poller", 5);
+                log_event("Failed to rename $oldrrd to $newrrd", $device, 'poller', 5);
+
                 return false;
             }
         } else {
@@ -316,10 +323,11 @@ class Rrd extends BaseDatastore
      * @param string $extension File extension (default is .rrd)
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function name($host, $extra, $extension = ".rrd")
+    public function name($host, $extra, $extension = '.rrd')
     {
-        $filename = self::safeName(is_array($extra) ? implode("-", $extra) : $extra);
-        return implode("/", [$this->dirFromHost($host), $filename . $extension]);
+        $filename = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
+
+        return implode('/', [$this->dirFromHost($host), $filename . $extension]);
     }
 
     /**
@@ -331,7 +339,8 @@ class Rrd extends BaseDatastore
     public function dirFromHost($host)
     {
         $host = str_replace(':', '_', trim($host, '[]'));
-        return implode("/", [$this->rrd_dir, $host]);
+
+        return implode('/', [$this->rrd_dir, $host]);
     }
 
     /**
@@ -353,6 +362,7 @@ class Rrd extends BaseDatastore
             $cmd = self::buildCommand($command, $filename, $options);
         } catch (FileExistsException $e) {
             Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
+
             return [null, null];
         }
 
@@ -360,10 +370,11 @@ class Rrd extends BaseDatastore
 
         // do not write rrd files, but allow read-only commands
         $ro_commands = ['graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'];
-        if ($this->disabled && !in_array($command, $ro_commands)) {
-            if (!Config::get('hide_rrd_disabled')) {
+        if ($this->disabled && ! in_array($command, $ro_commands)) {
+            if (! Config::get('hide_rrd_disabled')) {
                 Log::debug('[%rRRD Disabled%n]', ['color' => true]);
             }
+
             return [null, null];
         }
 
@@ -385,6 +396,7 @@ class Rrd extends BaseDatastore
         }
 
         $this->recordStatistic($stat->end());
+
         return $output;
     }
 
@@ -415,8 +427,8 @@ class Rrd extends BaseDatastore
 
         // no remote for create < 1.5.5 and tune < 1.5
         if ($this->rrdcached &&
-            !($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
-            !($command == 'tune' && $this->rrdcached && version_compare($this->version, '1.5', '<'))
+            ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
+            ! ($command == 'tune' && $this->rrdcached && version_compare($this->version, '1.5', '<'))
         ) {
             // only relative paths if using rrdcached
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
@@ -440,7 +452,8 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             $chk = $this->command('last', $filename, '');
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            return !Str::contains(implode($chk), "$filename': No such file or directory");
+
+            return ! Str::contains(implode($chk), "$filename': No such file or directory");
         } else {
             return is_file($filename);
         }
@@ -455,6 +468,7 @@ class Rrd extends BaseDatastore
     {
         if (empty($hostname)) {
             Log::error("Could not purge rrd $prefix, empty hostname");
+
             return;
         }
 
@@ -469,7 +483,7 @@ class Rrd extends BaseDatastore
      *
      * @param string $graph_file
      * @param string $options
-     * @return integer
+     * @return int
      */
     public function graph($graph_file, $options)
     {
@@ -499,7 +513,7 @@ class Rrd extends BaseDatastore
      */
     public static function safeName($name)
     {
-        return (string)preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
+        return (string) preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
     }
 
     /**
@@ -510,7 +524,7 @@ class Rrd extends BaseDatastore
      */
     public static function safeDescr($descr)
     {
-        return (string)preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
+        return (string) preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
     }
 
     /**

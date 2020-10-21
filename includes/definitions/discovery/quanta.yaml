@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>[^,]+), (?<features>[^,]+), (?<version>[^,]+)/'
+        serial: NETGEAR-SWITCHING-MIB::agentInventorySerialNumber.0

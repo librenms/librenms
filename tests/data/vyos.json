@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.44641",
+                    "sysDescr": "VyOS 1.2.0-beta1",
+                    "sysContact": null,
+                    "version": "1.2.0-beta1",
+                    "hardware": null,
+                    "features": null,
+                    "os": "vyos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "vyos.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

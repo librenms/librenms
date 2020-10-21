@@ -24,7 +24,7 @@ if (rrdtool_check_rrd_exists($proxmox_rrd)) {
     $rrd_filename = $proxmox_rrd;
 }
 
-$ds_in  = 'INOCTETS';
+$ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
 require 'includes/html/graphs/generic_data.inc.php';

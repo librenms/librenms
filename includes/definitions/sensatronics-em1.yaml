@@ -4,9 +4,8 @@ type: sensor
 icon: sensatronics
 over:
     - { graph: device_temperature, text: 'Temperature' }
-mib_dir:
-    - sensatronics
+mib_dir: sensatronics
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.16174.1.1
+            - .1.3.6.1.4.1.16174.1.1.3

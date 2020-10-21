@@ -12,8 +12,8 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['ignore'] = array('=',0);
+$options = [];
+$options['filter']['ignore'] = ['=', 0];
 $options['type'] = 'ntp';
 $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];
@@ -30,15 +30,14 @@ $components = $components[$device['device_id']];
     </thead>
 <?php
 foreach ($components as $peer) {
-    $string = $peer['peer'].":".$peer['port'];
+    $string = $peer['peer'] . ':' . $peer['port'];
     if ($peer['status'] == 2) {
         $status = $peer['error'];
         $error = 'class="danger"';
     } else {
         $status = 'Ok';
         $error = '';
-    }
-    ?>
+    } ?>
 <tr <?php echo $error; ?>>
 <td><?php echo $string; ?></td>
 <td><?php echo $peer['stratum']; ?></td>
@@ -57,12 +56,12 @@ foreach ($components as $peer) {
     <div class="panel-body">
         <?php
 
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_ntp_stratum';
+        $graph_array['type'] = 'device_ntp_stratum';
         require 'includes/html/print-graphrow.inc.php';
 
         ?>
@@ -76,12 +75,12 @@ foreach ($components as $peer) {
     <div class="panel-body">
         <?php
 
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_ntp_offset';
+        $graph_array['type'] = 'device_ntp_offset';
         require 'includes/html/print-graphrow.inc.php';
 
         ?>
@@ -95,12 +94,12 @@ foreach ($components as $peer) {
     <div class="panel-body">
         <?php
 
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_ntp_delay';
+        $graph_array['type'] = 'device_ntp_delay';
         require 'includes/html/print-graphrow.inc.php';
 
         ?>
@@ -114,12 +113,12 @@ foreach ($components as $peer) {
     <div class="panel-body">
         <?php
 
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_ntp_dispersion';
+        $graph_array['type'] = 'device_ntp_dispersion';
         require 'includes/html/print-graphrow.inc.php';
 
         ?>

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -34,11 +33,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
-use Symfony\Component\Process\Process;
-use LibreNMS\Alert\AlertRules;
 use Log;
+use Symfony\Component\Process\Process;
 
 class PingCheck implements ShouldQueue
 {
@@ -47,18 +46,18 @@ class PingCheck implements ShouldQueue
     private $process;
     private $rrd_tags;
 
-    /** @var \Illuminate\Database\Eloquent\Collection $devices List of devices keyed by hostname */
+    /** @var \Illuminate\Database\Eloquent\Collection List of devices keyed by hostname */
     private $devices;
-    /** @var array $groups List of device group ids to check */
+    /** @var array List of device group ids to check */
     private $groups = [];
 
     // working data for loop
-    /** @var Collection $tiered */
+    /** @var Collection */
     private $tiered;
-    /** @var Collection $current */
+    /** @var Collection */
     private $current;
     private $current_tier;
-    /** @var Collection $deferred */
+    /** @var Collection */
     private $deferred;
 
     /**
@@ -118,7 +117,7 @@ class PingCheck implements ShouldQueue
                 if (preg_match('/^(?<hostname>[^\s]+): (?:Name or service not known|Temporary failure in name resolution)/', $line, $errored)) {
                     $this->recordData([
                         'hostname' => $errored['hostname'],
-                        'status' => 'unreachable'
+                        'status' => 'unreachable',
                     ]);
                 }
                 continue;
@@ -138,7 +137,7 @@ class PingCheck implements ShouldQueue
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
             d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
-            d_echo("Devices left in tier: " . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
+            d_echo('Devices left in tier: ' . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
         }
 
         if (\App::runningInConsole()) {
@@ -156,14 +155,16 @@ class PingCheck implements ShouldQueue
 
         /** @var Builder $query */
         $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
+            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
             ->orderBy('max_depth');
 
         if ($this->groups) {
             $query->whereIn('poller_group', $this->groups);
         }
 
-        $this->devices = $query->get()->keyBy('hostname');
+        $this->devices = $query->get()->keyBy(function ($device) {
+            return Device::pollerTarget(json_decode(json_encode($device), true));
+        });
 
         // working collections
         $this->tiered = $this->devices->groupBy('max_depth', true);
@@ -175,7 +176,7 @@ class PingCheck implements ShouldQueue
 
         if ($vdebug) {
             $this->tiered->each(function (Collection $tier, $index) {
-                echo "Tier $index (" . $tier->count() . "): ";
+                echo "Tier $index (" . $tier->count() . '): ';
                 echo $tier->implode('hostname', ', ');
                 echo PHP_EOL;
             });
@@ -198,7 +199,7 @@ class PingCheck implements ShouldQueue
 
         $this->current_tier++;  // next tier
 
-        if (!$this->tiered->has($this->current_tier)) {
+        if (! $this->tiered->has($this->current_tier)) {
             // out of devices
             return;
         }
@@ -250,7 +251,7 @@ class PingCheck implements ShouldQueue
                 // if changed, update reason
                 $device->status_reason = $device->status ? '' : 'icmp';
                 $type = $device->status ? 'up' : 'down';
-                Log::event('Device status changed to ' . ucfirst($type) . " from icmp check.", $device->device_id, $type);
+                Log::event('Device status changed to ' . ucfirst($type) . ' from icmp check.', $device->device_id, $type);
             }
 
             $device->save(); // only saves if needed (which is every time because of last_ping)
@@ -298,7 +299,7 @@ class PingCheck implements ShouldQueue
         if ($this->deferred->has($device->max_depth)) {
             // add this data to the proper tier, unless it already exists...
             $tier = $this->deferred->get($device->max_depth);
-            if (!$tier->has($device->hostname)) {
+            if (! $tier->has($device->hostname)) {
                 $tier->put($device->hostname, $data);
             }
         } else {

@@ -32,7 +32,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "calix.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

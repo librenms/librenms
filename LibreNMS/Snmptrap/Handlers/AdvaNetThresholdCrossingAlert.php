@@ -19,7 +19,6 @@
  *
  * Adva Threshold Exceeded Alarms.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>
@@ -45,14 +44,15 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdInterval"));
-        $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
+        $interval = $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdInterval'));
+        $ifName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
         $threshMessage = $this->getThresholdMessage(
-            $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdVariable"))
+            $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdVariable'))
         );
 
         Log::event("$ifName $threshMessage threshold exceeded for $interval", $device->device_id, 'trap', 2);
     }
+
     public function getThresholdMessage($thresholdOid)
     {
         foreach ($this->getThresholds() as $oid => $descr) {
@@ -60,8 +60,10 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
                 return $descr;
             }
         }
+
         return 'unknown';
     }
+
     public function getThresholds()
     {
         return [

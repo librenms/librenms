@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 foreach ($pre_cache['fabos_sensors'] as $data) {
     if (is_numeric($data['swSensorValue']) && $data['swSensorValue'] !== '-2147483648') {
         $descr = $data['swSensorInfo'];

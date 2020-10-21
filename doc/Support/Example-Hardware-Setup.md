@@ -225,3 +225,22 @@ Lab
 | Ports          | 25678               |                     |
 | Health sensors | 2457                |                     |
 | Load           | 10.92               |                     |
+
+## [dagb](https://github.com/dagbdagb)
+
+> Work
+
+Running in VMware.
+
+|                | LibreNMS            | MariaDB             |
+| -------------- | ------------------- | ------------------- |
+| Type           | Virtual             | Same Server         |
+| OS             | CentOS 7            |                     |
+| CPU            | 12 Cores Xeon 6130  |                     |
+| Memory         | 8GB                 |                     |
+| Disk Type      | SAN (SSD)           |                     |
+| Disk Space     | 26GB/72GB/7GB       | (logs/RRDs/db)      |
+| Devices        | 650                 |                     |
+| Ports          | 34300               |                     |
+| Health sensors | 10500               |                     |
+| Load           | 5.5 (45%)           |                     |
