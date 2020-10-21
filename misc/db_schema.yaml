@@ -614,7 +614,7 @@ device_group_service_template:
     device_group_service_template_service_template_id_index: { Name: device_group_service_template_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
   Constraints:
     device_group_service_template_device_group_id_foreign: { name: device_group_service_template_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
-    device_group_service_template_service_template_id_foreign: { name: device_group_service_template_service_template_id_foreign, foreign_key: service_template_id, table: service_templates, key: id, extra: 'ON DELETE CASCADE' }
+    device_group_service_template_service_template_id_foreign: { name: device_group_service_template_service_template_id_foreign, foreign_key: service_template_id, table: devices, key: service_template_id, extra: 'ON DELETE CASCADE' }
 device_outages:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
