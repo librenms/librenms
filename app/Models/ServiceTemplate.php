@@ -69,6 +69,12 @@ class ServiceTemplate extends Model implements Keyable
         return $query->where('disabled', 1);
     }
 
+    public function users()
+    {
+        // FIXME does not include global read
+        return $this->belongsToMany(\App\Models\User::class, 'service_templates_perms', 'service_template_id', 'user_id');
+    }
+
     public function group()
     {
         return $this->belongsTo(\App\Models\DeviceGroup::class, 'id', 'device_group_id');

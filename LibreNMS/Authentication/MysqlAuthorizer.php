@@ -149,6 +149,7 @@ class MysqlAuthorizer extends AuthorizerBase
         Eloquent::DB()->table('devices_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('devices_group_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('ports_perms')->where('user_id', $user_id)->delete();
+        Eloquent::DB()->table('service_templates_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('users_prefs')->where('user_id', $user_id)->delete();
 
         return User::destroy($user_id);

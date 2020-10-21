@@ -36,6 +36,7 @@ class Schema
         'devices_perms',
         'bill_perms',
         'ports_perms',
+        'service_templates_perms',
     ];
 
     private $relationships;
