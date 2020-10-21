@@ -14,7 +14,7 @@ class ServiceTemplateController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(ServiceTemplate::class, 'service_template');
+        $this->authorizeResource(ServiceTemplate::class, 'serviceTemplate');
     }
 
     /**
