@@ -49,4 +49,9 @@ class ServiceTemplate extends Model implements Keyable
     {
         return $query->where('disabled', 1);
     }
+
+    public function group()
+    {
+        return $this->belongsTo(\App\Models\DeviceGroup::class, 'id', 'device_group_id');
+    }
 }
