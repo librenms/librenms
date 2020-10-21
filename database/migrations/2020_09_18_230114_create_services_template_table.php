@@ -47,9 +47,6 @@ class CreateServicesTemplateTable extends Migration
             $table->unsignedInteger('service_template_id')->unsigned()->index();
             $table->primary(['device_group_id', 'service_template_id']);
         });
-
-
-
     }
 
     /**
@@ -75,7 +72,5 @@ class CreateServicesTemplateTable extends Migration
             });
         }
         Schema::drop('device_group_device');
-
     }
 }
-
