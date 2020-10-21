@@ -61,18 +61,20 @@ trait YamlMempoolsDiscovery
                     }
                 }
 
+                $used = $data[$yaml['used']] ?? null;
+                $total = $data[$yaml['total']] ?? (is_numeric($yaml['total']) ? $yaml['total'] : null); // allow hard-coded value
                 $mempools->push((new Mempool([
                     'mempool_index' => isset($yaml['index']) ? YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data) : $index,
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
                     'mempool_descr' => isset($yaml['descr']) ? YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data) : 'Memory',
-                    'mempool_free_oid' => isset($oids['free']) ? "{$oids['free']}.$index" : null,
                     'mempool_used_oid' => isset($oids['used']) ? "{$oids['used']}.$index" : null,
+                    'mempool_free_oid' => (isset($oids['free']) && ($used === null || $total === null)) ? "{$oids['free']}.$index" : null, // only use "used" if we have both used and total
                     'mempool_perc_oid' => isset($oids['percent_used']) ? "{$oids['percent_used']}.$index" : null,
                     'mempool_perc_warn' => $yaml['warn_percent'] ?? 90,
                 ]))->fillUsage(
-                    $data[$yaml['used']] ?? null,
-                    $data[$yaml['total']] ?? (is_numeric($yaml['total']) ? $yaml['total'] : null), // allow hard-coded value
+                    $used,
+                    $total,
                     $data[$yaml['free']] ?? null,
                     $data[$yaml['percent_used']] ?? null
                 ));
