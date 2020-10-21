@@ -34,9 +34,9 @@ class CreateServicesTemplateTable extends Migration
             $table->unsignedInteger('service_template_changed')->default(0);
         });
         Schema::create('service_templates_perms', function (Blueprint $table) {
-            $table->id();
             $table->unsignedInteger('user_id')->index();
-            $table->unsignedInteger('service_template_id');
+            $table->unsignedInteger('service_template_id')->index();
+            $table->primary(['device_group_id', 'user_id']);
         });
     }
 
