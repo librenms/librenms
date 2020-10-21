@@ -43,7 +43,6 @@ class RouteServiceProvider extends ServiceProvider
              * Define the "api" routes for the application.
              *
              * These routes are typically stateless.
-             *
              */
             Route::prefix('api')
                  ->middleware('api')
@@ -54,7 +53,6 @@ class RouteServiceProvider extends ServiceProvider
              * Define the "web" routes for the application.
              *
              * These routes all receive session state, CSRF protection, etc.
-             *
              */
             Route::middleware('web')
                  ->namespace($this->namespace)
