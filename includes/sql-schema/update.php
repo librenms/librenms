@@ -23,12 +23,6 @@
  * @copyright  2017-2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-use LibreNMS\Config;
-use LibreNMS\Exceptions\LockException;
-use LibreNMS\Util\FileLock;
-use LibreNMS\Util\MemcacheLock;
-
 if (! isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = [];
@@ -37,15 +31,13 @@ if (! isset($init_modules) && php_sapi_name() == 'cli') {
 
 $return = 0;
 
-try {
-    if (isset($skip_schema_lock) && ! $skip_schema_lock) {
-        if (Config::get('distributed_poller')) {
-            $schemaLock = MemcacheLock::lock('schema', 30, 86000);
-        } else {
-            $schemaLock = FileLock::lock('schema', 30);
-        }
-    }
+// make sure the cache_locks table exists before attempting to use a db lock
+if (config('cache.default') == 'database' && ! \Schema::hasTable('cache_locks')) {
+    $skip_schema_lock = true;
+}
 
+$schemaLock = Cache::lock('schema', 86000);
+if (! empty($skip_schema_lock) || $schemaLock->get()) {
     $db_rev = get_db_schema();
 
     $migrate_opts = ['--force' => true, '--ansi' => true];
@@ -107,10 +99,5 @@ try {
         echo Artisan::output();
     }
 
-    if (isset($schemaLock)) {
-        $schemaLock->release();
-    }
-} catch (LockException $e) {
-    echo $e->getMessage() . PHP_EOL;
-    $return = 1;
+    $schemaLock->release();
 }

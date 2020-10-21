@@ -177,8 +177,8 @@ class DeviceGroupController extends Controller
     {
         $deviceGroup->delete();
 
-        Toastr::success(__('Device Group :name deleted', ['name' => $deviceGroup->name]));
+        $msg = __('Device Group :name deleted', ['name' => $deviceGroup->name]);
 
-        return redirect()->route('device-groups.index');
+        return response($msg, 200);
     }
 }

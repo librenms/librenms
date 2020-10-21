@@ -13,6 +13,7 @@ class CreateProcessesTable extends Migration
     public function up()
     {
         Schema::create('processes', function (Blueprint $table) {
+            $table->id();
             $table->unsignedInteger('device_id')->index();
             $table->integer('pid');
             $table->integer('vsz');

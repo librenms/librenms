@@ -8,9 +8,6 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
-
-use LibreNMS\Util\FileLock;
-
 $init_modules = ['discovery'];
 require __DIR__ . '/includes/init.php';
 
@@ -33,7 +30,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
-        $new_discovery_lock = FileLock::lockOrDie('new-discovery');
+        $new_discovery_lock = Cache::lock('new-discovery', 300);
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
@@ -138,7 +135,7 @@ if ($discovered_devices) {
     }
 }
 
-if ($doing === 'new') {
+if (isset($new_discovery_lock)) {
     $new_discovery_lock->release();
 }
 
