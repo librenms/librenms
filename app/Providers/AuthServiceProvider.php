@@ -59,8 +59,8 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('device', function ($user, $device) {
             return $user->canAccessDevice($device);
         });
-        Gate::define('service_template', function ($user, $serviceTemplate) {
-            return $user->canAccessServiceTemplate($serviceTemplate);
+        Gate::define('service_template', function ($user, $template) {
+            return $user->canAccessServiceTemplate($template);
         });
     }
 }

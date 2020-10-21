@@ -29,7 +29,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     });
     Route::prefix('services')->name('services.')->group(function () {
         Route::resource('templates', 'ServiceTemplateController');
-        Route::post('templates/{serviceTemplate}', 'ServiceTemplateController@remove')->name('templates.remove');
+        Route::post('templates/{template}', 'ServiceTemplateController@remove')->name('templates.remove');
         Route::post('templates/discover', 'ServiceTemplateController@discover')->name('templates.discover');
     });
     Route::get('locations', 'LocationController@index');
@@ -112,7 +112,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
             Route::get('service', 'ServiceController');
-            Route::get('serviceTemplate', 'ServiceTemplateController');
+            Route::get('template', 'ServiceTemplateController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });

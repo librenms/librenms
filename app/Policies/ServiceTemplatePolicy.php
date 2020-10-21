@@ -26,12 +26,12 @@ class ServiceTemplatePolicy
      * Determine whether the user can view the service template.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return mixed
      */
-    public function view(User $user, ServiceTemplate $serviceTemplate)
+    public function view(User $user, ServiceTemplate $template)
     {
-        return $this->viewAny($user) || Permissions::canAccessServiceTemplate($serviceTemplate, $user);
+        return $this->viewAny($user) || Permissions::canAccessServiceTemplate($template, $user);
     }
 
     /**
@@ -49,10 +49,10 @@ class ServiceTemplatePolicy
      * Determine whether the user can update the service template.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return mixed
      */
-    public function update(User $user, ServiceTemplate $serviceTemplate)
+    public function update(User $user, ServiceTemplate $template)
     {
         return $user->isAdmin();
     }
@@ -61,10 +61,10 @@ class ServiceTemplatePolicy
      * Determine whether the user can delete the service template.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return mixed
      */
-    public function delete(User $user, ServiceTemplate $serviceTemplate)
+    public function delete(User $user, ServiceTemplate $template)
     {
         return $user->isAdmin();
     }
@@ -73,10 +73,10 @@ class ServiceTemplatePolicy
      * Determine whether the user can restore the service template.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return mixed
      */
-    public function restore(User $user, ServiceTemplate $serviceTemplate)
+    public function restore(User $user, ServiceTemplate $template)
     {
         return $user->hasGlobalAdmin();
     }
@@ -85,10 +85,10 @@ class ServiceTemplatePolicy
      * Determine whether the user can permanently delete the service template.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return mixed
      */
-    public function forceDelete(User $user, ServiceTemplate $serviceTemplate)
+    public function forceDelete(User $user, ServiceTemplate $template)
     {
         return $user->isAdmin();
     }
@@ -98,10 +98,10 @@ class ServiceTemplatePolicy
      * from Oxidized or Rancid
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return mixed
      */
-    public function showConfig(User $user, ServiceTemplate $serviceTemplate)
+    public function showConfig(User $user, ServiceTemplate $template)
     {
         return $user->isAdmin();
     }
@@ -110,10 +110,10 @@ class ServiceTemplatePolicy
      * Determine whether the user can update service template notes.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return mixed
      */
-    public function updateNotes(User $user, ServiceTemplate $serviceTemplate)
+    public function updateNotes(User $user, ServiceTemplate $template)
     {
         return $user->isAdmin();
     }

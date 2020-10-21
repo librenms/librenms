@@ -14,7 +14,7 @@ class ServiceTemplateController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(ServiceTemplate::class, 'serviceTemplate');
+        $this->authorizeResource(ServiceTemplate::class, 'template');
     }
 
     /**
@@ -65,7 +65,7 @@ class ServiceTemplateController extends Controller
             'ignore' => 'integer',
         ]);
 
-        $serviceTemplate = ServiceTemplate::make($request->only([
+        $template = ServiceTemplate::make($request->only([
             'name',
             'device_group_id',
             'type',
@@ -76,9 +76,9 @@ class ServiceTemplateController extends Controller
             'disabled',
             'ignore',
         ]));
-        $serviceTemplate->save();
+        $template->save();
 
-        Toastr::success(__('Service Template :name created', ['name' => $serviceTemplate->name]));
+        Toastr::success(__('Service Template :name created', ['name' => $template->name]));
 
         return redirect()->route('services.templates.index');
     }
@@ -86,24 +86,24 @@ class ServiceTemplateController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function show(ServiceTemplate $serviceTemplate)
+    public function show(ServiceTemplate $template)
     {
-        return redirect(url('/services/templates/' . $serviceTemplate->id));
+        return redirect(url('/services/templates/' . $template->id));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function edit(ServiceTemplate $serviceTemplate)
+    public function edit(ServiceTemplate $template)
     {
         return view('service-template.edit', [
-            'service_template' => $serviceTemplate,
+            'service_template' => $template,
             'device_groups' => DeviceGroup::orderBy('name')->get(),
             'services' => Services::list(),
             //'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -114,17 +114,17 @@ class ServiceTemplateController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function update(Request $request, ServiceTemplate $serviceTemplate)
+    public function update(Request $request, ServiceTemplate $template)
     {
         $this->validate($request, [
             'name' => [
                 'required',
                 'string',
-                Rule::unique('service_templates')->where(function ($query) use ($serviceTemplate) {
-                    $query->where('id', '!=', $serviceTemplate->id);
+                Rule::unique('service_templates')->where(function ($query) use ($template) {
+                    $query->where('id', '!=', $template->id);
                 }),
             ],
             'device_group_id' => 'integer',
@@ -137,11 +137,11 @@ class ServiceTemplateController extends Controller
             'ignore' => 'integer',
         ]);
 
-        $serviceTemplate->fill($request->only(['name', 'device_group_id', 'type', 'param', 'ip', 'desc', 'changed', 'ignore', 'disable']));
+        $template->fill($request->only(['name', 'device_group_id', 'type', 'param', 'ip', 'desc', 'changed', 'ignore', 'disable']));
 
-        if ($serviceTemplate->isDirty()) {
-            if ($serviceTemplate->save()) {
-                Toastr::success(__('Service Template :name updated', ['name' => $serviceTemplate->name]));
+        if ($template->isDirty()) {
+            if ($template->save()) {
+                Toastr::success(__('Service Template :name updated', ['name' => $template->name]));
             } else {
                 Toastr::error(__('Failed to save'));
 
@@ -157,7 +157,7 @@ class ServiceTemplateController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function discover()
@@ -172,14 +172,14 @@ class ServiceTemplateController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function remove(ServiceTemplate $serviceTemplate)
+    public function remove(ServiceTemplate $template)
     {
-        Service::where('service_template_id', $serviceTemplate->id)->delete();
+        Service::where('service_template_id', $template->id)->delete();
 
-        $msg = __('Service Template :name removed', ['name' => $serviceTemplate->name]);
+        $msg = __('Service Template :name removed', ['name' => $template->name]);
 
         return response($msg, 200);
     }
@@ -187,15 +187,15 @@ class ServiceTemplateController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\ServiceTemplate $serviceTemplate
+     * @param \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function destroy(ServiceTemplate $serviceTemplate)
+    public function destroy(ServiceTemplate $template)
     {
-        Service::where('service_template_id', $serviceTemplate->id)->delete();
-        $serviceTemplate->delete();
+        Service::where('service_template_id', $template->id)->delete();
+        $template->delete();
 
-        $msg = __('Service Template :name deleted', ['name' => $serviceTemplate->name]);
+        $msg = __('Service Template :name deleted', ['name' => $template->name]);
 
         return response($msg, 200);
     }
