@@ -28,9 +28,9 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
     });
     Route::prefix('services')->name('services.')->group(function () {
-        Route::resource('templates', 'ServiceTemplateController');
-        Route::post('templates/{serviceTemplate}', 'ServiceTemplateController@remove')->name('templates.remove');
-        Route::post('templates/discover', 'ServiceTemplateController@discover')->name('templates.discover');
+        Route::resource('serviceTemplates', 'ServiceTemplateController');
+        Route::post('serviceTemplates/{serviceTemplate}', 'ServiceTemplateController@remove')->name('templates.remove');
+        Route::post('serviceTemplates/discover', 'ServiceTemplateController@discover')->name('templates.discover');
     });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
