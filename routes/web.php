@@ -112,7 +112,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
             Route::get('service', 'ServiceController');
-            Route::get('template', 'ServiceTemplateController');
+            Route::get('serviceTemplate', 'ServiceTemplateController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });
