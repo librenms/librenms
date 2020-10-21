@@ -104,6 +104,8 @@ class ServiceTemplateController extends Controller
     {
         return view('service-template.edit', [
             'service_template' => $serviceTemplate,
+            'device_groups' => DeviceGroup::orderBy('name')->get(),
+            'services' => Services::list(),
             //'filters' => json_encode(new QueryBuilderFilter('group')),
         ]);
     }
