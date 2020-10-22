@@ -187,9 +187,11 @@ class ServiceTemplateController extends Controller
      */
     public function remove(ServiceTemplate $template)
     {
-        Service::where('service_template_id', $template->id)->delete();
-
-        $msg = __('Services for Template :name have been removed', ['name' => $template->name]);
+        if (Service::where('service_template_id', $template->id)->delete()) {
+            $msg = __('Services for Template :name have been removed', ['name' => $template->name]);
+        } else {
+            $msg = __('No Services for Template :name were removed', ['name' => $template->name]);
+        }
 
         return response($msg, 200);
     }
