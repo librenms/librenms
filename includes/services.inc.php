@@ -118,8 +118,8 @@ function discover_service($device, $service)
 }
 function discover_service_templates()
 {
-    foreach (Service::find('service_templates')->pluck('id') as $service_template) {
-        discover_service_template($service_template);
+    foreach (Service::find('service_templates') as $service_template) {
+        discover_service_template($service_template['id']);
     }
 
     return true;
