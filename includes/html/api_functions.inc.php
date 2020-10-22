@@ -2367,16 +2367,16 @@ function get_service_templates(Illuminate\Http\Request $request)
 
 function discover_service_templates()
 {
-    $changes = 0;
+    $changes = false;
 
     foreach (Service::find('service_templates')->pluck('id') as $service_template) {
         $status = discover_service_template($service_template);
-        if ($status === 0) {
-            $changes = 1;
+        if ($status == true) {
+            $changes = true;
         }
     }
-    if ($changes == 0) {
-        return api_success(202, 'No Service changes were made');
+    if ($changes == false) {
+        return api_success(200, 'No Service changes were made');
     }
 
     return api_success(200, 'Service changes were made');
