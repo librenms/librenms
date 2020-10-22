@@ -18,7 +18,6 @@ use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
-use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
