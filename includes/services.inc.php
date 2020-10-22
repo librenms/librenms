@@ -140,8 +140,11 @@ function discover_service_template($service_template = null)
         delete_service($service);
         $status = 0;
     }
+    if ($status == 0) {
+        return true;
+    }
 
-    return $status;
+    return false;
 }
 
 function poll_service($service)
