@@ -46,11 +46,12 @@ trait YamlMempoolsDiscovery
         $mempools_yaml = $this->getDiscovery('mempools');
 
         foreach ($mempools_yaml['pre-cache']['oids'] ?? [] as $oid) {
-            $this->mempoolsPrefetch = snmpwalk_cache_oid($this->getDeviceArray(), $oid, $this->mempoolsPrefetch, null, null, '-OQUb');
+            $options = $mempools_yaml['pre-cache']['snmp_flags'] ?? '-OQUb';
+            $this->mempoolsPrefetch = snmpwalk_cache_oid($this->getDeviceArray(), $oid, $this->mempoolsPrefetch, null, null, $options);
         }
 
         foreach ($mempools_yaml['data'] as $yaml) {
-            $oids = $this->fetchData($yaml, $this->getDiscovery()['mib'] ?? 'ALL');
+            $this->fetchData($yaml, $this->getDiscovery()['mib'] ?? 'ALL');
             $snmp_data = array_merge_recursive($this->mempoolsPrefetch, $this->mempoolsData);
 
             $count = 1;
@@ -60,28 +61,42 @@ trait YamlMempoolsDiscovery
                     continue;
                 }
 
-                $used = $data[$yaml['used']] ?? null;
-                $total = $data[$yaml['total']] ?? (is_numeric($yaml['total']) ? $yaml['total'] : null); // allow hard-coded value
+                $used = $this->getData('used', $index, $yaml);
+                $total = $this->getData('total', $index, $yaml);
                 $mempools->push((new Mempool([
                     'mempool_index' => isset($yaml['index']) ? YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data) : $index,
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
                     'mempool_descr' => isset($yaml['descr']) ? ucwords(YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data)) : 'Memory',
                     'mempool_used_oid' => $this->getOid('used', $index, $yaml),
-                    'mempool_free_oid' => ($used === null || $total === null) ? $this->getOid('free', $index, $yaml) : null, // only use "used" if we have both used and total
+                    'mempool_free_oid' => ($used === null || $total === null) ? $this->getOid('free', $index, $yaml) : null, // only use "free" if we have both used and total
                     'mempool_perc_oid' => $this->getOid('percent_used', $index, $yaml),
                     'mempool_perc_warn' => $yaml['warn_percent'] ?? 90,
                 ]))->fillUsage(
                     $used,
                     $total,
-                    $data[$yaml['free']] ?? null,
-                    $data[$yaml['percent_used']] ?? null
+                    $this->getData('free', $index, $yaml),
+                    $this->getData('percent_used', $index, $yaml),
                 ));
                 $count++;
             }
         }
 
         return $mempools;
+    }
+
+    private function getData($field, $index, $yaml)
+    {
+        $oid = $yaml[$field];
+        if (isset($this->mempoolsData[$index][$oid])) {
+            return $this->mempoolsData[$index][$oid];
+        }
+
+        if (isset($this->mempoolsPrefetch[$index][$oid])) {
+            return $this->mempoolsPrefetch[$index][$oid];
+        }
+
+        return is_numeric($yaml[$field]) ? $yaml[$field] : null;  // hard coded number
     }
 
     private function getOid($field, $index, $yaml)

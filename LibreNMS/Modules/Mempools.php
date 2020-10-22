@@ -41,7 +41,15 @@ class Mempools implements Module
     public function discover(OS $os)
     {
         if ($os instanceof MempoolsDiscovery) {
-            $mempools = $os->discoverMempools();
+            $mempools = $os->discoverMempools()->filter(function (Mempool $mempool) {
+                if ($mempool->mempool_total > 0) {
+                    return true;
+                }
+
+                \Log::debug('Rejected invalid mempool', $mempool->toArray());
+                return false;
+            });
+
             ModuleModelObserver::observe('\App\Models\Mempool');
             $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
