@@ -78,13 +78,8 @@
 
 <script>
 $("[type='checkbox']").bootstrapSwitch('offColor','danger');
-$("[type='checkbox']").on( 'switchChange.bootstrapSwitch',function (e, state) {
-if ($("[type='checkbox']").bootstrapSwitch('state') === true) {
-    $value = '1';
-    $('input.prop_state').val($value);
-} else {
-    $value = '0';
-    $('input.prop_state').val($value);
-}
+$("#ignore").on( 'switchChange.bootstrapSwitch', function (e, state) {
+    var value = $(this).is(':checked') ? "1": "0";
+    $('#ignore').val(value);
 });
 </script>
