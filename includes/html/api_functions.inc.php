@@ -2367,8 +2367,22 @@ function get_service_templates(Illuminate\Http\Request $request)
 
 function discover_service_templates()
 {
-    foreach (Service::find('service_templates')->pluck('id') as $service_template) {
-        discover_service_template($service_template);
+    foreach (Service::find('service_templates') as $services_template) {
+        foreach (Device::inDeviceGroup($services_template['device_group_id'])->pluck('device_id') as $device) {
+            foreach (Service::where('service_template_id', $services_template['id'])->where('device_id', $device)->where('service_template_changed', '!=', $services_template['changed'])->pluck('service_id') as $service) {
+                $update = ['service_desc' => $services_template['desc'], 'service_ip' => $services_template['ip'], 'service_param' => $services_template['param'], 'service_ignore' => $services_template['ignore'], 'service_disabled' => $services_template['disabled'], 'service_template_id' => $services_template['id'], 'service_name' => $services_template['name'], 'service_template_changed' => $services_template['changed']];
+                edit_service($update, $service['service_id']);
+                log_event("Updated Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
+            }
+            if (! Service::where('service_template_id', $services_template['id'])->where('device_id', $device)->count()) {
+                add_service($device, $services_template['type'], $services_template['desc'], $services_template['ip'], $services_template['param'], $services_template['ignore'], $services_template['disabled'], $services_template['id'], $services_template['name'], $services_template['changed']);
+                log_event("Added Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
+            }
+        }
+        // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
+        foreach (Service::where('service_template_id', $services_template['id'])->where('service_template_changed', '!=', $services_template['changed'])->pluck('service_id') as $service) {
+            delete_service($service);
+        }
     }
 
     return true;
