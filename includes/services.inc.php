@@ -119,7 +119,7 @@ function discover_service($device, $service)
 
 function discover_service_templates()
 {
-    $service_templates = Service::select('id')->get();
+    $service_templates = ServiceTemplate::get('id');
 
     foreach ($service_templates as $service_template) {
         discover_service_template($service_template->id);
@@ -130,11 +130,11 @@ function discover_service_templates()
 
 function discover_service_template($service_template = null)
 {
-    $services_template = ServiceTemplate::find($service_template);
+    $services_template = ServiceTemplate::get($service_template);
     $status = 1;
 
     foreach (Device::inDeviceGroup($services_template['device_group_id'])->pluck('device_id') as $device) {
-        foreach (Service::where('service_template_id', $service_template)->where('device_id', $device)->where('service_template_changed', '!=', $services_template['changed'])->pluck('service_id') as $service) {
+        foreach (Service::where('service_template_id', $service_template->id)->where('device_id', $device)->where('service_template_changed', '!=', $services_template->changed)->pluck('service_id') as $service) {
             $update = ['service_desc' => $services_template['desc'], 'service_ip' => $services_template['ip'], 'service_param' => $services_template['param'], 'service_ignore' => $services_template['ignore'], 'service_disabled' => $services_template['disabled'], 'service_template_id' => $services_template['id'], 'service_name' => $services_template['name'], 'service_template_changed' => $services_template['changed']];
             edit_service($update, $service['service_id']);
             log_event("Updated Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
