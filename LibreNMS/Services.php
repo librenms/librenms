@@ -35,9 +35,11 @@ class Services
     public static function list()
     {
         $services = [];
-        foreach (scandir(Config::get('nagios_plugins')) as $file) {
-            if (substr($file, 0, 6) === 'check_') {
-                $services[] = substr($file, 6);
+        if (is_dir(Config::get('nagios_plugins'))) {
+            foreach (scandir(Config::get('nagios_plugins')) as $file) {
+                if (substr($file, 0, 6) === 'check_') {
+                    $services[] = substr($file, 6);
+                }
             }
         }
 
