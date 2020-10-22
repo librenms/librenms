@@ -1,10 +1,6 @@
 mib: SOPHOS-XG-MIB
 modules:
    os:
-      version: SOPHOS-XG-MIB::sfosDeviceFWVersion.0
-      hardware:
-         - .1.3.6.1.4.1.2604.5.1.1.2.0
-      serial:
-         - .1.3.6.1.4.1.2604.5.1.1.4.0
-
-
+      version:  SOPHOS-XG-MIB::sfosDeviceFWVersion.0
+      hardware: SOPHOS-XG-MIB::sfosDeviceType.0
+      serial:   SOPHOS-XG-MIB::sfosDeviceAppKey.0
