@@ -783,7 +783,7 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     if (oid_is_numeric($oid)) {
         $default_options = '-Os';
     } else {
-        if ($mib != 'ALL') {
+        if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
             $oid = "$mib::$oid";
         }
         $default_options = '-On';

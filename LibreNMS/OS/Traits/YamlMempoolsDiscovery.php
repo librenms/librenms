@@ -49,16 +49,14 @@ trait YamlMempoolsDiscovery
         }
 
         foreach ($mempools_yaml['data'] as $yaml) {
-            $oids = $this->fetchData($yaml);
+            $oids = $this->fetchData($yaml, $this->getDiscovery()['mib'] ?? 'ALL');
             $snmp_data = array_merge_recursive($this->mempoolsPrefetch, $this->mempoolsData);
 
             $count = 1;
             foreach ($this->mempoolsData as $index => $data) {
-                foreach ($yaml['skip_values'] ?? [] as $skip_entry) {
-                    if (YamlDiscovery::canSkipItem($skip_entry['value'], $index, $skip_entry, [], $snmp_data)) {
-                        echo 's';
-                        continue 2;
-                    }
+                if (YamlDiscovery::canSkipItem(null, $index, $yaml, [], $data)) {
+                    echo 's';
+                    continue;
                 }
 
                 $used = $data[$yaml['used']] ?? null;
@@ -68,9 +66,9 @@ trait YamlMempoolsDiscovery
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
                     'mempool_descr' => isset($yaml['descr']) ? YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data) : 'Memory',
-                    'mempool_used_oid' => isset($oids['used']) ? "{$oids['used']}.$index" : null,
-                    'mempool_free_oid' => (isset($oids['free']) && ($used === null || $total === null)) ? "{$oids['free']}.$index" : null, // only use "used" if we have both used and total
-                    'mempool_perc_oid' => isset($oids['percent_used']) ? "{$oids['percent_used']}.$index" : null,
+                    'mempool_used_oid' => isset($oids['used']) ? YamlDiscovery::oidToNumeric("{$oids['used']}.$index", $this->getDeviceArray()) : null,
+                    'mempool_free_oid' => (isset($oids['free']) && ($used === null || $total === null)) ? YamlDiscovery::oidToNumeric("{$oids['free']}.$index", $this->getDeviceArray()) : null, // only use "used" if we have both used and total
+                    'mempool_perc_oid' => isset($oids['percent_used']) ? YamlDiscovery::oidToNumeric("{$oids['percent_used']}.$index", $this->getDeviceArray()) : null,
                     'mempool_perc_warn' => $yaml['warn_percent'] ?? 90,
                 ]))->fillUsage(
                     $used,
@@ -92,21 +90,22 @@ trait YamlMempoolsDiscovery
      * @return array oids for fields
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    private function fetchData($yaml)
+    private function fetchData($yaml, $mib)
     {
         $oids = [];
         $this->mempoolsData = []; // clear data from previous mempools
+        $options = $yaml['snmp_flags'] ?? '-OQUb';
 
         if (isset($yaml['oid'])) {
-            $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml['oid'], $this->mempoolsData, null, null, '-OQUb');
+            $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml['oid'], $this->mempoolsData, null, null, $options);
         }
 
         foreach ($this->mempoolsFields as $field) {
             if (isset($yaml[$field]) && ! is_numeric($yaml[$field])) { // allow for hard-coded values
                 if (empty($yaml['oid'])) { // if table given, skip individual oids
-                    $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml[$field], $this->mempoolsData, null, null, '-OQUb');
+                    $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml[$field], $this->mempoolsData, null, null, $options);
                 }
-                $oids[$field] = YamlDiscovery::oidToNumeric($yaml[$field], $this->getDeviceArray());
+                $oids[$field] = YamlDiscovery::oidToNumeric($yaml[$field], $this->getDeviceArray(), $mib);
             }
         }
 

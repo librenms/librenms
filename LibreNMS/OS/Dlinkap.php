@@ -25,6 +25,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Mempool;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
@@ -52,11 +53,28 @@ class Dlinkap extends OS implements ProcessorDiscovery
             Processor::discover(
                 'dlinkap-cpu',
                 $this->getDeviceId(),
-                $this->getDeviceArray()['sysObjectID'] . '.5.1.3.0',  // different OID for each model
+                $this->getDevice()->sysObjectID . '.5.1.3.0',  // different OID for each model
                 0,
                 'Processor',
                 100
             ),
         ];
+    }
+
+    public function discoverMempools()
+    {
+        $oid = $this->getDevice()->sysObjectID . '.5.1.4.0';
+        $memory = snmp_get($this->getDeviceArray(), $oid, '-OQv');
+
+        if ($memory === false) {
+            return collect();
+        }
+
+        return collect()->push((new Mempool([
+            'mempool_index' => 0,
+            'mempool_type' => 'dlinkap',
+            'mempool_descr' => 'Memory',
+            'mempool_perc_oid' => $oid,
+        ]))->fillUsage(null, null, null, $memory));
     }
 }

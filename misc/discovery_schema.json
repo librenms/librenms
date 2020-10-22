@@ -43,6 +43,9 @@
                                     "skip_values": {
                                         "$ref": "#/definitions/skip_values"
                                     },
+                                    "snmp_flags": {
+                                        "type": "string"
+                                    },
                                     "total": {
                                         "type": [
                                             "integer",

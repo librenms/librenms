@@ -261,7 +261,7 @@ class YamlDiscovery
      * @param mixed $value
      * @param array $yaml_item_data The data key from this item
      * @param array $group_options The options key from this group of items
-     * @param array $item_snmp_data The pre-cache data array
+     * @param array $pre_cache The pre-cache data array
      * @return bool
      */
     public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
@@ -319,7 +319,11 @@ class YamlDiscovery
             return $oid;
         }
 
-        $numeric_oid = snmp_translate($oid, $mib, $mibdir, null, $device);
+        foreach(explode(':', $mib) as $mib_name) {
+            if  ($numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device)) {
+                break;
+            }
+        }
 
         if (empty($numeric_oid)) {
             throw new InvalidOidException("Unable to translate oid $oid");
