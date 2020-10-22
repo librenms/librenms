@@ -122,7 +122,7 @@ function discover_service_templates()
     $service_templates = Service::all();
 
     foreach ($service_templates as $service_template) {
-        discover_service_template($service_template['id']);
+        discover_service_template($service_template->id);
     }
 
     return true;
