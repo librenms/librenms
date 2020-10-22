@@ -2371,15 +2371,15 @@ function discover_service_templates()
 
     foreach (Service::find('service_templates')->pluck('id') as $service_template) {
         $status = discover_service_template($service_template);
-        if ($status == true) {
+        if ($status === true) {
             $changes = true;
         }
     }
-    if ($changes == false) {
-        return api_success(200, 'No Service changes were made');
+    if ($changes === false) {
+        return false;
     }
 
-    return api_success(200, 'Service changes were made');
+    return true;
 }
 
 function add_service_for_host(Illuminate\Http\Request $request)
