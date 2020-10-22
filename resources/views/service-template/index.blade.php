@@ -90,7 +90,7 @@
                     data: { type: "discover-service-template", id: id },
                     dataType: "json",
                     success: function(data){
-                        if(data['status'] == 'ok') {
+                        if(data['status'] == '0') {
                             toastr.success(data['message']);
                         } else {
                             toastr.error(data['message']);
@@ -111,7 +111,7 @@
                         toastr.success(msg);
                     },
                     error:function(){
-                        toastr.error('No Services were updated when Applying this Service Template');
+                        toastr.error('No Services were updated');
                     }
                 });
             }
@@ -125,7 +125,7 @@
                         toastr.success(msg);
                     },
                     error: function () {
-                        toastr.error('@lang('No Services for this Service Template were deleted')');
+                        toastr.error('@lang('No Services for this Service Template were removed')');
                     }
                 });
             }
