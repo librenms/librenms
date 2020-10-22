@@ -146,7 +146,7 @@ class ServiceTemplateController extends Controller
             'desc',
             'changed',
             'ignore',
-            'disable'
+            'disable',
         ]));
 
         if ($template->isDirty()) {
