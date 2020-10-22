@@ -119,7 +119,9 @@ function discover_service($device, $service)
 
 function discover_service_templates()
 {
-    foreach (Service::find('service_templates') as $service_template) {
+    $service_templates = Service::all();
+
+    foreach ($service_templates as $service_template) {
         discover_service_template($service_template['id']);
     }
 
