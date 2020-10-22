@@ -129,15 +129,25 @@ class ServiceTemplateController extends Controller
             ],
             'device_group_id' => 'integer',
             'type' => 'string',
-            'param' => 'string',
-            'ip' => 'string',
-            'desc' => 'string',
+            'param' => 'nullable|string',
+            'ip' => 'nullable|string',
+            'desc' => 'nullable|string',
             'changed' => 'integer',
             'disabled' => 'integer',
             'ignore' => 'integer',
         ]);
 
-        $template->fill($request->only(['name', 'device_group_id', 'type', 'param', 'ip', 'desc', 'changed', 'ignore', 'disable']));
+        $template->fill($request->only([
+            'name',
+            'device_group_id',
+            'type',
+            'param',
+            'ip',
+            'desc',
+            'changed',
+            'ignore',
+            'disable'
+        ]));
 
         if ($template->isDirty()) {
             if ($template->save()) {
