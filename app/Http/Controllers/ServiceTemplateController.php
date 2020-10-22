@@ -165,20 +165,6 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Discover all Service Templates.
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
-     */
-    public function discover()
-    {
-        discover_service_templates();
-
-        $msg = __('All Service Templates applied');
-
-        return response($msg, 200);
-    }
-
-    /**
      * Remove the Services for the specified resource.
      *
      * @param \App\Models\ServiceTemplate $template

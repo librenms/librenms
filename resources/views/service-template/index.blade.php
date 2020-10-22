@@ -17,7 +17,7 @@
                         <i class="fa fa-plus"></i> @lang('New Service Template')
                     </a>
                     <button type="button" title="@lang('Apply Service Templates')" class="btn btn-success" aria-label="@lang('Apply Service Templates')"
-                            onclick="discover_st(this, '{{ route('services.templates.discover') }}')">
+                            onclick="discover_st(this)">
                         <i
                             class="fa fa-refresh" aria-hidden="true"></i> @lang('Apply Service Templates')</button>
                 </div>
@@ -102,13 +102,19 @@
                 });
             }
         }
-        function discover_st(button, url) {
+        function discover_st(button) {
             if (confirm('@lang('Are you sure you want to Apply All Service Templates?')')) {
                 $.ajax({
-                    url: url,
                     type: 'POST',
-                    success: function (msg) {
-                        toastr.success(msg);
+                    url: 'ajax_form.php',
+                    data: { type: "discover-service-templates" },
+                    dataType: "json",
+                    success: function(data){
+                        if(data['status'] == '0') {
+                            toastr.success(data['message']);
+                        } else {
+                            toastr.error(data['message']);
+                        }
                     },
                     error:function(){
                         toastr.error('No Services were updated');
