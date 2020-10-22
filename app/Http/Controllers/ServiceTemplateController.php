@@ -165,9 +165,8 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Discover all Service Templates.
      *
-     * @param \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function discover()
@@ -180,7 +179,7 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the Services for the specified resource.
      *
      * @param \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
