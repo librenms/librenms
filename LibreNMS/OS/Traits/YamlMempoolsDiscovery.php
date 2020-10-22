@@ -65,7 +65,7 @@ trait YamlMempoolsDiscovery
                     'mempool_index' => isset($yaml['index']) ? YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data) : $index,
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
-                    'mempool_descr' => isset($yaml['descr']) ? YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data) : 'Memory',
+                    'mempool_descr' => isset($yaml['descr']) ? ucwords(YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data)) : 'Memory',
                     'mempool_used_oid' => isset($oids['used']) ? YamlDiscovery::oidToNumeric("{$oids['used']}.$index", $this->getDeviceArray()) : null,
                     'mempool_free_oid' => (isset($oids['free']) && ($used === null || $total === null)) ? YamlDiscovery::oidToNumeric("{$oids['free']}.$index", $this->getDeviceArray()) : null, // only use "used" if we have both used and total
                     'mempool_perc_oid' => isset($oids['percent_used']) ? YamlDiscovery::oidToNumeric("{$oids['percent_used']}.$index", $this->getDeviceArray()) : null,

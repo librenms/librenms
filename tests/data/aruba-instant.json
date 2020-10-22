@@ -2643,7 +2643,7 @@
                     "entPhysicalIndex": null,
                     "mempool_type": "aruba-instant",
                     "mempool_precision": 1,
-                    "mempool_descr": "instant-ap-src-1 [CNBJHMV0WN]",
+                    "mempool_descr": "Instant-ap-src-1 [CNBJHMV0WN]",
                     "mempool_perc": 34,
                     "mempool_perc_oid": null,
                     "mempool_used": 177905664,

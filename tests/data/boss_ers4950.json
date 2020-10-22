@@ -11183,7 +11183,7 @@
                     "entPhysicalIndex": null,
                     "mempool_type": "avaya-ers",
                     "mempool_precision": 1048576,
-                    "mempool_descr": "Unit 1 memory",
+                    "mempool_descr": "Unit 1 Memory",
                     "mempool_perc": 62,
                     "mempool_perc_oid": null,
                     "mempool_used": 331350016,
