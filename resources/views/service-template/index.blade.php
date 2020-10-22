@@ -139,7 +139,7 @@
                     url: url,
                     type: 'DELETE',
                     success: function (msg) {
-                        document.getElementById("manage-service-templates-table").deleteRow(index);
+                        document.getElementById("manage-services-templates-table").deleteRow(index);
                         toastr.success(msg);
                     },
                     error: function () {
