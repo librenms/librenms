@@ -134,7 +134,7 @@ function discover_service_template($service_template = null)
     $status = 1;
 
     foreach (Device::inDeviceGroup($services_template->device_group_id)->pluck('device_id') as $device) {
-        foreach (Service::where('service_template_id', $services_template->id)->where('device_id', $device->device_id)->where('service_template_changed', '!=', $services_template->changed)->pluck('service_id') as $service) {
+        foreach (Service::where('service_template_id', $services_template->id)->where('device_id', $device)->where('service_template_changed', '!=', $services_template->changed)->pluck('service_id') as $service) {
             $update['service_desc'] = $services_template->desc;
             $update['service_ip'] = $services_template->ip;
             $update['service_param'] = $services_template->param;
@@ -143,7 +143,7 @@ function discover_service_template($service_template = null)
             $update['service_type'] = $services_template->type;
             $update['service_name'] = $services_template->name;
             $update['service_template_changed'] = $services_template->changed;
-            edit_service($update, $service->service_id);
+            edit_service($update, $service);
             log_event("Updated Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
             $status = 0;
         }
