@@ -538,12 +538,7 @@ function snmpwalk_cache_long_oid($device, $oid, $noid, $array, $mib = null, $mib
  */
 function snmpwalk_cache_oid_num($device, $oid, $array, $mib = null, $mibdir = null)
 {
-    $snmpwalk_cache_oid = snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = '-OQUn');
-    dd($snmpwalk_cache_oid);
-//    if (! in_array($oid, ['ubntGpsFix', 'ubntHostCpuLoad', 'ubntHostTemperature'])) {
-        throw new Exception(json_encode($snmpwalk_cache_oid));
-//    }
-    return $snmpwalk_cache_oid;
+    return snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = '-OQUn');
 }//end snmpwalk_cache_oid_num()
 
 function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUs')
