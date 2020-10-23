@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Device;
-use App\Models\Service;
-use App\Models\ServiceTemplate;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -115,54 +113,6 @@ function discover_service($device, $service)
         echo '+';
     }
     echo "$service ";
-}
-
-function discover_service_templates()
-{
-    $service_templates = ServiceTemplate::get('id');
-
-    foreach ($service_templates as $service_template) {
-        discover_service_template($service_template->id);
-    }
-
-    return true;
-}
-
-function discover_service_template($service_template = null)
-{
-    $services_template = ServiceTemplate::find($service_template);
-    $status = 1;
-
-    foreach (Device::inDeviceGroup($services_template->device_group_id)->pluck('device_id') as $device) {
-        foreach (Service::where('service_template_id', $services_template->id)->where('device_id', $device)->where('service_template_changed', '!=', $services_template->changed)->pluck('service_id') as $service) {
-            $update['service_desc'] = $services_template->desc;
-            $update['service_ip'] = $services_template->ip;
-            $update['service_param'] = $services_template->param;
-            $update['service_ignore'] = $services_template->ignore;
-            $update['service_disabled'] = $services_template->disabled;
-            $update['service_type'] = $services_template->type;
-            $update['service_name'] = $services_template->name;
-            $update['service_template_changed'] = $services_template->changed;
-            edit_service($update, $service);
-            log_event("Updated Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
-            $status = 0;
-        }
-        if (! Service::where('service_template_id', $service_template)->where('device_id', $device)->count()) {
-            add_service($device, $services_template['type'], $services_template['desc'], $services_template['ip'], $services_template['param'], $services_template['ignore'], $services_template['disabled'], $services_template['id'], $services_template['name'], $services_template['changed']);
-            log_event("Added Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
-            $status = 0;
-        }
-    }
-    // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
-    foreach (Service::where('service_template_id', $service_template)->where('service_template_changed', '!=', $services_template['changed'])->pluck('service_id') as $service) {
-        delete_service($service);
-        $status = 0;
-    }
-    if ($status == 0) {
-        return true;
-    }
-
-    return false;
 }
 
 function poll_service($service)

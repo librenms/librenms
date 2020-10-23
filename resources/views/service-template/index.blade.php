@@ -17,7 +17,7 @@
                         <i class="fa fa-plus"></i> @lang('New Service Template')
                     </a>
                     <button type="button" title="@lang('Apply Service Templates')" class="btn btn-success" aria-label="@lang('Apply Service Templates')"
-                            onclick="discover_st(this)">
+                            onclick="applyall_st(this)">
                         <i
                             class="fa fa-refresh" aria-hidden="true"></i> @lang('Apply Service Templates')</button>
                 </div>
@@ -54,17 +54,17 @@
                                         <td>{{ $service_template->disabled }}</td>
                                         <td>
                                             <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
-                                                    onclick="apply_st(this, '{{ $service_template->name }}', '{{ $service_template->id }}')">
+                                                    onclick="apply_st(this, '{{ $service_template->name }}', '{{ $service_template->id }}, '{{ route('services.templates.apply', $service_template->id) }}')">
                                                 <i
                                                     class="fa fa-refresh" aria-hidden="true"></i></button>
-                                            <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Apply')"
+                                            <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Remove')"
                                                     onclick="remove_st(this, '{{ $service_template->name }}', '{{ $service_template->id }}', '{{ route('services.templates.remove', $service_template->id) }}')">
                                                 <i
                                                     class="fa fa-ban" aria-hidden="true"></i></button>
-                                            <a type="button" title="@lang('edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
+                                            <a type="button" title="@lang('Edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
                                             href="{{ route('services.templates.edit', $service_template->id) }}">
                                                 <i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                            <button type="button" class="btn btn-danger btn-sm" title="@lang('delete Service Template')" aria-label="@lang('Delete')"
+                                            <button type="button" class="btn btn-danger btn-sm" title="@lang('Delete Service Template')" aria-label="@lang('Delete')"
                                                     onclick="delete_st(this, '{{ $service_template->name }}', '{{ $service_template->id }}', '{{ route('services.templates.destroy', $service_template->id) }}')">
                                                 <i
                                                     class="fa fa-trash" aria-hidden="true"></i></button>
@@ -82,19 +82,13 @@
 
 @section('scripts')
     <script>
-        function apply_st(button, name, id) {
+        function apply_st(button, name, id, url) {
             if (confirm('@lang('Are you sure you want to create Services for ')' + name + '?')) {
                 $.ajax({
+                    url: url,
                     type: 'POST',
-                    url: 'ajax_form.php',
-                    data: { type: "discover-service-template", id: id },
-                    dataType: "json",
-                    success: function(data){
-                        if(data['status'] == '0') {
-                            toastr.success(data['message']);
-                        } else {
-                            toastr.error(data['message']);
-                        }
+                    success: function (msg) {
+                        toastr.success(msg);
                     },
                     error:function(){
                         toastr.error('No Services were updated when Applying this Service Template');
@@ -102,19 +96,13 @@
                 });
             }
         }
-        function discover_st(button) {
+        function applyall_st(button, url) {
             if (confirm('@lang('Are you sure you want to Apply All Service Templates?')')) {
                 $.ajax({
+                    url: url,
                     type: 'POST',
-                    url: 'ajax_form.php',
-                    data: { type: "discover-service-templates" },
-                    dataType: "json",
-                    success: function(data){
-                        if(data['status'] == '0') {
-                            toastr.success(data['message']);
-                        } else {
-                            toastr.error(data['message']);
-                        }
+                    success: function (msg) {
+                        toastr.success(msg);
                     },
                     error:function(){
                         toastr.error('No Services were updated');

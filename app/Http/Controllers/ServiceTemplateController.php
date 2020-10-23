@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
@@ -84,6 +85,48 @@ class ServiceTemplateController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param App\Models\ServiceTemplate $template
+     * @param App\Models\Device $device
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function storeservice(Request $request, ServiceTemplate $template, $device)
+    {
+        $request = [
+            'service_name' => $template->name,
+            'device_id' => $device,
+            'service_type' => $template->type,
+            'service_param' => $template->param,
+            'service_ip' => $template->ip,
+            'service_desc' => $template->desc,
+            'service_changed' => $template->changed,
+            'service_disabled' => $template->disabled,
+            'service_ignore' => $template->ignore,
+        ];
+
+        $service = Service::make($request->only([
+            'service_name',
+            'device_id',
+            'service_type',
+            'service_param',
+            'service_ip',
+            'service_desc',
+            'service_changed',
+            'service_disabled',
+            'service_ignore',
+        ]));
+        if ($service->save()) {
+            log_event("Service: {$services_template->name} created from Service Template ID: {$services_template->id}", $device, 'service', 2);
+            return true;
+        } else {
+            log_event("Service: {$services_template->name} creation FAILED from Service Template ID: {$services_template->id}", $device, 'service', 2);
+            return false;
+        }
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param \App\Models\ServiceTemplate $template
@@ -162,6 +205,74 @@ class ServiceTemplateController extends Controller
         }
 
         return redirect()->route('services.templates.index');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param \App\Models\ServiceTemplate $template
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function apply(ServiceTemplate $template)
+    {
+        foreach (Device::inDeviceGroup($template->device_group_id)->pluck('device_id') as $device) {
+            foreach (Service::where('service_template_id', $template->id)->where('device_id', $device)->pluck('service_id') as $service) {
+                $request = [
+                    'service_name' => $template->name,
+                    'service_type' => $template->type,
+                    'service_param' => $template->param,
+                    'service_ip' => $template->ip,
+                    'service_desc' => $template->desc,
+                    'service_changed' => $template->changed,
+                    'service_disabled' => $template->disabled,
+                    'service_ignore' => $template->ignore,
+                ];
+
+                $template->fill($request->only([
+                    'service_name',
+                    'service_type',
+                    'service_param',
+                    'service_ip',
+                    'service_desc',
+                    'service_changed',
+                    'service_ignore',
+                    'service_disable',
+                ]));
+
+                if ($service->isDirty()) {
+                    if ($service->save()) {
+                        log_event("Service: {$services_template->name} updated Service Template ID: {$services_template->id}", $device, 'service', 2);
+                    } else {
+                        log_event("Service: {$services_template->name} update FAILED Service Template ID: {$services_template->id}", $device, 'service', 2);
+                    }
+                }
+            }
+            if (! Service::where('service_template_id', $service_template)->where('device_id', $device)->count()) {
+                storeservice($request, $device);
+                log_event("Added Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
+            }
+        }
+        // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
+        Service::where('service_template_id', $template)->where('service_template_changed', '!=', $services->changed)->delete();
+        $msg = __('Services for Template :name have been updates', ['name' => $template->name]);
+
+        return response($msg, 200);
+    }
+
+    /**
+     * Remove the Services for the specified resource.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function applyall()
+    {
+        $service_templates = ServiceTemplate::get('id');
+
+        foreach ($service_templates as $service_template) {
+            apply($service_template->id);
+        }
+
+        return response($msg, 200);
     }
 
     /**
