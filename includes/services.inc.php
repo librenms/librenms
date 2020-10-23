@@ -130,7 +130,7 @@ function discover_service_templates()
 
 function discover_service_template($service_template = null)
 {
-    $services_template = ServiceTemplate::get($service_template);
+    $services_template = ServiceTemplate::find($service_template);
     $status = 1;
 
     foreach (Device::inDeviceGroup($services_template->device_group_id)->pluck('device_id') as $device) {
