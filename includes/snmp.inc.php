@@ -465,7 +465,7 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
     foreach (explode("\n", $data) as $entry) {
-        if (! Str::contains($entry, ' =')) {
+        if (! Str::contains($entry, ' =') && ! empty($entry)) {
             $array[$index][$oid] .= "\n$entry";
             continue;
         }
@@ -538,7 +538,12 @@ function snmpwalk_cache_long_oid($device, $oid, $noid, $array, $mib = null, $mib
  */
 function snmpwalk_cache_oid_num($device, $oid, $array, $mib = null, $mibdir = null)
 {
-    return snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = '-OQUn');
+    $snmpwalk_cache_oid = snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = '-OQUn');
+    dd($snmpwalk_cache_oid);
+//    if (! in_array($oid, ['ubntGpsFix', 'ubntHostCpuLoad', 'ubntHostTemperature'])) {
+        throw new Exception(json_encode($snmpwalk_cache_oid));
+//    }
+    return $snmpwalk_cache_oid;
 }//end snmpwalk_cache_oid_num()
 
 function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUs')
