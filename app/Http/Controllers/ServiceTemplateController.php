@@ -88,8 +88,8 @@ class ServiceTemplateController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param App\Models\ServiceTemplate $template
-     * @param App\Models\Device $device
+     * @param \App\Models\ServiceTemplate $template
+     * @param \App\Models\Device $device
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function storeservice(Request $request, ServiceTemplate $template, $device)
