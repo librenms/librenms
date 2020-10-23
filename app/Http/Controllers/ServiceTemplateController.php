@@ -118,10 +118,12 @@ class ServiceTemplateController extends Controller
             'service_ignore',
         ]));
         if ($service->save()) {
-            log_event("Service: {$services_template->name} created from Service Template ID: {$services_template->id}", $device, 'service', 2);
+            log_event("Service: {$template->name} created from Service Template ID: {$template->id}", $device, 'service', 2);
+
             return true;
         } else {
-            log_event("Service: {$services_template->name} creation FAILED from Service Template ID: {$services_template->id}", $device, 'service', 2);
+            log_event("Service: {$template->name} creation FAILED from Service Template ID: {$template->id}", $device, 'service', 2);
+
             return false;
         }
     }
@@ -241,15 +243,15 @@ class ServiceTemplateController extends Controller
 
                 if ($service->isDirty()) {
                     if ($service->save()) {
-                        log_event("Service: {$services_template->name} updated Service Template ID: {$services_template->id}", $device, 'service', 2);
+                        log_event("Service: {$template->name} updated Service Template ID: {$template->id}", $device, 'service', 2);
                     } else {
-                        log_event("Service: {$services_template->name} update FAILED Service Template ID: {$services_template->id}", $device, 'service', 2);
+                        log_event("Service: {$template->name} update FAILED Service Template ID: {$template->id}", $device, 'service', 2);
                     }
                 }
             }
             if (! Service::where('service_template_id', $service_template)->where('device_id', $device)->count()) {
                 storeservice($request, $device);
-                log_event("Added Service: {$services_template['name']} from Service Template ID: {$services_template['id']}", $device, 'service', 2);
+                log_event("Added Service: {$template['name']} from Service Template ID: {$template['id']}", $device, 'service', 2);
             }
         }
         // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
