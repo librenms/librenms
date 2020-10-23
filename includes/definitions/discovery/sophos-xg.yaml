@@ -1,4 +1,3 @@
-mib_dir: sophos-xg
 mib: SFOS-FIREWALL-MIB
 modules:
    os:
