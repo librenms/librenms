@@ -722,13 +722,6 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
     return $array;
 }//end snmpwalk_cache_threepart_oid()
 
-function snmp_cache_oid($oid, $device, $array, $mib = 0)
-{
-    $array = snmpwalk_cache_oid($device, $oid, $array, $mib);
-
-    return $array;
-}//end snmp_cache_oid()
-
 /**
  * generate snmp auth arguments
  * @param array $device
