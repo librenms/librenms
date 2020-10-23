@@ -1,9 +1,11 @@
-mib: sophos-xg/SOPHOS-XG-MIB
+mib_dir: sophos-xg
+mib: SFOS-FIREWALL-MIB
 modules:
    os:
       version:  
-         - SOPHOS-XG-MIB::sfosDeviceFWVersion.0
+         - SFOS-FIREWALL-MIB::sfosDeviceFWVersion.0
       hardware: 
-         - SOPHOS-XG-MIB::sfosDeviceType.0
+         - SFOS-FIREWALL-MIB::sfosDeviceType.0
       serial:   
-         - SOPHOS-XG-MIB::sfosDeviceAppKey.0
+         - SFOS-FIREWALL-MIB::sfosDeviceAppKey.0
+
