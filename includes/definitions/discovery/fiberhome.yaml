@@ -9,7 +9,7 @@ modules:
                 descr: 'Hswa {{ $index }} Memory'
                 skip_values:
                     -
-                        oid: mgrCardWorkStatus
+                        oid: GEPON-OLT-COMMON-MIB::mgrCardWorkStatus
                         op: '!='
                         value: 1
     os:

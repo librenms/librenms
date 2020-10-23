@@ -127,7 +127,7 @@ class Mempools implements Module
         if ($mempool->mempool_total != 100) {
             $used = format_bi($mempool->mempool_used);
             $total = format_bi($mempool->mempool_total);
-            echo "  $used / $total";
+            echo "  {$used}iB / {$total}iB";
         }
         echo PHP_EOL;
     }

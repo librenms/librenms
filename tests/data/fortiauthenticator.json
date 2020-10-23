@@ -936,23 +936,42 @@
         "discovery": {
             "mempools": [
                 {
-                    "mempool_index": "0",
+                    "mempool_index": "1",
                     "entPhysicalIndex": null,
-                    "mempool_type": "fortiauthenticator",
+                    "mempool_type": "ucd",
                     "mempool_precision": 1024,
-                    "mempool_descr": "Physical Memory",
-                    "mempool_perc": 61,
+                    "mempool_descr": "System",
+                    "mempool_perc": 74,
                     "mempool_perc_oid": null,
-                    "mempool_used": 1284334797,
+                    "mempool_used": 1546362880,
                     "mempool_used_oid": null,
-                    "mempool_free": 821132083,
+                    "mempool_free": 552243200,
                     "mempool_free_oid": null,
-                    "mempool_total": 2105466880,
+                    "mempool_total": 2098606080,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "2",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Swap",
+                    "mempool_perc": 0,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 8192,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1073729536,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1073737728,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
                 }
             ]
         },

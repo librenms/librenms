@@ -52,7 +52,7 @@ trait YamlMempoolsDiscovery
 
         foreach ($mempools_yaml['data'] as $yaml) {
             $this->fetchData($yaml, $this->getDiscovery()['mib'] ?? 'ALL');
-            $snmp_data = array_merge_recursive($this->mempoolsPrefetch, $this->mempoolsData);
+            $snmp_data = array_replace_recursive($this->mempoolsPrefetch, $this->mempoolsData);
 
             $count = 1;
             foreach ($this->mempoolsData as $index => $data) {
