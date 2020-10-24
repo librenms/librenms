@@ -132,13 +132,14 @@ check_dependencies() {
     local ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
     local ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
     local ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
+    local ver_73=$(php -r "echo (int)version_compare(PHP_VERSION, '7.3', '<');")
     local python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
     local python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
     local phpver="master"
     local pythonver="master"
+    local old_branches="php53 php56 php71-python2 php72"
 
-    local old_branches="php53 php56 php71-python2"
-    if [[ " $old_branches " =~ " $branch " ]] && [[ "$ver_72" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
+    if [[ " $old_branches " =~ " $branch " ]] && [[ "$ver_73" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
         status_run "Supported PHP and Python version, switched back to master branch." 'git checkout master'
     elif [[ "$ver_56" != "0" ]]; then
         phpver="php53"
@@ -166,6 +167,11 @@ check_dependencies() {
 
         if [[ "$branch" != "php71-python2" ]]; then
             status_run "${msg}switched to php71-python2 branch." 'git checkout php71-python2'
+        fi
+    elif [[ "$ver_73" != "0" ]]; then
+        phpver="php72"
+        if [[ "$branch" != "php72" ]]; then
+            status_run "Unsupported PHP version, switched to php72 branch." 'git checkout php72'
         fi
     fi
 
