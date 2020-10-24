@@ -2,14 +2,14 @@
 
 namespace App\Observers;
 
-use App\Service;
+use App\Models\Service;
 
 class ServiceObserver
 {
     /**
      * Handle the service "created" event.
      *
-     * @param  \App\Service  $service
+     * @param  \App\Models\Service  $service
      * @return void
      */
     public function created(Service $service)
@@ -20,7 +20,7 @@ class ServiceObserver
     /**
      * Handle the service "updated" event.
      *
-     * @param  \App\Service  $service
+     * @param  \App\Models\Service  $service
      * @return void
      */
     public function updated(Service $service)
@@ -31,7 +31,7 @@ class ServiceObserver
     /**
      * Handle the service "deleted" event.
      *
-     * @param  \App\Service  $service
+     * @param  \App\Models\Service  $service
      * @return void
      */
     public function deleted(Service $service)
@@ -42,7 +42,7 @@ class ServiceObserver
     /**
      * Handle the service "restored" event.
      *
-     * @param  \App\Service  $service
+     * @param  \App\Models\Service  $service
      * @return void
      */
     public function restored(Service $service)
@@ -53,7 +53,7 @@ class ServiceObserver
     /**
      * Handle the service "force deleted" event.
      *
-     * @param  \App\Service  $service
+     * @param  \App\Models\Service  $service
      * @return void
      */
     public function forceDeleted(Service $service)
