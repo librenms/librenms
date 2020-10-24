@@ -89,13 +89,13 @@ class ServiceTemplateController extends Controller
      *
      * @param \App\Models\ServiceTemplate $template
      * @param \App\Models\Device $device
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     * @return bool
      */
     public function storeservice(ServiceTemplate $template, Device $device)
     {
         $request = [
             'service_name' => $template->name,
-            'device_id' => $device,
+            'device_id' => $device->id,
             'service_type' => $template->type,
             'service_param' => $template->param,
             'service_ip' => $template->ip,
@@ -117,11 +117,11 @@ class ServiceTemplateController extends Controller
             'service_ignore',
         ]));
         if ($service->save()) {
-            log_event("Service: {$template->name} created from Service Template ID: {$template->id}", $device, 'service', 2);
+            log_event("Service: {$template->name} created from Service Template ID: {$template->id}", $device->id, 'service', 2);
 
             return true;
         } else {
-            log_event("Service: {$template->name} creation FAILED from Service Template ID: {$template->id}", $device, 'service', 2);
+            log_event("Service: {$template->name} creation FAILED from Service Template ID: {$template->id}", $device->id, 'service', 2);
 
             return false;
         }
@@ -254,7 +254,7 @@ class ServiceTemplateController extends Controller
             }
         }
         // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
-        Service::where('service_template_id', $template)->where('service_template_changed', '!=', $services->changed)->delete();
+        Service::where('service_template_id', $template)->where('service_template_changed', '!=', $template->changed)->delete();
         $msg = __('Services for Template :name have been updates', ['name' => $template->name]);
 
         return response($msg, 200);
