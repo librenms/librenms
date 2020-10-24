@@ -6,7 +6,7 @@ path: blob/master/doc/
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is 7.2.5**
+**Please note the minimum supported PHP version is @= config.extra.php_min_version =@**
 
 # Install Required Packages
 

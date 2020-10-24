@@ -14,7 +14,7 @@ Connect to the server command line and follow the instructions below.
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is 7.3**
+**Please note the minimum supported PHP version is @= php.version_min =@**
 
 ## Install Required Packages
 

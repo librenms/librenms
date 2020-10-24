@@ -24,6 +24,9 @@ markdown_extensions:
             options:
               startinline: true
 plugins:
+  - macros:
+      j2_variable_start_string: '@='
+      j2_variable_end_string: '=@'
   - search
   - exclude:
       glob: General/Changelogs/*
@@ -35,6 +38,8 @@ extra_javascript:
 extra:
     article_nav_top: false
     article_nav_bottom: true
+    php:
+        version_min: 7.2.5
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms/
