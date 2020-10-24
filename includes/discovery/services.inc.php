@@ -4,8 +4,8 @@ use App\Models\Service;
 use LibreNMS\Config;
 
 if (Config::get('discover_services_templates')) {
-    foreach (Service::find('service_templates')->pluck('id') as $service_template) {
-        discover_service_template($service_template['id']);
+    foreach (Service::find('service_templates')->pluck('id') as $template) {
+        discover_service_template($template['id']);
     }
 }
 if (Config::get('discover_services')) {

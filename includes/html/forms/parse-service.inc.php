@@ -28,7 +28,7 @@ if (is_numeric($service_id) && $service_id > 0) {
         'param'     => $service[0]['service_param'],
         'ignore'    => $service[0]['service_ignore'],
         'disabled'  => $service[0]['service_disabled'],
-        'service_template_id' => $service[0]['service_template_id'],
+        'template_id' => $service[0]['service_template_id'],
         'name'      => $service[0]['service_name'],
         'service_template_changed' => $service[0]['service_template_changed'],
     ];

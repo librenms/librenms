@@ -42,30 +42,30 @@
                             </tr>
                             </thead>
                             <tbody>
-                                @foreach($device_group->serviceTemplates as $service_template)
-                                    <tr id="row_{{ $service_template->id }}">
-                                        <td>{{ $service_template->name }}</td>
-                                        <td>{{ $service_template->type }}</td>
-                                        <td>{{ $service_template->param }}</td>
-                                        <td>{{ $service_template->ip }}</td>
-                                        <td>{{ $service_template->desc }}</td>
-                                        <td>{{ $service_template->changed }}</td>
-                                        <td>{{ $service_template->ignore }}</td>
-                                        <td>{{ $service_template->disabled }}</td>
+                                @foreach($device_group->serviceTemplates as $template)
+                                    <tr id="row_{{ $template->id }}">
+                                        <td>{{ $template->name }}</td>
+                                        <td>{{ $template->type }}</td>
+                                        <td>{{ $template->param }}</td>
+                                        <td>{{ $template->ip }}</td>
+                                        <td>{{ $template->desc }}</td>
+                                        <td>{{ $template->changed }}</td>
+                                        <td>{{ $template->ignore }}</td>
+                                        <td>{{ $template->disabled }}</td>
                                         <td>
                                             <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
-                                                    onclick="apply_st(this, '{{ $service_template->name }}', '{{ $service_template->id }}, '{{ route('services.templates.apply', $service_template->id) }}')">
+                                                    onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}, '{{ route('services.templates.apply', $template->id) }}')">
                                                 <i
                                                     class="fa fa-refresh" aria-hidden="true"></i></button>
                                             <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Remove')"
-                                                    onclick="remove_st(this, '{{ $service_template->name }}', '{{ $service_template->id }}', '{{ route('services.templates.remove', $service_template->id) }}')">
+                                                    onclick="remove_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.remove', $template->id) }}')">
                                                 <i
                                                     class="fa fa-ban" aria-hidden="true"></i></button>
                                             <a type="button" title="@lang('Edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
-                                            href="{{ route('services.templates.edit', $service_template->id) }}">
+                                            href="{{ route('services.templates.edit', $template->id) }}">
                                                 <i class="fa fa-pencil" aria-hidden="true"></i></a>
                                             <button type="button" class="btn btn-danger btn-sm" title="@lang('Delete Service Template')" aria-label="@lang('Delete')"
-                                                    onclick="delete_st(this, '{{ $service_template->name }}', '{{ $service_template->id }}', '{{ route('services.templates.destroy', $service_template->id) }}')">
+                                                    onclick="delete_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.destroy', $template->id) }}')">
                                                 <i
                                                     class="fa fa-trash" aria-hidden="true"></i></button>
                                         </td>

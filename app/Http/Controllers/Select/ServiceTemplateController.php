@@ -38,11 +38,11 @@ class ServiceTemplateController extends SelectController
         return ServiceTemplate::hasAccess($request->user())->select('id', 'name');
     }
 
-    public function formatItem($service_template)
+    public function formatItem($template)
     {
         return [
-            'id' => $service_template->id,
-            'text' => $service_template->name,
+            'id' => $template->id,
+            'text' => $template->name,
         ];
     }
 }

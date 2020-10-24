@@ -38,7 +38,7 @@ class ServiceTemplateController extends Controller
     public function create()
     {
         return view('service-template.create', [
-            'service_template' => new ServiceTemplate(),
+            'template' => new ServiceTemplate(),
             'device_groups' => DeviceGroup::orderBy('name')->get(),
             'services' => Services::list(),
             //'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -87,12 +87,11 @@ class ServiceTemplateController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
      * @param \App\Models\ServiceTemplate $template
      * @param \App\Models\Device $device
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function storeservice(Request $request, ServiceTemplate $template, $device)
+    public function storeservice(ServiceTemplate $template, Device $device)
     {
         $request = [
             'service_name' => $template->name,
@@ -148,7 +147,7 @@ class ServiceTemplateController extends Controller
     public function edit(ServiceTemplate $template)
     {
         return view('service-template.edit', [
-            'service_template' => $template,
+            'template' => $template,
             'device_groups' => DeviceGroup::orderBy('name')->get(),
             'services' => Services::list(),
             //'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -249,9 +248,9 @@ class ServiceTemplateController extends Controller
                     }
                 }
             }
-            if (! Service::where('service_template_id', $service_template)->where('device_id', $device)->count()) {
+            if (! Service::where('service_template_id', $template)->where('device_id', $device)->count()) {
                 storeservice($request, $device);
-                log_event("Added Service: {$template['name']} from Service Template ID: {$template['id']}", $device, 'service', 2);
+                log_event("Added Service: {$template->name} from Service Template ID: {$template->id}", $device, 'service', 2);
             }
         }
         // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
@@ -268,11 +267,12 @@ class ServiceTemplateController extends Controller
      */
     public function applyall()
     {
-        $service_templates = ServiceTemplate::get('id');
+        $templates = ServiceTemplate::get('id');
 
-        foreach ($service_templates as $service_template) {
-            apply($service_template->id);
+        foreach ($templates as $template) {
+            apply($template->id);
         }
+        $msg = __('All Service Templates have been applied');
 
         return response($msg, 200);
     }
