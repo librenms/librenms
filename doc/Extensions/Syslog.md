@@ -156,32 +156,45 @@ $ModLoad imudp
 $UDPServerRun 514
 ```
 
-Create a file called something like `/etc/rsyslog.d/30-librenms.conf` containing:
+Create a file called `/etc/rsyslog.d/30-librenms.conf`and add the following depending on your version of rsyslog.
 
-```
-# Feed syslog messages to librenms
-$ModLoad omprog
+=== "Version 8"
+    ```
+    # Feed syslog messages to librenms
+    module(load="omprog")
 
-$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n"
+    template(name="librenms"
+            type="string"
+            string= "%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n")
+            action(type="omprog"
+            binary="/opt/librenms/syslog.php"
+            template="librenms")
 
-*.* action(type="omprog" binary="/opt/librenms/syslog.php" template="librenms")
+    & stop
+    ```
 
-& stop
+=== "Version 7"
+    ```
+    #Feed syslog messages to librenms
+    $ModLoad omprog
 
-```
+    $template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n"
 
-Ancient versions of rsyslog may require different syntax.
+    *.* action(type="omprog" binary="/opt/librenms/syslog.php" template="librenms")
 
-This is an example for rsyslog 5 (default on Debian 7):
+    & stop
 
-```bash
-# Feed syslog messages to librenms
-$ModLoad omprog
-$template librenms,"%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY% %timegenerated:8:25%||%msg%||%programname%\n"
+    ```
 
-$ActionOMProgBinary /opt/librenms/syslog.php
-*.* :omprog:;librenms
-```
+=== "Legacy"
+    ```
+    # Feed syslog messages to librenms
+    $ModLoad omprog
+    $template librenms,"%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY%    %timegenerated:8:25%||%msg%||%programname%\n"
+
+    $ActionOMProgBinary /opt/librenms/syslog.php
+    *.* :omprog:;librenms
+    ```
 
 If your rsyslog server is recieving messages relayed by another syslog
 server, you may try replacing `%fromhost%` with `%hostname%`, since

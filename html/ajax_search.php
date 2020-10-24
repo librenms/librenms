@@ -22,10 +22,10 @@ if (isset($_REQUEST['search'])) {
 
         if (! Auth::user()->hasGlobalRead()) {
             $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-            $perms_sql = '`D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
+            $perms_sql = '`D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids)) . ' AND ';
         } else {
             $device_ids = [];
-            $perms_sql = '1';
+            $perms_sql = '';
         }
 
         if ($_REQUEST['type'] == 'group') {
@@ -63,7 +63,7 @@ if (isset($_REQUEST['search'])) {
             }
 
             // search filter
-            $query_filter .= '`D`.`hostname` LIKE ?
+            $query_filter .= '(`D`.`hostname` LIKE ?
                               OR `L`.`location` LIKE ?
                               OR `D`.`sysName` LIKE ?
                               OR `D`.`purpose` LIKE ?
@@ -91,6 +91,8 @@ if (isset($_REQUEST['search'])) {
                 $query_args_list[] = "%$mac_search%";
             }
 
+            $query_filter .= ')';
+
             // result limitation
             $query_args_list[] = $limit;
             $results = dbFetchRows($query .
@@ -117,7 +119,7 @@ if (isset($_REQUEST['search'])) {
                         $highlight_colour = '#008000';
                     }
 
-                    $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D` WHERE ' . $perms_sql . ' AND `I`.`device_id` = `D`.`device_id` AND `I`.`ignore` = 0 AND `I`.`deleted` = 0 AND `D`.`device_id` = ?', array_merge($device_ids, [$result['device_id']]));
+                    $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D` WHERE ' . $perms_sql . ' `I`.`device_id` = `D`.`device_id` AND `I`.`ignore` = 0 AND `I`.`deleted` = 0 AND `D`.`device_id` = ?', array_merge($device_ids, [$result['device_id']]));
 
                     $device[] = [
                         'name'            => $name,
@@ -145,7 +147,7 @@ if (isset($_REQUEST['search'])) {
                 );
             } else {
                 $results = dbFetchRows(
-                    "SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D` WHERE $perms_sql AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ?) ORDER BY ifDescr LIMIT ?",
+                    "SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D` WHERE $perms_sql `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ?) ORDER BY ifDescr LIMIT ?",
                     array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
                 );
             }
@@ -191,7 +193,7 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'bgp') {
             // Search bgp peers
             $results = dbFetchRows(
-                "SELECT `bgpPeers`.*,`D`.* FROM `bgpPeers`, `devices` AS `D` WHERE $perms_sql AND  `bgpPeers`.`device_id`=`D`.`device_id` AND  (`astext` LIKE ? OR `bgpPeerIdentifier` LIKE ? OR `bgpPeerRemoteAs` LIKE ?) ORDER BY `astext` LIMIT ?",
+                "SELECT `bgpPeers`.*,`D`.* FROM `bgpPeers`, `devices` AS `D` WHERE $perms_sql `bgpPeers`.`device_id`=`D`.`device_id` AND  (`astext` LIKE ? OR `bgpPeerIdentifier` LIKE ? OR `bgpPeerRemoteAs` LIKE ?) ORDER BY `astext` LIMIT ?",
                 array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
             );
 
@@ -240,7 +242,7 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'applications') {
             // Device search
             $results = dbFetchRows(
-                "SELECT * FROM `applications` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `applications`.`device_id` WHERE $perms_sql AND (`app_type` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ?",
+                "SELECT * FROM `applications` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `applications`.`device_id` WHERE $perms_sql (`app_type` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ?",
                 array_merge($device_ids, ["%$search%", "%$search%", $limit])
             );
 
@@ -280,7 +282,7 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'munin') {
             // Device search
             $results = dbFetchRows(
-                "SELECT * FROM `munin_plugins` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `munin_plugins`.`device_id` WHERE $perms_sql AND (`mplug_type` LIKE ? OR `mplug_title` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ?",
+                "SELECT * FROM `munin_plugins` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `munin_plugins`.`device_id` WHERE $perms_sql (`mplug_type` LIKE ? OR `mplug_title` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ?",
                 array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
             );
 
@@ -320,7 +322,7 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'iftype') {
             // Device search
             $results = dbFetchRows(
-                "SELECT `ports`.ifType FROM `ports` WHERE $perms_sql AND `ifType` LIKE ? GROUP BY ifType ORDER BY ifType LIMIT ?",
+                "SELECT `ports`.ifType FROM `ports` WHERE $perms_sql `ifType` LIKE ? GROUP BY ifType ORDER BY ifType LIMIT ?",
                 array_merge($device_ids, ["%$search%", $limit])
             );
 

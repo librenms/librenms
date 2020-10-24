@@ -391,9 +391,11 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     $data = str_replace('"', '', $data);
     $data = str_replace('End of MIB', '', $data);
 
-    if (is_string($data) && (preg_match('/No Such (Object|Instance)/i', $data) || preg_match('/Wrong Type(.*)should be/', $data))) {
+    if (is_string($data) && preg_match('/No Such (Object|Instance)/i', $data)) {
         d_echo('Invalid snmp_walk() data = ' . print_r($data, true));
         $data = false;
+    } elseif (preg_match('/Wrong Type(.*)should be/', $data)) {
+        $data = preg_replace('/Wrong Type \(should be .*\): /', '', $data);
     } else {
         if (Str::endsWith($data, '(It is past the end of the MIB tree)')) {
             $no_more_pattern = '/.*No more variables left in this MIB View \(It is past the end of the MIB tree\)[\n]?/';

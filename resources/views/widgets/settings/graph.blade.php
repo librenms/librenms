@@ -28,6 +28,7 @@
             <option value="sixhour" @if($graph_range == 'sixhour') selected @endif>@lang('Six Hours')</option>
             <option value="twelvehour" @if($graph_range == 'twelvehour') selected @endif>@lang('Twelve Hours')</option>
             <option value="day" @if($graph_range == 'day') selected @endif>@lang('One Day')</option>
+            <option value="twoday" @if($graph_range == 'twoday') selected @endif>@lang('Two Days')</option>
             <option value="week" @if($graph_range == 'week') selected @endif>@lang('One Week')</option>
             <option value="twoweek" @if($graph_range == 'twoweek') selected @endif>@lang('Two Weeks')</option>
             <option value="month" @if($graph_range == 'month') selected @endif>@lang('One Month')</option>

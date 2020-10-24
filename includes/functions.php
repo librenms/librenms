@@ -16,13 +16,11 @@ use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
-use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Fping;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\MemcacheLock;
 use LibreNMS\Util\Time;
 use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Process\Process;
@@ -2052,7 +2050,7 @@ function device_is_up($device, $record_perf = false)
             $type = 'up';
             $reason = $device['status_reason'];
 
-            $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL', [$device['device_id']]);
+            $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]);
             if (! empty($going_down)) {
                 $up_again = time() - $uptime;
                 if ($up_again <= $going_down) {
@@ -2062,8 +2060,8 @@ function device_is_up($device, $record_perf = false)
                 dbUpdate(
                     ['device_id' => $device['device_id'], 'up_again' => $up_again],
                     'device_outages',
-                    'device_id=? and up_again is NULL',
-                    [$device['device_id']]
+                    'device_id=? and going_down=? and up_again is NULL',
+                    [$device['device_id'], $going_down]
                 );
             }
         } else {
@@ -2334,12 +2332,9 @@ function get_device_oid_limit($device)
  */
 function lock_and_purge($table, $sql)
 {
-    try {
-        $purge_name = $table . '_purge';
-
-        if (Config::get('distributed_poller')) {
-            MemcacheLock::lock($purge_name, 0, 86000);
-        }
+    $purge_name = $table . '_purge';
+    $lock = Cache::lock($purge_name, 86000);
+    if ($lock->get()) {
         $purge_days = Config::get($purge_name);
 
         $name = str_replace('_', ' ', ucfirst($table));
@@ -2348,13 +2343,12 @@ function lock_and_purge($table, $sql)
                 echo "$name cleared for entries over $purge_days days\n";
             }
         }
+        $lock->release();
 
         return 0;
-    } catch (LockException $e) {
-        echo $e->getMessage() . PHP_EOL;
-
-        return -1;
     }
+
+    return -1;
 }
 
 /**
@@ -2369,24 +2363,21 @@ function lock_and_purge_query($table, $sql, $msg)
 {
     $purge_name = $table . '_purge';
 
-    if (Config::get('distributed_poller')) {
-        MemcacheLock::lock($purge_name, 0, 86000);
-    }
     $purge_duration = Config::get($purge_name);
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
-    try {
+    $lock = Cache::lock($purge_name, 86000);
+    if ($lock->get()) {
         if (dbQuery($sql, [$purge_duration])) {
             printf($msg, $purge_duration);
         }
-    } catch (LockException $e) {
-        echo $e->getMessage() . PHP_EOL;
+        $lock->release();
 
-        return -1;
+        return 0;
     }
 
-    return 0;
+    return -1;
 }
 
 /**
