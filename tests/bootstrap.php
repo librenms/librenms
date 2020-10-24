@@ -49,6 +49,8 @@ if (getenv('SNMPSIM')) {
     }, $snmpsim);
 }
 
+touch(\config('database.connections.testing_persistent.database'));
+
 if (getenv('DBTEST')) {
     global $migrate_result, $migrate_output;
 
