@@ -85,49 +85,6 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param \App\Models\ServiceTemplate $template
-     * @param \App\Models\Device $device
-     * @return bool
-     */
-    public function storeservice(ServiceTemplate $template, Device $device)
-    {
-        $request = [
-            'service_name' => $template->name,
-            'device_id' => $device->id,
-            'service_type' => $template->type,
-            'service_param' => $template->param,
-            'service_ip' => $template->ip,
-            'service_desc' => $template->desc,
-            'service_changed' => $template->changed,
-            'service_disabled' => $template->disabled,
-            'service_ignore' => $template->ignore,
-        ];
-
-        $service = Service::make($request->only([
-            'service_name',
-            'device_id',
-            'service_type',
-            'service_param',
-            'service_ip',
-            'service_desc',
-            'service_changed',
-            'service_disabled',
-            'service_ignore',
-        ]));
-        if ($service->save()) {
-            log_event("Service: {$template->name} created from Service Template ID: {$template->id}", $device->id, 'service', 2);
-
-            return true;
-        } else {
-            log_event("Service: {$template->name} creation FAILED from Service Template ID: {$template->id}", $device->id, 'service', 2);
-
-            return false;
-        }
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param \App\Models\ServiceTemplate $template
@@ -217,41 +174,16 @@ class ServiceTemplateController extends Controller
     public function apply(ServiceTemplate $template)
     {
         foreach (Device::inDeviceGroup($template->device_group_id)->pluck('device_id') as $device) {
-            foreach (Service::where('service_template_id', $template->id)->where('device_id', $device)->pluck('service_id') as $service) {
-                $request = [
-                    'service_name' => $template->name,
-                    'service_type' => $template->type,
-                    'service_param' => $template->param,
-                    'service_ip' => $template->ip,
-                    'service_desc' => $template->desc,
-                    'service_changed' => $template->changed,
-                    'service_disabled' => $template->disabled,
-                    'service_ignore' => $template->ignore,
-                ];
-
-                $template->fill($request->only([
-                    'service_name',
-                    'service_type',
-                    'service_param',
-                    'service_ip',
-                    'service_desc',
-                    'service_changed',
-                    'service_ignore',
-                    'service_disable',
-                ]));
-
-                if ($service->isDirty()) {
-                    if ($service->save()) {
-                        log_event("Service: {$template->name} updated Service Template ID: {$template->id}", $device, 'service', 2);
-                    } else {
-                        log_event("Service: {$template->name} update FAILED Service Template ID: {$template->id}", $device, 'service', 2);
-                    }
-                }
-                if (! Service::where('service_template_id', $template->id)->where('device_id', $device)->count()) {
-                    storeservice($request, $device);
-                    log_event("Added Service: {$template->name} from Service Template ID: {$template->id}", $device, 'service', 2);
-                }
-            }
+            $device->services()->updateOrCreate(['service_template_id' => $template->id], [
+                'service_name' => $template->name,
+                'service_type' => $template->type,
+                'service_param' => $template->param,
+                'service_ip' => $template->ip,
+                'service_desc' => $template->desc,
+                'service_changed' => $template->changed,
+                'service_disabled' => $template->disabled,
+                'service_ignore' => $template->ignore,
+            ]);
         }
         // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
         Service::where('service_template_id', $template)->where('service_template_changed', '!=', $template->changed)->delete();
@@ -270,7 +202,7 @@ class ServiceTemplateController extends Controller
         $templates = ServiceTemplate::get('id');
 
         foreach ($templates as $template) {
-            apply($template->id);
+            ServiceTemplateController::apply($template->id);
         }
         $msg = __('All Service Templates have been applied');
 
