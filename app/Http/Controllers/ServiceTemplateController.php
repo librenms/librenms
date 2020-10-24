@@ -247,11 +247,12 @@ class ServiceTemplateController extends Controller
                         log_event("Service: {$template->name} update FAILED Service Template ID: {$template->id}", $device, 'service', 2);
                     }
                 }
+                if (! Service::where('service_template_id', $template->id)->where('device_id', $device)->count()) {
+                    storeservice($request, $device);
+                    log_event("Added Service: {$template->name} from Service Template ID: {$template->id}", $device, 'service', 2);
+                }
             }
-            if (! Service::where('service_template_id', $template)->where('device_id', $device)->count()) {
-                storeservice($request, $device);
-                log_event("Added Service: {$template->name} from Service Template ID: {$template->id}", $device, 'service', 2);
-            }
+
         }
         // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
         Service::where('service_template_id', $template)->where('service_template_changed', '!=', $template->changed)->delete();
