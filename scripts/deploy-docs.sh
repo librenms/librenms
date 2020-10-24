@@ -16,6 +16,7 @@ lunr==0.5.8
 Markdown==3.2.2
 mkdocs==1.1.2
 mkdocs-exclude==1.0.2
+mkdocs-macros-plugin==0.4.18
 mkdocs-material==5.2.2
 nltk==3.5
 pymdown-extensions==7.1
