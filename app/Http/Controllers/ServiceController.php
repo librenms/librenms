@@ -2,18 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Device;
-use App\Models\DeviceGroup;
 use App\Models\Service;
-use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use LibreNMS\Services;
 use Toastr;
 
 class ServiceController extends Controller
 {
-/**
+    /**
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
