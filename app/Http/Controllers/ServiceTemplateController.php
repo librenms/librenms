@@ -173,7 +173,7 @@ class ServiceTemplateController extends Controller
      */
     public function apply(ServiceTemplate $template)
     {
-        foreach (Device::inDeviceGroup($template->device_group_id) as $device) {
+        foreach (Device::inDeviceGroup($template->device_group_id)->get() as $device) {
             $device->services()->updateOrCreate(['service_template_id' => $template->id], [
                 'service_name' => $template->name,
                 'service_type' => $template->type,
