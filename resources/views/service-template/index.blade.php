@@ -17,7 +17,7 @@
                         <i class="fa fa-plus"></i> @lang('New Service Template')
                     </a>
                     <button type="button" title="@lang('Apply Service Templates')" class="btn btn-success" aria-label="@lang('Apply Service Templates')"
-                            onclick="applyall_st(this, '{{ route('services.templates.apply') }}')">
+                            onclick="applyall_st(this, '{{ route('services.templates.applyall') }}')">
                         <i
                             class="fa fa-refresh" aria-hidden="true"></i> @lang('Apply Service Templates')</button>
                 </div>
