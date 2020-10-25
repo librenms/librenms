@@ -143,8 +143,8 @@ check_dependencies() {
     phpver="master"
     pythonver="master"
 
-    old_branches="php53 php56 php71-python2"
-    if [[ $old_branches =~ $branch ]] && [[ "$ver_72" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
+    old_branches="^(php53|php56|php71-python2)$"
+    if [[ $branch =~ $old_branches ]] && [[ "$ver_72" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
         status_run "Supported PHP and Python version, switched back to master branch." 'git checkout master'
     elif [[ "$ver_56" != "0" ]]; then
         phpver="php53"
