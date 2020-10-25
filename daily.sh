@@ -237,7 +237,7 @@ main () {
     local new_version="$3"
     local old_version="${old_version:=unset}"  # if $1 is unset, make it mismatch for pre-update daily.sh
 
-    cd "${LIBRENMS_DIR}"
+    cd "${LIBRENMS_DIR}" || exit 1
 
     # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
     if [[ "$LIBRENMS_USER" != "root" ]]; then
