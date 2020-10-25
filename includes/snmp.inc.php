@@ -465,7 +465,7 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
     foreach (explode("\n", $data) as $entry) {
-        if (! Str::contains($entry, ' =') && ! empty($entry)) {
+        if (! Str::contains($entry, ' =') && ! empty($entry) && isset($index, $oid)) {
             $array[$index][$oid] .= "\n$entry";
             continue;
         }

@@ -24,7 +24,7 @@ if ($device['os_group'] == 'printer') {
         if (Str::contains($descr, "\n")) {
             $new_descr = '';
             foreach (explode("\n", $descr) as $line) {
-                if (preg_match('/^[A-F\d]{1,2}( [A-F\d]{1,2})* ?$/', $line)) {
+                if (preg_match('/^([A-F\d]{2} )*[A-F\d]{1,2} ?$/', $line)) {
                     $line = snmp_hexstring($line);
                 }
                 $new_descr .= $line;
