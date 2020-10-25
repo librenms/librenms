@@ -46,21 +46,21 @@ LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 #######################################
 status_run() {
     # Explicitly define our arguments
-    local args="$@";
-    local arg_text=$1;
-    local arg_command=$2;
-    local arg_option=$3;
-    local log_file;
-    local exit_code;
-    local tmp;
-    local log_file=${LOG_DIR}/daily.log;
+    local args="$@"
+    local arg_text=$1
+    local arg_command=$2
+    local arg_option=$3
+    local log_file
+    local exit_code
+    local tmp
+    local log_file=${LOG_DIR}/daily.log
 
     # set log_file, using librenms $config['log_dir'], if set
     # otherwise we default to ./logs/daily.log
 
-    printf "%-50s" "${arg_text}";
+    printf "%-50s" "${arg_text}"
     echo "${arg_text}" >> ${log_file}
-    tmp=$(bash -c "${arg_command}" 2>&1);
+    tmp=$(bash -c "${arg_command}" 2>&1)
     exit_code=$?
     echo "${tmp}" >> ${log_file}
     echo "Returned: ${exit_code}" >> ${log_file}
@@ -68,9 +68,9 @@ status_run() {
     # print OK if the command ran successfully
     # or FAIL otherwise (non-zero exit code)
     if [[ "${exit_code}" == "0" ]]; then
-        printf " \033[0;32mOK\033[0m\n";
+        printf " \033[0;32mOK\033[0m\n"
     else
-        printf " \033[0;31mFAIL\033[0m\n";
+        printf " \033[0;31mFAIL\033[0m\n"
         if [[ "${arg_option}" == "update" ]]; then
             php "${LIBRENMS_DIR}/daily.php" -f notify -o "${tmp}"
         fi
@@ -94,10 +94,10 @@ status_run() {
 #   Exit-Code of Command
 #######################################
 call_daily_php() {
-    local args=( "$@" );
+    local args=( "$@" )
 
     for arg in "${args[@]}"; do
-        php "${LIBRENMS_DIR}/daily.php" -f "${arg}";
+        php "${LIBRENMS_DIR}/daily.php" -f "${arg}"
     done
 }
 
@@ -113,11 +113,11 @@ call_daily_php() {
 #   Exit-Code of Command
 #######################################
 set_notifiable_result() {
-    local args="$@";
-    local arg_type=$1;
-    local arg_result=$2;
+    local args="$@"
+    local arg_type=$1
+    local arg_result=$2
 
-    php "${LIBRENMS_DIR}/daily.php" -f handle_notifiable -t ${arg_type} -r ${arg_result};
+    php "${LIBRENMS_DIR}/daily.php" -f handle_notifiable -t ${arg_type} -r ${arg_result}
 }
 
 #######################################
@@ -173,9 +173,9 @@ check_dependencies() {
     set_notifiable_result pythonver ${pythonver}
 
     if [[ "$phpver" == "master" && "$pythonver" == "master" ]]; then
-        return 0;
+        return 0
     fi
-    return 1;
+    return 1
 }
 
 #######################################
@@ -232,12 +232,12 @@ version_compare () {
 #   Exit-Code of Command
 #######################################
 main () {
-    local arg="$1";
-    local old_version="$2";
-    local new_version="$3";
+    local arg="$1"
+    local old_version="$2"
+    local new_version="$3"
     local old_version="${old_version:=unset}"  # if $1 is unset, make it mismatch for pre-update daily.sh
 
-    cd ${LIBRENMS_DIR};
+    cd ${LIBRENMS_DIR}
 
     # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
     if [[ "$LIBRENMS_USER" != "root" ]]; then
@@ -245,11 +245,11 @@ main () {
         if [[ "$EUID" -eq 0 ]]; then
             echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
             sudo -u "$LIBRENMS_USER" "$DAILY_SCRIPT" "$@"
-            exit;
+            exit
         fi
 
         if [[ "$EUID" -ne "$LIBRENMS_USER_ID" ]]; then
-            printf "\033[0;93mWARNING\033[0m: You should run this script as ${LIBRENMS_USER}\n";
+            printf "\033[0;93mWARNING\033[0m: You should run this script as ${LIBRENMS_USER}\n"
         fi
     fi
 
@@ -371,8 +371,8 @@ main () {
                                "rrd_purge"
                                "ports_fdb"
                                "route"
-                               "ports_purge");
-                call_daily_php "${options[@]}";
+                               "ports_purge")
+                call_daily_php "${options[@]}"
             ;;
             submodules)
                 # Init+Update our submodules
@@ -381,12 +381,12 @@ main () {
             ;;
             notifications)
                 # Get notifications
-                local options=("notifications");
-                call_daily_php "${options[@]}";
+                local options=("notifications")
+                call_daily_php "${options[@]}"
             ;;
             peeringdb)
-                local options=("peeringdb");
-                call_daily_php "${options[@]}";
+                local options=("peeringdb")
+                call_daily_php "${options[@]}"
             ;;
         esac
     fi
