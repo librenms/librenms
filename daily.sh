@@ -311,7 +311,7 @@ main () {
             fi
         fi
 
-        if (( $update_res > 0 )); then
+        if (( update_res > 0 )); then
             set_notifiable_result update 0
         fi
 
