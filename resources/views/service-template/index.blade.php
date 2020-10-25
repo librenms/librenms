@@ -54,7 +54,7 @@
                                         <td>{{ $template->disabled }}</td>
                                         <td>
                                             <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
-                                                    onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}, '{{ route('services.templates.apply', $template->id) }}')">
+                                                    onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.apply', $template->id) }}')">
                                                 <i
                                                     class="fa fa-refresh" aria-hidden="true"></i></button>
                                             <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Remove')"
