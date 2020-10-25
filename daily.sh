@@ -59,11 +59,11 @@ status_run() {
     # otherwise we default to ./logs/daily.log
 
     printf "%-50s" "${arg_text}"
-    echo "${arg_text}" >> ${log_file}
+    echo "${arg_text}" >> "${log_file}"
     tmp=$(bash -c "${arg_command}" 2>&1)
     exit_code=$?
-    echo "${tmp}" >> ${log_file}
-    echo "Returned: ${exit_code}" >> ${log_file}
+    echo "${tmp}" >> "${log_file}"
+    echo "Returned: ${exit_code}" >> "${log_file}"
 
     # print OK if the command ran successfully
     # or FAIL otherwise (non-zero exit code)
@@ -117,7 +117,7 @@ set_notifiable_result() {
     local arg_type=$1
     local arg_result=$2
 
-    php "${LIBRENMS_DIR}/daily.php" -f handle_notifiable -t ${arg_type} -r ${arg_result}
+    php "${LIBRENMS_DIR}/daily.php" -f handle_notifiable -t "${arg_type}" -r "${arg_result}"
 }
 
 #######################################
@@ -193,7 +193,7 @@ version_compare () {
         return 0
     fi
     local IFS=.
-    local i ver1=($1) ver2=($2)
+    local i ver1=("$1") ver2=("$2")
 
     local parts2=${#ver2[@]}
     [[ -n $3 ]] && parts2=$3
@@ -237,7 +237,7 @@ main () {
     local new_version="$3"
     local old_version="${old_version:=unset}"  # if $1 is unset, make it mismatch for pre-update daily.sh
 
-    cd ${LIBRENMS_DIR}
+    cd "${LIBRENMS_DIR}"
 
     # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
     if [[ "$LIBRENMS_USER" != "root" ]]; then
