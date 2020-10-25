@@ -177,6 +177,7 @@ class ServiceTemplateController extends Controller
             $device->services()->updateOrCreate(['service_template_id' => $template->id], [
                 'service_name' => $template->name,
                 'service_type' => $template->type,
+                'service_template_id' => $template->id,
                 'service_param' => $template->param,
                 'service_ip' => $template->ip,
                 'service_desc' => $template->desc,
