@@ -48,7 +48,7 @@ status_run() {
     # Explicitly define our arguments
     local args arg_text arg_command arg_option log_file exit_code tmp log_file
 
-    args="$@"
+    args=("$@")
     arg_text=$1
     arg_command=$2
     arg_option=$3
@@ -95,7 +95,7 @@ status_run() {
 call_daily_php() {
     local args
 
-    args=( "$@" )
+    args=("$@")
 
     for arg in "${args[@]}"; do
         php "${LIBRENMS_DIR}/daily.php" -f "${arg}"
@@ -116,7 +116,7 @@ call_daily_php() {
 set_notifiable_result() {
     local args arg_type arg_result
 
-    args="$@"
+    args=("$@")
     arg_type=$1
     arg_result=$2
 
