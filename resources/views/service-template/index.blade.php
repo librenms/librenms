@@ -17,7 +17,7 @@
                         <i class="fa fa-plus"></i> @lang('New Service Template')
                     </a>
                     <button type="button" title="@lang('Apply Service Templates')" class="btn btn-success" aria-label="@lang('Apply Service Templates')"
-                            onclick="applyall_st(this, '{{ route('services.templates.applyall') }}')">
+                            onclick="applyAll_st(this, '{{ route('services.templates.applyAll') }}')">
                         <i
                             class="fa fa-refresh" aria-hidden="true"></i> @lang('Apply Service Templates')</button>
                 </div>
@@ -96,7 +96,7 @@
                 });
             }
         }
-        function applyall_st(button, url) {
+        function applyAll_st(button, url) {
             if (confirm('@lang('Are you sure you want to Apply All Service Templates?')')) {
                 $.ajax({
                     url: url,

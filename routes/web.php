@@ -29,9 +29,9 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     });
     Route::prefix('services')->name('services.')->group(function () {
         Route::resource('templates', 'ServiceTemplateController');
-        Route::post('templates/applyall', 'ServiceTemplateController@applyall')->name('templates.applyall');
-        Route::post('templates/apply', 'ServiceTemplateController@apply')->name('templates.apply');
-        Route::post('templates/remove', 'ServiceTemplateController@remove')->name('templates.remove');
+        Route::post('templates/applyAll', 'ServiceTemplateController@applyAll')->name('templates.applyAll');
+        Route::post('templates/apply/{template}', 'ServiceTemplateController@apply')->name('templates.apply');
+        Route::post('templates/remove/{template}', 'ServiceTemplateController@remove')->name('templates.remove');
     });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
