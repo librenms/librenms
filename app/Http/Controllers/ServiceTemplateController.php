@@ -197,7 +197,7 @@ class ServiceTemplateController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function applyall()
+    public function applyAll()
     {
         $templates = ServiceTemplate::get('id');
 
