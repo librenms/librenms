@@ -11,20 +11,30 @@ require_once 'includes/html/modal/delete_alert_template.inc.php';
           <tr>
             <th data-column-id="id" data-searchable="false" data-identifier="true" data-type="numeric">#</th>
             <th data-column-id="templatename">Name</th>
+            <th data-column-id="alert_rules" data-searchable="false" data-formatter="alert_rules">Alert Rules</th>
             <th data-column-id="actions" data-searchable="false" data-formatter="commands">Action</th>
             <th data-column-id="old_template" data-searchable="false" data-visible="false">Old template</th>
           </tr>
       </thead>
       <tbody>
 <?php
-$full_query = dbFetchRows('SELECT id, name, template from alert_templates', $param);
+$full_query = dbFetchRows('SELECT id, name, template FROM alert_templates', $param);
 foreach ($full_query as $template) {
     if ($template['name'] == 'Default Alert Template') {
         $default_tplid = $template['id'];
         $template['id'] = 0;
+        $db_alert_rules = dbFetchRows('SELECT r.id, r.name FROM alert_rules AS r where r.id NOT IN (SELECT alert_rule_id FROM alert_template_map) ORDER BY r.name');
+    } else {
+        $db_alert_rules = dbFetchRows('SELECT r.id as id, r.name as name FROM alert_rules AS r LEFT JOIN alert_template_map AS m ON r.id=m.alert_rule_id WHERE m.alert_templates_id = ? ORDER BY r.name', $template['id']);
+    }
+
+    $template['alert_rules'] = [];
+    foreach ($db_alert_rules as $rule) {
+        $template['alert_rules'][] = $rule;
     }
     $templates[] = $template;
 }
+
 $template_ids = array_column($templates, 'id');
 array_multisort($templates, SORT_ASC, $template_ids);
 foreach ($templates as $template) {
@@ -32,7 +42,7 @@ foreach ($templates as $template) {
     echo '<tr data-row-id="' . $template['id'] . '">
             <td>' . $template['id'] . '</td>
             <td>' . $template['name'] . '</td>
-            <td></td>
+            <td>' . json_encode($template['alert_rules']) . '</td>
             <td>' . $old_template . '</td>
           </tr>';
 }
@@ -73,7 +83,15 @@ $(document).ready(function() {
                     response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
                 }
                 return response;
-            }
+            },
+            "alert_rules": function(column, row) {
+                var response = '';
+                alert_rules = JSON.parse(row.alert_rules);
+                $.each(alert_rules, function(_, alert_rule) {
+                    response = response + alert_rule.name + '<br>';
+                });
+                return response;
+            },
         },
     }).on("loaded.rs.jquery.bootgrid", function() {
         /* Executes after data is loaded and rendered */
