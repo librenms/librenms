@@ -68,9 +68,9 @@ status_run() {
     # print OK if the command ran successfully
     # or FAIL otherwise (non-zero exit code)
     if [[ "${exit_code}" == "0" ]]; then
-        printf " \033[0;32mOK\033[0m\n"
+        printf " \\033[0;32mOK\\033[0m\\n"
     else
-        printf " \033[0;31mFAIL\033[0m\n"
+        printf " \\033[0;31mFAIL\\033[0m\\n"
         if [[ "${arg_option}" == "update" ]]; then
             php "${LIBRENMS_DIR}/daily.php" -f notify -o "${tmp}"
         fi
@@ -260,7 +260,7 @@ main () {
         fi
 
         if [[ "$EUID" -ne "$LIBRENMS_USER_ID" ]]; then
-            printf "\033[0;93mWARNING\033[0m: You should run this script as %s\n" "${LIBRENMS_USER}"
+            printf "\\033[0;93mWARNING\\033[0m: You should run this script as %s\\n" "${LIBRENMS_USER}"
         fi
     fi
 
