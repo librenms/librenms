@@ -32,6 +32,12 @@ class CreateServicesTemplateTable extends Migration
             $table->unsignedInteger('service_template_id')->default(0);
             $table->string('service_name')->nullable()->default(null);
             $table->unsignedInteger('service_template_changed')->default(0);
+            $table->text('service_desc')->nullable()->default(null)->change();
+            $table->text('service_param')->nullable()->default(null)->change();
+            $table->boolean('service_ignore')->default(0)->change();
+            $table->text('service_ip')->nullable()->default(null)->change();
+            $table->text('service_ds')->nullable()->default(null)->change();
+            $table->text('service_message')->nullable()->default(null)->change();
         });
         Schema::create('service_templates_perms', function (Blueprint $table) {
             $table->unsignedInteger('user_id')->index();
@@ -54,6 +60,12 @@ class CreateServicesTemplateTable extends Migration
                 'service_name',
                 'service_template_changed',
             ]);
+            $table->text('service_desc')->change();
+            $table->text('service_param')->change();
+            $table->boolean('service_ignore')->change();
+            $table->text('service_ip')->change();
+            $table->text('service_ds')->change();
+            $table->text('service_message')->change();
         });
         Schema::drop('service_templates_perms');
     }
