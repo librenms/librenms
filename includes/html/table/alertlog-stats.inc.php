@@ -13,7 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
-$alert_severities = array(
+$alert_severities = [
     // alert_rules.status is enum('ok','warning','critical')
     'ok' => 1,
     'warning' => 2,
@@ -21,7 +21,7 @@ $alert_severities = array(
     'ok only' => 4,
     'warning only' => 5,
     'critical only' => 6,
-);
+];
 
 $where = 1;
 $params = [];
@@ -38,7 +38,7 @@ if (is_numeric($vars['time_interval'])) {
     $param[] = $vars['time_interval'];
 }
 
-$alert_rules = array();
+$alert_rules = [];
 $sql = "SELECT id, name, severity from alert_rules";
 foreach (dbFetchRows($sql, $param) as $alertlog) {
     $alert_rules[$alertlog['id']]['alert'] = $alertlog['name'];
@@ -99,18 +99,18 @@ $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
     $dev = device_by_id_cache($alertlog['device_id']);
 
-    $response[] = array(
+    $response[] = [
         'id' => $rulei++,
         'count' => $alertlog['COUNT(*)'],
         'hostname' => '<div class="incident">' . generate_device_link($dev, shorthost($dev['hostname'])),
         'alert_rule' => $alert_rules[$alertlog['rule_id']]['alert'],
-    );
+    ];
 }//end foreach
 
-$output = array(
+$output = [
     'current' => $current,
     'rowCount' => $rowCount,
     'rows' => $response,
     'total' => $total,
-);
+];
 echo _json_encode($output);
