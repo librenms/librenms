@@ -31,7 +31,7 @@ class CreateServicesTemplateTable extends Migration
         Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->default(0);
             $table->string('service_name')->nullable()->default(null);
-            $table->unsignedInteger('service_template_changed')->default(0);
+            $table->timestamp('service_template_changed')->default(0);
             $table->text('service_desc')->nullable()->default(null)->change();
             $table->text('service_param')->nullable()->default(null)->change();
             $table->boolean('service_ignore')->default(0)->change();
