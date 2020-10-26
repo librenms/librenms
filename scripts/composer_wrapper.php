@@ -93,7 +93,8 @@ if (! $exec) {
 }
 
 if ($exec) {
-    passthru("$exec " . implode(' ', array_splice($argv, 1)) . "$extra_args 2>&1");
+    passthru("$exec " . implode(' ', array_splice($argv, 1)) . "$extra_args 2>&1", $exit_code);
+    exit($exit_code);
 } else {
     echo "Composer not available, please manually install composer.\n";
 }
