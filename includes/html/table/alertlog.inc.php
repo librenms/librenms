@@ -13,7 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
-$alert_severities = array(
+$alert_severities = [
     // alert_rules.status is enum('ok','warning','critical')
     'ok' => 1,
     'warning' => 2,
@@ -21,7 +21,7 @@ $alert_severities = array(
     'ok only' => 4,
     'warning only' => 5,
     'critical only' => 6,
-);
+];
 
 
 $where = 1;
@@ -51,7 +51,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
     $param[] = "%$searchPhrase%";
 }
 
-$alert_rules = array();
+$alert_rules = [];
 $sql = "SELECT id, name, severity from alert_rules";
 foreach (dbFetchRows($sql, $param) as $alertlog) {
     $alert_rules[$alertlog['id']]['alert'] = $alertlog['name'];
@@ -119,7 +119,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         $status = 'label-primary';
     }//end if
 
-    $response[] = array(
+    $response[] = [
         'id' => $rulei++,
         'time_logged' => $alertlog['humandate'],
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
@@ -127,13 +127,13 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'alert' => htmlspecialchars($alert_rules[$alertlog['rule_id']]['alert']),
         'status' => "<i class='alert-status " . $status . "' title='". ($alert_state ? 'active':'recovered')."'></i>",
         'severity' => $alert_rules[$alertlog['rule_id']]['severity_name']
-    );
+    ];
 }//end foreach
 
-$output = array(
+$output = [
     'current' => $current,
     'rowCount' => $rowCount,
     'rows' => $response,
     'total' => $total,
-);
+];
 echo _json_encode($output);
