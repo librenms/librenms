@@ -186,9 +186,11 @@ class ServiceTemplateController extends Controller
                 'service_ignore' => $template->ignore,
             ]);
         }
-        // remove any remaining services for this template that haven't been updated (they are no longer in the correct device group)
-        Service::where('service_template_id', $template)->where('service_template_changed', '!=', $template->changed)->delete();
-        $msg = __('Services for Template :name have been updates', ['name' => $template->name]);
+        // remove any remaining services no longer in the correct device group
+        foreach (Device::notInDeviceGroup($template->device_group_id)->get() as $device) {
+            Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
+        }
+            $msg = __('Services for Template :name have been updates', ['name' => $template->name]);
 
         return response($msg, 200);
     }
@@ -200,10 +202,8 @@ class ServiceTemplateController extends Controller
      */
     public function applyAll()
     {
-        $templates = ServiceTemplate::get('id');
-
-        foreach ($templates as $template) {
-            ServiceTemplateController::apply($template->id);
+        foreach (ServiceTemplate::all() as $template) {
+            ServiceTemplateController::apply($template);
         }
         $msg = __('All Service Templates have been applied');
 
