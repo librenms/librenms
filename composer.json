@@ -20,12 +20,6 @@
         "issues": "https://github.com/librenms/librenms/issues/",
         "irc": "irc://irc.freenode.org/#librenms"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:librenms/StringBladeCompiler.git"
-        }
-    ],
     "require": {
         "php": "^7.3",
         "ext-curl": "*",
@@ -39,7 +33,7 @@
         "amenadiel/jpgraph": "^3.6",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^2.0",
-        "darkghosthunter/larapoke": "^4.1",
+        "darkghosthunter/larapoke": "dev-master",
         "doctrine/dbal": "^2.11",
         "easybook/geshi": "^1.0.8",
         "ezyang/htmlpurifier": "^4.8",
@@ -62,7 +56,7 @@
         "symfony/yaml": "^4.0",
         "tecnickcom/tcpdf": "~6.2.0",
         "tightenco/ziggy": "^0.9",
-        "wpb/string-blade-compiler": "dev-laravel-7-and-autoload-blade-custom-directives"
+        "wpb/string-blade-compiler": "dev-master"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",
