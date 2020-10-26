@@ -190,7 +190,7 @@ class ServiceTemplateController extends Controller
         foreach (Device::notInDeviceGroup($template->device_group_id)->get() as $device) {
             Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
         }
-            $msg = __('Services for Template :name have been updates', ['name' => $template->name]);
+        $msg = __('Services for Template :name have been updates', ['name' => $template->name]);
 
         return response($msg, 200);
     }
