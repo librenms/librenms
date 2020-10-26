@@ -380,6 +380,13 @@ is mode 0400. One solution is to include `@reboot chmod 444
 /sys/devices/virtual/dmi/id/product_serial` in the crontab for root or
 equivalent.
 
+Non-x86 or SMBIOS-based systems, such as ARM-based Raspberry Pi units should
+query device tree locations for this metadata, for example:
+```
+extend hardware '/bin/cat /sys/firmware/devicetree/base/model'
+extend serial '/bin/cat /sys/firmware/devicetree/base/serial-number'
+```
+
 The LibreNMS server include a copy of this example here:
 
 ```

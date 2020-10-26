@@ -62,8 +62,7 @@
         "symfony/yaml": "^4.0",
         "tecnickcom/tcpdf": "~6.2.0",
         "tightenco/ziggy": "^0.8.0",
-        "wpb/string-blade-compiler": "dev-laravel-7-and-autoload-blade-custom-directives",
-        "xjtuwangke/passwordhash": "dev-master"
+        "wpb/string-blade-compiler": "dev-laravel-7-and-autoload-blade-custom-directives"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",
