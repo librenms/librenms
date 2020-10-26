@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\AlertRule;
+use App\Models\AlertTemplate;
+use App\Models\AlertTemplateMap;
+
 $no_refresh = true;
 
 require_once 'includes/html/modal/alert_template.inc.php';
@@ -18,15 +22,19 @@ require_once 'includes/html/modal/delete_alert_template.inc.php';
       </thead>
       <tbody>
 <?php
-$full_query = dbFetchRows('SELECT id, name, template FROM alert_templates', $param);
+$full_query = AlertTemplate::select('id', 'name', 'template')->get()->toArray();
 foreach ($full_query as $template) {
     if ($template['name'] == 'Default Alert Template') {
         $default_tplid = $template['id'];
         $template['id'] = 0;
-        $db_alert_rules = dbFetchRows('SELECT r.id, r.name FROM alert_rules AS r where r.id NOT IN (SELECT alert_rule_id FROM alert_template_map) ORDER BY r.name');
+        $rules_query = AlertRule::whereNotIn('id', AlertTemplateMap::pluck('alert_rule_id'));
     } else {
-        $db_alert_rules = dbFetchRows('SELECT r.id as id, r.name as name FROM alert_rules AS r LEFT JOIN alert_template_map AS m ON r.id=m.alert_rule_id WHERE m.alert_templates_id = ? ORDER BY r.name', $template['id']);
+        $rules_query = AlertRule::leftJoin('alert_template_map', 'alert_rules.id', '=', 'alert_template_map.alert_rule_id')
+                                  ->where('alert_template_map.alert_templates_id', '=', $template['id']);
     }
+    $db_alert_rules = $rules_query->select('alert_rules.id', 'alert_rules.name')
+                                  ->orderBy('name')
+                                  ->get();
 
     $template['alert_rules'] = [];
     foreach ($db_alert_rules as $rule) {
