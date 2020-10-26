@@ -181,7 +181,7 @@ class ServiceTemplateController extends Controller
                 'service_param' => $template->param,
                 'service_ip' => $template->ip,
                 'service_desc' => $template->desc,
-                'service_changed' => $template->changed,
+                'service_template_changed' => $template->changed,
                 'service_disabled' => $template->disabled,
                 'service_ignore' => $template->ignore,
             ]);
