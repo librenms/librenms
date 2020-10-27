@@ -31,15 +31,16 @@ class ServiceController extends Controller
         $service = Service::make(
             $request->only(
                 [
-                'service_name',
-                'device_id',
-                'service_type',
-                'service_param',
-                'service_ip',
-                'service_desc',
-                'service_changed',
-                'service_disabled',
-                'service_ignore',]
+                    'service_name',
+                    'device_id',
+                    'service_type',
+                    'service_param',
+                    'service_ip',
+                    'service_desc',
+                    'service_changed',
+                    'service_disabled',
+                    'service_ignore',
+                ]
             )
         );
         $service->save();

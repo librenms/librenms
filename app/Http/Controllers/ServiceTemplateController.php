@@ -27,7 +27,8 @@ class ServiceTemplateController extends Controller
     {
         return view(
             'service-template.index', [
-            'device_groups' => DeviceGroup::with('serviceTemplates')->orderBy('name')->get(),]
+                'device_groups' => DeviceGroup::with('serviceTemplates')->orderBy('name')->get(),
+            ]
         );
     }
 
@@ -40,9 +41,10 @@ class ServiceTemplateController extends Controller
     {
         return view(
             'service-template.create', [
-            'template' => new ServiceTemplate(),
-            'device_groups' => DeviceGroup::orderBy('name')->get(),
-            'services' => Services::list(),]
+                'template' => new ServiceTemplate(),
+                'device_groups' => DeviceGroup::orderBy('name')->get(),
+                'services' => Services::list(),
+            ]
             //'filters' => json_encode(new QueryBuilderFilter('group')),
             //FIXME do i need the above?
         );
@@ -66,21 +68,23 @@ class ServiceTemplateController extends Controller
                 'desc' => 'nullable|string',
                 'changed' => 'integer',
                 'disabled' => 'integer',
-                'ignore' => 'integer',]
+                'ignore' => 'integer',
+            ]
         );
 
         $template = ServiceTemplate::make(
             $request->only(
                 [
-                'name',
-                'device_group_id',
-                'type',
-                'param',
-                'ip',
-                'desc',
-                'changed',
-                'disabled',
-                'ignore',]
+                    'name',
+                    'device_group_id',
+                    'type',
+                    'param',
+                    'ip',
+                    'desc',
+                    'changed',
+                    'disabled',
+                    'ignore',
+                ]
             )
         );
         $template->save();
@@ -111,9 +115,10 @@ class ServiceTemplateController extends Controller
     {
         return view(
             'service-template.edit', [
-            'template' => $template,
-            'device_groups' => DeviceGroup::orderBy('name')->get(),
-            'services' => Services::list(),]
+                'template' => $template,
+                'device_groups' => DeviceGroup::orderBy('name')->get(),
+                'services' => Services::list(),
+            ]
             //'filters' => json_encode(new QueryBuilderFilter('group')),
         );
     }
@@ -145,21 +150,23 @@ class ServiceTemplateController extends Controller
                 'desc' => 'nullable|string',
                 'changed' => 'integer',
                 'disabled' => 'integer',
-                'ignore' => 'integer',]
+                'ignore' => 'integer',
+            ]
         );
 
         $template->fill(
             $request->only(
                 [
-                'name',
-                'device_group_id',
-                'type',
-                'param',
-                'ip',
-                'desc',
-                'changed',
-                'ignore',
-                'disable',]
+                    'name',
+                    'device_group_id',
+                    'type',
+                    'param',
+                    'ip',
+                    'desc',
+                    'changed',
+                    'ignore',
+                    'disable',
+                ]
             )
         );
 
@@ -188,16 +195,20 @@ class ServiceTemplateController extends Controller
     {
         foreach (Device::inDeviceGroup($template->device_group_id)->get() as $device) {
             $device->services()->updateOrCreate(
-                ['service_template_id' => $template->id], [
-                'service_name' => $template->name,
-                'service_type' => $template->type,
-                'service_template_id' => $template->id,
-                'service_param' => $template->param,
-                'service_ip' => $template->ip,
-                'service_desc' => $template->desc,
-                'service_template_changed' => $template->changed,
-                'service_disabled' => $template->disabled,
-                'service_ignore' => $template->ignore,]
+                [
+                    'service_template_id' => $template->id
+                ],
+                [
+                    'service_name' => $template->name,
+                    'service_type' => $template->type,
+                    'service_template_id' => $template->id,
+                    'service_param' => $template->param,
+                    'service_ip' => $template->ip,
+                    'service_desc' => $template->desc,
+                    'service_template_changed' => $template->changed,
+                    'service_disabled' => $template->disabled,
+                    'service_ignore' => $template->ignore,
+                ]
             );
         }
         // remove any remaining services no longer in the correct device group
