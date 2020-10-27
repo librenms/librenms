@@ -7,16 +7,18 @@ $divisor = 1;
 
 foreach ($pre_cache['bti800'] as $index => $entry) {
     if ($entry['sfpInfoWigth'] != '0') {
+
         $oidRx = '.1.3.6.1.4.1.30005.1.7.100.1.2.6.3.1.8.' . $index;
         $oidTx = '.1.3.6.1.4.1.30005.1.7.100.1.2.6.3.1.7.' . $index;
-        $currentRx = snmp_get($device, $oidRx, '-Oqv', 'BTI8xx-SFP-MIB', '/opt/librenms/mibs/bti800');
-        $currentTx = snmp_get($device, $oidTx, '-Oqv', 'BTI8xx-SFP-MIB', '/opt/librenms/mibs/bti800');
+        $currentRx = snmp_get($device, $oidRx, '-Oqv', 'BTI8xx-SFP-MIB', '/opt/librenms/mibs/bti');
+        $currentTx = snmp_get($device, $oidTx, '-Oqv', 'BTI8xx-SFP-MIB', '/opt/librenms/mibs/bti');
         if ($currentRx != 0 || $currentTx != 0) {
             $entPhysicalIndex = $entry['sfpDiagnosticIndex'];
             $entPhysicalIndex_measured = 'ports';
 
             //Discover receive power level
-            $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['sfpDiagnosticIndex'], $device['device_id']]) . '>
+            $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['sfpDiagnosticIndex'], $device['device_id']]) . ' Rx Power';
+
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
@@ -38,7 +40,8 @@ foreach ($pre_cache['bti800'] as $index => $entry) {
             );
 
             //Discover transmit power level
-            $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['sfpDiagnosticIndex'], $device['device_id']]) . ' Rx Power';
+            $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['sfpDiagnosticIndex'], $device['device_id']]) . ' Tx Power';
+
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
