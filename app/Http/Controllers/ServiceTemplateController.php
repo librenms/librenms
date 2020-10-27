@@ -196,7 +196,7 @@ class ServiceTemplateController extends Controller
         foreach (Device::inDeviceGroup($template->device_group_id)->get() as $device) {
             $device->services()->updateOrCreate(
                 [
-                    'service_template_id' => $template->id
+                    'service_template_id' => $template->id,
                 ],
                 [
                     'service_name' => $template->name,
