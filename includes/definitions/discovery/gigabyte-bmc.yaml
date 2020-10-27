@@ -3,20 +3,27 @@ modules:
     os:
         hardware: GIGABYTE-BMC::fruPartNumber.0
         serial: SNMPv2-MIB::snmpSetSerialNo.0
-    processors:
-        data:
-            -
-                oid: processorCollection
-                num_oid: '.1.3.6.1.4.1.15370.552.2.1.1'
 
     sensors:
         voltage:
+            options:
             data:
                 -
                     oid: sensorCollection
-                    num_oid: '.1.3.6.1.4.1.15370.554.1.1.4.{{ $index }}'
-                    descr: Voltage
-                    divisor: 10
+                    value: sensorValue
+                    num_oid: '.1.3.6.1.4.1.15370.554.1.{{ index }}'
+                    descr: '{{ $sensorName }}'
+                    group: Voltage
+                    index: 'SensorEntry.{{ index }}'
+                    skip_values: 
+                        -
+                            #oid: '.1.3.6.1.4.1.15370.554.1.1.2.{{ index }}'
+                            oid: 'sensorName'
+                            #op: 'not_in_array'
+                            op: not_regex
+                            #regex: '/_TEMP$/'
+                            value: '/^(P|VR)_/'
+                    #divisor: 10
 #
 #        temperature:
 #            data:

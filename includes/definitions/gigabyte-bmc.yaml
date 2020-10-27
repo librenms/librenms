@@ -1,7 +1,7 @@
 os: gigabyte-bmc
 type: server
 group: unix
-mib_dir: gigabyte-bmc
+mib_dir: gigabyte
 text: 'GIGABYTE-BMC'
 over:
     - { graph: device_processor, text: 'Processor Usage' }
