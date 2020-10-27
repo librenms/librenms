@@ -22,7 +22,7 @@ you can do so by running the following commands:
 ```bash
 cd /opt/librenms
 git pull
-composer install --no-dev
+./scripts/composer_wrapper.php install --no-dev
 php includes/sql-schema/update.php
 ./validate.php
 ```

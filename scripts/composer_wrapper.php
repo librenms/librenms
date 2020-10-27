@@ -55,8 +55,13 @@ if (php_sapi_name() == 'cli' && isset($_SERVER['TERM'])) {
 if (is_file($install_dir . '/composer.phar')) {
     $exec = PHP_BINDIR . '/php ' . $install_dir . '/composer.phar';
 
-    // self-update
-    passthru("$exec self-update -q" . $extra_args);
+    // If older than 1 week, try update
+    if (time() - filemtime($install_dir . '/composer.phar') > 60 * 60 * 24 * 7) {
+        // self-update
+        passthru("$exec self-update --quiet --2" . $extra_args);
+    }
+
+    @touch($install_dir . '/composer.phar');
 } else {
     $sig_url = ($use_https ? 'https' : 'http') . '://composer.github.io/installer.sig';
 

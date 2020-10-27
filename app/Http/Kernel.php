@@ -2,7 +2,6 @@
 
 namespace App\Http;
 
-use App\Checks;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -96,10 +95,4 @@ class Kernel extends HttpKernel
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
         \Illuminate\Auth\Middleware\Authorize::class,
     ];
-
-    public function bootstrap()
-    {
-        Checks::preBoot();
-        parent::bootstrap();
-    }
 }
