@@ -11,7 +11,7 @@ class ServiceController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function store(Request $request)
@@ -28,17 +28,20 @@ class ServiceController extends Controller
             'service_ignore' => 'integer',
         ];
 
-        $service = Service::make($request->only([
-            'service_name',
-            'device_id',
-            'service_type',
-            'service_param',
-            'service_ip',
-            'service_desc',
-            'service_changed',
-            'service_disabled',
-            'service_ignore',
-        ]));
+        $service = Service::make(
+            $request->only(
+                [
+                'service_name',
+                'device_id',
+                'service_type',
+                'service_param',
+                'service_ip',
+                'service_desc',
+                'service_changed',
+                'service_disabled',
+                'service_ignore',]
+            )
+        );
         $service->save();
 
         Toastr::success(__('Service :name created', ['name' => $service->service_name]));

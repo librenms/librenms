@@ -44,7 +44,7 @@ class ServiceTemplate extends Model implements Keyable
     /**
      * Check if user can access this device.
      *
-     * @param User $user
+     * @param  User $user
      * @return bool
      */
     public function canAccess($user)
@@ -61,7 +61,7 @@ class ServiceTemplate extends Model implements Keyable
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder $query
      * @return Builder
      */
     public function scopeIsDisabled($query)

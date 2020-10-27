@@ -25,9 +25,10 @@ class ServiceTemplateController extends Controller
      */
     public function index()
     {
-        return view('service-template.index', [
-            'device_groups' => DeviceGroup::with('serviceTemplates')->orderBy('name')->get(),
-        ]);
+        return view(
+            'service-template.index', [
+            'device_groups' => DeviceGroup::with('serviceTemplates')->orderBy('name')->get(),]
+        );
     }
 
     /**
@@ -37,46 +38,51 @@ class ServiceTemplateController extends Controller
      */
     public function create()
     {
-        return view('service-template.create', [
+        return view(
+            'service-template.create', [
             'template' => new ServiceTemplate(),
             'device_groups' => DeviceGroup::orderBy('name')->get(),
-            'services' => Services::list(),
+            'services' => Services::list(),]
             //'filters' => json_encode(new QueryBuilderFilter('group')),
             //FIXME do i need the above?
-        ]);
+        );
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|unique:service_templates',
-            'device_group_id' => 'integer',
-            'type' => 'string',
-            'param' => 'nullable|string',
-            'ip' => 'nullable|string',
-            'desc' => 'nullable|string',
-            'changed' => 'integer',
-            'disabled' => 'integer',
-            'ignore' => 'integer',
-        ]);
+        $this->validate(
+            $request, [
+                'name' => 'required|string|unique:service_templates',
+                'device_group_id' => 'integer',
+                'type' => 'string',
+                'param' => 'nullable|string',
+                'ip' => 'nullable|string',
+                'desc' => 'nullable|string',
+                'changed' => 'integer',
+                'disabled' => 'integer',
+                'ignore' => 'integer',]
+        );
 
-        $template = ServiceTemplate::make($request->only([
-            'name',
-            'device_group_id',
-            'type',
-            'param',
-            'ip',
-            'desc',
-            'changed',
-            'disabled',
-            'ignore',
-        ]));
+        $template = ServiceTemplate::make(
+            $request->only(
+                [
+                'name',
+                'device_group_id',
+                'type',
+                'param',
+                'ip',
+                'desc',
+                'changed',
+                'disabled',
+                'ignore',]
+            )
+        );
         $template->save();
 
         Toastr::success(__('Service Template :name created', ['name' => $template->name]));
@@ -87,7 +93,7 @@ class ServiceTemplateController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show(ServiceTemplate $template)
@@ -98,57 +104,64 @@ class ServiceTemplateController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function edit(ServiceTemplate $template)
     {
-        return view('service-template.edit', [
+        return view(
+            'service-template.edit', [
             'template' => $template,
             'device_groups' => DeviceGroup::orderBy('name')->get(),
-            'services' => Services::list(),
+            'services' => Services::list(),]
             //'filters' => json_encode(new QueryBuilderFilter('group')),
-        ]);
+        );
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\ServiceTemplate $template
+     * @param  \Illuminate\Http\Request    $request
+     * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function update(Request $request, ServiceTemplate $template)
     {
-        $this->validate($request, [
-            'name' => [
-                'required',
-                'string',
-                Rule::unique('service_templates')->where(function ($query) use ($template) {
-                    $query->where('id', '!=', $template->id);
-                }),
-            ],
-            'device_group_id' => 'integer',
-            'type' => 'string',
-            'param' => 'nullable|string',
-            'ip' => 'nullable|string',
-            'desc' => 'nullable|string',
-            'changed' => 'integer',
-            'disabled' => 'integer',
-            'ignore' => 'integer',
-        ]);
+        $this->validate(
+            $request, [
+                'name' => [
+                    'required',
+                    'string',
+                    Rule::unique('service_templates')->where(
+                        function ($query) use ($template) {
+                            $query->where('id', '!=', $template->id);
+                        }
+                    ),
+                ],
+                'device_group_id' => 'integer',
+                'type' => 'string',
+                'param' => 'nullable|string',
+                'ip' => 'nullable|string',
+                'desc' => 'nullable|string',
+                'changed' => 'integer',
+                'disabled' => 'integer',
+                'ignore' => 'integer',]
+        );
 
-        $template->fill($request->only([
-            'name',
-            'device_group_id',
-            'type',
-            'param',
-            'ip',
-            'desc',
-            'changed',
-            'ignore',
-            'disable',
-        ]));
+        $template->fill(
+            $request->only(
+                [
+                'name',
+                'device_group_id',
+                'type',
+                'param',
+                'ip',
+                'desc',
+                'changed',
+                'ignore',
+                'disable',]
+            )
+        );
 
         if ($template->isDirty()) {
             if ($template->save()) {
@@ -168,13 +181,14 @@ class ServiceTemplateController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function apply(ServiceTemplate $template)
     {
         foreach (Device::inDeviceGroup($template->device_group_id)->get() as $device) {
-            $device->services()->updateOrCreate(['service_template_id' => $template->id], [
+            $device->services()->updateOrCreate(
+                ['service_template_id' => $template->id], [
                 'service_name' => $template->name,
                 'service_type' => $template->type,
                 'service_template_id' => $template->id,
@@ -183,8 +197,8 @@ class ServiceTemplateController extends Controller
                 'service_desc' => $template->desc,
                 'service_template_changed' => $template->changed,
                 'service_disabled' => $template->disabled,
-                'service_ignore' => $template->ignore,
-            ]);
+                'service_ignore' => $template->ignore,]
+            );
         }
         // remove any remaining services no longer in the correct device group
         foreach (Device::notInDeviceGroup($template->device_group_id)->get() as $device) {
@@ -213,7 +227,7 @@ class ServiceTemplateController extends Controller
     /**
      * Remove the Services for the specified resource.
      *
-     * @param \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function remove(ServiceTemplate $template)
@@ -230,7 +244,7 @@ class ServiceTemplateController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function destroy(ServiceTemplate $template)
