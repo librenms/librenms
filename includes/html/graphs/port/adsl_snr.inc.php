@@ -3,11 +3,11 @@
 $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'adsl');
 
 $rrd_list[0]['filename'] = $rrd_filename;
-$rrd_list[0]['descr'] = 'Downstream';
+$rrd_list[0]['descr'] = 'Central to CPE';
 $rrd_list[0]['ds'] = 'AturCurrSnrMgn';
 
 $rrd_list[1]['filename'] = $rrd_filename;
-$rrd_list[1]['descr'] = 'Upstream';
+$rrd_list[1]['descr'] = 'CPE to Central';
 $rrd_list[1]['ds'] = 'AtucCurrSnrMgn';
 
 $unit_text = 'dB';
