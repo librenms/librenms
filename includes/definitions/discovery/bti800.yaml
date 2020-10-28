@@ -4,7 +4,7 @@ modules:
         hardware:
             - BTI8xx-SYSTEM-MIB::systemProductName.0
             - BTI8xx-SYSTEM-MIB::systemHWVersion.0
-        hardware_template: '{{ BTI8xx-SYSTEM-MIB::systemProductName.0 }} {{ BTI8xx-SYSTEM-MI>
+        hardware_template: '{{ BTI8xx-SYSTEM-MIB::systemProductName.0 }} {{ BTI8xx-SYSTEM-MIB::systemHWVersion.0 }}'
         serial: BTI8xx-TC-MIB::fruBaseInfoserialNumber.1             
         version: BTI8xx-SYSTEM-MIB::systemSWVersion.0             
     sensors:
