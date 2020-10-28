@@ -64,7 +64,7 @@
     <label for="ignore" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Ignore alert tag')</label>
     <div class="col-sm-9 col-md-10">
         <input type="hidden" value="0" name="ignore">
-        <input type="checkbox" class="form-control" id="ignore" name="ignore" data-size="small"@if(old('ignore', $template->ignore) == 1) checked @endif>
+        <input type="checkbox" class="form-control" id="ignore" name="ignore" data-size="small" value="{{ old('ignore', $template->ignore) }}"@if(old('ignore', $template->ignore) == 1) checked @endif>
         <span class="help-block">{{ $errors->first('ignore') }}</span>
     </div>
 </div>
@@ -73,7 +73,7 @@
     <label for="ip" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Disable polling and alerting')</label>
     <div class="col-sm-9 col-md-10">
         <input type="hidden" value="0" name="disabled">
-        <input type="checkbox" class="form-control" id="disabled" name="disabled" data-size="small"@if(old('disabled', $template->disabled) == 1) checked @endif>
+        <input type="checkbox" class="form-control" id="disabled" name="disabled" data-size="small" value="{{ old('disabled', $template->disabled) }}"@if(old('disabled', $template->disabled) == 1) checked @endif>
         <span class="help-block">{{ $errors->first('disabled') }}</span>
     </div>
 </div>
