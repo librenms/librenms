@@ -25,17 +25,17 @@ require_once 'includes/html/modal/delete_alert_template.inc.php';
 $full_query = AlertTemplate::select('id', 'name', 'template')->get();
 foreach ($full_query as $template) {
     $single_template = ['name' => $template->name,
-                        'template' => $template->template
-                        ];
+        'template' => $template->template
+    ];
 
     if ($template->name == 'Default Alert Template') {
-    foreach ($template->alert_rules as $rule)
-        $default_tplid = $template->id;
-        $single_template['id'] = 0;
-        $single_template['alert_rules'] = AlertRule::whereNotIn('id', AlertTemplateMap::pluck('alert_rule_id'))
-                                                     ->select('alert_rules.id', 'alert_rules.name')
-                                                     ->orderBy('name')
-                                                     ->get();
+        foreach ($template->alert_rules as $rule)
+            $default_tplid = $template->id;
+            $single_template['id'] = 0;
+            $single_template['alert_rules'] = AlertRule::whereNotIn('id', AlertTemplateMap::pluck('alert_rule_id'))
+                                                         ->select('alert_rules.id', 'alert_rules.name')
+                                                         ->orderBy('name')
+                                                         ->get();
     } else {
         $single_template['id'] = $template->id;
         $single_template['alert_rules'] = $template->alert_rules;

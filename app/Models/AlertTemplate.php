@@ -37,6 +37,6 @@ class AlertTemplate extends BaseModel
 
     public function alert_rules()
     {
-        return $this->hasManyThrough(\App\Models\AlertRule::class, \App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id', 'id' , 'alert_rule_id')->orderBy('name');
+        return $this->hasManyThrough(\App\Models\AlertRule::class, \App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id', 'id', 'alert_rule_id')->orderBy('name');
     }
 }
