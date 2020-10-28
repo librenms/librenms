@@ -10,10 +10,10 @@
                     "version": "2.2.2Build2",
                     "hardware": "BTI-SA-805 1.0",
                     "features": null,
-                    "os": "bti805",
+                    "os": "bti800",
                     "type": "network",
                     "serial": "HF17240001",
-                    "icon": "bti.svg",
+                    "icon": "bti.png",
                     "location": null
                 }
             ]
@@ -28,10 +28,10 @@
                     "version": "2.2.2Build2",
                     "hardware": "BTI-SA-805 1.0",
                     "features": null,
-                    "os": "bti805",
+                    "os": "bti800",
                     "type": "network",
                     "serial": "HF17240001",
-                    "icon": "bti.svg",
+                    "icon": "bti.png",
                     "location": null
                 }
             ]
