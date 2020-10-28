@@ -7,7 +7,6 @@ $divisor = 1;
 
 foreach ($pre_cache['bti800'] as $index => $entry) {
     if ($entry['sfpInfoWigth'] != '0') {
-
         $oidRx = '.1.3.6.1.4.1.30005.1.7.100.1.2.6.3.1.8.' . $index;
         $oidTx = '.1.3.6.1.4.1.30005.1.7.100.1.2.6.3.1.7.' . $index;
         $currentRx = snmp_get($device, $oidRx, '-Oqv', 'BTI8xx-SFP-MIB', '/opt/librenms/mibs/bti');
