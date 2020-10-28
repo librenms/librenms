@@ -466,11 +466,11 @@ class Device extends BaseModel
 
     public function scopeNotInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereIn(
+        return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
                     ->from('device_group_device')
-                    ->whereNotIn('device_group_id', $deviceGroup);
+                    ->where('device_group_id', $deviceGroup);
             }
         );
     }
