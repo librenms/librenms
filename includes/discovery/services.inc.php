@@ -1,13 +1,11 @@
 <?php
 
 use App\Http\Controllers\ServiceTemplateController;
-use App\Models\Service;
+use App\Models\ServiceTemplate;
 use LibreNMS\Config;
 
 if (Config::get('discover_services_templates')) {
-    foreach (Service::find('service_templates')->pluck('id') as $template) {
-        ServiceTemplateController::apply($template['id']);
-    }
+    ServiceTemplateController::applyAll();
 }
 if (Config::get('discover_services')) {
     // FIXME: use /etc/services?
