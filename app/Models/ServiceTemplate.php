@@ -25,6 +25,11 @@ class ServiceTemplate extends Model implements Keyable
         'name',
     ];
 
+    protected $casts = [
+        'ignore' => 'integer',
+        'disabled' => 'integer',
+    ];
+
     // ---- Helper Functions ----
 
     public function getCompositeKey()
