@@ -28,7 +28,7 @@
                         <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang($device_group->name)
                     </x-slot>
                     <div class="table-responsive">
-                        <table id="manage-services-templates-table" class="table table-condensed table-hover">
+                        <table id="manage-services-templates-table-{{ $device_group->id }}" class="table table-condensed table-hover">
                             <thead>
                             <tr>
                                 <th>@lang('Name')</th>
@@ -65,7 +65,7 @@
                                             href="{{ route('services.templates.edit', $template->id) }}">
                                                 <i class="fa fa-pencil" aria-hidden="true"></i></a>
                                             <button type="button" class="btn btn-danger btn-sm" title="@lang('Delete Service Template')" aria-label="@lang('Delete')"
-                                                    onclick="delete_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.destroy', $template->id) }}')">
+                                                    onclick="delete_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.destroy', $template->id) }}', '{{ $device_group->id}}')">
                                                 <i
                                                     class="fa fa-trash" aria-hidden="true"></i></button>
                                         </td>
@@ -126,14 +126,14 @@
 
             return false;
         }
-        function delete_st(button, name, id, url) {
+        function delete_st(button, name, id, url, dg) {
             var index = button.parentNode.parentNode.rowIndex;
             if (confirm('@lang('Are you sure you want to delete AND remove all Services created by ')' + name + '?')) {
                 $.ajax({
                     url: url,
                     type: 'DELETE',
                     success: function (msg) {
-                        document.getElementById("manage-services-templates-table").deleteRow(index);
+                        document.getElementById("manage-services-templates-table-" + dg).deleteRow(index);
                         toastr.success(msg);
                     },
                     error: function () {
