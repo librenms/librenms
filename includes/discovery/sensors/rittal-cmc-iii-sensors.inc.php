@@ -21,7 +21,7 @@
  * @copyright 2020 Denny Friebe
  * @author    Denny Friebe <denny.friebe@icera-network.de>
  */
-$cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', null, 'RITTAL-CMC-III-MIB', null);
+$cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
 
 foreach ($cmc_iii_var_table as $index => $entry) {
@@ -34,7 +34,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
     switch ($var_type) {
         case 'description':
             // Every new sensor starts with their description.
-            if ($sensor_id == false) {
+            if ($sensor_id == 0) {
                 $sensor_id = 1;
             } else {
                 $sensor_id++;
