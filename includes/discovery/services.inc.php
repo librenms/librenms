@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ServiceTemplateController;
-use App\Models\ServiceTemplate;
 use LibreNMS\Config;
 
 if (Config::get('discover_services_templates')) {
