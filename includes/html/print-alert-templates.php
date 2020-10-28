@@ -22,25 +22,26 @@ require_once 'includes/html/modal/delete_alert_template.inc.php';
       </thead>
       <tbody>
 <?php
-$full_query = AlertTemplate::select('id', 'name', 'template')->get()->toArray();
+$full_query = AlertTemplate::select('id', 'name', 'template')->get();
 foreach ($full_query as $template) {
-    if ($template['name'] == 'Default Alert Template') {
-        $default_tplid = $template['id'];
-        $template['id'] = 0;
-        $rules_query = AlertRule::whereNotIn('id', AlertTemplateMap::pluck('alert_rule_id'));
-    } else {
-        $rules_query = AlertRule::leftJoin('alert_template_map', 'alert_rules.id', '=', 'alert_template_map.alert_rule_id')
-                                  ->where('alert_template_map.alert_templates_id', '=', $template['id']);
-    }
-    $db_alert_rules = $rules_query->select('alert_rules.id', 'alert_rules.name')
-                                  ->orderBy('name')
-                                  ->get();
+    $single_template = ['name' => $template->name,
+                        'template' => $template->template
+                        ];
 
-    $template['alert_rules'] = [];
-    foreach ($db_alert_rules as $rule) {
-        $template['alert_rules'][] = $rule;
+    if ($template->name == 'Default Alert Template') {
+    foreach ($template->alert_rules as $rule)
+        $default_tplid = $template->id;
+        $single_template['id'] = 0;
+        $single_template['alert_rules'] = AlertRule::whereNotIn('id', AlertTemplateMap::pluck('alert_rule_id'))
+                                                     ->select('alert_rules.id', 'alert_rules.name')
+                                                     ->orderBy('name')
+                                                     ->get();
+    } else {
+        $single_template['id'] = $template->id;
+        $single_template['alert_rules'] = $template->alert_rules;
     }
-    $templates[] = $template;
+
+    $templates[] = $single_template;
 }
 
 $template_ids = array_column($templates, 'id');
