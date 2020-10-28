@@ -219,6 +219,17 @@ class Validator
     }
 
     /**
+     * Submit an informational validation result.
+     *
+     * @param string $message
+     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
+     */
+    public function info($message, $group = null)
+    {
+        $this->result(new ValidationResult($message, ValidationResult::INFO), $group);
+    }
+
+    /**
      * Get version_info() array.  This will cache the result and add remote data if requested and not already existing.
      *
      * @param bool $remote

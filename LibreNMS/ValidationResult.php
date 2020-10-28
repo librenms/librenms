@@ -29,6 +29,7 @@ class ValidationResult
     const FAILURE = 0;
     const WARNING = 1;
     const SUCCESS = 2;
+    const INFO = 3;
 
     private $message;
     private $status;
@@ -69,6 +70,16 @@ class ValidationResult
     public static function warn($message, $fix = null)
     {
         return new self($message, self::WARNING, $fix);
+    }
+
+    /**
+     * Create a new informational Validation result
+     * @param string $message The message to describe this result
+     * @return ValidationResult
+     */
+    public static function info($message)
+    {
+        return new self($message, self::INFO);
     }
 
     /**
@@ -173,15 +184,14 @@ class ValidationResult
      */
     public static function getStatusText($status)
     {
-        if ($status === self::SUCCESS) {
-            return '%gOK%n';
-        } elseif ($status === self::WARNING) {
-            return '%YWARN%n';
-        } elseif ($status === self::FAILURE) {
-            return '%RFAIL%n';
-        }
+        $table = [
+            self::SUCCESS => '%gOK%n',
+            self::WARNING => '%YWARN%n',
+            self::FAILURE => '%RFAIL%n',
+            self::INFO => '%CINFO%n',
+        ];
 
-        return 'Unknown';
+        return $table[$status] ?? 'Unknown';
     }
 
     public function getListDescription()

@@ -43,4 +43,14 @@ return [
 
     'install' => env('INSTALL', false),
 
+    /*
+    |--------------------------------------------------------------------------
+    | NODE ID
+    |--------------------------------------------------------------------------
+    |
+    | Unique value to identify this node. Primarily used for distributed polling.
+    */
+
+    'node_id' => env('NODE_ID'),
+
 ];
