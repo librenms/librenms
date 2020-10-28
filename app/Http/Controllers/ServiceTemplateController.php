@@ -87,6 +87,8 @@ class ServiceTemplateController extends Controller
                 ]
             )
         );
+        $template['ignore'] = $request->get('ignore'); // checkboxes are missing when unchecked
+        $template['disabled'] = $request->get('disabled'); // checkboxes are missing when unchecked
         $template->save();
 
         Toastr::success(__('Service Template :name created', ['name' => $template->name]));
