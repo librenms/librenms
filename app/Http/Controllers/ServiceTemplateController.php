@@ -165,7 +165,7 @@ class ServiceTemplateController extends Controller
                     'desc',
                     'changed',
                     'ignore',
-                    'disable',
+                    'disabled',
                 ]
             )
         );
