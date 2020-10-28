@@ -63,7 +63,7 @@
 <div class="form-group @if($errors->has('ignore')) has-error @endif">
     <label for="ignore" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Ignore alert tag')</label>
     <div class="col-sm-9 col-md-10">
-        <input type="checkbox" class="form-control" id="ignore" name="ignore" data-size="small" value="{{ old('ignore', $template->ignore) }}" @if(old('ignore', $template->ignore)) checked @endif>
+        <input type="checkbox" class="form-control" id="ignore" name="ignore" data-size="small" value="{{ old('ignore', $template->ignore) }}" @if(old('ignore', $template->ignore) == 1) checked @endif>
         <span class="help-block">{{ $errors->first('ignore') }}</span>
     </div>
 </div>
@@ -71,7 +71,7 @@
 <div class="form-group @if($errors->has('ip')) has-error @endif">
     <label for="ip" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Disable polling and alerting')</label>
     <div class="col-sm-9 col-md-10">
-        <input type="checkbox" class="form-control" id="disabled" name="disabled" data-size="small" value="{{ old('disabled', $template->disabled) }}"@if(old('disabled', $template->disabled)) checked @endif>
+        <input type="checkbox" class="form-control" id="disabled" name="disabled" data-size="small" value="{{ old('disabled', $template->disabled) }}"@if(old('disabled', $template->disabled) == 1) checked @endif>
         <span class="help-block">{{ $errors->first('disabled') }}</span>
     </div>
 </div>
