@@ -25,6 +25,11 @@ class ServiceTemplate extends Model implements Keyable
         'name',
     ];
 
+    protected $attributes = [ // default values
+        'ignore' => '0',
+        'disabled' => '0',
+    ];
+
     protected $casts = [
         'ignore' => 'integer',
         'disabled' => 'integer',
