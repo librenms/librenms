@@ -23,7 +23,6 @@ class Service extends DeviceRelatedModel
         'service_ds',
         'service_template_id',
         'service_name',
-        'service_template_changed',
     ];
 
     // ---- Query Scopes ----

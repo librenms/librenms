@@ -26,11 +26,10 @@ $disabled = isset($vars['disabled']) ? 1 : 0;
 $device_id = $vars['device_id'];
 $template_id = $vars['template_id'];
 $name = $vars['name'];
-$template_changed = $vars['template_changed'];
 
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
-    $update = ['service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param, 'service_ignore' => $ignore, 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name, 'service_template_changed' => $template_changed];
+    $update = ['service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param, 'service_ignore' => $ignore, 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
     if (is_numeric(edit_service($update, $service_id))) {
         $status = ['status' =>0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $type . '</i>'];
     } else {

@@ -30,7 +30,6 @@ if (is_numeric($service_id) && $service_id > 0) {
         'disabled'  => $service[0]['service_disabled'],
         'template_id' => $service[0]['service_template_id'],
         'name'      => $service[0]['service_name'],
-        'service_template_changed' => $service[0]['service_template_changed'],
     ];
 
     header('Content-Type: application/json');

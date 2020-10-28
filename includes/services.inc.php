@@ -36,7 +36,7 @@ function get_service_status($device = null)
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name, $template_changed = '')
+function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name)
 {
     if (! is_array($device)) {
         $device = device_by_id_cache($device);
@@ -46,14 +46,14 @@ function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, 
         $ip = Device::pollerTarget($device['hostname']);
     }
 
-    $insert = ['device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name, 'service_template_changed' => $template_changed];
+    $insert = ['device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
 
     return dbInsert($insert, 'services');
 }
 
 function service_get($device = null, $service = null)
 {
-    $sql_query = 'SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds`,`service_template_id`,`service_name`,`service_template_changed` FROM `services` WHERE';
+    $sql_query = 'SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds`,`service_template_id`,`service_name` FROM `services` WHERE';
     $sql_param = [];
     $add = 0;
 
