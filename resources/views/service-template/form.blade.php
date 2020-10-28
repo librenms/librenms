@@ -77,7 +77,7 @@
 </div>
 
 <script>
-$("[type='checkbox']").bootstrapSwitch('offColor','danger');
+$("[type='checkbox']").bootstrapSwitch('onColor','danger');
 $("#ignore").on( 'switchChange.bootstrapSwitch', function (e, state) {
     var value = $(this).is(':checked') ? "1": "0";
     $('#ignore').val(value);

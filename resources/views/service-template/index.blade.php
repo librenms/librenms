@@ -23,7 +23,7 @@
                 </div>
             </div>
             @foreach($device_groups as $device_group)
-                <x-panel id="manage-services-templates-panel-dg">
+                <x-panel id="manage-services-templates-panel-{{ $device_group->id }}">
                     <x-slot name="title">
                         <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang($device_group->name)
                     </x-slot>
@@ -133,7 +133,7 @@
                     url: url,
                     type: 'DELETE',
                     success: function (msg) {
-                        document.getElementById("manage-services-templates-table").deleteRow(index);
+                        document.getElementById("manage-services-templates-panel-{{ $device_group->id }}").deleteRow(index);
                         toastr.success(msg);
                     },
                     error: function () {
