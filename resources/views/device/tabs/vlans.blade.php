@@ -18,10 +18,12 @@
                 <td>
                 @foreach($vlans as $port)
                     @if(!$vars)
+@if($port->port)
 @portLink($port->port, $port->port->getShortLabel())
 @if($port->untagged)
 (U)@endif
 @if(!$loop->last),
+@endif
 @endif
 
                     @else
