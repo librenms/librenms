@@ -1,0 +1,16 @@
+mib: RITTAL-CMC-III-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: cmcIIIUnitStatus
+                    value: cmcIIIUnitStatus
+                    state_name: cmcIIIUnitStatus
+                    num_oid: '.1.3.6.1.4.1.2606.7.2.1.{{ $index }}'
+                    index: 'cmcIIIUnitStatus.{{ $index }}'
+                    descr: Unit Status
+                    states:
+                        - { descr: OK, graph: 1, value: 1, generic: 0 }
+                        - { descr: Failed, graph: 1, value: 2, generic: 2 }
+                        - { descr: Overload, graph: 1, value: 3, generic: 1 }
