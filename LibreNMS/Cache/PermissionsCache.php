@@ -30,6 +30,7 @@ use App\Models\Port;
 use App\Models\User;
 use Auth;
 use DB;
+use LibreNMS\Config;
 
 class PermissionsCache
 {
