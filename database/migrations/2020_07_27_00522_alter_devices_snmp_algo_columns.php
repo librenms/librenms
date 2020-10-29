@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterAuthalgoColumn extends Migration
+class AlterDevicesSnmpAlgoColumns extends Migration
 {
     /**
      * Run the migrations.
@@ -15,6 +15,7 @@ class AlterAuthalgoColumn extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             $table->string('authalgo', 10)->nullable()->change();
+            $table->string('cryptoalgo', 10)->nullable()->change();
         });
     }
 
