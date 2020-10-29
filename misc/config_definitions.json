@@ -3903,13 +3903,6 @@
             "default": true,
             "type": "boolean"
         },
-        "openssl": {
-            "default": "/usr/bin/openssl",
-            "group": "external",
-            "section": "binaries",
-            "order": 9,
-            "type": "executable"
-        },
         "opentsdb.enable": {
             "default": false,
             "type": "boolean",

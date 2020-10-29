@@ -17,12 +17,12 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 use LibreNMS\Util\OS;
-use LibreNMS\Enum\Alert;
 use Symfony\Component\Process\Process;
 
 function generate_priority_label($priority)
@@ -127,7 +127,7 @@ function external_exec($command)
 
     if ($proc->getExitCode()) {
         Log::event('Unsupported SNMP Algorithm - ' . $proc->getExitCode(), $device['device_id'], 'poller', Alert::ERROR);
-        d_echo("Exitcode: " . $proc->getExitCode());
+        d_echo('Exitcode: ' . $proc->getExitCode());
         d_echo($proc->getErrorOutput());
     }
 
@@ -844,7 +844,7 @@ function version_info($remote = false)
 
 /**
  * checks if System is SNMPv3 SHA2 Capable for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * @return boolean
+ * @return bool
  */
 function snmpv3_sha2_capable()
 {
