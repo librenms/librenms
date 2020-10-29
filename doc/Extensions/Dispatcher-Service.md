@@ -165,6 +165,8 @@ LibreNMS are no longer required and must be removed.
 A systemd unit file is provided - the sysv and upstart init scripts
 could also be used with a little modification.
 
+This requires: python3-systemd
+
 ## systemd
 
 A systemd unit file can be found in `misc/librenms.service`. To
