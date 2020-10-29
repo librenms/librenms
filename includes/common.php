@@ -23,6 +23,7 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 use LibreNMS\Util\OS;
 use LibreNMS\Enum\Alert;
+use Symfony\Component\Process\Process;
 
 function generate_priority_label($priority)
 {
@@ -90,7 +91,7 @@ function external_exec($command)
 
     $device = DeviceCache::getPrimary();
 
-    $proc = new \Symfony\Component\Process\Process($command);
+    $proc = new Process($command);
     $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
     if ($debug && ! $vdebug) {
@@ -123,15 +124,11 @@ function external_exec($command)
 
     $proc->run();
     $output = $proc->getOutput();
-    
-    d_echo;
-    print("Exitcode: " . $proc->getExitCode());
+
     if ($proc->getExitCode()) {
-        //Log::event('Unsupported SNMP Algorithm', $device['device_id'], 'poller', Alert::ERROR);
         Log::event('Unsupported SNMP Algorithm - ' . $proc->getExitCode(), $device['device_id'], 'poller', Alert::ERROR);
-        if ($debug && !$vdebug) {
-            print($proc->getErrorOutput());
-        }
+        d_echo("Exitcode: " . $proc->getExitCode());
+        d_echo($proc->getErrorOutput());
     }
 
     if ($debug && ! $vdebug) {
@@ -851,14 +848,10 @@ function version_info($remote = false)
  */
 function snmpv3_sha2_capable()
 {
-    $ret = shell_exec(Config::get('snmpget', 'snmpget') . ' --help 2>&1| grep SHA');
+    $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
+    $process->run();
 
-    $parts = explode('|', $ret);
-
-    if (count($parts) <= 2) {
-        return false;
-    }
-    return true;
+    return Str::contains($process->getErrorOutput(), 'SHA-512');
 }
 
 /**

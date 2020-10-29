@@ -189,6 +189,8 @@ foreach (get_port_assoc_modes() as $mode) {
 
     echo "              <option value=\"$mode\" $selected>$mode</option>\n";
 }
+
+$snmpv3_sha2_capable = snmpv3_sha2_capable();
 ?>
             </select>
           </div>
@@ -240,12 +242,12 @@ foreach (get_port_assoc_modes() as $mode) {
               <select name="authalgo" id="authalgo" class="form-control input-sm">
                 <option value="MD5" selected>MD5</option>
                 <option value="SHA">SHA</option>
-                <option value="SHA-224"<?=snmpv3_sha2_capable()?:" disabled"?>>SHA-224</option>
-                <option value="SHA-256"<?=snmpv3_sha2_capable()?:" disabled"?>>SHA-256</option>
-                <option value="SHA-384"<?=snmpv3_sha2_capable()?:" disabled"?>>SHA-384</option>
-                <option value="SHA-512"<?=snmpv3_sha2_capable()?:" disabled"?>>SHA-512</option>
+                <option value="SHA-224"<?= $snmpv3_sha2_capable ?:" disabled"?>>SHA-224</option>
+                <option value="SHA-256"<?= $snmpv3_sha2_capable ?:" disabled"?>>SHA-256</option>
+                <option value="SHA-384"<?= $snmpv3_sha2_capable ?:" disabled"?>>SHA-384</option>
+                <option value="SHA-512"<?= $snmpv3_sha2_capable ?:" disabled"?>>SHA-512</option>
               </select>
-              <?php if (!snmpv3_sha2_capable()) {?>
+              <?php if (!$snmpv3_sha2_capable) {?>
               <label class="text-left"><small>Optional requirements not resolved so some options are disabled</small></label>
               <?php } ?>
             </div>
@@ -261,11 +263,11 @@ foreach (get_port_assoc_modes() as $mode) {
             <div class="col-sm-9">
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
                 <option value="AES" selected>AES</option>
-                <option value="AES-192"<?=snmpv3_sha2_capable()?:" disabled"?>>AES-192</option>
-                <option value="AES-256"<?=snmpv3_sha2_capable()?:" disabled"?>>AES-256</option>
+                <option value="AES-192"<?= $snmpv3_sha2_capable ?:" disabled"?>>AES-192</option>
+                <option value="AES-256"<?= $snmpv3_sha2_capable ?:" disabled"?>>AES-256</option>
                 <option value="DES">DES</option>
               </select>
-              <?php if (!snmpv3_sha2_capable()) {?>
+              <?php if (!$snmpv3_sha2_capable) {?>
               <label class="text-left"><small>Optional requirements not resolved so some options are disabled</small></label>
               <?php } ?>
             </div>
