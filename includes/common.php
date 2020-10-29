@@ -126,7 +126,7 @@ function external_exec($command)
     $output = $proc->getOutput();
 
     if ($proc->getExitCode()) {
-        Log::event('Unsupported SNMP Algorithm - ' . $proc->getExitCode(), $device['device_id'], 'poller', Alert::ERROR);
+        Log::event('Unsupported SNMP Algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
         d_echo('Exitcode: ' . $proc->getExitCode());
         d_echo($proc->getErrorOutput());
     }
