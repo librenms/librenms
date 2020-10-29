@@ -72,7 +72,7 @@ status_run() {
     else
         printf " \033[0;31mFAIL\033[0m\n";
         if [[ "${arg_option}" == "update" ]]; then
-            php "${LIBRENMS_DIR}/daily.php" -f notify -o "${tmp}" > /dev/null 2>&1
+            php "${LIBRENMS_DIR}/daily.php" -f notify -o "${tmp}"
         fi
         if [[ ! -z "${tmp}" ]]; then
             # print output in case of failure
@@ -126,9 +126,6 @@ set_notifiable_result() {
 #   Exit-Code: 0 >= min ver, 1 < min ver
 #######################################
 check_dependencies() {
-    # Check first, no point in continuing otherwise.
-    php_dependencies
-
     local branch=$(git rev-parse --abbrev-ref HEAD)
     scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
 
@@ -179,17 +176,6 @@ check_dependencies() {
         return 0;
     fi
     return 1;
-}
-
-#######################################
-# The check-platform-reqs command checks that your PHP and extensions versions match the platform requirements of the installed packages
-#
-# Returns:
-#    Exits on error
-#######################################
-php_dependencies() {
-    status_run 'Checking PHP dependencies' "${COMPOSER} check-platform-reqs --no-dev --no-cache" 'update' || exit 1
-    return 0
 }
 
 #######################################
