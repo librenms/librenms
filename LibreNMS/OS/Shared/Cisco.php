@@ -127,7 +127,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                 [$entPhysicalIndex] = explode('.', $index);
                 $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entPhysicalIndex];
                 $descr = ucwords($entPhysicalName . ' - ' . $entry['cempMemPoolName']);
-                $descr = str_replace(['Cisco ', 'Network Processing Engine'], '', $descr);
+                $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
 
                 $mempool = new Mempool([
                     'mempool_index' => $index,
