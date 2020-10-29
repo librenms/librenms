@@ -6,6 +6,11 @@ group: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_ping_perf, text: 'ICMP Response' }
+poller_modules:
+    cipsec-tunnels: true
+    cisco-asa-firewall: true
+    cisco-ipsec-flow-monitor: true
+    cisco-remote-access-monitor: true
 discovery:
     -
         sysObjectID:
@@ -25,7 +30,6 @@ discovery:
 discovery_modules:
     entity-physical: false
     cisco-vrf-lite: false
-    sensors: false
     storage: false
     hr-device: false
     arp-table: false
