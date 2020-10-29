@@ -57,6 +57,7 @@ require 'overview/sensors/frequency.inc.php';
 require 'overview/sensors/load.inc.php';
 require 'overview/sensors/state.inc.php';
 require 'overview/sensors/count.inc.php';
+require 'overview/sensors/percent.inc.php';
 require 'overview/sensors/signal.inc.php';
 require 'overview/sensors/airflow.inc.php';
 require 'overview/sensors/snr.inc.php';

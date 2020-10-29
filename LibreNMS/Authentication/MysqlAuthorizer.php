@@ -3,10 +3,9 @@
 namespace LibreNMS\Authentication;
 
 use App\Models\User;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\AuthenticationException;
-use Phpass\PasswordHash;
 
 class MysqlAuthorizer extends AuthorizerBase
 {
@@ -27,32 +26,11 @@ class MysqlAuthorizer extends AuthorizerBase
             throw new AuthenticationException($message = 'login denied');
         }
 
-        // check for old passwords
-        if (strlen($hash) == 32) {
-            // md5
-            if (md5($password) === $hash) {
+        if (Hash::check($password, $hash)) {
+            if (Hash::needsRehash($hash)) {
                 $this->changePassword($username, $password);
-
-                return true;
             }
-        } elseif (Str::startsWith($hash, '$1$')) {
-            // old md5 crypt
-            if (crypt($password, $hash) == $hash) {
-                $this->changePassword($username, $password);
 
-                return true;
-            }
-        } elseif (Str::startsWith($hash, '$P$')) {
-            // Phpass
-            $hasher = new PasswordHash();
-            if ($hasher->CheckPassword($password, $hash)) {
-                $this->changePassword($username, $password);
-
-                return true;
-            }
-        }
-
-        if (password_verify($password, $hash)) {
             return true;
         }
 

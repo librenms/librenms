@@ -4,26 +4,24 @@ path: blob/master/doc/
 
 # Setting up services
 
-Services within LibreNMS provides the ability to use Nagios plugins to
-perform additional monitoring outside of SNMP.
+Services within LibreNMS provides the ability to leverage Nagios plugins to
+perform additional monitoring outside of SNMP. Services can also be used
+in conjuction with your SNMP monitoring for larger monitoring functionality.
 
-**These services are tied into an existing device so you need at least
-one device to be able to add it to LibreNMS - localhost is a good
-one. This is needed in order for alerting to work properly.**
+**Services must be tied to a device to function properly. A good generic
+option is to use `localhost`, but it is suggest to attach the check to 
+the device you are monitoring.**
 
-## Pre installed plugins
+## Nagios plugins source
 
-Note: Plugins will only load if they are prefixed with "check_" and
-they have that prefix stripped out when displaying in the "Add Service"
+Plugins come from two main sources:
+
+* [monitoring-plugins](https://www.monitoring-plugins.org)
+* [pkg-nagios-plugins-contrib](https://github.com/bzed/pkg-nagios-plugins-contrib)
+
+Note: Plugins will only load if they are prefixed with `check_`.
+The `check_` prefix is stripped out when displaying in the "Add Service"
 GUI "Type" dropdown list.
-
-Plugins come from two main places
-[pkg-nagios-plugins-contrib](https://github.com/bzed/pkg-nagios-plugins-contrib)
-and [monitoring-plugins](https://www.monitoring-plugins.org). This is
-where you can find the documentation for most, if not all of the plugins.
-
-The plugins are bundled with the pre build VM images via the package
-`monitoring-plugins` in Ubuntu and `nagios-plugins-all` in CentOS.
 
 ## Service Templates
 
@@ -75,16 +73,21 @@ $config['discover_services_templates']           = true;
 
 ## Setup
 
-Service checks is now distributed aware. If you run a distributed
-setup then you can now run `services-wrapper.py` in cron instead of
-`check-services.php` across all polling nodes.
+Service checks are now distributable if you run a distributed
+setup. To leverage this, use the `dispatch` service. Alternatively,
+you could also replace `check-services.php` with `services-wrapper.py` in 
+cron instead to run across all polling nodes. 
 
 If you need to debug the output of services-wrapper.py then you can
 add `-d` to the end of the command - it is NOT recommended to do this
 in cron.
 
-Firstly, install Nagios plugins however you would like, this could be
-via yum, apt-get or direct from source.
+Firstly, install Nagios plugins.
+
+Debian / Ubuntu: `sudo apt install monitoring-plugins`
+Centos: `yum install nagios-plugins-all`
+
+Note: The plugins are bundled with the pre-build VM and Docker images.
 
 Next, you need to enable the services within config.php with the following:
 
@@ -94,15 +97,27 @@ $config['show_services']           = 1;
 
 This will enable a new service menu within your navbar.
 
+Debian/Ubuntu:
 ```php
 $config['nagios_plugins']   = "/usr/lib/nagios/plugins";
+```
+
+Centos:
+```php
+$config['nagios_plugins']   = "/usr/lib64/nagios/plugins";
 ```
 
 This will point LibreNMS at the location of the nagios plugins -
 please ensure that any plugins you use are set to executable. For example:
 
+Debian/Ubuntu:
 ```
 chmod +x /usr/lib/nagios/plugins/*
+```
+
+Centos:
+```
+chmod +x /usr/lib64/nagios/plugins/*
 ```
 
 Finally, you now need to add services-wrapper.py to the current cron
@@ -161,7 +176,7 @@ go together. Example below:
 
 ## Alerting
 
-Services uses the Nagios Alerting scheme where:
+Services uses the Nagios Alerting scheme where exit code:
 
 ```
     0 = Ok,

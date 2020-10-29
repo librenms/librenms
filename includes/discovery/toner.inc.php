@@ -19,6 +19,19 @@ if ($device['os_group'] == 'printer') {
 
         $raw_toner = $data['prtMarkerSuppliesLevel'];
         $descr = $data['prtMarkerSuppliesDescription'];
+
+        // work around weird HP bug where descriptions are on two lines and the second line is hex
+        if (Str::contains($descr, "\n")) {
+            $new_descr = '';
+            foreach (explode("\n", $descr) as $line) {
+                if (preg_match('/^([A-F\d]{2} )*[A-F\d]{1,2} ?$/', $line)) {
+                    $line = snmp_hexstring($line);
+                }
+                $new_descr .= $line;
+            }
+            $descr = $new_descr;
+        }
+
         $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
         $raw_toner = $data['prtMarkerSuppliesLevel'];
         $toner_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
@@ -115,5 +128,5 @@ foreach ($toners as $test_toner) {
     }
 }
 
-unset($valid_toner);
+unset($valid_toner, $line, $new_descr);
 echo PHP_EOL;

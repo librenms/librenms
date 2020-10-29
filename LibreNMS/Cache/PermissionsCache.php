@@ -1,6 +1,6 @@
 <?php
-/**
- * Permissions.php
+/*
+ * PermissionsCache.php
  *
  * Class to check the direct permissions on devices, ports, and bills for normal users (not global read only and admin)
  *
@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
- * @copyright  2019 Tony Murray
+ * @copyright  2019-2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS;
+namespace LibreNMS\Cache;
 
 use App\Models\Bill;
 use App\Models\Device;
@@ -32,7 +32,7 @@ use App\Models\User;
 use Auth;
 use DB;
 
-class Permissions
+class PermissionsCache
 {
     private $devicePermissions;
     private $portPermissions;
