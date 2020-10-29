@@ -81,7 +81,7 @@ class Vrp extends OS implements
                 $apTable = snmpwalk_group($this->getDeviceArray(), $apTableOid, 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
             }
 
-            $apRadioTableOids = [
+            $apRadioTableOids = [ // hwWlanRadioInfoTable
                 'hwWlanRadioMac',
                 'hwWlanRadioChUtilizationRate',
                 'hwWlanRadioChInterferenceRate',
@@ -313,7 +313,7 @@ class Vrp extends OS implements
                 'hwAccessOnlineTime',
                 'hwAccessCurAuthenPlace',
                 'hwAccessAuthtype',
-                'hwAccessVLANID'
+                'hwAccessVLANID',
             ];
             foreach ($hwAccessOids as $hwAccessOid) {
                 $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), $hwAccessOid, $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
