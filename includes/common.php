@@ -22,7 +22,6 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
-use LibreNMS\Util\OS;
 use Symfony\Component\Process\Process;
 
 function generate_priority_label($priority)
@@ -126,7 +125,11 @@ function external_exec($command)
     $output = $proc->getOutput();
 
     if ($proc->getExitCode()) {
-        Log::event('Unsupported SNMP Algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+        if (Str::startsWith($proc->getErrorOutput(), 'Invalid authentication protocol specified')) {
+            Log::event('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+        } elseif (Str::startsWith($proc->getErrorOutput(), 'Invalid privacy protocol specified')) {
+            Log::event('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+        }
         d_echo('Exitcode: ' . $proc->getExitCode());
         d_echo($proc->getErrorOutput());
     }
