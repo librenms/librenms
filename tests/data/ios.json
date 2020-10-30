@@ -13540,7 +13540,7 @@
                     "ospfIfMetricAddressLessIf": 0,
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 100,
-                    "ospfIfMetricStatus": 0,
+                    "ospfIfMetricStatus": "active",
                     "context_name": null,
                     "ifIndex": null
                 },
@@ -13570,7 +13570,7 @@
                     "ospfIfMetricAddressLessIf": 0,
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 1,
-                    "ospfIfMetricStatus": 0,
+                    "ospfIfMetricStatus": "active",
                     "context_name": null,
                     "ifIndex": null
                 }

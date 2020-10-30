@@ -18,7 +18,7 @@ class AddTosToOspfPorts extends Migration
             $table->integer('ospfIfMetricAddressLessIf')->nullable()->after('ospfIfMetricIpAddress');
             $table->integer('ospfIfMetricTOS')->nullable()->after('ospfIfMetricAddressLessIf');
             $table->integer('ospfIfMetricValue')->nullable()->after('ospfIfMetricTOS');
-            $table->integer('ospfIfMetricStatus')->nullable()->after('ospfIfMetricValue');
+            $table->string('ospfIfMetricStatus', 32)->nullable()->after('ospfIfMetricValue');
         });
     }
 
