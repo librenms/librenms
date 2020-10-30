@@ -1261,23 +1261,14 @@ ospf_ports:
     - { Field: ospfIfDemand, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfAuthType, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricIpAddress, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricAddressLessIf, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricTOS, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricValue, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricStatus, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospf_ports_device_id_ospf_port_id_context_name_unique: { Name: ospf_ports_device_id_ospf_port_id_context_name_unique, Columns: [device_id, ospf_port_id, context_name], Unique: true, Type: BTREE }
-ospf_tos:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospf_port_id, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricIpAddress, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricAddressLessIf, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricTOS, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricValue, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfIfMetricStatus, Type: int, 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospf_tos_device_id_ospf_port_id_context_name_unique: { Name: ospf_tos_device_id_ospf_port_id_context_name_unique, Columns: [device_id, ospf_port_id, context_name], Unique: true, Type: BTREE }
 packages:
   Columns:
     - { Field: pkg_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

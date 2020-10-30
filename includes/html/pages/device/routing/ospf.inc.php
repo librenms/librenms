@@ -99,7 +99,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
                         </tr>
                       </thead>
                   </div>';
-    foreach (dbFetchRows("SELECT * FROM `ospf_ports` AS O, `ports` AS P, `ospf_tos` AS T WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND P.port_id = O.port_id AND O.ospf_port_id = T.ospf_port_id ORDER BY O.`ospfIfAreaId`", [$device['device_id']]) as $ospfport) {
+    foreach (dbFetchRows("SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND P.port_id = O.port_id ORDER BY O.`ospfIfAreaId`", [$device['device_id']]) as $ospfport) {
         $ospfport = cleanPort($ospfport);
         $port_status_color = 'default';
 

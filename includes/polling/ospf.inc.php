@@ -5,7 +5,6 @@ use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
 use App\Models\OspfPort;
-use App\Models\OspfTos;
 use LibreNMS\RRD\RrdDefinition;
 
 $device_model = DeviceCache::getPrimary();
@@ -149,7 +148,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
             ->where('ospfIfIpAddress', $ospf_tos['ospfIfMetricIpAddress'])
             ->where('context_name', $device['context_name'])
             ->value('ospf_port_id');
-        $tos = OspfTos::updateOrCreate([
+        $tos = OspfPort::updateOrCreate([
             'device_id' => $device['device_id'],
             'ospf_port_id' => $ospf_tos['ospf_port_id'],
             'context_name' => $device['context_name'],
@@ -157,11 +156,6 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
         $ospf_tos_metrics->push($tos);
     }
-
-    // cleanup
-    OspfTos::query()
-        ->where(['device_id' => $device['device_id'], 'context_name' => $device['context_name']])
-        ->whereNotIn('id', $ospf_tos_metrics->pluck('id'))->delete();
 
     echo $ospf_tos_metrics->count();
 }
