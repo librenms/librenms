@@ -30,6 +30,11 @@ class Mempool extends DeviceRelatedModel implements Keyable
 
     public function fillUsage($used = null, $total = null, $free = null, $percent = null)
     {
+        // handle signed vs unsigned snmp output
+        $total = ($total < 0 ? $total + 4294967296 : $total);
+        $used = ($used < 0 ? $used + 4294967296 : $used);
+        $free = ($free < 0 ? $free + 4294967296 : $free);
+
         $this->mempool_total = $this->calculateTotal($total, $used, $free);
         $this->mempool_used = $used * $this->mempool_precision;
         $this->mempool_free = $free * $this->mempool_precision;
@@ -47,13 +52,13 @@ class Mempool extends DeviceRelatedModel implements Keyable
         if ($used === null) {
             $this->mempool_used = $free !== null
                 ? $this->mempool_total - $this->mempool_free
-                : $this->mempool_total * ($percent / 100);
+                : round($this->mempool_total * ($percent / 100));
         }
 
         if ($free === null) {
             $this->mempool_free = $used !== null
                 ? $this->mempool_total - $this->mempool_used
-                : $this->mempool_total * (1 - ($percent / 100));
+                : round($this->mempool_total * (1 - ($percent / 100)));
         }
 
         if ($percent == null) {

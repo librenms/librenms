@@ -138,6 +138,8 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                     'mempool_used_oid' => isset($entry['cempMemPoolHCUsed']) ? ".1.3.6.1.4.1.9.9.221.1.1.1.1.18.$index" : ".1.3.6.1.4.1.9.9.221.1.1.1.1.7.$index",
                     'mempool_free_oid' => isset($entry['cempMemPoolHCFree']) ? ".1.3.6.1.4.1.9.9.221.1.1.1.1.20.$index" : ".1.3.6.1.4.1.9.9.221.1.1.1.1.8.$index",
                     'mempool_perc_warn' => 90,
+                    'mempool_largestfree' => $entry['cempMemPoolHCLargestFree'] ?? $entry['cempMemPoolLargestFree'] ?? null,
+                    'mempool_lowestfree' => $entry['cempMemPoolHCLowestFree'] ?? $entry['cempMemPoolLowestFree'] ?? null,
                 ]);
                 $mempool->fillUsage($entry['cempMemPoolHCUsed'] ?? $entry['cempMemPoolUsed'], null, $entry['cempMemPoolHCFree'] ?? $entry['cempMemPoolFree']);
                 $mempools->push($mempool);
@@ -159,6 +161,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                     'mempool_used_oid' => ".1.3.6.1.4.1.9.9.48.1.1.1.5.$index",
                     'mempool_free_oid' => ".1.3.6.1.4.1.9.9.48.1.1.1.6.$index",
                     'mempool_perc_warn' => 90,
+                    'mempool_largestfree' => $entry['ciscoMemoryPoolLargestFree'] ?? null,
                 ]);
                 $mempool->fillUsage($entry['ciscoMemoryPoolUsed'], null, $entry['ciscoMemoryPoolFree']);
                 $mempools->push($mempool);

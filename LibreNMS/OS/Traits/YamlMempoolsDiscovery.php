@@ -71,12 +71,12 @@ trait YamlMempoolsDiscovery
                     'mempool_used_oid' => $this->getOid('used', $index, $yaml),
                     'mempool_free_oid' => ($used === null || $total === null) ? $this->getOid('free', $index, $yaml) : null, // only use "free" if we have both used and total
                     'mempool_perc_oid' => $this->getOid('percent_used', $index, $yaml),
-                    'mempool_perc_warn' => $yaml['warn_percent'] ?? 90,
+                    'mempool_perc_warn' => isset($yaml['warn_percent']) ? YamlDiscovery::replaceValues('warn_percent', $index, $count, $yaml, $snmp_data) : 90,
                 ]))->fillUsage(
                     $used,
                     $total,
                     $this->getData('free', $index, $yaml),
-                    $this->getData('percent_used', $index, $yaml),
+                    $this->getData('percent_used', $index, $yaml)
                 ));
                 $count++;
             }

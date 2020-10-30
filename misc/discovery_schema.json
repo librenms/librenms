@@ -57,6 +57,9 @@
                                     },
                                     "used": {
                                         "type": "string"
+                                    },
+                                    "warn_percent": {
+                                        "type": "string"
                                     }
                                 },
                                 "additionalProperties": false
