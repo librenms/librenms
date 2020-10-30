@@ -59,20 +59,23 @@
         "discovery": {
             "mempools": [
                 {
-                    "mempool_index": "0",
+                    "mempool_index": "1",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hpblmos",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_type": "ucd",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "System",
+                    "mempool_perc": 24,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 61657088,
+                    "mempool_used_oid": null,
+                    "mempool_free": 200155136,
+                    "mempool_free_oid": null,
+                    "mempool_total": 261812224,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": null
                 }
             ]
         },
