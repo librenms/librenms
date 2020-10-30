@@ -6980,6 +6980,11 @@
                     "ospfIfMulticastForwarding": "blocked",
                     "ospfIfDemand": "false",
                     "ospfIfAuthType": "none",
+                    "ospfIfMetricIpAddress": "10.0.0.4",
+                    "ospfIfMetricAddressLessIf": 0,
+                    "ospfIfMetricTOS": 0,
+                    "ospfIfMetricValue": 5,
+                    "ospfIfMetricStatus": 0,
                     "context_name": null,
                     "ifIndex": null
                 },
@@ -7005,6 +7010,11 @@
                     "ospfIfMulticastForwarding": "blocked",
                     "ospfIfDemand": "false",
                     "ospfIfAuthType": "none",
+                    "ospfIfMetricIpAddress": "10.0.0.5",
+                    "ospfIfMetricAddressLessIf": 0,
+                    "ospfIfMetricTOS": 0,
+                    "ospfIfMetricValue": 1,
+                    "ospfIfMetricStatus": 0,
                     "context_name": null,
                     "ifIndex": null
                 }
