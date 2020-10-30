@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Config;
-use LibreNMS\Permissions;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerGeocoder();
 
         $this->app->singleton('permissions', function ($app) {
-            return new Permissions();
+            return new PermissionsCache();
         });
         $this->app->singleton('device-cache', function ($app) {
             return new \LibreNMS\Cache\Device();
