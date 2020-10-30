@@ -59,7 +59,10 @@
                                         "type": "string"
                                     },
                                     "warn_percent": {
-                                        "type": "string"
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
                                     }
                                 },
                                 "additionalProperties": false
