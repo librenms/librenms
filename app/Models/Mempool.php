@@ -42,7 +42,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         $this->mempool_perc = $percent;
 
         if (! $this->mempool_total) {
-            if (! $percent) {
+            if (! $percent && $percent !== '0') {
                 // could not calculate total, can't calculate other values
                 return $this;
             }
@@ -52,13 +52,13 @@ class Mempool extends DeviceRelatedModel implements Keyable
         if ($used === null) {
             $this->mempool_used = $free !== null
                 ? $this->mempool_total - $this->mempool_free
-                : round($this->mempool_total * ($percent / 100));
+                : round($this->mempool_total * ($percent ? ($percent / 100) : 0));
         }
 
         if ($free === null) {
             $this->mempool_free = $used !== null
                 ? $this->mempool_total - $this->mempool_used
-                : round($this->mempool_total * (1 - ($percent / 100)));
+                : round($this->mempool_total * ($percent ? (1 - ($percent / 100)) : 1));
         }
 
         if ($percent == null) {

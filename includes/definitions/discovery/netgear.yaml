@@ -1,5 +1,11 @@
 mib: NETGEAR-BOXSERVICES-PRIVATE-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemAvailable
+                free: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemFree
+                precision: 1024
     os:
         sysDescr_regex: '/^(?<hardware>\S+) .*, (?<version>[\d.]+),/'
         serial: ENTITY-MIB::entPhysicalSerialNum.1

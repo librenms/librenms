@@ -63,7 +63,7 @@ trait YamlMempoolsDiscovery
 
                 $used = $this->getData('used', $index, $yaml);
                 $total = $this->getData('total', $index, $yaml);
-                $mempools->push((new Mempool([
+                $mempool = (new Mempool([
                     'mempool_index' => isset($yaml['index']) ? YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data) : $index,
                     'mempool_type' => $yaml['type'] ?? $this->getName(),
                     'mempool_precision' => $yaml['precision'] ?? 1,
@@ -77,8 +77,12 @@ trait YamlMempoolsDiscovery
                     $total,
                     $this->getData('free', $index, $yaml),
                     $this->getData('percent_used', $index, $yaml)
-                ));
-                $count++;
+                );
+
+                if ($mempool->mempool_total) {
+                    $mempools->push($mempool);
+                    $count++;
+                }
             }
         }
 
