@@ -181,9 +181,10 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             /** @var string $processor_type */
             /** @var int $processor_index */
             /** @var int $processor_usage */
+            /** @var string $processor_descr */
             if (array_key_exists($processor_id, $data)) {
                 $usage = round($data[$processor_id], 2);
-                echo "$usage%\n";
+                echo "$processor_descr: $usage%\n";
 
                 $rrd_name = ['processor', $processor_type, $processor_index];
                 $fields = compact('usage');

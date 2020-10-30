@@ -25611,7 +25611,7 @@
                     "processor_index": "12.0",
                     "processor_type": "cpm",
                     "processor_usage": 2,
-                    "processor_descr": "cpu R0/0: Core 0",
+                    "processor_descr": "Slot 2 CPU: Core 0",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -25622,7 +25622,7 @@
                     "processor_index": "12.1",
                     "processor_type": "cpm",
                     "processor_usage": 2,
-                    "processor_descr": "cpu R0/0: Core 1",
+                    "processor_descr": "Slot 2 CPU: Core 1",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -25633,7 +25633,7 @@
                     "processor_index": "12.2",
                     "processor_type": "cpm",
                     "processor_usage": 2,
-                    "processor_descr": "cpu R0/0: Core 2",
+                    "processor_descr": "Slot 2 CPU: Core 2",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -25644,7 +25644,7 @@
                     "processor_index": "12.3",
                     "processor_type": "cpm",
                     "processor_usage": 2,
-                    "processor_descr": "cpu R0/0: Core 3",
+                    "processor_descr": "Slot 2 CPU: Core 3",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -25655,7 +25655,7 @@
                     "processor_index": "12.4",
                     "processor_type": "cpm",
                     "processor_usage": 1,
-                    "processor_descr": "cpu R0/0: Core 4",
+                    "processor_descr": "Slot 2 CPU: Core 4",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -25666,7 +25666,7 @@
                     "processor_index": "12.5",
                     "processor_type": "cpm",
                     "processor_usage": 1,
-                    "processor_descr": "cpu R0/0: Core 5",
+                    "processor_descr": "Slot 2 CPU: Core 5",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -25677,7 +25677,7 @@
                     "processor_index": "12.6",
                     "processor_type": "cpm",
                     "processor_usage": 1,
-                    "processor_descr": "cpu R0/0: Core 6",
+                    "processor_descr": "Slot 2 CPU: Core 6",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -25688,7 +25688,7 @@
                     "processor_index": "12.7",
                     "processor_type": "cpm",
                     "processor_usage": 1,
-                    "processor_descr": "cpu R0/0: Core 7",
+                    "processor_descr": "Slot 2 CPU: Core 7",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },

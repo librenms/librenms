@@ -129,7 +129,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                 $descr = ucwords($entPhysicalName . ' - ' . $entry['cempMemPoolName']);
                 $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
 
-                $mempool = new Mempool([
+                $mempools->push((new Mempool([
                     'mempool_index' => $index,
                     'entPhysicalIndex' => $entPhysicalIndex,
                     'mempool_type' => 'cemp',
@@ -140,9 +140,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                     'mempool_perc_warn' => 90,
                     'mempool_largestfree' => $entry['cempMemPoolHCLargestFree'] ?? $entry['cempMemPoolLargestFree'] ?? null,
                     'mempool_lowestfree' => $entry['cempMemPoolHCLowestFree'] ?? $entry['cempMemPoolLowestFree'] ?? null,
-                ]);
-                $mempool->fillUsage($entry['cempMemPoolHCUsed'] ?? $entry['cempMemPoolUsed'], null, $entry['cempMemPoolHCFree'] ?? $entry['cempMemPoolFree']);
-                $mempools->push($mempool);
+                ]))->fillUsage($entry['cempMemPoolHCUsed'] ?? $entry['cempMemPoolUsed'], null, $entry['cempMemPoolHCFree'] ?? $entry['cempMemPoolFree']));
             }
         }
 
@@ -153,7 +151,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
         $cmp = snmpwalk_cache_oid($this->getDeviceArray(), 'ciscoMemoryPool', [], 'CISCO-MEMORY-POOL-MIB');
         foreach (Arr::wrap($cmp) as $index => $entry) {
             if (is_numeric($entry['ciscoMemoryPoolUsed']) && is_numeric($index)) {
-                $mempool = new Mempool([
+                $mempools->push((new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'cmp',
                     'mempool_precision' => 1,
@@ -162,9 +160,36 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                     'mempool_free_oid' => ".1.3.6.1.4.1.9.9.48.1.1.1.6.$index",
                     'mempool_perc_warn' => 90,
                     'mempool_largestfree' => $entry['ciscoMemoryPoolLargestFree'] ?? null,
-                ]);
-                $mempool->fillUsage($entry['ciscoMemoryPoolUsed'], null, $entry['ciscoMemoryPoolFree']);
-                $mempools->push($mempool);
+                ]))->fillUsage($entry['ciscoMemoryPoolUsed'], null, $entry['ciscoMemoryPoolFree']));
+            }
+        }
+
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        $cpm = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
+
+        $count = 0;
+        foreach (Arr::wrap($cpm) as $index => $entry) {
+            $count++;
+            if (is_numeric($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
+                $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
+
+                $mempools->push((new Mempool([
+                    'mempool_index' => $index,
+                    'mempool_type' => 'cpm',
+                    'mempool_precision' => 1024,
+                    'mempool_descr' => "$cpu Memory",
+                    'mempool_used_oid' => empty($entry['cpmCPUMemoryHCUsed']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.12.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.17.$index",
+                    'mempool_free_oid' => empty($entry['cpmCPUMemoryHCFree']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.13.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.19.$index",
+                    'mempool_perc_warn' => 90,
+                    'mempool_lowestfree' => $entry['cpmCPUMemoryHCLowest'] ?? $entry['cpmCPUMemoryLowest'] ?? null,
+                ]))->fillUsage(
+                    empty($entry['cpmCPUMemoryHCUsed']) ? $entry['cpmCPUMemoryUsed'] : $entry['cpmCPUMemoryHCUsed'],
+                    null,
+                    empty($entry['cpmCPUMemoryHCFree']) ? $entry['cpmCPUMemoryFree'] : $entry['cpmCPUMemoryHCFree']
+                ));
             }
         }
 
@@ -179,7 +204,8 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
      */
     public function discoverProcessors()
     {
-        $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCPU', 'CISCO-PROCESS-MIB');
+        $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
+        $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
