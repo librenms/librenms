@@ -28,12 +28,21 @@ class Mempool extends DeviceRelatedModel implements Keyable
         'mempool_lowestfree',
     ];
 
+    public function isValid()
+    {
+        return $this->mempool_total > 0;
+    }
+
     public function fillUsage($used = null, $total = null, $free = null, $percent = null)
     {
-        // handle signed vs unsigned snmp output
-        $total = ($total < 0 ? $total + 4294967296 : $total);
-        $used = ($used < 0 ? $used + 4294967296 : $used);
-        $free = ($free < 0 ? $free + 4294967296 : $free);
+        try {
+            $total = $this->correctNegative($total);
+            $used = $this->correctNegative($used, $total);
+            $free = $this->correctNegative($free, $total);
+        } catch (\Exception $e) {
+            d_echo($e->getMessage());
+            return $this; // unhandled negative
+        }
 
         $this->mempool_total = $this->calculateTotal($total, $used, $free);
         $this->mempool_used = $used * $this->mempool_precision;
@@ -76,6 +85,20 @@ class Mempool extends DeviceRelatedModel implements Keyable
     public function getCompositeKey()
     {
         return "$this->mempool_type-$this->mempool_index";
+    }
+
+    private function correctNegative($value, $max = null)
+    {
+        $int_max = 4294967296;
+        if ($value < 0) {
+            // assume unsigned/signed issue
+            $value = $int_max + $value;
+            if (($max && $value > $max) || $value > $int_max) {
+                throw new \Exception('Uncorrectable negative value');
+            }
+        }
+
+        return $value;
     }
 
     private function calculateTotal($total, $used, $free)

@@ -2204,23 +2204,23 @@
         "discovery": {
             "mempools": [
                 {
-                    "mempool_index": "0",
+                    "mempool_index": "1",
                     "entPhysicalIndex": null,
-                    "mempool_type": "opengear",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
+                    "mempool_type": "ucd",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "System",
                     "mempool_perc": 36,
                     "mempool_perc_oid": null,
-                    "mempool_used": 90920,
+                    "mempool_used": 93102080,
                     "mempool_used_oid": null,
-                    "mempool_free": 163012,
+                    "mempool_free": 166924288,
                     "mempool_free_oid": null,
-                    "mempool_total": 253932,
+                    "mempool_total": 260026368,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": null
                 }
             ]
         },

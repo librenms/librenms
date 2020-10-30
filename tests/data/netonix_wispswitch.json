@@ -3654,25 +3654,6 @@
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
                     "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "2",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Swap",
-                    "mempool_perc": 0,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 0,
-                    "mempool_used_oid": null,
-                    "mempool_free": 0,
-                    "mempool_free_oid": null,
-                    "mempool_total": 0,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
                 }
             ]
         },
