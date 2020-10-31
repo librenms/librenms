@@ -50,16 +50,16 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery
      */
     public function discoverProcessors()
     {
+        $processors = [];
         $procdata = snmpwalk_group($this->getDeviceArray(), 'hh3cEntityExtCpuUsage', 'HH3C-ENTITY-EXT-MIB');
 
-        if (! empty($procdata)) {
-            $entity_data = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        if (empty($procdata)) {
+            return $processors;
         }
-
-        $processors = [];
+        $entity_data = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
 
         foreach ($procdata as $index => $usage) {
-            if ($usage != 0) {
+            if ($usage['hh3cEntityExtCpuUsage'] != 0) {
                 $processors[] = Processor::discover(
                     $this->getName(),
                     $this->getDeviceId(),
@@ -67,7 +67,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery
                     $index,
                     $entity_data[$index],
                     1,
-                    $usage,
+                    $usage['hh3cEntityExtCpuUsage'],
                     null,
                     $index
                 );
