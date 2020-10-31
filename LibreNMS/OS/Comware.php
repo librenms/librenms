@@ -86,6 +86,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery
             return $mempools; // avoid additional walks
         }
 
+        $data = snmpwalk_group($this->getDeviceArray(), 'hh3cEntityExtMemSize', 'HH3C-ENTITY-EXT-MIB', 1, $data);
         $entity_name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
         $entity_class = $this->getCacheByIndex('entPhysicalClass', 'ENTITY-MIB');
 
@@ -95,8 +96,9 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery
                     'mempool_index' => $index,
                     'mempool_type' => 'comware',
                     'mempool_descr' => $entity_name[$index],
+                    'mempool_precision' => 1,
                     'mempool_perc_oid' => ".1.3.6.1.4.1.25506.2.6.1.1.1.1.8.$index",
-                ]))->fillUsage(null, null, null, $entry['hh3cEntityExtMemUsage']));
+                ]))->fillUsage(null, $entry['hh3cEntityExtMemSize'], null, $entry['hh3cEntityExtMemUsage']));
             }
         }
 
