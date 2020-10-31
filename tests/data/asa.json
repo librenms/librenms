@@ -3064,7 +3064,7 @@
                     "processor_index": "2",
                     "processor_type": "cpm",
                     "processor_usage": 0,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 0/0",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -3075,7 +3075,7 @@
                     "processor_index": "3",
                     "processor_type": "cpm",
                     "processor_usage": 1,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 0/1",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -3086,7 +3086,7 @@
                     "processor_index": "4",
                     "processor_type": "cpm",
                     "processor_usage": 0,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 4",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

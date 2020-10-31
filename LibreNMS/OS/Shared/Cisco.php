@@ -219,10 +219,8 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                 continue; // skip bad data
             }
 
-            $entPhysicalIndex = $entry['cpmCPUTotalPhysicalIndex'];
-
-            if ($entPhysicalIndex) {
-                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entPhysicalIndex];
+            if (isset($entry['cpmCPUTotalPhysicalIndex'])) {
+                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']];
             }
 
             if (empty($descr)) {
@@ -241,7 +239,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                         1,
                         $core_usage,
                         null,
-                        $entPhysicalIndex
+                        $entry['cpmCPUTotalPhysicalIndex']
                     );
                 }
             } else {
@@ -254,7 +252,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                     1,
                     $usage,
                     null,
-                    $entPhysicalIndex
+                    $entry['cpmCPUTotalPhysicalIndex']
                 );
             }
         }

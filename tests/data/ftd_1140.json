@@ -4348,7 +4348,7 @@
                     "processor_index": "2",
                     "processor_type": "cpm",
                     "processor_usage": 13,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 2",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -4359,7 +4359,7 @@
                     "processor_index": "3",
                     "processor_type": "cpm",
                     "processor_usage": 13,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 3",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -4370,7 +4370,7 @@
                     "processor_index": "4",
                     "processor_type": "cpm",
                     "processor_usage": 0,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 4",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -4381,7 +4381,7 @@
                     "processor_index": "5",
                     "processor_type": "cpm",
                     "processor_usage": 0,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 5",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -4392,7 +4392,7 @@
                     "processor_index": "6",
                     "processor_type": "cpm",
                     "processor_usage": 0,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 6",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -4403,7 +4403,7 @@
                     "processor_index": "7",
                     "processor_type": "cpm",
                     "processor_usage": 0,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 7",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -4414,7 +4414,7 @@
                     "processor_index": "8",
                     "processor_type": "cpm",
                     "processor_usage": 0,
-                    "processor_descr": "Processor 1",
+                    "processor_descr": "Processor 8",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
