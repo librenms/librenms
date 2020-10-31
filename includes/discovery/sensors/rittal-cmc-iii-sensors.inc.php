@@ -92,7 +92,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
 }
 
 //At first device discovery the serial number is not set. But we need this in the next step for our state indexes.
-if (!$device['serial']) {
+if (! $device['serial']) {
     $serial_number = snmp_get($device, 'cmcIIIUnitSerial.0', '-Oqv', 'RITTAL-CMC-III-MIB');
 } else {
     $serial_number = $device['serial'];
@@ -154,4 +154,4 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
     }
 }
 
-unset($cmc_iii_var_table, $cmc_iii_sensors, $index, $entry, $var_name_parts, $sensor_name, $var_type, $sensor_id, $sensor_logic, $unit, $type, $sensor_data);
+unset($cmc_iii_var_table, $cmc_iii_sensors, $index, $entry, $var_name_parts, $sensor_name, $var_type, $sensor_id, $sensor_logic, $unit, $type, $sensor_data, $serial_number);
