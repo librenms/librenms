@@ -81,10 +81,6 @@ class Mempools implements Module
 
             $mempool->save();
 
-            if ($mempool->mempool_type == 'ucd') {
-                return; // ucd has it's own rrd format
-            }
-
             $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
             $rrd_def = RrdDefinition::make()
                 ->addDataset('used', 'GAUGE', 0)

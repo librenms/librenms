@@ -146,9 +146,15 @@ trait HostResources
             return collect();
         }
 
+        $ram_bytes = isset($hr_storage[1]['hrStorageSize'])
+            ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits']
+            : snmp_get($this->getDeviceArray(), 'hrMemorySize.0', '-OQUv', 'HOST-RESOURCES-MIB') * 1024;
+
         return collect($hr_storage)->filter(Closure::fromCallable([$this, 'memValid']))
-            ->map(function ($storage, $index) {
-                $total = $storage['hrStorageSize'];
+            ->map(function ($storage, $index) use ($ram_bytes) {
+                // use total ram for buffers, cached, and shared
+                $total = $storage['hrStorageType'] == 'hrStorageOther' ? $ram_bytes / $storage['hrStorageAllocationUnits'] : $storage['hrStorageSize'];
+
                 if (Str::contains($storage['hrStorageDescr'], 'Real Memory Metrics')) {
                     // bsnmp does not report the same as net-snmp, total RAM is stored in hrMemorySize
                     $size = $this->getCacheTable('hrMemorySize', 'HOST-RESOURCES-MIB');
@@ -164,7 +170,7 @@ trait HostResources
                     'mempool_descr' => $storage['hrStorageDescr'],
                     'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
                     'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
-                    'mempool_total_oid' => $storage['hrStorageType'] == 'hrStorageOther' ? ".1.3.6.1.2.1.25.2.3.1.5.$index" : null, // variable size
+                    'mempool_total_oid' => null,
                 ]))->fillUsage($storage['hrStorageUsed'], $total);
             });
     }
