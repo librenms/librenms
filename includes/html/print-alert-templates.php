@@ -22,7 +22,9 @@ require_once 'includes/html/modal/delete_alert_template.inc.php';
       </thead>
       <tbody>
 <?php
-$full_query = AlertTemplate::select('id', 'name', 'template')->get();
+$full_query = AlertTemplate::select('id', 'name', 'template')
+                             ->with('alert_rules.id', 'alert_rules.name')
+                             ->get();
 foreach ($full_query as $template) {
     $single_template = ['name' => $template->name,
         'template' => $template->template,
