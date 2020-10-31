@@ -1,20 +1,5 @@
 mib: HUAWEI-WAN-MIB:HUAWEI-ENTITY-EXTENT-MIB:HUAWEI-ENERGYMNGT-MIB:HUAWEI-STACK-MIB
 modules:
-    mempools:
-        pre-cache:
-            oids:
-                - HUAWEI-ENTITY-EXTENT-MIB::entPhysicalName
-                - HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc
-        data:
-            -
-                total: HUAWEI-ENTITY-EXTENT-MIB::hwEntityMemSize
-                percent_used: HUAWEI-ENTITY-EXTENT-MIB::hwEntityMemUsage
-                descr: '{{ HUAWEI-ENTITY-EXTENT-MIB::entPhysicalName }}{{ HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc }} Memory'
-            -
-                total: HUAWEI-ENTITY-EXTENT-MIB::hwEntityMemSizeMega
-                percent_used: HUAWEI-ENTITY-EXTENT-MIB::hwEntityMemUsage
-                descr: '{{ HUAWEI-ENTITY-EXTENT-MIB::entPhysicalName }}{{ HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc }} Memory'
-                precision: 1048576
     os:
         sysDescr_regex: '/\((?<hardware>\S+) (?<version>V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/'
         hardware:
