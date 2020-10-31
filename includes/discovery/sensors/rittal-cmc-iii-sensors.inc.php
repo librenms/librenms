@@ -108,8 +108,8 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
     }
 
     if (isset($sensor_data['logic'])) {
-        // We need separate state indexes for each device because the sensor logic can vary from device to device depending on its configuration. So we add our device ID here.
-        $sensor_data['name'] = $sensor_data['name'] . '_' . $device['device_id'];
+        // We need separate state indexes for each device because the sensor logic can vary from device to device depending on its configuration. So we add our device serial here.
+        $sensor_data['name'] = $sensor_data['name'] . '_' . $device['serial'];
         $sensor_logic = [
             [
                 'value'   => 0,
