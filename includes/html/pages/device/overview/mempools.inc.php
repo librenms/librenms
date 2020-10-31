@@ -2,16 +2,16 @@
 
 $graph_type = 'mempool_usage';
 
-$mempools = dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', [$device['device_id']]);
+$mempools = \DeviceCache::getPrimary()->mempools;
 
-if (count($mempools)) {
+if ($mempools->isNotEmpty()) {
     echo '
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">
         ';
-    echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=mempool/">';
+    echo '<a href="device/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=mempool/">';
     echo '<i class="fa fa-braille fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory Pools</strong></a>';
     echo '
         </div>
@@ -19,18 +19,31 @@ if (count($mempools)) {
         ';
 
     foreach ($mempools as $mempool) {
-        $percent = round($mempool['mempool_perc'], 0);
-        $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
-        $total = formatStorage($mempool['mempool_total']);
-        $used = formatStorage($mempool['mempool_used']);
-        $free = formatStorage($mempool['mempool_free']);
-        $background = get_percentage_colours($percent, $mempool['mempool_perc_warn']);
+        $percent = $mempool->mempool_perc;
+        $free = $mempool->mempool_free;
+        if ($mempool->mempool_type == 'hrstorage' && $mempool->mempool_descr == 'Physical memory') {
+            // calculate available RAM instead of Free
+            if ($buffers = $mempools->firstWhere('mempool_descr', '=', 'Memory buffers')) {
+                $free += $buffers->mempool_used;
+            }
+            if ($cache = $mempools->firstWhere('mempool_descr', '=', 'Cached memory')) {
+                $free += $cache->mempool_used;
+            }
+
+            $percent = $free ? round($free / $mempool->mempool_total * 100) : 0;
+        }
+
+        $text_descr = rewrite_entity_descr($mempool->mempool_descr);
+        $total = formatStorage($mempool->mempool_total);
+        $used = formatStorage($mempool->mempool_used);
+        $free = formatStorage($free);
+        $background = get_percentage_colours($percent, $mempool->mempool_perc_warn);
 
         $graph_array = [];
         $graph_array['height'] = '100';
         $graph_array['width'] = '210';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['id'] = $mempool['mempool_id'];
+        $graph_array['id'] = $mempool->mempool_id;
         $graph_array['type'] = $graph_type;
         $graph_array['from'] = \LibreNMS\Config::get('time.day');
         $graph_array['legend'] = 'no';
@@ -40,7 +53,7 @@ if (count($mempools)) {
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
         $link = generate_url($link_array);
 
-        $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - ' . $text_descr);
+        $overlib_content = generate_overlib_content($graph_array, DeviceCache::getPrimary()->hostname . ' - ' . $text_descr);
 
         $graph_array['width'] = 80;
         $graph_array['height'] = 20;
