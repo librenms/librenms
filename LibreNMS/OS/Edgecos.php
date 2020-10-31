@@ -58,6 +58,7 @@ class Edgecos extends OS implements ProcessorDiscovery
         }
 
         $mempool->fillUsage($data['memoryAllocated.0'], $data['memoryTotal.0'], $data['memoryFreed.0']);
+
         return collect([$mempool]);
     }
 

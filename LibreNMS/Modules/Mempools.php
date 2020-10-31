@@ -46,6 +46,7 @@ class Mempools implements Module
                     return true;
                 }
                 d_echo("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value");
+
                 return false;
             });
 

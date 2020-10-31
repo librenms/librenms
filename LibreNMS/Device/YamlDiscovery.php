@@ -320,8 +320,8 @@ class YamlDiscovery
             return $oid;
         }
 
-        foreach(explode(':', $mib) as $mib_name) {
-            if  ($numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device)) {
+        foreach (explode(':', $mib) as $mib_name) {
+            if ($numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device)) {
                 break;
             }
         }

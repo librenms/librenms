@@ -89,7 +89,6 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $entity_name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
         $entity_class = $this->getCacheByIndex('entPhysicalClass', 'ENTITY-MIB');
 
-
         foreach ($data as $index => $entry) {
             if ($entity_class[$index] == 'module' && $entry['hh3cEntityExtMemUsage'] > 0) {
                 $mempools->push((new Mempool([

@@ -41,6 +41,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
             $free = $this->correctNegative($free, $total);
         } catch (\Exception $e) {
             d_echo($e->getMessage());
+
             return $this; // unhandled negative
         }
 

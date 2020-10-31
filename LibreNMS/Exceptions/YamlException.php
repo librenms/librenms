@@ -27,5 +27,4 @@ namespace LibreNMS\Exceptions;
 
 class YamlException extends \Exception
 {
-
 }
