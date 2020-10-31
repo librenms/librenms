@@ -60,7 +60,8 @@ trait UcdResources
             'memAvailSwap.0',
             'memTotalReal.0',
             'memAvailReal.0',
-            'memSysAvail.0',
+            'memBuffer.0',
+            'memCached.0',
         ], '-OQUs', 'UCD-SNMP-MIB');
 
         if ($this->oidValid($data, 'memTotalReal') && ($this->oidValid($data, 'memAvailReal') || $this->oidValid($data, 'memSysAvail'))) {
@@ -69,7 +70,7 @@ trait UcdResources
                 'mempool_type' => 'ucd',
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'System',
-            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memSysAvail'] ?? $data[0]['memAvailReal']));
+            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memAvailReal'] + $data[0]['memBuffer'] + $data[0]['memCached']));
         }
 
         if ($this->oidValid($data, 'memTotalSwap') && $this->oidValid($data, 'memAvailSwap')) {
@@ -95,7 +96,6 @@ trait UcdResources
             'memShared.0',
             'memBuffer.0',
             'memCached.0',
-            'memSysAvail.0',
         ], '-OQUs', 'UCD-SNMP-MIB');
 
         if (! empty($data[0])) {
@@ -103,7 +103,7 @@ trait UcdResources
             optional($mempools->firstWhere('mempool_descr', 'Swap'))
                 ->fillUsage(null, $data[0]['memTotalSwap'], $data[0]['memAvailSwap']);
             optional($mempools->firstWhere('mempool_descr', 'System'))
-                ->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memSysAvail'] ?? $data[0]['memAvailReal']);
+                ->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memAvailReal'] + $data[0]['memBuffer'] + $data[0]['memCached']);
 
             $rrd_def = RrdDefinition::make()
                 ->addDataset('totalswap', 'GAUGE', 0)
@@ -113,8 +113,7 @@ trait UcdResources
                 ->addDataset('totalfree', 'GAUGE', 0)
                 ->addDataset('shared', 'GAUGE', 0)
                 ->addDataset('buffered', 'GAUGE', 0)
-                ->addDataset('cached', 'GAUGE', 0)
-                ->addDataset('available', 'GAUGE', 0);
+                ->addDataset('cached', 'GAUGE', 0);
 
             $fields = [
                 'totalswap'    => $data[0]['memTotalSwap'],
@@ -125,13 +124,12 @@ trait UcdResources
                 'shared'       => $data[0]['memShared'],
                 'buffered'     => $data[0]['memBuffer'],
                 'cached'       => $data[0]['memCached'],
-                'available'    => $data[0]['memSysAvail'],
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'ucd_mem', $tags, $fields);
+            data_update($this->getDeviceArray(), 'ucd_memory', $tags, $fields);
 
-            $this->enableGraph('ucd_memory');
+            $this->enableGraph('ucd_mem');
         }
 
         return $mempools;
