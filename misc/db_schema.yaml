@@ -896,15 +896,18 @@ mempools:
     - { Field: mempool_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: mempool_index, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: entPhysicalIndex, Type: int, 'Null': true, Extra: '' }
-    - { Field: hrDeviceIndex, Type: int, 'Null': true, Extra: '' }
     - { Field: mempool_type, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: mempool_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: mempool_descr, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mempool_perc, Type: int, 'Null': false, Extra: '' }
+    - { Field: mempool_perc_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_used, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_used_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_free, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_free_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_total, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_total_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_largestfree, Type: bigint, 'Null': true, Extra: '' }
     - { Field: mempool_lowestfree, Type: bigint, 'Null': true, Extra: '' }
     - { Field: mempool_deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
