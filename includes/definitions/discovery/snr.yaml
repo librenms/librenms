@@ -1,5 +1,12 @@
 mib: NAG-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NAG-MIB::sysMemorySize
+                used: NAG-MIB::sysMemoryBusy
+                descr: 'Memory Usage'
+                index: 0
     os:
         hardware:
             - NAG-MIB::sysHardwareVersion.0
