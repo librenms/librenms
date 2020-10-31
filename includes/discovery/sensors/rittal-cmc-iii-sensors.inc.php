@@ -91,6 +91,13 @@ foreach ($cmc_iii_var_table as $index => $entry) {
     }
 }
 
+//At first device discovery the serial number is not set. But we need this in the next step for our state indexes.
+if (!$device['serial']) {
+    $serial_number = snmp_get($device, 'cmcIIIUnitSerial.0', '-Oqv', 'RITTAL-CMC-III-MIB');
+} else {
+    $serial_number = $device['serial'];
+}
+
 foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
     // Some sensors provide either no useful data at all or only partially useful data.
     if (! isset($sensor_data['oid']) || $sensor_data['name'] == 'System V24 Port' || $sensor_data['name'] == 'Memory USB-Stick' || $sensor_data['name'] == 'Memory SD-Card' || $sensor_data['name'] == 'Login') {
@@ -109,7 +116,7 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
 
     if (isset($sensor_data['logic'])) {
         // We need separate state indexes for each device because the sensor logic can vary from device to device depending on its configuration. So we add our device serial here.
-        $sensor_data['name'] = $sensor_data['name'] . '_' . $device['serial'];
+        $sensor_data['name'] = $sensor_data['name'] . '_' . $serial_number;
         $sensor_logic = [
             [
                 'value'   => 0,
