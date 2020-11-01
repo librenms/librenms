@@ -26,7 +26,6 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
 use LibreNMS\Device\Processor;
-use LibreNMS\RRD\RrdDefinition;
 
 trait UcdResources
 {
@@ -68,8 +67,10 @@ trait UcdResources
             $mempools->push((new Mempool([
                 'mempool_index' => 1,
                 'mempool_type' => 'ucd',
+                'mempool_class' => 'system',
                 'mempool_precision' => 1024,
-                'mempool_descr' => 'System',
+                'mempool_descr' => 'Physical memory',
+                'mempool_free_oid' => '.1.3.6.1.4.1.2021.4.6.0',
             ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memAvailReal'] + $data[0]['memBuffer'] + $data[0]['memCached']));
         }
 
@@ -77,59 +78,33 @@ trait UcdResources
             $mempools->push((new Mempool([
                 'mempool_index' => 2,
                 'mempool_type' => 'ucd',
+                'mempool_class' => 'swap',
                 'mempool_precision' => 1024,
-                'mempool_descr' => 'Swap',
+                'mempool_descr' => 'Swap space',
+                'mempool_free_oid' => '.1.3.6.1.4.1.2021.4.4.0',
             ]))->fillUsage(null, $data[0]['memTotalSwap'], $data[0]['memAvailSwap']));
         }
 
-        return $mempools;
-    }
+        if ($this->oidValid($data, 'memBuffer')) {
+            $mempools->push((new Mempool([
+                'mempool_index' => 3,
+                'mempool_type' => 'ucd',
+                'mempool_class' => 'buffer',
+                'mempool_precision' => 1024,
+                'mempool_descr' => 'Memory buffers',
+                'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.14.0',
+            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memBuffer']));
+        }
 
-    public function pollUcdMempools($mempools)
-    {
-        $data = snmp_get_multi($this->getDeviceArray(), [
-            'memTotalSwap.0',
-            'memAvailSwap.0',
-            'memTotalReal.0',
-            'memAvailReal.0',
-            'memTotalFree.0',
-            'memShared.0',
-            'memBuffer.0',
-            'memCached.0',
-        ], '-OQUs', 'UCD-SNMP-MIB');
-
-        if (! empty($data[0])) {
-            // update DB
-            optional($mempools->firstWhere('mempool_descr', 'Swap'))
-                ->fillUsage(null, $data[0]['memTotalSwap'], $data[0]['memAvailSwap']);
-            optional($mempools->firstWhere('mempool_descr', 'System'))
-                ->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memAvailReal'] + $data[0]['memBuffer'] + $data[0]['memCached']);
-
-            $rrd_def = RrdDefinition::make()
-                ->addDataset('totalswap', 'GAUGE', 0)
-                ->addDataset('availswap', 'GAUGE', 0)
-                ->addDataset('totalreal', 'GAUGE', 0)
-                ->addDataset('availreal', 'GAUGE', 0)
-                ->addDataset('totalfree', 'GAUGE', 0)
-                ->addDataset('shared', 'GAUGE', 0)
-                ->addDataset('buffered', 'GAUGE', 0)
-                ->addDataset('cached', 'GAUGE', 0);
-
-            $fields = [
-                'totalswap'    => $data[0]['memTotalSwap'],
-                'availswap'    => $data[0]['memAvailSwap'],
-                'totalreal'    => $data[0]['memTotalReal'],
-                'availreal'    => $data[0]['memAvailReal'],
-                'totalfree'    => $data[0]['memTotalFree'],
-                'shared'       => $data[0]['memShared'],
-                'buffered'     => $data[0]['memBuffer'],
-                'cached'       => $data[0]['memCached'],
-            ];
-
-            $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'ucd_memory', $tags, $fields);
-
-            $this->enableGraph('ucd_mem');
+        if ($this->oidValid($data, 'memCached')) {
+            $mempools->push((new Mempool([
+                'mempool_index' => 4,
+                'mempool_type' => 'ucd',
+                'mempool_class' => 'cached',
+                'mempool_precision' => 1024,
+                'mempool_descr' => 'Cached memory',
+                'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.15.0',
+            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memCached']));
         }
 
         return $mempools;

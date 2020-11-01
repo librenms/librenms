@@ -64,38 +64,33 @@ class Mempools implements Module
 
     public function poll(OS $os)
     {
-        [$ucd, $other] = $os->getDevice()->mempools
-            ->partition('mempool_type', 'ucd');
+        $mempools = $os->getDevice()->mempools;
 
-        // poll UCD if exists.
-        if ($ucd->isNotEmpty() && method_exists($os, 'pollUcdMempools')) {
-            $os->pollUcdMempools($ucd);
+        if ($mempools->isEmpty()) {
+            return;
         }
 
-        if ($other->isNotEmpty()) {
-            $os instanceof MempoolsPolling
-                ? $os->pollMempools($other)
-                : $this->defaultPolling($os, $other);
-        }
+        $os instanceof MempoolsPolling
+            ? $os->pollMempools($mempools)
+            : $this->defaultPolling($os, $mempools);
 
-        $this->calculateAvailable($os->getDevice()->mempools)
-            ->each(function (Mempool $mempool) use ($os) {
-                $this->printMempool($mempool);
+        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os) {
+            $this->printMempool($mempool);
 
-                $mempool->save();
+            $mempool->save();
 
-                $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
-                $rrd_def = RrdDefinition::make()
-                ->addDataset('used', 'GAUGE', 0)
-                ->addDataset('free', 'GAUGE', 0);
-                $fields = [
-                'used' => $mempool->mempool_used,
-                'free' => $mempool->mempool_free,
+            $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
+            $rrd_def = RrdDefinition::make()
+            ->addDataset('used', 'GAUGE', 0)
+            ->addDataset('free', 'GAUGE', 0);
+            $fields = [
+            'used' => $mempool->mempool_used,
+            'free' => $mempool->mempool_free,
             ];
 
-                $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def');
-                data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
-            });
+            $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def');
+            data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
+        });
     }
 
     /**
