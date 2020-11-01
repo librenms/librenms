@@ -1261,7 +1261,7 @@
         "graphing.availability": {
             "group": "poller",
             "section": "availability",
-            "order": 10,
+            "order": 1,
             "default": [
                 "86400",
                 "604800",
@@ -1269,6 +1269,13 @@
                 "31536000"
             ],
             "type": "array"
+        },
+        "graphing.availability_consider_maintenance": {
+            "group": "poller",
+            "section": "availability",
+            "order": 2,
+            "default": false,
+            "type": "boolean"
         },
         "dot": {
             "default": "/usr/bin/dot",
@@ -4982,7 +4989,8 @@
                 }
             ],
             "validate": {
-                "value.*.authalgo": "in:MD5,SHA"
+                "value.*.authalgo": "in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512",
+                "value.*.cryptoalgo": "in:AES,AES-192,AES-256,DES"
             }
         },
         "snmp.version": {

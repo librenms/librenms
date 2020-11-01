@@ -2000,6 +2000,9 @@ function device_is_up($device, $record_perf = false)
     $device_perf = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = ['NOW()'];
+    $maintenance = DeviceCache::get($device['device_id'])->isUnderMaintenance();
+    $consider_maintenance = Config::get('graphing.availability_consider_maintenance');
+    $state_update_again = false;
 
     if ($record_perf === true && can_ping_device($device['attribs'])) {
         $trace_debug = [];
@@ -2036,15 +2039,20 @@ function device_is_up($device, $record_perf = false)
         $response['status_reason'] = 'icmp';
     }
 
-    if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason']) {
-        dbUpdate(
-            ['status' => $response['status'], 'status_reason' => $response['status_reason']],
-            'devices',
-            'device_id=?',
-            [$device['device_id']]
-        );
+    // Special case where the device is still down, optional mode is on, device not in maintenance mode and has no ongoing outages
+    if (($consider_maintenance && ! $maintenance) && ($device['status'] == '0' && $response['status'] == '0')) {
+        $state_update_again = empty(dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]));
+    }
 
-        $uptime = $device['uptime'] ?: 0;
+    if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason'] || $state_update_again) {
+        if (! $state_update_again) {
+            dbUpdate(
+                ['status' => $response['status'], 'status_reason' => $response['status_reason']],
+                'devices',
+                'device_id=?',
+                [$device['device_id']]
+            );
+        }
 
         if ($response['status']) {
             $type = 'up';
@@ -2052,11 +2060,7 @@ function device_is_up($device, $record_perf = false)
 
             $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]);
             if (! empty($going_down)) {
-                $up_again = time() - $uptime;
-                if ($up_again <= $going_down) {
-                    // network connection loss, not device down
-                    $up_again = time();
-                }
+                $up_again = time();
                 dbUpdate(
                     ['device_id' => $device['device_id'], 'up_again' => $up_again],
                     'device_outages',
@@ -2068,9 +2072,12 @@ function device_is_up($device, $record_perf = false)
             $type = 'down';
             $reason = $response['status_reason'];
 
-            $data = ['device_id' => $device['device_id'],
-                'going_down' => strtotime($device['last_polled']), ];
-            dbInsert($data, 'device_outages');
+            if (! $consider_maintenance || (! $maintenance && $consider_maintenance)) {
+                // use current time as a starting point when an outage starts
+                $data = ['device_id' => $device['device_id'],
+                    'going_down' => time(), ];
+                dbInsert($data, 'device_outages');
+            }
         }
 
         log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
