@@ -227,7 +227,7 @@ function get_graph_generic_by_hostname(Illuminate\Http\Request $request)
     $device = device_by_id_cache($device_id);
     $vars['device'] = $device['device_id'];
 
-    return check_device_permission($device_id, function () use ($request , $vars) {
+    return check_device_permission($device_id, function () use ($request, $vars) {
         if ($request->has('from')) {
             $vars['from'] = $request->get('from');
         }
