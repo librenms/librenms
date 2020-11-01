@@ -79,7 +79,8 @@ class Mempools implements Module
 
             $mempool->save();
 
-            $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
+            $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index];
+            $rrd_oldname = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
             $rrd_def = RrdDefinition::make()
             ->addDataset('used', 'GAUGE', 0)
             ->addDataset('free', 'GAUGE', 0);
@@ -88,7 +89,7 @@ class Mempools implements Module
             'free' => $mempool->mempool_free,
             ];
 
-            $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def');
+            $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def', 'rrd_oldname');
             data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
         });
     }
