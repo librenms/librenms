@@ -15,6 +15,8 @@ class MempoolsAddOids extends Migration
     {
         Schema::table('mempools', function (Blueprint $table) {
             $table->dropColumn('hrDeviceIndex');
+            $table->string('mempool_class', 32)->after('mempool_type');
+            $table->string('mempool_descr', 128)->change();
             $table->string('mempool_perc_oid')->after('mempool_perc')->nullable();
             $table->string('mempool_used_oid')->after('mempool_used')->nullable();
             $table->string('mempool_free_oid')->after('mempool_free')->nullable();
@@ -30,8 +32,9 @@ class MempoolsAddOids extends Migration
     public function down()
     {
         Schema::table('mempools', function (Blueprint $table) {
+            $table->string('mempool_descr', 64)->change();
             $table->integer('hrDeviceIndex')->nullable()->after('entPhysicalIndex');
-            $table->dropColumn(['mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid']);
+            $table->dropColumn(['mempool_class', 'mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid']);
         });
     }
 }

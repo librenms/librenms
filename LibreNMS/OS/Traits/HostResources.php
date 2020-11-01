@@ -26,6 +26,7 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
 use Closure;
+use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 
@@ -78,7 +79,7 @@ trait HostResources
             }
 
             $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
 
@@ -146,20 +147,17 @@ trait HostResources
             return collect();
         }
 
-        $ram_bytes = isset($hr_storage[1]['hrStorageSize'])
-            ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits']
-            : snmp_get($this->getDeviceArray(), 'hrMemorySize.0', '-OQUv', 'HOST-RESOURCES-MIB') * 1024;
+        $ram_bytes = snmp_get($this->getDeviceArray(), 'hrMemorySize.0', '-OQUv', 'HOST-RESOURCES-MIB') * 1024
+            ?: (isset($hr_storage[1]['hrStorageSize']) ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits'] : 0);
 
         return collect($hr_storage)->filter(Closure::fromCallable([$this, 'memValid']))
             ->map(function ($storage, $index) use ($ram_bytes) {
-                // use total ram for buffers, cached, and shared
-                $total = $storage['hrStorageType'] == 'hrStorageOther' ? $ram_bytes / $storage['hrStorageAllocationUnits'] : $storage['hrStorageSize'];
-
-                if (Str::contains($storage['hrStorageDescr'], 'Real Memory Metrics')) {
+                $total = $storage['hrStorageSize'];
+                if ($storage['hrStorageType'] == 'hrStorageOther' || Str::contains($storage['hrStorageDescr'], 'Real Memory Metrics')) {
+                    // use total RAM for buffers, cached, and shared
                     // bsnmp does not report the same as net-snmp, total RAM is stored in hrMemorySize
-                    $size = $this->getCacheTable('hrMemorySize', 'HOST-RESOURCES-MIB');
                     if (isset($size['hrMemorySize.0'])) {
-                        $total = $size['hrMemorySize.0'] * 1024 / $storage['hrStorageAllocationUnits'];  // kilobytes, but will be calculated with this entries allocation units later
+                        $total = $ram_bytes / $storage['hrStorageAllocationUnits']; // will be calculated with this entries allocation units later
                     }
                 }
 
@@ -171,7 +169,7 @@ trait HostResources
                     'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
                     'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
                     'mempool_total_oid' => null,
-                ]))->fillUsage($storage['hrStorageUsed'], $total);
+                ]))->setClass()->fillUsage($storage['hrStorageUsed'], $total);
             });
     }
 

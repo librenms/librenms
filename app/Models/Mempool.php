@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Mempool extends DeviceRelatedModel implements Keyable
@@ -13,6 +14,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         'mempool_index',
         'entPhysicalIndex',
         'mempool_type',
+        'mempool_class',
         'mempool_precision',
         'mempool_descr',
         'mempool_perc',
@@ -76,6 +78,45 @@ class Mempool extends DeviceRelatedModel implements Keyable
 
         if ($percent == null) {
             $this->mempool_perc = $this->mempool_used / $this->mempool_total * 100;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the mempool class.  If no class is given, try to detect it from available data.
+     *
+     * @param  null  $class
+     * @return \App\Models\Mempool
+     */
+    public function setClass($class = null)
+    {
+        if ($class) {
+            $this->mempool_class = $class;
+
+            return $this;
+        }
+
+        $memoryClasses = [
+            'system' => ['physical', 'ram', 'real'],
+            'virtual' => ['virtual'],
+            'swap' => ['swap'],
+            'buffers' => ['buffers'],
+            'cached' => ['cached'],
+            'shared' => ['shared'],
+        ];
+
+        $descr = strtolower($this->mempool_descr);
+
+        foreach ($memoryClasses as $class => $search) {
+            if (Str::contains($descr, $search)) {
+                $this->mempool_class = $class;
+
+                return $this;
+            }
+            if ($descr == 'virtual memory' && ! empty($this->mempool_class)) {
+                dd('here', $this->toArray());
+            }
         }
 
         return $this;

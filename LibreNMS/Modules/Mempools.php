@@ -26,6 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Mempool;
+use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Module;
@@ -49,6 +50,7 @@ class Mempools implements Module
 
                 return false;
             });
+            $this->calculateAvailable($mempools);
 
             ModuleModelObserver::observe('\App\Models\Mempool');
             $this->syncModels($os->getDevice(), 'mempools', $mempools);
@@ -76,23 +78,24 @@ class Mempools implements Module
                 : $this->defaultPolling($os, $other);
         }
 
-        $os->getDevice()->mempools->each(function (Mempool $mempool) use ($os) {
-            $this->printMempool($mempool);
+        $this->calculateAvailable($os->getDevice()->mempools)
+            ->each(function (Mempool $mempool) use ($os) {
+                $this->printMempool($mempool);
 
-            $mempool->save();
+                $mempool->save();
 
-            $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
-            $rrd_def = RrdDefinition::make()
+                $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
+                $rrd_def = RrdDefinition::make()
                 ->addDataset('used', 'GAUGE', 0)
                 ->addDataset('free', 'GAUGE', 0);
-            $fields = [
+                $fields = [
                 'used' => $mempool->mempool_used,
                 'free' => $mempool->mempool_free,
             ];
 
-            $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def');
-            data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
-        });
+                $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def');
+                data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
+            });
     }
 
     /**
@@ -124,9 +127,59 @@ class Mempools implements Module
         $os->getDevice()->mempools()->delete();
     }
 
+    /**
+     * Calculate available memory.  This is free + buffers + cached.
+     *
+     * @param  \Illuminate\Support\Collection  $mempools
+     * @return \Illuminate\Support\Collection|void
+     */
+    private function calculateAvailable(Collection $mempools)
+    {
+        if ($mempools->count() > 2) { // optimization
+            $system = null;
+            $buffers = null;
+            $cached = null;
+
+            foreach ($mempools as $mempool) {
+                /** @var Mempool $mempool */
+                if ($mempool->mempool_class == 'system') {
+                    if ($system !== null) {
+                        d_echo('Aborted available calculation, too many system class mempools');
+
+                        return $mempools; // more than one system, abort
+                    }
+                    $system = $mempool;
+                } elseif ($mempool->mempool_class == 'buffers') {
+                    if ($buffers !== null) {
+                        d_echo('Aborted available calculation, too many buffers class mempools');
+
+                        return $mempools; // more than one buffer, abort
+                    }
+                    $buffers = $mempool->mempool_used;
+                } elseif ($mempool->mempool_class == 'cached') {
+                    if ($cached !== null) {
+                        d_echo('Aborted available calculation, too many cached class mempools');
+
+                        return $mempools; // more than one cache, abort
+                    }
+                    $cached = $mempool->mempool_used;
+                }
+            }
+
+            if ($system !== null) {
+                $old = format_bi($system->mempool_free);
+                $system->fillUsage(($system->mempool_used - $buffers - $cached) / $system->mempool_precision, $system->mempool_total / $system->mempool_precision);
+                $new = format_bi($system->mempool_free);
+                d_echo("Free memory adjusted by availability calculation: {$old}iB -> {$new}iB\n");
+            }
+        }
+
+        return $mempools;
+    }
+
     private function printMempool(Mempool $mempool)
     {
-        echo "$mempool->mempool_type: $mempool->mempool_descr: $mempool->mempool_perc%";
+        echo "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
             $used = format_bi($mempool->mempool_used);
             $total = format_bi($mempool->mempool_total);
