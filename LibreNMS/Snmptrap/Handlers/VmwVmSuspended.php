@@ -27,6 +27,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\PowerState;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
@@ -46,7 +47,7 @@ class VmwVmSuspended implements SnmptrapHandler
         $vmGuestName = VmwTrapUtil::getGuestName($trap);
 
         $vminfo = $device->vminfo()->where('vmwVmDisplayName', $vmGuestName)->first();
-        $vminfo->vmwVmState = 'suspended';
+        $vminfo->vmwVmState = PowerState::SUSPENDED;
 
         Log::event("Guest $vmGuestName has been suspended", $device->device_id, 'trap', 2);
 

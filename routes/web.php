@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
+    Route::view('vminfo', 'vminfo');
 
     // Device Tabs
     Route::group(['prefix' => 'device/{device}', 'namespace' => 'Device\Tabs', 'as' => 'device.'], function () {
@@ -124,6 +125,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('location', 'LocationController');
             Route::post('port-nac', 'PortNacController');
             Route::post('syslog', 'SyslogController');
+            Route::post('vminfo', 'VminfoController');
         });
 
         // dashboard widgets
