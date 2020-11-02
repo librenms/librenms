@@ -146,9 +146,9 @@ if ($port_adsl['adslLineCoding']) {
     //    adslAtucCurrAttainableRate is UploadMaxRate
     echo 'Max:' . formatRates($port_adsl['adslAturCurrAttainableRate']) . '/' . formatRates($port_adsl['adslAtucCurrAttainableRate']);
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
-    echo 'Atten:' . $port_adsl['adslAtucCurrAtn'] . 'dB/' . $port_adsl['adslAturCurrAtn'] . 'dB';
+    echo 'Atten:' . $port_adsl['adslAturCurrAtn'] . 'dB/' . $port_adsl['adslAtucCurrAtn'] . 'dB';
     echo '<br />';
-    echo 'SNR:' . $port_adsl['adslAtucCurrSnrMgn'] . 'dB/' . $port_adsl['adslAturCurrSnrMgn'] . 'dB';
+    echo 'SNR:' . $port_adsl['adslAturCurrSnrMgn'] . 'dB/' . $port_adsl['adslAtucCurrSnrMgn'] . 'dB';
 } else {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {
