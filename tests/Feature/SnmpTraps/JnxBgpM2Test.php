@@ -35,7 +35,7 @@ class JnxBgpM2Test extends SnmpTrapTestCase
 {
     public function testBgpPeerUnknown()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
@@ -62,8 +62,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
 
     public function testBgpBackwardTrasition()
     {
-        $device = factory(Device::class)->create();
-        $bgppeer = factory(BgpPeer::class)->make(['bgpPeerIdentifier' => '2001:d88:1::2', 'bgpPeerState' => 'established']);
+        $device = Device::factory()->create();
+        $bgppeer = BgpPeer::factory()->make(['bgpPeerIdentifier' => '2001:d88:1::2', 'bgpPeerState' => 'established']);
         $device->bgppeers()->save($bgppeer);
 
         $trapText = "$device->hostname
@@ -91,8 +91,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
 
     public function testBgpEstablished()
     {
-        $device = factory(Device::class)->create();
-        $bgppeer = factory(BgpPeer::class)->make(['bgpPeerIdentifier' => '2001:d88:1::2', 'bgpPeerState' => 'idle']);
+        $device = Device::factory()->create();
+        $bgppeer = BgpPeer::factory()->make(['bgpPeerIdentifier' => '2001:d88:1::2', 'bgpPeerState' => 'idle']);
         $device->bgppeers()->save($bgppeer);
 
         $trapText = "$device->hostname
