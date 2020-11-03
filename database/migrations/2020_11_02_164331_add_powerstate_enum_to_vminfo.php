@@ -15,14 +15,16 @@ class AddPowerstateEnumToVminfo extends Migration
      */
     public function up()
     {
-        foreach (Vminfo::select('id', 'vmwVmState')->get() as $vm) {
-            if (is_numeric($vm->vmwVmState)) {
-                continue;
-            }
+        Vminfo::select('id', 'vmwVmState')->chunk(100, function ($vms) {
+            foreach ($vms as $vm) {
+                if (is_numeric($vm->vmwVmState)) {
+                    continue;
+                }
 
-            $vm->vmwVmState = PowerState::STATES[strtolower($vm->vmwVmState)];
-            $vm->update();
-        }
+                $vm->vmwVmState = PowerState::STATES[strtolower($vm->vmwVmState)];
+                $vm->update();
+            }
+        });
 
         Schema::table('vminfo', function (Blueprint $table) {
             $table->smallInteger('vmwVmState')->unsigned()->change();
