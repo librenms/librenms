@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2007-2017 VMware, Inc.  All rights reserved.
+-- Copyright 2007-2018 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
@@ -11,7 +11,7 @@ IMPORTS
         FROM VMWARE-ROOT-MIB;
 
 vmwProducts MODULE-IDENTITY
-       LAST-UPDATED "201710130000Z"
+       LAST-UPDATED "201806270000Z"
        ORGANIZATION "VMware, Inc"
        CONTACT-INFO
                "VMware, Inc
@@ -26,6 +26,9 @@ vmwProducts MODULE-IDENTITY
                 which are returned from SNMPv2-MIB sysObjectId for
                 agents in specific VMware products.
                "
+       REVISION      "201806270000Z"
+       DESCRIPTION
+               "Add vmwVrops snmp agent's sysObjectId value."
        REVISION      "201710130000Z"
        DESCRIPTION
                "Changed vmwNSXManagerAppliance, vmwNSXManagerAppliance, and vmwNSXControllerAppliance oid."
@@ -60,6 +63,9 @@ vmwServer OBJECT IDENTIFIER
 
 vmwVCOps OBJECT IDENTIFIER
     ::= { vmwProductSpecific 5 }
+
+vmwVrops OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 50 }
 
 vmwGenericAppliance OBJECT IDENTIFIER
     ::= { vmwProductSpecific 6 }

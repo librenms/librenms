@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 $storage_array = snmpwalk_cache_oid($device, 'hrStorageEntry', null, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES:NetWare-Host-Ext-MIB');
 
 if (is_array($storage_array)) {
@@ -41,7 +43,7 @@ if (is_array($storage_array)) {
             $deny = 1;
         } //end if
 
-        if ($device['os'] == 'linux' || $device['os'] == 'vmware') {
+        if ($device['os'] == 'linux' || Str::startsWith($device['os'], 'vmware')) {
             if ($descr == 'Physical memory' || $descr == 'Real Memory') {
                 $perc_warn = 99;
                 $deny = 0;
