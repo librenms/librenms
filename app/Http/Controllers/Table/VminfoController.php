@@ -26,7 +26,6 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
 use App\Models\Vminfo;
-use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Url;
 
 class VminfoController extends TableController
@@ -68,7 +67,7 @@ class VminfoController extends TableController
             'vmwVmCpus' => $vm->vmwVmCpus,
             'hostname' => self::getHostname($vm->device),
             'deviceid' => $vm->device_id,
-            'sysname' => $vm->device->sysname
+            'sysname' => $vm->device->sysname,
 
         ];
     }
