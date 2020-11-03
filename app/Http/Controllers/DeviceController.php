@@ -31,6 +31,7 @@ class DeviceController extends Controller
         'accesspoints' => \App\Http\Controllers\Device\Tabs\AccessPointsController::class,
         'vlans' => \App\Http\Controllers\Device\Tabs\VlansController::class,
         'vm' => \App\Http\Controllers\Device\Tabs\VmInfoController::class,
+        'vminfo' => \App\Http\Controllers\Device\Tabs\VmInfoController::class,
         'mef' => \App\Http\Controllers\Device\Tabs\MefController::class,
         'tnmsne' => \App\Http\Controllers\Device\Tabs\TnmsneController::class,
         'loadbalancer' => \App\Http\Controllers\Device\Tabs\LoadBalancerController::class,

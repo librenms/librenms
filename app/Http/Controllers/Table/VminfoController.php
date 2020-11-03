@@ -33,7 +33,6 @@ class VminfoController extends TableController
 {
     public function searchFields($request)
     {
-        //TODO d.hostname,  d.sysname
         return ['vmwVmDisplayName', 'vmwVmGuestOS', 'devices.hostname', 'devices.sysname'];
     }
 
@@ -50,8 +49,6 @@ class VminfoController extends TableController
      */
     public function baseQuery($request)
     {
-
-        /** @var Builder $query */
         return Vminfo::hasAccess($request->user())
             ->select('vminfo.*')
             ->with('device')
@@ -66,10 +63,12 @@ class VminfoController extends TableController
         return [
             'vmwVmState' => '<span class="label ' . $vm->stateLabel[1] . '">' . $vm->stateLabel[0] . '</span>',
             'vmwVmDisplayName' => is_null($vm->vmDevice) ? $vm->vmwVmDisplayName : self::getHostname($vm->vmDevice),
-            'vmwVmGuestOS' => $vm->vmwVmGuestOS,
+            'vmwVmGuestOS' => $vm->operatingSystem,
             'vmwVmMemSize' => $vm->memoryFormatted,
             'vmwVmCpus' => $vm->vmwVmCpus,
             'hostname' => self::getHostname($vm->device),
+            'deviceid' => $vm->device_id,
+            'sysname' => $vm->device->sysname
 
         ];
     }
