@@ -24,8 +24,9 @@ class AddPowerstateEnumToVminfo extends Migration
             $vm->update();
         }
 
-        // No native support for tinyints apparently.
-        DB::statement('ALTER TABLE `vminfo` CHANGE `vmwVmState` `vmwVmState` TINYINT UNSIGNED NOT NULL;');
+        Schema::table('vminfo', function (Blueprint $table) {
+            $table->smallInteger('vmwVmState')->unsigned()->change();
+        });
     }
 
     /**
