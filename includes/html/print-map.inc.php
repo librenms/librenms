@@ -391,8 +391,7 @@ function highlightNode(e) {
         echo "window.location.pathname = 'map/group=" . $group . "/highlight_node=' + highlight_node;";
     } else {
         echo "window.location.pathname = 'map/highlight_node=' + highlight_node;";
-    }
-    ?>
+    } ?>
 }
 
 $('#highlight_node option[value="<?=$highlight_node?>"]').prop('selected', true);
