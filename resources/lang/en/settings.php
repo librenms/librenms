@@ -66,6 +66,7 @@ return [
         'system' => [
             'cleanup' => 'Cleanup',
             'proxy' => 'Proxy',
+            'specialports' => 'Ports',
             'updates' => 'Updates',
             'server' => 'Server',
         ],
@@ -412,6 +413,22 @@ return [
         'authlog_purge' => [
             'description' => 'Auth log entries older than (days)',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'peering_descr' => [
+            'description' => 'Peering Port Prefix',
+            'help' => 'Ports with this Prefix, seperated by a ":" from a Port description will be recognized as Peering Port',
+        ],
+        'transit_descr' => [
+            'description' => 'Transit Port Prefix',
+            'help' => 'Ports with this Prefix, seperated by a ":" from a Port description will be recognized as Transit Port',
+        ],
+        'core_descr' => [
+            'description' => 'Core Port Prefix',
+            'help' => 'Ports with this Prefix, seperated by a ":" from a Port description will be recognized as Core Port',
+        ],
+        'customers_descr' => [
+            'description' => 'Customer Port Prefix',
+            'help' => 'Ports with this Prefix, seperated by a ":" from a Port description will be recognized as Customer Port',
         ],
         'base_url' => [
             'description' => 'Specific URL',
