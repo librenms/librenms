@@ -31,6 +31,7 @@ use App\Models\ServiceTemplate;
 use App\Models\User;
 use Auth;
 use DB;
+use LibreNMS\Config;
 
 class PermissionsCache
 {

@@ -37,7 +37,7 @@ class MgmtTrapNmsEventTest extends SnmpTrapTestCase
 {
     public function testEvent()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -73,7 +73,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
     //Test alarm with addtional text supplied.
     public function testEventAddText()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -110,7 +110,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
     //Event trap on a specific port
     public function testEventPort()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];

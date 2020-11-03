@@ -13,7 +13,7 @@ IMPORTS
        FROM SNMPv2-CONF;
 
 vmwVRNIAgentCapabilityMIB MODULE-IDENTITY
-   LAST-UPDATED "201710130000Z"
+   LAST-UPDATED "202005200000Z"
    ORGANIZATION "VMware, Inc"
    CONTACT-INFO
       "VMware, Inc
@@ -24,7 +24,32 @@ vmwVRNIAgentCapabilityMIB MODULE-IDENTITY
       Web: http://kb.vmware.com/kb/1013445
       "
    DESCRIPTION
-     "This module defines agent capabilities for deployed VRNI agents by release."
+     "This module defines agent capabilities for deployed VRNI agents by release.
+     It is compatible with vRNI v3.8 and onwards"
+
+  REVISION     "202005200000Z"
+   DESCRIPTION
+     "Notifications sent by VRNI as updated in 5.1 and 5.2 release"
+
+  REVISION     "201908190000Z"
+   DESCRIPTION
+     "Notifications sent by VRNI as updated in 5.0 release"
+
+   REVISION     "201906060000Z"
+   DESCRIPTION
+     "Notifications sent by VRNI as updated in 4.2 release"
+
+   REVISION     "201903220000Z"
+   DESCRIPTION
+     "Notifications sent by VRNI as updated in 4.1 release"
+
+   REVISION     "201812040000Z"
+   DESCRIPTION
+     "Notifications sent by VRNI as updated in 4.0 release"
+
+   REVISION     "201809120000Z"
+   DESCRIPTION
+     "Notifications sent by VRNI as updated in 3.9 release"  
 
    REVISION     "201710130000Z"
    DESCRIPTION
@@ -47,6 +72,141 @@ vmwVRNIAgentCapabilityMIB MODULE-IDENTITY
         ::= { vmwareAgentCapabilities 125 }
 
 vmwVRNICapability OBJECT IDENTIFIER ::= { vmwVRNIAgentCapabilityMIB 10 }
+
+vmwVRNIAgent2020v520 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+    "5.2.0"
+  STATUS  current
+  DESCRIPTION
+    "Release 5.2.0 for VMware VRNI.
+    It describes all the notifications sent from this version of VRNI appliance."
+  REFERENCE
+    "http://www.vmware.com/products"
+    -- REVISION 202005200000Z Tenth Version
+    SUPPORTS VMWARE-VRNI-MIB
+    INCLUDES { vmwNetworkInsightNotificationInfoGroup3,
+               vmwNetworkInsightNotificationGroup1,
+               vmwNetworkInsightNotificationGroup2,
+               vmwNetworkInsightNotificationGroup3,
+               vmwNetworkInsightNotificationGroup4,
+               vmwNetworkInsightNotificationGroup5,
+               vmwNetworkInsightNotificationGroup6,
+               vmwNetworkInsightNotificationGroup7,
+               vmwNetworkInsightNotificationGroup8,
+               vmwNetworkInsightNotificationGroup9,
+               vmwNetworkInsightNotificationGroup10
+            }
+    ::= { vmwVRNICapability 16 }
+
+vmwVRNIAgent2019v500 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+    "5.0.0"
+  STATUS  current
+  DESCRIPTION
+    "Release 5.0.0 for VMware VRNI.
+    It describes all the notifications sent from this version of VRNI appliance."
+  REFERENCE
+    "http://www.vmware.com/products"
+    -- REVISION 201908190000Z Ninth Version
+    SUPPORTS VMWARE-VRNI-MIB
+    INCLUDES { vmwNetworkInsightNotificationInfoGroup3,
+               vmwNetworkInsightNotificationGroup1,
+               vmwNetworkInsightNotificationGroup2,
+               vmwNetworkInsightNotificationGroup3,
+               vmwNetworkInsightNotificationGroup4,
+               vmwNetworkInsightNotificationGroup5,
+               vmwNetworkInsightNotificationGroup6,
+               vmwNetworkInsightNotificationGroup7,
+               vmwNetworkInsightNotificationGroup8,
+               vmwNetworkInsightNotificationGroup9
+            }
+    ::= { vmwVRNICapability 15 }
+
+vmwVRNIAgent2019v420 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+    "4.2.0"
+  STATUS  current
+  DESCRIPTION
+    "Release 4.2.0 for VMware VRNI.
+    It describes all the notifications sent from this version of VRNI appliance."
+  REFERENCE
+    "http://www.vmware.com/products"
+    -- REVISION 201906060000Z Eighth Version
+    SUPPORTS VMWARE-VRNI-MIB
+    INCLUDES { vmwNetworkInsightNotificationInfoGroup3,
+               vmwNetworkInsightNotificationGroup1,
+               vmwNetworkInsightNotificationGroup2,
+               vmwNetworkInsightNotificationGroup3,
+               vmwNetworkInsightNotificationGroup4,
+               vmwNetworkInsightNotificationGroup5,
+               vmwNetworkInsightNotificationGroup6,
+               vmwNetworkInsightNotificationGroup7,
+               vmwNetworkInsightNotificationGroup8
+            }
+    ::= { vmwVRNICapability 14 }
+
+vmwVRNIAgent2019v410 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+    "4.1.0"
+  STATUS  current
+  DESCRIPTION
+    "Release 4.1.0 for VMware VRNI.
+    It describes all the notifications sent from this version of VRNI appliance."
+  REFERENCE
+    "http://www.vmware.com/products"
+    -- REVISION 201903220000Z Seventh Version
+    SUPPORTS VMWARE-VRNI-MIB
+    INCLUDES { vmwNetworkInsightNotificationInfoGroup3,
+               vmwNetworkInsightNotificationGroup1,
+               vmwNetworkInsightNotificationGroup2,
+               vmwNetworkInsightNotificationGroup3,
+               vmwNetworkInsightNotificationGroup4,
+               vmwNetworkInsightNotificationGroup5,
+               vmwNetworkInsightNotificationGroup6,
+               vmwNetworkInsightNotificationGroup7
+            }
+    ::= { vmwVRNICapability 13 }
+
+vmwVRNIAgent2018v400 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+    "4.0.0"
+  STATUS  current
+  DESCRIPTION
+    "Release 4.0.0 for VMware VRNI.
+    It describes all the notifications sent from this version of VRNI appliance."
+  REFERENCE
+    "http://www.vmware.com/products"
+    -- REVISION 201812120000Z Sixth Version
+    SUPPORTS VMWARE-VRNI-MIB
+    INCLUDES { vmwNetworkInsightNotificationInfoGroup3,
+               vmwNetworkInsightNotificationGroup1,
+               vmwNetworkInsightNotificationGroup2,
+               vmwNetworkInsightNotificationGroup3,
+               vmwNetworkInsightNotificationGroup4,
+               vmwNetworkInsightNotificationGroup5,
+               vmwNetworkInsightNotificationGroup6
+            }
+    ::= { vmwVRNICapability 12 }
+
+vmwVRNIAgent2018v390 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+    "3.9.0"
+  STATUS  current
+  DESCRIPTION
+    "Release 3.9.0 for VMware VRNI.
+    It describes all the notifications sent from the VRNI appliance."
+  REFERENCE
+    "http://www.vmware.com/products"
+    -- REVISION 201809120000Z Fifth Version
+    SUPPORTS VMWARE-VRNI-MIB
+    INCLUDES { vmwNetworkInsightNotificationInfoGroup3,
+               vmwNetworkInsightNotificationGroup1,
+               vmwNetworkInsightNotificationGroup2,
+               vmwNetworkInsightNotificationGroup3,
+               vmwNetworkInsightNotificationGroup4,
+               vmwNetworkInsightNotificationGroup5
+            }
+    ::= { vmwVRNICapability 11 }          
 
 vmwVRNIAgent2016v350 AGENT-CAPABILITIES
   PRODUCT-RELEASE

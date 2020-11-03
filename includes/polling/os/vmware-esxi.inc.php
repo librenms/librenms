@@ -1,41 +1,6 @@
 <?php
 
 /*
- * Fetch the VMware product version.
- *
- *  VMWARE-SYSTEM-MIB::vmwProdName.0 = STRING: VMware ESXi
- *  VMWARE-SYSTEM-MIB::vmwProdVersion.0 = STRING: 4.1.0
- *  VMWARE-SYSTEM-MIB::vmwProdBuild.0 = STRING: 348481
- *
- *  version:   ESXi 4.1.0
- *  features:  build-348481
- */
-
-$data = snmp_get_multi($device, 'VMWARE-SYSTEM-MIB::vmwProdName.0 VMWARE-SYSTEM-MIB::vmwProdVersion.0 VMWARE-SYSTEM-MIB::vmwProdBuild.0', '-OQUs', '+VMWARE-ROOT-MIB:VMWARE-SYSTEM-MIB:VMWARE-VMINFO-MIB', 'vmware');
-
-$hardware_snmp = snmp_get($device, 'entPhysicalDescr.1', '-OsvQU', 'ENTITY-MIB');
-
-if (preg_match('/VMware-vCenter-Server-Appliance/', $data[0]['vmwProdBuild'])) {
-    preg_match('/^(?>\S+\s){1,2}/', $device['sysDescr'], $ver);
-    $version = $ver[0];
-
-    preg_match('/(\d){7}/', $device['sysDescr'], $feat);
-    $features = 'build-' . $feat[0];
-
-    preg_match('/^(?>\S+\s*){1,4}/', $hardware_snmp, $hard);
-    $hardware = rtrim($hard[0]);
-} else {
-    $version = preg_replace('/^VMware /', '', $data[0]['vmwProdName']) . ' ' . $data[0]['vmwProdVersion'];
-    $features = 'build-' . $data[0]['vmwProdBuild'];
-    $hardware = $hardware_snmp;
-}
-
-$serial = snmp_get($device, 'entPhysicalSerialNum.1', '-OsvQU', 'ENTITY-MIB');
-
-// Clean up Generic hardware descriptions
-$hardware = rewrite_generic_hardware($hardware);
-
-/*
  * CONSOLE: Start the VMware discovery process.
  */
 

@@ -34,7 +34,7 @@ class JnxPowerSupplyTest extends SnmpTrapTestCase
 {
     public function testJnxPowerSupplyFailureTrap()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:49716->[10.0.0.1]:162
@@ -57,7 +57,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX96
 
     public function testJnxPowerSupplyOkTrap()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:49716->[10.0.0.1]:162
