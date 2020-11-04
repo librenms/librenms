@@ -769,8 +769,8 @@
             "type": "array"
         },
         "customers_descr": {
-            "default": ["cust"],
-            "type": "array",
+            "default": "cust",
+            "type": "text",
             "group": "system",
             "section": "specialports",
             "order": 3
