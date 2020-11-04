@@ -698,11 +698,8 @@ class Service:
             return
 
         if logfile_mdiff > self.config.poller.frequency:
-            if self.config.watchdog_enabled:
-                critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
-                self.restart()
-            else:
-                info("Watchdog is disabled")
+            critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
+            self.restart()
         else:
             info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
