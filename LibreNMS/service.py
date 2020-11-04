@@ -291,8 +291,12 @@ class Service:
         self._lm = self.create_lock_manager()
         self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance, 'maintenance')
         self.stats_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.log_performance_stats, 'performance')
-        info("Starting watchdog timer for log file: {}".format(self.config.watchdog_logfile))
-        self.watchdog_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.logfile_watchdog, 'watchdog')
+        if self.config.watchdog_enabled:
+            info("Starting watchdog timer for log file: {}".format(self.config.watchdog_logfile))
+            self.watchdog_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.logfile_watchdog, 'watchdog')
+        else:
+            info("Watchdog is disabled.")
+        self.systemd_watchdog_timer = LibreNMS.RecurringTimer(10, self.systemd_watchdog, 'systemd-watchdog')
         self.is_master = False
 
     def service_age(self):
@@ -356,6 +360,7 @@ class Service:
         if self.config.update_enabled:
             self.daily_timer.start()
         self.stats_timer.start()
+        self.systemd_watchdog_timer.start()
         if self.config.watchdog_enabled:
             self.watchdog_timer.start()
 
@@ -532,7 +537,7 @@ class Service:
             return
 
         info('Restarting service... ')
-        
+
         if 'psutil' not in sys.modules:
             warning("psutil is not available, polling gap possible")
             self._stop_managers_and_wait()
@@ -587,6 +592,7 @@ class Service:
 
         self.daily_timer.stop()
         self.stats_timer.stop()
+        self.systemd_watchdog_timer.stop()
         if self.config.watchdog_enabled:
             self.watchdog_timer.stop()
 
@@ -678,10 +684,11 @@ class Service:
         except pymysql.err.Error:
             exception("Unable to log performance statistics - is the database still online?")
 
-    def logfile_watchdog(self):
-        # notify systemd service watchdog service
+    def systemd_watchdog(self):
         if 'systemd.daemon' in sys.modules:
             notify("WATCHDOG=1")
+
+    def logfile_watchdog(self):
 
         try:
             # check that lofgile has been written to within last poll period
