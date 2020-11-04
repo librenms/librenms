@@ -77,7 +77,7 @@ if (is_file($install_dir . '/composer.phar')) {
             echo "Error: Failed to download $installer_url\n";
         } elseif (@hash_file('SHA384', $dest) === $good_sha) {
             // Installer verified
-            shell_exec("php $dest");
+            shell_exec("php $dest --version=1.10.17");
             $exec = "php $install_dir/composer.phar";
         } else {
             echo "Error: Corrupted download, signature doesn't match for $installer_url\n";
