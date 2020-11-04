@@ -156,7 +156,7 @@ trait HostResources
                 if ($storage['hrStorageType'] == 'hrStorageOther' || Str::contains($storage['hrStorageDescr'], 'Real Memory Metrics')) {
                     // use total RAM for buffers, cached, and shared
                     // bsnmp does not report the same as net-snmp, total RAM is stored in hrMemorySize
-                    if (isset($size['hrMemorySize.0'])) {
+                    if ($ram_bytes) {
                         $total = $ram_bytes / $storage['hrStorageAllocationUnits']; // will be calculated with this entries allocation units later
                     }
                 }
