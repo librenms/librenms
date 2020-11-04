@@ -99,7 +99,7 @@ class Unix extends \LibreNMS\OS
             //  NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"manufacturer\"
             $manufacturer = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.8072.1.3.2.3.1.1.12.109.97.110.117.102.97.99.116.117.114.101.114', '-Oqv', 'NET-SNMP-EXTEND-MIB');
             if ($manufacturer) {
-                $hardware = Str::start($hardware, $manufacturer);
+                $hardware = Str::start($hardware, $manufacturer . ' ');
             }
 
             $version_extend = snmp_get_multi_oid($this->getDeviceArray(), [

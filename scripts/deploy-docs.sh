@@ -9,19 +9,29 @@ fi
 
 pip3 install --upgrade pip
 pip3 install --user --requirement <(cat <<EOF
+click==7.1.2
 future==0.18.2
 Jinja2==2.11.2
-livereload==2.6.1
+joblib==0.17.0
+livereload==2.6.3
 lunr==0.5.8
-Markdown==3.2.2
-mkdocs==1.1.2
-mkdocs-material==5.2.2
-nltk==3.5
-pymdown-extensions==7.1
-PyYAML==5.3.1
-six==1.15.0
-tornado==6.0.4
+Markdown==3.3.2
 MarkupSafe==1.1.1
+mkdocs==1.1.2
+mkdocs-exclude==1.0.2
+mkdocs-macros-plugin==0.4.18
+mkdocs-material==6.1.0
+mkdocs-material-extensions==1.0.1
+nltk==3.5
+Pygments==2.7.1
+pymdown-extensions==8.0.1
+python-dateutil==2.8.1
+PyYAML==5.3.1
+regex==2020.10.23
+six==1.15.0
+termcolor==1.1.0
+tornado==6.0.4
+tqdm==4.50.2
 EOF
 )
 

@@ -24,6 +24,9 @@ markdown_extensions:
             options:
               startinline: true
 plugins:
+  - macros:
+      j2_variable_start_string: '@='
+      j2_variable_end_string: '=@'
   - search
   - exclude:
       glob: General/Changelogs/*
@@ -35,6 +38,8 @@ extra_javascript:
 extra:
     article_nav_top: false
     article_nav_bottom: true
+    php:
+        version_min: 7.2.5
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms/
@@ -70,6 +75,7 @@ nav:
       - Network Map: Extensions/Network-Map.md
       - Syslog: Extensions/Syslog.md
       - Dashboards: Extensions/Dashboards.md
+      - Supermicro: Extensions/Supermicro.md
   - 5. Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md

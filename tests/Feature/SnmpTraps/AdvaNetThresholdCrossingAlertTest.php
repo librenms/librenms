@@ -32,7 +32,7 @@ class AdvaNetThresholdCrossingAlertTest extends SnmpTrapTestCase
 {
     public function testNetThresholdTrap()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

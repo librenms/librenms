@@ -231,7 +231,7 @@ class ServiceConfig:
     def _get_config_data(self):
         try:
             import dotenv
-            env_path =  "{}/.env".format(self.BASE_DIR)
+            env_path = "{}/.env".format(self.BASE_DIR)
             info("Attempting to load .env from '%s'", env_path)
             dotenv.load_dotenv(dotenv_path=env_path, verbose=True)
 
@@ -321,7 +321,7 @@ class Service:
         # Speed things up by only looking at direct zombie children
         for p in psutil.Process().children(recursive=False):
             try:
-                cmd = p.cmdline() # cmdline is uncached, so needs to go here to avoid NoSuchProcess
+                cmd = p.cmdline()  # cmdline is uncached, so needs to go here to avoid NoSuchProcess
                 status = p.status()
 
                 if status == psutil.STATUS_ZOMBIE:
@@ -555,7 +555,8 @@ class Service:
         :param signalnum: UNIX signal number
         :param flag: Flags accompanying signal
         """
-        if (signal(SIGCHLD, SIG_DFL) == SIG_DFL):
+        handler = signal(SIGCHLD, SIG_DFL)
+        if handler == SIG_DFL:
             # signal is already being handled, bail out as this handler is not reentrant - the kernel will re-raise the signal later
             return
 

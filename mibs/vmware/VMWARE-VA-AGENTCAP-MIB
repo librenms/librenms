@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2008-2017 VMware, Inc.  All rights reserved.
+-- Copyright 2008-2020 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-VA-AGENTCAP-MIB DEFINITIONS ::= BEGIN
@@ -12,7 +12,7 @@ IMPORTS
     AGENT-CAPABILITIES
        FROM  SNMPv2-CONF;
 vmwVAAgentCapabilityMIB MODULE-IDENTITY
-   LAST-UPDATED "201710130000Z"
+   LAST-UPDATED "202003270000Z"
    ORGANIZATION "VMware, Inc"
    CONTACT-INFO
       "VMware, Inc
@@ -25,9 +25,13 @@ vmwVAAgentCapabilityMIB MODULE-IDENTITY
    DESCRIPTION
      "This module defines agent capabilities for deployed VMware Virtual Appliance agents
       by release."
+   REVISION     "202003270000Z"
+   DESCRIPTION
+         "Capabilities for VMware VSphere (Release 7.0) VCenter added."
+
    REVISION     "201710130000Z"
    DESCRIPTION
-         "Capabilities for VMware VSphere (Release 6.7) ESXi 2017 added."
+         "Capabilities for VMware VSphere (Release 6.7) VCenter added."
 
    REVISION     "201604220000Z"
    DESCRIPTION
@@ -40,6 +44,237 @@ vmwVAAgentCapabilityMIB MODULE-IDENTITY
 
 vmwVACapability OBJECT IDENTIFIER ::= {  vmwVAAgentCapabilityMIB 1 }
 
+
+--
+-- 2020 Release and follow up patch releases
+--
+
+vmwVCSA2020x AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "7.0.x"
+  STATUS  current
+  DESCRIPTION
+     "Release 7.0 for VMware Virtual Appliance (VCSA) supporting SNMPv1, SNMPv2c, and SNMPv3.
+      Added REST API configuration/status/test support for appliance similar to vicfg-snmp CLI,
+      Service is off by default, see 'systemctl status snmpcfgd' and systemctl enable/start to use.
+      Added a configuration option for HOST-RESOURCES-MIB added for reporting java processes clearly.
+      Remaining changes for this release were bug fixes.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+
+     -- RFC 3418
+     SUPPORTS SNMPv2-MIB
+     INCLUDES {
+         snmpGroup,
+         systemGroup,
+         snmpCommunityGroup,
+         snmpBasicNotificationsGroup,
+         snmpWarmStartNotificationGroup
+         -- groups not supported; snmpSetGroup, snmpNotificationGroup
+     }
+     VARIATION snmpSetSerialNo
+     ACCESS  not-implemented
+     DESCRIPTION "Agent provides read-only view of system information."
+
+     VARIATION snmpTrapOID
+     ACCESS not-implemented
+     DESCRIPTION "Agent does not proxy other agents RFC1157 Trap-PDUs."
+
+     VARIATION  snmpTrapEnterprise
+     ACCESS not-implemented
+     DESCRIPTION "Agent does not proxy other agents RFC1157 Trap-PDUs."
+
+     VARIATION snmpEnableAuthenTraps
+     SYNTAX INTEGER { disabled(2) }
+     ACCESS read-only
+     DESCRIPTION "Agent does not support authentication traps. Poll snmpInBadCommunityNames for same info."
+     -- which implies:
+     -- VARIATION authenticationFailure
+     -- ACCESS not-implemented
+     -- DESCRIPTION "Agent does not provide this notification. snmpEnableAuthenTraps will return disabled."
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 2863
+     SUPPORTS IF-MIB
+     INCLUDES {
+         ifGeneralInformationGroup,
+         linkUpDownNotificationsGroup
+     }
+
+     VARIATION ifAdminStatus
+     ACCESS read-only
+     DESCRIPTION "Agent provides read-only view of administrative state for each physical interface."
+
+     VARIATION ifLinkUpDownTrapEnable
+     ACCESS read-only
+     DESCRIPTION "Agent provides read-only view of system information."
+
+     VARIATION ifAlias
+     ACCESS read-only
+     DESCRIPTION "ifIndexes may only change across reboot."
+
+     VARIATION ifInUnknownProtos
+     ACCESS not-implemented
+     DESCRIPTION "This counter always returns 0."
+
+     -- ifRcvAddressGroup is interface/media specific
+     VARIATION ifRcvAddressStatus
+     ACCESS not-implemented
+     DESCRIPTION "Required if media specific mib modules are implemented."
+
+     VARIATION ifRcvAddressType
+     ACCESS not-implemented
+     DESCRIPTION "Required if media specific mib modules are implemented."
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 4293
+     SUPPORTS IP-MIB
+     INCLUDES {
+         ipSystemStatsGroup,
+         ipAddressGroup,
+         ipNetToPhysicalGroup,
+         ipDefaultRouterGroup,
+         icmpStatsGroup,
+         ipSystemStatsHCOctetGroup,
+         ipSystemStatsHCPacketGroup,
+         ipv4GeneralGroup,
+         ipv4IfGroup,
+         ipv4SystemStatsGroup,
+         ipv4SystemStatsHCPacketGroup,
+         ipv6GeneralGroup2,
+         ipv6IfGroup,
+         ipAddressPrefixGroup,
+         ipv6RouterAdvertGroup,
+         ipLastChangeGroup
+     }
+     -- VARIATION ipv6ScopeGroup
+     -- ACCESS  not-implemented
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 4292
+     -- supports SNMPv2/3 Contexts for multiple instances
+     SUPPORTS IP-FORWARD-MIB
+     INCLUDES {
+         inetForwardCidrRouteGroup
+     }
+
+     -- RFC 4113
+     -- supports SNMPv2/3 Contexts for multiple instances
+     SUPPORTS UDP-MIB
+     -- The next two 32 bit counters will be fixed per bug report PR 890894
+     -- VARIATION udpInDatagrams
+     -- ACCESS not-implemented, use udpHCInDatagrams
+     -- VARIATION udpOutDatagrams
+     -- ACCESS not-implemented, use udpHCOutDatagrams
+     INCLUDES {
+        udpBaseGroup,
+        udpEndpointGroup
+     }
+
+     -- RFC 4022
+     -- supports SNMPv2/3 Contexts for multiple instances
+     SUPPORTS TCP-MIB
+     INCLUDES {
+         tcpBaseGroup,
+         tcpConnectionGroup,
+         tcpListenerGroup
+     }
+
+     -- RFC 2790
+     -- NOTE: For storage larger than Integer32 (Terabyte) this agent will report INT_MAX
+     SUPPORTS HOST-RESOURCES-MIB
+     INCLUDES {
+            hrSystemGroup,
+            hrStorageGroup,
+            hrDeviceGroup,
+            hrSWRunGroup,
+            hrSWRunPerfGroup,
+            hrSWInstalledGroup  -- updates once an hour
+     }
+
+     VARIATION  hrSystemNumUsers
+     ACCESS read-only
+     DESCRIPTION "Value reports number of active appliace shell sessions"
+
+     VARIATION  hrSystemDate
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+     VARIATION hrSystemInitialLoadDevice
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+     VARIATION hrSystemInitialLoadParameters
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+     VARIATION hrStorageSize
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+     VARIATION  hrSWRunStatus
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+    -- hrDeviceStatus reports unknown for: cpu, nic either running/unknown.
+    --               disk reports running, warning, down, unknown
+    -- device error counters do not account for all failure cases
+
+     VARIATION hrSWOSIndex
+     ACCESS not-implemented
+     DESCRIPTION "No operatingSystem entry exists in hrSWRunGroup hrSWRunTable"
+
+     VARIATION  hrFSLastFullBackupDate
+     ACCESS not-implemented
+     DESCRIPTION "is not implemented"
+
+     VARIATION  hrFSLastPartialBackupDate
+     ACCESS not-implemented
+     DESCRIPTION "is not implemented"
+
+     VARIATION hrPrinterStatus
+     ACCESS not-implemented
+     DESCRIPTION "is not implemented"
+
+     VARIATION hrPrinterDetectedErrorState
+     ACCESS not-implemented
+     DESCRIPTION "is not implemented"
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 4133
+     SUPPORTS ENTITY-MIB
+     INCLUDES {
+        entityPhysicalGroup,
+        entityPhysical2Group,
+        entityPhysical3Group,
+        entityGeneralGroup
+     }
+     -- VARIATION entityNotificationsGroup
+     -- ACCESS not-implemented
+     -- VARIATION entityMappingGroup
+     -- ACCESS not-implemented
+
+     -- ********************* ************ ************ *************** ***
+     -- REVISION 201008020000Z
+     SUPPORTS VMWARE-SYSTEM-MIB
+     INCLUDES {
+         vmwSystemGroup
+     }
+     -- VARIATION vmwProdUpdate
+     -- ACCESS not-implemented
+     -- VARIATION vmwProdPatch
+     -- ACCESS not-implemented
+
+     -- ********************* ************ ************ *************** ***
+     -- REVISION 201602030000Z
+     SUPPORTS VMWARE-VCHA-MIB
+     INCLUDES {
+         vmwVchaNotificationInfoGroup,
+         vmwVchaNotificationGroup
+     }
+
+   ::= { vmwVACapability 9 }
 
 --
 -- 2017 Release and follow up patch releases

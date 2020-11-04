@@ -60,11 +60,12 @@ class DeviceController extends Controller
         $device = str_replace('device=', '', $device);
         $device = is_numeric($device) ? DeviceCache::get($device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
-        DeviceCache::setPrimary($device_id);
 
         if (! $device->exists) {
             abort(404);
         }
+
+        DeviceCache::setPrimary($device_id);
 
         $current_tab = str_replace('tab=', '', $current_tab);
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';

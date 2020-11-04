@@ -11,11 +11,11 @@ if (getidbyname($vm['vmwVmDisplayName'])) {
 
 echo '</td>';
 
-if ($vm['vmwVmState'] == 'powered off') {
+if ($vm['vmwVmState'] == 'powered off' || $vm['vmwVmState'] == 'Shut off') {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-default">OFF</span></td>';
-} elseif ($vm['vmwVmState'] == 'powered on') {
+} elseif ($vm['vmwVmState'] == 'powered on' || $vm['vmwVmState'] == 'Running') {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-success">ON</span></td>';
-} elseif ($vm['vmwVmState'] == 'suspended') {
+} elseif ($vm['vmwVmState'] == 'suspended' || $vm['vmwVmState'] == 'Paused') {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-warning">SUSPEND</span></td>';
 }
 

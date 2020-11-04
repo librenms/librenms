@@ -30,7 +30,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
     }
 }
 
-$oids = snmp_walk($device, '.1.3.6.1.4.1.10876.2.1.1.1.1.3', '-OsqnU', 'SUPERMICRO-HEALTH-MIB');
+$oids = snmp_walk($device, '.1.3.6.1.4.1.10876.2.1.1.1.1.3', '-OsqnU', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
 d_echo($oids . "\n");
 
 $oids = trim($oids);
@@ -53,11 +53,11 @@ foreach (explode("\n", $oids) as $data) {
             $limit_oid = '.1.3.6.1.4.1.10876.2.1.1.1.1.5.' . $index;
             $lowlimit_oid = '.1.3.6.1.4.1.10876.2.1.1.1.1.6.' . $index;
 
-            $descr = snmp_get($device, $descr_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB');
-            $current = (snmp_get($device, $volt_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB') / $divisor);
-            $limit = (snmp_get($device, $limit_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB') / $divisor);
-            $lowlimit = (snmp_get($device, $lowlimit_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB') / $divisor);
-            $monitor = snmp_get($device, $monitor_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB');
+            $descr = snmp_get($device, $descr_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
+            $current = (snmp_get($device, $volt_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro') / $divisor);
+            $limit = (snmp_get($device, $limit_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro') / $divisor);
+            $lowlimit = (snmp_get($device, $lowlimit_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro') / $divisor);
+            $monitor = snmp_get($device, $monitor_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
             $descr = trim(str_ireplace('Voltage', '', $descr));
 
             if ($monitor == 'true') {

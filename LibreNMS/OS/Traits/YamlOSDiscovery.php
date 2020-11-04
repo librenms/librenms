@@ -55,6 +55,10 @@ trait YamlOSDiscovery
             $this->parseRegex($os_yaml['sysDescr_regex'], $device->sysDescr);
         }
 
+        if (isset($os_yaml['hardware_mib'])) {
+            $this->translateSysObjectID($os_yaml['hardware_mib'], $os_yaml['hardware_regex'] ?? null);
+        }
+
         $oids = Arr::only($os_yaml, $this->fields);
         $fetch_oids = array_unique(Arr::flatten($oids));
         $numeric = $this->isNumeric($fetch_oids);
@@ -116,6 +120,16 @@ trait YamlOSDiscovery
         return trim(preg_replace_callback('/{{ ([^ ]+) }}/', function ($matches) use ($data) {
             return $data[$matches[1]] ?? '';
         }, $template));
+    }
+
+    private function translateSysObjectID($mib, $regex)
+    {
+        $device = $this->getDevice();
+        $device->hardware = snmp_translate($device->sysObjectID, $mib, null, '-Os', $this->getDeviceArray());
+
+        if ($regex) {
+            $this->parseRegex($regex, $device->hardware);
+        }
     }
 
     private function isNumeric($oids)

@@ -391,9 +391,11 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     $data = str_replace('"', '', $data);
     $data = str_replace('End of MIB', '', $data);
 
-    if (is_string($data) && (preg_match('/No Such (Object|Instance)/i', $data) || preg_match('/Wrong Type(.*)should be/', $data))) {
+    if (is_string($data) && preg_match('/No Such (Object|Instance)/i', $data)) {
         d_echo('Invalid snmp_walk() data = ' . print_r($data, true));
         $data = false;
+    } elseif (preg_match('/Wrong Type(.*)should be/', $data)) {
+        $data = preg_replace('/Wrong Type \(should be .*\): /', '', $data);
     } else {
         if (Str::endsWith($data, '(It is past the end of the MIB tree)')) {
             $no_more_pattern = '/.*No more variables left in this MIB View \(It is past the end of the MIB tree\)[\n]?/';
@@ -465,6 +467,11 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
     foreach (explode("\n", $data) as $entry) {
+        if (! Str::contains($entry, ' =') && ! empty($entry) && isset($index, $oid)) {
+            $array[$index][$oid] .= "\n$entry";
+            continue;
+        }
+
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
@@ -716,13 +723,6 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
 
     return $array;
 }//end snmpwalk_cache_threepart_oid()
-
-function snmp_cache_oid($oid, $device, $array, $mib = 0)
-{
-    $array = snmpwalk_cache_oid($device, $oid, $array, $mib);
-
-    return $array;
-}//end snmp_cache_oid()
 
 /**
  * generate snmp auth arguments

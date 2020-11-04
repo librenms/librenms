@@ -1,6 +1,7 @@
 <?php
 
 // Build SNMP Cache Array
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -553,7 +554,7 @@ foreach ($ports as $port) {
         // Check to make sure Port data is cached.
         $this_port = &$port_stats[$ifIndex];
 
-        if ($device['os'] == 'vmware' && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
+        if (Str::startsWith($device['os'], 'vmware') && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
             $this_port['ifDescr'] = $matches[1];
         }
 
@@ -734,8 +735,9 @@ foreach ($ports as $port) {
         if (! empty($port['skipped'])) {
             // We don't care about statistics for skipped selective polling ports
             d_echo("$port_id skipped because selective polling ports is set.");
-        } elseif ($port['ifOperStatus'] == 'down' && $port['ifOperStatus_prev'] == 'down' && $this_port['ifOperStatus'] == 'down' && $this_port['ifLastChange'] == $port['ifLastChange']) {
+        } elseif ($port['ifType'] != 'adsl' && $port['ifOperStatus'] == 'down' && $port['ifOperStatus_prev'] == 'down' && $this_port['ifOperStatus'] == 'down' && $this_port['ifLastChange'] == $port['ifLastChange']) {
             // We don't care about statistics for down ports on which states did not change since last polling
+            // We still take into account 'adsl' ports that may update speed/noise even if the interface is status down
             d_echo("$port_id skipped because port is still down since last polling.");
         } else {
             // End parse ifAlias

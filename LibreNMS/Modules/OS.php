@@ -61,7 +61,7 @@ class OS implements Module
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
                 // OS Specific
                 include base_path('/includes/polling/os/' . $device['os'] . '.inc.php');
-            } elseif ($device['os_group'] && base_path('/includes/polling/os/' . $device['os_group'] . '.inc.php')) {
+            } elseif ($device['os_group'] && is_file(base_path('/includes/polling/os/' . $device['os_group'] . '.inc.php'))) {
                 // OS Group Specific
                 include base_path('/includes/polling/os/' . $device['os_group'] . '.inc.php');
             } else {

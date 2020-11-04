@@ -74,7 +74,7 @@ DB_PASSWORD=
 
 ## Distributed Polling Configuration
 
-Once you have your Redis database set up, configure it in the .env file on each node.
+Once you have your Redis database set up, configure it in the .env file on each node. Configure the redis cache driver for distributed locking.
 
 ```dotenv
 REDIS_HOST=127.0.0.1
@@ -86,6 +86,8 @@ REDIS_SENTINEL_SERVICE=myservice
 REDIS_DB=0
 #REDIS_PASSWORD=
 #REDIS_TIMEOUT=60
+
+CACHE_DRIVER=redis
 ```
 
 ## Basic Configuration
