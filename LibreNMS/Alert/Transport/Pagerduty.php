@@ -70,7 +70,7 @@ class Pagerduty extends Transport
         $url = 'https://events.pagerduty.com/v2/enqueue';
         $client = new Client();
 
-        $request_opts = [ 'json' => $data ];
+        $request_opts = ['json' => $data];
         $request_opts['proxy'] = get_proxy();
 
         try {
