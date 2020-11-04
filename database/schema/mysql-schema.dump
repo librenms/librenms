@@ -1324,7 +1324,7 @@ CREATE TABLE `notifications` (
   `severity` int(11) DEFAULT 0 COMMENT '0=ok,1=warning,2=critical',
   `source` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `checksum` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
-  `datetime` timestamp NOT NULL DEFAULT '1970-01-02 06:00:00',
+  `datetime` timestamp NOT NULL DEFAULT '1970-01-02 00:00:00',
   PRIMARY KEY (`notifications_id`),
   UNIQUE KEY `notifications_checksum_unique` (`checksum`),
   KEY `notifications_severity_index` (`severity`)
@@ -2174,7 +2174,7 @@ CREATE TABLE `users` (
   `descr` char(30) COLLATE utf8_unicode_ci NOT NULL,
   `level` tinyint(4) NOT NULL DEFAULT 0,
   `can_modify_passwd` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NOT NULL DEFAULT '1970-01-02 06:00:01',
+  `created_at` timestamp NOT NULL DEFAULT '1970-01-02 00:00:01',
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `remember_token` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
