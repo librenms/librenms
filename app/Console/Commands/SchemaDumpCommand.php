@@ -50,7 +50,7 @@ class SchemaDumpCommand extends DumpCommand
 
         $stdout = new StreamOutput(fopen('php://stdout', 'w'));
         $parameters = ['--force' => true, '--ansi' => true];
-        if($database) {
+        if ($database) {
             $parameters['--database'] = $database;
         }
 
@@ -61,10 +61,12 @@ class SchemaDumpCommand extends DumpCommand
 
         if (file_put_contents($file, $yaml)) {
             $this->info(basename($file) . ' updated!');
+
             return 0;
         }
 
         $this->error('Failed to write file ' . $file);
+
         return 1;
     }
 }

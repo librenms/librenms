@@ -359,7 +359,7 @@ class Schema
                     $output[$table]['Indexes'][$key_name] = [
                         'Name' => $key->Key_name,
                         'Columns' => [$key->Column_name],
-                        'Unique' => !$key->Non_unique,
+                        'Unique' => ! $key->Non_unique,
                         'Type' => $key->Index_type,
                     ];
                 }
