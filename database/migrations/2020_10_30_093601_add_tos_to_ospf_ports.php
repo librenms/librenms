@@ -30,11 +30,7 @@ class AddTosToOspfPorts extends Migration
     public function down()
     {
         Schema::table('ospf_ports', function (Blueprint $table) {
-            $table->dropColumn('ospfIfMetricIpAddress');
-            $table->dropColumn('ospfIfMetricAddressLessIf');
-            $table->dropColumn('ospfIfMetricTOS');
-            $table->dropColumn('ospfIfMetricValue');
-            $table->dropColumn('ospfIfMetricStatus');
+            $table->dropColumn(['ospfIfMetricIpAddress', 'ospfIfMetricAddressLessIf', 'ospfIfMetricTOS', 'ospfIfMetricValue', 'ospfIfMetricStatus']);
         });
     }
 }
