@@ -4,12 +4,12 @@ F5-BIGIP-GLOBAL-MIB DEFINITIONS ::= BEGIN
 -- F5-BIGIP-GLOBAL-MIB 
 --     A private enterprise MIB for F5 global traffic management 
 --     systems.
---     VERSION: 11.6.1
+--     VERSION: 14.1.2.7
 --================================================================
 
 IMPORTS
     OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
-    Integer32, Opaque, enterprises, Counter32, Counter64, TimeTicks
+    Opaque, enterprises, Counter32, Counter64, TimeTicks
         FROM SNMPv2-SMI
 
     Gauge 
@@ -29,7 +29,7 @@ IMPORTS
 
 --================================================================
 bigipGlobalTM MODULE-IDENTITY
-    LAST-UPDATED "201508070110Z" -- Fri Aug  7 01:10:51 UTC 2015 
+    LAST-UPDATED "201801292200Z" -- Mon Jan 29 22:00:01 UTC 2018 
     ORGANIZATION "F5 Networks, Inc."
     CONTACT-INFO
          "postal: F5 Networks, Inc. 
@@ -59,6 +59,9 @@ gtmVirtualServers        OBJECT IDENTIFIER ::= { bigipGlobalTM 11}
 gtmWideips               OBJECT IDENTIFIER ::= { bigipGlobalTM 12 }
 gtmProberPools           OBJECT IDENTIFIER ::= { bigipGlobalTM 13 }
 gtmDNSSEC                OBJECT IDENTIFIER ::= { bigipGlobalTM 14 }
+gtmDevices               OBJECT IDENTIFIER ::= { bigipGlobalTM 15 }
+gtmDeviceIps             OBJECT IDENTIFIER ::= { bigipGlobalTM 16 }
+gtmLinkIps               OBJECT IDENTIFIER ::= { bigipGlobalTM 17 }
 
 --gtmGlobals
 gtmGlobalAttrs           OBJECT IDENTIFIER ::= { gtmGlobals 1 }
@@ -74,6 +77,7 @@ gtmApplication           OBJECT IDENTIFIER ::= { gtmApplications 1 }
 gtmApplicationStatus     OBJECT IDENTIFIER ::= { gtmApplications 2 }
 gtmAppContextStat        OBJECT IDENTIFIER ::= { gtmApplications 3 }
 gtmAppContextDisable     OBJECT IDENTIFIER ::= { gtmApplications 4 }
+gtmApplicationWideip     OBJECT IDENTIFIER ::= { gtmApplications 5 }
 
 --gtmDataCenters
 gtmDataCenter            OBJECT IDENTIFIER ::= { gtmDataCenters 1 }
@@ -140,6 +144,17 @@ gtmProberPoolMemberStatus      OBJECT IDENTIFIER ::= { gtmProberPools 6 }
 
 --gtmDNSSEC
 gtmDnssecZoneStat        OBJECT IDENTIFIER ::= { gtmDNSSEC 1 }
+
+--gtmDevices
+gtmDevice                OBJECT IDENTIFIER ::= { gtmDevices 1 }
+gtmDeviceStat            OBJECT IDENTIFIER ::= { gtmDevices 2 }
+gtmDeviceStatus          OBJECT IDENTIFIER ::= { gtmDevices 3 }
+
+--gtmDeviceIps
+gtmDeviceIp              OBJECT IDENTIFIER ::= { gtmDeviceIps 1 }
+
+--gtmLinkIps
+gtmLinkIp                OBJECT IDENTIFIER ::= { gtmLinkIps 1 }
 
 
 
@@ -321,7 +336,7 @@ gtmAttrDefaultFallback OBJECT-TYPE
 	::= { gtmGlobalAttr 11 } 
 
 gtmAttrPersistMask OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -345,7 +360,7 @@ gtmAttrGtmSetsRecursion OBJECT-TYPE
 	::= { gtmGlobalAttr 13 } 
 
 gtmAttrQosFactorLcs OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -355,7 +370,7 @@ gtmAttrQosFactorLcs OBJECT-TYPE
 	::= { gtmGlobalAttr 14 } 
 
 gtmAttrQosFactorRtt OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -365,7 +380,7 @@ gtmAttrQosFactorRtt OBJECT-TYPE
 	::= { gtmGlobalAttr 15 } 
 
 gtmAttrQosFactorHops OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -375,7 +390,7 @@ gtmAttrQosFactorHops OBJECT-TYPE
 	::= { gtmGlobalAttr 16 } 
 
 gtmAttrQosFactorHitRatio OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -385,7 +400,7 @@ gtmAttrQosFactorHitRatio OBJECT-TYPE
 	::= { gtmGlobalAttr 17 } 
 
 gtmAttrQosFactorPacketRate OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -395,7 +410,7 @@ gtmAttrQosFactorPacketRate OBJECT-TYPE
 	::= { gtmGlobalAttr 18 } 
 
 gtmAttrQosFactorBps OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -405,7 +420,7 @@ gtmAttrQosFactorBps OBJECT-TYPE
 	::= { gtmGlobalAttr 19 } 
 
 gtmAttrQosFactorVsCapacity OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -415,7 +430,7 @@ gtmAttrQosFactorVsCapacity OBJECT-TYPE
 	::= { gtmGlobalAttr 20 } 
 
 gtmAttrQosFactorTopology OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -425,7 +440,7 @@ gtmAttrQosFactorTopology OBJECT-TYPE
 	::= { gtmGlobalAttr 21 } 
 
 gtmAttrQosFactorConnRate OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -437,7 +452,7 @@ gtmAttrQosFactorConnRate OBJECT-TYPE
 	::= { gtmGlobalAttr 22 } 
 
 gtmAttrTimerRetryPathData OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -446,7 +461,7 @@ gtmAttrTimerRetryPathData OBJECT-TYPE
 	::= { gtmGlobalAttr 23 } 
 
 gtmAttrTimerGetAutoconfigData OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -455,7 +470,7 @@ gtmAttrTimerGetAutoconfigData OBJECT-TYPE
 	::= { gtmGlobalAttr 24 } 
 
 gtmAttrTimerPersistCache OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -465,7 +480,7 @@ gtmAttrTimerPersistCache OBJECT-TYPE
 	::= { gtmGlobalAttr 25 } 
 
 gtmAttrDefaultProbeLimit OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -474,7 +489,7 @@ gtmAttrDefaultProbeLimit OBJECT-TYPE
 	::= { gtmGlobalAttr 26 } 
 
 gtmAttrDownThreshold OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -486,7 +501,7 @@ gtmAttrDownThreshold OBJECT-TYPE
 	::= { gtmGlobalAttr 27 } 
 
 gtmAttrDownMultiple OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -498,7 +513,7 @@ gtmAttrDownMultiple OBJECT-TYPE
 	::= { gtmGlobalAttr 28 } 
 
 gtmAttrPathTtl OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -507,7 +522,7 @@ gtmAttrPathTtl OBJECT-TYPE
 	::= { gtmGlobalAttr 29 } 
 
 gtmAttrTraceTtl OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -516,7 +531,7 @@ gtmAttrTraceTtl OBJECT-TYPE
 	::= { gtmGlobalAttr 30 } 
 
 gtmAttrLdnsDuration OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -525,7 +540,7 @@ gtmAttrLdnsDuration OBJECT-TYPE
 	::= { gtmGlobalAttr 31 } 
 
 gtmAttrPathDuration OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -534,7 +549,7 @@ gtmAttrPathDuration OBJECT-TYPE
 	::= { gtmGlobalAttr 32 } 
 
 gtmAttrRttSampleCount OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -544,7 +559,7 @@ gtmAttrRttSampleCount OBJECT-TYPE
 	::= { gtmGlobalAttr 33 } 
 
 gtmAttrRttPacketLength OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -554,7 +569,7 @@ gtmAttrRttPacketLength OBJECT-TYPE
 	::= { gtmGlobalAttr 34 } 
 
 gtmAttrRttTimeout OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -563,7 +578,7 @@ gtmAttrRttTimeout OBJECT-TYPE
 	::= { gtmGlobalAttr 35 } 
 
 gtmAttrMaxMonReqs OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -575,7 +590,7 @@ gtmAttrMaxMonReqs OBJECT-TYPE
 	::= { gtmGlobalAttr 36 } 
 
 gtmAttrTraceroutePort OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -610,7 +625,7 @@ gtmAttrProbeDisabledObjects OBJECT-TYPE
 	::= { gtmGlobalAttr 39 } 
 
 gtmAttrLinkLimitFactor OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -622,7 +637,7 @@ gtmAttrLinkLimitFactor OBJECT-TYPE
 	::= { gtmGlobalAttr 40 } 
 
 gtmAttrOverLimitLinkLimitFactor OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -636,7 +651,7 @@ gtmAttrOverLimitLinkLimitFactor OBJECT-TYPE
 	::= { gtmGlobalAttr 41 } 
 
 gtmAttrLinkPrepaidFactor OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -647,7 +662,7 @@ gtmAttrLinkPrepaidFactor OBJECT-TYPE
 	::= { gtmGlobalAttr 42 } 
 
 gtmAttrLinkCompensateInbound OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -661,7 +676,7 @@ gtmAttrLinkCompensateInbound OBJECT-TYPE
 	::= { gtmGlobalAttr 43 } 
 
 gtmAttrLinkCompensateOutbound OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -675,7 +690,7 @@ gtmAttrLinkCompensateOutbound OBJECT-TYPE
 	::= { gtmGlobalAttr 44 } 
 
 gtmAttrLinkCompensationHistory OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -684,7 +699,7 @@ gtmAttrLinkCompensationHistory OBJECT-TYPE
 	::= { gtmGlobalAttr 45 } 
 
 gtmAttrMaxLinkOverLimitCount OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -695,7 +710,7 @@ gtmAttrMaxLinkOverLimitCount OBJECT-TYPE
 	::= { gtmGlobalAttr 46 } 
 
 gtmAttrLowerBoundPctRow OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -705,7 +720,7 @@ gtmAttrLowerBoundPctRow OBJECT-TYPE
 	::= { gtmGlobalAttr 47 } 
 
 gtmAttrLowerBoundPctCol OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -763,7 +778,7 @@ gtmAttrSyncGroup OBJECT-TYPE
 	::= { gtmGlobalAttr 52 } 
 
 gtmAttrSyncTimeout OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -773,7 +788,7 @@ gtmAttrSyncTimeout OBJECT-TYPE
 	::= { gtmGlobalAttr 53 } 
 
 gtmAttrSyncZonesTimeout OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -783,7 +798,7 @@ gtmAttrSyncZonesTimeout OBJECT-TYPE
 	::= { gtmGlobalAttr 54 } 
 
 gtmAttrTimeTolerance OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -810,7 +825,7 @@ gtmAttrTopologyLongestMatch OBJECT-TYPE
 	::= { gtmGlobalAttr 56 } 
 
 gtmAttrTopologyAclThreshold OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -820,7 +835,7 @@ gtmAttrTopologyAclThreshold OBJECT-TYPE
 	::= { gtmGlobalAttr 57 } 
 
 gtmAttrStaticPersistCidr OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -831,7 +846,7 @@ gtmAttrStaticPersistCidr OBJECT-TYPE
 	::= { gtmGlobalAttr 58 } 
 
 gtmAttrStaticPersistV6Cidr OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -842,7 +857,7 @@ gtmAttrStaticPersistV6Cidr OBJECT-TYPE
 	::= { gtmGlobalAttr 59 } 
 
 gtmAttrQosFactorVsScore OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -852,7 +867,7 @@ gtmAttrQosFactorVsScore OBJECT-TYPE
 	::= { gtmGlobalAttr 60 } 
 
 gtmAttrTimerSendKeepAlive OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -861,7 +876,7 @@ gtmAttrTimerSendKeepAlive OBJECT-TYPE
 	::= { gtmGlobalAttr 61 } 
 
 gtmAttrCertificateDepth OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -871,7 +886,7 @@ gtmAttrCertificateDepth OBJECT-TYPE
 	::= { gtmGlobalAttr 62 } 
 
 gtmAttrMaxMemoryUsage OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -895,7 +910,7 @@ gtmGlobalLdnsProbeProtoTable OBJECT-TYPE
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
-		"A table containing information of global LDSN probe protocols for GTM (Global Traffic Management)."
+		"A table containing information of global LDNS probe protocols for GTM (Global Traffic Management)."
 	::= { gtmGlobalLdnsProbeProto 2 } 
 
 gtmGlobalLdnsProbeProtoEntry OBJECT-TYPE
@@ -912,9 +927,9 @@ gtmGlobalLdnsProbeProtoEntry OBJECT-TYPE
 
 GtmGlobalLdnsProbeProtoEntry ::= 
 	SEQUENCE {
-        	gtmGlobalLdnsProbeProtoIndex                           INTEGER,
-        	gtmGlobalLdnsProbeProtoType                            INTEGER,
-        	gtmGlobalLdnsProbeProtoName                            LongDisplayString
+        	gtmGlobalLdnsProbeProtoIndex                              INTEGER,
+        	gtmGlobalLdnsProbeProtoType                               INTEGER,
+        	gtmGlobalLdnsProbeProtoName                               LongDisplayString
 	}
 
 gtmGlobalLdnsProbeProtoIndex OBJECT-TYPE 
@@ -955,8 +970,8 @@ gtmStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmGlobalStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmGlobalStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmGlobalStat 1 } 
 
@@ -1160,10 +1175,10 @@ gtmAppEntry OBJECT-TYPE
 
 GtmAppEntry ::= 
 	SEQUENCE {
-        	gtmAppName                                             LongDisplayString,
-        	gtmAppPersist                                          INTEGER,
-        	gtmAppTtlPersist                                       Integer32,
-        	gtmAppAvailability                                     INTEGER
+        	gtmAppName                                                LongDisplayString,
+        	gtmAppPersist                                             INTEGER,
+        	gtmAppTtlPersist                                          Gauge,
+        	gtmAppAvailability                                        INTEGER
 	}
 
 gtmAppName OBJECT-TYPE 
@@ -1186,7 +1201,7 @@ gtmAppPersist OBJECT-TYPE
 	::= { gtmAppEntry 2 } 
 
 gtmAppTtlPersist OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -1240,11 +1255,11 @@ gtmAppStatusEntry OBJECT-TYPE
 
 GtmAppStatusEntry ::= 
 	SEQUENCE {
-        	gtmAppStatusName                                       LongDisplayString,
-        	gtmAppStatusAvailState                                 INTEGER,
-        	gtmAppStatusEnabledState                               INTEGER,
-        	gtmAppStatusParentType                                 Integer32,
-        	gtmAppStatusDetailReason                               LongDisplayString
+        	gtmAppStatusName                                          LongDisplayString,
+        	gtmAppStatusAvailState                                    INTEGER,
+        	gtmAppStatusEnabledState                                  INTEGER,
+        	gtmAppStatusParentType                                    Gauge,
+        	gtmAppStatusDetailReason                                  LongDisplayString
 	}
 
 gtmAppStatusName OBJECT-TYPE 
@@ -1267,7 +1282,7 @@ gtmAppStatusAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified application indicated in color.
+		"The availability of the specified application indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -1291,7 +1306,7 @@ gtmAppStatusEnabledState OBJECT-TYPE
 	::= { gtmAppStatusEntry 3 } 
 
 gtmAppStatusParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -1342,14 +1357,14 @@ gtmAppContStatEntry OBJECT-TYPE
 
 GtmAppContStatEntry ::= 
 	SEQUENCE {
-        	gtmAppContStatAppName                                  LongDisplayString,
-        	gtmAppContStatType                                     INTEGER,
-        	gtmAppContStatName                                     LongDisplayString,
-        	gtmAppContStatNumAvail                                 Counter64,
-        	gtmAppContStatAvailState                               INTEGER,
-        	gtmAppContStatEnabledState                             INTEGER,
-        	gtmAppContStatParentType                               Integer32,
-        	gtmAppContStatDetailReason                             LongDisplayString
+        	gtmAppContStatAppName                                     LongDisplayString,
+        	gtmAppContStatType                                        INTEGER,
+        	gtmAppContStatName                                        LongDisplayString,
+        	gtmAppContStatNumAvail                                    Counter64,
+        	gtmAppContStatAvailState                                  INTEGER,
+        	gtmAppContStatEnabledState                                INTEGER,
+        	gtmAppContStatParentType                                  Gauge,
+        	gtmAppContStatDetailReason                                LongDisplayString
 	}
 
 gtmAppContStatAppName OBJECT-TYPE 
@@ -1401,7 +1416,7 @@ gtmAppContStatAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified application context indicated in color.
+		"The availability of the specified application context indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -1425,7 +1440,7 @@ gtmAppContStatEnabledState OBJECT-TYPE
 	::= { gtmAppContStatEntry 6 } 
 
 gtmAppContStatParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -1476,9 +1491,9 @@ gtmAppContDisEntry OBJECT-TYPE
 
 GtmAppContDisEntry ::= 
 	SEQUENCE {
-        	gtmAppContDisAppName                                   LongDisplayString,
-        	gtmAppContDisType                                      INTEGER,
-        	gtmAppContDisName                                      LongDisplayString
+        	gtmAppContDisAppName                                      LongDisplayString,
+        	gtmAppContDisType                                         INTEGER,
+        	gtmAppContDisName                                         LongDisplayString
 	}
 
 gtmAppContDisAppName OBJECT-TYPE 
@@ -1541,10 +1556,10 @@ gtmDcEntry OBJECT-TYPE
 
 GtmDcEntry ::= 
 	SEQUENCE {
-        	gtmDcName                                              LongDisplayString,
-        	gtmDcLocation                                          LongDisplayString,
-        	gtmDcContact                                           LongDisplayString,
-        	gtmDcEnabled                                           INTEGER
+        	gtmDcName                                                 LongDisplayString,
+        	gtmDcLocation                                             LongDisplayString,
+        	gtmDcContact                                              LongDisplayString,
+        	gtmDcEnabled                                              INTEGER
 	}
 
 gtmDcName OBJECT-TYPE 
@@ -1590,8 +1605,8 @@ gtmDcStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmDataCenterStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmDataCenterStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmDataCenterStat 1 } 
 
@@ -1625,15 +1640,15 @@ gtmDcStatEntry OBJECT-TYPE
 
 GtmDcStatEntry ::= 
 	SEQUENCE {
-        	gtmDcStatName                                          LongDisplayString,
-        	gtmDcStatCpuUsage                                      Counter64,
-        	gtmDcStatMemAvail                                      Counter64,
-        	gtmDcStatBitsPerSecIn                                  Counter64,
-        	gtmDcStatBitsPerSecOut                                 Counter64,
-        	gtmDcStatPktsPerSecIn                                  Counter64,
-        	gtmDcStatPktsPerSecOut                                 Counter64,
-        	gtmDcStatConnections                                   Counter64,
-        	gtmDcStatConnRate                                      Counter64
+        	gtmDcStatName                                             LongDisplayString,
+        	gtmDcStatCpuUsage                                         Counter64,
+        	gtmDcStatMemAvail                                         Counter64,
+        	gtmDcStatBitsPerSecIn                                     Counter64,
+        	gtmDcStatBitsPerSecOut                                    Counter64,
+        	gtmDcStatPktsPerSecIn                                     Counter64,
+        	gtmDcStatPktsPerSecOut                                    Counter64,
+        	gtmDcStatConnections                                      Counter64,
+        	gtmDcStatConnRate                                         Counter64
 	}
 
 gtmDcStatName OBJECT-TYPE 
@@ -1673,7 +1688,7 @@ gtmDcStatBitsPerSecOut OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of bits per second sent out from the specified data center."
+		"The number of bits per second sent from the specified data center."
 	::= { gtmDcStatEntry 5 } 
 
 gtmDcStatPktsPerSecIn OBJECT-TYPE 
@@ -1689,7 +1704,7 @@ gtmDcStatPktsPerSecOut OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of packets per second sent out from the specified data center."
+		"The number of packets per second sent from the specified data center."
 	::= { gtmDcStatEntry 7 } 
 
 gtmDcStatConnections OBJECT-TYPE 
@@ -1743,11 +1758,11 @@ gtmDcStatusEntry OBJECT-TYPE
 
 GtmDcStatusEntry ::= 
 	SEQUENCE {
-        	gtmDcStatusName                                        LongDisplayString,
-        	gtmDcStatusAvailState                                  INTEGER,
-        	gtmDcStatusEnabledState                                INTEGER,
-        	gtmDcStatusParentType                                  Integer32,
-        	gtmDcStatusDetailReason                                LongDisplayString
+        	gtmDcStatusName                                           LongDisplayString,
+        	gtmDcStatusAvailState                                     INTEGER,
+        	gtmDcStatusEnabledState                                   INTEGER,
+        	gtmDcStatusParentType                                     Gauge,
+        	gtmDcStatusDetailReason                                   LongDisplayString
 	}
 
 gtmDcStatusName OBJECT-TYPE 
@@ -1770,7 +1785,7 @@ gtmDcStatusAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified data center indicated in color.
+		"The availability of the specified data center indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -1794,7 +1809,7 @@ gtmDcStatusEnabledState OBJECT-TYPE
 	::= { gtmDcStatusEntry 3 } 
 
 gtmDcStatusParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -1816,23 +1831,25 @@ gtmDcStatusDetailReason OBJECT-TYPE
 gtmIpNumber OBJECT-TYPE 
 	SYNTAX INTEGER
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The number of gtmIp entries in the table."
+		"Deprecated!.
+		The number of gtmIp entries in the table."
 	::= { gtmIp 1 } 
 
 gtmIpTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF GtmIpEntry
 	MAX-ACCESS not-accessible
-	STATUS current
+	STATUS deprecated
 	DESCRIPTION
-		"A table containing information of IPs for GTM (Global Traffic Management)."
+		"Deprecated! Replaced by gtmDeviceIp and gtmLinkIp tables.
+		 A table containing information of IPs for GTM (Global Traffic Management)."
 	::= { gtmIp 2 } 
 
 gtmIpEntry OBJECT-TYPE
 	SYNTAX  GtmIpEntry
 	MAX-ACCESS not-accessible
-	STATUS current
+	STATUS deprecated
 	DESCRIPTION
 		"Columns in the gtmIp Table"
 	INDEX {
@@ -1845,51 +1862,51 @@ gtmIpEntry OBJECT-TYPE
 
 GtmIpEntry ::= 
 	SEQUENCE {
-        	gtmIpIpType                                            InetAddressType,
-        	gtmIpIp                                                InetAddress,
-        	gtmIpLinkName                                          LongDisplayString,
-        	gtmIpServerName                                        LongDisplayString,
-        	gtmIpUnitId                                            Integer32,
-        	gtmIpIpXlatedType                                      InetAddressType,
-        	gtmIpIpXlated                                          InetAddress,
-        	gtmIpDeviceName                                        LongDisplayString
+        	gtmIpIpType                                               InetAddressType,
+        	gtmIpIp                                                   InetAddress,
+        	gtmIpLinkName                                             LongDisplayString,
+        	gtmIpServerName                                           LongDisplayString,
+        	gtmIpUnitId                                               Gauge,
+        	gtmIpIpXlatedType                                         InetAddressType,
+        	gtmIpIpXlated                                             InetAddress,
+        	gtmIpDeviceName                                           LongDisplayString
 	}
 
 gtmIpIpType OBJECT-TYPE 
 	SYNTAX InetAddressType
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The IP address type of gtmIpIp."
+		"Deprecated! The IP address type of gtmIpIp."
 	::= { gtmIpEntry 1 } 
 
 gtmIpIp OBJECT-TYPE 
 	SYNTAX InetAddress
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The IP address that belong to the specified box. It is interpreted 
+		"Deprecated! The IP address that belong to the specified box. It is interpreted 
 		within the context of a gtmIpIpType value."
 	::= { gtmIpEntry 2 } 
 
 gtmIpLinkName OBJECT-TYPE 
 	SYNTAX LongDisplayString
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The link name with which the specified IP address associates."
+		"Deprecated! The link name with which the specified IP address associates."
 	::= { gtmIpEntry 3 } 
 
 gtmIpServerName OBJECT-TYPE 
 	SYNTAX LongDisplayString
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The name of the server with which the specified IP address is associated."
+		"Deprecated! The name of the server with which the specified IP address is associated."
 	::= { gtmIpEntry 4 } 
 
 gtmIpUnitId OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -1900,26 +1917,26 @@ gtmIpUnitId OBJECT-TYPE
 gtmIpIpXlatedType OBJECT-TYPE 
 	SYNTAX InetAddressType
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The IP address type of gtmIpIpXlated."
+		"Deprecated! The IP address type of gtmIpIpXlated."
 	::= { gtmIpEntry 6 } 
 
 gtmIpIpXlated OBJECT-TYPE 
 	SYNTAX InetAddress
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The translated address for the specified IP. It is interpreted
+		"Deprecated! The translated address for the specified IP. It is interpreted 
 		within the context of a gtmIpIpXlatedType value."
 	::= { gtmIpEntry 7 } 
 
 gtmIpDeviceName OBJECT-TYPE 
 	SYNTAX LongDisplayString
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The box name with which the specified IP address associates."
+		"Deprecated! The box name with which the specified IP address associates."
 	::= { gtmIpEntry 8 } 
 
 --==================================================================
@@ -1955,54 +1972,54 @@ gtmLinkEntry OBJECT-TYPE
 
 GtmLinkEntry ::= 
 	SEQUENCE {
-        	gtmLinkName                                            LongDisplayString,
-        	gtmLinkDcName                                          LongDisplayString,
-        	gtmLinkIspName                                         LongDisplayString,
-        	gtmLinkUplinkAddressType                               InetAddressType,
-        	gtmLinkUplinkAddress                                   InetAddress,
-        	gtmLinkLimitInCpuUsageEnabled                          INTEGER,
-        	gtmLinkLimitInMemAvailEnabled                          INTEGER,
-        	gtmLinkLimitInBitsPerSecEnabled                        INTEGER,
-        	gtmLinkLimitInPktsPerSecEnabled                        INTEGER,
-        	gtmLinkLimitInConnEnabled                              INTEGER,
-        	gtmLinkLimitInConnPerSecEnabled                        INTEGER,
-        	gtmLinkLimitInCpuUsage                                 Counter64,
-        	gtmLinkLimitInMemAvail                                 Counter64,
-        	gtmLinkLimitInBitsPerSec                               Counter64,
-        	gtmLinkLimitInPktsPerSec                               Counter64,
-        	gtmLinkLimitInConn                                     Counter64,
-        	gtmLinkLimitInConnPerSec                               Counter64,
-        	gtmLinkLimitOutCpuUsageEnabled                         INTEGER,
-        	gtmLinkLimitOutMemAvailEnabled                         INTEGER,
-        	gtmLinkLimitOutBitsPerSecEnabled                       INTEGER,
-        	gtmLinkLimitOutPktsPerSecEnabled                       INTEGER,
-        	gtmLinkLimitOutConnEnabled                             INTEGER,
-        	gtmLinkLimitOutConnPerSecEnabled                       INTEGER,
-        	gtmLinkLimitOutCpuUsage                                Counter64,
-        	gtmLinkLimitOutMemAvail                                Counter64,
-        	gtmLinkLimitOutBitsPerSec                              Counter64,
-        	gtmLinkLimitOutPktsPerSec                              Counter64,
-        	gtmLinkLimitOutConn                                    Counter64,
-        	gtmLinkLimitOutConnPerSec                              Counter64,
-        	gtmLinkLimitTotalCpuUsageEnabled                       INTEGER,
-        	gtmLinkLimitTotalMemAvailEnabled                       INTEGER,
-        	gtmLinkLimitTotalBitsPerSecEnabled                     INTEGER,
-        	gtmLinkLimitTotalPktsPerSecEnabled                     INTEGER,
-        	gtmLinkLimitTotalConnEnabled                           INTEGER,
-        	gtmLinkLimitTotalConnPerSecEnabled                     INTEGER,
-        	gtmLinkLimitTotalCpuUsage                              Counter64,
-        	gtmLinkLimitTotalMemAvail                              Counter64,
-        	gtmLinkLimitTotalBitsPerSec                            Counter64,
-        	gtmLinkLimitTotalPktsPerSec                            Counter64,
-        	gtmLinkLimitTotalConn                                  Counter64,
-        	gtmLinkLimitTotalConnPerSec                            Counter64,
-        	gtmLinkMonitorRule                                     LongDisplayString,
-        	gtmLinkDuplex                                          INTEGER,
-        	gtmLinkEnabled                                         INTEGER,
-        	gtmLinkRatio                                           Integer32,
-        	gtmLinkPrepaid                                         Counter64,
-        	gtmLinkPrepaidInDollars                                Integer32,
-        	gtmLinkWeightingType                                   INTEGER
+        	gtmLinkName                                               LongDisplayString,
+        	gtmLinkDcName                                             LongDisplayString,
+        	gtmLinkIspName                                            LongDisplayString,
+        	gtmLinkUplinkAddressType                                  InetAddressType,
+        	gtmLinkUplinkAddress                                      InetAddress,
+        	gtmLinkLimitInCpuUsageEnabled                             INTEGER,
+        	gtmLinkLimitInMemAvailEnabled                             INTEGER,
+        	gtmLinkLimitInBitsPerSecEnabled                           INTEGER,
+        	gtmLinkLimitInPktsPerSecEnabled                           INTEGER,
+        	gtmLinkLimitInConnEnabled                                 INTEGER,
+        	gtmLinkLimitInConnPerSecEnabled                           INTEGER,
+        	gtmLinkLimitInCpuUsage                                    Counter64,
+        	gtmLinkLimitInMemAvail                                    Counter64,
+        	gtmLinkLimitInBitsPerSec                                  Counter64,
+        	gtmLinkLimitInPktsPerSec                                  Counter64,
+        	gtmLinkLimitInConn                                        Counter64,
+        	gtmLinkLimitInConnPerSec                                  Counter64,
+        	gtmLinkLimitOutCpuUsageEnabled                            INTEGER,
+        	gtmLinkLimitOutMemAvailEnabled                            INTEGER,
+        	gtmLinkLimitOutBitsPerSecEnabled                          INTEGER,
+        	gtmLinkLimitOutPktsPerSecEnabled                          INTEGER,
+        	gtmLinkLimitOutConnEnabled                                INTEGER,
+        	gtmLinkLimitOutConnPerSecEnabled                          INTEGER,
+        	gtmLinkLimitOutCpuUsage                                   Counter64,
+        	gtmLinkLimitOutMemAvail                                   Counter64,
+        	gtmLinkLimitOutBitsPerSec                                 Counter64,
+        	gtmLinkLimitOutPktsPerSec                                 Counter64,
+        	gtmLinkLimitOutConn                                       Counter64,
+        	gtmLinkLimitOutConnPerSec                                 Counter64,
+        	gtmLinkLimitTotalCpuUsageEnabled                          INTEGER,
+        	gtmLinkLimitTotalMemAvailEnabled                          INTEGER,
+        	gtmLinkLimitTotalBitsPerSecEnabled                        INTEGER,
+        	gtmLinkLimitTotalPktsPerSecEnabled                        INTEGER,
+        	gtmLinkLimitTotalConnEnabled                              INTEGER,
+        	gtmLinkLimitTotalConnPerSecEnabled                        INTEGER,
+        	gtmLinkLimitTotalCpuUsage                                 Counter64,
+        	gtmLinkLimitTotalMemAvail                                 Counter64,
+        	gtmLinkLimitTotalBitsPerSec                               Counter64,
+        	gtmLinkLimitTotalPktsPerSec                               Counter64,
+        	gtmLinkLimitTotalConn                                     Counter64,
+        	gtmLinkLimitTotalConnPerSec                               Counter64,
+        	gtmLinkMonitorRule                                        LongDisplayString,
+        	gtmLinkDuplex                                             INTEGER,
+        	gtmLinkEnabled                                            INTEGER,
+        	gtmLinkRatio                                              Gauge,
+        	gtmLinkPrepaid                                            Counter64,
+        	gtmLinkPrepaidInDollars                                   Gauge,
+        	gtmLinkWeightingType                                      INTEGER
 	}
 
 gtmLinkName OBJECT-TYPE 
@@ -2465,7 +2482,7 @@ gtmLinkEnabled OBJECT-TYPE
 	::= { gtmLinkEntry 44 } 
 
 gtmLinkRatio OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -2481,7 +2498,7 @@ gtmLinkPrepaid OBJECT-TYPE
 	::= { gtmLinkEntry 46 } 
 
 gtmLinkPrepaidInDollars OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -2535,10 +2552,10 @@ gtmLinkCostEntry OBJECT-TYPE
 
 GtmLinkCostEntry ::= 
 	SEQUENCE {
-        	gtmLinkCostName                                        LongDisplayString,
-        	gtmLinkCostIndex                                       INTEGER,
-        	gtmLinkCostUptoBps                                     Counter64,
-        	gtmLinkCostDollarsPerMbps                              Integer32
+        	gtmLinkCostName                                           LongDisplayString,
+        	gtmLinkCostIndex                                          INTEGER,
+        	gtmLinkCostUptoBps                                        Counter64,
+        	gtmLinkCostDollarsPerMbps                                 Gauge
 	}
 
 gtmLinkCostName OBJECT-TYPE 
@@ -2566,7 +2583,7 @@ gtmLinkCostUptoBps OBJECT-TYPE
 	::= { gtmLinkCostEntry 3 } 
 
 gtmLinkCostDollarsPerMbps OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -2582,8 +2599,8 @@ gtmLinkStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmLinkStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmLinkStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmLinkStat 1 } 
 
@@ -2616,19 +2633,19 @@ gtmLinkStatEntry OBJECT-TYPE
 
 GtmLinkStatEntry ::= 
 	SEQUENCE {
-        	gtmLinkStatName                                        LongDisplayString,
-        	gtmLinkStatRate                                        Gauge,
-        	gtmLinkStatRateIn                                      Gauge,
-        	gtmLinkStatRateOut                                     Gauge,
-        	gtmLinkStatRateNode                                    Gauge,
-        	gtmLinkStatRateNodeIn                                  Gauge,
-        	gtmLinkStatRateNodeOut                                 Gauge,
-        	gtmLinkStatRateVses                                    Gauge,
-        	gtmLinkStatRateVsesIn                                  Gauge,
-        	gtmLinkStatRateVsesOut                                 Gauge,
-        	gtmLinkStatLcsIn                                       Counter64,
-        	gtmLinkStatLcsOut                                      Counter64,
-        	gtmLinkStatPaths                                       Counter64
+        	gtmLinkStatName                                           LongDisplayString,
+        	gtmLinkStatRate                                           Gauge,
+        	gtmLinkStatRateIn                                         Gauge,
+        	gtmLinkStatRateOut                                        Gauge,
+        	gtmLinkStatRateNode                                       Gauge,
+        	gtmLinkStatRateNodeIn                                     Gauge,
+        	gtmLinkStatRateNodeOut                                    Gauge,
+        	gtmLinkStatRateVses                                       Gauge,
+        	gtmLinkStatRateVsesIn                                     Gauge,
+        	gtmLinkStatRateVsesOut                                    Gauge,
+        	gtmLinkStatLcsIn                                          Counter64,
+        	gtmLinkStatLcsOut                                         Counter64,
+        	gtmLinkStatPaths                                          Counter64
 	}
 
 gtmLinkStatName OBJECT-TYPE 
@@ -2778,11 +2795,11 @@ gtmLinkStatusEntry OBJECT-TYPE
 
 GtmLinkStatusEntry ::= 
 	SEQUENCE {
-        	gtmLinkStatusName                                      LongDisplayString,
-        	gtmLinkStatusAvailState                                INTEGER,
-        	gtmLinkStatusEnabledState                              INTEGER,
-        	gtmLinkStatusParentType                                Integer32,
-        	gtmLinkStatusDetailReason                              LongDisplayString
+        	gtmLinkStatusName                                         LongDisplayString,
+        	gtmLinkStatusAvailState                                   INTEGER,
+        	gtmLinkStatusEnabledState                                 INTEGER,
+        	gtmLinkStatusParentType                                   Gauge,
+        	gtmLinkStatusDetailReason                                 LongDisplayString
 	}
 
 gtmLinkStatusName OBJECT-TYPE 
@@ -2805,7 +2822,7 @@ gtmLinkStatusAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified link indicated in color.
+		"The availability of the specified link indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -2829,7 +2846,7 @@ gtmLinkStatusEnabledState OBJECT-TYPE
 	::= { gtmLinkStatusEntry 3 } 
 
 gtmLinkStatusParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -2871,50 +2888,52 @@ gtmPoolEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmPool Table"
 	INDEX {
+		gtmPoolPoolType,
 		gtmPoolName
 	}
 	::= { gtmPoolTable 1 } 
 
 GtmPoolEntry ::= 
 	SEQUENCE {
-        	gtmPoolName                                            LongDisplayString,
-        	gtmPoolTtl                                             Integer32,
-        	gtmPoolEnabled                                         INTEGER,
-        	gtmPoolVerifyMember                                    INTEGER,
-        	gtmPoolDynamicRatio                                    INTEGER,
-        	gtmPoolAnswersToReturn                                 INTEGER,
-        	gtmPoolLbMode                                          INTEGER,
-        	gtmPoolAlternate                                       INTEGER,
-        	gtmPoolFallback                                        INTEGER,
-        	gtmPoolManualResume                                    INTEGER,
-        	gtmPoolQosCoeffRtt                                     Integer32,
-        	gtmPoolQosCoeffHops                                    Integer32,
-        	gtmPoolQosCoeffTopology                                Integer32,
-        	gtmPoolQosCoeffHitRatio                                Integer32,
-        	gtmPoolQosCoeffPacketRate                              Integer32,
-        	gtmPoolQosCoeffVsCapacity                              Integer32,
-        	gtmPoolQosCoeffBps                                     Integer32,
-        	gtmPoolQosCoeffLcs                                     Integer32,
-        	gtmPoolQosCoeffConnRate                                Integer32,
-        	gtmPoolFallbackIpType                                  InetAddressType,
-        	gtmPoolFallbackIp                                      InetAddress,
-        	gtmPoolCname                                           LongDisplayString,
-        	gtmPoolLimitCpuUsageEnabled                            INTEGER,
-        	gtmPoolLimitMemAvailEnabled                            INTEGER,
-        	gtmPoolLimitBitsPerSecEnabled                          INTEGER,
-        	gtmPoolLimitPktsPerSecEnabled                          INTEGER,
-        	gtmPoolLimitConnEnabled                                INTEGER,
-        	gtmPoolLimitConnPerSecEnabled                          INTEGER,
-        	gtmPoolLimitCpuUsage                                   Counter64,
-        	gtmPoolLimitMemAvail                                   Counter64,
-        	gtmPoolLimitBitsPerSec                                 Counter64,
-        	gtmPoolLimitPktsPerSec                                 Counter64,
-        	gtmPoolLimitConn                                       Counter64,
-        	gtmPoolLimitConnPerSec                                 Counter64,
-        	gtmPoolMonitorRule                                     LongDisplayString,
-        	gtmPoolQosCoeffVsScore                                 Integer32,
-        	gtmPoolFallbackIpv6Type                                InetAddressType,
-        	gtmPoolFallbackIpv6                                    InetAddress
+        	gtmPoolName                                               LongDisplayString,
+        	gtmPoolTtl                                                Gauge,
+        	gtmPoolEnabled                                            INTEGER,
+        	gtmPoolVerifyMember                                       INTEGER,
+        	gtmPoolDynamicRatio                                       INTEGER,
+        	gtmPoolAnswersToReturn                                    INTEGER,
+        	gtmPoolLbMode                                             INTEGER,
+        	gtmPoolAlternate                                          INTEGER,
+        	gtmPoolFallback                                           INTEGER,
+        	gtmPoolManualResume                                       INTEGER,
+        	gtmPoolQosCoeffRtt                                        Gauge,
+        	gtmPoolQosCoeffHops                                       Gauge,
+        	gtmPoolQosCoeffTopology                                   Gauge,
+        	gtmPoolQosCoeffHitRatio                                   Gauge,
+        	gtmPoolQosCoeffPacketRate                                 Gauge,
+        	gtmPoolQosCoeffVsCapacity                                 Gauge,
+        	gtmPoolQosCoeffBps                                        Gauge,
+        	gtmPoolQosCoeffLcs                                        Gauge,
+        	gtmPoolQosCoeffConnRate                                   Gauge,
+        	gtmPoolFallbackIpType                                     InetAddressType,
+        	gtmPoolFallbackIp                                         InetAddress,
+        	gtmPoolCname                                              LongDisplayString,
+        	gtmPoolLimitCpuUsageEnabled                               INTEGER,
+        	gtmPoolLimitMemAvailEnabled                               INTEGER,
+        	gtmPoolLimitBitsPerSecEnabled                             INTEGER,
+        	gtmPoolLimitPktsPerSecEnabled                             INTEGER,
+        	gtmPoolLimitConnEnabled                                   INTEGER,
+        	gtmPoolLimitConnPerSecEnabled                             INTEGER,
+        	gtmPoolLimitCpuUsage                                      Counter64,
+        	gtmPoolLimitMemAvail                                      Counter64,
+        	gtmPoolLimitBitsPerSec                                    Counter64,
+        	gtmPoolLimitPktsPerSec                                    Counter64,
+        	gtmPoolLimitConn                                          Counter64,
+        	gtmPoolLimitConnPerSec                                    Counter64,
+        	gtmPoolMonitorRule                                        LongDisplayString,
+        	gtmPoolQosCoeffVsScore                                    Gauge,
+        	gtmPoolFallbackIpv6Type                                   InetAddressType,
+        	gtmPoolFallbackIpv6                                       InetAddress,
+        	gtmPoolPoolType                                           INTEGER
 	}
 
 gtmPoolName OBJECT-TYPE 
@@ -2926,7 +2945,7 @@ gtmPoolName OBJECT-TYPE
 	::= { gtmPoolEntry 1 } 
 
 gtmPoolTtl OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -2972,8 +2991,8 @@ gtmPoolAnswersToReturn OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of returns for a request from the specified pool.,
-		It's up to 16 returns for a request."
+		"The number of answers to return for a given request from the
+	        specified pool. A maximum of up to 16 answers is allowed."
 	::= { gtmPoolEntry 6 } 
 
 gtmPoolLbMode OBJECT-TYPE 
@@ -3073,7 +3092,7 @@ gtmPoolManualResume OBJECT-TYPE
 	::= { gtmPoolEntry 10 } 
 
 gtmPoolQosCoeffRtt OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3081,7 +3100,7 @@ gtmPoolQosCoeffRtt OBJECT-TYPE
 	::= { gtmPoolEntry 11 } 
 
 gtmPoolQosCoeffHops OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3089,7 +3108,7 @@ gtmPoolQosCoeffHops OBJECT-TYPE
 	::= { gtmPoolEntry 12 } 
 
 gtmPoolQosCoeffTopology OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3097,7 +3116,7 @@ gtmPoolQosCoeffTopology OBJECT-TYPE
 	::= { gtmPoolEntry 13 } 
 
 gtmPoolQosCoeffHitRatio OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3105,7 +3124,7 @@ gtmPoolQosCoeffHitRatio OBJECT-TYPE
 	::= { gtmPoolEntry 14 } 
 
 gtmPoolQosCoeffPacketRate OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3113,7 +3132,7 @@ gtmPoolQosCoeffPacketRate OBJECT-TYPE
 	::= { gtmPoolEntry 15 } 
 
 gtmPoolQosCoeffVsCapacity OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3121,7 +3140,7 @@ gtmPoolQosCoeffVsCapacity OBJECT-TYPE
 	::= { gtmPoolEntry 16 } 
 
 gtmPoolQosCoeffBps OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3129,7 +3148,7 @@ gtmPoolQosCoeffBps OBJECT-TYPE
 	::= { gtmPoolEntry 17 } 
 
 gtmPoolQosCoeffLcs OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3137,7 +3156,7 @@ gtmPoolQosCoeffLcs OBJECT-TYPE
 	::= { gtmPoolEntry 18 } 
 
 gtmPoolQosCoeffConnRate OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -3151,7 +3170,9 @@ gtmPoolFallbackIpType OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The IP address type of gtmPoolFallbackIp."
+		"The IP address type of gtmPoolFallbackIp. This field is used
+	        to store the IPv4 fallback IP address type for A type pools and
+	        the IPv6 fallback IP address type for AAAA type pools."
 	::= { gtmPoolEntry 20 } 
 
 gtmPoolFallbackIp OBJECT-TYPE 
@@ -3159,20 +3180,23 @@ gtmPoolFallbackIp OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The fallback/emergency failure IP for the specified pool. It is 
-		interpreted within the context of a gtmPoolFallbackIpType value."
+		"The fallback/emergency failure IP for the specified pool. It is
+		interpreted within the context of a gtmPoolFallbackIpType value.
+	        This field is used to store the IPv4 fallback IP address for A type
+	        pools and the IPv6 fallback IP address for AAAA type pools."
 	::= { gtmPoolEntry 21 } 
 
 gtmPoolCname OBJECT-TYPE 
 	SYNTAX LongDisplayString
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The CNAME (canonical name) for the specified pool.
-		 CNAME is also referred to as a CNAME record, a record 
-		in a DNS database that indicates the true, or canonical, 
-		host name of a computer that its aliases are associated with. 
-		(eg. www.wip.d.com)."
+		"Deprecated! No longer used. To achieve similar behavior please use
+	        a CNAME type pool member with static target setting enabled.
+	        The CNAME (canonical name) for the specified pool. CNAME is also
+	        referred to as a CNAME record, a record in a DNS database that
+	        indicates the true, or canonical, host name of a computer that its
+	        aliases are associated with. (eg. www.wip.d.com)."
 	::= { gtmPoolEntry 22 } 
 
 gtmPoolLimitCpuUsageEnabled OBJECT-TYPE 
@@ -3306,7 +3330,7 @@ gtmPoolMonitorRule OBJECT-TYPE
 	::= { gtmPoolEntry 35 } 
 
 gtmPoolQosCoeffVsScore OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -3317,19 +3341,40 @@ gtmPoolQosCoeffVsScore OBJECT-TYPE
 gtmPoolFallbackIpv6Type OBJECT-TYPE 
 	SYNTAX InetAddressType
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The IP address type of gtmPoolFallbackIpv6."
+		"Deprecated! No longer used. Please use gtmPoolFallbackIpType as this
+	        field is used to store the IPv4 fallback IP address type for A type
+	        pools and the IPv6 fallback IP address type for AAAA type pools.
+	        The IP address type of gtmPoolFallbackIpv6."
 	::= { gtmPoolEntry 37 } 
 
 gtmPoolFallbackIpv6 OBJECT-TYPE 
 	SYNTAX InetAddress
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The fallback/emergency failure IPv6 IP address for the specified pool. It is 
+		"Deprecated! No longer used. Please use gtmPoolFallbackIp as this
+	        field is used to store the IPv4 fallback IP address for A type pools
+	        and the IPv6 fallback IP address for AAAA type pools.
+		The fallback/emergency failure IPv6 IP address for the specified pool. It is
 		interpreted within the context of a gtmPoolFallbackIpv6Type value."
 	::= { gtmPoolEntry 38 } 
+
+gtmPoolPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of a pool."
+	::= { gtmPoolEntry 39 } 
 
 --==================================================================
 -- Gtm_pool_stat
@@ -3339,8 +3384,8 @@ gtmPoolStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmPoolStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmPoolStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmPoolStat 1 } 
 
@@ -3367,21 +3412,23 @@ gtmPoolStatEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmPoolStat Table"
 	INDEX {
-		gtmPoolStatName
+		gtmPoolStatName,
+		gtmPoolStatPoolType
 	}
 	::= { gtmPoolStatTable 1 } 
 
 GtmPoolStatEntry ::= 
 	SEQUENCE {
-        	gtmPoolStatName                                        LongDisplayString,
-        	gtmPoolStatPreferred                                   Counter64,
-        	gtmPoolStatAlternate                                   Counter64,
-        	gtmPoolStatFallback                                    Counter64,
-        	gtmPoolStatDropped                                     Counter64,
-        	gtmPoolStatExplicitIp                                  Counter64,
-        	gtmPoolStatReturnToDns                                 Counter64,
-        	gtmPoolStatReturnFromDns                               Counter64,
-        	gtmPoolStatCnameResolutions                            Counter64
+        	gtmPoolStatName                                           LongDisplayString,
+        	gtmPoolStatPreferred                                      Counter64,
+        	gtmPoolStatAlternate                                      Counter64,
+        	gtmPoolStatFallback                                       Counter64,
+        	gtmPoolStatDropped                                        Counter64,
+        	gtmPoolStatExplicitIp                                     Counter64,
+        	gtmPoolStatReturnToDns                                    Counter64,
+        	gtmPoolStatReturnFromDns                                  Counter64,
+        	gtmPoolStatCnameResolutions                               Counter64,
+        	gtmPoolStatPoolType                                       INTEGER
 	}
 
 gtmPoolStatName OBJECT-TYPE 
@@ -3457,11 +3504,27 @@ gtmPoolStatReturnFromDns OBJECT-TYPE
 gtmPoolStatCnameResolutions OBJECT-TYPE 
 	SYNTAX Counter64
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The number of times which a query is resolved by the CNAME of the
+		"Deprecated! No longer useful.
+	        The number of times which a query is resolved by the CNAME of the
 	        specified pool."
 	::= { gtmPoolStatEntry 9 } 
+
+gtmPoolStatPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of a pool."
+	::= { gtmPoolStatEntry 10 } 
 
 --==================================================================
 -- Gtm_pool_member
@@ -3489,6 +3552,7 @@ gtmPoolMbrEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmPoolMbr Table"
 	INDEX {
+		gtmPoolMbrPoolType,
 		gtmPoolMbrPoolName,
 		gtmPoolMbrServerName,
 		gtmPoolMbrVsName
@@ -3497,28 +3561,37 @@ gtmPoolMbrEntry OBJECT-TYPE
 
 GtmPoolMbrEntry ::= 
 	SEQUENCE {
-        	gtmPoolMbrPoolName                                     LongDisplayString,
-        	gtmPoolMbrIpType                                       InetAddressType,
-        	gtmPoolMbrIp                                           InetAddress,
-        	gtmPoolMbrPort                                         InetPortNumber,
-        	gtmPoolMbrVsName                                       LongDisplayString,
-        	gtmPoolMbrOrder                                        INTEGER,
-        	gtmPoolMbrLimitCpuUsageEnabled                         INTEGER,
-        	gtmPoolMbrLimitMemAvailEnabled                         INTEGER,
-        	gtmPoolMbrLimitBitsPerSecEnabled                       INTEGER,
-        	gtmPoolMbrLimitPktsPerSecEnabled                       INTEGER,
-        	gtmPoolMbrLimitConnEnabled                             INTEGER,
-        	gtmPoolMbrLimitConnPerSecEnabled                       INTEGER,
-        	gtmPoolMbrLimitCpuUsage                                Counter64,
-        	gtmPoolMbrLimitMemAvail                                Counter64,
-        	gtmPoolMbrLimitBitsPerSec                              Counter64,
-        	gtmPoolMbrLimitPktsPerSec                              Counter64,
-        	gtmPoolMbrLimitConn                                    Counter64,
-        	gtmPoolMbrLimitConnPerSec                              Counter64,
-        	gtmPoolMbrMonitorRule                                  LongDisplayString,
-        	gtmPoolMbrEnabled                                      INTEGER,
-        	gtmPoolMbrRatio                                        INTEGER,
-        	gtmPoolMbrServerName                                   LongDisplayString
+        	gtmPoolMbrPoolName                                        LongDisplayString,
+        	gtmPoolMbrIpType                                          InetAddressType,
+        	gtmPoolMbrIp                                              InetAddress,
+        	gtmPoolMbrPort                                            InetPortNumber,
+        	gtmPoolMbrVsName                                          LongDisplayString,
+        	gtmPoolMbrOrder                                           INTEGER,
+        	gtmPoolMbrLimitCpuUsageEnabled                            INTEGER,
+        	gtmPoolMbrLimitMemAvailEnabled                            INTEGER,
+        	gtmPoolMbrLimitBitsPerSecEnabled                          INTEGER,
+        	gtmPoolMbrLimitPktsPerSecEnabled                          INTEGER,
+        	gtmPoolMbrLimitConnEnabled                                INTEGER,
+        	gtmPoolMbrLimitConnPerSecEnabled                          INTEGER,
+        	gtmPoolMbrLimitCpuUsage                                   Counter64,
+        	gtmPoolMbrLimitMemAvail                                   Counter64,
+        	gtmPoolMbrLimitBitsPerSec                                 Counter64,
+        	gtmPoolMbrLimitPktsPerSec                                 Counter64,
+        	gtmPoolMbrLimitConn                                       Counter64,
+        	gtmPoolMbrLimitConnPerSec                                 Counter64,
+        	gtmPoolMbrMonitorRule                                     LongDisplayString,
+        	gtmPoolMbrEnabled                                         INTEGER,
+        	gtmPoolMbrRatio                                           INTEGER,
+        	gtmPoolMbrServerName                                      LongDisplayString,
+        	gtmPoolMbrPoolType                                        INTEGER,
+        	gtmPoolMbrStaticTarget                                    INTEGER,
+        	gtmPoolMbrRdataPriority                                   INTEGER,
+        	gtmPoolMbrRdataWeight                                     INTEGER,
+        	gtmPoolMbrRdataPort                                       INTEGER,
+        	gtmPoolMbrRdataOrder                                      INTEGER,
+        	gtmPoolMbrRdataPreference                                 INTEGER,
+        	gtmPoolMbrRdataFlags                                      LongDisplayString,
+        	gtmPoolMbrRdataService                                    LongDisplayString
 	}
 
 gtmPoolMbrPoolName OBJECT-TYPE 
@@ -3732,6 +3805,98 @@ gtmPoolMbrServerName OBJECT-TYPE
 		"The name of the server with which the specified pool_member is associated."
 	::= { gtmPoolMbrEntry 22 } 
 
+gtmPoolMbrPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the pool to which the specified member belongs."
+	::= { gtmPoolMbrEntry 23 } 
+
+gtmPoolMbrStaticTarget OBJECT-TYPE 
+	SYNTAX INTEGER {
+		false(0),
+		true(1)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The state indicating whether or not the pool member is a
+	        static target CNAME. The default is false. This is only used
+	        on CNAME type pool members."
+	::= { gtmPoolMbrEntry 24 } 
+
+gtmPoolMbrRdataPriority OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The pool member RDATA priority. The default is 10. This is
+	        only used on MX or SRV type pool members."
+	::= { gtmPoolMbrEntry 25 } 
+
+gtmPoolMbrRdataWeight OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The pool member RDATA weight. The default is 10. This is
+	        only used on SRV type pool members."
+	::= { gtmPoolMbrEntry 26 } 
+
+gtmPoolMbrRdataPort OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The pool member RDATA port. The default is 0. This is only
+	        used on SRV type pool members."
+	::= { gtmPoolMbrEntry 27 } 
+
+gtmPoolMbrRdataOrder OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The pool member RDATA order. The default is 10. This is only
+	        used on NAPTR type pool members."
+	::= { gtmPoolMbrEntry 28 } 
+
+gtmPoolMbrRdataPreference OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The pool member RDATA preference. The default is 10. This is
+	        only used on NAPTR type pool members."
+	::= { gtmPoolMbrEntry 29 } 
+
+gtmPoolMbrRdataFlags OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The pool member RDATA flags. If specified, valid strings are
+	        either 'a' for address type or 's' for service type. This is
+	        only used on NAPTR type pool members."
+	::= { gtmPoolMbrEntry 30 } 
+
+gtmPoolMbrRdataService OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The pool member RDATA service. This is only used on
+	        NAPTR type pool members."
+	::= { gtmPoolMbrEntry 31 } 
+
 --==================================================================
 -- Gtm_pool_status
 --==================================================================
@@ -3758,17 +3923,19 @@ gtmPoolStatusEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmPoolStatus Table"
 	INDEX {
+		gtmPoolStatusPoolType,
 		gtmPoolStatusName
 	}
 	::= { gtmPoolStatusTable 1 } 
 
 GtmPoolStatusEntry ::= 
 	SEQUENCE {
-        	gtmPoolStatusName                                      LongDisplayString,
-        	gtmPoolStatusAvailState                                INTEGER,
-        	gtmPoolStatusEnabledState                              INTEGER,
-        	gtmPoolStatusParentType                                Integer32,
-        	gtmPoolStatusDetailReason                              LongDisplayString
+        	gtmPoolStatusName                                         LongDisplayString,
+        	gtmPoolStatusAvailState                                   INTEGER,
+        	gtmPoolStatusEnabledState                                 INTEGER,
+        	gtmPoolStatusParentType                                   Gauge,
+        	gtmPoolStatusDetailReason                                 LongDisplayString,
+        	gtmPoolStatusPoolType                                     INTEGER
 	}
 
 gtmPoolStatusName OBJECT-TYPE 
@@ -3791,7 +3958,7 @@ gtmPoolStatusAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified pool indicated in color.
+		"The availability of the specified pool indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -3815,7 +3982,7 @@ gtmPoolStatusEnabledState OBJECT-TYPE
 	::= { gtmPoolStatusEntry 3 } 
 
 gtmPoolStatusParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -3830,6 +3997,21 @@ gtmPoolStatusDetailReason OBJECT-TYPE
 	DESCRIPTION
 		"The detail description of the specified pool's status."
 	::= { gtmPoolStatusEntry 5 } 
+
+gtmPoolStatusPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of a pool."
+	::= { gtmPoolStatusEntry 6 } 
 
 --==================================================================
 -- Gtm_pool_member_depends
@@ -3860,6 +4042,7 @@ gtmPoolMbrDepsEntry OBJECT-TYPE
 		gtmPoolMbrDepsServerName,
 		gtmPoolMbrDepsVsName,
 		gtmPoolMbrDepsPoolName,
+		gtmPoolMbrDepsPoolType,
 		gtmPoolMbrDepsDependServerName,
 		gtmPoolMbrDepsDependVsName
 	}
@@ -3867,17 +4050,18 @@ gtmPoolMbrDepsEntry OBJECT-TYPE
 
 GtmPoolMbrDepsEntry ::= 
 	SEQUENCE {
-        	gtmPoolMbrDepsIpType                                   InetAddressType,
-        	gtmPoolMbrDepsIp                                       InetAddress,
-        	gtmPoolMbrDepsPort                                     InetPortNumber,
-        	gtmPoolMbrDepsPoolName                                 LongDisplayString,
-        	gtmPoolMbrDepsVipType                                  InetAddressType,
-        	gtmPoolMbrDepsVip                                      InetAddress,
-        	gtmPoolMbrDepsVport                                    InetPortNumber,
-        	gtmPoolMbrDepsServerName                               LongDisplayString,
-        	gtmPoolMbrDepsVsName                                   LongDisplayString,
-        	gtmPoolMbrDepsDependServerName                         LongDisplayString,
-        	gtmPoolMbrDepsDependVsName                             LongDisplayString
+        	gtmPoolMbrDepsIpType                                      InetAddressType,
+        	gtmPoolMbrDepsIp                                          InetAddress,
+        	gtmPoolMbrDepsPort                                        InetPortNumber,
+        	gtmPoolMbrDepsPoolName                                    LongDisplayString,
+        	gtmPoolMbrDepsVipType                                     InetAddressType,
+        	gtmPoolMbrDepsVip                                         InetAddress,
+        	gtmPoolMbrDepsVport                                       InetPortNumber,
+        	gtmPoolMbrDepsServerName                                  LongDisplayString,
+        	gtmPoolMbrDepsVsName                                      LongDisplayString,
+        	gtmPoolMbrDepsDependServerName                            LongDisplayString,
+        	gtmPoolMbrDepsDependVsName                                LongDisplayString,
+        	gtmPoolMbrDepsPoolType                                    INTEGER
 	}
 
 gtmPoolMbrDepsIpType OBJECT-TYPE 
@@ -3976,6 +4160,21 @@ gtmPoolMbrDepsDependVsName OBJECT-TYPE
 		"The virtual server name on which the specified pool member depends."
 	::= { gtmPoolMbrDepsEntry 11 } 
 
+gtmPoolMbrDepsPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of a pool to which the specified member belongs."
+	::= { gtmPoolMbrDepsEntry 12 } 
+
 --==================================================================
 -- Gtm_pool_member_stat
 --==================================================================
@@ -3984,8 +4183,8 @@ gtmPoolMbrStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmPoolMemberStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmPoolMemberStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmPoolMemberStat 1 } 
 
@@ -4012,6 +4211,7 @@ gtmPoolMbrStatEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmPoolMbrStat Table"
 	INDEX {
+		gtmPoolMbrStatPoolType,
 		gtmPoolMbrStatPoolName,
 		gtmPoolMbrStatServerName,
 		gtmPoolMbrStatVsName
@@ -4020,15 +4220,16 @@ gtmPoolMbrStatEntry OBJECT-TYPE
 
 GtmPoolMbrStatEntry ::= 
 	SEQUENCE {
-        	gtmPoolMbrStatPoolName                                 LongDisplayString,
-        	gtmPoolMbrStatIpType                                   InetAddressType,
-        	gtmPoolMbrStatIp                                       InetAddress,
-        	gtmPoolMbrStatPort                                     InetPortNumber,
-        	gtmPoolMbrStatPreferred                                Counter64,
-        	gtmPoolMbrStatAlternate                                Counter64,
-        	gtmPoolMbrStatFallback                                 Counter64,
-        	gtmPoolMbrStatServerName                               LongDisplayString,
-        	gtmPoolMbrStatVsName                                   LongDisplayString
+        	gtmPoolMbrStatPoolName                                    LongDisplayString,
+        	gtmPoolMbrStatIpType                                      InetAddressType,
+        	gtmPoolMbrStatIp                                          InetAddress,
+        	gtmPoolMbrStatPort                                        InetPortNumber,
+        	gtmPoolMbrStatPreferred                                   Counter64,
+        	gtmPoolMbrStatAlternate                                   Counter64,
+        	gtmPoolMbrStatFallback                                    Counter64,
+        	gtmPoolMbrStatServerName                                  LongDisplayString,
+        	gtmPoolMbrStatVsName                                      LongDisplayString,
+        	gtmPoolMbrStatPoolType                                    INTEGER
 	}
 
 gtmPoolMbrStatPoolName OBJECT-TYPE 
@@ -4110,6 +4311,21 @@ gtmPoolMbrStatVsName OBJECT-TYPE
 		"The name of the specified virtual server."
 	::= { gtmPoolMbrStatEntry 9 } 
 
+gtmPoolMbrStatPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of a pool to which the specified member belongs."
+	::= { gtmPoolMbrStatEntry 10 } 
+
 --==================================================================
 -- Gtm_pool_member_status
 --==================================================================
@@ -4136,6 +4352,7 @@ gtmPoolMbrStatusEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmPoolMbrStatus Table"
 	INDEX {
+		gtmPoolMbrStatusPoolType,
 		gtmPoolMbrStatusPoolName,
 		gtmPoolMbrStatusServerName,
 		gtmPoolMbrStatusVsName
@@ -4144,16 +4361,17 @@ gtmPoolMbrStatusEntry OBJECT-TYPE
 
 GtmPoolMbrStatusEntry ::= 
 	SEQUENCE {
-        	gtmPoolMbrStatusPoolName                               LongDisplayString,
-        	gtmPoolMbrStatusIpType                                 InetAddressType,
-        	gtmPoolMbrStatusIp                                     InetAddress,
-        	gtmPoolMbrStatusPort                                   InetPortNumber,
-        	gtmPoolMbrStatusAvailState                             INTEGER,
-        	gtmPoolMbrStatusEnabledState                           INTEGER,
-        	gtmPoolMbrStatusParentType                             Integer32,
-        	gtmPoolMbrStatusDetailReason                           LongDisplayString,
-        	gtmPoolMbrStatusVsName                                 LongDisplayString,
-        	gtmPoolMbrStatusServerName                             LongDisplayString
+        	gtmPoolMbrStatusPoolName                                  LongDisplayString,
+        	gtmPoolMbrStatusIpType                                    InetAddressType,
+        	gtmPoolMbrStatusIp                                        InetAddress,
+        	gtmPoolMbrStatusPort                                      InetPortNumber,
+        	gtmPoolMbrStatusAvailState                                INTEGER,
+        	gtmPoolMbrStatusEnabledState                              INTEGER,
+        	gtmPoolMbrStatusParentType                                Gauge,
+        	gtmPoolMbrStatusDetailReason                              LongDisplayString,
+        	gtmPoolMbrStatusVsName                                    LongDisplayString,
+        	gtmPoolMbrStatusServerName                                LongDisplayString,
+        	gtmPoolMbrStatusPoolType                                  INTEGER
 	}
 
 gtmPoolMbrStatusPoolName OBJECT-TYPE 
@@ -4204,7 +4422,7 @@ gtmPoolMbrStatusAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified pool member indicated in color.
+		"The availability of the specified pool member indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -4228,7 +4446,7 @@ gtmPoolMbrStatusEnabledState OBJECT-TYPE
 	::= { gtmPoolMbrStatusEntry 6 } 
 
 gtmPoolMbrStatusParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -4260,6 +4478,21 @@ gtmPoolMbrStatusServerName OBJECT-TYPE
 	DESCRIPTION
 		"The name of the server with which the specified pool_member is associated."
 	::= { gtmPoolMbrStatusEntry 10 } 
+
+gtmPoolMbrStatusPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the pool to which the specified member belongs."
+	::= { gtmPoolMbrStatusEntry 11 } 
 
 --==================================================================
 -- Gtm_region_entry
@@ -4293,8 +4526,8 @@ gtmRegionEntryEntry OBJECT-TYPE
 
 GtmRegionEntryEntry ::= 
 	SEQUENCE {
-        	gtmRegionEntryName                                     LongDisplayString,
-        	gtmRegionEntryRegionDbType                             INTEGER
+        	gtmRegionEntryName                                        LongDisplayString,
+        	gtmRegionEntryRegionDbType                                INTEGER
 	}
 
 gtmRegionEntryName OBJECT-TYPE 
@@ -4353,11 +4586,11 @@ gtmRegItemEntry OBJECT-TYPE
 
 GtmRegItemEntry ::= 
 	SEQUENCE {
-        	gtmRegItemRegionDbType                                 INTEGER,
-        	gtmRegItemRegionName                                   LongDisplayString,
-        	gtmRegItemType                                         INTEGER,
-        	gtmRegItemNegate                                       INTEGER,
-        	gtmRegItemRegEntry                                     LongDisplayString
+        	gtmRegItemRegionDbType                                    INTEGER,
+        	gtmRegItemRegionName                                      LongDisplayString,
+        	gtmRegItemType                                            INTEGER,
+        	gtmRegItemNegate                                          INTEGER,
+        	gtmRegItemRegEntry                                        LongDisplayString
 	}
 
 gtmRegItemRegionDbType OBJECT-TYPE 
@@ -4390,7 +4623,7 @@ gtmRegItemType OBJECT-TYPE
 		pool(5),
 		datacenter(6),
 		ispregion(7),
-		geoip-isp(8)
+		geoipIsp(8)
 	}
 	MAX-ACCESS read-only
 	STATUS current
@@ -4450,9 +4683,9 @@ gtmRuleEntry OBJECT-TYPE
 
 GtmRuleEntry ::= 
 	SEQUENCE {
-        	gtmRuleName                                            LongDisplayString,
-        	gtmRuleDefinition                                      LongDisplayString,
-        	gtmRuleConfigSource                                    INTEGER
+        	gtmRuleName                                               LongDisplayString,
+        	gtmRuleDefinition                                         LongDisplayString,
+        	gtmRuleConfigSource                                       INTEGER
 	}
 
 gtmRuleName OBJECT-TYPE 
@@ -4518,10 +4751,10 @@ gtmRuleEventEntry OBJECT-TYPE
 
 GtmRuleEventEntry ::= 
 	SEQUENCE {
-        	gtmRuleEventName                                       LongDisplayString,
-        	gtmRuleEventEventType                                  LongDisplayString,
-        	gtmRuleEventPriority                                   INTEGER,
-        	gtmRuleEventScript                                     LongDisplayString
+        	gtmRuleEventName                                          LongDisplayString,
+        	gtmRuleEventEventType                                     LongDisplayString,
+        	gtmRuleEventPriority                                      INTEGER,
+        	gtmRuleEventScript                                        LongDisplayString
 	}
 
 gtmRuleEventName OBJECT-TYPE 
@@ -4565,8 +4798,8 @@ gtmRuleEventStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmRuleEventStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmRuleEventStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmRuleEventStat 1 } 
 
@@ -4601,12 +4834,12 @@ gtmRuleEventStatEntry OBJECT-TYPE
 
 GtmRuleEventStatEntry ::= 
 	SEQUENCE {
-        	gtmRuleEventStatName                                   LongDisplayString,
-        	gtmRuleEventStatEventType                              LongDisplayString,
-        	gtmRuleEventStatPriority                               INTEGER,
-        	gtmRuleEventStatFailures                               Counter64,
-        	gtmRuleEventStatAborts                                 Counter64,
-        	gtmRuleEventStatTotalExecutions                        Counter64
+        	gtmRuleEventStatName                                      LongDisplayString,
+        	gtmRuleEventStatEventType                                 LongDisplayString,
+        	gtmRuleEventStatPriority                                  INTEGER,
+        	gtmRuleEventStatFailures                                  Counter64,
+        	gtmRuleEventStatAborts                                    Counter64,
+        	gtmRuleEventStatTotalExecutions                           Counter64
 	}
 
 gtmRuleEventStatName OBJECT-TYPE 
@@ -4690,30 +4923,30 @@ gtmServerEntry OBJECT-TYPE
 
 GtmServerEntry ::= 
 	SEQUENCE {
-        	gtmServerName                                          LongDisplayString,
-        	gtmServerDcName                                        LongDisplayString,
-        	gtmServerType                                          INTEGER,
-        	gtmServerEnabled                                       INTEGER,
-        	gtmServerLimitCpuUsageEnabled                          INTEGER,
-        	gtmServerLimitMemAvailEnabled                          INTEGER,
-        	gtmServerLimitBitsPerSecEnabled                        INTEGER,
-        	gtmServerLimitPktsPerSecEnabled                        INTEGER,
-        	gtmServerLimitConnEnabled                              INTEGER,
-        	gtmServerLimitConnPerSecEnabled                        INTEGER,
-        	gtmServerLimitCpuUsage                                 Counter64,
-        	gtmServerLimitMemAvail                                 Counter64,
-        	gtmServerLimitBitsPerSec                               Counter64,
-        	gtmServerLimitPktsPerSec                               Counter64,
-        	gtmServerLimitConn                                     Counter64,
-        	gtmServerLimitConnPerSec                               Counter64,
-        	gtmServerProberType                                    InetAddressType,
-        	gtmServerProber                                        InetAddress,
-        	gtmServerMonitorRule                                   LongDisplayString,
-        	gtmServerAllowSvcChk                                   INTEGER,
-        	gtmServerAllowPath                                     INTEGER,
-        	gtmServerAllowSnmp                                     INTEGER,
-        	gtmServerAutoconfState                                 INTEGER,
-        	gtmServerLinkAutoconfState                             INTEGER
+        	gtmServerName                                             LongDisplayString,
+        	gtmServerDcName                                           LongDisplayString,
+        	gtmServerType                                             INTEGER,
+        	gtmServerEnabled                                          INTEGER,
+        	gtmServerLimitCpuUsageEnabled                             INTEGER,
+        	gtmServerLimitMemAvailEnabled                             INTEGER,
+        	gtmServerLimitBitsPerSecEnabled                           INTEGER,
+        	gtmServerLimitPktsPerSecEnabled                           INTEGER,
+        	gtmServerLimitConnEnabled                                 INTEGER,
+        	gtmServerLimitConnPerSecEnabled                           INTEGER,
+        	gtmServerLimitCpuUsage                                    Counter64,
+        	gtmServerLimitMemAvail                                    Counter64,
+        	gtmServerLimitBitsPerSec                                  Counter64,
+        	gtmServerLimitPktsPerSec                                  Counter64,
+        	gtmServerLimitConn                                        Counter64,
+        	gtmServerLimitConnPerSec                                  Counter64,
+        	gtmServerProberType                                       InetAddressType,
+        	gtmServerProber                                           InetAddress,
+        	gtmServerMonitorRule                                      LongDisplayString,
+        	gtmServerAllowSvcChk                                      INTEGER,
+        	gtmServerAllowPath                                        INTEGER,
+        	gtmServerAllowSnmp                                        INTEGER,
+        	gtmServerAutoconfState                                    INTEGER,
+        	gtmServerLinkAutoconfState                                INTEGER
 	}
 
 gtmServerName OBJECT-TYPE 
@@ -4989,8 +5222,8 @@ gtmServerStatResetStats OBJECT-TYPE
 	STATUS	 deprecated
 	DESCRIPTION
 		"Deprecated!.
-		The action to reset resetable statistics data in  gtmServerStat. 
-		 Setting this value to 1 will reset statistics data. 
+		The action to reset resettable statistics data in gtmServerStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmServerStat 1 } 
 
@@ -5026,17 +5259,17 @@ gtmServerStatEntry OBJECT-TYPE
 
 GtmServerStatEntry ::= 
 	SEQUENCE {
-        	gtmServerStatName                                      LongDisplayString,
-        	gtmServerStatUnitId                                    INTEGER,
-        	gtmServerStatVsPicks                                   Counter64,
-        	gtmServerStatCpuUsage                                  Counter64,
-        	gtmServerStatMemAvail                                  Counter64,
-        	gtmServerStatBitsPerSecIn                              Counter64,
-        	gtmServerStatBitsPerSecOut                             Counter64,
-        	gtmServerStatPktsPerSecIn                              Counter64,
-        	gtmServerStatPktsPerSecOut                             Counter64,
-        	gtmServerStatConnections                               Counter64,
-        	gtmServerStatConnRate                                  Counter64
+        	gtmServerStatName                                         LongDisplayString,
+        	gtmServerStatUnitId                                       INTEGER,
+        	gtmServerStatVsPicks                                      Counter64,
+        	gtmServerStatCpuUsage                                     Counter64,
+        	gtmServerStatMemAvail                                     Counter64,
+        	gtmServerStatBitsPerSecIn                                 Counter64,
+        	gtmServerStatBitsPerSecOut                                Counter64,
+        	gtmServerStatPktsPerSecIn                                 Counter64,
+        	gtmServerStatPktsPerSecOut                                Counter64,
+        	gtmServerStatConnections                                  Counter64,
+        	gtmServerStatConnRate                                     Counter64
 	}
 
 gtmServerStatName OBJECT-TYPE 
@@ -5101,7 +5334,7 @@ gtmServerStatBitsPerSecOut OBJECT-TYPE
 	STATUS	 deprecated
 	DESCRIPTION
 		"Deprecated! Replaced by data in gtmServerStat2 table.
-		The number of bits per second sent out from the specified server."
+		The number of bits per second sent from the specified server."
 	::= { gtmServerStatEntry 7 } 
 
 gtmServerStatPktsPerSecIn OBJECT-TYPE 
@@ -5119,7 +5352,7 @@ gtmServerStatPktsPerSecOut OBJECT-TYPE
 	STATUS	 deprecated
 	DESCRIPTION
 		"Deprecated! Replaced by data in gtmServerStat2 table.
-		The number of packets per second sent out from the specified server."
+		The number of packets per second sent from the specified server."
 	::= { gtmServerStatEntry 9 } 
 
 gtmServerStatConnections OBJECT-TYPE 
@@ -5174,11 +5407,11 @@ gtmServerStatusEntry OBJECT-TYPE
 
 GtmServerStatusEntry ::= 
 	SEQUENCE {
-        	gtmServerStatusName                                    LongDisplayString,
-        	gtmServerStatusAvailState                              INTEGER,
-        	gtmServerStatusEnabledState                            INTEGER,
-        	gtmServerStatusParentType                              Integer32,
-        	gtmServerStatusDetailReason                            LongDisplayString
+        	gtmServerStatusName                                       LongDisplayString,
+        	gtmServerStatusAvailState                                 INTEGER,
+        	gtmServerStatusEnabledState                               INTEGER,
+        	gtmServerStatusParentType                                 Gauge,
+        	gtmServerStatusDetailReason                               LongDisplayString
 	}
 
 gtmServerStatusName OBJECT-TYPE 
@@ -5201,7 +5434,7 @@ gtmServerStatusAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified server indicated in color.
+		"The availability of the specified server indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -5225,7 +5458,7 @@ gtmServerStatusEnabledState OBJECT-TYPE
 	::= { gtmServerStatusEntry 3 } 
 
 gtmServerStatusParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -5278,14 +5511,14 @@ gtmTopItemEntry OBJECT-TYPE
 
 GtmTopItemEntry ::= 
 	SEQUENCE {
-        	gtmTopItemLdnsType                                     INTEGER,
-        	gtmTopItemLdnsNegate                                   INTEGER,
-        	gtmTopItemLdnsEntry                                    LongDisplayString,
-        	gtmTopItemServerType                                   INTEGER,
-        	gtmTopItemServerNegate                                 INTEGER,
-        	gtmTopItemServerEntry                                  LongDisplayString,
-        	gtmTopItemWeight                                       Integer32,
-        	gtmTopItemOrder                                        Integer32
+        	gtmTopItemLdnsType                                        INTEGER,
+        	gtmTopItemLdnsNegate                                      INTEGER,
+        	gtmTopItemLdnsEntry                                       LongDisplayString,
+        	gtmTopItemServerType                                      INTEGER,
+        	gtmTopItemServerNegate                                    INTEGER,
+        	gtmTopItemServerEntry                                     LongDisplayString,
+        	gtmTopItemWeight                                          Gauge,
+        	gtmTopItemOrder                                           Gauge
 	}
 
 gtmTopItemLdnsType OBJECT-TYPE 
@@ -5298,7 +5531,7 @@ gtmTopItemLdnsType OBJECT-TYPE
 		pool(5),
 		datacenter(6),
 		ispregion(7),
-		geoip-isp(8)
+		geoipIsp(8)
 	}
 	MAX-ACCESS read-only
 	STATUS current
@@ -5337,7 +5570,7 @@ gtmTopItemServerType OBJECT-TYPE
 		pool(5),
 		datacenter(6),
 		ispregion(7),
-		geoip-isp(8)
+		geoipIsp(8)
 	}
 	MAX-ACCESS read-only
 	STATUS current
@@ -5367,7 +5600,7 @@ gtmTopItemServerEntry OBJECT-TYPE
 	::= { gtmTopItemEntry 6 } 
 
 gtmTopItemWeight OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -5375,7 +5608,7 @@ gtmTopItemWeight OBJECT-TYPE
 	::= { gtmTopItemEntry 7 } 
 
 gtmTopItemOrder OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -5415,29 +5648,30 @@ gtmVsEntry OBJECT-TYPE
 
 GtmVsEntry ::= 
 	SEQUENCE {
-        	gtmVsIpType                                            InetAddressType,
-        	gtmVsIp                                                InetAddress,
-        	gtmVsPort                                              InetPortNumber,
-        	gtmVsName                                              LongDisplayString,
-        	gtmVsServerName                                        LongDisplayString,
-        	gtmVsIpXlatedType                                      InetAddressType,
-        	gtmVsIpXlated                                          InetAddress,
-        	gtmVsPortXlated                                        InetPortNumber,
-        	gtmVsLimitCpuUsageEnabled                              INTEGER,
-        	gtmVsLimitMemAvailEnabled                              INTEGER,
-        	gtmVsLimitBitsPerSecEnabled                            INTEGER,
-        	gtmVsLimitPktsPerSecEnabled                            INTEGER,
-        	gtmVsLimitConnEnabled                                  INTEGER,
-        	gtmVsLimitConnPerSecEnabled                            INTEGER,
-        	gtmVsLimitCpuUsage                                     Counter64,
-        	gtmVsLimitMemAvail                                     Counter64,
-        	gtmVsLimitBitsPerSec                                   Counter64,
-        	gtmVsLimitPktsPerSec                                   Counter64,
-        	gtmVsLimitConn                                         Counter64,
-        	gtmVsLimitConnPerSec                                   Counter64,
-        	gtmVsMonitorRule                                       LongDisplayString,
-        	gtmVsEnabled                                           INTEGER,
-        	gtmVsLinkName                                          LongDisplayString
+        	gtmVsIpType                                               InetAddressType,
+        	gtmVsIp                                                   InetAddress,
+        	gtmVsPort                                                 InetPortNumber,
+        	gtmVsName                                                 LongDisplayString,
+        	gtmVsServerName                                           LongDisplayString,
+        	gtmVsIpXlatedType                                         InetAddressType,
+        	gtmVsIpXlated                                             InetAddress,
+        	gtmVsPortXlated                                           InetPortNumber,
+        	gtmVsLimitCpuUsageEnabled                                 INTEGER,
+        	gtmVsLimitMemAvailEnabled                                 INTEGER,
+        	gtmVsLimitBitsPerSecEnabled                               INTEGER,
+        	gtmVsLimitPktsPerSecEnabled                               INTEGER,
+        	gtmVsLimitConnEnabled                                     INTEGER,
+        	gtmVsLimitConnPerSecEnabled                               INTEGER,
+        	gtmVsLimitCpuUsage                                        Counter64,
+        	gtmVsLimitMemAvail                                        Counter64,
+        	gtmVsLimitBitsPerSec                                      Counter64,
+        	gtmVsLimitPktsPerSec                                      Counter64,
+        	gtmVsLimitConn                                            Counter64,
+        	gtmVsLimitConnPerSec                                      Counter64,
+        	gtmVsMonitorRule                                          LongDisplayString,
+        	gtmVsEnabled                                              INTEGER,
+        	gtmVsLinkName                                             LongDisplayString,
+        	gtmVsLtmName                                              LongDisplayString
 	}
 
 gtmVsIpType OBJECT-TYPE 
@@ -5655,6 +5889,15 @@ gtmVsLinkName OBJECT-TYPE
 		"The parent link of this virtual server."
 	::= { gtmVsEntry 23 } 
 
+gtmVsLtmName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The user configured LTM name of the specified virtual server.
+	        This string is not populated as a result of monitoring activity."
+	::= { gtmVsEntry 24 } 
+
 --==================================================================
 -- Gtm_vs_depends
 --==================================================================
@@ -5690,16 +5933,16 @@ gtmVsDepsEntry OBJECT-TYPE
 
 GtmVsDepsEntry ::= 
 	SEQUENCE {
-        	gtmVsDepsIpType                                        InetAddressType,
-        	gtmVsDepsIp                                            InetAddress,
-        	gtmVsDepsPort                                          InetPortNumber,
-        	gtmVsDepsVipType                                       InetAddressType,
-        	gtmVsDepsVip                                           InetAddress,
-        	gtmVsDepsVport                                         InetPortNumber,
-        	gtmVsDepsServerName                                    LongDisplayString,
-        	gtmVsDepsVsName                                        LongDisplayString,
-        	gtmVsDepsDependServerName                              LongDisplayString,
-        	gtmVsDepsDependVsName                                  LongDisplayString
+        	gtmVsDepsIpType                                           InetAddressType,
+        	gtmVsDepsIp                                               InetAddress,
+        	gtmVsDepsPort                                             InetPortNumber,
+        	gtmVsDepsVipType                                          InetAddressType,
+        	gtmVsDepsVip                                              InetAddress,
+        	gtmVsDepsVport                                            InetPortNumber,
+        	gtmVsDepsServerName                                       LongDisplayString,
+        	gtmVsDepsVsName                                           LongDisplayString,
+        	gtmVsDepsDependServerName                                 LongDisplayString,
+        	gtmVsDepsDependVsName                                     LongDisplayString
 	}
 
 gtmVsDepsIpType OBJECT-TYPE 
@@ -5798,8 +6041,8 @@ gtmVsStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmVirtualServStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmVirtualServStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmVirtualServStat 1 } 
 
@@ -5834,20 +6077,20 @@ gtmVsStatEntry OBJECT-TYPE
 
 GtmVsStatEntry ::= 
 	SEQUENCE {
-        	gtmVsStatIpType                                        InetAddressType,
-        	gtmVsStatIp                                            InetAddress,
-        	gtmVsStatPort                                          InetPortNumber,
-        	gtmVsStatName                                          LongDisplayString,
-        	gtmVsStatCpuUsage                                      Counter64,
-        	gtmVsStatMemAvail                                      Counter64,
-        	gtmVsStatBitsPerSecIn                                  Counter64,
-        	gtmVsStatBitsPerSecOut                                 Counter64,
-        	gtmVsStatPktsPerSecIn                                  Counter64,
-        	gtmVsStatPktsPerSecOut                                 Counter64,
-        	gtmVsStatConnections                                   Counter64,
-        	gtmVsStatConnRate                                      Counter64,
-        	gtmVsStatVsScore                                       Counter64,
-        	gtmVsStatServerName                                    LongDisplayString
+        	gtmVsStatIpType                                           InetAddressType,
+        	gtmVsStatIp                                               InetAddress,
+        	gtmVsStatPort                                             InetPortNumber,
+        	gtmVsStatName                                             LongDisplayString,
+        	gtmVsStatCpuUsage                                         Counter64,
+        	gtmVsStatMemAvail                                         Counter64,
+        	gtmVsStatBitsPerSecIn                                     Counter64,
+        	gtmVsStatBitsPerSecOut                                    Counter64,
+        	gtmVsStatPktsPerSecIn                                     Counter64,
+        	gtmVsStatPktsPerSecOut                                    Counter64,
+        	gtmVsStatConnections                                      Counter64,
+        	gtmVsStatConnRate                                         Counter64,
+        	gtmVsStatVsScore                                          Counter64,
+        	gtmVsStatServerName                                       LongDisplayString
 	}
 
 gtmVsStatIpType OBJECT-TYPE 
@@ -5915,7 +6158,7 @@ gtmVsStatBitsPerSecOut OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of bits per second sent out from the specified virtual server."
+		"The number of bits per second sent from the specified virtual server."
 	::= { gtmVsStatEntry 8 } 
 
 gtmVsStatPktsPerSecIn OBJECT-TYPE 
@@ -5931,7 +6174,7 @@ gtmVsStatPktsPerSecOut OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of packets per second sent out from the specified virtual server."
+		"The number of packets per second sent from the specified virtual server."
 	::= { gtmVsStatEntry 10 } 
 
 gtmVsStatConnections OBJECT-TYPE 
@@ -6004,15 +6247,15 @@ gtmVsStatusEntry OBJECT-TYPE
 
 GtmVsStatusEntry ::= 
 	SEQUENCE {
-        	gtmVsStatusIpType                                      InetAddressType,
-        	gtmVsStatusIp                                          InetAddress,
-        	gtmVsStatusPort                                        InetPortNumber,
-        	gtmVsStatusAvailState                                  INTEGER,
-        	gtmVsStatusEnabledState                                INTEGER,
-        	gtmVsStatusParentType                                  Integer32,
-        	gtmVsStatusDetailReason                                LongDisplayString,
-        	gtmVsStatusVsName                                      LongDisplayString,
-        	gtmVsStatusServerName                                  LongDisplayString
+        	gtmVsStatusIpType                                         InetAddressType,
+        	gtmVsStatusIp                                             InetAddress,
+        	gtmVsStatusPort                                           InetPortNumber,
+        	gtmVsStatusAvailState                                     INTEGER,
+        	gtmVsStatusEnabledState                                   INTEGER,
+        	gtmVsStatusParentType                                     Gauge,
+        	gtmVsStatusDetailReason                                   LongDisplayString,
+        	gtmVsStatusVsName                                         LongDisplayString,
+        	gtmVsStatusServerName                                     LongDisplayString
 	}
 
 gtmVsStatusIpType OBJECT-TYPE 
@@ -6055,7 +6298,7 @@ gtmVsStatusAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified virtual server indicated in color.
+		"The availability of the specified virtual server indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -6079,7 +6322,7 @@ gtmVsStatusEnabledState OBJECT-TYPE
 	::= { gtmVsStatusEntry 5 } 
 
 gtmVsStatusParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -6137,21 +6380,28 @@ gtmWideipEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmWideip Table"
 	INDEX {
+		gtmWideipType,
 		gtmWideipName
 	}
 	::= { gtmWideipTable 1 } 
 
 GtmWideipEntry ::= 
 	SEQUENCE {
-        	gtmWideipName                                          LongDisplayString,
-        	gtmWideipPersist                                       INTEGER,
-        	gtmWideipTtlPersist                                    Integer32,
-        	gtmWideipEnabled                                       INTEGER,
-        	gtmWideipLbmodePool                                    INTEGER,
-        	gtmWideipApplication                                   LongDisplayString,
-        	gtmWideipLastResortPool                                LongDisplayString,
-        	gtmWideipIpv6Noerror                                   INTEGER,
-        	gtmWideipLoadBalancingDecisionLogVerbosity             Integer32
+        	gtmWideipName                                             LongDisplayString,
+        	gtmWideipPersist                                          INTEGER,
+        	gtmWideipTtlPersist                                       Gauge,
+        	gtmWideipEnabled                                          INTEGER,
+        	gtmWideipLbmodePool                                       INTEGER,
+        	gtmWideipApplication                                      LongDisplayString,
+        	gtmWideipLastResortPool                                   LongDisplayString,
+        	gtmWideipIpNoError                                        INTEGER,
+        	gtmWideipLoadBalancingDecisionLogVerbosity                Gauge,
+        	gtmWideipIpNoErrorTtl                                     Gauge,
+        	gtmWideipPersistCidr                                      Gauge,
+        	gtmWideipPersistV6Cidr                                    Gauge,
+        	gtmWideipMinimalResponse                                  INTEGER,
+        	gtmWideipType                                             INTEGER,
+        	gtmWideipLastResortPoolType                               INTEGER
 	}
 
 gtmWideipName OBJECT-TYPE 
@@ -6175,7 +6425,7 @@ gtmWideipPersist OBJECT-TYPE
 	::= { gtmWideipEntry 2 } 
 
 gtmWideipTtlPersist OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -6228,9 +6478,10 @@ gtmWideipLbmodePool OBJECT-TYPE
 gtmWideipApplication OBJECT-TYPE 
 	SYNTAX LongDisplayString
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The application name the specified wide IP is used for."
+		"Deprecated! No longer useful. Please use gtmApplicationWideip.
+	        The application name the specified wide IP is used for."
 	::= { gtmWideipEntry 6 } 
 
 gtmWideipLastResortPool OBJECT-TYPE 
@@ -6241,19 +6492,20 @@ gtmWideipLastResortPool OBJECT-TYPE
 		"The name of the last-resort pool for the specified wide IP."
 	::= { gtmWideipEntry 7 } 
 
-gtmWideipIpv6Noerror OBJECT-TYPE 
+gtmWideipIpNoError OBJECT-TYPE 
 	SYNTAX INTEGER {
-		false(0),
-		true(1)
+		disable(0),
+		enable(1)
 	}
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"When enabled, all IPv6 wide IP requests will be returned with a noerror response."
+		"When enabled on a given wide IP, all requests sent to that
+	        wide IP will be returned with a noerror response."
 	::= { gtmWideipEntry 8 } 
 
 gtmWideipLoadBalancingDecisionLogVerbosity OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -6268,6 +6520,84 @@ gtmWideipLoadBalancingDecisionLogVerbosity OBJECT-TYPE
 	        traversed during load-balancing."
 	::= { gtmWideipEntry 9 } 
 
+gtmWideipIpNoErrorTtl OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The negative caching TTL of the SOA record for the NoError
+	        response. The default is 0, which means that no SOA is included
+	        (ie no caching)."
+	::= { gtmWideipEntry 10 } 
+
+gtmWideipPersistCidr OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A mask used to group IPv4 LDNS addresses. This allows one
+	        persistence record to be shared by IPv4 LDNS addresses that
+	        match within this mask. The default is 32 (no shared
+	        persistence records)."
+	::= { gtmWideipEntry 11 } 
+
+gtmWideipPersistV6Cidr OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A mask used to group IPv6 LDNS addresses. This allows one
+	        persistence record to be shared by IPv6 LDNS addresses that
+	        match within this mask. The default is 128 (no shared
+	        persistence records)."
+	::= { gtmWideipEntry 12 } 
+
+gtmWideipMinimalResponse OBJECT-TYPE 
+	SYNTAX INTEGER {
+		disable(0),
+		enable(1)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether or not GTM will form the smallest allowable DNS
+	        response to a query. The default is enabled. When set to
+	        disabled, GTM will attempt to chase CNAME chains to obtain
+	        the ultimate answer and attempt to add address resource
+	        records to the additional section of the response for each
+	        answer when needed."
+	::= { gtmWideipEntry 13 } 
+
+gtmWideipType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of a wide IP."
+	::= { gtmWideipEntry 14 } 
+
+gtmWideipLastResortPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the last-resort pool for the specified wide IP."
+	::= { gtmWideipEntry 15 } 
+
 --==================================================================
 -- Gtm_wideip_stat
 --==================================================================
@@ -6276,8 +6606,8 @@ gtmWideipStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmWideipStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmWideipStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmWideipStat 1 } 
 
@@ -6304,25 +6634,28 @@ gtmWideipStatEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmWideipStat Table"
 	INDEX {
+		gtmWideipStatWipType,
 		gtmWideipStatName
 	}
 	::= { gtmWideipStatTable 1 } 
 
 GtmWideipStatEntry ::= 
 	SEQUENCE {
-        	gtmWideipStatName                                      LongDisplayString,
-        	gtmWideipStatRequests                                  Counter64,
-        	gtmWideipStatResolutions                               Counter64,
-        	gtmWideipStatPersisted                                 Counter64,
-        	gtmWideipStatPreferred                                 Counter64,
-        	gtmWideipStatFallback                                  Counter64,
-        	gtmWideipStatDropped                                   Counter64,
-        	gtmWideipStatExplicitIp                                Counter64,
-        	gtmWideipStatReturnToDns                               Counter64,
-        	gtmWideipStatReturnFromDns                             Counter64,
-        	gtmWideipStatCnameResolutions                          Counter64,
-        	gtmWideipStatARequests                                 Counter64,
-        	gtmWideipStatAaaaRequests                              Counter64
+        	gtmWideipStatName                                         LongDisplayString,
+        	gtmWideipStatRequests                                     Counter64,
+        	gtmWideipStatResolutions                                  Counter64,
+        	gtmWideipStatPersisted                                    Counter64,
+        	gtmWideipStatPreferred                                    Counter64,
+        	gtmWideipStatFallback                                     Counter64,
+        	gtmWideipStatDropped                                      Counter64,
+        	gtmWideipStatExplicitIp                                   Counter64,
+        	gtmWideipStatReturnToDns                                  Counter64,
+        	gtmWideipStatReturnFromDns                                Counter64,
+        	gtmWideipStatCnameResolutions                             Counter64,
+        	gtmWideipStatARequests                                    Counter64,
+        	gtmWideipStatAaaaRequests                                 Counter64,
+        	gtmWideipStatAlternate                                    Counter64,
+        	gtmWideipStatWipType                                      INTEGER
 	}
 
 gtmWideipStatName OBJECT-TYPE 
@@ -6371,7 +6704,7 @@ gtmWideipStatFallback OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of times which the alternate load balance method is used
+		"The number of times which the fallback load balance method is used
 	        for the specified wide IP."
 	::= { gtmWideipStatEntry 6 } 
 
@@ -6422,18 +6755,44 @@ gtmWideipStatCnameResolutions OBJECT-TYPE
 gtmWideipStatARequests OBJECT-TYPE 
 	SYNTAX Counter64
 	MAX-ACCESS read-only
-	STATUS current
+	STATUS	 deprecated
 	DESCRIPTION
-		"The number of A requests for the specified wide IP."
+		"Deprecated! No longer used.
+	        The number of A requests for the specified wide IP."
 	::= { gtmWideipStatEntry 12 } 
 
 gtmWideipStatAaaaRequests OBJECT-TYPE 
 	SYNTAX Counter64
 	MAX-ACCESS read-only
+	STATUS	 deprecated
+	DESCRIPTION
+		"Deprecated! No longer used.
+	        The number of AAAA requests for the specified wide IP."
+	::= { gtmWideipStatEntry 13 } 
+
+gtmWideipStatAlternate OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of AAAA requests for the specified wide IP."
-	::= { gtmWideipStatEntry 13 } 
+		"The number of times which the alternate load balance method is used
+	        for the specified wide IP."
+	::= { gtmWideipStatEntry 14 } 
+
+gtmWideipStatWipType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the wide IP."
+	::= { gtmWideipStatEntry 15 } 
 
 --==================================================================
 -- Gtm_wideip_status
@@ -6461,17 +6820,19 @@ gtmWideipStatusEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmWideipStatus Table"
 	INDEX {
+		gtmWideipStatusType,
 		gtmWideipStatusName
 	}
 	::= { gtmWideipStatusTable 1 } 
 
 GtmWideipStatusEntry ::= 
 	SEQUENCE {
-        	gtmWideipStatusName                                    LongDisplayString,
-        	gtmWideipStatusAvailState                              INTEGER,
-        	gtmWideipStatusEnabledState                            INTEGER,
-        	gtmWideipStatusParentType                              Integer32,
-        	gtmWideipStatusDetailReason                            LongDisplayString
+        	gtmWideipStatusName                                       LongDisplayString,
+        	gtmWideipStatusAvailState                                 INTEGER,
+        	gtmWideipStatusEnabledState                               INTEGER,
+        	gtmWideipStatusParentType                                 Gauge,
+        	gtmWideipStatusDetailReason                               LongDisplayString,
+        	gtmWideipStatusType                                       INTEGER
 	}
 
 gtmWideipStatusName OBJECT-TYPE 
@@ -6494,7 +6855,7 @@ gtmWideipStatusAvailState OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The availability of the specified wide IP indicated in color.
+		"The availability of the specified wide IP indicated by color.
 		none - error;
 		green - available in some capacity;
 		yellow - not currently available;
@@ -6518,7 +6879,7 @@ gtmWideipStatusEnabledState OBJECT-TYPE
 	::= { gtmWideipStatusEntry 3 } 
 
 gtmWideipStatusParentType OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -6533,6 +6894,21 @@ gtmWideipStatusDetailReason OBJECT-TYPE
 	DESCRIPTION
 		"The detail description of the specified wide IP's status."
 	::= { gtmWideipStatusEntry 5 } 
+
+gtmWideipStatusType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of a wide IP."
+	::= { gtmWideipStatusEntry 6 } 
 
 --==================================================================
 -- Gtm_wideip_alias
@@ -6561,6 +6937,7 @@ gtmWideipAliasEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmWideipAlias Table"
 	INDEX {
+		gtmWideipAliasWipType,
 		gtmWideipAliasWipName,
 		gtmWideipAliasName
 	}
@@ -6568,8 +6945,9 @@ gtmWideipAliasEntry OBJECT-TYPE
 
 GtmWideipAliasEntry ::= 
 	SEQUENCE {
-        	gtmWideipAliasWipName                                  LongDisplayString,
-        	gtmWideipAliasName                                     LongDisplayString
+        	gtmWideipAliasWipName                                     LongDisplayString,
+        	gtmWideipAliasName                                        LongDisplayString,
+        	gtmWideipAliasWipType                                     INTEGER
 	}
 
 gtmWideipAliasWipName OBJECT-TYPE 
@@ -6587,6 +6965,21 @@ gtmWideipAliasName OBJECT-TYPE
 	DESCRIPTION
 		"The alias name of the specified wide IP."
 	::= { gtmWideipAliasEntry 2 } 
+
+gtmWideipAliasWipType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the wide IP."
+	::= { gtmWideipAliasEntry 3 } 
 
 --==================================================================
 -- Gtm_wideip_pool
@@ -6615,17 +7008,21 @@ gtmWideipPoolEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmWideipPool Table"
 	INDEX {
+		gtmWideipPoolWipType,
 		gtmWideipPoolWipName,
+		gtmWideipPoolPoolType,
 		gtmWideipPoolPoolName
 	}
 	::= { gtmWideipPoolTable 1 } 
 
 GtmWideipPoolEntry ::= 
 	SEQUENCE {
-        	gtmWideipPoolWipName                                   LongDisplayString,
-        	gtmWideipPoolPoolName                                  LongDisplayString,
-        	gtmWideipPoolOrder                                     INTEGER,
-        	gtmWideipPoolRatio                                     INTEGER
+        	gtmWideipPoolWipName                                      LongDisplayString,
+        	gtmWideipPoolPoolName                                     LongDisplayString,
+        	gtmWideipPoolOrder                                        INTEGER,
+        	gtmWideipPoolRatio                                        INTEGER,
+        	gtmWideipPoolWipType                                      INTEGER,
+        	gtmWideipPoolPoolType                                     INTEGER
 	}
 
 gtmWideipPoolWipName OBJECT-TYPE 
@@ -6660,6 +7057,36 @@ gtmWideipPoolRatio OBJECT-TYPE
 		"The load balancing ratio given to the specified pool."
 	::= { gtmWideipPoolEntry 4 } 
 
+gtmWideipPoolWipType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the wide IP."
+	::= { gtmWideipPoolEntry 5 } 
+
+gtmWideipPoolPoolType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the pool."
+	::= { gtmWideipPoolEntry 6 } 
+
 --==================================================================
 -- Gtm_wideip_rule
 --==================================================================
@@ -6687,6 +7114,7 @@ gtmWideipRuleEntry OBJECT-TYPE
 	DESCRIPTION
 		"Columns in the gtmWideipRule Table"
 	INDEX {
+		gtmWideipRuleWipType,
 		gtmWideipRuleWipName,
 		gtmWideipRuleRuleName
 	}
@@ -6694,9 +7122,10 @@ gtmWideipRuleEntry OBJECT-TYPE
 
 GtmWideipRuleEntry ::= 
 	SEQUENCE {
-        	gtmWideipRuleWipName                                   LongDisplayString,
-        	gtmWideipRuleRuleName                                  LongDisplayString,
-        	gtmWideipRulePriority                                  Integer32
+        	gtmWideipRuleWipName                                      LongDisplayString,
+        	gtmWideipRuleRuleName                                     LongDisplayString,
+        	gtmWideipRulePriority                                     Gauge,
+        	gtmWideipRuleWipType                                      INTEGER
 	}
 
 gtmWideipRuleWipName OBJECT-TYPE 
@@ -6716,12 +7145,27 @@ gtmWideipRuleRuleName OBJECT-TYPE
 	::= { gtmWideipRuleEntry 2 } 
 
 gtmWideipRulePriority OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The execution priority of the rule for the specified wide IP."
 	::= { gtmWideipRuleEntry 3 } 
+
+gtmWideipRuleWipType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the wide IP."
+	::= { gtmWideipRuleEntry 4 } 
 
 --==================================================================
 -- Gtm_server_stat2
@@ -6731,8 +7175,8 @@ gtmServerStat2ResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmServerStat2. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmServerStat2.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmServerStat2 1 } 
 
@@ -6766,17 +7210,17 @@ gtmServerStat2Entry OBJECT-TYPE
 
 GtmServerStat2Entry ::= 
 	SEQUENCE {
-        	gtmServerStat2Name                                     LongDisplayString,
-        	gtmServerStat2UnitId                                   INTEGER,
-        	gtmServerStat2VsPicks                                  Counter64,
-        	gtmServerStat2CpuUsage                                 Counter64,
-        	gtmServerStat2MemAvail                                 Counter64,
-        	gtmServerStat2BitsPerSecIn                             Counter64,
-        	gtmServerStat2BitsPerSecOut                            Counter64,
-        	gtmServerStat2PktsPerSecIn                             Counter64,
-        	gtmServerStat2PktsPerSecOut                            Counter64,
-        	gtmServerStat2Connections                              Counter64,
-        	gtmServerStat2ConnRate                                 Counter64
+        	gtmServerStat2Name                                        LongDisplayString,
+        	gtmServerStat2UnitId                                      INTEGER,
+        	gtmServerStat2VsPicks                                     Counter64,
+        	gtmServerStat2CpuUsage                                    Counter64,
+        	gtmServerStat2MemAvail                                    Counter64,
+        	gtmServerStat2BitsPerSecIn                                Counter64,
+        	gtmServerStat2BitsPerSecOut                               Counter64,
+        	gtmServerStat2PktsPerSecIn                                Counter64,
+        	gtmServerStat2PktsPerSecOut                               Counter64,
+        	gtmServerStat2Connections                                 Counter64,
+        	gtmServerStat2ConnRate                                    Counter64
 	}
 
 gtmServerStat2Name OBJECT-TYPE 
@@ -6835,7 +7279,7 @@ gtmServerStat2BitsPerSecOut OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of bits per second sent out from the specified server."
+		"The number of bits per second sent from the specified server."
 	::= { gtmServerStat2Entry 7 } 
 
 gtmServerStat2PktsPerSecIn OBJECT-TYPE 
@@ -6851,7 +7295,7 @@ gtmServerStat2PktsPerSecOut OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of packets per second sent out from the specified server."
+		"The number of packets per second sent from the specified server."
 	::= { gtmServerStat2Entry 9 } 
 
 gtmServerStat2Connections OBJECT-TYPE 
@@ -6904,9 +7348,9 @@ gtmProberPoolEntry OBJECT-TYPE
 
 GtmProberPoolEntry ::= 
 	SEQUENCE {
-        	gtmProberPoolName                                      LongDisplayString,
-        	gtmProberPoolLbMode                                    INTEGER,
-        	gtmProberPoolEnabled                                   INTEGER
+        	gtmProberPoolName                                         LongDisplayString,
+        	gtmProberPoolLbMode                                       INTEGER,
+        	gtmProberPoolEnabled                                      INTEGER
 	}
 
 gtmProberPoolName OBJECT-TYPE 
@@ -6947,8 +7391,8 @@ gtmProberPoolStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmProberPoolStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmProberPoolStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmProberPoolStat 1 } 
 
@@ -6981,10 +7425,10 @@ gtmProberPoolStatEntry OBJECT-TYPE
 
 GtmProberPoolStatEntry ::= 
 	SEQUENCE {
-        	gtmProberPoolStatName                                  LongDisplayString,
-        	gtmProberPoolStatTotalProbes                           Counter64,
-        	gtmProberPoolStatSuccessfulProbes                      Counter64,
-        	gtmProberPoolStatFailedProbes                          Counter64
+        	gtmProberPoolStatName                                     LongDisplayString,
+        	gtmProberPoolStatTotalProbes                              Counter64,
+        	gtmProberPoolStatSuccessfulProbes                         Counter64,
+        	gtmProberPoolStatFailedProbes                             Counter64
 	}
 
 gtmProberPoolStatName OBJECT-TYPE 
@@ -7051,10 +7495,10 @@ gtmProberPoolStatusEntry OBJECT-TYPE
 
 GtmProberPoolStatusEntry ::= 
 	SEQUENCE {
-        	gtmProberPoolStatusName                                LongDisplayString,
-        	gtmProberPoolStatusAvailState                          INTEGER,
-        	gtmProberPoolStatusEnabledState                        INTEGER,
-        	gtmProberPoolStatusDetailReason                        LongDisplayString
+        	gtmProberPoolStatusName                                   LongDisplayString,
+        	gtmProberPoolStatusAvailState                             INTEGER,
+        	gtmProberPoolStatusEnabledState                           INTEGER,
+        	gtmProberPoolStatusDetailReason                           LongDisplayString
 	}
 
 gtmProberPoolStatusName OBJECT-TYPE 
@@ -7141,10 +7585,10 @@ gtmProberPoolMbrEntry OBJECT-TYPE
 
 GtmProberPoolMbrEntry ::= 
 	SEQUENCE {
-        	gtmProberPoolMbrPoolName                               LongDisplayString,
-        	gtmProberPoolMbrServerName                             LongDisplayString,
-        	gtmProberPoolMbrPmbrOrder                              INTEGER,
-        	gtmProberPoolMbrEnabled                                INTEGER
+        	gtmProberPoolMbrPoolName                                  LongDisplayString,
+        	gtmProberPoolMbrServerName                                LongDisplayString,
+        	gtmProberPoolMbrPmbrOrder                                 INTEGER,
+        	gtmProberPoolMbrEnabled                                   INTEGER
 	}
 
 gtmProberPoolMbrPoolName OBJECT-TYPE 
@@ -7191,8 +7635,8 @@ gtmProberPoolMbrStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmProberPoolMemberStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmProberPoolMemberStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmProberPoolMemberStat 1 } 
 
@@ -7226,11 +7670,11 @@ gtmProberPoolMbrStatEntry OBJECT-TYPE
 
 GtmProberPoolMbrStatEntry ::= 
 	SEQUENCE {
-        	gtmProberPoolMbrStatPoolName                           LongDisplayString,
-        	gtmProberPoolMbrStatServerName                         LongDisplayString,
-        	gtmProberPoolMbrStatTotalProbes                        Counter64,
-        	gtmProberPoolMbrStatSuccessfulProbes                   Counter64,
-        	gtmProberPoolMbrStatFailedProbes                       Counter64
+        	gtmProberPoolMbrStatPoolName                              LongDisplayString,
+        	gtmProberPoolMbrStatServerName                            LongDisplayString,
+        	gtmProberPoolMbrStatTotalProbes                           Counter64,
+        	gtmProberPoolMbrStatSuccessfulProbes                      Counter64,
+        	gtmProberPoolMbrStatFailedProbes                          Counter64
 	}
 
 gtmProberPoolMbrStatPoolName OBJECT-TYPE 
@@ -7306,11 +7750,11 @@ gtmProberPoolMbrStatusEntry OBJECT-TYPE
 
 GtmProberPoolMbrStatusEntry ::= 
 	SEQUENCE {
-        	gtmProberPoolMbrStatusPoolName                         LongDisplayString,
-        	gtmProberPoolMbrStatusServerName                       LongDisplayString,
-        	gtmProberPoolMbrStatusAvailState                       INTEGER,
-        	gtmProberPoolMbrStatusEnabledState                     INTEGER,
-        	gtmProberPoolMbrStatusDetailReason                     LongDisplayString
+        	gtmProberPoolMbrStatusPoolName                            LongDisplayString,
+        	gtmProberPoolMbrStatusServerName                          LongDisplayString,
+        	gtmProberPoolMbrStatusAvailState                          INTEGER,
+        	gtmProberPoolMbrStatusEnabledState                        INTEGER,
+        	gtmProberPoolMbrStatusDetailReason                        LongDisplayString
 	}
 
 gtmProberPoolMbrStatusPoolName OBJECT-TYPE 
@@ -7404,71 +7848,71 @@ gtmAttr2Entry OBJECT-TYPE
 
 GtmAttr2Entry ::= 
 	SEQUENCE {
-        	gtmAttr2DumpTopology                                   INTEGER,
-        	gtmAttr2CacheLdns                                      INTEGER,
-        	gtmAttr2AolAware                                       INTEGER,
-        	gtmAttr2CheckStaticDepends                             INTEGER,
-        	gtmAttr2CheckDynamicDepends                            INTEGER,
-        	gtmAttr2DrainRequests                                  INTEGER,
-        	gtmAttr2EnableResetsRipeness                           INTEGER,
-        	gtmAttr2FbRespectDepends                               INTEGER,
-        	gtmAttr2FbRespectAcl                                   INTEGER,
-        	gtmAttr2DefaultAlternate                               INTEGER,
-        	gtmAttr2DefaultFallback                                INTEGER,
-        	gtmAttr2PersistMask                                    Integer32,
-        	gtmAttr2GtmSetsRecursion                               INTEGER,
-        	gtmAttr2QosFactorLcs                                   Integer32,
-        	gtmAttr2QosFactorRtt                                   Integer32,
-        	gtmAttr2QosFactorHops                                  Integer32,
-        	gtmAttr2QosFactorHitRatio                              Integer32,
-        	gtmAttr2QosFactorPacketRate                            Integer32,
-        	gtmAttr2QosFactorBps                                   Integer32,
-        	gtmAttr2QosFactorVsCapacity                            Integer32,
-        	gtmAttr2QosFactorTopology                              Integer32,
-        	gtmAttr2QosFactorConnRate                              Integer32,
-        	gtmAttr2TimerRetryPathData                             Integer32,
-        	gtmAttr2TimerGetAutoconfigData                         Integer32,
-        	gtmAttr2TimerPersistCache                              Integer32,
-        	gtmAttr2DefaultProbeLimit                              Integer32,
-        	gtmAttr2DownThreshold                                  Integer32,
-        	gtmAttr2DownMultiple                                   Integer32,
-        	gtmAttr2PathTtl                                        Integer32,
-        	gtmAttr2TraceTtl                                       Integer32,
-        	gtmAttr2LdnsDuration                                   Integer32,
-        	gtmAttr2PathDuration                                   Integer32,
-        	gtmAttr2RttSampleCount                                 Integer32,
-        	gtmAttr2RttPacketLength                                Integer32,
-        	gtmAttr2RttTimeout                                     Integer32,
-        	gtmAttr2MaxMonReqs                                     Integer32,
-        	gtmAttr2TraceroutePort                                 Integer32,
-        	gtmAttr2PathsNeverDie                                  INTEGER,
-        	gtmAttr2ProbeDisabledObjects                           INTEGER,
-        	gtmAttr2LinkLimitFactor                                Integer32,
-        	gtmAttr2OverLimitLinkLimitFactor                       Integer32,
-        	gtmAttr2LinkPrepaidFactor                              Integer32,
-        	gtmAttr2LinkCompensateInbound                          Integer32,
-        	gtmAttr2LinkCompensateOutbound                         Integer32,
-        	gtmAttr2LinkCompensationHistory                        Integer32,
-        	gtmAttr2MaxLinkOverLimitCount                          Integer32,
-        	gtmAttr2LowerBoundPctRow                               Integer32,
-        	gtmAttr2LowerBoundPctCol                               Integer32,
-        	gtmAttr2Autoconf                                       INTEGER,
-        	gtmAttr2Autosync                                       INTEGER,
-        	gtmAttr2SyncNamedConf                                  INTEGER,
-        	gtmAttr2SyncGroup                                      LongDisplayString,
-        	gtmAttr2SyncTimeout                                    Integer32,
-        	gtmAttr2SyncZonesTimeout                               Integer32,
-        	gtmAttr2TimeTolerance                                  Integer32,
-        	gtmAttr2TopologyLongestMatch                           INTEGER,
-        	gtmAttr2TopologyAclThreshold                           Integer32,
-        	gtmAttr2StaticPersistCidr                              Integer32,
-        	gtmAttr2StaticPersistV6Cidr                            Integer32,
-        	gtmAttr2QosFactorVsScore                               Integer32,
-        	gtmAttr2TimerSendKeepAlive                             Integer32,
-        	gtmAttr2CertificateDepth                               Integer32,
-        	gtmAttr2MaxMemoryUsage                                 Integer32,
-        	gtmAttr2Name                                           LongDisplayString,
-        	gtmAttr2ForwardStatus                                  INTEGER
+        	gtmAttr2DumpTopology                                      INTEGER,
+        	gtmAttr2CacheLdns                                         INTEGER,
+        	gtmAttr2AolAware                                          INTEGER,
+        	gtmAttr2CheckStaticDepends                                INTEGER,
+        	gtmAttr2CheckDynamicDepends                               INTEGER,
+        	gtmAttr2DrainRequests                                     INTEGER,
+        	gtmAttr2EnableResetsRipeness                              INTEGER,
+        	gtmAttr2FbRespectDepends                                  INTEGER,
+        	gtmAttr2FbRespectAcl                                      INTEGER,
+        	gtmAttr2DefaultAlternate                                  INTEGER,
+        	gtmAttr2DefaultFallback                                   INTEGER,
+        	gtmAttr2PersistMask                                       Gauge,
+        	gtmAttr2GtmSetsRecursion                                  INTEGER,
+        	gtmAttr2QosFactorLcs                                      Gauge,
+        	gtmAttr2QosFactorRtt                                      Gauge,
+        	gtmAttr2QosFactorHops                                     Gauge,
+        	gtmAttr2QosFactorHitRatio                                 Gauge,
+        	gtmAttr2QosFactorPacketRate                               Gauge,
+        	gtmAttr2QosFactorBps                                      Gauge,
+        	gtmAttr2QosFactorVsCapacity                               Gauge,
+        	gtmAttr2QosFactorTopology                                 Gauge,
+        	gtmAttr2QosFactorConnRate                                 Gauge,
+        	gtmAttr2TimerRetryPathData                                Gauge,
+        	gtmAttr2TimerGetAutoconfigData                            Gauge,
+        	gtmAttr2TimerPersistCache                                 Gauge,
+        	gtmAttr2DefaultProbeLimit                                 Gauge,
+        	gtmAttr2DownThreshold                                     Gauge,
+        	gtmAttr2DownMultiple                                      Gauge,
+        	gtmAttr2PathTtl                                           Gauge,
+        	gtmAttr2TraceTtl                                          Gauge,
+        	gtmAttr2LdnsDuration                                      Gauge,
+        	gtmAttr2PathDuration                                      Gauge,
+        	gtmAttr2RttSampleCount                                    Gauge,
+        	gtmAttr2RttPacketLength                                   Gauge,
+        	gtmAttr2RttTimeout                                        Gauge,
+        	gtmAttr2MaxMonReqs                                        Gauge,
+        	gtmAttr2TraceroutePort                                    Gauge,
+        	gtmAttr2PathsNeverDie                                     INTEGER,
+        	gtmAttr2ProbeDisabledObjects                              INTEGER,
+        	gtmAttr2LinkLimitFactor                                   Gauge,
+        	gtmAttr2OverLimitLinkLimitFactor                          Gauge,
+        	gtmAttr2LinkPrepaidFactor                                 Gauge,
+        	gtmAttr2LinkCompensateInbound                             Gauge,
+        	gtmAttr2LinkCompensateOutbound                            Gauge,
+        	gtmAttr2LinkCompensationHistory                           Gauge,
+        	gtmAttr2MaxLinkOverLimitCount                             Gauge,
+        	gtmAttr2LowerBoundPctRow                                  Gauge,
+        	gtmAttr2LowerBoundPctCol                                  Gauge,
+        	gtmAttr2Autoconf                                          INTEGER,
+        	gtmAttr2Autosync                                          INTEGER,
+        	gtmAttr2SyncNamedConf                                     INTEGER,
+        	gtmAttr2SyncGroup                                         LongDisplayString,
+        	gtmAttr2SyncTimeout                                       Gauge,
+        	gtmAttr2SyncZonesTimeout                                  Gauge,
+        	gtmAttr2TimeTolerance                                     Gauge,
+        	gtmAttr2TopologyLongestMatch                              INTEGER,
+        	gtmAttr2TopologyAclThreshold                              Gauge,
+        	gtmAttr2StaticPersistCidr                                 Gauge,
+        	gtmAttr2StaticPersistV6Cidr                               Gauge,
+        	gtmAttr2QosFactorVsScore                                  Gauge,
+        	gtmAttr2TimerSendKeepAlive                                Gauge,
+        	gtmAttr2CertificateDepth                                  Gauge,
+        	gtmAttr2MaxMemoryUsage                                    Gauge,
+        	gtmAttr2Name                                              LongDisplayString,
+        	gtmAttr2ForwardStatus                                     INTEGER
 	}
 
 gtmAttr2DumpTopology OBJECT-TYPE 
@@ -7635,7 +8079,7 @@ gtmAttr2DefaultFallback OBJECT-TYPE
 	::= { gtmAttr2Entry 11 } 
 
 gtmAttr2PersistMask OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -7657,7 +8101,7 @@ gtmAttr2GtmSetsRecursion OBJECT-TYPE
 	::= { gtmAttr2Entry 13 } 
 
 gtmAttr2QosFactorLcs OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7666,7 +8110,7 @@ gtmAttr2QosFactorLcs OBJECT-TYPE
 	::= { gtmAttr2Entry 14 } 
 
 gtmAttr2QosFactorRtt OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7675,7 +8119,7 @@ gtmAttr2QosFactorRtt OBJECT-TYPE
 	::= { gtmAttr2Entry 15 } 
 
 gtmAttr2QosFactorHops OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7684,7 +8128,7 @@ gtmAttr2QosFactorHops OBJECT-TYPE
 	::= { gtmAttr2Entry 16 } 
 
 gtmAttr2QosFactorHitRatio OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7693,7 +8137,7 @@ gtmAttr2QosFactorHitRatio OBJECT-TYPE
 	::= { gtmAttr2Entry 17 } 
 
 gtmAttr2QosFactorPacketRate OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7702,7 +8146,7 @@ gtmAttr2QosFactorPacketRate OBJECT-TYPE
 	::= { gtmAttr2Entry 18 } 
 
 gtmAttr2QosFactorBps OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7711,7 +8155,7 @@ gtmAttr2QosFactorBps OBJECT-TYPE
 	::= { gtmAttr2Entry 19 } 
 
 gtmAttr2QosFactorVsCapacity OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7720,7 +8164,7 @@ gtmAttr2QosFactorVsCapacity OBJECT-TYPE
 	::= { gtmAttr2Entry 20 } 
 
 gtmAttr2QosFactorTopology OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7729,7 +8173,7 @@ gtmAttr2QosFactorTopology OBJECT-TYPE
 	::= { gtmAttr2Entry 21 } 
 
 gtmAttr2QosFactorConnRate OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -7740,7 +8184,7 @@ gtmAttr2QosFactorConnRate OBJECT-TYPE
 	::= { gtmAttr2Entry 22 } 
 
 gtmAttr2TimerRetryPathData OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7748,7 +8192,7 @@ gtmAttr2TimerRetryPathData OBJECT-TYPE
 	::= { gtmAttr2Entry 23 } 
 
 gtmAttr2TimerGetAutoconfigData OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7756,7 +8200,7 @@ gtmAttr2TimerGetAutoconfigData OBJECT-TYPE
 	::= { gtmAttr2Entry 24 } 
 
 gtmAttr2TimerPersistCache OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7765,7 +8209,7 @@ gtmAttr2TimerPersistCache OBJECT-TYPE
 	::= { gtmAttr2Entry 25 } 
 
 gtmAttr2DefaultProbeLimit OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7773,7 +8217,7 @@ gtmAttr2DefaultProbeLimit OBJECT-TYPE
 	::= { gtmAttr2Entry 26 } 
 
 gtmAttr2DownThreshold OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7784,7 +8228,7 @@ gtmAttr2DownThreshold OBJECT-TYPE
 	::= { gtmAttr2Entry 27 } 
 
 gtmAttr2DownMultiple OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7795,7 +8239,7 @@ gtmAttr2DownMultiple OBJECT-TYPE
 	::= { gtmAttr2Entry 28 } 
 
 gtmAttr2PathTtl OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7803,7 +8247,7 @@ gtmAttr2PathTtl OBJECT-TYPE
 	::= { gtmAttr2Entry 29 } 
 
 gtmAttr2TraceTtl OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7811,7 +8255,7 @@ gtmAttr2TraceTtl OBJECT-TYPE
 	::= { gtmAttr2Entry 30 } 
 
 gtmAttr2LdnsDuration OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7819,7 +8263,7 @@ gtmAttr2LdnsDuration OBJECT-TYPE
 	::= { gtmAttr2Entry 31 } 
 
 gtmAttr2PathDuration OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7827,7 +8271,7 @@ gtmAttr2PathDuration OBJECT-TYPE
 	::= { gtmAttr2Entry 32 } 
 
 gtmAttr2RttSampleCount OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7836,7 +8280,7 @@ gtmAttr2RttSampleCount OBJECT-TYPE
 	::= { gtmAttr2Entry 33 } 
 
 gtmAttr2RttPacketLength OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7845,7 +8289,7 @@ gtmAttr2RttPacketLength OBJECT-TYPE
 	::= { gtmAttr2Entry 34 } 
 
 gtmAttr2RttTimeout OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7853,7 +8297,7 @@ gtmAttr2RttTimeout OBJECT-TYPE
 	::= { gtmAttr2Entry 35 } 
 
 gtmAttr2MaxMonReqs OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7864,7 +8308,7 @@ gtmAttr2MaxMonReqs OBJECT-TYPE
 	::= { gtmAttr2Entry 36 } 
 
 gtmAttr2TraceroutePort OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7896,7 +8340,7 @@ gtmAttr2ProbeDisabledObjects OBJECT-TYPE
 	::= { gtmAttr2Entry 39 } 
 
 gtmAttr2LinkLimitFactor OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7907,7 +8351,7 @@ gtmAttr2LinkLimitFactor OBJECT-TYPE
 	::= { gtmAttr2Entry 40 } 
 
 gtmAttr2OverLimitLinkLimitFactor OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7920,7 +8364,7 @@ gtmAttr2OverLimitLinkLimitFactor OBJECT-TYPE
 	::= { gtmAttr2Entry 41 } 
 
 gtmAttr2LinkPrepaidFactor OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7930,7 +8374,7 @@ gtmAttr2LinkPrepaidFactor OBJECT-TYPE
 	::= { gtmAttr2Entry 42 } 
 
 gtmAttr2LinkCompensateInbound OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7943,7 +8387,7 @@ gtmAttr2LinkCompensateInbound OBJECT-TYPE
 	::= { gtmAttr2Entry 43 } 
 
 gtmAttr2LinkCompensateOutbound OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7956,7 +8400,7 @@ gtmAttr2LinkCompensateOutbound OBJECT-TYPE
 	::= { gtmAttr2Entry 44 } 
 
 gtmAttr2LinkCompensationHistory OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7964,7 +8408,7 @@ gtmAttr2LinkCompensationHistory OBJECT-TYPE
 	::= { gtmAttr2Entry 45 } 
 
 gtmAttr2MaxLinkOverLimitCount OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -7974,7 +8418,7 @@ gtmAttr2MaxLinkOverLimitCount OBJECT-TYPE
 	::= { gtmAttr2Entry 46 } 
 
 gtmAttr2LowerBoundPctRow OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -7983,7 +8427,7 @@ gtmAttr2LowerBoundPctRow OBJECT-TYPE
 	::= { gtmAttr2Entry 47 } 
 
 gtmAttr2LowerBoundPctCol OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -8036,7 +8480,7 @@ gtmAttr2SyncGroup OBJECT-TYPE
 	::= { gtmAttr2Entry 52 } 
 
 gtmAttr2SyncTimeout OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -8045,7 +8489,7 @@ gtmAttr2SyncTimeout OBJECT-TYPE
 	::= { gtmAttr2Entry 53 } 
 
 gtmAttr2SyncZonesTimeout OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -8054,7 +8498,7 @@ gtmAttr2SyncZonesTimeout OBJECT-TYPE
 	::= { gtmAttr2Entry 54 } 
 
 gtmAttr2TimeTolerance OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -8079,7 +8523,7 @@ gtmAttr2TopologyLongestMatch OBJECT-TYPE
 	::= { gtmAttr2Entry 56 } 
 
 gtmAttr2TopologyAclThreshold OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -8088,7 +8532,7 @@ gtmAttr2TopologyAclThreshold OBJECT-TYPE
 	::= { gtmAttr2Entry 57 } 
 
 gtmAttr2StaticPersistCidr OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -8098,7 +8542,7 @@ gtmAttr2StaticPersistCidr OBJECT-TYPE
 	::= { gtmAttr2Entry 58 } 
 
 gtmAttr2StaticPersistV6Cidr OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -8108,7 +8552,7 @@ gtmAttr2StaticPersistV6Cidr OBJECT-TYPE
 	::= { gtmAttr2Entry 59 } 
 
 gtmAttr2QosFactorVsScore OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -8117,7 +8561,7 @@ gtmAttr2QosFactorVsScore OBJECT-TYPE
 	::= { gtmAttr2Entry 60 } 
 
 gtmAttr2TimerSendKeepAlive OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -8125,7 +8569,7 @@ gtmAttr2TimerSendKeepAlive OBJECT-TYPE
 	::= { gtmAttr2Entry 61 } 
 
 gtmAttr2CertificateDepth OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -8134,7 +8578,7 @@ gtmAttr2CertificateDepth OBJECT-TYPE
 	::= { gtmAttr2Entry 62 } 
 
 gtmAttr2MaxMemoryUsage OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS	 deprecated
 	DESCRIPTION
@@ -8168,8 +8612,8 @@ gtmDnssecZoneStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmDnssecZoneStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmDnssecZoneStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmDnssecZoneStat 1 } 
 
@@ -8202,31 +8646,35 @@ gtmDnssecZoneStatEntry OBJECT-TYPE
 
 GtmDnssecZoneStatEntry ::= 
 	SEQUENCE {
-        	gtmDnssecZoneStatName                                  LongDisplayString,
-        	gtmDnssecZoneStatNsec3s                                Counter64,
-        	gtmDnssecZoneStatNsec3Nodata                           Counter64,
-        	gtmDnssecZoneStatNsec3Nxdomain                         Counter64,
-        	gtmDnssecZoneStatNsec3Referral                         Counter64,
-        	gtmDnssecZoneStatNsec3Resalt                           Counter64,
-        	gtmDnssecZoneStatDnssecResponses                       Counter64,
-        	gtmDnssecZoneStatDnssecDnskeyQueries                   Counter64,
-        	gtmDnssecZoneStatDnssecNsec3paramQueries               Counter64,
-        	gtmDnssecZoneStatDnssecDsQueries                       Counter64,
-        	gtmDnssecZoneStatSigCryptoFailed                       Counter64,
-        	gtmDnssecZoneStatSigSuccess                            Counter64,
-        	gtmDnssecZoneStatSigFailed                             Counter64,
-        	gtmDnssecZoneStatSigRrsetFailed                        Counter64,
-        	gtmDnssecZoneStatConnectFlowFailed                     Counter64,
-        	gtmDnssecZoneStatTowireFailed                          Counter64,
-        	gtmDnssecZoneStatAxfrQueries                           Counter64,
-        	gtmDnssecZoneStatIxfrQueries                           Counter64,
-        	gtmDnssecZoneStatXfrStarts                             Counter64,
-        	gtmDnssecZoneStatXfrCompletes                          Counter64,
-        	gtmDnssecZoneStatXfrMsgs                               Counter64,
-        	gtmDnssecZoneStatXfrMasterMsgs                         Counter64,
-        	gtmDnssecZoneStatXfrResponseAverageSize                Counter64,
-        	gtmDnssecZoneStatXfrSerial                             Counter64,
-        	gtmDnssecZoneStatXfrMasterSerial                       Counter64
+        	gtmDnssecZoneStatName                                     LongDisplayString,
+        	gtmDnssecZoneStatNsec3s                                   Counter64,
+        	gtmDnssecZoneStatNsec3Nodata                              Counter64,
+        	gtmDnssecZoneStatNsec3Nxdomain                            Counter64,
+        	gtmDnssecZoneStatNsec3Referral                            Counter64,
+        	gtmDnssecZoneStatNsec3Resalt                              Counter64,
+        	gtmDnssecZoneStatDnssecResponses                          Counter64,
+        	gtmDnssecZoneStatDnssecDnskeyQueries                      Counter64,
+        	gtmDnssecZoneStatDnssecNsec3paramQueries                  Counter64,
+        	gtmDnssecZoneStatDnssecDsQueries                          Counter64,
+        	gtmDnssecZoneStatSigCryptoFailed                          Counter64,
+        	gtmDnssecZoneStatSigSuccess                               Counter64,
+        	gtmDnssecZoneStatSigFailed                                Counter64,
+        	gtmDnssecZoneStatSigRrsetFailed                           Counter64,
+        	gtmDnssecZoneStatConnectFlowFailed                        Counter64,
+        	gtmDnssecZoneStatTowireFailed                             Counter64,
+        	gtmDnssecZoneStatAxfrQueries                              Counter64,
+        	gtmDnssecZoneStatIxfrQueries                              Counter64,
+        	gtmDnssecZoneStatXfrStarts                                Counter64,
+        	gtmDnssecZoneStatXfrCompletes                             Counter64,
+        	gtmDnssecZoneStatXfrMsgs                                  Counter64,
+        	gtmDnssecZoneStatXfrMasterMsgs                            Counter64,
+        	gtmDnssecZoneStatXfrResponseAverageSize                   Counter64,
+        	gtmDnssecZoneStatXfrSerial                                Counter64,
+        	gtmDnssecZoneStatXfrMasterSerial                          Counter64,
+        	gtmDnssecZoneStatDsXfr                                    Counter64,
+        	gtmDnssecZoneStatDsReferral                               Counter64,
+        	gtmDnssecZoneStatDnssecCdsQueries                         Counter64,
+        	gtmDnssecZoneStatDnssecCdnskeyQueries                     Counter64
 	}
 
 gtmDnssecZoneStatName OBJECT-TYPE 
@@ -8429,6 +8877,38 @@ gtmDnssecZoneStatXfrMasterSerial OBJECT-TYPE
 		"The zone serial number of the primary server."
 	::= { gtmDnssecZoneStatEntry 25 } 
 
+gtmDnssecZoneStatDsXfr OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of DS record sets that were added to BIG-IP DNSSEC enabled zone transfers."
+	::= { gtmDnssecZoneStatEntry 26 } 
+
+gtmDnssecZoneStatDsReferral OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of referral responses generated in which DS RR(s) were added."
+	::= { gtmDnssecZoneStatEntry 27 } 
+
+gtmDnssecZoneStatDnssecCdsQueries OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of queries for CDS type."
+	::= { gtmDnssecZoneStatEntry 28 } 
+
+gtmDnssecZoneStatDnssecCdnskeyQueries OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of queries for CDNSKEY type."
+	::= { gtmDnssecZoneStatEntry 29 } 
+
 --==================================================================
 -- Global_gtm_dnssec_zone_stat
 --==================================================================
@@ -8437,8 +8917,8 @@ gtmDnssecStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  gtmGlobalDnssecStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in gtmGlobalDnssecStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { gtmGlobalDnssecStat 1 } 
 
@@ -8633,6 +9113,534 @@ gtmDnssecStatXfrMasterSerial OBJECT-TYPE
 	DESCRIPTION
 		"The zone serial number of the primary server."
 	::= { gtmGlobalDnssecStat 25 } 
+
+--==================================================================
+-- Gtm_application_wideip
+--==================================================================
+gtmApplicationWideipNumber OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of gtmApplicationWideip entries in the table."
+	::= { gtmApplicationWideip 1 } 
+
+gtmApplicationWideipTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtmApplicationWideipEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing information on wide IPs associated with
+		the specified applications for GTM (Global Traffic Management)."
+	::= { gtmApplicationWideip 2 } 
+
+gtmApplicationWideipEntry OBJECT-TYPE
+	SYNTAX  GtmApplicationWideipEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the gtmApplicationWideip Table"
+	INDEX {
+		gtmApplicationWideipApplicationName,
+		gtmApplicationWideipWipName,
+		gtmApplicationWideipWipType
+	}
+	::= { gtmApplicationWideipTable 1 } 
+
+GtmApplicationWideipEntry ::= 
+	SEQUENCE {
+        	gtmApplicationWideipApplicationName                       LongDisplayString,
+        	gtmApplicationWideipWipName                               LongDisplayString,
+        	gtmApplicationWideipWipType                               INTEGER
+	}
+
+gtmApplicationWideipApplicationName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a GTM application."
+	::= { gtmApplicationWideipEntry 1 } 
+
+gtmApplicationWideipWipName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the wide IP associated with the GTM application."
+	::= { gtmApplicationWideipEntry 2 } 
+
+gtmApplicationWideipWipType OBJECT-TYPE 
+	SYNTAX INTEGER {
+		a(1),
+		cname(5),
+		mx(15),
+		aaaa(28),
+		srv(33),
+		naptr(35)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of the wide IP associated with the GTM application."
+	::= { gtmApplicationWideipEntry 3 } 
+
+--==================================================================
+-- Gtm_device
+--==================================================================
+gtmDeviceNumber OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of gtmDevice entries in the table."
+	::= { gtmDevice 1 } 
+
+gtmDeviceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtmDeviceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing information on devices associated with a
+		server for GTM (Global Traffic Management)."
+	::= { gtmDevice 2 } 
+
+gtmDeviceEntry OBJECT-TYPE
+	SYNTAX  GtmDeviceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the gtmDevice Table"
+	INDEX {
+		gtmDeviceServerName,
+		gtmDeviceName
+	}
+	::= { gtmDeviceTable 1 } 
+
+GtmDeviceEntry ::= 
+	SEQUENCE {
+        	gtmDeviceServerName                                       LongDisplayString,
+        	gtmDeviceName                                             LongDisplayString
+	}
+
+gtmDeviceServerName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the server associated with a device."
+	::= { gtmDeviceEntry 1 } 
+
+gtmDeviceName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a device."
+	::= { gtmDeviceEntry 2 } 
+
+--==================================================================
+-- Gtm_device_stat
+--==================================================================
+gtmDeviceStatResetStats OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The action to reset resettable statistics data in gtmDeviceStat.
+		 Setting this value to 1 will reset statistics data.
+		 Note, some statistics data may not be reset including data that are incremental counters."
+	::= { gtmDeviceStat 1 } 
+
+gtmDeviceStatNumber OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of gtmDeviceStat entries in the table."
+	::= { gtmDeviceStat 2 } 
+
+gtmDeviceStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtmDeviceStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing statistics information on devices associated with a
+		 server for GTM (Global Traffic Management)."
+	::= { gtmDeviceStat 3 } 
+
+gtmDeviceStatEntry OBJECT-TYPE
+	SYNTAX  GtmDeviceStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the gtmDeviceStat Table"
+	INDEX {
+		gtmDeviceStatServerName,
+		gtmDeviceStatName
+	}
+	::= { gtmDeviceStatTable 1 } 
+
+GtmDeviceStatEntry ::= 
+	SEQUENCE {
+        	gtmDeviceStatName                                         LongDisplayString,
+        	gtmDeviceStatServerName                                   LongDisplayString,
+        	gtmDeviceStatCpuUsage                                     Counter64,
+        	gtmDeviceStatMemAvail                                     Counter64,
+        	gtmDeviceStatBitsPerSecIn                                 Counter64,
+        	gtmDeviceStatBitsPerSecOut                                Counter64,
+        	gtmDeviceStatPktsPerSecIn                                 Counter64,
+        	gtmDeviceStatPktsPerSecOut                                Counter64,
+        	gtmDeviceStatConnections                                  Counter64
+	}
+
+gtmDeviceStatName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a device."
+	::= { gtmDeviceStatEntry 1 } 
+
+gtmDeviceStatServerName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a server."
+	::= { gtmDeviceStatEntry 2 } 
+
+gtmDeviceStatCpuUsage OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The CPU usage in percentage for the specified device."
+	::= { gtmDeviceStatEntry 3 } 
+
+gtmDeviceStatMemAvail OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The memory available in bytes for the specified device."
+	::= { gtmDeviceStatEntry 4 } 
+
+gtmDeviceStatBitsPerSecIn OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of bits per second received by the specified device."
+	::= { gtmDeviceStatEntry 5 } 
+
+gtmDeviceStatBitsPerSecOut OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of bits per second sent from the specified device."
+	::= { gtmDeviceStatEntry 6 } 
+
+gtmDeviceStatPktsPerSecIn OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of packets per second received by the specified device."
+	::= { gtmDeviceStatEntry 7 } 
+
+gtmDeviceStatPktsPerSecOut OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of packets per second sent from the specified device."
+	::= { gtmDeviceStatEntry 8 } 
+
+gtmDeviceStatConnections OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of total connections to the specified device."
+	::= { gtmDeviceStatEntry 9 } 
+
+--==================================================================
+-- Gtm_device_status
+--==================================================================
+gtmDeviceStatusNumber OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of gtmDeviceStatus entries in the table."
+	::= { gtmDeviceStatus 1 } 
+
+gtmDeviceStatusTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtmDeviceStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing status information of devices within associated
+		 server for GTM (Global Traffic Management)."
+	::= { gtmDeviceStatus 2 } 
+
+gtmDeviceStatusEntry OBJECT-TYPE
+	SYNTAX  GtmDeviceStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the gtmDeviceStatus Table"
+	INDEX {
+		gtmDeviceStatusServerName,
+		gtmDeviceStatusName
+	}
+	::= { gtmDeviceStatusTable 1 } 
+
+GtmDeviceStatusEntry ::= 
+	SEQUENCE {
+        	gtmDeviceStatusName                                       LongDisplayString,
+        	gtmDeviceStatusServerName                                 LongDisplayString,
+        	gtmDeviceStatusAvailState                                 INTEGER,
+        	gtmDeviceStatusEnabledState                               INTEGER,
+        	gtmDeviceStatusDetailReason                               LongDisplayString
+	}
+
+gtmDeviceStatusName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a device."
+	::= { gtmDeviceStatusEntry 1 } 
+
+gtmDeviceStatusServerName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the server associated with a device."
+	::= { gtmDeviceStatusEntry 2 } 
+
+gtmDeviceStatusAvailState OBJECT-TYPE 
+	SYNTAX INTEGER {
+		none(0),
+		green(1),
+		yellow(2),
+		red(3),
+		blue(4),
+		gray(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The availability of the specified device indicated by color.
+	    none - error;
+	    green - available in some capacity;
+	    yellow - not currently available;
+	    red - not available;
+	    blue - availability is unknown;
+	    gray - unlicensed."
+	::= { gtmDeviceStatusEntry 3 } 
+
+gtmDeviceStatusEnabledState OBJECT-TYPE 
+	SYNTAX INTEGER {
+		none(0),
+		enabled(1),
+		disabled(2),
+		disabledbyparent(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The activity status of the specified device, as specified
+	    by the user."
+	::= { gtmDeviceStatusEntry 4 } 
+
+gtmDeviceStatusDetailReason OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The detail description of the specified devices status."
+	::= { gtmDeviceStatusEntry 5 } 
+
+--==================================================================
+-- Gtm_device_ip
+--==================================================================
+gtmDeviceIpNumber OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of gtmDeviceIp entries in the table."
+	::= { gtmDeviceIp 1 } 
+
+gtmDeviceIpTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtmDeviceIpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing information of device IPs for GTM (Global Traffic Management)."
+	::= { gtmDeviceIp 2 } 
+
+gtmDeviceIpEntry OBJECT-TYPE
+	SYNTAX  GtmDeviceIpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the gtmDeviceIp Table"
+	INDEX {
+		gtmDeviceIpServerName,
+		gtmDeviceIpDeviceName,
+		gtmDeviceIpIpType,
+		gtmDeviceIpIp
+	}
+	::= { gtmDeviceIpTable 1 } 
+
+GtmDeviceIpEntry ::= 
+	SEQUENCE {
+        	gtmDeviceIpServerName                                     LongDisplayString,
+        	gtmDeviceIpDeviceName                                     LongDisplayString,
+        	gtmDeviceIpIpType                                         InetAddressType,
+        	gtmDeviceIpIp                                             InetAddress,
+        	gtmDeviceIpIpXlatedType                                   InetAddressType,
+        	gtmDeviceIpIpXlated                                       InetAddress
+	}
+
+gtmDeviceIpServerName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the server associated with the specified device IP address."
+	::= { gtmDeviceIpEntry 1 } 
+
+gtmDeviceIpDeviceName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the device associated with the specified device IP address."
+	::= { gtmDeviceIpEntry 2 } 
+
+gtmDeviceIpIpType OBJECT-TYPE 
+	SYNTAX InetAddressType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IP address type of gtmDeviceIpIp."
+	::= { gtmDeviceIpEntry 3 } 
+
+gtmDeviceIpIp OBJECT-TYPE 
+	SYNTAX InetAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IP address that belongs to the specified device. It is interpreted
+	    within the context of a gtmDeviceIpIpType value."
+	::= { gtmDeviceIpEntry 4 } 
+
+gtmDeviceIpIpXlatedType OBJECT-TYPE 
+	SYNTAX InetAddressType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IP address type of gtmDeviceIpIpXlated."
+	::= { gtmDeviceIpEntry 5 } 
+
+gtmDeviceIpIpXlated OBJECT-TYPE 
+	SYNTAX InetAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The translated address for the specified device IP. It is interpreted
+	    within the context of a gtmDeviceIpIpXlatedType value."
+	::= { gtmDeviceIpEntry 6 } 
+
+--==================================================================
+-- Gtm_link_ip
+--==================================================================
+gtmLinkIpNumber OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of gtmLinkIp entries in the table."
+	::= { gtmLinkIp 1 } 
+
+gtmLinkIpTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtmLinkIpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing information of link IPs for GTM (Global Traffic Management)."
+	::= { gtmLinkIp 2 } 
+
+gtmLinkIpEntry OBJECT-TYPE
+	SYNTAX  GtmLinkIpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the gtmLinkIp Table"
+	INDEX {
+		gtmLinkIpLinkName,
+		gtmLinkIpIpType,
+		gtmLinkIpIp
+	}
+	::= { gtmLinkIpTable 1 } 
+
+GtmLinkIpEntry ::= 
+	SEQUENCE {
+        	gtmLinkIpLinkName                                         LongDisplayString,
+        	gtmLinkIpIpType                                           InetAddressType,
+        	gtmLinkIpIp                                               InetAddress,
+        	gtmLinkIpIpXlatedType                                     InetAddressType,
+        	gtmLinkIpIpXlated                                         InetAddress
+	}
+
+gtmLinkIpLinkName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The link name associated with the specified link IP address."
+	::= { gtmLinkIpEntry 1 } 
+
+gtmLinkIpIpType OBJECT-TYPE 
+	SYNTAX InetAddressType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IP address type of gtmLinkIpIp."
+	::= { gtmLinkIpEntry 2 } 
+
+gtmLinkIpIp OBJECT-TYPE 
+	SYNTAX InetAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IP address that belongs to the specified link. It is interpreted
+	    within the context of a gtmLinkIpIpType value."
+	::= { gtmLinkIpEntry 3 } 
+
+gtmLinkIpIpXlatedType OBJECT-TYPE 
+	SYNTAX InetAddressType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IP address type of gtmLinkIpIpXlated."
+	::= { gtmLinkIpEntry 4 } 
+
+gtmLinkIpIpXlated OBJECT-TYPE 
+	SYNTAX InetAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The translated address for the specified link IP. It is interpreted
+	    within the context of a gtmLinkIpIpXlatedType value."
+	::= { gtmLinkIpEntry 5 } 
 
 --================================================================
  -- Compliance and Group
@@ -9027,7 +10035,8 @@ gtmPoolGroup OBJECT-GROUP
 		gtmPoolMonitorRule,
 		gtmPoolQosCoeffVsScore,
 		gtmPoolFallbackIpv6Type,
-		gtmPoolFallbackIpv6
+		gtmPoolFallbackIpv6,
+		gtmPoolPoolType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9046,7 +10055,8 @@ gtmPoolStatGroup OBJECT-GROUP
 		gtmPoolStatExplicitIp,
 		gtmPoolStatReturnToDns,
 		gtmPoolStatReturnFromDns,
-		gtmPoolStatCnameResolutions
+		gtmPoolStatCnameResolutions,
+		gtmPoolStatPoolType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9077,7 +10087,16 @@ gtmPoolMbrGroup OBJECT-GROUP
 		gtmPoolMbrMonitorRule,
 		gtmPoolMbrEnabled,
 		gtmPoolMbrRatio,
-		gtmPoolMbrServerName
+		gtmPoolMbrServerName,
+		gtmPoolMbrPoolType,
+		gtmPoolMbrStaticTarget,
+		gtmPoolMbrRdataPriority,
+		gtmPoolMbrRdataWeight,
+		gtmPoolMbrRdataPort,
+		gtmPoolMbrRdataOrder,
+		gtmPoolMbrRdataPreference,
+		gtmPoolMbrRdataFlags,
+		gtmPoolMbrRdataService
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9091,7 +10110,8 @@ gtmPoolStatusGroup OBJECT-GROUP
 		gtmPoolStatusAvailState,
 		gtmPoolStatusEnabledState,
 		gtmPoolStatusParentType,
-		gtmPoolStatusDetailReason
+		gtmPoolStatusDetailReason,
+		gtmPoolStatusPoolType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9111,7 +10131,8 @@ gtmPoolMbrDepsGroup OBJECT-GROUP
 		gtmPoolMbrDepsServerName,
 		gtmPoolMbrDepsVsName,
 		gtmPoolMbrDepsDependServerName,
-		gtmPoolMbrDepsDependVsName
+		gtmPoolMbrDepsDependVsName,
+		gtmPoolMbrDepsPoolType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9130,7 +10151,8 @@ gtmPoolMbrStatGroup OBJECT-GROUP
 		gtmPoolMbrStatAlternate,
 		gtmPoolMbrStatFallback,
 		gtmPoolMbrStatServerName,
-		gtmPoolMbrStatVsName
+		gtmPoolMbrStatVsName,
+		gtmPoolMbrStatPoolType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9149,7 +10171,8 @@ gtmPoolMbrStatusGroup OBJECT-GROUP
 		gtmPoolMbrStatusParentType,
 		gtmPoolMbrStatusDetailReason,
 		gtmPoolMbrStatusVsName,
-		gtmPoolMbrStatusServerName
+		gtmPoolMbrStatusServerName,
+		gtmPoolMbrStatusPoolType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9332,7 +10355,8 @@ gtmVsGroup OBJECT-GROUP
 		gtmVsLimitConnPerSec,
 		gtmVsMonitorRule,
 		gtmVsEnabled,
-		gtmVsLinkName
+		gtmVsLinkName,
+		gtmVsLtmName
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9410,8 +10434,14 @@ gtmWideipGroup OBJECT-GROUP
 		gtmWideipLbmodePool,
 		gtmWideipApplication,
 		gtmWideipLastResortPool,
-		gtmWideipIpv6Noerror,
-		gtmWideipLoadBalancingDecisionLogVerbosity
+		gtmWideipIpNoError,
+		gtmWideipLoadBalancingDecisionLogVerbosity,
+		gtmWideipIpNoErrorTtl,
+		gtmWideipPersistCidr,
+		gtmWideipPersistV6Cidr,
+		gtmWideipMinimalResponse,
+		gtmWideipType,
+		gtmWideipLastResortPoolType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9434,7 +10464,9 @@ gtmWideipStatGroup OBJECT-GROUP
 		gtmWideipStatReturnFromDns,
 		gtmWideipStatCnameResolutions,
 		gtmWideipStatARequests,
-		gtmWideipStatAaaaRequests
+		gtmWideipStatAaaaRequests,
+		gtmWideipStatAlternate,
+		gtmWideipStatWipType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9448,7 +10480,8 @@ gtmWideipStatusGroup OBJECT-GROUP
 		gtmWideipStatusAvailState,
 		gtmWideipStatusEnabledState,
 		gtmWideipStatusParentType,
-		gtmWideipStatusDetailReason
+		gtmWideipStatusDetailReason,
+		gtmWideipStatusType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9459,7 +10492,8 @@ gtmWideipAliasGroup OBJECT-GROUP
 	 OBJECTS {
 		gtmWideipAliasNumber,
 		gtmWideipAliasWipName,
-		gtmWideipAliasName
+		gtmWideipAliasName,
+		gtmWideipAliasWipType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9472,7 +10506,9 @@ gtmWideipPoolGroup OBJECT-GROUP
 		gtmWideipPoolWipName,
 		gtmWideipPoolPoolName,
 		gtmWideipPoolOrder,
-		gtmWideipPoolRatio
+		gtmWideipPoolRatio,
+		gtmWideipPoolWipType,
+		gtmWideipPoolPoolType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9484,7 +10520,8 @@ gtmWideipRuleGroup OBJECT-GROUP
 		gtmWideipRuleNumber,
 		gtmWideipRuleWipName,
 		gtmWideipRuleRuleName,
-		gtmWideipRulePriority
+		gtmWideipRulePriority,
+		gtmWideipRuleWipType
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9493,6 +10530,7 @@ gtmWideipRuleGroup OBJECT-GROUP
 
 gtmServerStat2Group OBJECT-GROUP
 	 OBJECTS {
+		gtmServerStat2ResetStats,
 		gtmServerStat2Number,
 		gtmServerStat2Name,
 		gtmServerStat2UnitId,
@@ -9694,7 +10732,11 @@ gtmDnssecZoneStatGroup OBJECT-GROUP
 		gtmDnssecZoneStatXfrMasterMsgs,
 		gtmDnssecZoneStatXfrResponseAverageSize,
 		gtmDnssecZoneStatXfrSerial,
-		gtmDnssecZoneStatXfrMasterSerial
+		gtmDnssecZoneStatXfrMasterSerial,
+		gtmDnssecZoneStatDsXfr,
+		gtmDnssecZoneStatDsReferral,
+		gtmDnssecZoneStatDnssecCdsQueries,
+		gtmDnssecZoneStatDnssecCdnskeyQueries
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -9733,4 +10775,89 @@ gtmDnssecStatGroup OBJECT-GROUP
 	DESCRIPTION
 		"A collection of objects of gtmGlobalDnssecStat MIB."
 	::= { bigipGlobalTMGroups 51 }
+
+gtmApplicationWideipGroup OBJECT-GROUP
+	 OBJECTS {
+		gtmApplicationWideipNumber,
+		gtmApplicationWideipApplicationName,
+		gtmApplicationWideipWipName,
+		gtmApplicationWideipWipType
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of gtmApplicationWideip MIB."
+	::= { bigipGlobalTMGroups 52 }
+
+gtmDeviceGroup OBJECT-GROUP
+	 OBJECTS {
+		gtmDeviceNumber,
+		gtmDeviceServerName,
+		gtmDeviceName
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of gtmDevice MIB."
+	::= { bigipGlobalTMGroups 53 }
+
+gtmDeviceStatGroup OBJECT-GROUP
+	 OBJECTS {
+		gtmDeviceStatResetStats,
+		gtmDeviceStatNumber,
+		gtmDeviceStatName,
+		gtmDeviceStatServerName,
+		gtmDeviceStatCpuUsage,
+		gtmDeviceStatMemAvail,
+		gtmDeviceStatBitsPerSecIn,
+		gtmDeviceStatBitsPerSecOut,
+		gtmDeviceStatPktsPerSecIn,
+		gtmDeviceStatPktsPerSecOut,
+		gtmDeviceStatConnections
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of gtmDeviceStat MIB."
+	::= { bigipGlobalTMGroups 54 }
+
+gtmDeviceStatusGroup OBJECT-GROUP
+	 OBJECTS {
+		gtmDeviceStatusNumber,
+		gtmDeviceStatusName,
+		gtmDeviceStatusServerName,
+		gtmDeviceStatusAvailState,
+		gtmDeviceStatusEnabledState,
+		gtmDeviceStatusDetailReason
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of gtmDeviceStatus MIB."
+	::= { bigipGlobalTMGroups 55 }
+
+gtmDeviceIpGroup OBJECT-GROUP
+	 OBJECTS {
+		gtmDeviceIpNumber,
+		gtmDeviceIpServerName,
+		gtmDeviceIpDeviceName,
+		gtmDeviceIpIpType,
+		gtmDeviceIpIp,
+		gtmDeviceIpIpXlatedType,
+		gtmDeviceIpIpXlated
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of gtmDeviceIp MIB."
+	::= { bigipGlobalTMGroups 56 }
+
+gtmLinkIpGroup OBJECT-GROUP
+	 OBJECTS {
+		gtmLinkIpNumber,
+		gtmLinkIpLinkName,
+		gtmLinkIpIpType,
+		gtmLinkIpIp,
+		gtmLinkIpIpXlatedType,
+		gtmLinkIpIpXlated
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of gtmLinkIp MIB."
+	::= { bigipGlobalTMGroups 57 }
 END
