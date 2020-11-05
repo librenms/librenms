@@ -58,7 +58,7 @@ foreach ($mempools->values() as $index => $mempool) {
         $stack = $system_pools && $index > 0 ? ':STACK' : '';
         if ($system_pools) {
             $free_indexes[] = $index;
-            $rrd_options .= " AREA:mempooltotal$index#{$color}60:$stack";
+            $rrd_options .= " AREA:mempooltotal$index#{$color}70:$stack";
         }
 
         if ($mempool->mempool_class == 'swap') {
