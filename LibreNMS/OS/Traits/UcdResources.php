@@ -61,6 +61,7 @@ trait UcdResources
             'memAvailReal.0',
             'memBuffer.0',
             'memCached.0',
+            'memSysAvail.0',
         ], '-OQUs', 'UCD-SNMP-MIB');
 
         if ($this->oidValid($data, 'memTotalReal') && ($this->oidValid($data, 'memAvailReal') || $this->oidValid($data, 'memSysAvail'))) {
@@ -89,7 +90,7 @@ trait UcdResources
             $mempools->push((new Mempool([
                 'mempool_index' => 3,
                 'mempool_type' => 'ucd',
-                'mempool_class' => 'buffer',
+                'mempool_class' => 'buffers',
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Memory buffers',
                 'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.14.0',
@@ -105,6 +106,17 @@ trait UcdResources
                 'mempool_descr' => 'Cached memory',
                 'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.15.0',
             ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memCached']));
+        }
+
+        if ($this->oidValid($data, 'memSysAvail')) {
+            $mempools->push((new Mempool([
+                'mempool_index' => 5,
+                'mempool_type' => 'ucd',
+                'mempool_class' => 'available',
+                'mempool_precision' => 1024,
+                'mempool_descr' => 'Available memory',
+                'mempool_free_oid' => '.1.3.6.1.4.1.2021.4.27.0',
+            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memSysAvail']));
         }
 
         return $mempools;
