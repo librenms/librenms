@@ -25,7 +25,7 @@ $mempools = DeviceCache::get($device['device_id'])->mempools->sort(function (Mem
     }
 
     return $a_weight < $b_weight ? -1 : 1;
-});
+})->values();
 
 // find available
 $available = null;
@@ -43,7 +43,7 @@ $section = 0;
 $free_indexes = [];
 
 /** @var \App\Models\Mempool $mempool */
-foreach ($mempools->values() as $index => $mempool) {
+foreach ($mempools as $index => $mempool) {
     $color = $colors[$index % 8];
 
     $descr = rrdtool_escape($mempool->mempool_descr, 22);
@@ -75,27 +75,30 @@ foreach ($mempools->values() as $index => $mempool) {
 
 // add free/availability calculations if we have buffers/cached
 if (! empty($free_indexes)) {
-    $rrd_options .= ' CDEF:mempoolfree=100,mempooltotal' . implode(',mempooltotal', $free_indexes) . str_repeat(',-', count($free_indexes));
-    $rrd_options .= " CDEF:mempoolfreebytes=mempoolfree{$free_indexes[0]},mempoolused{$free_indexes[0]},+,mempoolfree,100,/,*";
-    $legend_sections[1] .= " COMMENT:'  Free memory            '";
-    $legend_sections[1] .= ' GPRINT:mempoolfree:MIN:%3.0lf%%';
-    $legend_sections[1] .= ' GPRINT:mempoolfree:LAST:%3.0lf%%';
-    $legend_sections[1] .= ' GPRINT:mempoolfree:MAX:%3.0lf%%';
-    $legend_sections[1] .= ' GPRINT:mempoolfreebytes:LAST:%6.2lf%sB\l';
+    $mempool_classes = $mempools->pluck('mempool_class');
+    if ($mempool_classes->contains('buffers') || $mempool_classes->contains('cached')) {
+        $rrd_options .= ' CDEF:mempoolfree=100,mempooltotal' . implode(',mempooltotal', $free_indexes) . str_repeat(',-', count($free_indexes));
+        $rrd_options .= " CDEF:mempoolfreebytes=mempoolfree{$free_indexes[0]},mempoolused{$free_indexes[0]},+,mempoolfree,100,/,*";
+        $legend_sections[1] .= " COMMENT:'  Free memory            '";
+        $legend_sections[1] .= ' GPRINT:mempoolfree:MIN:%3.0lf%%';
+        $legend_sections[1] .= ' GPRINT:mempoolfree:LAST:%3.0lf%%';
+        $legend_sections[1] .= ' GPRINT:mempoolfree:MAX:%3.0lf%%';
+        $legend_sections[1] .= ' GPRINT:mempoolfreebytes:LAST:%6.2lf%sB\l';
 
-    if ($available === null) {
-        $rrd_options .= " CDEF:mempoolavailablebytes=mempoolfree{$free_indexes[0]}";
-    } else {
-        $available_filename = rrd_name($device['hostname'], ['mempool', $available->mempool_type, $available->mempool_class, $available->mempool_index]);
-        $rrd_options .= " DEF:mempoolavailablebytes=$available_filename:free:AVERAGE";
+        if ($available === null) {
+            $rrd_options .= " CDEF:mempoolavailablebytes=mempoolfree{$free_indexes[0]}";
+        } else {
+            $available_filename = rrd_name($device['hostname'], ['mempool', $available->mempool_type, $available->mempool_class, $available->mempool_index]);
+            $rrd_options .= " DEF:mempoolavailablebytes=$available_filename:free:AVERAGE";
+        }
+
+        $rrd_options .= " CDEF:mempoolavailable=100,mempooltotal{$free_indexes[0]},-";
+        $legend_sections[1] .= " COMMENT:'  Available memory       '";
+        $legend_sections[1] .= ' GPRINT:mempoolavailable:MIN:%3.0lf%%';
+        $legend_sections[1] .= ' GPRINT:mempoolavailable:LAST:%3.0lf%%';
+        $legend_sections[1] .= ' GPRINT:mempoolavailable:MAX:%3.0lf%%';
+        $legend_sections[1] .= ' GPRINT:mempoolavailablebytes:LAST:%6.2lf%sB\l';
     }
-
-    $rrd_options .= " CDEF:mempoolavailable=100,mempooltotal{$free_indexes[0]},-";
-    $legend_sections[1] .= " COMMENT:'  Available memory       '";
-    $legend_sections[1] .= ' GPRINT:mempoolavailable:MIN:%3.0lf%%';
-    $legend_sections[1] .= ' GPRINT:mempoolavailable:LAST:%3.0lf%%';
-    $legend_sections[1] .= ' GPRINT:mempoolavailable:MAX:%3.0lf%%';
-    $legend_sections[1] .= ' GPRINT:mempoolavailablebytes:LAST:%6.2lf%sB\l';
 }
 
 $rrd_options .= implode(" COMMENT:' \\l'", $legend_sections);
