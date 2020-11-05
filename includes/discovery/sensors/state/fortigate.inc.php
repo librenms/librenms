@@ -27,14 +27,12 @@ $systemMode = snmp_get($device, $fgHaSystemModeOid, '-Ovq', 'FORTINET-FORTIGATE-
 
 // Verify that there is a cluster in the first place
 if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
-
     $fgHaStatsEntryOid = '.1.3.6.1.4.1.12356.101.13.2.1.1';
 
     // Fetch the cluster members
     $haStats = snmpwalk_cache_multi_oid($device, $fgHaStatsEntryOid, [], 'FORTINET-FORTIGATE-MIB');
 
     if (is_array($haStats)) {
-
         $stateName = 'clusterState';
         $states = [
             ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'CRITICAL'],
