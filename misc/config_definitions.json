@@ -1812,13 +1812,14 @@
         },
         "graph_colours.varied": {
             "default": [
-                "cc0000",
-                "ea8f00",
-                "ffaa66",
-                "008fea",
+                "CC0000",
+                "EA8F00",
+                "FFAA66",
+                "008FEA",
                 "3CB371",
-                "011319",
-                ""
+                "708090",
+                "663399",
+                "00BFFF"
             ],
             "type": "array"
         },

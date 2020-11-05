@@ -44,8 +44,10 @@ foreach ($mempools as $index => $mempool) {
         $stack = '';
         if (in_array($mempool->mempool_class, ['system', 'cached', 'buffers'])) {
             $free_indexes[] = $index;
-            $stack = ':STACK';
-            $rrd_options .= " AREA:mempooltotal$index#{$color}50:$stack";
+            if ($index > 0) {
+                $stack = ':STACK';
+            }
+            $rrd_options .= " AREA:mempooltotal$index#{$color}60:$stack";
         } elseif (! empty($free_indexes)) {
             $rrd_options .= ' CDEF:mempoolfree=100,mempooltotal' . implode(',mempooltotal', $free_indexes) . str_repeat(',-', count($free_indexes));
             $rrd_options .= " CDEF:mempoolfreebytes=mempoolfree{$free_indexes[0]},mempoolused{$free_indexes[0]},+,mempoolfree,100,/,*";
@@ -57,6 +59,7 @@ foreach ($mempools as $index => $mempool) {
             $rrd_optionsb .= ' GPRINT:mempoolfree:MAX:%3.0lf%%';
             $rrd_optionsb .= ' GPRINT:mempoolfreebytes:LAST:%6.2lf%sB\\l';
 
+            $stack = '';
             unset($free_indexes);
         }
 
