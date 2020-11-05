@@ -243,7 +243,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl restart nginx
-        systemctl restart php7.4-fpm
+        systemctl restart php-fpm
         ```
 
     === "Apache"
@@ -281,7 +281,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         a2enmod proxy_fcgi setenvif rewrite
         a2ensite librenms.conf
         systemctl restart apache2
-        systemctl restart php7.4-fpm
+        systemctl restart php-fpm
         ```
 
 === "CentOS 8"
