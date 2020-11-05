@@ -21,17 +21,16 @@
  * @copyright  2020 Net Entertainment AB
  * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
  */
-
 $index = 0;
 $fgHaSystemModeOid = '.1.3.6.1.4.1.12356.101.13.1.1.0';
 $systemMode = snmp_get($device, $fgHaSystemModeOid, '-Ovq', 'FORTINET-FORTIGATE-MIB');
 
-# Verify that there is a cluster in the first place
+// Verify that there is a cluster in the first place
 if ($systemMode == "activePassive" || $systemMode == "activeActive") {
 
     $fgHaStatsEntryOid = '.1.3.6.1.4.1.12356.101.13.2.1.1';
 
-    # Fetch the cluster members
+    // Fetch the cluster members
     $haStats = snmpwalk_cache_multi_oid($device, $fgHaStatsEntryOid, [], 'FORTINET-FORTIGATE-MIB');
 
     if (is_array($haStats)) {
@@ -42,9 +41,9 @@ if ($systemMode == "activePassive" || $systemMode == "activeActive") {
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
         ];
 
-        create_state_index ($stateName, $states);
+        create_state_index($stateName, $states);
 
-        $clusterMemberCount = count ($haStats);
+        $clusterMemberCount = count($haStats);
         $clusterState = $clusterMemberCount == 1 ? 0 : 1;
 
         $descr = 'Cluster State';
