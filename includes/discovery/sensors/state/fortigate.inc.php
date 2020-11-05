@@ -53,13 +53,18 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
             $index,
             $stateName,
             $descr,
+            1,
+            1,
             null,
             null,
             null,
             null,
+            $clusterState,
+            'snmp',
             null,
             null,
-            $clusterState
+            null,
+            'HA'
         );
 
         create_sensor_to_state_index($device, $stateName, $index);
