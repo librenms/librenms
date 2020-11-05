@@ -26,7 +26,8 @@ $mempools = DeviceCache::get($device['device_id'])->mempools->sort(function (\Ap
 })->values(); // reset keys
 
 $colors = \LibreNMS\Config::get('graph_colours.varied');
-$rrd_optionsb = '';
+$legend_sections = [];
+$section = 0;
 $free_indexes = [];
 
 /** @var \App\Models\Mempool $mempool */
@@ -52,25 +53,36 @@ foreach ($mempools as $index => $mempool) {
             $rrd_options .= ' CDEF:mempoolfree=100,mempooltotal' . implode(',mempooltotal', $free_indexes) . str_repeat(',-', count($free_indexes));
             $rrd_options .= " CDEF:mempoolfreebytes=mempoolfree{$free_indexes[0]},mempoolused{$free_indexes[0]},+,mempoolfree,100,/,*";
             $rrd_options .= ' AREA:mempoolfree#e5e5e550:STACK';
+            $legend_sections[1] .= " COMMENT:'  Free Memory            '";
+            $legend_sections[1] .= ' GPRINT:mempoolfree:MIN:%3.0lf%%';
+            $legend_sections[1] .= ' GPRINT:mempoolfree:LAST:%3.0lf%%';
+            $legend_sections[1] .= ' GPRINT:mempoolfree:MAX:%3.0lf%%';
+            $legend_sections[1] .= ' GPRINT:mempoolfreebytes:LAST:%6.2lf%sB\l';
 
-            $rrd_optionsb .= " LINE1.5:mempoolfree#e5e5e5:'Free Memory            ':STACK";
-            $rrd_optionsb .= ' GPRINT:mempoolfree:MIN:%3.0lf%%';
-            $rrd_optionsb .= ' GPRINT:mempoolfree:LAST:%3.0lf%%';
-            $rrd_optionsb .= ' GPRINT:mempoolfree:MAX:%3.0lf%%';
-            $rrd_optionsb .= ' GPRINT:mempoolfreebytes:LAST:%6.2lf%sB\\l';
+            $rrd_options .= " CDEF:mempoolavailablebytes=mempoolfree{$free_indexes[0]}";
+            $rrd_options .= " CDEF:mempoolavailable=100,mempooltotal{$free_indexes[0]},-";
+            $legend_sections[1] .= " COMMENT:'  Available Memory       '";
+            $legend_sections[1] .= ' GPRINT:mempoolavailable:MIN:%3.0lf%%';
+            $legend_sections[1] .= ' GPRINT:mempoolavailable:LAST:%3.0lf%%';
+            $legend_sections[1] .= ' GPRINT:mempoolavailable:MAX:%3.0lf%%';
+            $legend_sections[1] .= ' GPRINT:mempoolavailablebytes:LAST:%6.2lf%sB\l';
 
             $stack = '';
             unset($free_indexes);
         }
 
-        $rrd_optionsb .= " LINE1.5:mempooltotal$index#$color:'$descr'$stack";
-        $rrd_optionsb .= " GPRINT:mempooltotal$index:MIN:%3.0lf%%";
-        $rrd_optionsb .= " GPRINT:mempooltotal$index:LAST:%3.0lf%%";
-        $rrd_optionsb .= " GPRINT:mempooltotal$index:MAX:%3.0lf%%";
-        $rrd_optionsb .= " GPRINT:mempoolused$index:LAST:%6.2lf%sB\\l ";
+        if ($mempool->mempool_class == 'swap') {
+            $section = 2;
+        }
+
+        $legend_sections[$section] .= " LINE1.5:mempooltotal$index#$color:'$descr'$stack";
+        $legend_sections[$section] .= " GPRINT:mempooltotal$index:MIN:%3.0lf%%";
+        $legend_sections[$section] .= " GPRINT:mempooltotal$index:LAST:%3.0lf%%";
+        $legend_sections[$section] .= " GPRINT:mempooltotal$index:MAX:%3.0lf%%";
+        $legend_sections[$section] .= " GPRINT:mempoolused$index:LAST:%6.2lf%sB\\l ";
     }
 }
 
-$rrd_options .= $rrd_optionsb;
+$rrd_options .= implode(" COMMENT:' \\l'", $legend_sections);
 
 $rrd_options .= ' HRULE:0#999999';
