@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
- * @copyright  2020 NetEntertainment AB
+ * @copyright  2020 Net Entertainment AB
  * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
  */
 $index = 0;
@@ -30,10 +30,12 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
     $fgHaStatsEntryOid = '.1.3.6.1.4.1.12356.101.13.2.1.1';
 
     // Fetch the cluster members
-    $haStats = snmpwalk_cache_multi_oid($device, $fgHaStatsEntryOid, [], 'FORTINET-FORTIGATE-MIB');
+    $haStatsEntries = snmpwalk_cache_multi_oid($device, $fgHaStatsEntryOid, [], 'FORTINET-FORTIGATE-MIB');
 
-    if (is_array($haStats)) {
+    if (is_array($haStatsEntries)) {
         $stateName = 'clusterState';
+        $descr = 'Cluster State';
+
         $states = [
             ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'CRITICAL'],
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
@@ -41,15 +43,16 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
 
         create_state_index($stateName, $states);
 
-        $clusterMemberCount = count($haStats);
+        $clusterMemberCount = count($haStatsEntries);
+
+        // If the device is part of a cluster but the member count is 1 the cluster has issues
         $clusterState = $clusterMemberCount == 1 ? 0 : 1;
 
-        $descr = 'Cluster State';
         discover_sensor(
             $valid['sensor'],
             'state',
             $device,
-            $fgHaStatsEntryOid,
+            $fgHaSystemModeOid,
             $index,
             $stateName,
             $descr,
@@ -68,5 +71,53 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
         );
 
         create_sensor_to_state_index($device, $stateName, $index);
+
+        // Setup a sensor for the cluster sync state
+        $stateName = 'haSyncStatus';
+        $descr = 'HA sync status';
+        $states = [
+            ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'Out Of Sync'],
+            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'In Sync'],
+        ];
+
+        create_state_index($stateName, $states);
+
+        discover_sensor(
+            $valid['sensor'],
+            'state',
+            $device,
+            "$fgHaStatsEntryOid",
+            $index,
+            $stateName,
+            $descr,
+            1,
+            1,
+            null,
+            null,
+            null,
+            null,
+            1,
+            'snmp',
+            $index,
+            null,
+            null,
+            'HA'
+        );
+
+        create_sensor_to_state_index($device, $stateName, $index);
     }
 }
+
+unset(
+    $index,
+    $fgHaSystemModeOid,
+    $systemMode,
+    $fgHaStatsEntryOid,
+    $haStatsEntries,
+    $stateName,
+    $descr,
+    $states,
+    $clusterMemberCount,
+    $clusterState,
+    $entry
+);
