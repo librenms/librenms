@@ -17,8 +17,10 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
         } elseif ($device['os'] === 'vrp') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
-        } else {
+        } elseif ($device['os_group'] == 'cisco') {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', [], 'CISCO-BGP4-MIB');
+        } else {
+            $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
         }
 
         foreach ($peers as $peer) {
@@ -225,7 +227,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'aristaBgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
                                 'aristaBgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
                             ];
-                        } else {
+                        } elseif ($device['os_group'] == 'cisco') {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
                             $mib = 'CISCO-BGP4-MIB';
                             $oid_map = [
@@ -241,23 +243,23 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'cbgpPeer2LastError' => 'bgpPeerLastErrorCode',
                                 'cbgpPeer2LastErrorTxt' => 'bgpPeerLastErrorText',
                             ];
+                        } else {
+                            $peer_identifier = $peer['bgpPeerIdentifier'];
+                            $mib = 'BGP4-MIB';
+                            $oid_map = [
+                                'bgpPeerState' => 'bgpPeerState',
+                                'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'bgpPeerInUpdates' => 'bgpPeerInUpdates',
+                                'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
+                                'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                                'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                                'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                                'bgpPeerLocalAddr' => 'bgpLocalAddr', // silly db field name
+                                'bgpPeerLastError' => 'bgpPeerLastErrorCode',
+                            ];
                         }
                     }
-                } else {
-                    $peer_identifier = $peer['bgpPeerIdentifier'];
-                    $mib = 'BGP4-MIB';
-                    $oid_map = [
-                        'bgpPeerState' => 'bgpPeerState',
-                        'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
-                        'bgpPeerInUpdates' => 'bgpPeerInUpdates',
-                        'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
-                        'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
-                        'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
-                        'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
-                        'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
-                        'bgpPeerLocalAddr' => 'bgpLocalAddr', // silly db field name
-                        'bgpPeerLastError' => 'bgpPeerLastErrorCode',
-                    ];
                 }
 
                 // --- Build peer data if it is not already filled in ---
