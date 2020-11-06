@@ -14,6 +14,6 @@ if ($device['os'] == 'fortigate') {
         }
 
         $sensor_value = $clusterState;
-        unset($fgHaStatsEntryOid, $haStats, $clusterMemberCount, $clusterState );
+        unset($fgHaStatsEntryOid, $haStats, $clusterMemberCount, $clusterState);
     }
 }
