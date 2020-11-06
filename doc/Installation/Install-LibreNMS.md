@@ -61,7 +61,8 @@ Connect to the server command line and follow the instructions below.
 ## Add librenms user
 
 ```
-useradd librenms -d /opt/librenms -M -r -s /usr/bin/bash
+BASHLOCATION=$(which bash)
+useradd librenms -d /opt/librenms -M -r -s $BASHLOCATION
 ```
 
 ## Download LibreNMS
