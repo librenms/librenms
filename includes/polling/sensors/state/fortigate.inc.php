@@ -30,5 +30,4 @@ if ($device['os'] == 'fortigate') {
 
         unset($fgHaStatsEntryOid, $haStatsEntries, $clusterMemberCount, $synchronized, $clusterState);
     }
-
 }
