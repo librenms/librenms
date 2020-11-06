@@ -19,8 +19,8 @@ if ($device['os'] == 'fortigate') {
             $clusterState = 0;
             // 0 = unsynchronized, 1 = synchronized
             $synchronized = 1;
-            foreach($haStatsEntries as $entry) {
-                if($entry['fgHaStatsSyncStatus'] == 'unsynchronized') {
+            foreach ($haStatsEntries as $entry) {
+                if ($entry['fgHaStatsSyncStatus'] == 'unsynchronized') {
                     $synchronized = 0;
                 }
             }
