@@ -59,9 +59,9 @@ if (is_file($install_dir . '/composer.phar')) {
     if (time() - filemtime($install_dir . '/composer.phar') > 60 * 60 * 24 * 7) {
         // self-update
         passthru("$exec self-update --quiet --2" . $extra_args);
+        touch($install_dir . '/composer.phar');
     }
 
-    @touch($install_dir . '/composer.phar');
 } else {
     $sig_url = ($use_https ? 'https' : 'http') . '://composer.github.io/installer.sig';
 
