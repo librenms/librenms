@@ -897,8 +897,9 @@ mempools:
     - { Field: mempool_index, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: entPhysicalIndex, Type: int, 'Null': true, Extra: '' }
     - { Field: mempool_type, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mempool_class, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: mempool_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
-    - { Field: mempool_descr, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: mempool_descr, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mempool_perc, Type: int, 'Null': false, Extra: '' }
     - { Field: mempool_perc_oid, Type: varchar(255), 'Null': true, Extra: '' }
