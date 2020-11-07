@@ -102,6 +102,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
             'swap' => ['swap'],
             'buffers' => ['buffers'],
             'cached' => ['cache'],
+            'system' => ['shared real memory metrics'],
             'shared' => ['shared'],
         ];
 
