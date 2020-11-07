@@ -367,7 +367,7 @@ indicate otherwise!
 Initiate the follow database with the following command:
 
 ```
-php build-base.php
+php includes/sql-schema/update.php
 ```
 
 # Create admin user
