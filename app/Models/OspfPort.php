@@ -56,6 +56,11 @@ class OspfPort extends PortRelatedModel
         'ospfIfMulticastForwarding',
         'ospfIfDemand',
         'ospfIfAuthType',
+        'ospfIfMetricIpAddress',
+        'ospfIfMetricAddressLessIf',
+        'ospfIfMetricTOS',
+        'ospfIfMetricValue',
+        'ospfIfMetricStatus',
     ];
 
     // ---- Define Relationships ----

@@ -93,6 +93,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
                           <th>Port</th>
                           <th>Port Type</th>
                           <th>Port State</th>
+                          <th>Cost</th>
                           <th>Status</th>
                           <th>Area ID</th>
                         </tr>
@@ -112,6 +113,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
                       <td>' . generate_port_link($ospfport) . '</td>
                       <td>' . $ospfport['ospfIfType'] . '</td>
                       <td>' . $ospfport['ospfIfState'] . '</td>
+                      <td>' . $ospfport['ospfIfMetricValue'] . '</td>
                       <td><span class="label label-' . $port_status_color . '">' . $ospfport['ospfIfAdminStat'] . '</span></td>
                       <td>' . $ospfport['ospfIfAreaId'] . '</td>
                     </tr>

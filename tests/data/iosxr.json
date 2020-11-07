@@ -28874,5 +28874,140 @@
                 }
             ]
         }
+    },
+    "ospf": {
+        "poller": {
+            "ospf_ports": [
+                {
+                    "ospf_port_id": "0.0.0.3.0",
+                    "ospfIfIpAddress": "0.0.0.3",
+                    "ospfAddressLessIf": 0,
+                    "ospfIfAreaId": "0.0.0.0",
+                    "ospfIfType": "pointToPoint",
+                    "ospfIfAdminStat": "enabled",
+                    "ospfIfRtrPriority": 1,
+                    "ospfIfTransitDelay": 1,
+                    "ospfIfRetransInterval": 5,
+                    "ospfIfHelloInterval": 10,
+                    "ospfIfRtrDeadInterval": 40,
+                    "ospfIfPollInterval": 120,
+                    "ospfIfState": "pointToPoint",
+                    "ospfIfDesignatedRouter": "0.0.0.0",
+                    "ospfIfBackupDesignatedRouter": "0.0.0.0",
+                    "ospfIfEvents": 1,
+                    "ospfIfAuthKey": null,
+                    "ospfIfStatus": "active",
+                    "ospfIfMulticastForwarding": "blocked",
+                    "ospfIfDemand": "false",
+                    "ospfIfAuthType": "none",
+                    "ospfIfMetricIpAddress": "0.0.0.3",
+                    "ospfIfMetricAddressLessIf": 0,
+                    "ospfIfMetricTOS": 0,
+                    "ospfIfMetricValue": 1,
+                    "ospfIfMetricStatus": "active",
+                    "context_name": null,
+                    "ifIndex": null
+                },
+                {
+                    "ospf_port_id": "0.0.0.5.0",
+                    "ospfIfIpAddress": "0.0.0.5",
+                    "ospfAddressLessIf": 0,
+                    "ospfIfAreaId": "0.0.0.0",
+                    "ospfIfType": "pointToPoint",
+                    "ospfIfAdminStat": "enabled",
+                    "ospfIfRtrPriority": 1,
+                    "ospfIfTransitDelay": 1,
+                    "ospfIfRetransInterval": 5,
+                    "ospfIfHelloInterval": 10,
+                    "ospfIfRtrDeadInterval": 40,
+                    "ospfIfPollInterval": 120,
+                    "ospfIfState": "pointToPoint",
+                    "ospfIfDesignatedRouter": "0.0.0.0",
+                    "ospfIfBackupDesignatedRouter": "0.0.0.0",
+                    "ospfIfEvents": 1,
+                    "ospfIfAuthKey": null,
+                    "ospfIfStatus": "active",
+                    "ospfIfMulticastForwarding": "blocked",
+                    "ospfIfDemand": "false",
+                    "ospfIfAuthType": "none",
+                    "ospfIfMetricIpAddress": "0.0.0.5",
+                    "ospfIfMetricAddressLessIf": 0,
+                    "ospfIfMetricTOS": 0,
+                    "ospfIfMetricValue": 100,
+                    "ospfIfMetricStatus": "active",
+                    "context_name": null,
+                    "ifIndex": null
+                }
+            ],
+            "ospf_instances": [
+                {
+                    "ospf_instance_id": 0,
+                    "ospfRouterId": "0.0.0.1",
+                    "ospfAdminStat": "enabled",
+                    "ospfVersionNumber": "version2",
+                    "ospfAreaBdrRtrStatus": "false",
+                    "ospfASBdrRtrStatus": "true",
+                    "ospfExternLsaCount": 3452,
+                    "ospfExternLsaCksumSum": 113033774,
+                    "ospfTOSSupport": "false",
+                    "ospfOriginateNewLsas": 14738,
+                    "ospfRxNewLsas": 2460205,
+                    "ospfExtLsdbLimit": 10240,
+                    "ospfMulticastExtensions": 0,
+                    "ospfExitOverflowInterval": 0,
+                    "ospfDemandExtensions": "true",
+                    "context_name": null
+                }
+            ],
+            "ospf_areas": [
+                {
+                    "ospfAreaId": "0.0.0.0",
+                    "ospfAuthType": null,
+                    "ospfImportAsExtern": "importExternal",
+                    "ospfSpfRuns": 1974,
+                    "ospfAreaBdrRtrCount": 3,
+                    "ospfAsBdrRtrCount": 154,
+                    "ospfAreaLsaCount": 705,
+                    "ospfAreaLsaCksumSum": 22790689,
+                    "ospfAreaSummary": "sendAreaSummary",
+                    "ospfAreaStatus": "active",
+                    "context_name": null
+                }
+            ],
+            "ospf_nbrs": [
+                {
+                    "port_id": null,
+                    "ospf_nbr_id": "0.0.0.4.0",
+                    "ospfNbrIpAddr": "0.0.0.4",
+                    "ospfNbrAddressLessIndex": 0,
+                    "ospfNbrRtrId": "0.0.0.2",
+                    "ospfNbrOptions": 82,
+                    "ospfNbrPriority": 0,
+                    "ospfNbrState": "full",
+                    "ospfNbrEvents": 6,
+                    "ospfNbrLsRetransQLen": 0,
+                    "ospfNbmaNbrStatus": "active",
+                    "ospfNbmaNbrPermanence": "dynamic",
+                    "ospfNbrHelloSuppressed": "false",
+                    "context_name": null
+                },
+                {
+                    "port_id": null,
+                    "ospf_nbr_id": "0.0.0.6.0",
+                    "ospfNbrIpAddr": "0.0.0.6",
+                    "ospfNbrAddressLessIndex": 0,
+                    "ospfNbrRtrId": "0.0.0.2",
+                    "ospfNbrOptions": 82,
+                    "ospfNbrPriority": 0,
+                    "ospfNbrState": "full",
+                    "ospfNbrEvents": 6,
+                    "ospfNbrLsRetransQLen": 0,
+                    "ospfNbmaNbrStatus": "active",
+                    "ospfNbmaNbrPermanence": "dynamic",
+                    "ospfNbrHelloSuppressed": "false",
+                    "context_name": null
+                }
+            ]
+        }
     }
 }
