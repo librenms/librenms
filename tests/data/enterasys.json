@@ -45,6 +45,7 @@
                     "mempool_index": "3",
                     "entPhysicalIndex": null,
                     "mempool_type": "enterasys",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "RAM device",
                     "mempool_perc": 92,

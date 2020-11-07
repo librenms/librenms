@@ -7562,6 +7562,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "fortigate",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Main Memory",
                     "mempool_perc": 23,

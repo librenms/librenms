@@ -1356,6 +1356,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "fortisandbox",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Physical Memory",
                     "mempool_perc": 23,

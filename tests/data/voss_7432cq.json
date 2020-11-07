@@ -7776,6 +7776,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "avaya-vsp",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "VOSS Memory",
                     "mempool_perc": 8,

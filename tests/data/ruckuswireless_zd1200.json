@@ -62,6 +62,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "ruckuswireless",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "System Memory",
                     "mempool_perc": 3,

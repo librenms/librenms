@@ -696,6 +696,7 @@
                     "mempool_index": "1",
                     "entPhysicalIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Physical Memory",
                     "mempool_perc": 48,

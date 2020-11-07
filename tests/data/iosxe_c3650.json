@@ -95,6 +95,7 @@
                     "mempool_index": "1000",
                     "entPhysicalIndex": null,
                     "mempool_type": "cpm",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Switch 1 Memory",
                     "mempool_perc": 39,

@@ -65,6 +65,7 @@ class Vrp extends OS implements
                 $mempools->push((new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'vrp',
+                    'mempool_class' => 'system',
                     'mempool_precision' => empty($entry['hwEntityMemSizeMega']) ? 1 : 1048576,
                     'mempool_descr' => substr("$descr Memory", 0, 64),
                     'mempool_perc_oid' => ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.$index",

@@ -94,6 +94,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "netspire",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Storage",
                     "mempool_perc": 0,

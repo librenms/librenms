@@ -5208,6 +5208,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "fs-switch",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Chassis Memory",
                     "mempool_perc": 21,

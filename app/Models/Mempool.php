@@ -98,11 +98,10 @@ class Mempool extends DeviceRelatedModel implements Keyable
         }
 
         $memoryClasses = [
-            'system' => ['physical', 'ram', 'real'],
             'virtual' => ['virtual'],
             'swap' => ['swap'],
             'buffers' => ['buffers'],
-            'cached' => ['cached'],
+            'cached' => ['cache'],
             'shared' => ['shared'],
         ];
 
@@ -114,10 +113,8 @@ class Mempool extends DeviceRelatedModel implements Keyable
 
                 return $this;
             }
-            if ($descr == 'virtual memory' && ! empty($this->mempool_class)) {
-                dd('here', $this->toArray());
-            }
         }
+        $this->mempool_class = 'system'; // just call everything else system
 
         return $this;
     }

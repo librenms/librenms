@@ -2642,6 +2642,7 @@
                     "mempool_index": "CNBJHMV0WN",
                     "entPhysicalIndex": null,
                     "mempool_type": "aruba-instant",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Instant-ap-src-1 [CNBJHMV0WN]",
                     "mempool_perc": 34,

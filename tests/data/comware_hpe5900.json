@@ -247,6 +247,7 @@
                     "mempool_index": "192",
                     "entPhysicalIndex": null,
                     "mempool_type": "comware",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Board",
                     "mempool_perc": 32,

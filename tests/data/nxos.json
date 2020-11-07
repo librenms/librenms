@@ -6,6 +6,7 @@
                     "mempool_index": "1",
                     "entPhysicalIndex": null,
                     "mempool_type": "cpm",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Processor 1 Memory",
                     "mempool_perc": 27,

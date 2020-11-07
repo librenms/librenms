@@ -11182,6 +11182,7 @@
                     "mempool_index": ".3.10.0",
                     "entPhysicalIndex": null,
                     "mempool_type": "avaya-ers",
+                    "mempool_class": "system",
                     "mempool_precision": 1048576,
                     "mempool_descr": "Unit 1 Memory",
                     "mempool_perc": 62,

@@ -7776,6 +7776,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "sonicwall-mem",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory Utilization",
                     "mempool_perc": 23,

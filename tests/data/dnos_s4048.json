@@ -36891,6 +36891,7 @@
                     "mempool_index": "stack.1.1",
                     "entPhysicalIndex": null,
                     "mempool_type": "dell-net",
+                    "mempool_class": "system",
                     "mempool_precision": 1048576,
                     "mempool_descr": "Memory Usage",
                     "mempool_perc": 30,

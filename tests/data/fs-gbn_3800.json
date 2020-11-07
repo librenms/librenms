@@ -23826,6 +23826,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "fs-gbn",
+                    "mempool_class": "system",
                     "mempool_precision": 1048576,
                     "mempool_descr": "ARM Cortex-A9, 400MHz Memory",
                     "mempool_perc": 44,

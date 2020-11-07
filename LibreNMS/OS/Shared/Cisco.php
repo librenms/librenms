@@ -133,6 +133,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                     'mempool_index' => $index,
                     'entPhysicalIndex' => $entPhysicalIndex,
                     'mempool_type' => 'cemp',
+                    'mempool_class' => 'system',
                     'mempool_precision' => 1,
                     'mempool_descr' => $descr,
                     'mempool_used_oid' => isset($entry['cempMemPoolHCUsed']) ? ".1.3.6.1.4.1.9.9.221.1.1.1.1.18.$index" : ".1.3.6.1.4.1.9.9.221.1.1.1.1.7.$index",
@@ -154,6 +155,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                 $mempools->push((new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'cmp',
+                    'mempool_class' => 'system',
                     'mempool_precision' => 1,
                     'mempool_descr' => $entry['ciscoMemoryPoolName'],
                     'mempool_used_oid' => ".1.3.6.1.4.1.9.9.48.1.1.1.5.$index",
@@ -179,6 +181,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDisco
                 $mempools->push((new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'cpm',
+                    'mempool_class' => 'system',
                     'mempool_precision' => 1024,
                     'mempool_descr' => "$cpu Memory",
                     'mempool_used_oid' => empty($entry['cpmCPUMemoryHCUsed']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.12.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.17.$index",

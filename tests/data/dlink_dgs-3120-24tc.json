@@ -6278,6 +6278,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "dlink",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory",
                     "mempool_perc": 96,

@@ -11856,6 +11856,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "aos7",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Device Memory",
                     "mempool_perc": 54,

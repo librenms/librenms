@@ -62,6 +62,7 @@
                     "mempool_index": "1",
                     "entPhysicalIndex": null,
                     "mempool_type": "jetstream",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory #1",
                     "mempool_perc": 75,

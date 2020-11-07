@@ -7134,6 +7134,7 @@
                     "mempool_index": "9",
                     "entPhysicalIndex": null,
                     "mempool_type": "vrp",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "SRU Board 0 Memory",
                     "mempool_perc": 36,

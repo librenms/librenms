@@ -13982,6 +13982,7 @@
                     "mempool_index": "67108873",
                     "entPhysicalIndex": null,
                     "mempool_type": "vrp",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "MPU Board 0 Memory",
                     "mempool_perc": 9,

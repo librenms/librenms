@@ -842,6 +842,7 @@
                     "mempool_index": "1",
                     "entPhysicalIndex": null,
                     "mempool_type": "patton-sn",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "System Heap Memory",
                     "mempool_perc": 4,

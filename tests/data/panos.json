@@ -5714,6 +5714,7 @@
                     "mempool_index": "1020",
                     "entPhysicalIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Slot-1 Management Memory",
                     "mempool_perc": 48,

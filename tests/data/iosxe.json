@@ -7097,6 +7097,7 @@
                     "mempool_index": "7",
                     "entPhysicalIndex": null,
                     "mempool_type": "cpm",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "cpu R0/0 Memory",
                     "mempool_perc": 83,

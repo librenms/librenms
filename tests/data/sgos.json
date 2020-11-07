@@ -952,6 +952,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "sgos",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "ProxySG Memory",
                     "mempool_perc": 6,

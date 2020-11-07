@@ -46,6 +46,7 @@ class Edgecos extends OS implements ProcessorDiscovery
         $mempool = new Mempool([
             'mempool_index' => 0,
             'mempool_type' => 'edgecos',
+            'mempool_class' => 'system',
             'mempool_precision' => 1,
             'mempool_descr' => 'Memory',
             'mempool_perc_warn' => 90,

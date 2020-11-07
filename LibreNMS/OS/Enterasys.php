@@ -44,6 +44,7 @@ class Enterasys extends \LibreNMS\OS
                 $mempools->push((new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'enterasys',
+                    'mempool_class' => 'system',
                     'mempool_descr' => $descr,
                     'mempool_precision' => 1024,
                     'mempool_free_oid' => ".1.3.6.1.4.1.5624.1.2.49.1.3.1.1.5.$index.2.$mem_id",

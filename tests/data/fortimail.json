@@ -928,6 +928,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "fortimail",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Physical Memory",
                     "mempool_perc": 42,

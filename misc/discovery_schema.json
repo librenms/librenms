@@ -55,6 +55,9 @@
                                     "type": {
                                         "type": "string"
                                     },
+                                    "class": {
+                                        "type": "string"
+                                    },
                                     "used": {
                                         "type": "string"
                                     },

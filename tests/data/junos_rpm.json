@@ -12495,6 +12495,7 @@
                     "mempool_index": "9.1.0.0",
                     "entPhysicalIndex": null,
                     "mempool_type": "junos",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Routing Engine",
                     "mempool_perc": 70,

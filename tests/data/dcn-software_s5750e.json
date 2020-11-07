@@ -62,6 +62,7 @@
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
                     "mempool_type": "dcn-software",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory Usage",
                     "mempool_perc": 81,
