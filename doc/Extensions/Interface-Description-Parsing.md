@@ -52,7 +52,7 @@ This requires an additional script to be [setup](#setup)
 The following config options can be set to enable more custom types:
 
 ```php
-$config['customers_descr'][]         = 'cust';
+$config['customers_descr']           = 'cust';
 $config['transit_descr'][]           = "transit";
 $config['peering_descr'][]           = "peering";
 $config['core_descr'][]              = "core";
