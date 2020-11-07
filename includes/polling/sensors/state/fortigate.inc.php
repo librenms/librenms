@@ -24,7 +24,7 @@
 if ($device['os'] == 'fortigate') {
     if (in_array($sensor['sensor_type'], ['clusterState', 'haSyncStatus'])) {
         // Fetch the cluster members and their data
-        $fgHaStatsEntryOid = '.1.3.6.1.4.1.12356.101.13.2.1.1';
+        $fgHaStatsEntryOid = 'fgHaStatsEntry';
         $haStatsEntries = snmpwalk_cache_multi_oid($device, $fgHaStatsEntryOid, [], 'FORTINET-FORTIGATE-MIB');
 
         if ($sensor['sensor_type'] == 'clusterState') {

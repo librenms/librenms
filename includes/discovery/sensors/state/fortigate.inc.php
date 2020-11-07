@@ -22,12 +22,12 @@
  * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
  */
 $index = 0;
-$fgHaSystemModeOid = '.1.3.6.1.4.1.12356.101.13.1.1.0';
+$fgHaSystemModeOid = 'fgHaSystemMode.0';
 $systemMode = snmp_get($device, $fgHaSystemModeOid, '-Ovq', 'FORTINET-FORTIGATE-MIB');
 
 // Verify that the device is clustered
 if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
-    $fgHaStatsEntryOid = '.1.3.6.1.4.1.12356.101.13.2.1.1';
+    $fgHaStatsEntryOid = 'fgHaStatsEntry';
 
     // Fetch the cluster members
     $haStatsEntries = snmpwalk_cache_multi_oid($device, $fgHaStatsEntryOid, [], 'FORTINET-FORTIGATE-MIB');
