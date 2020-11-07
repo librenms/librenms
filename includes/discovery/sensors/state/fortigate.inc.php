@@ -38,7 +38,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
 
         $states = [
             ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'CRITICAL'],
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
+            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'OK'],
         ];
 
         create_state_index($stateName, $states);
@@ -78,6 +78,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
         $states = [
             ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'Out Of Sync'],
             ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'In Sync'],
+            ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'No Peer'],
         ];
 
         create_state_index($stateName, $states);
@@ -86,7 +87,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
             $valid['sensor'],
             'state',
             $device,
-            "$fgHaStatsEntryOid",
+            $fgHaStatsEntryOid,
             $index,
             $stateName,
             $descr,
