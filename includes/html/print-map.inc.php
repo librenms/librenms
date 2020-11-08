@@ -14,8 +14,8 @@
 
 use LibreNMS\Config;
 
-$highlight_node = $vars['highlight_node'] ?: 0;
-$group = $vars['group'] ?: 0;
+$highlight_node = $vars['highlight_node'] ?? 0;
+$group = $vars['group'] ?? 0;
 
 //Don't know where this should come from, but it is used later, so I just define it here.
 $row_colour = '#ffffff';
