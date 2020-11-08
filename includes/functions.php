@@ -2072,7 +2072,7 @@ function device_is_up($device, $record_perf = false)
             $type = 'down';
             $reason = $response['status_reason'];
 
-            if ($device['status'] != $response['status'] {
+            if ($device['status'] != $response['status']) {
                 if (! $consider_maintenance || (! $maintenance && $consider_maintenance)) {
                     // use current time as a starting point when an outage starts
                     $data = ['device_id' => $device['device_id'],
