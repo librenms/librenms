@@ -298,11 +298,26 @@ class Vrp extends OS implements
     {
         $nac = collect();
         // We collect the first table
-        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'hwAccessTable', [], 'HUAWEI-AAA-MIB');
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'hwAccessInterface', [], 'HUAWEI-AAA-MIB');
 
         if (! empty($portAuthSessionEntry)) {
-            // If it is not empty, lets add the Extended table
-            $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'hwAccessExtTable', $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
+            // If it is not empty, lets add all the necessary OIDs
+            $hwAccessOids = [
+                'hwAccessMACAddress',
+                'hwAccessDomain',
+                'hwAccessUserName',
+                'hwAccessIPAddress',
+                'hwAccessType',
+                'hwAccessAuthorizetype',
+                'hwAccessSessionTimeout',
+                'hwAccessOnlineTime',
+                'hwAccessCurAuthenPlace',
+                'hwAccessAuthtype',
+                'hwAccessVLANID',
+            ];
+            foreach ($hwAccessOids as $hwAccessOid) {
+                $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), $hwAccessOid, $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
+            }
             // We cache a port_ifName -> port_id map
             $ifName_map = $this->getDevice()->ports()->pluck('port_id', 'ifName');
 
