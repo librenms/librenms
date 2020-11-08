@@ -60,7 +60,7 @@ class VmInfoController implements DeviceTab
     {
         return $device->vmInfo()
         ->select('vmwVmDisplayName', 'vmwVmState', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus')
-        ->with('vmDevice')
+        ->with('parentDevice')
         ->orderBy('vmwVmDisplayName')
         ->get();
     }

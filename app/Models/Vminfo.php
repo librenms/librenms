@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Config;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PowerState;
 use LibreNMS\Util\Rewrite;
@@ -14,22 +17,17 @@ class Vminfo extends DeviceRelatedModel
     protected $table = 'vminfo';
     public $timestamps = false;
 
-    public function vmDevice()
-    {
-        return $this->hasOne('App\Models\Device', 'hostname', 'vmwVmDisplayName');
-    }
-
-    public function getStateLabelAttribute()
+    public function getStateLabelAttribute(): string
     {
         return PowerState::stateLabel($this->vmwVmState);
     }
 
-    public function getMemoryFormattedAttribute()
+    public function getMemoryFormattedAttribute(): string
     {
         return Rewrite::formatStorage($this->vmwVmMemSize * 1024 * 1024);
     }
 
-    public function getOperatingSystemAttribute()
+    public function getOperatingSystemAttribute(): string
     {
         if (Str::contains($this->vmwVmGuestOS, 'tools not installed')) {
             return 'Unknown (VMware Tools not installed)';
@@ -40,5 +38,21 @@ class Vminfo extends DeviceRelatedModel
         } else {
             return Rewrite::vmwareGuest($this->vmwVmGuestOS);
         }
+    }
+
+    public function scopeGuessFromDevice(Builder $query, Device $device): Builder
+    {
+        $where = [$device->hostname];
+
+        if (Config::get('mydomain')) {
+            $where[] = $device->hostname . '.' . Config::get('mydomain');
+        }
+
+        return $query->whereIn('vmwVmDisplayName', $where);
+    }
+
+    public function parentDevice(): HasOne
+    {
+        return $this->hasOne('App\Models\Device', 'hostname', 'vmwVmDisplayName');
     }
 }

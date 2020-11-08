@@ -51,7 +51,7 @@ class VminfoController extends TableController
         return Vminfo::hasAccess($request->user())
             ->select('vminfo.*')
             ->with('device')
-            ->with('vmDevice')
+            ->with('parentDevice')
             ->when($request->get('searchPhrase') || in_array('hostname', array_keys($request->get('sort', []))), function ($query) {
                 $query->leftJoin('devices', 'devices.device_id', 'vminfo.device_id');
             });
@@ -61,7 +61,7 @@ class VminfoController extends TableController
     {
         return [
             'vmwVmState' => '<span class="label ' . $vm->stateLabel[1] . '">' . $vm->stateLabel[0] . '</span>',
-            'vmwVmDisplayName' => is_null($vm->vmDevice) ? $vm->vmwVmDisplayName : self::getHostname($vm->vmDevice),
+            'vmwVmDisplayName' => is_null($vm->parentDevice) ? $vm->vmwVmDisplayName : self::getHostname($vm->parentDevice),
             'vmwVmGuestOS' => $vm->operatingSystem,
             'vmwVmMemSize' => $vm->memoryFormatted,
             'vmwVmCpus' => $vm->vmwVmCpus,

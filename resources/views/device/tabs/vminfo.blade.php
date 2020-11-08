@@ -15,8 +15,8 @@
         @foreach($data['vms'] as $vm)
             <tr>
                 <td>
-                    @if ($vm->vmDevice)
-                        @deviceLink($vm->vmDevice)
+                    @if ($vm->parentDevice)
+                        @deviceLink($vm->parentDevice)
                     @else
                         {{ $vm->vmwVmDisplayName }}
                     @endif
