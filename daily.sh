@@ -130,7 +130,7 @@ set_notifiable_result() {
 #   Exit-Code: 0 >= min ver, 1 < min ver
 #######################################
 check_dependencies() {
-    local branch ver_56 ver_71 ver_72 python3 python_deps phpver pythonver old_branches msg
+    local branch ver_56 ver_71 ver_72 ver_73 python3 python_deps phpver pythonver old_branches msg
 
     branch=$(git rev-parse --abbrev-ref HEAD)
     scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
