@@ -153,7 +153,7 @@ trait HostResources
         return collect($hr_storage)->filter(Closure::fromCallable([$this, 'memValid']))
             ->map(function ($storage, $index) use ($ram_bytes) {
                 $total = $storage['hrStorageSize'];
-                if (Str::contains($storage['hrStorageDescr'], 'Real Memory Metrics') || ($storage['hrStorageType'] == 'hrStorageOther' && $total != 0 )) {
+                if (Str::contains($storage['hrStorageDescr'], 'Real Memory Metrics') || ($storage['hrStorageType'] == 'hrStorageOther' && $total != 0)) {
                     // use total RAM for buffers, cached, and shared
                     // bsnmp does not report the same as net-snmp, total RAM is stored in hrMemorySize
                     if ($ram_bytes) {
