@@ -34,44 +34,6 @@ use Toastr;
 
 class Checks
 {
-    public static function preAutoload()
-    {
-        // Check PHP version otherwise it will just say server error
-        if (version_compare(PHP_VERSION, '7.3', '<')) {
-            self::printMessage(
-                'PHP version 7.3 or newer is required to run LibreNMS',
-                null,
-                true
-            );
-        }
-    }
-
-    /**
-     * Pre-boot dependency check
-     */
-    public static function postAutoload()
-    {
-        if (! class_exists(\Illuminate\Foundation\Application::class)) {
-            self::printMessage(
-                'Error: Missing dependencies! Run the following command to fix:',
-                './scripts/composer_wrapper.php install --no-dev',
-                true
-            );
-        }
-    }
-
-    public static function preBoot()
-    {
-        // check php extensions
-        if ($missing = self::missingPhpExtensions()) {
-            self::printMessage(
-                'Missing PHP extensions.  Please install and enable them on your LibreNMS server.',
-                $missing,
-                true
-            );
-        }
-    }
-
     /**
      * Post boot Toast messages
      */
@@ -155,19 +117,5 @@ class Checks
         if ($exit) {
             exit(1);
         }
-    }
-
-    private static function missingPhpExtensions()
-    {
-        // allow mysqli, but prefer mysqlnd
-        if (! extension_loaded('mysqlnd') && ! extension_loaded('mysqli')) {
-            return ['mysqlnd'];
-        }
-
-        $required_modules = ['mbstring', 'pcre', 'curl', 'xml', 'gd'];
-
-        return array_filter($required_modules, function ($module) {
-            return ! extension_loaded($module);
-        });
     }
 }
