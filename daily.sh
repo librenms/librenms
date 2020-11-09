@@ -247,7 +247,7 @@ version_compare () {
 #   Exit-Code of Command
 #######################################
 main () {
-    local arg old_version new_version old_version branch options
+    local arg old_version new_version branch options
 
     arg="$1"
     old_version="$2"
