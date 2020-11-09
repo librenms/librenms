@@ -15,7 +15,7 @@ class MempoolsAddOids extends Migration
     {
         Schema::table('mempools', function (Blueprint $table) {
             $table->dropColumn('hrDeviceIndex');
-            $table->string('mempool_class', 32)->after('mempool_type');
+            $table->string('mempool_class', 32)->default('system')->after('mempool_type');
             $table->string('mempool_descr', 128)->change();
             $table->string('mempool_perc_oid')->after('mempool_perc')->nullable();
             $table->string('mempool_used_oid')->after('mempool_used')->nullable();
