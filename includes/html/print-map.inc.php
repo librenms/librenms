@@ -14,7 +14,8 @@
 
 use LibreNMS\Config;
 
-$highlight_node = $vars['highlight_node'] | 0;
+$highlight_node = $vars['highlight_node'] ?? 0;
+$group = $vars['group'] ?? 0;
 
 //Don't know where this should come from, but it is used later, so I just define it here.
 $row_colour = '#ffffff';
@@ -44,11 +45,11 @@ $ports = [];
 $devices = [];
 
 $where = '';
-if (is_numeric($vars['group'])) {
+if (is_numeric($group) && $group) {
     $where .= ' AND D1.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
-    $sql_array[] = $vars['group'];
+    $sql_array[] = $group;
     $where .= ' OR D2.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
-    $sql_array[] = $vars['group'];
+    $sql_array[] = $group;
 }
 
 if (in_array('mac', Config::get('network_map_items'))) {
@@ -385,7 +386,12 @@ var network = new vis.Network(container, data, options);
 
 function highlightNode(e) {
     highlight_node = document.getElementById("highlight_node").value;
-    window.location.pathname = 'map/highlight_node=' + highlight_node;
+    <?php
+    if ($group) {
+        echo "window.location.pathname = 'map/group=" . $group . "/highlight_node=' + highlight_node;";
+    } else {
+        echo "window.location.pathname = 'map/highlight_node=' + highlight_node;";
+    } ?>
 }
 
 $('#highlight_node option[value="<?=$highlight_node?>"]').prop('selected', true);
