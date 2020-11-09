@@ -4,12 +4,12 @@ F5-BIGIP-APM-MIB DEFINITIONS ::= BEGIN
 -- F5-BIGIP-APM-MIB 
 --     A private enterprise MIB for F5  traffic management 
 --     systems.
---     VERSION: 11.6.1
+--     VERSION: 14.1.2.7
 --================================================================
 
 IMPORTS
     OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
-    Integer32, Opaque, enterprises, Counter32, Counter64, TimeTicks
+    Opaque, enterprises, Counter32, Counter64, TimeTicks
         FROM SNMPv2-SMI
 
     Gauge 
@@ -29,7 +29,7 @@ IMPORTS
 
 --================================================================
 bigipApm MODULE-IDENTITY
-    LAST-UPDATED "201507231521Z" -- Thu Jul 23 15:21:23 UTC 2015 
+    LAST-UPDATED "201610051918Z" -- Wed Oct  5 19:18:17 UTC 2016 
     ORGANIZATION "F5 Networks, Inc."
     CONTACT-INFO
          "postal: F5 Networks, Inc. 
@@ -58,6 +58,9 @@ apmLeasepool                   OBJECT IDENTIFIER ::= { bigipApm 2 }
 apmLeasepoolStat               OBJECT IDENTIFIER ::= { apmLeasepool 1 }
 apmAcl                         OBJECT IDENTIFIER ::= { bigipApm 3 }
 apmAclStat                     OBJECT IDENTIFIER ::= { apmAcl 1 }
+apmGlobalLicenseStat           OBJECT IDENTIFIER ::= { apmProfiles 9 }
+apmIpv6Leasepool               OBJECT IDENTIFIER ::= { bigipApm 4 }
+apmIpv6LeasepoolStat           OBJECT IDENTIFIER ::= { apmIpv6Leasepool 1 }
 
 
 --==================================================================
@@ -68,8 +71,8 @@ apmPaStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmProfileAccessStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmProfileAccessStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmProfileAccessStat 1 } 
 
@@ -103,233 +106,235 @@ apmPaStatEntry OBJECT-TYPE
 
 ApmPaStatEntry ::= 
 	SEQUENCE {
-        	apmPaStatName                                          LongDisplayString,
-        	apmPaStatConfigSyncState                               Counter64,
-        	apmPaStatTotalSessions                                 Counter64,
-        	apmPaStatTotalEstablishedStateSessions                 Counter64,
-        	apmPaStatCurrentActiveSessions                         Counter64,
-        	apmPaStatCurrentPendingSessions                        Counter64,
-        	apmPaStatCurrentCompletedSessions                      Counter64,
-        	apmPaStatUserLoggedoutSessions                         Counter64,
-        	apmPaStatAdminTerminatedSessions                       Counter64,
-        	apmPaStatMiscTerminatedSessions                        Counter64,
-        	apmPaStatAccessPolicyResultAllow                       Counter64,
-        	apmPaStatAccessPolicyResultDeny                        Counter64,
-        	apmPaStatAccessPolicyResultRedirect                    Counter64,
-        	apmPaStatAccessPolicyResultRedirectWithSession         Counter64,
-        	apmPaStatEndingDenyAgentTotalInstances                 Counter64,
-        	apmPaStatEndingDenyAgentTotalUsages                    Counter64,
-        	apmPaStatEndingDenyAgentTotalSuccesses                 Counter64,
-        	apmPaStatEndingDenyAgentTotalFailures                  Counter64,
-        	apmPaStatEndingDenyAgentTotalErrors                    Counter64,
-        	apmPaStatEndingDenyAgentTotalSessVars                  Counter64,
-        	apmPaStatEndingRedirectAgentTotalInstances             Counter64,
-        	apmPaStatEndingRedirectAgentTotalUsages                Counter64,
-        	apmPaStatEndingRedirectAgentTotalSuccesses             Counter64,
-        	apmPaStatEndingRedirectAgentTotalFailures              Counter64,
-        	apmPaStatEndingRedirectAgentTotalErrors                Counter64,
-        	apmPaStatEndingRedirectAgentTotalSessVars              Counter64,
-        	apmPaStatEndingAllowAgentTotalInstances                Counter64,
-        	apmPaStatEndingAllowAgentTotalUsages                   Counter64,
-        	apmPaStatEndingAllowAgentTotalSuccesses                Counter64,
-        	apmPaStatEndingAllowAgentTotalFailures                 Counter64,
-        	apmPaStatEndingAllowAgentTotalErrors                   Counter64,
-        	apmPaStatEndingAllowAgentTotalSessVars                 Counter64,
-        	apmPaStatAdAgentTotalInstances                         Counter64,
-        	apmPaStatAdAgentTotalUsages                            Counter64,
-        	apmPaStatAdAgentTotalSuccesses                         Counter64,
-        	apmPaStatAdAgentTotalFailures                          Counter64,
-        	apmPaStatAdAgentTotalErrors                            Counter64,
-        	apmPaStatAdAgentTotalSessVars                          Counter64,
-        	apmPaStatClientCertAgentTotalInstances                 Counter64,
-        	apmPaStatClientCertAgentTotalUsages                    Counter64,
-        	apmPaStatClientCertAgentTotalSuccesses                 Counter64,
-        	apmPaStatClientCertAgentTotalFailures                  Counter64,
-        	apmPaStatClientCertAgentTotalErrors                    Counter64,
-        	apmPaStatClientCertAgentTotalSessVars                  Counter64,
-        	apmPaStatHttpAgentTotalInstances                       Counter64,
-        	apmPaStatHttpAgentTotalUsages                          Counter64,
-        	apmPaStatHttpAgentTotalSuccesses                       Counter64,
-        	apmPaStatHttpAgentTotalFailures                        Counter64,
-        	apmPaStatHttpAgentTotalErrors                          Counter64,
-        	apmPaStatHttpAgentTotalSessVars                        Counter64,
-        	apmPaStatLdapAgentTotalInstances                       Counter64,
-        	apmPaStatLdapAgentTotalUsages                          Counter64,
-        	apmPaStatLdapAgentTotalSuccesses                       Counter64,
-        	apmPaStatLdapAgentTotalFailures                        Counter64,
-        	apmPaStatLdapAgentTotalErrors                          Counter64,
-        	apmPaStatLdapAgentTotalSessVars                        Counter64,
-        	apmPaStatRadiusAgentTotalInstances                     Counter64,
-        	apmPaStatRadiusAgentTotalUsages                        Counter64,
-        	apmPaStatRadiusAgentTotalSuccesses                     Counter64,
-        	apmPaStatRadiusAgentTotalFailures                      Counter64,
-        	apmPaStatRadiusAgentTotalErrors                        Counter64,
-        	apmPaStatRadiusAgentTotalSessVars                      Counter64,
-        	apmPaStatSecuridAgentTotalInstances                    Counter64,
-        	apmPaStatSecuridAgentTotalUsages                       Counter64,
-        	apmPaStatSecuridAgentTotalSuccesses                    Counter64,
-        	apmPaStatSecuridAgentTotalFailures                     Counter64,
-        	apmPaStatSecuridAgentTotalErrors                       Counter64,
-        	apmPaStatSecuridAgentTotalSessVars                     Counter64,
-        	apmPaStatRadiusAcctAgentTotalInstances                 Counter64,
-        	apmPaStatRadiusAcctAgentTotalUsages                    Counter64,
-        	apmPaStatRadiusAcctAgentTotalSuccesses                 Counter64,
-        	apmPaStatRadiusAcctAgentTotalFailures                  Counter64,
-        	apmPaStatRadiusAcctAgentTotalErrors                    Counter64,
-        	apmPaStatRadiusAcctAgentTotalSessVars                  Counter64,
-        	apmPaStatEpsLinuxFcAgentTotalInstances                 Counter64,
-        	apmPaStatEpsLinuxFcAgentTotalUsages                    Counter64,
-        	apmPaStatEpsLinuxFcAgentTotalSuccesses                 Counter64,
-        	apmPaStatEpsLinuxFcAgentTotalFailures                  Counter64,
-        	apmPaStatEpsLinuxFcAgentTotalErrors                    Counter64,
-        	apmPaStatEpsLinuxFcAgentTotalSessVars                  Counter64,
-        	apmPaStatEpsLinuxPcAgentTotalInstances                 Counter64,
-        	apmPaStatEpsLinuxPcAgentTotalUsages                    Counter64,
-        	apmPaStatEpsLinuxPcAgentTotalSuccesses                 Counter64,
-        	apmPaStatEpsLinuxPcAgentTotalFailures                  Counter64,
-        	apmPaStatEpsLinuxPcAgentTotalErrors                    Counter64,
-        	apmPaStatEpsLinuxPcAgentTotalSessVars                  Counter64,
-        	apmPaStatEpsMacFcAgentTotalInstances                   Counter64,
-        	apmPaStatEpsMacFcAgentTotalUsages                      Counter64,
-        	apmPaStatEpsMacFcAgentTotalSuccesses                   Counter64,
-        	apmPaStatEpsMacFcAgentTotalFailures                    Counter64,
-        	apmPaStatEpsMacFcAgentTotalErrors                      Counter64,
-        	apmPaStatEpsMacFcAgentTotalSessVars                    Counter64,
-        	apmPaStatEpsMacPcAgentTotalInstances                   Counter64,
-        	apmPaStatEpsMacPcAgentTotalUsages                      Counter64,
-        	apmPaStatEpsMacPcAgentTotalSuccesses                   Counter64,
-        	apmPaStatEpsMacPcAgentTotalFailures                    Counter64,
-        	apmPaStatEpsMacPcAgentTotalErrors                      Counter64,
-        	apmPaStatEpsMacPcAgentTotalSessVars                    Counter64,
-        	apmPaStatEpsWinCcAgentTotalInstances                   Counter64,
-        	apmPaStatEpsWinCcAgentTotalUsages                      Counter64,
-        	apmPaStatEpsWinCcAgentTotalSuccesses                   Counter64,
-        	apmPaStatEpsWinCcAgentTotalFailures                    Counter64,
-        	apmPaStatEpsWinCcAgentTotalErrors                      Counter64,
-        	apmPaStatEpsWinCcAgentTotalSessVars                    Counter64,
-        	apmPaStatEpsAvAgentTotalInstances                      Counter64,
-        	apmPaStatEpsAvAgentTotalUsages                         Counter64,
-        	apmPaStatEpsAvAgentTotalSuccesses                      Counter64,
-        	apmPaStatEpsAvAgentTotalFailures                       Counter64,
-        	apmPaStatEpsAvAgentTotalErrors                         Counter64,
-        	apmPaStatEpsAvAgentTotalSessVars                       Counter64,
-        	apmPaStatEpsWinOsInfoAgentTotalInstances               Counter64,
-        	apmPaStatEpsWinOsInfoAgentTotalUsages                  Counter64,
-        	apmPaStatEpsWinOsInfoAgentTotalSuccesses               Counter64,
-        	apmPaStatEpsWinOsInfoAgentTotalFailures                Counter64,
-        	apmPaStatEpsWinOsInfoAgentTotalErrors                  Counter64,
-        	apmPaStatEpsWinOsInfoAgentTotalSessVars                Counter64,
-        	apmPaStatEpsWinFcAgentTotalInstances                   Counter64,
-        	apmPaStatEpsWinFcAgentTotalUsages                      Counter64,
-        	apmPaStatEpsWinFcAgentTotalSuccesses                   Counter64,
-        	apmPaStatEpsWinFcAgentTotalFailures                    Counter64,
-        	apmPaStatEpsWinFcAgentTotalErrors                      Counter64,
-        	apmPaStatEpsWinFcAgentTotalSessVars                    Counter64,
-        	apmPaStatEpsWinMcAgentTotalInstances                   Counter64,
-        	apmPaStatEpsWinMcAgentTotalUsages                      Counter64,
-        	apmPaStatEpsWinMcAgentTotalSuccesses                   Counter64,
-        	apmPaStatEpsWinMcAgentTotalFailures                    Counter64,
-        	apmPaStatEpsWinMcAgentTotalErrors                      Counter64,
-        	apmPaStatEpsWinMcAgentTotalSessVars                    Counter64,
-        	apmPaStatEpsFwcAgentTotalInstances                     Counter64,
-        	apmPaStatEpsFwcAgentTotalUsages                        Counter64,
-        	apmPaStatEpsFwcAgentTotalSuccesses                     Counter64,
-        	apmPaStatEpsFwcAgentTotalFailures                      Counter64,
-        	apmPaStatEpsFwcAgentTotalErrors                        Counter64,
-        	apmPaStatEpsFwcAgentTotalSessVars                      Counter64,
-        	apmPaStatEpsWinPcTotalInstances                        Counter64,
-        	apmPaStatEpsWinPcTotalUsages                           Counter64,
-        	apmPaStatEpsWinPcTotalSuccesses                        Counter64,
-        	apmPaStatEpsWinPcTotalFailures                         Counter64,
-        	apmPaStatEpsWinPcTotalErrors                           Counter64,
-        	apmPaStatEpsWinPcTotalSessVars                         Counter64,
-        	apmPaStatEpsWinPwTotalInstances                        Counter64,
-        	apmPaStatEpsWinPwTotalUsages                           Counter64,
-        	apmPaStatEpsWinPwTotalSuccesses                        Counter64,
-        	apmPaStatEpsWinPwTotalFailures                         Counter64,
-        	apmPaStatEpsWinPwTotalErrors                           Counter64,
-        	apmPaStatEpsWinPwTotalSessVars                         Counter64,
-        	apmPaStatEpsWinRcAgentTotalInstances                   Counter64,
-        	apmPaStatEpsWinRcAgentTotalUsages                      Counter64,
-        	apmPaStatEpsWinRcAgentTotalSuccesses                   Counter64,
-        	apmPaStatEpsWinRcAgentTotalFailures                    Counter64,
-        	apmPaStatEpsWinRcAgentTotalErrors                      Counter64,
-        	apmPaStatEpsWinRcAgentTotalSessVars                    Counter64,
-        	apmPaStatEpsWinGpAgentTotalInstances                   Counter64,
-        	apmPaStatEpsWinGpAgentTotalUsages                      Counter64,
-        	apmPaStatEpsWinGpAgentTotalSuccesses                   Counter64,
-        	apmPaStatEpsWinGpAgentTotalFailures                    Counter64,
-        	apmPaStatEpsWinGpAgentTotalErrors                      Counter64,
-        	apmPaStatEpsWinGpAgentTotalSessVars                    Counter64,
-        	apmPaStatExternalLogonAgentTotalInstances              Counter64,
-        	apmPaStatExternalLogonAgentTotalUsages                 Counter64,
-        	apmPaStatExternalLogonAgentTotalSuccesses              Counter64,
-        	apmPaStatExternalLogonAgentTotalFailures               Counter64,
-        	apmPaStatExternalLogonAgentTotalErrors                 Counter64,
-        	apmPaStatExternalLogonAgentTotalSessVars               Counter64,
-        	apmPaStatLogonAgentTotalInstances                      Counter64,
-        	apmPaStatLogonAgentTotalUsages                         Counter64,
-        	apmPaStatLogonAgentTotalSuccesses                      Counter64,
-        	apmPaStatLogonAgentTotalFailures                       Counter64,
-        	apmPaStatLogonAgentTotalErrors                         Counter64,
-        	apmPaStatLogonAgentTotalSessVars                       Counter64,
-        	apmPaStatRaAgentTotalInstances                         Counter64,
-        	apmPaStatRaAgentTotalUsages                            Counter64,
-        	apmPaStatRaAgentTotalSuccesses                         Counter64,
-        	apmPaStatRaAgentTotalFailures                          Counter64,
-        	apmPaStatRaAgentTotalErrors                            Counter64,
-        	apmPaStatRaAgentTotalSessVars                          Counter64,
-        	apmPaStatRdsAgentTotalInstances                        Counter64,
-        	apmPaStatRdsAgentTotalUsages                           Counter64,
-        	apmPaStatRdsAgentTotalSuccesses                        Counter64,
-        	apmPaStatRdsAgentTotalFailures                         Counter64,
-        	apmPaStatRdsAgentTotalErrors                           Counter64,
-        	apmPaStatRdsAgentTotalSessVars                         Counter64,
-        	apmPaStatVaAgentTotalInstances                         Counter64,
-        	apmPaStatVaAgentTotalUsages                            Counter64,
-        	apmPaStatVaAgentTotalSuccesses                         Counter64,
-        	apmPaStatVaAgentTotalFailures                          Counter64,
-        	apmPaStatVaAgentTotalErrors                            Counter64,
-        	apmPaStatVaAgentTotalSessVars                          Counter64,
-        	apmPaStatIeAgentTotalInstances                         Counter64,
-        	apmPaStatIeAgentTotalUsages                            Counter64,
-        	apmPaStatIeAgentTotalSuccesses                         Counter64,
-        	apmPaStatIeAgentTotalFailures                          Counter64,
-        	apmPaStatIeAgentTotalErrors                            Counter64,
-        	apmPaStatIeAgentTotalSessVars                          Counter64,
-        	apmPaStatLoggingAgentTotalInstances                    Counter64,
-        	apmPaStatLoggingAgentTotalUsages                       Counter64,
-        	apmPaStatLoggingAgentTotalSuccesses                    Counter64,
-        	apmPaStatLoggingAgentTotalFailures                     Counter64,
-        	apmPaStatLoggingAgentTotalErrors                       Counter64,
-        	apmPaStatLoggingAgentTotalSessVars                     Counter64,
-        	apmPaStatDecnBoxAgentTotalInstances                    Counter64,
-        	apmPaStatDecnBoxAgentTotalUsages                       Counter64,
-        	apmPaStatDecnBoxAgentTotalSuccesses                    Counter64,
-        	apmPaStatDecnBoxAgentTotalFailures                     Counter64,
-        	apmPaStatDecnBoxAgentTotalErrors                       Counter64,
-        	apmPaStatDecnBoxAgentTotalSessVars                     Counter64,
-        	apmPaStatMesgBoxAgentTotalInstances                    Counter64,
-        	apmPaStatMesgBoxAgentTotalUsages                       Counter64,
-        	apmPaStatMesgBoxAgentTotalSuccesses                    Counter64,
-        	apmPaStatMesgBoxAgentTotalFailures                     Counter64,
-        	apmPaStatMesgBoxAgentTotalErrors                       Counter64,
-        	apmPaStatMesgBoxAgentTotalSessVars                     Counter64,
-        	apmPaStatApdNoResultErrors                             Counter64,
-        	apmPaStatApdNoSessionErrors                            Counter64,
-        	apmPaStatApdNoDeviceInfoErrors                         Counter64,
-        	apmPaStatApdNoTokenErrors                              Counter64,
-        	apmPaStatApdNoSigErrors                                Counter64,
-        	apmPaStatApdTotalMismatchErrors                        Counter64,
-        	apmPaStatApdInvalidSigErrors                           Counter64,
-        	apmPaStatApdMcPipelineInitErrors                       Counter64,
-        	apmPaStatApdMcSetSessVarErrors                         Counter64,
-        	apmPaStatApdMcPipelineCloseErrors                      Counter64,
-        	apmPaStatApdApResultErrors                             Counter64,
-        	apmPaStatApdApInternalErrors                           Counter64,
-        	apmPaStatAllowedRequests                               Counter64,
-        	apmPaStatDeniedRequests                                Counter64,
-        	apmPaStatVsName                                        LongDisplayString
+        	apmPaStatName                                             LongDisplayString,
+        	apmPaStatConfigSyncState                                  Counter64,
+        	apmPaStatTotalSessions                                    Counter64,
+        	apmPaStatTotalEstablishedStateSessions                    Counter64,
+        	apmPaStatCurrentActiveSessions                            Counter64,
+        	apmPaStatCurrentPendingSessions                           Counter64,
+        	apmPaStatCurrentCompletedSessions                         Counter64,
+        	apmPaStatUserLoggedoutSessions                            Counter64,
+        	apmPaStatAdminTerminatedSessions                          Counter64,
+        	apmPaStatMiscTerminatedSessions                           Counter64,
+        	apmPaStatAccessPolicyResultAllow                          Counter64,
+        	apmPaStatAccessPolicyResultDeny                           Counter64,
+        	apmPaStatAccessPolicyResultRedirect                       Counter64,
+        	apmPaStatAccessPolicyResultRedirectWithSession            Counter64,
+        	apmPaStatEndingDenyAgentTotalInstances                    Counter64,
+        	apmPaStatEndingDenyAgentTotalUsages                       Counter64,
+        	apmPaStatEndingDenyAgentTotalSuccesses                    Counter64,
+        	apmPaStatEndingDenyAgentTotalFailures                     Counter64,
+        	apmPaStatEndingDenyAgentTotalErrors                       Counter64,
+        	apmPaStatEndingDenyAgentTotalSessVars                     Counter64,
+        	apmPaStatEndingRedirectAgentTotalInstances                Counter64,
+        	apmPaStatEndingRedirectAgentTotalUsages                   Counter64,
+        	apmPaStatEndingRedirectAgentTotalSuccesses                Counter64,
+        	apmPaStatEndingRedirectAgentTotalFailures                 Counter64,
+        	apmPaStatEndingRedirectAgentTotalErrors                   Counter64,
+        	apmPaStatEndingRedirectAgentTotalSessVars                 Counter64,
+        	apmPaStatEndingAllowAgentTotalInstances                   Counter64,
+        	apmPaStatEndingAllowAgentTotalUsages                      Counter64,
+        	apmPaStatEndingAllowAgentTotalSuccesses                   Counter64,
+        	apmPaStatEndingAllowAgentTotalFailures                    Counter64,
+        	apmPaStatEndingAllowAgentTotalErrors                      Counter64,
+        	apmPaStatEndingAllowAgentTotalSessVars                    Counter64,
+        	apmPaStatAdAgentTotalInstances                            Counter64,
+        	apmPaStatAdAgentTotalUsages                               Counter64,
+        	apmPaStatAdAgentTotalSuccesses                            Counter64,
+        	apmPaStatAdAgentTotalFailures                             Counter64,
+        	apmPaStatAdAgentTotalErrors                               Counter64,
+        	apmPaStatAdAgentTotalSessVars                             Counter64,
+        	apmPaStatClientCertAgentTotalInstances                    Counter64,
+        	apmPaStatClientCertAgentTotalUsages                       Counter64,
+        	apmPaStatClientCertAgentTotalSuccesses                    Counter64,
+        	apmPaStatClientCertAgentTotalFailures                     Counter64,
+        	apmPaStatClientCertAgentTotalErrors                       Counter64,
+        	apmPaStatClientCertAgentTotalSessVars                     Counter64,
+        	apmPaStatHttpAgentTotalInstances                          Counter64,
+        	apmPaStatHttpAgentTotalUsages                             Counter64,
+        	apmPaStatHttpAgentTotalSuccesses                          Counter64,
+        	apmPaStatHttpAgentTotalFailures                           Counter64,
+        	apmPaStatHttpAgentTotalErrors                             Counter64,
+        	apmPaStatHttpAgentTotalSessVars                           Counter64,
+        	apmPaStatLdapAgentTotalInstances                          Counter64,
+        	apmPaStatLdapAgentTotalUsages                             Counter64,
+        	apmPaStatLdapAgentTotalSuccesses                          Counter64,
+        	apmPaStatLdapAgentTotalFailures                           Counter64,
+        	apmPaStatLdapAgentTotalErrors                             Counter64,
+        	apmPaStatLdapAgentTotalSessVars                           Counter64,
+        	apmPaStatRadiusAgentTotalInstances                        Counter64,
+        	apmPaStatRadiusAgentTotalUsages                           Counter64,
+        	apmPaStatRadiusAgentTotalSuccesses                        Counter64,
+        	apmPaStatRadiusAgentTotalFailures                         Counter64,
+        	apmPaStatRadiusAgentTotalErrors                           Counter64,
+        	apmPaStatRadiusAgentTotalSessVars                         Counter64,
+        	apmPaStatSecuridAgentTotalInstances                       Counter64,
+        	apmPaStatSecuridAgentTotalUsages                          Counter64,
+        	apmPaStatSecuridAgentTotalSuccesses                       Counter64,
+        	apmPaStatSecuridAgentTotalFailures                        Counter64,
+        	apmPaStatSecuridAgentTotalErrors                          Counter64,
+        	apmPaStatSecuridAgentTotalSessVars                        Counter64,
+        	apmPaStatRadiusAcctAgentTotalInstances                    Counter64,
+        	apmPaStatRadiusAcctAgentTotalUsages                       Counter64,
+        	apmPaStatRadiusAcctAgentTotalSuccesses                    Counter64,
+        	apmPaStatRadiusAcctAgentTotalFailures                     Counter64,
+        	apmPaStatRadiusAcctAgentTotalErrors                       Counter64,
+        	apmPaStatRadiusAcctAgentTotalSessVars                     Counter64,
+        	apmPaStatEpsLinuxFcAgentTotalInstances                    Counter64,
+        	apmPaStatEpsLinuxFcAgentTotalUsages                       Counter64,
+        	apmPaStatEpsLinuxFcAgentTotalSuccesses                    Counter64,
+        	apmPaStatEpsLinuxFcAgentTotalFailures                     Counter64,
+        	apmPaStatEpsLinuxFcAgentTotalErrors                       Counter64,
+        	apmPaStatEpsLinuxFcAgentTotalSessVars                     Counter64,
+        	apmPaStatEpsLinuxPcAgentTotalInstances                    Counter64,
+        	apmPaStatEpsLinuxPcAgentTotalUsages                       Counter64,
+        	apmPaStatEpsLinuxPcAgentTotalSuccesses                    Counter64,
+        	apmPaStatEpsLinuxPcAgentTotalFailures                     Counter64,
+        	apmPaStatEpsLinuxPcAgentTotalErrors                       Counter64,
+        	apmPaStatEpsLinuxPcAgentTotalSessVars                     Counter64,
+        	apmPaStatEpsMacFcAgentTotalInstances                      Counter64,
+        	apmPaStatEpsMacFcAgentTotalUsages                         Counter64,
+        	apmPaStatEpsMacFcAgentTotalSuccesses                      Counter64,
+        	apmPaStatEpsMacFcAgentTotalFailures                       Counter64,
+        	apmPaStatEpsMacFcAgentTotalErrors                         Counter64,
+        	apmPaStatEpsMacFcAgentTotalSessVars                       Counter64,
+        	apmPaStatEpsMacPcAgentTotalInstances                      Counter64,
+        	apmPaStatEpsMacPcAgentTotalUsages                         Counter64,
+        	apmPaStatEpsMacPcAgentTotalSuccesses                      Counter64,
+        	apmPaStatEpsMacPcAgentTotalFailures                       Counter64,
+        	apmPaStatEpsMacPcAgentTotalErrors                         Counter64,
+        	apmPaStatEpsMacPcAgentTotalSessVars                       Counter64,
+        	apmPaStatEpsWinCcAgentTotalInstances                      Counter64,
+        	apmPaStatEpsWinCcAgentTotalUsages                         Counter64,
+        	apmPaStatEpsWinCcAgentTotalSuccesses                      Counter64,
+        	apmPaStatEpsWinCcAgentTotalFailures                       Counter64,
+        	apmPaStatEpsWinCcAgentTotalErrors                         Counter64,
+        	apmPaStatEpsWinCcAgentTotalSessVars                       Counter64,
+        	apmPaStatEpsAvAgentTotalInstances                         Counter64,
+        	apmPaStatEpsAvAgentTotalUsages                            Counter64,
+        	apmPaStatEpsAvAgentTotalSuccesses                         Counter64,
+        	apmPaStatEpsAvAgentTotalFailures                          Counter64,
+        	apmPaStatEpsAvAgentTotalErrors                            Counter64,
+        	apmPaStatEpsAvAgentTotalSessVars                          Counter64,
+        	apmPaStatEpsWinOsInfoAgentTotalInstances                  Counter64,
+        	apmPaStatEpsWinOsInfoAgentTotalUsages                     Counter64,
+        	apmPaStatEpsWinOsInfoAgentTotalSuccesses                  Counter64,
+        	apmPaStatEpsWinOsInfoAgentTotalFailures                   Counter64,
+        	apmPaStatEpsWinOsInfoAgentTotalErrors                     Counter64,
+        	apmPaStatEpsWinOsInfoAgentTotalSessVars                   Counter64,
+        	apmPaStatEpsWinFcAgentTotalInstances                      Counter64,
+        	apmPaStatEpsWinFcAgentTotalUsages                         Counter64,
+        	apmPaStatEpsWinFcAgentTotalSuccesses                      Counter64,
+        	apmPaStatEpsWinFcAgentTotalFailures                       Counter64,
+        	apmPaStatEpsWinFcAgentTotalErrors                         Counter64,
+        	apmPaStatEpsWinFcAgentTotalSessVars                       Counter64,
+        	apmPaStatEpsWinMcAgentTotalInstances                      Counter64,
+        	apmPaStatEpsWinMcAgentTotalUsages                         Counter64,
+        	apmPaStatEpsWinMcAgentTotalSuccesses                      Counter64,
+        	apmPaStatEpsWinMcAgentTotalFailures                       Counter64,
+        	apmPaStatEpsWinMcAgentTotalErrors                         Counter64,
+        	apmPaStatEpsWinMcAgentTotalSessVars                       Counter64,
+        	apmPaStatEpsFwcAgentTotalInstances                        Counter64,
+        	apmPaStatEpsFwcAgentTotalUsages                           Counter64,
+        	apmPaStatEpsFwcAgentTotalSuccesses                        Counter64,
+        	apmPaStatEpsFwcAgentTotalFailures                         Counter64,
+        	apmPaStatEpsFwcAgentTotalErrors                           Counter64,
+        	apmPaStatEpsFwcAgentTotalSessVars                         Counter64,
+        	apmPaStatEpsWinPcTotalInstances                           Counter64,
+        	apmPaStatEpsWinPcTotalUsages                              Counter64,
+        	apmPaStatEpsWinPcTotalSuccesses                           Counter64,
+        	apmPaStatEpsWinPcTotalFailures                            Counter64,
+        	apmPaStatEpsWinPcTotalErrors                              Counter64,
+        	apmPaStatEpsWinPcTotalSessVars                            Counter64,
+        	apmPaStatEpsWinPwTotalInstances                           Counter64,
+        	apmPaStatEpsWinPwTotalUsages                              Counter64,
+        	apmPaStatEpsWinPwTotalSuccesses                           Counter64,
+        	apmPaStatEpsWinPwTotalFailures                            Counter64,
+        	apmPaStatEpsWinPwTotalErrors                              Counter64,
+        	apmPaStatEpsWinPwTotalSessVars                            Counter64,
+        	apmPaStatEpsWinRcAgentTotalInstances                      Counter64,
+        	apmPaStatEpsWinRcAgentTotalUsages                         Counter64,
+        	apmPaStatEpsWinRcAgentTotalSuccesses                      Counter64,
+        	apmPaStatEpsWinRcAgentTotalFailures                       Counter64,
+        	apmPaStatEpsWinRcAgentTotalErrors                         Counter64,
+        	apmPaStatEpsWinRcAgentTotalSessVars                       Counter64,
+        	apmPaStatEpsWinGpAgentTotalInstances                      Counter64,
+        	apmPaStatEpsWinGpAgentTotalUsages                         Counter64,
+        	apmPaStatEpsWinGpAgentTotalSuccesses                      Counter64,
+        	apmPaStatEpsWinGpAgentTotalFailures                       Counter64,
+        	apmPaStatEpsWinGpAgentTotalErrors                         Counter64,
+        	apmPaStatEpsWinGpAgentTotalSessVars                       Counter64,
+        	apmPaStatExternalLogonAgentTotalInstances                 Counter64,
+        	apmPaStatExternalLogonAgentTotalUsages                    Counter64,
+        	apmPaStatExternalLogonAgentTotalSuccesses                 Counter64,
+        	apmPaStatExternalLogonAgentTotalFailures                  Counter64,
+        	apmPaStatExternalLogonAgentTotalErrors                    Counter64,
+        	apmPaStatExternalLogonAgentTotalSessVars                  Counter64,
+        	apmPaStatLogonAgentTotalInstances                         Counter64,
+        	apmPaStatLogonAgentTotalUsages                            Counter64,
+        	apmPaStatLogonAgentTotalSuccesses                         Counter64,
+        	apmPaStatLogonAgentTotalFailures                          Counter64,
+        	apmPaStatLogonAgentTotalErrors                            Counter64,
+        	apmPaStatLogonAgentTotalSessVars                          Counter64,
+        	apmPaStatRaAgentTotalInstances                            Counter64,
+        	apmPaStatRaAgentTotalUsages                               Counter64,
+        	apmPaStatRaAgentTotalSuccesses                            Counter64,
+        	apmPaStatRaAgentTotalFailures                             Counter64,
+        	apmPaStatRaAgentTotalErrors                               Counter64,
+        	apmPaStatRaAgentTotalSessVars                             Counter64,
+        	apmPaStatRdsAgentTotalInstances                           Counter64,
+        	apmPaStatRdsAgentTotalUsages                              Counter64,
+        	apmPaStatRdsAgentTotalSuccesses                           Counter64,
+        	apmPaStatRdsAgentTotalFailures                            Counter64,
+        	apmPaStatRdsAgentTotalErrors                              Counter64,
+        	apmPaStatRdsAgentTotalSessVars                            Counter64,
+        	apmPaStatVaAgentTotalInstances                            Counter64,
+        	apmPaStatVaAgentTotalUsages                               Counter64,
+        	apmPaStatVaAgentTotalSuccesses                            Counter64,
+        	apmPaStatVaAgentTotalFailures                             Counter64,
+        	apmPaStatVaAgentTotalErrors                               Counter64,
+        	apmPaStatVaAgentTotalSessVars                             Counter64,
+        	apmPaStatIeAgentTotalInstances                            Counter64,
+        	apmPaStatIeAgentTotalUsages                               Counter64,
+        	apmPaStatIeAgentTotalSuccesses                            Counter64,
+        	apmPaStatIeAgentTotalFailures                             Counter64,
+        	apmPaStatIeAgentTotalErrors                               Counter64,
+        	apmPaStatIeAgentTotalSessVars                             Counter64,
+        	apmPaStatLoggingAgentTotalInstances                       Counter64,
+        	apmPaStatLoggingAgentTotalUsages                          Counter64,
+        	apmPaStatLoggingAgentTotalSuccesses                       Counter64,
+        	apmPaStatLoggingAgentTotalFailures                        Counter64,
+        	apmPaStatLoggingAgentTotalErrors                          Counter64,
+        	apmPaStatLoggingAgentTotalSessVars                        Counter64,
+        	apmPaStatDecnBoxAgentTotalInstances                       Counter64,
+        	apmPaStatDecnBoxAgentTotalUsages                          Counter64,
+        	apmPaStatDecnBoxAgentTotalSuccesses                       Counter64,
+        	apmPaStatDecnBoxAgentTotalFailures                        Counter64,
+        	apmPaStatDecnBoxAgentTotalErrors                          Counter64,
+        	apmPaStatDecnBoxAgentTotalSessVars                        Counter64,
+        	apmPaStatMesgBoxAgentTotalInstances                       Counter64,
+        	apmPaStatMesgBoxAgentTotalUsages                          Counter64,
+        	apmPaStatMesgBoxAgentTotalSuccesses                       Counter64,
+        	apmPaStatMesgBoxAgentTotalFailures                        Counter64,
+        	apmPaStatMesgBoxAgentTotalErrors                          Counter64,
+        	apmPaStatMesgBoxAgentTotalSessVars                        Counter64,
+        	apmPaStatApdNoResultErrors                                Counter64,
+        	apmPaStatApdNoSessionErrors                               Counter64,
+        	apmPaStatApdNoDeviceInfoErrors                            Counter64,
+        	apmPaStatApdNoTokenErrors                                 Counter64,
+        	apmPaStatApdNoSigErrors                                   Counter64,
+        	apmPaStatApdTotalMismatchErrors                           Counter64,
+        	apmPaStatApdInvalidSigErrors                              Counter64,
+        	apmPaStatApdMcPipelineInitErrors                          Counter64,
+        	apmPaStatApdMcSetSessVarErrors                            Counter64,
+        	apmPaStatApdMcPipelineCloseErrors                         Counter64,
+        	apmPaStatApdApResultErrors                                Counter64,
+        	apmPaStatApdApInternalErrors                              Counter64,
+        	apmPaStatAllowedRequests                                  Counter64,
+        	apmPaStatDeniedRequests                                   Counter64,
+        	apmPaStatVsName                                           LongDisplayString,
+        	apmPaStatSessionsEvalTimedOut                             Counter64,
+        	apmPaStatSessionsEstabTimedOut                            Counter64
 	}
 
 apmPaStatName OBJECT-TYPE 
@@ -2359,6 +2364,24 @@ apmPaStatVsName OBJECT-TYPE
 		"The name virtual server in the specified access profile"
 	::= { apmPaStatEntry 227 } 
 
+apmPaStatSessionsEvalTimedOut OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total sessions terminated due to inactivity while going through
+	    access policy evaluation in the specified profile"
+	::= { apmPaStatEntry 228 } 
+
+apmPaStatSessionsEstabTimedOut OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total sessions terminated due to inactivity after completed
+	    access policy evaluation in the specified profile"
+	::= { apmPaStatEntry 229 } 
+
 --==================================================================
 -- Profile_connectivity_stat
 --==================================================================
@@ -2367,8 +2390,8 @@ apmPcStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmProfileConnectivityStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmProfileConnectivityStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmProfileConnectivityStat 1 } 
 
@@ -2401,14 +2424,14 @@ apmPcStatEntry OBJECT-TYPE
 
 ApmPcStatEntry ::= 
 	SEQUENCE {
-        	apmPcStatName                                          LongDisplayString,
-        	apmPcStatTotConns                                      Counter64,
-        	apmPcStatCurConns                                      Counter64,
-        	apmPcStatMaxConns                                      Counter64,
-        	apmPcStatIngressRaw                                    Counter64,
-        	apmPcStatEgressRaw                                     Counter64,
-        	apmPcStatIngressCompressed                             Counter64,
-        	apmPcStatEgressCompressed                              Counter64
+        	apmPcStatName                                             LongDisplayString,
+        	apmPcStatTotConns                                         Counter64,
+        	apmPcStatCurConns                                         Counter64,
+        	apmPcStatMaxConns                                         Counter64,
+        	apmPcStatIngressRaw                                       Counter64,
+        	apmPcStatEgressRaw                                        Counter64,
+        	apmPcStatIngressCompressed                                Counter64,
+        	apmPcStatEgressCompressed                                 Counter64
 	}
 
 apmPcStatName OBJECT-TYPE 
@@ -2483,8 +2506,8 @@ apmPrStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmProfileRewriteStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmProfileRewriteStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmProfileRewriteStat 1 } 
 
@@ -2517,15 +2540,15 @@ apmPrStatEntry OBJECT-TYPE
 
 ApmPrStatEntry ::= 
 	SEQUENCE {
-        	apmPrStatName                                          LongDisplayString,
-        	apmPrStatClientReqBytes                                Counter64,
-        	apmPrStatClientRespBytes                               Counter64,
-        	apmPrStatServerReqBytes                                Counter64,
-        	apmPrStatServerRespBytes                               Counter64,
-        	apmPrStatClientReqs                                    Counter64,
-        	apmPrStatClientResps                                   Counter64,
-        	apmPrStatServerReqs                                    Counter64,
-        	apmPrStatServerResps                                   Counter64
+        	apmPrStatName                                             LongDisplayString,
+        	apmPrStatClientReqBytes                                   Counter64,
+        	apmPrStatClientRespBytes                                  Counter64,
+        	apmPrStatServerReqBytes                                   Counter64,
+        	apmPrStatServerRespBytes                                  Counter64,
+        	apmPrStatClientReqs                                       Counter64,
+        	apmPrStatClientResps                                      Counter64,
+        	apmPrStatServerReqs                                       Counter64,
+        	apmPrStatServerResps                                      Counter64
 	}
 
 apmPrStatName OBJECT-TYPE 
@@ -2608,8 +2631,8 @@ apmPgStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmProfileAccessAgentStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmProfileAccessAgentStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmProfileAccessAgentStat 1 } 
 
@@ -2643,14 +2666,14 @@ apmPgStatEntry OBJECT-TYPE
 
 ApmPgStatEntry ::= 
 	SEQUENCE {
-        	apmPgStatName                                          LongDisplayString,
-        	apmPgStatAgentName                                     LongDisplayString,
-        	apmPgStatInstances                                     Counter64,
-        	apmPgStatUsages                                        Counter64,
-        	apmPgStatSuccesses                                     Counter64,
-        	apmPgStatFailures                                      Counter64,
-        	apmPgStatErrors                                        Counter64,
-        	apmPgStatSessionVars                                   Counter64
+        	apmPgStatName                                             LongDisplayString,
+        	apmPgStatAgentName                                        LongDisplayString,
+        	apmPgStatInstances                                        Counter64,
+        	apmPgStatUsages                                           Counter64,
+        	apmPgStatSuccesses                                        Counter64,
+        	apmPgStatFailures                                         Counter64,
+        	apmPgStatErrors                                           Counter64,
+        	apmPgStatSessionVars                                      Counter64
 	}
 
 apmPgStatName OBJECT-TYPE 
@@ -2725,8 +2748,8 @@ apmPmStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmProfileAccessMiscStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmProfileAccessMiscStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmProfileAccessMiscStat 1 } 
 
@@ -2759,20 +2782,20 @@ apmPmStatEntry OBJECT-TYPE
 
 ApmPmStatEntry ::= 
 	SEQUENCE {
-        	apmPmStatName                                          LongDisplayString,
-        	apmPmStatConfigSyncState                               Counter64,
-        	apmPmStatInspResultError                               Counter64,
-        	apmPmStatInspSessionError                              Counter64,
-        	apmPmStatInspDeviceInfoError                           Counter64,
-        	apmPmStatInspTokenError                                Counter64,
-        	apmPmStatInspSignatureError                            Counter64,
-        	apmPmStatInspDataMsmtchError                           Counter64,
-        	apmPmStatInspClientSignError                           Counter64,
-        	apmPmStatMemInitError                                  Counter64,
-        	apmPmStatMemSessionVarError                            Counter64,
-        	apmPmStatMemCloseError                                 Counter64,
-        	apmPmStatResultError                                   Counter64,
-        	apmPmStatInternalError                                 Counter64
+        	apmPmStatName                                             LongDisplayString,
+        	apmPmStatConfigSyncState                                  Counter64,
+        	apmPmStatInspResultError                                  Counter64,
+        	apmPmStatInspSessionError                                 Counter64,
+        	apmPmStatInspDeviceInfoError                              Counter64,
+        	apmPmStatInspTokenError                                   Counter64,
+        	apmPmStatInspSignatureError                               Counter64,
+        	apmPmStatInspDataMsmtchError                              Counter64,
+        	apmPmStatInspClientSignError                              Counter64,
+        	apmPmStatMemInitError                                     Counter64,
+        	apmPmStatMemSessionVarError                               Counter64,
+        	apmPmStatMemCloseError                                    Counter64,
+        	apmPmStatResultError                                      Counter64,
+        	apmPmStatInternalError                                    Counter64
 	}
 
 apmPmStatName OBJECT-TYPE 
@@ -2895,13 +2918,13 @@ apmAccessStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmAccessStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmAccessStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmAccessStat 1 } 
 
 apmAccessStatTotalSessions OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -2909,7 +2932,7 @@ apmAccessStatTotalSessions OBJECT-TYPE
 	::= { apmAccessStat 2 } 
 
 apmAccessStatCurrentActiveSessions OBJECT-TYPE 
-	SYNTAX Counter64
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
@@ -2988,6 +3011,24 @@ apmAccessStatResultRedirectWithSession OBJECT-TYPE
 		"The total sessions redirected to the configured URI without closing the session in the system"
 	::= { apmAccessStat 12 } 
 
+apmAccessStatSessionsEvalTimedOut OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total sessions terminated due to inactivity while going through access
+	    policy evaluation in the system"
+	::= { apmAccessStat 13 } 
+
+apmAccessStatSessionsEstabTimedOut OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total sessions terminated due to inactivity after completed access
+	    policy evaluation in the system"
+	::= { apmAccessStat 14 } 
+
 --==================================================================
 -- Global_connectivity_stat
 --==================================================================
@@ -2996,8 +3037,8 @@ apmGlobalConnectivityStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmGlobalConnectivityStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmGlobalConnectivityStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmGlobalConnectivityStat 1 } 
 
@@ -3006,15 +3047,15 @@ apmGlobalConnectivityStatTotConns OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total SSL/VPN connections in the system"
+		"The total connectivity sessions in the system"
 	::= { apmGlobalConnectivityStat 2 } 
 
 apmGlobalConnectivityStatCurConns OBJECT-TYPE 
-	SYNTAX Counter64
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total current SSL/VPN connections in the system"
+		"The current connectivity sessions in the system"
 	::= { apmGlobalConnectivityStat 3 } 
 
 apmGlobalConnectivityStatMaxConns OBJECT-TYPE 
@@ -3022,7 +3063,7 @@ apmGlobalConnectivityStatMaxConns OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The max SSL/VPN connections in the system"
+		"The max connectivity sessions in the system"
 	::= { apmGlobalConnectivityStat 4 } 
 
 apmGlobalConnectivityStatIngressRaw OBJECT-TYPE 
@@ -3030,7 +3071,7 @@ apmGlobalConnectivityStatIngressRaw OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total raw bytes received by SSL/VPN connections in the system"
+		"The total raw bytes received by connectivity sessions in the system"
 	::= { apmGlobalConnectivityStat 5 } 
 
 apmGlobalConnectivityStatEgressRaw OBJECT-TYPE 
@@ -3038,7 +3079,7 @@ apmGlobalConnectivityStatEgressRaw OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total raw bytes transmitted by SSL/VPN connections in the system"
+		"The total raw bytes transmitted by connectivity sessions in the system"
 	::= { apmGlobalConnectivityStat 6 } 
 
 apmGlobalConnectivityStatIngressCompressed OBJECT-TYPE 
@@ -3046,7 +3087,7 @@ apmGlobalConnectivityStatIngressCompressed OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total compressed bytes received by SSL/VPN connections in the system"
+		"The total compressed bytes received by connectivity sessions in the system"
 	::= { apmGlobalConnectivityStat 7 } 
 
 apmGlobalConnectivityStatEgressCompressed OBJECT-TYPE 
@@ -3054,7 +3095,7 @@ apmGlobalConnectivityStatEgressCompressed OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total compressed bytes transmitted by SSL/VPN connections in the system"
+		"The total compressed bytes transmitted by connectivity sessions in the system"
 	::= { apmGlobalConnectivityStat 8 } 
 
 --==================================================================
@@ -3065,8 +3106,8 @@ apmGlobalRewriteStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmGlobalRewriteStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmGlobalRewriteStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmGlobalRewriteStat 1 } 
 
@@ -3142,8 +3183,8 @@ apmLeasepoolStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmLeasepoolStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmLeasepoolStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmLeasepoolStat 1 } 
 
@@ -3160,7 +3201,7 @@ apmLeasepoolStatTable OBJECT-TYPE
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
-		"A table containing statistic information of leasepools."
+		"A table containing statistic information of ipv4 leasepools."
 	::= { apmLeasepoolStat 3 } 
 
 apmLeasepoolStatEntry OBJECT-TYPE
@@ -3176,17 +3217,17 @@ apmLeasepoolStatEntry OBJECT-TYPE
 
 ApmLeasepoolStatEntry ::= 
 	SEQUENCE {
-        	apmLeasepoolStatName                                   LongDisplayString,
-        	apmLeasepoolStatCurMembers                             Integer32,
-        	apmLeasepoolStatCurAssigned                            Integer32,
-        	apmLeasepoolStatCurFree                                Integer32,
-        	apmLeasepoolStatMaxAssigned                            Integer32,
-        	apmLeasepoolStatTotPickRequests                        Counter64,
-        	apmLeasepoolStatTotPickFailure                         Counter64,
-        	apmLeasepoolStatTotReserveRequests                     Counter64,
-        	apmLeasepoolStatTotReserveFailure                      Counter64,
-        	apmLeasepoolStatTotReleaseRequests                     Counter64,
-        	apmLeasepoolStatTotReleaseFailure                      Counter64
+        	apmLeasepoolStatName                                      LongDisplayString,
+        	apmLeasepoolStatCurMembers                                Gauge,
+        	apmLeasepoolStatCurAssigned                               Gauge,
+        	apmLeasepoolStatCurFree                                   Gauge,
+        	apmLeasepoolStatMaxAssigned                               Gauge,
+        	apmLeasepoolStatTotPickRequests                           Counter64,
+        	apmLeasepoolStatTotPickFailure                            Counter64,
+        	apmLeasepoolStatTotReserveRequests                        Counter64,
+        	apmLeasepoolStatTotReserveFailure                         Counter64,
+        	apmLeasepoolStatTotReleaseRequests                        Counter64,
+        	apmLeasepoolStatTotReleaseFailure                         Counter64
 	}
 
 apmLeasepoolStatName OBJECT-TYPE 
@@ -3198,35 +3239,35 @@ apmLeasepoolStatName OBJECT-TYPE
 	::= { apmLeasepoolStatEntry 1 } 
 
 apmLeasepoolStatCurMembers OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The current number of IP addresses in the leasepool"
+		"The current number of IPv4 addresses in the leasepool"
 	::= { apmLeasepoolStatEntry 2 } 
 
 apmLeasepoolStatCurAssigned OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of IP addresses currently assigned to user sessions"
+		"The number of IPv4 addresses currently assigned to user sessions"
 	::= { apmLeasepoolStatEntry 3 } 
 
 apmLeasepoolStatCurFree OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The number of available/free addresses in the leasepool"
+		"The number of available/free IPv4 addresses in the leasepool"
 	::= { apmLeasepoolStatEntry 4 } 
 
 apmLeasepoolStatMaxAssigned OBJECT-TYPE 
-	SYNTAX Integer32
+	SYNTAX Gauge
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The max number of IP addresses assigned at any single time in the leasepool since last stats reset"
+		"The max number of IPv4 addresses assigned at any single time in the leasepool since last stats reset"
 	::= { apmLeasepoolStatEntry 5 } 
 
 apmLeasepoolStatTotPickRequests OBJECT-TYPE 
@@ -3234,7 +3275,7 @@ apmLeasepoolStatTotPickRequests OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total number of requests for IP addresses from active unit in HA pair"
+		"The total number of requests for IPv4 addresses from active unit in HA pair"
 	::= { apmLeasepoolStatEntry 6 } 
 
 apmLeasepoolStatTotPickFailure OBJECT-TYPE 
@@ -3242,7 +3283,7 @@ apmLeasepoolStatTotPickFailure OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total number of failures to assign an IP address"
+		"The total number of failures to assign an IPv4 address"
 	::= { apmLeasepoolStatEntry 7 } 
 
 apmLeasepoolStatTotReserveRequests OBJECT-TYPE 
@@ -3250,7 +3291,7 @@ apmLeasepoolStatTotReserveRequests OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total number of requests for specific IP address from standby unit in HA pair"
+		"The total number of requests for specific IPv4 address from standby unit in HA pair"
 	::= { apmLeasepoolStatEntry 8 } 
 
 apmLeasepoolStatTotReserveFailure OBJECT-TYPE 
@@ -3258,7 +3299,7 @@ apmLeasepoolStatTotReserveFailure OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total number of failures to reserve a specific IP address"
+		"The total number of failures to reserve a specific IPv4 address"
 	::= { apmLeasepoolStatEntry 9 } 
 
 apmLeasepoolStatTotReleaseRequests OBJECT-TYPE 
@@ -3266,7 +3307,7 @@ apmLeasepoolStatTotReleaseRequests OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The total number of requests to release IP address for either active or stand"
+		"The total number of requests to release IPv4 address for either active or standby"
 	::= { apmLeasepoolStatEntry 10 } 
 
 apmLeasepoolStatTotReleaseFailure OBJECT-TYPE 
@@ -3285,8 +3326,8 @@ apmAclStatResetStats OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"The action to reset resetable statistics data in  apmAclStat. 
-		 Setting this value to 1 will reset statistics data. 
+		"The action to reset resettable statistics data in apmAclStat.
+		 Setting this value to 1 will reset statistics data.
 		 Note, some statistics data may not be reset including data that are incremental counters."
 	::= { apmAclStat 1 } 
 
@@ -3319,11 +3360,11 @@ apmAclStatEntry OBJECT-TYPE
 
 ApmAclStatEntry ::= 
 	SEQUENCE {
-        	apmAclStatName                                         LongDisplayString,
-        	apmAclStatActionAllow                                  Counter64,
-        	apmAclStatActionContinue                               Counter64,
-        	apmAclStatActionDiscard                                Counter64,
-        	apmAclStatActionReject                                 Counter64
+        	apmAclStatName                                            LongDisplayString,
+        	apmAclStatActionAllow                                     Counter64,
+        	apmAclStatActionContinue                                  Counter64,
+        	apmAclStatActionDiscard                                   Counter64,
+        	apmAclStatActionReject                                    Counter64
 	}
 
 apmAclStatName OBJECT-TYPE 
@@ -3365,6 +3406,194 @@ apmAclStatActionReject OBJECT-TYPE
 	DESCRIPTION
 		"The number of times reject action executed"
 	::= { apmAclStatEntry 5 } 
+
+--==================================================================
+-- Global_license_stat
+--==================================================================
+apmGlobalLicenseStatResetStats OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The action to reset resettable statistics data in apmGlobalLicenseStat.
+		 Setting this value to 1 will reset statistics data.
+		 Note, some statistics data may not be reset including data that are incremental counters."
+	::= { apmGlobalLicenseStat 1 } 
+
+apmGlobalLicenseStatTotalAccessSessions OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total access session licenses in the system"
+	::= { apmGlobalLicenseStat 2 } 
+
+apmGlobalLicenseStatTotalConnectivitySessions OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total connectivity session licenses in the system"
+	::= { apmGlobalLicenseStat 3 } 
+
+apmGlobalLicenseStatTotalSwgSessions OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total secure web gateway session licenses in the system"
+	::= { apmGlobalLicenseStat 4 } 
+
+apmGlobalLicenseStatTotalSwgLimitedSessions OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total secure web gateway limited session licenses in the system"
+	::= { apmGlobalLicenseStat 5 } 
+
+--==================================================================
+-- Ipv6_leasepool_stat
+--==================================================================
+apmIpv6LeasepoolStatResetStats OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The action to reset resettable statistics data in apmIpv6LeasepoolStat.
+		 Setting this value to 1 will reset statistics data.
+		 Note, some statistics data may not be reset including data that are incremental counters."
+	::= { apmIpv6LeasepoolStat 1 } 
+
+apmIpv6LeasepoolStatNumber OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of apmIpv6LeasepoolStat entries in the table."
+	::= { apmIpv6LeasepoolStat 2 } 
+
+apmIpv6LeasepoolStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ApmIpv6LeasepoolStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing statistic information of ipv6 leasepools."
+	::= { apmIpv6LeasepoolStat 3 } 
+
+apmIpv6LeasepoolStatEntry OBJECT-TYPE
+	SYNTAX  ApmIpv6LeasepoolStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the apmIpv6LeasepoolStat Table"
+	INDEX {
+		apmIpv6LeasepoolStatName
+	}
+	::= { apmIpv6LeasepoolStatTable 1 } 
+
+ApmIpv6LeasepoolStatEntry ::= 
+	SEQUENCE {
+        	apmIpv6LeasepoolStatName                                  LongDisplayString,
+        	apmIpv6LeasepoolStatCurMembers                            Gauge,
+        	apmIpv6LeasepoolStatCurAssigned                           Gauge,
+        	apmIpv6LeasepoolStatCurFree                               Gauge,
+        	apmIpv6LeasepoolStatMaxAssigned                           Gauge,
+        	apmIpv6LeasepoolStatTotPickRequests                       Counter64,
+        	apmIpv6LeasepoolStatTotPickFailure                        Counter64,
+        	apmIpv6LeasepoolStatTotReserveRequests                    Counter64,
+        	apmIpv6LeasepoolStatTotReserveFailure                     Counter64,
+        	apmIpv6LeasepoolStatTotReleaseRequests                    Counter64,
+        	apmIpv6LeasepoolStatTotReleaseFailure                     Counter64
+	}
+
+apmIpv6LeasepoolStatName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a leasepool"
+	::= { apmIpv6LeasepoolStatEntry 1 } 
+
+apmIpv6LeasepoolStatCurMembers OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current number of IPv6 addresses in the leasepool"
+	::= { apmIpv6LeasepoolStatEntry 2 } 
+
+apmIpv6LeasepoolStatCurAssigned OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of IPv6 addresses currently assigned to user sessions"
+	::= { apmIpv6LeasepoolStatEntry 3 } 
+
+apmIpv6LeasepoolStatCurFree OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of available/free IPv6 addresses in the leasepool"
+	::= { apmIpv6LeasepoolStatEntry 4 } 
+
+apmIpv6LeasepoolStatMaxAssigned OBJECT-TYPE 
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The max number of IPv6 addresses assigned at any single time in the leasepool since last stats reset"
+	::= { apmIpv6LeasepoolStatEntry 5 } 
+
+apmIpv6LeasepoolStatTotPickRequests OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests for IPv6 addresses from active unit in HA pair"
+	::= { apmIpv6LeasepoolStatEntry 6 } 
+
+apmIpv6LeasepoolStatTotPickFailure OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of failures to assign an IPv6 address"
+	::= { apmIpv6LeasepoolStatEntry 7 } 
+
+apmIpv6LeasepoolStatTotReserveRequests OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests for specific IPv6 address from standby unit in HA pair"
+	::= { apmIpv6LeasepoolStatEntry 8 } 
+
+apmIpv6LeasepoolStatTotReserveFailure OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of failures to reserve a specific IPv6 address"
+	::= { apmIpv6LeasepoolStatEntry 9 } 
+
+apmIpv6LeasepoolStatTotReleaseRequests OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests to release IPv6 address for either active or standby"
+	::= { apmIpv6LeasepoolStatEntry 10 } 
+
+apmIpv6LeasepoolStatTotReleaseFailure OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of failures to release IPv6 address"
+	::= { apmIpv6LeasepoolStatEntry 11 } 
 
 --================================================================
  -- Compliance and Group
@@ -3611,7 +3840,9 @@ apmPaStatGroup OBJECT-GROUP
 		apmPaStatApdApInternalErrors,
 		apmPaStatAllowedRequests,
 		apmPaStatDeniedRequests,
-		apmPaStatVsName
+		apmPaStatVsName,
+		apmPaStatSessionsEvalTimedOut,
+		apmPaStatSessionsEstabTimedOut
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -3710,7 +3941,9 @@ apmAccessStatGroup OBJECT-GROUP
 		apmAccessStatResultAllow,
 		apmAccessStatResultDeny,
 		apmAccessStatResultRedirect,
-		apmAccessStatResultRedirectWithSession
+		apmAccessStatResultRedirectWithSession,
+		apmAccessStatSessionsEvalTimedOut,
+		apmAccessStatSessionsEstabTimedOut
 	}
 	STATUS	 current
 	DESCRIPTION
@@ -3785,4 +4018,38 @@ apmAclStatGroup OBJECT-GROUP
 	DESCRIPTION
 		"A collection of objects of apmAclStat MIB."
 	::= { bigipApmGroups 10 }
+
+apmGlobalLicenseStatGroup OBJECT-GROUP
+	 OBJECTS {
+		apmGlobalLicenseStatResetStats,
+		apmGlobalLicenseStatTotalAccessSessions,
+		apmGlobalLicenseStatTotalConnectivitySessions,
+		apmGlobalLicenseStatTotalSwgSessions,
+		apmGlobalLicenseStatTotalSwgLimitedSessions
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of apmGlobalLicenseStat MIB."
+	::= { bigipApmGroups 11 }
+
+apmIpv6LeasepoolStatGroup OBJECT-GROUP
+	 OBJECTS {
+		apmIpv6LeasepoolStatResetStats,
+		apmIpv6LeasepoolStatNumber,
+		apmIpv6LeasepoolStatName,
+		apmIpv6LeasepoolStatCurMembers,
+		apmIpv6LeasepoolStatCurAssigned,
+		apmIpv6LeasepoolStatCurFree,
+		apmIpv6LeasepoolStatMaxAssigned,
+		apmIpv6LeasepoolStatTotPickRequests,
+		apmIpv6LeasepoolStatTotPickFailure,
+		apmIpv6LeasepoolStatTotReserveRequests,
+		apmIpv6LeasepoolStatTotReserveFailure,
+		apmIpv6LeasepoolStatTotReleaseRequests,
+		apmIpv6LeasepoolStatTotReleaseFailure
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of apmIpv6LeasepoolStat MIB."
+	::= { bigipApmGroups 12 }
 END

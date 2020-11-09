@@ -25,9 +25,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BgpPeer extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $table = 'bgpPeers';
     protected $primaryKey = 'bgpPeer_id';

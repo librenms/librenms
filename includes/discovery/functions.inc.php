@@ -1176,6 +1176,10 @@ function build_bgp_peers($device, $data, $peer2)
             }
         }
         if ($peer && $peer_ip != '0.0.0.0') {
+            if ($peer_as < 0) {
+                //if ASN is negative -> overflow int32 -> original number is max(INT32) - min(INT32) + 1 + value
+                $peer_as = 4294967296 + $peer_as;
+            }
             d_echo("Found peer $peer_ip (AS$peer_as)\n");
             $peerlist[] = [
                 'ip'      => $peer_ip,

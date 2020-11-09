@@ -4,12 +4,15 @@ namespace App\Models;
 
 use DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Rewrite;
 use Permissions;
 
 class Port extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'port_id';
 

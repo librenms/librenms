@@ -2000,6 +2000,9 @@ function device_is_up($device, $record_perf = false)
     $device_perf = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = ['NOW()'];
+    $maintenance = DeviceCache::get($device['device_id'])->isUnderMaintenance();
+    $consider_maintenance = Config::get('graphing.availability_consider_maintenance');
+    $state_update_again = false;
 
     if ($record_perf === true && can_ping_device($device['attribs'])) {
         $trace_debug = [];
@@ -2036,15 +2039,20 @@ function device_is_up($device, $record_perf = false)
         $response['status_reason'] = 'icmp';
     }
 
-    if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason']) {
-        dbUpdate(
-            ['status' => $response['status'], 'status_reason' => $response['status_reason']],
-            'devices',
-            'device_id=?',
-            [$device['device_id']]
-        );
+    // Special case where the device is still down, optional mode is on, device not in maintenance mode and has no ongoing outages
+    if (($consider_maintenance && ! $maintenance) && ($device['status'] == '0' && $response['status'] == '0')) {
+        $state_update_again = empty(dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]));
+    }
 
-        $uptime = $device['uptime'] ?: 0;
+    if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason'] || $state_update_again) {
+        if (! $state_update_again) {
+            dbUpdate(
+                ['status' => $response['status'], 'status_reason' => $response['status_reason']],
+                'devices',
+                'device_id=?',
+                [$device['device_id']]
+            );
+        }
 
         if ($response['status']) {
             $type = 'up';
@@ -2052,11 +2060,7 @@ function device_is_up($device, $record_perf = false)
 
             $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]);
             if (! empty($going_down)) {
-                $up_again = time() - $uptime;
-                if ($up_again <= $going_down) {
-                    // network connection loss, not device down
-                    $up_again = time();
-                }
+                $up_again = time();
                 dbUpdate(
                     ['device_id' => $device['device_id'], 'up_again' => $up_again],
                     'device_outages',
@@ -2068,9 +2072,14 @@ function device_is_up($device, $record_perf = false)
             $type = 'down';
             $reason = $response['status_reason'];
 
-            $data = ['device_id' => $device['device_id'],
-                'going_down' => strtotime($device['last_polled']), ];
-            dbInsert($data, 'device_outages');
+            if ($device['status'] != $response['status']) {
+                if (! $consider_maintenance || (! $maintenance && $consider_maintenance)) {
+                    // use current time as a starting point when an outage starts
+                    $data = ['device_id' => $device['device_id'],
+                        'going_down' => time(), ];
+                    dbInsert($data, 'device_outages');
+                }
+            }
         }
 
         log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
@@ -2177,83 +2186,6 @@ function cache_peeringdb()
     } else {
         echo 'Peering DB integration disabled' . PHP_EOL;
     }
-}
-
-/**
- * Dump the database schema to an array.
- * The top level will be a list of tables
- * Each table contains the keys Columns and Indexes.
- *
- * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
- * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
- *
- * @param string $connection use a specific connection
- * @return array
- */
-function dump_db_schema($connection = null)
-{
-    $output = [];
-    $db_name = DB::connection($connection)->getDatabaseName();
-
-    foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;")) as $table) {
-        $table = $table->TABLE_NAME;
-        foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'")) as $data) {
-            $def = [
-                'Field'   => $data->COLUMN_NAME,
-                'Type'    => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),
-                'Null'    => $data->IS_NULLABLE === 'YES',
-                'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data->EXTRA),
-            ];
-
-            if (isset($data->COLUMN_DEFAULT) && $data->COLUMN_DEFAULT != 'NULL') {
-                $default = trim($data->COLUMN_DEFAULT, "'");
-                $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
-            }
-            // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
-            if ($def['Type'] == 'timestamp') {
-                $def['Extra'] = preg_replace('/DEFAULT_GENERATED[ ]*/', '', $def['Extra']);
-            }
-
-            $output[$table]['Columns'][] = $def;
-        }
-
-        $keys = DB::connection($connection)->select(DB::raw("SHOW INDEX FROM `$table`"));
-        usort($keys, function ($a, $b) {
-            return $a->Key_name <=> $b->Key_name;
-        });
-        foreach ($keys as $key) {
-            $key_name = $key->Key_name;
-            if (isset($output[$table]['Indexes'][$key_name])) {
-                $output[$table]['Indexes'][$key_name]['Columns'][] = $key->Column_name;
-            } else {
-                $output[$table]['Indexes'][$key_name] = [
-                    'Name'    => $key->Key_name,
-                    'Columns' => [$key->Column_name],
-                    'Unique'  => ! $key->Non_unique,
-                    'Type'    => $key->Index_type,
-                ];
-            }
-        }
-
-        $create = DB::connection($connection)->select(DB::raw("SHOW CREATE TABLE `$table`"))[0];
-
-        if (isset($create->{'Create Table'})) {
-            $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';
-            $constraint_count = preg_match_all($constraint_regex, $create->{'Create Table'}, $constraints);
-            for ($i = 0; $i < $constraint_count; $i++) {
-                $constraint_name = $constraints['name'][$i];
-                $output[$table]['Constraints'][$constraint_name] = [
-                    'name' => $constraint_name,
-                    'foreign_key' => $constraints['foreign_key'][$i],
-                    'table' => $constraints['table'][$i],
-                    'key' => $constraints['key'][$i],
-                    'extra' => $constraints['extra'][$i],
-                ];
-            }
-        }
-    }
-
-    return $output;
 }
 
 /**

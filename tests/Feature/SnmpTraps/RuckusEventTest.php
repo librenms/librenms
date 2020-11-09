@@ -34,7 +34,7 @@ class RuckusEventTest extends SnmpTrapTestCase
 {
     public function testRuckusAssocTrap()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -52,7 +52,7 @@ RUCKUS-EVENT-MIB::ruckusEventClientMacAddr \"de:ad:be:ef:11:221.0.5.1.1.1.2.2\""
 
     public function testRuckusDiassocTrap()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -70,7 +70,7 @@ RUCKUS-EVENT-MIB::ruckusEventClientMacAddr \"de:ad:be:ef:33:441.0.5.1.1.1.2.2\""
 
     public function testRuckusSetErrorTrap()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

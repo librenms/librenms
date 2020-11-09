@@ -48,8 +48,10 @@ foreach ($pre_cache['aos6_fan_oids'] as $index => $data) {
             ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'notRunning'],
             ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'running'],
         ];
-        create_state_index($state_name, $states);
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
-        create_sensor_to_state_index($device, $state_name, $index);
+        if (! empty($current)) {
+            create_state_index($state_name, $states);
+            discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
+            create_sensor_to_state_index($device, $state_name, $index);
+        }
     }
 }

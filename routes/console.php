@@ -25,7 +25,7 @@ Artisan::command('device:rename
         $this->argument('old hostname'),
         $this->argument('new hostname'),
     ]))->setTty(true)->run();
-})->describe(__('Rename a device, this can be used to change the hostname or IP of a device'));
+})->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
 Artisan::command('device:add
     {device spec : Hostname or IP to add}
@@ -137,7 +137,7 @@ Artisan::command('device:add
 
         return 3;
     }
-})->describe('Add a new device');
+})->purpose('Add a new device');
 
 Artisan::command('device:remove
     {device spec : ' . __('Hostname, IP, or device id to remove') . '}
@@ -147,11 +147,11 @@ Artisan::command('device:remove
         base_path('delhost.php'),
         $this->argument('device spec'),
     ]))->setTty(true)->run();
-})->describe('Remove a device');
+})->purpose('Remove a device');
 
 Artisan::command('update', function () {
     (new Process([base_path('daily.sh')]))->setTty(true)->run();
-})->describe(__('Update LibreNMS and run maintenance routines'));
+})->purpose(__('Update LibreNMS and run maintenance routines'));
 
 Artisan::command('poller:ping
     {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
@@ -169,7 +169,7 @@ Artisan::command('poller:ping
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Check if devices are up or down via icmp'));
+})->purpose(__('Check if devices are up or down via icmp'));
 
 Artisan::command('poller:discovery
     {device spec : ' . __('Device spec to discover: device_id, hostname, wildcard, odd, even, all, new') . '}
@@ -197,7 +197,7 @@ Artisan::command('poller:discovery
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Discover information about existing devices, defines what will be polled'));
+})->purpose(__('Discover information about existing devices, defines what will be polled'));
 
 Artisan::command('poller:poll
     {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, odd, even, all') . '}
@@ -219,7 +219,7 @@ Artisan::command('poller:poll
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Poll data from devices as defined by discovery'));
+})->purpose(__('Poll data from devices as defined by discovery'));
 
 Artisan::command('poller:alerts', function () {
     $command = [base_path('alerts.php')];
@@ -231,7 +231,7 @@ Artisan::command('poller:alerts', function () {
     }
 
     (new Process($command))->setTty(true)->run();
-})->describe(__('Check for any pending alerts and deliver them via defined transports'));
+})->purpose(__('Check for any pending alerts and deliver them via defined transports'));
 
 Artisan::command('poller:billing
     {bill id? : ' . __('The bill id to poll') . '}
@@ -250,7 +250,7 @@ Artisan::command('poller:billing
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Collect billing data'));
+})->purpose(__('Collect billing data'));
 
 Artisan::command('poller:services
     {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, all') . '}
@@ -273,7 +273,7 @@ Artisan::command('poller:services
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Update LibreNMS and run maintenance routines'));
+})->purpose(__('Update LibreNMS and run maintenance routines'));
 
 Artisan::command('poller:billing-calculate
     {--c|clear-history : ' . __('Delete all billing history') . '}
@@ -285,7 +285,7 @@ Artisan::command('poller:billing-calculate
     }
 
     (new Process($command))->setTty(true)->run();
-})->describe(__('Run billing calculations'));
+})->purpose(__('Run billing calculations'));
 
 Artisan::command('scan
     {network?* : ' . __('CIDR notation network(s) to scan, can be ommited if \'nets\' config is set') . '}
@@ -327,4 +327,4 @@ Artisan::command('scan
     $command = array_merge($command, $this->argument('network'));
 
     (new Process($command))->setTty(true)->run();
-})->describe(__('Scan the network for hosts and try to add them to LibreNMS'));
+})->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));

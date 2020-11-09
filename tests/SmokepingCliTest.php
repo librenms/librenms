@@ -81,7 +81,7 @@ class SmokepingCliTest extends DBTestCase
 
     private $instance = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         // We need an app instance available for these tests to load the translation machinary
         $this->app = $this->createApplication();
@@ -332,7 +332,7 @@ class SmokepingCliTest extends DBTestCase
 
         // Generate a ridiculous number of random devices for testing
         foreach (range(1, 1000) as $i) {
-            $device = factory(Device::class)->create();
+            $device = Device::factory()->create();
             $data[$device->type][] = $device->hostname;
         }
 

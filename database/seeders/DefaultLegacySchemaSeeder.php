@@ -1,9 +1,8 @@
-#!/usr/bin/env php
 <?php
 /**
- * build-base.php
+ * DefaultLegacySchemaSeeder.php
  *
- * Create database structure.
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,36 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-if (! isset($init_modules)) {
-    $opts = getopt('ldh:u:p:n:t:s:');
 
-    $map = [
-        'h' => 'DB_HOST',
-        'u' => 'DB_USERNAME',
-        'p' => 'DB_PASSWORD',
-        'n' => 'DB_DATABASE',
-        't' => 'DB_PORT',
-        's' => 'DB_SOCKET',
-    ];
+namespace Database\Seeders;
 
-    // set env variables
-    foreach ($map as $opt => $env_name) {
-        if (isset($opts[$opt])) {
-            putenv("$env_name=" . $opts[$opt]);
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class DefaultLegacySchemaSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        // insert version 1000 to prevent legacy schema code from running.
+        // additionally prevents seeder from being run again by includes/sql-schema/update.php.
+        if (! DB::table('dbSchema')->exists()) {
+            DB::table('dbSchema')->insert(['version' => 1000]);
         }
     }
-
-    $init_modules = ['nodb', 'laravel'];
-    require __DIR__ . '/includes/init.php';
-
-    set_debug(isset($opts['d']));
-
-    $skip_schema_lock = isset($opts['l']);
 }
-
-require __DIR__ . '/includes/sql-schema/update.php';
-
-exit($return);

@@ -24,8 +24,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Component extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $table = 'component';
     protected $fillable = ['device_id', 'type', 'label', 'status', 'disabled', 'ignore', 'error'];

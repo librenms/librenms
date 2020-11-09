@@ -5,7 +5,7 @@
  * Try to discover any Virtual Machines.
  */
 
-if (($device['os'] == 'vmware') || ($device['os'] == 'linux')) {
+if (($device['os'] == 'vmware-esxi') || ($device['os'] == 'linux')) {
     /*
      * Variable to hold the discovered Virtual Machines.
      */

@@ -35,8 +35,8 @@ class JnxLdpLspTest extends SnmpTrapTestCase
 {
     public function testLdpLspDownTrap()
     {
-        $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
+        $device = Device::factory()->create();
+        $ipv4 = Ipv4Address::factory()->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
@@ -58,8 +58,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testLdpLspUpTrap()
     {
-        $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
+        $device = Device::factory()->create();
+        $ipv4 = Ipv4Address::factory()->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162

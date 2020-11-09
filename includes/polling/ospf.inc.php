@@ -134,6 +134,30 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
         ->whereNotIn('id', $ospf_neighbours->pluck('id'))->delete();
 
     echo $ospf_neighbours->count();
+
+    echo ' TOS Metrics: ';
+
+    // Pull data from device
+    $ospf_tos_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfIfMetricEntry', [], 'OSPF-MIB');
+    d_echo($ospf_tos_poll);
+
+    $ospf_tos_metrics = collect();
+    foreach ($ospf_tos_poll as $ospf_tos_id => $ospf_tos) {
+        // get ospf_port_id
+        $ospf_tos['ospf_port_id'] = OspfPort::query()
+            ->where('ospfIfIpAddress', $ospf_tos['ospfIfMetricIpAddress'])
+            ->where('context_name', $device['context_name'])
+            ->value('ospf_port_id');
+        $tos = OspfPort::updateOrCreate([
+            'device_id' => $device['device_id'],
+            'ospf_port_id' => $ospf_tos['ospf_port_id'],
+            'context_name' => $device['context_name'],
+        ], $ospf_tos);
+
+        $ospf_tos_metrics->push($tos);
+    }
+
+    echo $ospf_tos_metrics->count();
 }
 
 unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
@@ -181,6 +205,9 @@ unset(
     $ospf_nbr,
     $neighbour,
     $ospf_nbr_id,
+    $ospf_tos,
+    $tos,
+    $ospf_tos_id,
     $rrd_def,
     $fields,
     $tags
