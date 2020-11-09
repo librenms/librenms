@@ -760,8 +760,8 @@
             "type": "array"
         },
         "customers_descr": {
-            "default": "cust",
-            "type": "text"
+            "default": ["cust"],
+            "type": "array"
         },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
