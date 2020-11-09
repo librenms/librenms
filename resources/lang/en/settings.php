@@ -62,11 +62,11 @@ return [
             'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
+            'specialports' => 'Interface Description Parsing',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
             'proxy' => 'Proxy',
-            'specialports' => 'Ports',
             'updates' => 'Updates',
             'server' => 'Server',
         ],

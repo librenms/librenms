@@ -756,7 +756,7 @@
         "core_descr": {
             "default": ["core"],
             "type": "array",
-            "group": "system",
+            "group": "poller",
             "section": "specialports",
             "order": 2
         },
@@ -769,9 +769,9 @@
             "type": "array"
         },
         "customers_descr": {
-            "default": "cust",
-            "type": "text",
-            "group": "system",
+            "default": ["cust"],
+            "type": "array",
+            "group": "poller",
             "section": "specialports",
             "order": 3
         },
@@ -4094,7 +4094,7 @@
                 "peering"
             ],
             "type": "array",
-            "group": "system",
+            "group": "poller",
             "section": "specialports",
             "order": 0
         },
@@ -5134,7 +5134,7 @@
         "transit_descr": {
             "default": ["transit"],
             "type": "array",
-            "group": "system",
+            "group": "poller",
             "section": "specialports",
             "order": 1
         },
