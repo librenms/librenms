@@ -1161,7 +1161,7 @@ notifications:
     - { Field: severity, Type: int, 'Null': true, Extra: '', Default: '0' }
     - { Field: source, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: checksum, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: datetime, Type: datetime, 'Null': true, Extra: '', Default: '1970-01-02 00:00:00' }
+    - { Field: datetime, Type: timestamp, 'Null': false, Extra: '', Default: '1970-01-02 00:00:00' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [notifications_id], Unique: true, Type: BTREE }
     notifications_checksum_unique: { Name: notifications_checksum_unique, Columns: [checksum], Unique: true, Type: BTREE }
