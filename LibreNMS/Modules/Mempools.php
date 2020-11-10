@@ -85,8 +85,8 @@ class Mempools implements Module
             ->addDataset('used', 'GAUGE', 0)
             ->addDataset('free', 'GAUGE', 0);
             $fields = [
-            'used' => $mempool->mempool_used,
-            'free' => $mempool->mempool_free,
+                'used' => $mempool->mempool_used,
+                'free' => $mempool->mempool_free,
             ];
 
             $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def', 'rrd_oldname');
