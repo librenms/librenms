@@ -25,6 +25,7 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\Config;
+use LibreNMS\Enum\PowerState;
 
 class Html
 {
@@ -153,5 +154,24 @@ class Html
         ';
 
         return $output;
+    }
+
+    /**
+     * @param int|string $state
+     */
+    public static function powerStateLabel($state): array
+    {
+        $state = is_string($state) ? PowerState::STATES[$state] : $state;
+
+        switch ($state) {
+            case PowerState::OFF:
+                return ['OFF', 'label-default'];
+            case PowerState::ON:
+                return ['ON', 'label-success'];
+            case PowerState::SUSPENDED:
+                return ['SUSPENDED', 'label-warning'];
+            default:
+                return ['UNKNOWN', 'label-default'];
+        }
     }
 }

@@ -36,23 +36,4 @@ abstract class PowerState
         'suspended' => self::SUSPENDED,
         'paused' => self::SUSPENDED,
     ];
-
-    /**
-     * @param int|string $state
-     */
-    public static function stateLabel($state): array
-    {
-        $state = is_string($state) ? self::STATES[$state] : $state;
-
-        switch ($state) {
-            case self::OFF:
-                return ['OFF', 'label-default'];
-            case self::ON:
-                return ['ON', 'label-success'];
-            case self::SUSPENDED:
-                return ['SUSPENDED', 'label-warning'];
-            default:
-                return ['UNKNOWN', 'label-default'];
-        }
-    }
 }

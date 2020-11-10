@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\PowerState;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Rewrite;
 
 class Vminfo extends DeviceRelatedModel
@@ -19,7 +19,7 @@ class Vminfo extends DeviceRelatedModel
 
     public function getStateLabelAttribute(): string
     {
-        return PowerState::stateLabel($this->vmwVmState);
+        return Html::powerStateLabel($this->vmwVmState);
     }
 
     public function getMemoryFormattedAttribute(): string
