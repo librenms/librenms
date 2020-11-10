@@ -43,7 +43,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
     echo '
         <tbody>
           <tr data-toggle="collapse" data-target="#ospf-panel' . $i . '" class="accordion-toggle">
-            <td><button id="ospf-panel_button'. $i .'" class="btn btn-default btn-xs"><span id="ospf-panel_span'. $i .'" class="fa fa-plus"></span></button></td>
+            <td><button id="ospf-panel_button'. $i .'" class="btn btn-default btn-xs"><span id="ospf-panel_span' . $i . '" class="fa fa-plus"></span></button></td>
             <td>' . $instance['ospfRouterId'] . '</td>
             <td><span class="label label-' . $status_color . '">' . $instance['ospfAdminStat'] . '</span></td>
             <td><span class="label label-' . $abr_status_color . '">' . $instance['ospfAreaBdrRtrStatus'] . '</span></td>
@@ -54,7 +54,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
           </tr>
           <script type="text/javascript">
           $("#ospf-panel_button' . $i . '").click(function(){
-              $("#ospf-panel_span'. $i .'").toggleClass("fa-minus");
+              $("#ospf-panel_span' . $i . '").toggleClass("fa-minus");
           });
           </script>
           <tr>
