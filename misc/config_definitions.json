@@ -2419,7 +2419,7 @@
             "default": {
                 "section": "system",
                 "order": 0,
-                "descr": "Memory Pool Usage"
+                "descr": "Memory Usage"
             },
             "type": "graph"
         },
@@ -3100,14 +3100,6 @@
                 "section": "system",
                 "order": 0,
                 "descr": "Load Averages"
-            },
-            "type": "graph"
-        },
-        "graph_types.device.ucd_memory": {
-            "default": {
-                "section": "system",
-                "order": 0,
-                "descr": "Detailed Memory Usage"
             },
             "type": "graph"
         },
@@ -3977,7 +3969,7 @@
                     "text": "Processor Usage"
                 },
                 {
-                    "graph": "device_ucd_memory",
+                    "graph": "device_mempool",
                     "text": "Memory Usage"
                 }
             ],
