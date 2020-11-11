@@ -26,8 +26,9 @@
 namespace LibreNMS\OS;
 
 use App\Models\Mempool;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 
-class Enterasys extends \LibreNMS\OS
+class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
 {
     public function discoverMempools()
     {

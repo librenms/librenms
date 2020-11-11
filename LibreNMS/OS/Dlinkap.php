@@ -27,10 +27,11 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Mempool;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
-class Dlinkap extends OS implements ProcessorDiscovery
+class Dlinkap extends OS implements MempoolsDiscovery, ProcessorDiscovery
 {
     public function discoverOS(Device $device): void
     {

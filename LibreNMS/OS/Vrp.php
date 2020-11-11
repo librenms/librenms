@@ -31,6 +31,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
@@ -41,6 +42,7 @@ use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
 class Vrp extends OS implements
+    MempoolsDiscovery,
     OSPolling,
     ProcessorDiscovery,
     NacPolling,

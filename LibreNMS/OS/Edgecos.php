@@ -29,10 +29,11 @@ use App\Models\Mempool;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
-class Edgecos extends OS implements ProcessorDiscovery
+class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
 {
     public function discoverMempools()
     {
