@@ -22,7 +22,7 @@ jnxmplsLsrStdCapability MODULE-IDENTITY
     CONTACT-INFO
             "Juniper Technical Assistance Center
              Juniper Networks, Inc.
-             1194 N. Mathilda Avenue
+             1133 Innovation Way
              Sunnyvale, CA 94089
              E-mail: support@juniper.net"
 

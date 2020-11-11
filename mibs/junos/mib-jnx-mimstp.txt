@@ -6,16 +6,17 @@ IMPORTS
     enterprises,Counter32, TimeTicks,NOTIFICATION-TYPE FROM SNMPv2-SMI
     RowStatus, TEXTUAL-CONVENTION, MacAddress,
     TruthValue        FROM SNMPv2-TC
+    BridgeId, Timeout FROM BRIDGE-MIB
     jnxXstpMibs FROM JUNIPER-SMI;
 
 
 jnxMIMstMIB MODULE-IDENTITY
-    LAST-UPDATED "200705030000Z"
+    LAST-UPDATED "201605310000Z"     -- Tue May  31 00:00:00 2016 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "Juniper Technical Assistance Center
          Juniper Networks, Inc.
-         1194 N. Mathilda Avenue
+         1133 Innovation Way
          Sunnyvale, CA 94089
          E-mail: support@juniper.net"
     DESCRIPTION 
@@ -33,6 +34,9 @@ jnxMIMstMIB MODULE-IDENTITY
                "Defined new tables jnxMIMstCistPortProtectTable and 
                 jnxMIMstMstiPortProtectTable and new notifications under 
                 jnxMIMstTraps to support Root Protect and Loop Protect."
+    REVISION     "201605310000Z"
+    DESCRIPTION
+               "Removed duplicates" 
     ::= { jnxXstpMibs 1 }
 
 VlanId ::= TEXTUAL-CONVENTION 
@@ -40,19 +44,6 @@ VlanId ::= TEXTUAL-CONVENTION
     DESCRIPTION 
         "A 12-bit VLAN ID used in the VLAN Tag header."
     SYNTAX      Integer32 (1..4094)
-
-BridgeId ::= TEXTUAL-CONVENTION
-    STATUS  current
-    DESCRIPTION
-        " Identifier of Bridge in 8 byte format"
-    SYNTAX          OCTET STRING (SIZE (8))
-
-Timeout ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT "d4"
-    STATUS       current
-    DESCRIPTION
-        " Time out value in 4 byte"
-    SYNTAX       Integer32
 
 EnabledStatus ::= TEXTUAL-CONVENTION
     STATUS      current

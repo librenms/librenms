@@ -15,16 +15,16 @@ IMPORTS
         FROM SNMPv2-SMI
     jnxLicenseMibRoot
         FROM JUNIPER-SMI
-    DisplayString
+    DisplayString, DateAndTime
         FROM SNMPv2-TC;
 
 jnxLicenseMIB       MODULE-IDENTITY
-    LAST-UPDATED    "201007090000Z"
+    LAST-UPDATED    "202005050000Z"
     ORGANIZATION    "Juniper Networks, Inc."
     CONTACT-INFO
             "Juniper Technical Assistance Center
              Juniper Networks, Inc.
-             1194 N. Mathilda Avenue
+             1133 Innovation Way
              Sunnyvale, CA 94089
              E-mail: support@juniper.net"
     DESCRIPTION
@@ -33,6 +33,20 @@ jnxLicenseMIB       MODULE-IDENTITY
     REVISION    "201007090000Z"    -- Jul 09, 2010
     DESCRIPTION
              "Initial version."
+
+    REVISION    "201612150000Z"    -- Dec 15, 2016
+    DESCRIPTION
+             "Added OID jnxLicenseKeyType and Trap jnxLicenseExpired"
+
+
+    REVISION    "201906170000Z"    -- Jun 17, 2019
+    DESCRIPTION
+             "Deprecated jnxLicenseKeys."
+
+    REVISION    "202005050000Z"    -- May 05, 2020
+    DESCRIPTION
+             "Added OID jnxLicenseStartDate and jnxLicenseEndDate."
+
     ::=  {  jnxLicenseMibRoot  1  }
 
 jnxLicenseNotifications     OBJECT IDENTIFIER ::=  {  jnxLicenseMIB  0  }
@@ -65,7 +79,10 @@ JnxLicenseInstallEntry  ::=  SEQUENCE {
     jnxLicenseVersion         INTEGER,
     jnxLicenseDeviceId        DisplayString,
     jnxLicenseType            INTEGER,
-    jnxLicenseKeys            OCTET STRING
+    jnxLicenseKeys            OCTET STRING,
+    jnxLicenseKeyType		INTEGER,
+    jnxLicenseStartDate       DateAndTime,
+    jnxLicenseEndDate         DateAndTime
     }
 
 jnxLicenseId OBJECT-TYPE
@@ -99,9 +116,34 @@ jnxLicenseType OBJECT-TYPE
 jnxLicenseKeys      OBJECT-TYPE
     SYNTAX          OCTET STRING 
     MAX-ACCESS      read-only
-    STATUS          current
-    DESCRIPTION     "License Keys"
+    STATUS          deprecated
+    DESCRIPTION     "******** THIS OBJECT IS DEPRECATED ********
+                    This object is deprecated,
+                    it displays all the license keys 
+                    in the system."
+
     ::=  {  jnxLicenseInstallEntry 5  }
+
+jnxLicenseKeyType      OBJECT-TYPE
+    SYNTAX          INTEGER {commercial(1), trial(2), demo(3), emergency(4), lab(5), education(6)} 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License key type"
+    ::=  {  jnxLicenseInstallEntry 6  }
+
+jnxLicenseStartDate OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License Start Date information "
+    ::=  {  jnxLicenseInstallEntry 7  }
+
+jnxLicenseEndDate   OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License End Date information "
+    ::=  {  jnxLicenseInstallEntry 8  }
 
 -- Feature Listing Table 
 
@@ -256,5 +298,13 @@ jnxLicenseInfringeSingle NOTIFICATION-TYPE
          not available."
     ::= { jnxLicenseNotifications 5 }
 
+jnxLicenseKeyExpired NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName,  jnxLicenseFeatureLicenseId, jnxLicenseKeyType }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the license for feature
+         identified by jnxLicenseFeatureName is not valid i.e. either expired or
+         not available."
+    ::= { jnxLicenseNotifications 6 }
 
 END

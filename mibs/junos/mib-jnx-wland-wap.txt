@@ -1,0 +1,1380 @@
+JUNIPER-WLAN-WAP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+    IpAddress, Counter64
+        FROM SNMPv2-SMI
+    DisplayString, TimeStamp
+        FROM SNMPv2-TC
+    jnxWlanWAPStatusMibRoot
+        FROM JUNIPER-SMI;
+
+jnxWlanWAPMIB  MODULE-IDENTITY
+    LAST-UPDATED "201906130000Z" --  Jun 13, 2019
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "       Juniper Technical Assistance Center
+                    Juniper Networks, Inc.
+                    1133 Innovation Way,
+                    Sunnyvale, CA 94089
+                    E-mail: support@juniper.net"
+    DESCRIPTION
+        "The JUNOS WAP mPIM MIB for the Juniper Networks enterprise."
+
+    -- revision history
+    REVISION      "201906130000Z"
+    DESCRIPTION   "Creation Date"
+    ::= { jnxWlanWAPStatusMibRoot 1 }
+
+-- Managed object groups
+jnxWlanWAPStatusObjects   OBJECT IDENTIFIER ::= { jnxWlanWAPMIB 1 }
+jnxWlanWAPClientObjects   OBJECT IDENTIFIER ::= { jnxWlanWAPMIB 2 }
+
+-- WAP mPIM Status Table
+jnxWlanWAPStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxWlanWAPStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of WAP mPIM Status for the WL interfaces."
+    ::= { jnxWlanWAPStatusObjects 1 }
+
+jnxWlanWAPStatusEntry OBJECT-TYPE
+    SYNTAX      JnxWlanWAPStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry resprenting the status of one WL interfaces."
+    INDEX   { jnxWAPStatusIfdIndex }
+    ::= { jnxWlanWAPStatusTable 1 }
+
+JnxWlanWAPStatusEntry ::= SEQUENCE {
+    jnxWAPStatusIfdIndex                       Integer32,
+    jnxWAPStatusAccessPoint                    DisplayString,
+    jnxWAPStatusType                           DisplayString,
+    jnxWAPStatusLocation                       DisplayString,
+    jnxWAPStatusSerialNumber                   DisplayString,
+    jnxWAPStatusFirmwareVersion                DisplayString,
+    jnxWAPStatusAlternateVersion               DisplayString,
+    jnxWAPStatusCountry                        DisplayString,
+    jnxWAPStatusAccessInterface                DisplayString,
+    jnxWAPStatusSystemTime                     DisplayString,
+    jnxWAPStatusPacketCapture                  DisplayString,
+    jnxWAPStatusEthernetPortMAC                DisplayString,
+    jnxWAPStatusEthernetIPv4                   IpAddress,
+    jnxWAPStatusRadio1Status                   DisplayString,
+    jnxWAPStatusRadio1MAC                      DisplayString,
+    jnxWAPStatusRadio1Mode                     DisplayString,
+    jnxWAPStatusRadio1Channel                  DisplayString,
+    jnxWAPStatusRadio1Bandwidth                DisplayString,
+    jnxWAPStatusRadio1VAP0SSID                 DisplayString,
+    jnxWAPStatusRadio1VAP0MAC                  DisplayString,
+    jnxWAPStatusRadio1VAP0VLANID               Counter32,
+    jnxWAPStatusRadio1VAP0InputBytes           Counter64,
+    jnxWAPStatusRadio1VAP0OutputBytes          Counter64,
+    jnxWAPStatusRadio1VAP0InputPackets         Counter64,
+    jnxWAPStatusRadio1VAP0OutputPackets        Counter64,
+    jnxWAPStatusRadio1VAP1SSID                 DisplayString,
+    jnxWAPStatusRadio1VAP1MAC                  DisplayString,
+    jnxWAPStatusRadio1VAP1VLANID               Counter32,
+    jnxWAPStatusRadio1VAP1InputBytes           Counter64,
+    jnxWAPStatusRadio1VAP1OutputBytes          Counter64,
+    jnxWAPStatusRadio1VAP1InputPackets         Counter64,
+    jnxWAPStatusRadio1VAP1OutputPackets        Counter64,
+    jnxWAPStatusRadio1VAP2SSID                 DisplayString,
+    jnxWAPStatusRadio1VAP2MAC                  DisplayString,
+    jnxWAPStatusRadio1VAP2VLANID               Counter32,
+    jnxWAPStatusRadio1VAP2InputBytes           Counter64,
+    jnxWAPStatusRadio1VAP2OutputBytes          Counter64,
+    jnxWAPStatusRadio1VAP2InputPackets         Counter64,
+    jnxWAPStatusRadio1VAP2OutputPackets        Counter64,
+    jnxWAPStatusRadio1VAP3SSID                 DisplayString,
+    jnxWAPStatusRadio1VAP3MAC                  DisplayString,
+    jnxWAPStatusRadio1VAP3VLANID               Counter32,
+    jnxWAPStatusRadio1VAP3InputBytes           Counter64,
+    jnxWAPStatusRadio1VAP3OutputBytes          Counter64,
+    jnxWAPStatusRadio1VAP3InputPackets         Counter64,
+    jnxWAPStatusRadio1VAP3OutputPackets        Counter64,
+    jnxWAPStatusRadio1VAP4SSID                 DisplayString,
+    jnxWAPStatusRadio1VAP4MAC                  DisplayString,
+    jnxWAPStatusRadio1VAP4VLANID               Counter32,
+    jnxWAPStatusRadio1VAP4InputBytes           Counter64,
+    jnxWAPStatusRadio1VAP4OutputBytes          Counter64,
+    jnxWAPStatusRadio1VAP4InputPackets         Counter64,
+    jnxWAPStatusRadio1VAP4OutputPackets        Counter64,
+    jnxWAPStatusRadio1VAP5SSID                 DisplayString,
+    jnxWAPStatusRadio1VAP5MAC                  DisplayString,
+    jnxWAPStatusRadio1VAP5VLANID               Counter32,
+    jnxWAPStatusRadio1VAP5InputBytes           Counter64,
+    jnxWAPStatusRadio1VAP5OutputBytes          Counter64,
+    jnxWAPStatusRadio1VAP5InputPackets         Counter64,
+    jnxWAPStatusRadio1VAP5OutputPackets        Counter64,
+    jnxWAPStatusRadio1VAP6SSID                 DisplayString,
+    jnxWAPStatusRadio1VAP6MAC                  DisplayString,
+    jnxWAPStatusRadio1VAP6VLANID               Counter32,
+    jnxWAPStatusRadio1VAP6InputBytes           Counter64,
+    jnxWAPStatusRadio1VAP6OutputBytes          Counter64,
+    jnxWAPStatusRadio1VAP6InputPackets         Counter64,
+    jnxWAPStatusRadio1VAP6OutputPackets        Counter64,
+    jnxWAPStatusRadio1VAP7SSID                 DisplayString,
+    jnxWAPStatusRadio1VAP7MAC                  DisplayString,
+    jnxWAPStatusRadio1VAP7VLANID               Counter32,
+    jnxWAPStatusRadio1VAP7InputBytes           Counter64,
+    jnxWAPStatusRadio1VAP7OutputBytes          Counter64,
+    jnxWAPStatusRadio1VAP7InputPackets         Counter64,
+    jnxWAPStatusRadio1VAP7OutputPackets        Counter64,
+    jnxWAPStatusRadio2Status                   DisplayString,
+    jnxWAPStatusRadio2MAC                      DisplayString,
+    jnxWAPStatusRadio2Mode                     DisplayString,
+    jnxWAPStatusRadio2Channel                  DisplayString,
+    jnxWAPStatusRadio2Bandwidth                DisplayString,
+    jnxWAPStatusRadio2VAP0SSID                 DisplayString,
+    jnxWAPStatusRadio2VAP0MAC                  DisplayString,
+    jnxWAPStatusRadio2VAP0VLANID               Counter32,
+    jnxWAPStatusRadio2VAP0InputBytes           Counter64,
+    jnxWAPStatusRadio2VAP0OutputBytes          Counter64,
+    jnxWAPStatusRadio2VAP0InputPackets         Counter64,
+    jnxWAPStatusRadio2VAP0OutputPackets        Counter64,
+    jnxWAPStatusRadio2VAP1SSID                 DisplayString,
+    jnxWAPStatusRadio2VAP1MAC                  DisplayString,
+    jnxWAPStatusRadio2VAP1VLANID               Counter32,
+    jnxWAPStatusRadio2VAP1InputBytes           Counter64,
+    jnxWAPStatusRadio2VAP1OutputBytes          Counter64,
+    jnxWAPStatusRadio2VAP1InputPackets         Counter64,
+    jnxWAPStatusRadio2VAP1OutputPackets        Counter64,
+    jnxWAPStatusRadio2VAP2SSID                 DisplayString,
+    jnxWAPStatusRadio2VAP2MAC                  DisplayString,
+    jnxWAPStatusRadio2VAP2VLANID               Counter32,
+    jnxWAPStatusRadio2VAP2InputBytes           Counter64,
+    jnxWAPStatusRadio2VAP2OutputBytes          Counter64,
+    jnxWAPStatusRadio2VAP2InputPackets         Counter64,
+    jnxWAPStatusRadio2VAP2OutputPackets        Counter64,
+    jnxWAPStatusRadio2VAP3SSID                 DisplayString,
+    jnxWAPStatusRadio2VAP3MAC                  DisplayString,
+    jnxWAPStatusRadio2VAP3VLANID               Counter32,
+    jnxWAPStatusRadio2VAP3InputBytes           Counter64,
+    jnxWAPStatusRadio2VAP3OutputBytes          Counter64,
+    jnxWAPStatusRadio2VAP3InputPackets         Counter64,
+    jnxWAPStatusRadio2VAP3OutputPackets        Counter64,
+    jnxWAPStatusRadio2VAP4SSID                 DisplayString,
+    jnxWAPStatusRadio2VAP4MAC                  DisplayString,
+    jnxWAPStatusRadio2VAP4VLANID               Counter32,
+    jnxWAPStatusRadio2VAP4InputBytes           Counter64,
+    jnxWAPStatusRadio2VAP4OutputBytes          Counter64,
+    jnxWAPStatusRadio2VAP4InputPackets         Counter64,
+    jnxWAPStatusRadio2VAP4OutputPackets        Counter64,
+    jnxWAPStatusRadio2VAP5SSID                 DisplayString,
+    jnxWAPStatusRadio2VAP5MAC                  DisplayString,
+    jnxWAPStatusRadio2VAP5VLANID               Counter32,
+    jnxWAPStatusRadio2VAP5InputBytes           Counter64,
+    jnxWAPStatusRadio2VAP5OutputBytes          Counter64,
+    jnxWAPStatusRadio2VAP5InputPackets         Counter64,
+    jnxWAPStatusRadio2VAP5OutputPackets        Counter64,
+    jnxWAPStatusRadio2VAP6SSID                 DisplayString,
+    jnxWAPStatusRadio2VAP6MAC                  DisplayString,
+    jnxWAPStatusRadio2VAP6VLANID               Counter32,
+    jnxWAPStatusRadio2VAP6InputBytes           Counter64,
+    jnxWAPStatusRadio2VAP6OutputBytes          Counter64,
+    jnxWAPStatusRadio2VAP6InputPackets         Counter64,
+    jnxWAPStatusRadio2VAP6OutputPackets        Counter64,
+    jnxWAPStatusRadio2VAP7SSID                 DisplayString,
+    jnxWAPStatusRadio2VAP7MAC                  DisplayString,
+    jnxWAPStatusRadio2VAP7VLANID               Counter32,
+    jnxWAPStatusRadio2VAP7InputBytes           Counter64,
+    jnxWAPStatusRadio2VAP7OutputBytes          Counter64,
+    jnxWAPStatusRadio2VAP7InputPackets         Counter64,
+    jnxWAPStatusRadio2VAP7OutputPackets        Counter64
+    }
+
+jnxWAPStatusIfdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..999)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The WAP index associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 1 }
+
+jnxWAPStatusAccessPoint OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP name associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 2 }
+
+jnxWAPStatusType OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP IP associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 3 }
+
+jnxWAPStatusLocation OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP location associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 4 }
+
+jnxWAPStatusSerialNumber OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP serial number associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 5 }
+
+jnxWAPStatusFirmwareVersion OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP firmware version associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 6 }
+
+jnxWAPStatusAlternateVersion OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP alternate version associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 7 }
+
+jnxWAPStatusCountry OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP country associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 8 }
+
+jnxWAPStatusAccessInterface OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP interface associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 9 }
+
+jnxWAPStatusSystemTime OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The system time associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 10 }
+
+jnxWAPStatusPacketCapture OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP packet capture associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 11 }
+
+jnxWAPStatusEthernetPortMAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP ethernet port MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 12 }
+
+jnxWAPStatusEthernetIPv4 OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP IPv4 associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 13 }
+
+jnxWAPStatusRadio1Status OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 status associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 14 }
+
+jnxWAPStatusRadio1MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 mac associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 15 }
+
+jnxWAPStatusRadio1Mode OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 mode associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 16 }
+
+jnxWAPStatusRadio1Channel OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 channel associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 17 }
+
+jnxWAPStatusRadio1Bandwidth OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 bandwidth associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 18 }
+
+jnxWAPStatusRadio1VAP0SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 0 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 19 }
+
+jnxWAPStatusRadio1VAP0MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 0 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 20 }
+
+jnxWAPStatusRadio1VAP0VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 0 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 21 }
+
+jnxWAPStatusRadio1VAP0InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 0 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 22 }
+
+jnxWAPStatusRadio1VAP0OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 0 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 23 }
+
+jnxWAPStatusRadio1VAP0InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 0 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 24 }
+
+jnxWAPStatusRadio1VAP0OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 0 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 25 }
+
+jnxWAPStatusRadio1VAP1SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 1 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 26 }
+
+jnxWAPStatusRadio1VAP1MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 1 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 27 }
+
+jnxWAPStatusRadio1VAP1VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 1 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 28 }
+
+jnxWAPStatusRadio1VAP1InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 1 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 29 }
+
+jnxWAPStatusRadio1VAP1OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 1 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 30 }
+
+jnxWAPStatusRadio1VAP1InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 1 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 31 }
+
+jnxWAPStatusRadio1VAP1OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 1 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 32 }
+
+jnxWAPStatusRadio1VAP2SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 2 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 33 }
+
+jnxWAPStatusRadio1VAP2MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 2 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 34 }
+
+jnxWAPStatusRadio1VAP2VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 2 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 35 }
+
+jnxWAPStatusRadio1VAP2InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 2 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 36 }
+
+jnxWAPStatusRadio1VAP2OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 2 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 37 }
+
+jnxWAPStatusRadio1VAP2InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 2 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 38 }
+
+jnxWAPStatusRadio1VAP2OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 2 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 39 }
+
+jnxWAPStatusRadio1VAP3SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 3 ssid ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 40 }
+
+jnxWAPStatusRadio1VAP3MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 3 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 41 }
+
+jnxWAPStatusRadio1VAP3VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 3 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 42 }
+
+jnxWAPStatusRadio1VAP3InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 3 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 43 }
+
+jnxWAPStatusRadio1VAP3OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 3 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 44 }
+
+jnxWAPStatusRadio1VAP3InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 3 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 45 }
+
+jnxWAPStatusRadio1VAP3OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 3 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 46 }
+
+jnxWAPStatusRadio1VAP4SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 4 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 47 }
+
+jnxWAPStatusRadio1VAP4MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 4 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 48 }
+
+jnxWAPStatusRadio1VAP4VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 4 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 49 }
+
+jnxWAPStatusRadio1VAP4InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 4 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 50 }
+
+jnxWAPStatusRadio1VAP4OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 4 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 51 }
+
+jnxWAPStatusRadio1VAP4InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 4 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 52 }
+
+jnxWAPStatusRadio1VAP4OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 4 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 53 }
+
+jnxWAPStatusRadio1VAP5SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 5 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 54 }
+
+jnxWAPStatusRadio1VAP5MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 5 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 55 }
+
+jnxWAPStatusRadio1VAP5VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 5 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 56 }
+
+jnxWAPStatusRadio1VAP5InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 5 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 57 }
+
+jnxWAPStatusRadio1VAP5OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 5 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 58 }
+
+jnxWAPStatusRadio1VAP5InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 5 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 59 }
+
+jnxWAPStatusRadio1VAP5OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 5 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 60 }
+
+jnxWAPStatusRadio1VAP6SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 6 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 61 }
+
+jnxWAPStatusRadio1VAP6MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 6 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 62 }
+
+jnxWAPStatusRadio1VAP6VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 6 vland ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 63 }
+
+jnxWAPStatusRadio1VAP6InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 6 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 64 }
+
+jnxWAPStatusRadio1VAP6OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 6 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 65 }
+
+jnxWAPStatusRadio1VAP6InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 6 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 66 }
+
+jnxWAPStatusRadio1VAP6OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 6 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 67}
+
+jnxWAPStatusRadio1VAP7SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 7 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 68 }
+
+jnxWAPStatusRadio1VAP7MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 7 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 69 }
+
+jnxWAPStatusRadio1VAP7VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 7 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 70 }
+
+jnxWAPStatusRadio1VAP7InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 7 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 71 }
+
+jnxWAPStatusRadio1VAP7OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 7 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 72 }
+
+jnxWAPStatusRadio1VAP7InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 7 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 73 }
+
+jnxWAPStatusRadio1VAP7OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 1 vap 7 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 74 }
+
+jnxWAPStatusRadio2Status OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 status associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 75 }
+
+jnxWAPStatusRadio2MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 76 }
+
+jnxWAPStatusRadio2Mode OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 mode associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 77 }
+
+jnxWAPStatusRadio2Channel OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 channl associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 78 }
+
+jnxWAPStatusRadio2Bandwidth OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 bandwidth associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 79 }
+
+jnxWAPStatusRadio2VAP0SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 0 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 80 }
+
+jnxWAPStatusRadio2VAP0MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 0 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 81 }
+
+jnxWAPStatusRadio2VAP0VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 0 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 82 }
+
+jnxWAPStatusRadio2VAP0InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 0 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 83 }
+
+jnxWAPStatusRadio2VAP0OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 0 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 84 }
+
+jnxWAPStatusRadio2VAP0InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 0 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 85}
+
+jnxWAPStatusRadio2VAP0OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 0 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 86 }
+
+jnxWAPStatusRadio2VAP1SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 1 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 87 }
+
+jnxWAPStatusRadio2VAP1MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 1 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 88 }
+
+jnxWAPStatusRadio2VAP1VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 1 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 89 }
+
+jnxWAPStatusRadio2VAP1InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 1 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 90 }
+
+jnxWAPStatusRadio2VAP1OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 1 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 91 }
+
+jnxWAPStatusRadio2VAP1InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 1 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 92 }
+
+jnxWAPStatusRadio2VAP1OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 1 output packet associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 93 }
+
+jnxWAPStatusRadio2VAP2SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 2 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 94 }
+
+jnxWAPStatusRadio2VAP2MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 2 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 95 }
+
+jnxWAPStatusRadio2VAP2VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 2 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 96 }
+
+jnxWAPStatusRadio2VAP2InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 2 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 97 }
+
+jnxWAPStatusRadio2VAP2OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 2 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 98 }
+
+jnxWAPStatusRadio2VAP2InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 2 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 99 }
+
+jnxWAPStatusRadio2VAP2OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 2 output packet associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 100 }
+
+jnxWAPStatusRadio2VAP3SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 3 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 101 }
+
+jnxWAPStatusRadio2VAP3MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 3 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 102 }
+
+jnxWAPStatusRadio2VAP3VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 3 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 103 }
+
+jnxWAPStatusRadio2VAP3InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 3 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 104 }
+
+jnxWAPStatusRadio2VAP3OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 3 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 105 }
+
+jnxWAPStatusRadio2VAP3InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 3 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 106 }
+
+jnxWAPStatusRadio2VAP3OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 3 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 107 }
+
+jnxWAPStatusRadio2VAP4SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 4 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 108 }
+
+jnxWAPStatusRadio2VAP4MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 4 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 109 }
+
+jnxWAPStatusRadio2VAP4VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 4 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 110 }
+
+jnxWAPStatusRadio2VAP4InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 4 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 111 }
+
+jnxWAPStatusRadio2VAP4OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 4 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 112 }
+
+jnxWAPStatusRadio2VAP4InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 4 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 113 }
+
+jnxWAPStatusRadio2VAP4OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 4 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 114 }
+
+jnxWAPStatusRadio2VAP5SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 5 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 115 }
+
+jnxWAPStatusRadio2VAP5MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 5 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 116 }
+
+jnxWAPStatusRadio2VAP5VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 5 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 117 }
+
+jnxWAPStatusRadio2VAP5InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 5 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 118 }
+
+jnxWAPStatusRadio2VAP5OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 5 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 119 }
+
+jnxWAPStatusRadio2VAP5InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 5 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 120 }
+
+jnxWAPStatusRadio2VAP5OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 5 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 121 }
+
+jnxWAPStatusRadio2VAP6SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 6 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 122 }
+
+jnxWAPStatusRadio2VAP6MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 6 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 123 }
+
+jnxWAPStatusRadio2VAP6VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 6 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 124 }
+
+jnxWAPStatusRadio2VAP6InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 6 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 125 }
+
+jnxWAPStatusRadio2VAP6OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 6 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 126 }
+
+jnxWAPStatusRadio2VAP6InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 6 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 127 }
+
+jnxWAPStatusRadio2VAP6OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 6 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 128 }
+
+jnxWAPStatusRadio2VAP7SSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 7 ssid associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 129 }
+
+jnxWAPStatusRadio2VAP7MAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 7 MAC associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 130 }
+
+jnxWAPStatusRadio2VAP7VLANID OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 7 vlan ID associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 131 }
+
+jnxWAPStatusRadio2VAP7InputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 7 input bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 132 }
+
+jnxWAPStatusRadio2VAP7OutputBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 7 output bytes associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 133 }
+
+jnxWAPStatusRadio2VAP7InputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 7 input packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 134 }
+
+jnxWAPStatusRadio2VAP7OutputPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP radio 2 vap 7 output packets associated with this entry in WAP status table."
+    ::= { jnxWlanWAPStatusEntry 135 }
+
+-- WAP mPIM Client Table
+jnxWlanWAPClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxWlanWAPClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of WAP mPIM Status for the WL interfaces."
+    ::= { jnxWlanWAPClientObjects 1 }
+
+jnxWlanWAPClientEntry OBJECT-TYPE
+    SYNTAX      JnxWlanWAPClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry resprenting the status of one WL interfaces."
+    INDEX   { jnxWAPClientIfdIndex,
+              jnxWAPClientIndex }
+    ::= { jnxWlanWAPClientTable 1 }
+
+JnxWlanWAPClientEntry ::= SEQUENCE {
+    jnxWAPClientIfdIndex                       Counter32,
+    jnxWAPClientIndex                          Counter32,
+    jnxWAPClientRadioID                        Counter32,
+    jnxWAPClientSSID                           DisplayString,
+    jnxWAPClientMAC                            DisplayString,
+    jnxWAPClientAuth                           DisplayString,
+    jnxWAPClientPacketRx                       Counter64,
+    jnxWAPClientPacketTx                       Counter64,
+    jnxWAPClientBytesRx                        Counter64,
+    jnxWAPClientBytesTx                        Counter64
+    }
+
+jnxWAPClientIfdIndex OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The WAP index associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 1 }
+
+jnxWAPClientIndex OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The WAP index associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 2 }
+
+jnxWAPClientRadioID OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The WAP index associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 3 }
+
+jnxWAPClientSSID OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP IP associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 4 }
+
+jnxWAPClientMAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP IP associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 5 }
+
+jnxWAPClientAuth OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WAP IP associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 6 }
+
+jnxWAPClientPacketRx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The WAP index associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 7 }
+
+jnxWAPClientPacketTx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The WAP index associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 8 }
+
+jnxWAPClientBytesRx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The WAP index associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 9 }
+
+jnxWAPClientBytesTx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The WAP index associated with this entry in WAP client table."
+    ::= { jnxWlanWAPClientEntry 10 }
+
+END

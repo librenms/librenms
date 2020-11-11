@@ -19,16 +19,16 @@ IMPORTS
         FROM IF-MIB
     CounterBasedGauge64
         FROM HCNUM-TC
-    jnxMibs
+    jnxMibs, jnxSpNotifications
         FROM JUNIPER-SMI;
 
 jnxSpMIB  MODULE-IDENTITY
-    LAST-UPDATED "200504050000Z" -- Apr 5, 2005
+    LAST-UPDATED "201909190000Z"     -- Thu Sept 19 00:00:00 2019 UTC
     ORGANIZATION "Juniper Networks, Inc." 
     CONTACT-INFO
             "        Juniper Technical Assistance Center
                      Juniper Networks, Inc.
-                     1194 N. Mathilda Avenue
+                     1133 Innovation Way
                      Sunnyvale, CA 94089
                      E-mail: support@juniper.net"
 
@@ -43,10 +43,30 @@ jnxSpMIB  MODULE-IDENTITY
     DESCRIPTION
             "Added OID jnxSpSvcSetFlowLimitUtilised under jnxSpNotificationPrefix 
             Depreated OID jnxSpSvcSetFlowLimitUtilized ."
+
+    REVISION    "201605310000Z" -- 31-May-16
+    DESCRIPTION
+            "Removed duplicate entries"
+
+    REVISION    "201810220000Z" -- 22-Oct-18
+    DESCRIPTION
+            "Added OID jnxSpTcpLoggingHostStatus under jnxSpNotificationPrefix"
+
+    REVISION    "201908100000Z" -- 10-Aug-19
+    DESCRIPTION
+            "Added OIDs jnxSpSvcSetMemoryUsage64, jnxSpSvcSetMemLimitPktDrops64,
+             jnxSpSvcSetCpuLimitPktDrops64, jnxSpSvcSetFlowLimitPktDrops64
+             under JnxSpSvcSetEntry. "
+
+    REVISION    "201909190000Z" -- 19-Sept-19
+    DESCRIPTION
+            "Added OID jnxSpSvcSetSessCount under JnxSpSvcSetEntry.
+             Added new OIDs under JnxSpSvcSetIfEntry."
+
     ::= { jnxMibs 32 }
 
-    jnxSpNotifications    OBJECT IDENTIFIER ::= { jnxSpMIB 0 }
-    jnxFlowLimitTrapVars  OBJECT IDENTIFIER ::= { jnxSpMIB 2 }
+    jnxFlowLimitTrapVars   OBJECT IDENTIFIER ::= { jnxSpMIB 2 }
+    jnxTcpLoggingTrapVars  OBJECT IDENTIFIER ::= { jnxSpMIB 3 }
     
 --
 -- Per Service Set information
@@ -79,17 +99,22 @@ jnxSpMIB  MODULE-IDENTITY
 
     JnxSpSvcSetEntry ::=
         SEQUENCE {
-            jnxSpSvcSetName              DisplayString,
-            jnxSpSvcSetSvcType           DisplayString,
-            jnxSpSvcSetTypeIndex         Integer32,
-            jnxSpSvcSetIfName            DisplayString,
-            jnxSpSvcSetIfIndex           InterfaceIndex,
-            jnxSpSvcSetMemoryUsage       Gauge32,
-            jnxSpSvcSetCpuUtil           Gauge32,
-            jnxSpSvcSetSvcStyle          INTEGER, 
-            jnxSpSvcSetMemLimitPktDrops  Counter32,
-            jnxSpSvcSetCpuLimitPktDrops  Counter32,
-            jnxSpSvcSetFlowLimitPktDrops Counter32
+            jnxSpSvcSetName                 DisplayString,
+            jnxSpSvcSetSvcType              DisplayString,
+            jnxSpSvcSetTypeIndex            Integer32,
+            jnxSpSvcSetIfName               DisplayString,
+            jnxSpSvcSetIfIndex              InterfaceIndex,
+            jnxSpSvcSetMemoryUsage          Gauge32,
+            jnxSpSvcSetCpuUtil              Gauge32,
+            jnxSpSvcSetSvcStyle             INTEGER, 
+            jnxSpSvcSetMemLimitPktDrops     Counter32,
+            jnxSpSvcSetCpuLimitPktDrops     Counter32,
+            jnxSpSvcSetFlowLimitPktDrops    Counter32,
+            jnxSpSvcSetMemoryUsage64        CounterBasedGauge64,
+            jnxSpSvcSetMemLimitPktDrops64   CounterBasedGauge64,
+            jnxSpSvcSetCpuLimitPktDrops64   CounterBasedGauge64,
+            jnxSpSvcSetFlowLimitPktDrops64  CounterBasedGauge64,
+            jnxSpSvcSetSessCount            Counter32
         }
 
     jnxSpSvcSetName OBJECT-TYPE
@@ -198,6 +223,54 @@ jnxSpMIB  MODULE-IDENTITY
             "The number of packets dropped due to the Service Set exceeding
             the flow limit."
         ::= { jnxSpSvcSetEntry 11 }
+
+    jnxSpSvcSetMemoryUsage64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service Set, expressed in
+            bytes, represented by 64 bit integer."
+        ::= { jnxSpSvcSetEntry 12 }
+
+    jnxSpSvcSetMemLimitPktDrops64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped due to the Service Set exceeding
+            its memory limits (when in Red Zone),
+            represented by 64 bit integer."
+        ::= { jnxSpSvcSetEntry 13 }
+
+    jnxSpSvcSetCpuLimitPktDrops64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped due to the Service Set exceeding
+            the average cpu limits (when total exceeds 85%),
+            represented by 64 bit integer."
+        ::= { jnxSpSvcSetEntry 14 }
+
+    jnxSpSvcSetFlowLimitPktDrops64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped due to the Service Set exceeding
+            the flow limit, represented by 64 bit integer."
+        ::= { jnxSpSvcSetEntry 15 }
+
+    jnxSpSvcSetSessCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of sessions active in the Service Set."
+        ::= { jnxSpSvcSetEntry 16 }
+
 
 --
 -- Per Service information
@@ -338,16 +411,50 @@ jnxSpMIB  MODULE-IDENTITY
 
     JnxSpSvcSetIfEntry ::=
         SEQUENCE {
-            jnxSpSvcSetIfTableName         DisplayString,
-            jnxSpSvcSetIfSvcSets           Gauge32,
-            jnxSpSvcSetIfMemoryUsage       Gauge32,
-            jnxSpSvcSetIfPctMemoryUsage    Gauge32,
-            jnxSpSvcSetIfPolMemoryUsage    Gauge32,
-            jnxSpSvcSetIfPctPolMemoryUsage Gauge32,
-            jnxSpSvcSetIfMemoryZone        INTEGER,
-            jnxSpSvcSetIfCpuUtil           Gauge32,
-            jnxSpSvcSetIfMemoryUsage64     CounterBasedGauge64,
-            jnxSpSvcSetIfPolMemoryUsage64  CounterBasedGauge64
+            jnxSpSvcSetIfTableName                   DisplayString,
+            jnxSpSvcSetIfSvcSets                     Gauge32,
+            jnxSpSvcSetIfMemoryUsage                 Gauge32,
+            jnxSpSvcSetIfPctMemoryUsage              Gauge32,
+            jnxSpSvcSetIfPolMemoryUsage              Gauge32,
+            jnxSpSvcSetIfPctPolMemoryUsage           Gauge32,
+            jnxSpSvcSetIfMemoryZone                  INTEGER,
+            jnxSpSvcSetIfCpuUtil                     Gauge32,
+            jnxSpSvcSetIfMemoryUsage64               CounterBasedGauge64,
+            jnxSpSvcSetIfPolMemoryUsage64            CounterBasedGauge64,
+            jnxSpSvcSetIfNumTotalSessActive          Integer32,
+            jnxSpSvcSetIfPeakTotalSessActive         Integer32,
+            jnxSpSvcSetIfNumCreatedSessPerSec        Integer32,
+            jnxSpSvcSetIfNumDeletedSessPerSec        Integer32,
+            jnxSpSvcSetIfNumTotalTcpSessActive       Integer32,
+            jnxSpSvcSetIfNumTotalUdpSessActive       Integer32,
+            jnxSpSvcSetIfNumTotalOtherSessActive     Integer32,
+            jnxSpSvcSetIfPeakTotalTcpSessActive      Integer32,
+            jnxSpSvcSetIfPeakTotalUdpSessActive      Integer32,
+            jnxSpSvcSetIfPeakTotalOtherSessActive    Integer32,
+            jnxSpSvcSetIfPeakCreatedSessPerSec       Integer32,
+            jnxSpSvcSetIfPeakDeletedSessPerSec       Integer32,
+            jnxSpSvcSetIfNumTotalTcpIpv4SessActive   Integer32,
+            jnxSpSvcSetIfNumTotalTcpIpv6SessActive   Integer32,
+            jnxSpSvcSetIfNumTotalUdpIpv4SessActive   Integer32,
+            jnxSpSvcSetIfNumTotalUdpIpv6SessActive   Integer32,
+            jnxSpSvcSetIfNumTotalOtherIpv4SessActive Integer32,
+            jnxSpSvcSetIfNumTotalOtherIpv6SessActive Integer32,
+            jnxSpSvcSetIfNumTotalTcpGatedSessActive  Integer32,
+            jnxSpSvcSetIfNumTotalUdpGatedSessActive  Integer32,
+            jnxSpSvcSetIfNumTotalTcpRegSessActive    Integer32,
+            jnxSpSvcSetIfNumTotalUdpRegSessActive    Integer32,
+            jnxSpSvcSetIfNumTotalTcpTunSessActive    Integer32,
+            jnxSpSvcSetIfNumTotalUdpTunSessActive    Integer32,
+            jnxSpSvcSetIfSessPktRecv                 CounterBasedGauge64,
+            jnxSpSvcSetIfSessPktXmit                 CounterBasedGauge64,
+            jnxSpSvcSetIfSessSlowPathDiscard         CounterBasedGauge64,
+            jnxSpSvcSetIfSessSlowPathForward         CounterBasedGauge64,
+            jnxSpSvcSetIfMspNumCreatedSubsPerSec     Integer32,
+            jnxSpSvcSetIfMspNumDeletedSubsPerSec     Integer32,
+            jnxSpSvcSetIfMspNumTotalSubsActive       Integer32,
+            jnxSpSvcSetIfMspPeakCreatedSubsPerSec    Integer32,
+            jnxSpSvcSetIfMspPeakDeletedSubsPerSec    Integer32,
+            jnxSpSvcSetIfMspPeakTotalSubsActive      Integer32
         }
 
     jnxSpSvcSetIfTableName OBJECT-TYPE
@@ -459,6 +566,291 @@ jnxSpMIB  MODULE-IDENTITY
             bytes, represented by 64 bit integer."
         ::= { jnxSpSvcSetIfEntry 10 }
 
+    jnxSpSvcSetIfNumTotalSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 11 }
+
+    jnxSpSvcSetIfPeakTotalSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Peak number of sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 12 }
+
+    jnxSpSvcSetIfNumCreatedSessPerSec OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of sessions created per second in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 13 }
+
+    jnxSpSvcSetIfNumDeletedSessPerSec OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of sessions deleted per second in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 14 }
+
+    jnxSpSvcSetIfNumTotalTcpSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of TCP sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 15 }
+
+    jnxSpSvcSetIfNumTotalUdpSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of UDP sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 16 }
+
+    jnxSpSvcSetIfNumTotalOtherSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of other (not TCP or UDP) sessions active
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 17 }
+
+    jnxSpSvcSetIfPeakTotalTcpSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of TCP sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 18 }
+
+    jnxSpSvcSetIfPeakTotalUdpSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of UDP sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 19 }
+
+    jnxSpSvcSetIfPeakTotalOtherSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of other (not TCP or UDP) sessions active
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 20 }
+
+    jnxSpSvcSetIfPeakCreatedSessPerSec OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of sessions created per second in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 21 }
+
+    jnxSpSvcSetIfPeakDeletedSessPerSec OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of sessions deleted per second in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 22 }
+
+    jnxSpSvcSetIfNumTotalTcpIpv4SessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of IPv4 TCP sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 23 }
+
+    jnxSpSvcSetIfNumTotalTcpIpv6SessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of IPv6 TCP sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 24 }
+
+    jnxSpSvcSetIfNumTotalUdpIpv4SessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of IPv4 UDP sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 25 }
+
+    jnxSpSvcSetIfNumTotalUdpIpv6SessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of IPv6 UDP sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 26 }
+
+    jnxSpSvcSetIfNumTotalOtherIpv4SessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of other IPv4 sessions (not TCP or UDP) active
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 27 }
+
+    jnxSpSvcSetIfNumTotalOtherIpv6SessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of other IPv6 sessions (not TCP or UDP) active
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 28 }
+
+    jnxSpSvcSetIfNumTotalTcpGatedSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of TCP gated sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 29 }
+
+    jnxSpSvcSetIfNumTotalUdpGatedSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of UDP gated sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 30 }
+
+    jnxSpSvcSetIfNumTotalTcpRegSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of TCP regular sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 31 }
+
+    jnxSpSvcSetIfNumTotalUdpRegSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of UDP regular sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 32 }
+
+    jnxSpSvcSetIfNumTotalTcpTunSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of TCP tunneled sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 33 }
+
+    jnxSpSvcSetIfNumTotalUdpTunSessActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of UDP tunneled sessions active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 34 }
+
+    jnxSpSvcSetIfSessPktRecv OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of session packets received in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 35 }
+
+
+    jnxSpSvcSetIfSessPktXmit OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of session packets transmitted in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 36 }
+
+    jnxSpSvcSetIfSessSlowPathDiscard OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of session packets discarded in the slow path
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 37 }
+
+    jnxSpSvcSetIfSessSlowPathForward OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of session packets forwarded in the slow path
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 38 }
+
+    jnxSpSvcSetIfMspNumCreatedSubsPerSec OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of subscribers created per second
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 39 }
+
+    jnxSpSvcSetIfMspNumDeletedSubsPerSec OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of subscribers deleted per second
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 40 }
+
+    jnxSpSvcSetIfMspNumTotalSubsActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of subscribers active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 41 }
+
+    jnxSpSvcSetIfMspPeakCreatedSubsPerSec OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of subscribers created per second
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 42 }
+
+    jnxSpSvcSetIfMspPeakDeletedSubsPerSec OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of subscribers deleted per second
+             in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 43 }
+
+    jnxSpSvcSetIfMspPeakTotalSubsActive OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak total number of subscribers active in the Service PIC."
+        ::= { jnxSpSvcSetIfEntry 44 }
+
+
+--
 --
 -- Service PIC Notification definitions
 --
@@ -524,6 +916,41 @@ jnxSpMIB  MODULE-IDENTITY
             "The Service Set name."
         ::= { jnxFlowLimitTrapVars 2 }
 
+   jnxSpTcpLoggingHostIpaddr OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..64))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "The TCP logging remote host server IP address."
+        ::= { jnxTcpLoggingTrapVars 1 }
+
+   jnxSpTcpLoggingHostPort OBJECT-TYPE
+        SYNTAX        Integer32 (0..65535)
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "The TCP logging remote host server port number."
+        ::= { jnxTcpLoggingTrapVars 2 }
+
+   jnxSpTcpLoggingHostConnStatus OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..64))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "The TCP logging remote host server connection status.
+             Status can be either <connection established> or 
+             <connection dropped>"
+        ::= { jnxTcpLoggingTrapVars 3 }
+
+   jnxSpTcpLoggingHostRoutingInstance OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..64))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "The routing instance name under which TCP logging 
+            remote host server is configured."
+        ::= { jnxTcpLoggingTrapVars 4 }
+
    jnxSpSvcSetFlowLimitUtilized NOTIFICATION-TYPE
         OBJECTS {jnxSpSvcSetFlowLimitUtil,
                  jnxSpSvcSetNameUtil}
@@ -541,5 +968,15 @@ jnxSpMIB  MODULE-IDENTITY
             "This indicates a Service Set has reached its upper limit of flows
             threshold of a maximun flows allowed for a service set."
         ::= { jnxSpNotificationPrefix 5 }
+
+   jnxSpTcpLoggingHostStatus NOTIFICATION-TYPE
+        OBJECTS {jnxSpTcpLoggingHostIpaddr,
+                 jnxSpTcpLoggingHostPort,
+                 jnxSpTcpLoggingHostConnStatus,
+                 jnxSpTcpLoggingHostRoutingInstance}
+        STATUS  current
+        DESCRIPTION
+            "This provides TCP logging host connection status for Service Set."
+        ::= { jnxSpNotificationPrefix 6 }
 
 END

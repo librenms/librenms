@@ -22,7 +22,7 @@
         CONTACT-INFO
                 "Juniper Technical Assistance Center
                  Juniper Networks, Inc.
-                 1194 N. Mathilda Avenue
+                 1133 Innovation Way
                  Sunnyvale, CA 94089
                  E-mail: support@juniper.net
                  HTTP://www.juniper.net"
@@ -40,8 +40,7 @@
 
 
     jnxJsCertificateObjects OBJECT IDENTIFIER ::= { jnxJsCertificateMIB 1 }
-
-
+	jnxJsCertificateNotifications OBJECT IDENTIFIER ::= { jnxJsCertificateMIB 2 }
 
     -- ***************************************************************
     --  Loaded CA Certification Table
@@ -175,6 +174,56 @@
         DESCRIPTION
             "The issuer of the local certificate."
         ::= { jnxJsLoadedLocalCertEntry 4 }
+
+	-- ***************************************************************
+	-- Notifications
+	-- ***************************************************************
+
+	jnxJsCertNotificationType OBJECT IDENTIFIER
+		::= { jnxJsCertificateNotifications 1 }
+
+	jnxJsCertNotificationObj OBJECT IDENTIFIER
+		::= { jnxJsCertificateNotifications 2 }
+
+	-- ***************************************************************
+	-- Notifications - Variables
+	-- ***************************************************************
+
+	jnxJsCertName OBJECT-TYPE
+		SYNTAX          DisplayString
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION
+			"Cert-id of the local or CA certificate."
+		::= { jnxJsCertNotificationObj 1 }
+
+	jnxJsCertExpireTime OBJECT-TYPE
+		SYNTAX          DateAndTime
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION
+			"The expiration time and date of the local certificate or CA."
+		::= { jnxJsCertNotificationObj 2 }
+
+	-- ***************************************************************
+	-- Notifications - Traps
+	-- ***************************************************************
+
+	jnxJsCertExpiring NOTIFICATION-TYPE
+		OBJECTS         {
+							jnxJsCertName,
+							jnxJsCertExpireTime
+						}
+		STATUS          current
+		DESCRIPTION
+			"To provide notification for the event when CA or local certificate
+			 is about to expire. By default the notification will be sent 60
+			 days before the certificate expiration time. If the trap number of
+			 days before expiration is set then notification will be sent as per
+			 configured value. The notification will be sent every day from the
+			 60 days or the configured value for certificate expiration."
+		::= { jnxJsCertNotificationType 1 }
+
 
 
     -- ***************************************************************

@@ -28,7 +28,7 @@ jnxVmonMIB       MODULE-IDENTITY
     CONTACT-INFO
             "Juniper Technical Assistance Center
              Juniper Networks, Inc.
-             1194 N. Mathilda Avenue
+             1133 Innovation Way
              Sunnyvale, CA 94089
              E-mail: support@juniper.net"
     DESCRIPTION
@@ -53,7 +53,7 @@ JnxVmonFlowType ::= TEXTUAL-CONVENTION
     DESCRIPTION
             "This data type is to indication which type of flow we
             are talking about i.e. if it is a mpeg flow or rtp flow"
-    SYNTAX       OCTET STRING (SIZE (0..4))
+    SYNTAX       OCTET STRING (SIZE (0..30))
  
 JnxVmonTrapLevel ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
@@ -289,7 +289,10 @@ JnxmdiErrsEntry ::= SEQUENCE {
     jnxmdiErrsFlowInsertErr         Counter64,
     jnxmdiErrsPolicerDrop           Counter64,
     jnxmdiErrsPIDLimitExceed        Counter64,
-    jnxmdiErrsUnsupportedMediaPkts  Counter64
+    jnxmdiErrsUnsupportedMediaPkts  Counter64,
+    jnxmdiErrsFragmentedPkts        Counter64,
+    jnxmdiErrsMaxLabelsExceed       Counter64,
+    jnxmdiErrsOptionPkt             Counter64
 }
 
 jnxmdiErrsFlowInsertErr OBJECT-TYPE
@@ -324,6 +327,29 @@ jnxmdiErrsUnsupportedMediaPkts OBJECT-TYPE
         "Number of Unsupported media packets."
     ::= {  jnxmdiErrsEntry 4 }
 
+jnxmdiErrsFragmentedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Fragmented packets."
+    ::= {  jnxmdiErrsEntry 5 }
+
+jnxmdiErrsMaxLabelsExceed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max Labels exceeded count."
+    ::= {  jnxmdiErrsEntry 6 }
+
+jnxmdiErrsOptionPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Option header packet count."
+    ::= {  jnxmdiErrsEntry 7 }
 --
 -- Flow Table
 --
@@ -367,7 +393,10 @@ JnxmdiFlowEntry ::= SEQUENCE {
     jnxmdiFlowAvgMRV              DisplayString,
     jnxmdiFlowTemplateName        DisplayString,
     jnxmdiFlowMDIRecCount         Integer32,
-    jnxmdiFlowPIDCount            Integer32
+    jnxmdiFlowPIDCount            Integer32,
+    jnxmdiFlowMPLSLabel0          Unsigned32,
+    jnxmdiFlowMPLSLabel1          Unsigned32,
+    jnxmdiFlowMPLSLabel2          Unsigned32
 }
 
 jnxmdiFlowIdentifier OBJECT-TYPE
@@ -521,6 +550,30 @@ jnxmdiFlowPIDCount OBJECT-TYPE
     DESCRIPTION
         "PID Count for the flow"
     ::=   {  jnxmdiFlowEntry 19  }
+
+jnxmdiFlowMPLSLabel0 OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "MPLS Label-0 "
+    ::=   {  jnxmdiFlowEntry 20  }
+
+jnxmdiFlowMPLSLabel1 OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "MPLS Label-1 "
+    ::=   {  jnxmdiFlowEntry 21  }
+
+jnxmdiFlowMPLSLabel2 OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "MPLS Label-2 "
+    ::=   {  jnxmdiFlowEntry 22  }
 
 --
 -- Flow MDI Record Table

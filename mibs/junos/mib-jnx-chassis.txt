@@ -21,12 +21,12 @@ IMPORTS
 
 jnxBoxAnatomy MODULE-IDENTITY
 
-    LAST-UPDATED "201605160000Z"    -- May 16, 2016
+    LAST-UPDATED "201912090000Z"    -- Dec 09, 2019
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
 		     Juniper Networks, Inc.
-		     1194 N. Mathilda Avenue
+		     1133 Innovation Way
 		     Sunnyvale, CA 94089
 		     E-mail: support@juniper.net"
 
@@ -181,6 +181,42 @@ jnxBoxAnatomy MODULE-IDENTITY
     REVISION     "201605160000Z"    -- May 16, 2016
     DESCRIPTION
                "Added new trap: jnxFmHealthChkErr."
+   
+    REVISION     "201906100000Z"    -- Jun 10, 2019
+    DESCRIPTION
+               "Added new FRU type Fan Tray Controller."
+
+
+    REVISION     "201908100000Z"    -- Aug 10, 2019
+    DESCRIPTION
+               "Added new Added new OIDs to get memory utilization
+                which doesn't include inactive memory as free memory"
+ 
+    REVISION     "201911150000Z"    -- Nov 15, 2019
+    DESCRIPTION
+               "Added new offline reasons fruInvalidConfig,
+                katsPostError and katsRuntimeError"
+
+    REVISION     "201911300000Z"    -- Nov 30, 2019
+    DESCRIPTION
+               "Added new offline reasons gnfInitRestart and
+                gnfOverlapMac"
+    REVISION     "201912030000Z"    -- Dec 03, 2019
+    DESCRIPTION
+               "Added new offline reasons fpcUnsupportedMode"
+
+    REVISION     "201911140000Z"    -- Dev 16, 2019
+    DESCRIPTION
+               "Added new offline reason fruOfflinedonFipsConstraints"
+
+    REVISION     "201912090000Z"    -- Dec 09, 2019
+    DESCRIPTION
+               "Added new offline reasons fpcFtrayNotVerified,
+                fpcPemNotVerified and fabricAsicFault"
+
+    REVISION     "202001230000Z"    -- Jan 23, 2020
+    DESCRIPTION
+              "Added new Trap: jnxAlarmPortInput."
 
     ::= { jnxMibs 1 }
 
@@ -233,7 +269,17 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                      nodeDevice    (39),
                      interconnectDevice (40),
                      controlPlaneDevice (41),
-                     directorDevice (42)
+                     directorDevice (42),
+                     gnf1          (43),
+                     gnf2          (44),
+                     gnf3          (45),
+                     gnf4          (46),
+                     gnf5          (47),
+                     gnf6          (48),
+                     gnf7          (49),
+                     gnf8          (50),
+                     gnf9          (51),
+                     gnf10         (52)
                  }
 
 
@@ -975,7 +1021,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
         jnxOperating15MinAvgCPU     Gauge32,
         jnxOperatingFRUPower        Gauge32,
              jnxOperatingBufferCP        Gauge32,
-             jnxOperatingMemoryCP        Integer32
+             jnxOperatingMemoryCP        Integer32,
+        jnxOperatingBufferExt      Gauge32
     }
 
     jnxOperatingContentsIndex OBJECT-TYPE
@@ -1263,6 +1310,17 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                         in Megabytes. Zero if unavailable or
 	        	inapplicable."
 	    ::= { jnxOperatingEntry 28 }
+
+        jnxOperatingBufferExt OBJECT-TYPE
+            SYNTAX          Gauge32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                        "The buffer pool utilization in percentage
+                         of this subject.  Zero if unavailable or 
+                         inapplicable. does not include inactive memory
+                         as free memory."
+            ::= { jnxOperatingEntry 29 }
 
 --
 -- Box Redundancy Information Table
@@ -1595,7 +1653,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		powerDistributionUnit(17),              -- PDU
 		powerSupplyModule(18),                  -- PSM
 		switchFabricBoard(19),                  -- SFB
-		adapterCard(20)                         -- ADC
+		adapterCard(20),                        -- ADC
+	    ftc(21)                                 -- FTC
 	}
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -1746,7 +1805,20 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 mixedSwitchFabric(101),          -- Mixed Switch Fabric error
                 unsupportedFabric(102),          -- unsupported Fabric error
                 jamConfigError(103),             -- JAM configuration error
-                fruFpcHFanTrayIncompatible(104)  -- FPC incompatible with Horizontal FAN-TRAYs
+                fruFpcHFanTrayIncompatible(104), -- FPC incompatible with Horizontal FAN-TRAYs
+                gnfIsOffline(105),               -- GNF is Offline
+                gnfdisconnected(106),            -- GNF disconnected
+                fruIncompatibleWithVersion(107), -- Incompatibile with BSYS
+		fruInvalidConfig(108),           -- FRU invalid configuration
+		katsPostError(109),              -- KATS post error
+		katsRuntimeError(110),           -- KATS run time error
+		gnfInitRestart(111),             -- GNF has initiated FPC restart
+		gnfOverlapMac(112),              -- MAC address overlap detected between GNFs
+                fruOfflinedonFipsConstraints(113), -- FRU offlined due to FIPS constraints
+                fpcUnsupportedMode(114),         -- FPC Unsupported Mode
+                fpcFtrayNotVerified(115),        -- FPC Ftray not verified
+                fpcPemNotVerified(116),          -- FPC PEM not verified
+                fabricAsicFault(117)             -- Fabric ASIC Fault
 
 	}
 	MAX-ACCESS	read-only
@@ -2307,6 +2379,21 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 entity, acting in an agent role, has detected 
                 health check errors."
         ::= { jnxChassisTraps 27 }
+
+    jnxAlarmPortInput NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A AlarmPortInput trap signifies that the SNMP
+                entity, acting in an agent role, has detected input alarm port
+                errors."
+        ::= { jnxChassisTraps 28 }
 
     -- Traps for chassis alarm cleared conditions
 

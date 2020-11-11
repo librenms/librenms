@@ -11,34 +11,40 @@
 
     IMPORTS
         Counter32, Counter64, IpAddress, Integer32,
-        NOTIFICATION-TYPE, MODULE-IDENTITY, 
+        NOTIFICATION-TYPE, MODULE-IDENTITY,
         OBJECT-TYPE
             FROM SNMPv2-SMI
 
         TEXTUAL-CONVENTION, DisplayString
-            FROM SNMPv2-TC 
+            FROM SNMPv2-TC
 
         jnxJsChassisCluster
             FROM JUNIPER-JS-SMI;
 
 
     jnxJsChassisClusterMIB  MODULE-IDENTITY
-        LAST-UPDATED  "201309200000Z"
+        LAST-UPDATED  "201908290000Z"
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
              Juniper Networks, Inc.
-             1194 N. Mathilda Avenue
+             1133 Innovation Way
              Sunnyvale, CA 94089
 
              E-mail: support@juniper.net
              HTTP://www.juniper.net"
         DESCRIPTION
-            "Chassis Clustering is concerned with ensuring minimal disruption to 
-             data and control planes in case of a failover. If one of the chassis in 
-             a cluster fails, the other chassis in the cluster takes over the function 
+            "Chassis Clustering is concerned with ensuring minimal disruption to
+             data and control planes in case of a failover. If one of the chassis in
+             a cluster fails, the other chassis in the cluster takes over the function
              of the failed chassis with minimal service interruption.
              This module defines the objects pertaining to Chassis Cluster."
+
+        REVISION      "201908290000Z"
+        DESCRIPTION   "Added trap jnxJsChHAPeerBfdTrap"
+
+        REVISION      "201809180000Z"
+        DESCRIPTION   "Added trap jnxJsChClusterHealthTrap"
 
         REVISION      "201309200000Z"
         DESCRIPTION   "Added trap jnxJsChClusterWeightTrap"
@@ -54,12 +60,12 @@
 
         REVISION      "200902030000Z"
         DESCRIPTION   "Creation Date"
-    ::= { jnxJsChassisCluster 1 }   
+    ::= { jnxJsChassisCluster 1 }
 
 
-    jnxJsChassisClusterNotifications OBJECT IDENTIFIER ::= 
+    jnxJsChassisClusterNotifications OBJECT IDENTIFIER ::=
                                      { jnxJsChassisClusterMIB 0 }
-    jnxJsChassisClusterTrapObjects   OBJECT IDENTIFIER ::= 
+    jnxJsChassisClusterTrapObjects   OBJECT IDENTIFIER ::=
                                      { jnxJsChassisClusterMIB 1 }
 
     -- ***************************************************************
@@ -77,14 +83,13 @@
         DESCRIPTION
             "Notification to signal switchover/failover."
         ::= { jnxJsChassisClusterNotifications 1 }
-
     -- ***************************************************************
     -- definition of a trap that notifies changes in fabric
     -- and control link status.
     -- ***************************************************************
 
     jnxJsChClusterIntfTrap  NOTIFICATION-TYPE
-        OBJECTS { jnxJsChClusterSwitchoverInfoClusterId, 
+        OBJECTS { jnxJsChClusterSwitchoverInfoClusterId,
                   jnxJsChClusterIntfName,
                   jnxJsChClusterIntfState,
                   jnxJsChClusterIntfSeverity,
@@ -124,6 +129,34 @@
             "Notification to signal node health status change (healthy/unhealthy)."
         ::= { jnxJsChassisClusterNotifications 4 }
 
+    -- ***************************************************************
+    -- definition of a trap that notifies changes in HA health status
+    -- ***************************************************************
+
+    jnxJsChClusterHealthTrap NOTIFICATION-TYPE
+        OBJECTS { jnxJsChClusterHealthNodeID,
+                  jnxJsChClusterHealthSeverity,
+                  jnxJsChClusterHealthReason }
+        STATUS              current
+        DESCRIPTION
+            "Notification to signal cluster is in unhealth status."
+
+        ::= { jnxJsChassisClusterNotifications 5 }
+
+    -- ***************************************************************
+    -- definition of a trap that notifies changes in L3 HA peer status
+    -- ***************************************************************
+
+    jnxJsChHAPeerBfdTrap NOTIFICATION-TYPE
+        OBJECTS { jnxJsChHAPeerID,
+                  jnxJsChHAPeerBfdSeverity,
+                  jnxJsChHAPeerBfdReason }
+        STATUS              current
+        DESCRIPTION
+            "Notification to signal HA peer status change."
+
+        ::= { jnxJsChassisClusterNotifications 6 }
+
     jnxJsChClusterSwitchoverInfoRedundancyGroup OBJECT-TYPE
 
         SYNTAX      DisplayString
@@ -157,7 +190,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "This object contains the redundancy state of the cluster 
+            "This object contains the redundancy state of the cluster
              before the occurance of switchover."
         ::= { jnxJsChassisClusterTrapObjects 4 }
 
@@ -166,7 +199,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "This object contains the redundancy state of the cluster 
+            "This object contains the redundancy state of the cluster
              after the occurance of switchover."
         ::= { jnxJsChassisClusterTrapObjects 5 }
 
@@ -183,7 +216,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "This object contains the name of the link 
+            "This object contains the name of the link
              that changed its state."
         ::= { jnxJsChassisClusterTrapObjects 7 }
 
@@ -192,7 +225,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "This object contains the state of the link; 
+            "This object contains the state of the link;
              whether it is UP or DOWN."
         ::= { jnxJsChassisClusterTrapObjects 8 }
 
@@ -201,7 +234,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "This object reflects the severity; 
+            "This object reflects the severity;
              whether it is minor or major."
         ::= { jnxJsChassisClusterTrapObjects 9 }
 
@@ -210,7 +243,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "This object contains the reason why the link state 
+            "This object contains the reason why the link state
              changed."
         ::= { jnxJsChassisClusterTrapObjects 10 }
 
@@ -253,7 +286,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "This object contains identification of cluster, 
+            "This object contains identification of cluster,
              in which the event occured."
         ::= { jnxJsChassisClusterTrapObjects 15 }
 
@@ -262,7 +295,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "This object contains identification of RedundancyGroup, 
+            "This object contains identification of RedundancyGroup,
              in which the event occured."
         ::= { jnxJsChassisClusterTrapObjects 16 }
 
@@ -291,5 +324,57 @@
         DESCRIPTION
             "This object contains weight value."
         ::= { jnxJsChassisClusterTrapObjects 19 }
+
+    jnxJsChClusterHealthNodeID OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains identification of node,
+             in which the event occured."
+        ::= { jnxJsChassisClusterTrapObjects 20 }
+
+    jnxJsChClusterHealthSeverity OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object reflects the severity;
+             whether it is minor or major."
+        ::= { jnxJsChassisClusterTrapObjects 21 }
+
+    jnxJsChClusterHealthReason OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains ha unhealth status reason."
+        ::= { jnxJsChassisClusterTrapObjects 22 }
+
+    jnxJsChHAPeerID OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains identification of peer,
+             in which the event occured."
+        ::= { jnxJsChassisClusterTrapObjects 23 }
+
+    jnxJsChHAPeerBfdSeverity OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object reflects the severity;
+             whether it is minor or major."
+        ::= { jnxJsChassisClusterTrapObjects 24 }
+
+    jnxJsChHAPeerBfdReason OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains HA peer BFD down reason."
+        ::= { jnxJsChassisClusterTrapObjects 25 }
 
 END
