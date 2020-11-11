@@ -40,7 +40,7 @@ jnxoptIfExtMibModule MODULE-IDENTITY
     CONTACT-INFO
        " Email:      Juniper Technical Assistance Center
                      Juniper Networks, Inc.
-                     1194 N. Mathilda Avenue
+                     1133 Innovation Way
                      Sunnyvale, CA 94089
                      E-mail: support@juniper.net"
     DESCRIPTION
@@ -70,13 +70,15 @@ JnxoptIfChannelSpacing ::= TEXTUAL-CONVENTION
            2 - 50   GHz
            3 - 25   GHz
            4 - 12.5 GHz
-           5 - 6.25 GHz "
+           5 - 6.25 GHz 
+           6 - 37.5 GHz "
     SYNTAX  INTEGER {
         spacing100Ghz(1),
         spacing50Ghz(2),
         spacing25Ghz(3),
         spacing12point5Ghz(4),
-        spacing6point5Ghz(5)
+        spacing6point5Ghz(5),
+        spacing37point5Ghz(6)
         }
 
 
@@ -89,13 +91,17 @@ JnxoptIfBitRateLineCoding ::= TEXTUAL-CONVENTION
            3 - 40  Gbits/s
            4 - 100 Gbits/s
            5 - 400 Gbits/s
+           6 - 150 Gbits/s
+           7 - 200 Gbits/s
         40 Gbits/s and above are under study."
     SYNTAX  INTEGER {
         rate2point5G(1),
         rate10G(2),
         rate40G(3),
         rate100G(4),
-        rate400G(5)
+        rate400G(5),
+        rate150G(6),
+        rate200G(7)
         }
 
 JnxoptIfFiberTypeRecommendation ::= TEXTUAL-CONVENTION
@@ -238,7 +244,9 @@ JnxoptIfOTNOChAlarms  ::= TEXTUAL-CONVENTION
         -- OTN  Pre FEC BER 24 hour TCA
         jnxoptIf24HourThreshPreFECBERTCA(24),
         -- OTN OTU AIS alarm
-        jnxoptIfOtuAisAlarm(25)
+        jnxoptIfOtuAisAlarm(25),
+        -- OTN OTU Far end Fec Degraded/Excessive alarm,
+        jnxoptIfOtuFEFecErrAlarm(26)
     }
 
 JnxoptIfOTNODUkTcmAlarms  ::= TEXTUAL-CONVENTION

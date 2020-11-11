@@ -33,7 +33,7 @@
     	CONTACT-INFO
 					"Juniper Technical Assistance Center
 						Juniper Networks, Inc.
-						1194 N. Mathilda Avenue
+						1133 Innovation Way
 						Sunnyvale, CA 94089
 
 						E-mail: support@juniper.net
@@ -58,6 +58,12 @@
                          added jnxJsNatTrapRuleName, jnxJsNatTrapRuleType, 
                          jnxJsNatTrapRuleNumOfSessions and
                          jnxJsNatRuleThresholdStatus."
+
+        REVISION        "201807101022Z" -- July 10, 2018
+        DESCRIPTION     "added jnxJsNatSrcNumPortAvail,
+                         jnxJsNatSrcNumAddressAvail and
+                         jnxJsNatSrcNumAddressInuse in jnxJsSrcNatStatsEntry;
+                         added jnxJsNatTransType in jnxJsNatRuleTable."
 
     ::= { jnxJsNAT 1 }   
 
@@ -333,11 +339,14 @@
     JnxJsSrcNatStatsEntry ::= SEQUENCE
     {
         jnxJsNatSrcPoolName			DisplayString,
-        jnxJsNatSrcXlatedAddrType	InetAddressType,
+        jnxJsNatSrcXlatedAddrType	INTEGER,
         jnxJsNatSrcXlatedAddr		InetAddress,
         jnxJsNatSrcPoolType         INTEGER,
         jnxJsNatSrcNumPortInuse     INTEGER,
-        jnxJsNatSrcNumSessions      INTEGER
+        jnxJsNatSrcNumSessions      INTEGER,
+        jnxJsNatSrcNumPortAvail     Counter32,
+        jnxJsNatSrcNumAddressAvail  Counter32,
+        jnxJsNatSrcNumAddressInuse  Counter32
     }
 
 
@@ -353,8 +362,11 @@
 		::= { jnxJsSrcNatStatsEntry 1 }
 
 	jnxJsNatSrcXlatedAddrType OBJECT-TYPE
-        SYNTAX        InetAddressType
-        MAX-ACCESS    not-accessible
+        SYNTAX        INTEGER {
+                        ipv4      (1),
+                        ipv6      (2)
+                      }
+        MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
             "The type of dynamic source IP address allocated from 
@@ -421,6 +433,32 @@
 			 This attribute is only applicable to NAT translation without PAT."
 		::= { jnxJsSrcNatStatsEntry 6 }
 
+        jnxJsNatSrcNumPortAvail OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of ports available with this pool."
+        ::= { jnxJsSrcNatStatsEntry 7 }
+
+        jnxJsNatSrcNumAddressAvail OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of addresses available in this pool."
+        ::= { jnxJsSrcNatStatsEntry 8 }
+
+        jnxJsNatSrcNumAddressInuse OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of addresses in use from this pool.
+            This attribute is only applicable to pools used with
+            source dynamic translations."
+        ::= { jnxJsSrcNatStatsEntry 9 }
+
     -- ***************************************************************
     --  NAT Rule Hit Table
     -- ***************************************************************
@@ -448,7 +486,8 @@
         jnxJsNatRuleType                     INTEGER,
         jnxJsNatRuleTransHits                INTEGER,
         jnxJsNatRuleHits                     Counter32,
-        jnxJsNatRuleNumOfSessions            Counter32
+        jnxJsNatRuleNumOfSessions            Counter32,
+        jnxJsNatTransType                    INTEGER
     }
 
     jnxJsNatRuleName OBJECT-TYPE
@@ -496,6 +535,28 @@
         DESCRIPTION
             "The number of sessions on this NAT rule"
     ::= { jnxJsNatRuleEntry 5 }
+
+    jnxJsNatTransType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                trans-type-none      (10),
+                basic-nat-pt         (11),
+                basic-nat44          (12),
+                basic-nat66          (13),
+                det-napt44           (14),
+                dynamic-nat44        (15),
+                napt-44              (16),
+                napt-66              (17),
+                napt-pt              (18),
+                det-napt64           (19),
+                stateful-nat464      (20),
+                stateful-nat64       (21),
+                dnat-44              (22)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Translation type of this NAT rule"
+    ::= { jnxJsNatRuleEntry 6 }
 
     -- ***************************************************************
     --  NAT Pool Hit Table

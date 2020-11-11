@@ -1,0 +1,1094 @@
+MPLS-MLDP-STD-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Unsigned32, Counter32, Counter64, TimeTicks
+         FROM SNMPv2-SMI                                    -- RFC 2578
+      MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF                                   -- RFC 2580
+      TruthValue, RowStatus, StorageType, TimeStamp
+         FROM SNMPv2-TC                                     -- RFC 2579
+
+      InterfaceIndex
+           FROM IF-MIB                                     --  [RFC2020]
+
+      mplsStdMIB, MplsLdpIdentifier
+         FROM MPLS-TC-STD-MIB                               -- RFC 3811
+
+      MplsIndexType
+         FROM MPLS-LSR-STD-MIB                              -- RFC 3813
+
+      IndexInteger, IndexIntegerNextFree
+         FROM DIFFSERV-MIB                                  -- RFC 3289
+
+      InetAddress, InetAddressType
+         FROM INET-ADDRESS-MIB                              -- RFC 4001
+
+      mplsLdpStdMIB, mplsLdpEntityLdpId, mplsLdpEntityIndex, mplsLdpPeerLdpId, mplsLdpSessionStatsEntry
+         FROM MPLS-LDP-STD-MIB                              -- RFC 3815
+         
+      jnxMldpExperiment                                     -- *** JNX 
+       	 FROM JUNIPER-EXPERIMENT-MIB                        -- *** JNX 
+      ;
+
+    mplsMldpStdMIB MODULE-IDENTITY
+         LAST-UPDATED "201609260000Z"  -- September 26, 2016
+         ORGANIZATION "Multiprotocol Label Switching (mpls)
+                       Working Group"
+         CONTACT-INFO
+
+             "     Kishore Tiruveedhula
+                   Juniper Networks
+                   Email: kishoret@juniper.net
+
+                   Uwe Joorde
+                   Deutsche Telekom
+                   Email: Uwe.Joorde@telekom.de
+
+                   Arvind Venkateswaran
+                   Cisco Systems
+                   EMail: arvvenka@cisco.com
+
+                   Comments about this document should be emailed
+                   directly to the MPLS working group mailing list at
+                   mpls@lists.ietf.org"
+
+         DESCRIPTION
+           "Copyright (c) 2009 IETF Trust and the persons identified as
+            the document authors. All rights reserved.
+
+            This document is subject to BCP 78 and the IETF Trust's
+            Legal Provisions Relating to IETF Documents in effect on the
+            date of publication of this document
+            (http://trustee.ietf.org/license-info). Please review these
+            documents carefully, as they describe your rights and
+            restrictions with respect to this document.
+
+            The initial version of this MIB module was published in
+            RFC XXXX. For full legal notices see the RFC itself or see:
+            http://www.ietf.org/copyrights/ianamib.html
+-- RFC Editor. Please replace XXXX with the RFC number for this
+-- document and remove this note.
+
+            This MIB module contains managed object definitions for mLDP LSPS
+            defined in Label Distribution Protocol Extensions Point-to-Multipoint and
+            Multipoint-to-Multipoint Label Switched Paths, RFC 6388, November
+            2011."
+
+         REVISION "201609260000Z"  -- September 26, 2016
+         DESCRIPTION
+           "Initial version issued as part of RFC XXXX."
+-- RFC Editor. Please replace XXXX with the RFC number for this
+-- document and remove this note.
+
+--       ::= { mplsStdMIB YYY }
+         ::= { jnxMldpExperiment 1 }
+         
+-- RFC Editor. Please replace YYY with the codepoint issued by IANA
+-- and remove this note.
+
+   -- Top level components of this MIB module.
+
+
+   -- notifications
+
+   mplsMldpNotifications OBJECT IDENTIFIER ::= { mplsMldpStdMIB 0 }
+   -- tables, scalars
+   mplsMldpScalars       OBJECT IDENTIFIER ::= { mplsMldpStdMIB 1 }
+   mplsMldpObjects       OBJECT IDENTIFIER ::= { mplsMldpStdMIB 2 }
+
+  -- MPLS mLDP LSP scalars.
+
+   mplsMldpP2mpCapable OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "This object provides the P2MP capability of the LSR."
+
+         REFERENCE
+           "Section 2.1 of [RFC6388]."
+
+      ::= { mplsMldpScalars 1 }
+
+
+  mplsMldpMp2mpCapable OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "This object provides MP2MP capability of the LSR."
+
+         REFERENCE
+           "Section 3.1 of [RFC6388]."
+
+      ::= { mplsMldpScalars 2 }
+
+
+  mplsMldpMbbCapable OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "This object provides MBB (make before break) capability of the LSR."
+
+         REFERENCE
+           "Section 8.3 of [RFC6388]."
+
+      ::= { mplsMldpScalars 3 }
+
+     mplsMldpMbbTime OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..300)
+         UNITS       "seconds"
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "The 32-bit unsigned integer value provides the time for waiting MBB Ack
+            from upstream node."
+
+         DEFVAL { 30 }
+         ::= { mplsMldpScalars 4 }
+
+
+   mplsMldpNumFecs OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The number of active and passive mLdp Fecs on this device."
+
+      ::= { mplsMldpScalars 5 }
+
+   mplsMldpNumFecsActive OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The number of mLdp FECs Active on this device. The mLDP FEC is
+           considered active if the mplsMldpFecOperStatus is up(1)."
+
+      ::= { mplsMldpScalars 6 }
+
+   mplsMldpPlrCapable OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "This object provides Point of Local Repair (PLR)
+            capability of the LSR."
+
+         REFERENCE
+           "Section 5.1 of [I-D.ietf-mpls-mldp-node-protection]."
+
+      ::= { mplsMldpScalars 7 }
+
+   mplsMldpMptCapable OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "This object provides  Merge Point (MPT) capability of the LSR."
+
+         REFERENCE
+           "Section 5.2 of [I-D.ietf-mpls-mldp-node-protection]."
+
+      ::= { mplsMldpScalars 8 }
+
+   mplsMldpProtLsrCapable OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "This object provides Protected LSR capability."
+
+         REFERENCE
+           "Section 5.3 of [I-D.ietf-mpls-mldp-node-protection]."
+
+      ::= { mplsMldpScalars 9 }
+
+   mplsMldpNodeProtCapable OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "This object provides Node Protection capability of the LSR."
+
+         REFERENCE
+           "Section 5.3 of [I-D.ietf-mpls-mldp-node-protection]."
+
+      ::= { mplsMldpScalars 10 }
+
+   -- End of MPLS mLDP scalars.
+
+   -- MPLS mLDP tables.
+
+     --
+     -- The MPLS LDP Peer Capability Table
+     --
+
+     mplsLdpPeerCapabilityTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF MplsLdpPeerCapabilityEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+             "This table will have learned information relating to Mldp."
+         ::= { mplsMldpObjects 1 }
+
+     mplsLdpPeerCapabilityEntry OBJECT-TYPE
+         SYNTAX      MplsLdpPeerCapabilityEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+             "Information about a single Peer which is related
+             to a Session.  This table is augmented by
+             the mplsLdpSessionTable."
+         INDEX       { mplsLdpEntityLdpId,
+                       mplsLdpEntityIndex,
+                       mplsMldpPeerLdpId
+                     }
+         ::= { mplsLdpPeerCapabilityTable 1 }
+
+     MplsLdpPeerCapabilityEntry ::= SEQUENCE {
+         mplsMldpPeerLdpId               MplsLdpIdentifier,
+         mplsLdpPeerCapability           BITS
+     }
+     
+     mplsMldpPeerLdpId OBJECT-TYPE
+         SYNTAX      MplsLdpIdentifier
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "The LDP identifier of this LDP Peer."
+    
+         ::= { mplsLdpPeerCapabilityEntry 1 }
+
+     mplsLdpPeerCapability OBJECT-TYPE
+         SYNTAX      BITS {
+                        none (0),
+                        p2mp (1),
+                        mp2mp(2),
+                        mbb  (3),
+                        upstream-label-assignment  (4),
+                        dynamic (5),
+                        plr (6),
+                        mpt (7),
+                        prot-lsr (8),
+                        node-prot (9)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           " This will indicate the LDP capability information about peer.
+           The p2mp indicates peer supports P2MP Capability.
+           The mp2mp indicates peer supports MP2MP Capability.
+           The mbb indicates peer supports MBB Capability.
+           The upstream-label-assignment indicates peer supports Upstream label
+           assignment Capability.
+           The dynamic indicates peer supports dynamic Capability.
+           The plr indicates Point of Local Repair Capability.
+           The mpt indicates Point of Merge Point Capability.
+           The prot-lsr indicates Protected LSR Capability.
+           The node-prot indicates Node Protection LSR Capability.
+           "
+
+         REFERENCE
+         "RFC6388, Section 2.1 for P2MP Capability TLV.
+         and the section 3.1 for MP2MP Capability TLV.
+         The RFC6388 for MBB Capability TLV.
+         RFC5561 Section 9 for Dynamic Capability Announcement TLV.
+         RFC6389 Section 3 for Upstream Label Assignment Capability TLV.
+         Section 5 of [I-D.ietf-mpls-mldp-node-protection] describes for Point of Local Repair (plr)
+         capability,  Merge Point (mpt)  capability,
+         The Protected LSR (port-lsr) and Node Protection (node-prot) Capability. "
+
+         ::= { mplsLdpPeerCapabilityEntry 2 }
+
+     --
+     -- The MPLS mLDP Session Statistics Table
+     --
+
+     mplsMldpSessionStatsTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF MplsMldpSessionStatsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+             "A table of statistics related to mLDP on Sessions.
+             This table AUGMENTS the mplsLdpSessionStatsTable."
+         ::= { mplsMldpObjects 2 }
+
+     mplsMldpSessionStatsEntry OBJECT-TYPE
+         SYNTAX      MplsMldpSessionStatsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+             "An entry in this table represents mLDP statistical
+             information on a single session between an LDP
+             Entity and LDP Peer."
+
+         INDEX       { mplsLdpEntityLdpId,
+                       mplsLdpEntityIndex,
+                       mplsLdpPeerLdpId 
+                     }
+         ::= { mplsMldpSessionStatsTable 1 }
+
+     MplsMldpSessionStatsEntry ::= SEQUENCE {
+         mplsMldpSessionStatsNumFecsSent           Counter32,
+         mplsMldpSessionStatsNumMbbReqSentState    Counter32,
+         mplsMldpSessionStatsNumFecsRcvd           Counter32,
+         mplsMldpSessionStatsNumMbbReqRcvdState    Counter32,
+         mplsMldpSessionStatsNumMbbResetAckByTimer Counter32
+     }
+
+     mplsMldpSessionStatsNumFecsSent OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "This object counts the number of mLDP FECs sent on this
+             session. If the FEC is withdrawn, then this number is
+             decremented.
+
+             Discontinuities in the value of this counter can occur
+             at re-initialization of the management system, and at
+             other times as indicated by the value of
+             mplsLdpSessionDiscontinuityTime."
+
+         ::= { mplsMldpSessionStatsEntry 1 }
+
+     mplsMldpSessionStatsNumMbbReqSentState OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "This object counts the number of mLDP FECs sent on this
+             session and waiting for MBB Ack. This counter will get incremented
+             when MBB req sent for a label on this session and will get
+             decremented when the MBB Ack received."
+
+         ::= { mplsMldpSessionStatsEntry 2 }
+
+
+     mplsMldpSessionStatsNumFecsRcvd OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "This object counts the number of mLDP FECs received on this
+             session. If the FEC is withdrawn from the downstream session,
+             then this is decremented.
+
+             Discontinuities in the value of this counter can occur
+             at re-initialization of the management system, and at
+             other times as indicated by the value of
+             mplsLdpSessionDiscontinuityTime."
+
+         ::= { mplsMldpSessionStatsEntry 3 }
+
+    mplsMldpSessionStatsNumMbbReqRcvdState OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "This object counts the number of mLDP FECs received on this
+             session and waiting for sending MBB Ack. This counter will get
+             incremented when MBB req is received for a label on this session
+             and will get decremented when the MBB Ack sent."
+
+         ::= { mplsMldpSessionStatsEntry 4 }
+
+
+    mplsMldpSessionStatsNumMbbResetAckByTimer OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "This object counts the number mLDP FECs for which the MBB Ack is
+             reset by MBB timer, in which the LSR is waiting for MBB ack."
+
+         ::= { mplsMldpSessionStatsEntry 5 }
+
+     --
+     -- Mpls mLDP FEC Table
+     --
+
+     mplsMldpFecTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF MplsMldpFecEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+             "This table represents the FEC
+             (Forwarding Equivalence Class)
+             Information associated with an mLDP LSP."
+
+         ::= { mplsMldpObjects 3 }
+
+
+     mplsMldpFecEntry OBJECT-TYPE
+         SYNTAX      MplsMldpFecEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+             "Each row represents a single mLDP FEC Element."
+         INDEX       { mplsLdpEntityLdpId,
+                       mplsLdpEntityIndex,
+                       mplsMldpFecIndex 
+                     }
+
+         ::= { mplsMldpFecTable 1 }
+
+     MplsMldpFecEntry ::= SEQUENCE {
+         mplsMldpFecIndex               IndexInteger,
+         mplsMldpFecType                INTEGER,
+         mplsMldpFecRootAddrType        InetAddressType,
+         mplsMldpFecRootAddr            InetAddress,
+         mplsMldpFecOpaqueType          INTEGER,
+         mplsMldpFecOpaqueGenLspId      Unsigned32,
+         mplsMldpFecOpaqueTransitSourceOrBidirAddrType   InetAddressType,
+         mplsMldpFecOpaqueTransitSourceOrBidirAddr       InetAddress,
+         mplsMldpFecOpaqueTransitGroupAddrType           InetAddressType,
+         mplsMldpFecOpaqueTransitGroupAddr               InetAddress,
+         mplsMldpFecAdminStatus         INTEGER,
+         mplsMldpFecOperStatus          INTEGER,
+         mplsMldpFecMoFrr               INTEGER,
+         mplsMldpFecLsrState            INTEGER,
+         mplsMldpFecUpTime              TimeStamp
+     }
+
+     mplsMldpFecIndex OBJECT-TYPE
+         SYNTAX      IndexInteger
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+             "The index which uniquely identifies this entry."
+
+         ::= { mplsMldpFecEntry 1 }
+
+
+     mplsMldpFecType  OBJECT-TYPE
+         SYNTAX      INTEGER {
+                        p2mp(6),
+                        mp2mpUpstream(7),
+                        mp2mpDownstream(8)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The type of the FEC.  If the value of this object
+             is 6, then it is P2MP Fec Type, and 7, 8 are correspond to
+             MP2MP upstream and downstream type."
+
+         REFERENCE
+             "RFC6388, Section 2.2. The P2MP FEC Element and the section 3.3
+             for the MP2MP Fec elements."
+
+         ::= { mplsMldpFecEntry 2 }
+
+     mplsMldpFecRootAddrType  OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The value of this object is the type of the
+             Internet address.  The value of this object,
+             decides how the value of the mplsMldpFecRootAddr object
+             is interpreted."
+         REFERENCE
+             "RFC6388, Section 2.2. The P2MP FEC Element and the section 3.3
+             for the MP2MP Fec elements."
+
+         ::= { mplsMldpFecEntry 3 }
+
+     mplsMldpFecRootAddr     OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The value of this object is interpreted based
+             on the value of the mplsMldpFecRootAddrType object.
+             This is ingress node address for the mLDP LSP."
+
+         REFERENCE
+             "RFC6388, Section 2.2. The P2MP FEC Element and the section 3.3
+             for the MP2MP Fec elements."
+
+         ::= { mplsMldpFecEntry 4 }
+
+
+     mplsMldpFecOpaqueType  OBJECT-TYPE
+         SYNTAX      INTEGER {
+                        genericLspId(1),
+                        transitIpv4Source(3),
+                        transitIpv6Source(4),
+                        transitIpv4Bidir(5),
+                        transitIpv6Bidir(6)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+           "This is opaque type of the mLDP FEC. The value of this object is
+           shown below.
+
+             1 - The Generic LSP Identifier
+             3 - Transit IPv4 Source TLV
+             4 - Transit IPv6 Source TLV
+             5 - Transit IPv4 Bidir TLV
+             6 - Transit IPv6 Bidir TLV.
+             "
+         ::= { mplsMldpFecEntry 5 }
+
+      mplsMldpFecOpaqueGenLspId OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The 32-bit unsigned integer value which is to represent Generic
+             LSP ID. This value is only valid if the mplsMldpFecOpaqueType is
+             genericLspId(1), otherwise 0 must be returned."
+
+         REFERENCE
+             "RFC6388, Section 2.3.1."
+
+         ::= { mplsMldpFecEntry 6 }
+
+     mplsMldpFecOpaqueTransitSourceOrBidirAddrType        OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The value of this object is the type of the
+             Internet address.  The value of this object,
+             decides how the value of the  mplsMldpFecOpaqueTransitSourceOrBidirAddr
+             object is interpreted."
+         REFERENCE
+             "RFC6826, Section 3.1."
+
+         ::= { mplsMldpFecEntry 7 }
+
+     mplsMldpFecOpaqueTransitSourceOrBidirAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The value of this object is interpreted based
+             on the value of the mplsMldpFecOpaqueTransitSourceOrBidirAddrType
+              object.  This is source node address for the mLDP inband LSP."
+
+         REFERENCE
+             "RFC6826, Section 3.1."
+
+         ::= { mplsMldpFecEntry 8 }
+
+     mplsMldpFecOpaqueTransitGroupAddrType        OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The value of this object is the type of the
+             Internet address.  The value of this object,
+             decides how the value of the  mplsMldpFecOpaqueTransitGroupAddr
+             object is interpreted."
+
+         REFERENCE
+             "RFC6826, Section 3.2."
+
+         ::= { mplsMldpFecEntry 9 }
+
+     mplsMldpFecOpaqueTransitGroupAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The value of this object is interpreted based
+             on the value of the mplsMldpFecOpaqueTransitGroupAddrType
+              object.  This is group node address for the mLDP inband LSP."
+
+         REFERENCE
+             "RFC6826, Section 3.2."
+
+         ::= { mplsMldpFecEntry 10 }
+
+
+   mplsMldpFecAdminStatus OBJECT-TYPE
+      SYNTAX       INTEGER {
+                      up(1),        -- ready to pass data
+                      down(2)       -- out of service
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the admin status of this mLDP FEC."
+
+      DEFVAL { up }
+
+      ::= { mplsMldpFecEntry 11 }
+
+   mplsMldpFecOperStatus OBJECT-TYPE
+      SYNTAX        INTEGER {
+                      up(1),             -- ready to pass data
+                      down(2)            -- out of service
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the actual operational status of this mLDP Fec."
+
+      ::= { mplsMldpFecEntry 12 }
+
+     mplsMldpFecMoFrr OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "This object provides whether MoFRR enabled for this mLDP FEC.
+            on this mLDP FEC. As mentioned in the section 3.2 of [I-D.ietf-rtgwg-mofrr],
+            When this is enabled, then mLDP may select two upstream sessions,
+            one is primary and other one is backup. The backup traffic is
+            discarded when the primary upstream session is UP. When the
+            primary upstream session goes down, the traffic from the backup
+            upstream session will be forwarded to downstream.
+             "
+
+      ::= { mplsMldpFecEntry 13 }
+
+   mplsMldpFecLsrState OBJECT-TYPE
+      SYNTAX        INTEGER {
+                       egress(1),
+                       bud(2),
+                       transit(3),
+                       ingress(4)
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the role of FEC either egress, bud, transit or ingress"
+
+      ::= { mplsMldpFecEntry 14 }
+
+   mplsMldpFecUpTime OBJECT-TYPE
+      SYNTAX        TimeStamp
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This values shows Fec UP time. This is time since mplsMldpFecOperStatus is UP."
+
+      ::= { mplsMldpFecEntry 15 }
+
+   -- MPLS mLDP LSP Branch Traffic Stats Table.
+
+   mplsMldpFecBranchStatsTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF MplsMldpFecBranchStatsEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This table provides mLDP Fec branch MPLS Traffic Stats
+            information."
+
+      ::= { mplsMldpObjects 4 }
+
+   mplsMldpFecBranchStatsEntry OBJECT-TYPE
+      SYNTAX        MplsMldpFecBranchStatsEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table is created by the LSR for each
+            downstream branch (out-segment) from this LSR for this mLDP
+            LSP. Each downstream session may represent a single out-segment.
+
+            Each entry in the table is indexed by the four identifiers
+            of the mLDP LSP, and the out-segment that identifies the
+            outgoing branch."
+
+         INDEX       { mplsLdpEntityIndex,
+                       mplsMldpFecBranchFecIndex,
+                       mplsMldpFecBranchOutSegIndex
+                     }
+
+      ::= { mplsMldpFecBranchStatsTable 1 }
+
+
+   MplsMldpFecBranchStatsEntry ::= SEQUENCE {
+         mplsMldpFecBranchFecIndex          MplsIndexType,
+         mplsMldpFecBranchOutSegIndex       MplsIndexType,
+         mplsMldpFecBranchPeerLdpId         MplsLdpIdentifier,
+         mplsMldpFecBranchStatsPackets      Counter64,
+         mplsMldpFecBranchStatsBytes        Counter64,
+         mplsMldpFecBranchStatsDiscontinuityTime TimeStamp
+   }
+
+   mplsMldpFecBranchFecIndex          OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+             "This index identifies the mLDP FEC entry in the
+              mplsMldpFecTable.  This is same as mplsMldpFecIndex."
+
+         ::= { mplsMldpFecBranchStatsEntry 1 }
+
+
+   mplsMldpFecBranchOutSegIndex          OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This object identifies an outgoing branch from this mLDP LSP
+            Its value is unique within the context of the mLDP LSP.
+
+             This contains the same value as the mplsOutSegmentIndex in the
+             MPLS-LSR-STD-MIBs mplsOutSegmentTable."
+
+         ::= { mplsMldpFecBranchStatsEntry 2 }
+         
+   mplsMldpFecBranchPeerLdpId          OBJECT-TYPE
+      SYNTAX        MplsLdpIdentifier
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object identifies an outgoing branch peer LDP ID for this
+           mLDP LSP. Its value is unique within the context of the mLDP LSP.
+           On Egress node, this value could be 0.0.0.0:00 as there will no
+           downstream LDP session."
+
+         ::= { mplsMldpFecBranchStatsEntry 3 }
+
+   mplsMldpFecBranchStatsPackets OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object represent the 64-bit value, which gives the number
+            of packets forwarded by the mLDP LSP onto this branch.
+            This object should be read in conjunction with
+            mplsMldpFecBranchStatsDiscontinuityTime."
+
+      ::= { mplsMldpFecBranchStatsEntry 4 }
+
+   mplsMldpFecBranchStatsBytes OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object represent the 64-bit value, which gives the number
+            of bytes forwarded by the mLDP LSP onto this branch.
+            This object should be read in conjunction with
+            mplsMldpFecBranchStatsDiscontinuityTime."
+
+      ::= { mplsMldpFecBranchStatsEntry 5 }
+
+   mplsMldpFecBranchStatsDiscontinuityTime OBJECT-TYPE
+      SYNTAX      TimeStamp
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+           "The value of sysUpTime on the most recent occasion at which
+            any one or more of this rows Counter32 or Counter64 objects
+            experienced a discontinuity. If no such discontinuity has
+            occurred since the last re-initialization of the local
+            management subsystem, then this object contains a zero
+            value."
+      ::= { mplsMldpFecBranchStatsEntry 6 }
+
+   -- End of mplsMldpFecBranchStatsTable
+
+
+   -- MPLS mLDP LSP Upstream Session Table.
+
+   mplsMldpFecUpstreamSessTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF MplsMldpFecUpstreamSessEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This table provides mLDP Fec upstream Session information."
+
+      ::= { mplsMldpObjects 5 }
+
+   mplsMldpFecUpstreamSessEntry OBJECT-TYPE
+      SYNTAX        MplsMldpFecUpstreamSessEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table is created by the LSR for each
+            upstream session (in-segment) from this LSR for this mLDP
+            LSP. Each upstream session may represent a single in-segment.
+
+            Each entry in the table is indexed by the four identifiers
+            of the mLDP LSP, and the in-segment that identifies the
+            incoming traffic."
+      INDEX       { mplsLdpEntityLdpId,
+                    mplsLdpEntityIndex,
+                    mplsMldpFecUpstreamSessFecIndex,
+                    mplsMldpFecUpstreamSessInSegIndex
+                  }
+
+      ::= { mplsMldpFecUpstreamSessTable 1 }
+
+   MplsMldpFecUpstreamSessEntry ::= SEQUENCE {
+         mplsMldpFecUpstreamSessFecIndex     MplsIndexType,
+         mplsMldpFecUpstreamSessInSegIndex   MplsIndexType,
+         mplsMldpFecUpstreamSessPeerLdpId    MplsLdpIdentifier,
+         mplsMldpFecUpstreamSessPrimary      INTEGER,
+         mplsMldpFecUpstreamSessActive       INTEGER,
+         mplsMldpFecUpstreamSessPackets      Counter64,
+         mplsMldpFecUpstreamSessBytes        Counter64,
+         mplsMldpFecUpstreamSessDiscontinuityTime TimeStamp
+   }
+
+   mplsMldpFecUpstreamSessFecIndex          OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+             "This index identifies the mLDP FEC entry in the
+              mplsMldpFecTable."
+
+         ::= { mplsMldpFecUpstreamSessEntry 1 }
+
+
+   mplsMldpFecUpstreamSessInSegIndex          OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This object identifies an upstream session from this mLDP LSP
+            Its value is unique within the context of the mLDP LSP.
+
+             This contains the same value as the mplsInSegmentIndex in the
+             MPLS-LSR-STD-MIBs mplsInSegmentTable."
+
+         ::= { mplsMldpFecUpstreamSessEntry 2 }
+
+   mplsMldpFecUpstreamSessPeerLdpId           OBJECT-TYPE
+      SYNTAX        MplsLdpIdentifier
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object identifies an upstream session peer LDP ID for this
+           mLDP LSP. Its value is unique within the context of the mLDP LSP."
+
+         ::= { mplsMldpFecUpstreamSessEntry 3 }
+         
+    mplsMldpFecUpstreamSessPrimary  OBJECT-TYPE
+         SYNTAX      INTEGER {
+                        primary(1),
+                        backup(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "This indicated wether the received traffic from upstream is
+             primary or backup. This is valid only if the MoFRR
+             (mplsMldpFecMoFrr) is enabled on this FEC."
+
+         ::= { mplsMldpFecUpstreamSessEntry 4 }
+
+    mplsMldpFecUpstreamSessActive  OBJECT-TYPE
+         SYNTAX      INTEGER {
+                        active(1),
+                        inactive(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+         "This indicates whether the upstream session is active, means the
+         LSR programmed the forwarding engine to receive the traffic from
+         this upstream session. This will be Inactive if the LSR is wating
+         for MBB Ack."
+
+         ::= { mplsMldpFecUpstreamSessEntry 5 }
+
+   mplsMldpFecUpstreamSessPackets      OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object represent the 64-bit value, which gives the number
+            of packets received by the mLDP LSP from this upstream
+            session.  This object should be read in conjunction with
+            mplsMldpFecUpstreamSessDiscontinuityTime."
+
+      ::= { mplsMldpFecUpstreamSessEntry 6 }
+
+   mplsMldpFecUpstreamSessBytes      OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object represent the 64-bit value, which gives the number
+            of bytes received by the mLDP LSP from this upstream
+            session.  This object should be read in conjunction with
+            mplsMldpFecUpstreamSessDiscontinuityTime."
+
+      ::= { mplsMldpFecUpstreamSessEntry 7 }
+
+   mplsMldpFecUpstreamSessDiscontinuityTime OBJECT-TYPE
+      SYNTAX      TimeStamp
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+           "The value of sysUpTime on the most recent occasion at which
+            any one or more of this rows Counter32 or Counter64 objects
+            experienced a discontinuity. If no such discontinuity has
+            occurred since the last re-initialization of the local
+            management subsystem, then this object contains a zero
+            value."
+      ::= { mplsMldpFecUpstreamSessEntry 8 }
+
+   -- End of mplsMldpFecBranchStatsTable
+
+
+   -- MPLS mLDP Interface Traffic Stats Table.
+
+   mplsMldpInterfaceStatsTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF MplsMldpInterfaceStatsEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This table provides mLDP  Traffic Stats on specified interface."
+
+      ::= { mplsMldpObjects 6 }
+
+   mplsMldpInterfaceStatsEntry OBJECT-TYPE
+      SYNTAX        MplsMldpInterfaceStatsEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table is created by the LSR for each
+            downstream branch (out-segment) from this LSR for this mLDP
+            LSP. Each downstream session may represent a single out-segment.
+
+            Each entry in the table is indexed by the four identifiers
+            of the mLDP LSP, and the out-segment that identifies the
+            outgoing branch."
+
+         INDEX       { mplsMldpInterfaceIndex
+                     }
+
+      ::= { mplsMldpInterfaceStatsTable 1 }
+
+   MplsMldpInterfaceStatsEntry ::= SEQUENCE {
+         mplsMldpInterfaceIndex                 InterfaceIndex,
+         mplsMldpInterfaceStatsSentPackets      Counter64,
+         mplsMldpInterfaceStatsSentBytes        Counter64,
+         mplsMldpInterfaceStatsRecvPackets      Counter64,
+         mplsMldpInterfaceStatsRecvBytes        Counter64
+   }
+
+   mplsMldpInterfaceIndex          OBJECT-TYPE
+      SYNTAX        InterfaceIndex
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+             "This index identifies the specific interface. "
+
+         ::= { mplsMldpInterfaceStatsEntry 1 }
+
+   mplsMldpInterfaceStatsSentPackets OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "This is 64 bit value, which gives the number of packets
+            forwarded by all mLDP LSPs onto this interface."
+
+
+
+
+      ::= { mplsMldpInterfaceStatsEntry 2 }
+
+   mplsMldpInterfaceStatsSentBytes OBJECT-TYPE
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+             "This is 64 bit value, which gives the number of bytes
+             forwarded by all mLDP LSPs onto this interface."
+
+       ::= { mplsMldpInterfaceStatsEntry 3 }
+
+
+   mplsMldpInterfaceStatsRecvPackets OBJECT-TYPE
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+             "This is 64 bit value, which gives the number of packets
+             received by all mLDP LSPs from this interface."
+
+       ::= { mplsMldpInterfaceStatsEntry 4 }
+
+    mplsMldpInterfaceStatsRecvBytes OBJECT-TYPE
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+             "This is 64 bit value, which gives the number of bytes
+             received by all mLDP LSPs from this interface."
+
+       ::= { mplsMldpInterfaceStatsEntry 5 }
+
+    -- End of mplsMldpInterfaceStatsTable
+
+   -- Notifications.
+
+   mplsMldpFecUp NOTIFICATION-TYPE
+      OBJECTS     {
+         mplsMldpFecAdminStatus,
+         mplsMldpFecOperStatus
+      }
+      STATUS      current
+      DESCRIPTION
+           "This notification is generated when a mplsMldpFecOperStatus
+            object changes from down to up."
+
+      ::= { mplsMldpNotifications 1 }
+
+   mplsMldpFecDown NOTIFICATION-TYPE
+      OBJECTS     {
+         mplsMldpFecAdminStatus,
+         mplsMldpFecOperStatus
+      }
+      STATUS      current
+      DESCRIPTION
+           "This notification is generated when a mplsMldpFecOperStatus
+            object changes from up to down."
+
+      ::= { mplsMldpNotifications 2 }
+
+
+   mplsMldpMoFrrStatusChange NOTIFICATION-TYPE
+      OBJECTS     {
+         mplsMldpFecUpstreamSessPrimary
+      }
+      STATUS      current
+      DESCRIPTION
+           "This notification is generated when a mplsMldpFecUpstreamSessPrimary
+            object changes from primary to backup and vice versa."
+
+            ::= { mplsMldpNotifications 3 }
+
+   -- End of notifications.
+
+END

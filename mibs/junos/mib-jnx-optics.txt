@@ -17,20 +17,23 @@ IMPORTS
         FROM SNMPv2-TC
     ifIndex, ifDescr
         FROM IF-MIB
-    jnxOpticsMibRoot, jnxOpticsNotifications, jnxIplcNotifications
+    jnxOpticsMibRoot, jnxOpticsNotifications, jnxIplcNotifications, jnxIlaNotifications
         FROM JUNIPER-SMI;
 
 jnxIfOpticsMib MODULE-IDENTITY
-    LAST-UPDATED "201609122018Z" -- Mon Sep 12 20:18:00 IST 2016
+    LAST-UPDATED "201805020000Z" -- Wed May 2, 2018 00:00:00 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
                      Juniper Networks, Inc.
-                     1194 N. Mathilda Avenue
+                     1133 Innovation Way
                      Sunnyvale, CA 94089
                      E-mail: support@juniper.net"
 
     DESCRIPTION "Deprecated OCh2 related tables and entries"
+    REVISION      "201609280000Z"
+    DESCRIPTION
+               "Removed INDEX clause from unwanted places"
     REVISION    "201609122018Z"
     DESCRIPTION
            " Added Optics table entries for handling sub-port
@@ -45,6 +48,19 @@ jnxIfOpticsMib MODULE-IDENTITY
     REVISION      "201201260000Z"
     DESCRIPTION
                "Initial revision."
+
+    REVISION    "201605310000Z" -- 31-May-16
+    DESCRIPTION
+            "Corrected name in table sequence"
+
+    REVISION    "201805020000Z" -- 2-May-18
+    DESCRIPTION
+            "Added jnxOpticsOTIfHighPolarization object"
+
+    REVISION    "201808090000Z" -- 9-Aug-18
+    DESCRIPTION
+            "Added FRR related pre-FEC BER threshold objects for ot interface"
+
     ::= { jnxOpticsMibRoot 1 }
 
 --
@@ -105,6 +121,58 @@ JnxOpticsChannelSpacing ::= TEXTUAL-CONVENTION
         spacing6point5Ghz(5)
     }
 
+JnxOpticsOTIfFecType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "fec modes of an interface OT interface"
+    SYNTAX       INTEGER {
+                     none(0),
+                     sdfec(1),
+                     sdfec25(2),
+                     hgfec(3),
+                     sdfec15(4)
+                 }
+
+JnxOpticsOTIfEncodingOptions ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Encoding Options supported on OT interface"
+    SYNTAX       INTEGER {
+	             unknown (0),
+                     differential(1),
+                     non-differential(2)
+                 }
+
+JnxOpticsOTIfAdminStates ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Admin states for an interface"
+    SYNTAX       INTEGER {
+                      jnxAdminStateInService(1), 
+                                      -- In service
+                      jnxAdminStateInServiceMA(2),
+                                      -- In service maintenance, the link is in
+                                      -- service, but alarms are suppressed
+                      jnxAdminStateOutofService(3), 
+                                      -- Out of service due to a fault
+                      jnxAdminStateOutofServiceMA(4)
+                                      -- OOS maintenance as configured by the
+                                      -- user, may or may not have alarms`
+                 }
+
+JnxOpticsOTIfOperStates ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Operational states for an interface"
+    SYNTAX       INTEGER {
+                       jnxOperStateInit(1),
+                                     -- Starting state of the interface
+                       jnxOperStateNormal(2),
+                                     -- The interface is working normally
+                       jnxOperStateFault(3),
+                                     -- There is some traffic affecting fault
+                                     -- on the interface eg LOS
+                       jnxOperStateDegraded(4)
+                                     -- There is some function affecting 
+                                     -- degrading the performance on the
+                                     --  interface for eg  BER
+                 }
 
 --
 -- All the notifications related to the optics module
@@ -160,8 +228,49 @@ JnxOpticsNotificationId  ::= TEXTUAL-CONVENTION
                                                       -- TCA
         jnxOptics24HourCarrierFreqHighAlert(42),      -- Carrier freq high
                                                       -- TCA 24Hour
-        jnxOptics24HourCarrierFreqLowAlert(43)        -- Carrier freq Low
+        jnxOptics24HourCarrierFreqLowAlert(43),        -- Carrier freq Low
                                                       -- TCA 24Hour
+        jnxOpticsLossOfLock(44),                       -- Loss Of Lock
+        jnxOpticsLossOfSignal(45),                     -- Loss Of Signal
+        jnxOpticsLossOfFrame(46),                      -- Loss Of Frame
+        jnxOpticsLossOfMultiFrame(47),                 -- Loss Of Multi Frame
+        jnxOpticsOTUBDI(48),                           -- Loss of backward defect indication
+        jnxOpticsRxModemSYncFault(49),                 -- Rx Modem Sync Fault
+        jnxOpticsRxModemLOL(50),                       -- Rx Modem Loss of Lock
+        jnxOpticsRxLOA(51),                            -- Rx Loss of Alignment
+        jnxOpticsModBiasControlLoopFail(52),           -- Modulator bias control loop fail
+        jnxOpticsILTAfault(53),                        -- ILTA fault
+        jnxOpticsDACcalibrationfault(54),              -- DAC calibration fault
+        jnxOpticsADCcalibrationfault(55),              -- ADC calibration fault
+        jnxOpticsTecCurrentHighAlert(56),             -- TEC Current high alarm                                                  
+        jnxOpticsTecCurrentLowAlert(57),              -- TEC Current low alarm                                                   
+        jnxOpticsPamHistogramHighAlert(58),           -- PAM Histogram high alarm                                                
+        jnxOpticsResidualIsiHighAlert(59),            -- Residual ISI high alarm                                                 
+        jnxOpticsResidualIsiLowAlert(60),             -- Residual ISI low alarm                                                  
+        jnxOpticsFecCorrectedErrorsHighAlert(61),     -- Fec-Corrected Error Ratio high alarm                                    
+        jnxOpticsFecUCorrectedWordsHighAlert(62),     -- Fec-UCorrected Words Ratio high alarm                                   
+        jnxOptics24HourTecCurrentHighAlert(63),             -- TCA 24Hour - TEC Current high alarm                               
+        jnxOptics24HourTecCurrentLowAlert(64),              -- TCA 24Hour - TEC Current low alarm                                
+        jnxOptics24HourPamHistogramHighAlert(65),           -- TCA 24Hour - PAM Histogram high alarm                             
+        jnxOptics24HourResidualIsiHighAlert(66),            -- TCA 24Hour - Residual ISI high alarm                              
+        jnxOptics24HourResidualIsiLowAlert(67),             -- TCA 24Hour - Residual ISI low alarm                               
+        jnxOptics24HourFecCorrectedErrorsHighAlert(68),     -- TCA 24Hour - Fec-Corrected Error Ratio high alarm                 
+        jnxOptics24HourFecUCorrectedWordsHighAlert(69),     -- TCA 24Hour - Fec-UCorrected Words Ratio high alarm                
+        jnxOpticsLaserFreqErrorHighAlert(70),            -- Laser freq error high                                                
+                                                         -- TCA                                                                  
+        jnxOpticsLaserFreqErrorLowAlert(71),             -- Laser freq error Low                                                 
+                                                         -- TCA                                                                  
+        jnxOptics24HourLaserFreqErrorHighAlert(72),      -- Laser freq error high                                                
+                                                         -- TCA 24Hour
+        jnxOptics24HourLaserFreqErrorLowAlert(73),       -- Laser freq error Low                                                 
+                                                         -- TCA 24Hour
+        jnxOpticsSnrLowAlert(74),                        -- SNR low warning                                                      
+        jnxOptics24HourSnrLowAlert(75),                  -- SNR low warning                                                      
+                                                         -- TCA 24Hour
+        jnxOpticsPreFecBERHighAlert(76),                 -- PreFecBER warning                                                      
+        jnxOptics24HourPreFecBERHignAlert(77)            -- PreFecBER warning                                                      
+                                                         -- TCA 24Hour
+
     }
 
 JnxIplcNotificationId  ::= TEXTUAL-CONVENTION
@@ -263,11 +372,147 @@ JnxIplcNotificationId  ::= TEXTUAL-CONVENTION
 }
 
 
+JnxIlaNotificationId  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Ila alarm types"
+    SYNTAX       INTEGER {
+        jnxIlaBoardTemperatureAbnormalAlarm(1),
+        jnxIlaPower0AbnormalAlarm(2),
+        jnxIlaPower1AbnormalAlarm(3),
+        jnxIlaFan0MissingAlarm(4),
+        jnxIlaFan1MissingAlarm(5),
+        jnxIlaFan2MissingAlarm(6),
+        jnxIlaFan0SpeedAbnormalAlarm(7),
+        jnxIlaFan1SpeedAbnormalAlarm(8),
+        jnxIlaFan2SpeedAbnormalAlarm(9),
+        jnxIlaSoftwareVersionAbnormalAlarm(10),
+        jnxIlaCommunicationAbnormalAlarm(11),
+        jnxIlaTableErrAlarm(12),
+        jnxIlaEdfaEabCaseTemperatureAlarm(13),
+        jnxIlaEdfaEabRFLAlarm(14),
+        jnxIlaEdfaEabOOPAlarm(15),
+        jnxIlaEdfaEabOOGAlarm(16),
+        jnxIlaEdfaEabPump0EOLAlarm(17),
+        jnxIlaEdfaEabPump1EOLAlarm(18),
+        jnxIlaEdfaEabPump0TemperatureAlarm(19),
+        jnxIlaEdfaEabPump1TemperatureAlarm(20),
+        jnxIlaEdfaEabInputLOSAlarm(21),
+        jnxIlaEdfaEabOutputLOSAlarm(22),
+        jnxIlaEdfaEabCaliTableErrAlarm(23),
+        jnxIlaEdfaEbaCaseTemperatureAlarm(24),
+        jnxIlaEdfaEbaRFLAlarm(25),
+        jnxIlaEdfaEbaOOPAlarm(26),
+        jnxIlaEdfaEbaOOGAlarm(27),
+        jnxIlaEdfaEbaPump0EOLAlarm(28),
+        jnxIlaEdfaEbaPump1EOLAlarm(29),
+        jnxIlaEdfaEbaPump0TemperatureAlarm(30),
+        jnxIlaEdfaEbaPump1TemperatureAlarm(31),
+        jnxIlaEdfaEbaInputLOSAlarm(32),
+        jnxIlaEdfaEbaOutputLOSAlarm(33),
+        jnxIlaEdfaEbaCaliTableErrAlarm(34),
+        jnxIlaOscaAddPowerLOSAlarm(35),
+        jnxIlaOscaDropPowerLOSAlarm(36),
+        jnxIlaOscbAddPowerLOSAlarm(37),
+        jnxIlaOscbDropPowerLOSAlarm(38),
+        jnxIlaOscATxPwrLow15minAlert(39),
+        jnxIlaOscATxPwrHigh15minAlert(40),
+        jnxIlaOscARxPwrLow15minAlert(41),
+        jnxIlaOscARxPwrHigh15minAlert(42),
+        jnxIlaOscAFibLossLow15minAlert(43),
+        jnxIlaOscAFibLossHigh15minAlert(44),
+        jnxIlaVoaALineOutLow15minAlert(45),
+        jnxIlaVoaALineOutHigh15minAlert(46),
+        jnxIlaOscBTxPwrLow15minAlert(47),
+        jnxIlaOscBTxPwrHigh15minAlert(48),
+        jnxIlaOscBRxPwrLow15minAlert(49),
+        jnxIlaOscBRxPwrHigh15minAlert(50),
+        jnxIlaOscBFibLossLow15minAlert(51),
+        jnxIlaOscBFibLossHigh15minAlert(52),
+        jnxIlaVoaBLineOutLow15minAlert(53),
+        jnxIlaVoaBLineOutHigh15minAlert(54),
+        jnxIlaEdfaABInputPwrLow15minAlert(55),
+        jnxIlaEdfaABInputPwrHigh15minAlert(56),
+        jnxIlaEdfaABOutputPwrLow15minAlert(57),
+        jnxIlaEdfaABOutputPwrHigh15minAlert(58),
+        jnxIlaEdfaABPump0CurLow15minAlert(59),
+        jnxIlaEdfaABPump0CurHigh15minAlert(60),
+        jnxIlaEdfaABPump1CurLow15minAlert(61),
+        jnxIlaEdfaABPump1CurHigh15minAlert(62),
+        jnxIlaEdfaABPump0TempLow15minAlert(63),
+        jnxIlaEdfaABPump0TempHigh15minAlert(64),
+        jnxIlaEdfaABPump1TempLow15minAlert(65),
+        jnxIlaEdfaABPump1TempHigh15minAlert(66),
+        jnxIlaEdfaBAInputPwrLow15minAlert(67),
+        jnxIlaEdfaBAInputPwrHigh15minAlert(68),
+        jnxIlaEdfaBAOutputPwrLow15minAlert(69),
+        jnxIlaEdfaBAOutputPwrHigh15minAlert(70),
+        jnxIlaEdfaBAPump0CurLow15minAlert(71),
+        jnxIlaEdfaBAPump0CurHigh15minAlert(72),
+        jnxIlaEdfaBAPump1CurLow15minAlert(73),
+        jnxIlaEdfaBAPump1CurHigh15minAlert(74),
+        jnxIlaEdfaBAPump0TempLow15minAlert(75),
+        jnxIlaEdfaBAPump0TempHigh15minAlert(76),
+        jnxIlaEdfaBAPump1TempLow15minAlert(77),
+        jnxIlaEdfaBAPump1TempHigh15minAlert(78),
+        jnxIla24HourOscATxPwrLowAlert(79),
+        jnxIla24HourOscATxPwrHighAlert(80),
+        jnxIla24HourOscARxPwrLowAlert(81),
+        jnxIla24HourOscARxPwrHighAlert(82),
+        jnxIla24HourOscAFibLossLowAlert(83),
+        jnxIla24HourOscAFibLossHighAlert(84),
+        jnxIla24HourVoaALineOutLowAlert(85),
+        jnxIla24HourVoaALineOutHighAlert(86),
+        jnxIla24HourOscBTxPwrLowAlert(87),
+        jnxIla24HourOscBTxPwrHighAlert(88),
+        jnxIla24HourOscBRxPwrLowAlert(89),
+        jnxIla24HourOscBRxPwrHighAlert(90),
+        jnxIla24HourOscBFibLossLowAlert(91),
+        jnxIla24HourOscBFibLossHighAlert(92),
+        jnxIla24HourVoaBLineOutLowAlert(93),
+        jnxIla24HourVoaBLineOutHighAlert(94),
+        jnxIla24HourEdfaABInputPwrLowAlert(95),
+        jnxIla24HourEdfaABInputPwrHighAlert(96),
+        jnxIla24HourEdfaABOutputPwrLowAlert(97),
+        jnxIla24HourEdfaABOutputPwrHighAlert(98),
+        jnxIla24HourEdfaABPump0CurLowAlert(99),
+        jnxIla24HourEdfaABPump0CurHighAlert(100),
+        jnxIla24HourEdfaABPump1CurLowAlert(101),
+        jnxIla24HourEdfaABPump1CurHighAlert(102),
+        jnxIla24HourEdfaABPump0TempLowAlert(103),
+        jnxIla24HourEdfaABPump0TempHighAlert(104),
+        jnxIla24HourEdfaABPump1TempLowAlert(105),
+        jnxIla24HourEdfaABPump1TempHighAlert(106),
+        jnxIla24HourEdfaBAInputPwrLowAlert(107),
+        jnxIla24HourEdfaBAInputPwrHighAlert(108),
+        jnxIla24HourEdfaBAOutputPwrLowAlert(109),
+        jnxIla24HourEdfaBAOutputPwrHighAlert(110),
+        jnxIla24HourEdfaBAPump0CurLowAlert(111),
+        jnxIla24HourEdfaBAPump0CurHighAlert(112),
+        jnxIla24HourEdfaBAPump1CurLowAlert(113),
+        jnxIla24HourEdfaBAPump1CurHighAlert(114),
+        jnxIla24HourEdfaBAPump0TempLowAlert(115),
+        jnxIla24HourEdfaBAPump0TempHighAlert(116),
+        jnxIla24HourEdfaBAPump1TempLowAlert(117),
+        jnxIla24HourEdfaBAPump1TempHighAlert(118),
+        jnxIlaEdfaABSignalPwrLow15minAlert(119),
+        jnxIlaEdfaABSignalPwrHigh15minAlert(120),
+        jnxIla24HourEdfaABSignalPwrLowAlert(121),
+        jnxIla24HourEdfaABSignalPwrHighAlert(122),
+        jnxIlaEdfaBASignalPwrLow15minAlert(123),
+        jnxIlaEdfaBASignalPwrHigh15minAlert(124),
+        jnxIla24HourEdfaBASignalPwrLowAlert(125),
+        jnxIla24HourEdfaBASignalPwrHighAlert(126),
+        jnxIlaEdfaABGainRangeErrAlarm(127),
+        jnxIlaEdfaBAGainRangeErrAlarm(128)
+
+}
+
 jnxOptics                       OBJECT IDENTIFIER ::= { jnxIfOpticsMib 1 }
 jnxOpticsPerformanceMonitoring  OBJECT IDENTIFIER ::= { jnxIfOpticsMib 2 }
 jnxOpticsAlarm                  OBJECT IDENTIFIER ::= { jnxIfOpticsMib 3 }
 jnxOpticsOCh2                   OBJECT IDENTIFIER ::= { jnxIfOpticsMib 4 }
 jnxIplcAlarm                    OBJECT IDENTIFIER ::= { jnxIfOpticsMib 5 }
+jnxIlaAlarm                     OBJECT IDENTIFIER ::= { jnxIfOpticsMib 6 }
 
 --
 -- Optics config table
@@ -417,7 +662,8 @@ JnxOpticsConfigEntry ::=
               4 - XFP+
               5 - CFP
               6 - CFP+  
-              7 - Non pluggable "
+              7 - Non pluggable 
+              8 - QSFP DWDM"
         ::= { jnxOpticsConfigEntry 5 }
 
 
@@ -1203,7 +1449,71 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         jnxPMCurMaxRxLaserBiasCurrent
                             Integer32,
         jnxPMCurAvgRxLaserBiasCurrent
-                            Integer32
+                            Integer32,
+   jnxPMCurTecCurrent
+                            Integer32,
+   jnxPMCurMinTecCurrent
+                            Integer32,
+   jnxPMCurMaxTecCurrent
+                            Integer32,
+   jnxPMCurAvgTecCurrent
+                            Integer32,
+   jnxPMCurResidualDispersion
+                            Integer32,
+   jnxPMCurMinResidualDispersion
+                            Integer32,
+   jnxPMCurMaxResidualDispersion
+                            Integer32,
+   jnxPMCurAvgResidualDispersion
+                            Integer32,
+   jnxPMCurLevelHistogram
+                            Integer32,
+   jnxPMCurMinLevelHistogram
+                            Integer32,
+   jnxPMCurMaxLevelHistogram
+                            Integer32,
+   jnxPMCurAvgLevelHistogram
+                            Integer32,
+   jnxPMCurLaserFrequencyError
+                            Integer32,
+   jnxPMCurMinLaserFrequencyError
+                            Integer32,
+   jnxPMCurMaxLaserFrequencyError
+                            Integer32,
+   jnxPMCurAvgLaserFrequencyError
+                            Integer32,
+   jnxPMCurFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxPMCurFECCorrectedErrorsExponent
+                            Integer32,
+   jnxPMCurMinFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxPMCurMinFECCorrectedErrorsExponent
+                            Integer32,
+   jnxPMCurMaxFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxPMCurMaxFECCorrectedErrorsExponent
+                            Integer32,
+   jnxPMCurAvgFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxPMCurAvgFECCorrectedErrorsExponent
+                            Integer32,
+   jnxPMCurFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxPMCurFECUCorrectedWordsExponent
+                            Integer32,
+   jnxPMCurMinFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxPMCurMinFECUCorrectedWordsExponent
+                            Integer32,
+   jnxPMCurMaxFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxPMCurMaxFECUCorrectedWordsExponent
+                            Integer32,
+   jnxPMCurAvgFECUCorrectedWordsMantissa
+                            Integer32,          
+   jnxPMCurAvgFECUCorrectedWordsExponent
+                            Integer32          
     }
 
     jnxPMCurChromaticDispersion OBJECT-TYPE
@@ -1676,6 +1986,278 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
             "Received Average LaserBiasCurrent measured at  Transceiver port"
         ::= { jnxOpticsPMCurrentEntry 50 }
 
+ jnxPMCurTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received TecCurrent measured at  Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 51 } 
+   
+ jnxPMCurMinTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Minimum TecCurrent measured at  Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 52 } 
+   
+ jnxPMCurMaxTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Maximum TecCurrent measured at Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 53 } 
+   
+ jnxPMCurAvgTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Average TecCurrent measured at Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 54 } 
+   
+ jnxPMCurResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          ".1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxOpticsPMCurrentEntry 55 } 
+   
+ jnxPMCurMinResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          ".1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxOpticsPMCurrentEntry 56 }
+   
+ jnxPMCurMaxResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          ".1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxOpticsPMCurrentEntry 57 }
+   
+ jnxPMCurAvgResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          ".1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxOpticsPMCurrentEntry 58 }
+   
+ jnxPMCurLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The rate of measured signal at Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 59 }
+   
+ jnxPMCurMinLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Minimum rate of measured signal at Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 60 }
+   
+ jnxPMCurMaxLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Maximum rate of measured signal at Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 61 }
+   
+ jnxPMCurAvgLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Average rate of measured signal at Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 62 }
+   
+ jnxPMCurLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 63 }
+
+ jnxPMCurMinLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 64 }
+   
+ jnxPMCurMaxLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 65 }
+   
+ jnxPMCurAvgLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxOpticsPMCurrentEntry 66 }
+    
+ jnxPMCurFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 67 }
+
+ jnxPMCurFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 68 }
+
+ jnxPMCurMinFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 69 }
+   
+ jnxPMCurMinFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 70 }
+
+ jnxPMCurMaxFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 71 }
+
+ jnxPMCurMaxFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 72 }
+   
+ jnxPMCurAvgFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 73 }
+
+ jnxPMCurAvgFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 74 }
+   
+ jnxPMCurFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 75 }
+
+ jnxPMCurFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 76 }
+   
+ jnxPMCurMinFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 77 }
+
+ jnxPMCurMinFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 78 }
+   
+ jnxPMCurMaxFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 79 }
+
+ jnxPMCurMaxFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 80 }
+   
+ jnxPMCurAvgFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 81 }
+
+ jnxPMCurAvgFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMCurrentEntry 82 }
+
 
 --
 -- PM Interval Table
@@ -1779,7 +2361,55 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         jnxPMIntMaxRxLaserBiasCurrent
                             Integer32,
         jnxPMIntAvgRxLaserBiasCurrent
-                            Integer32
+                            Integer32,
+   jnxPMIntMinTecCurrent
+                            Integer32,
+   jnxPMIntMaxTecCurrent
+                            Integer32,
+   jnxPMIntAvgTecCurrent
+                            Integer32,
+   jnxPMIntMinResidualDispersion
+                            Integer32,
+   jnxPMIntMaxResidualDispersion
+                            Integer32,
+   jnxPMIntAvgResidualDispersion
+                            Integer32,
+   jnxPMIntMinLevelHistogram
+                            Integer32,
+   jnxPMIntMaxLevelHistogram
+                            Integer32,
+   jnxPMIntAvgLevelHistogram
+                            Integer32,
+   jnxPMIntMinLaserFrequencyError
+                            Integer32,
+   jnxPMIntMaxLaserFrequencyError
+                            Integer32,
+   jnxPMIntAvgLaserFrequencyError
+                            Integer32,
+   jnxPMIntMinFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxPMIntMinFECCorrectedErrorsExponent
+                            Integer32,
+   jnxPMIntMaxFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxPMIntMaxFECCorrectedErrorsExponent
+                            Integer32,
+   jnxPMIntAvgFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxPMIntAvgFECCorrectedErrorsExponent
+                            Integer32,
+   jnxPMIntMinFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxPMIntMinFECUCorrectedWordsExponent
+                            Integer32,
+   jnxPMIntMaxFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxPMIntMaxFECUCorrectedWordsExponent
+                            Integer32,
+   jnxPMIntAvgFECUCorrectedWordsMantissa
+                            Integer32, 
+   jnxPMIntAvgFECUCorrectedWordsExponent
+                            Integer32  
     }
 
     jnxOpticsPMIntervalNumber OBJECT-TYPE
@@ -2158,7 +2788,231 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
             "Receive Average LaserBiasCurrent measured at  Transceiver port"
         ::= { jnxOpticsPMIntervalEntry 40 }
 
+ jnxPMIntMinTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Minimum TecCurrent measured at  Transceiver
+      port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 41 }
+ 
+ jnxPMIntMaxTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Maximum TecCurrent measured at Transceiver
+      port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 42 }
+   
+ jnxPMIntAvgTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Average TecCurrent measured at Transceiver
+      port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 43 }
+   
+   
+ jnxPMIntMinResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Residual Dispersion measured at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 44 }
+   
+ jnxPMIntMaxResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Residual Dispersion measured at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 45 }
+   
+ jnxPMIntAvgResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Residual Dispersion measured at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 46 }
 
+ jnxPMIntMinLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Minimum rate of measured signal at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 47 }
+
+ jnxPMIntMaxLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Maximum rate of measured signal at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 48 }
+
+ jnxPMIntAvgLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Average rate of measured signal at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 49 }
+
+ jnxPMIntMinLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Laser Frequency Error  measured at  Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 50 }
+
+ jnxPMIntMaxLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Laser Frequency Error  measured at  Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 51 }
+
+ jnxPMIntAvgLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Laser Frequency Error  measured at  Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 52 }
+
+ jnxPMIntMinFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 53 }
+
+ jnxPMIntMinFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 54 }
+ 
+ jnxPMIntMaxFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 55 }
+
+ jnxPMIntMaxFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 56 }
+
+ jnxPMIntAvgFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 57 }
+
+   jnxPMIntAvgFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 58 }
+ 
+  jnxPMIntMinFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 59 }
+
+  jnxPMIntMinFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 60 }
+
+ jnxPMIntMaxFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 61 }
+
+ jnxPMIntMaxFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 62 }
+
+ jnxPMIntAvgFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 63 }
+
+ jnxPMIntAvgFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxOpticsPMIntervalEntry 64 }
 --
 -- Cur/Prev Day Table
 --
@@ -2261,6 +3115,54 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         jnxPMDayMaxRxLaserBiasCurrent
                                            Integer32,
         jnxPMDayAvgRxLaserBiasCurrent
+                                           Integer32,
+   jnxPMDayMinTecCurrent
+                                           Integer32,
+   jnxPMDayMaxTecCurrent
+                                           Integer32,
+   jnxPMDayAvgTecCurrent
+                                           Integer32,
+   jnxPMDayMinResidualDispersion
+                                           Integer32,
+   jnxPMDayMaxResidualDispersion
+                                           Integer32,
+   jnxPMDayAvgResidualDispersion
+                                           Integer32,
+   jnxPMDayMinLevelHistogram
+                                           Integer32,
+   jnxPMDayMaxLevelHistogram
+                                           Integer32,
+   jnxPMDayAvgLevelHistogram
+                                           Integer32,
+   jnxPMDayMinLaserFrequencyError
+                                           Integer32,
+   jnxPMDayMaxLaserFrequencyError
+                                           Integer32,
+   jnxPMDayAvgLaserFrequencyError
+                                           Integer32,
+   jnxPMDayMinFECCorrectedErrorsMantissa
+                                           Integer32,
+   jnxPMDayMinFECCorrectedErrorsExponent
+                                           Integer32,
+   jnxPMDayMaxFECCorrectedErrorsMantissa
+                                           Integer32,
+   jnxPMDayMaxFECCorrectedErrorsExponent
+                                           Integer32,
+   jnxPMDayAvgFECCorrectedErrorsMantissa
+                                           Integer32,
+   jnxPMDayAvgFECCorrectedErrorsExponent
+                                           Integer32,
+   jnxPMDayMinFECUCorrectedWordsMantissa
+                                           Integer32,
+   jnxPMDayMinFECUCorrectedWordsExponent
+                                           Integer32,
+   jnxPMDayMaxFECUCorrectedWordsMantissa
+                                           Integer32,
+   jnxPMDayMaxFECUCorrectedWordsExponent
+                                           Integer32,
+   jnxPMDayAvgFECUCorrectedWordsMantissa
+                                           Integer32,
+   jnxPMDayAvgFECUCorrectedWordsExponent
                                            Integer32
 
     }
@@ -2637,9 +3539,3597 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         DESCRIPTION
             "Receive Maximum LaserBiasCurrent measured at  Transceiver port"
         ::= { jnxOpticsPMDayEntry 40 }
+ jnxPMDayMinTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Minimum TecCurrent measured at  Transceiver
+      port"
+        ::= { jnxOpticsPMDayEntry 41 }
+ 
+ jnxPMDayMaxTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Maximum TecCurrent measured at Transceiver
+      port"
+        ::= { jnxOpticsPMDayEntry 42 }
+   
+ jnxPMDayAvgTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Average TecCurrent measured at Transceiver
+      port"
+        ::= { jnxOpticsPMDayEntry 43 }
+   
+   
+ jnxPMDayMinResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxOpticsPMDayEntry 44 }
+   
+ jnxPMDayMaxResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxOpticsPMDayEntry 45 }
+   
+ jnxPMDayAvgResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxOpticsPMDayEntry 46 }
+
+ jnxPMDayMinLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Minimum rate of measured signal at Transceiver port"
+        ::= { jnxOpticsPMDayEntry 47 }
+   
+ jnxPMDayMaxLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Maximum rate of measured signal at Transceiver port"
+        ::= { jnxOpticsPMDayEntry 48 }
+   
+ jnxPMDayAvgLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Average rate of measured signal at Transceiver port"
+        ::= { jnxOpticsPMDayEntry 49 }
+
+ jnxPMDayMinLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxOpticsPMDayEntry 50 }
+   
+ jnxPMDayMaxLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxOpticsPMDayEntry 51 }
+   
+ jnxPMDayAvgLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxOpticsPMDayEntry 52 }
+
+ jnxPMDayMinFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 53 }
+   
+ jnxPMDayMinFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 54 }
+   
+ jnxPMDayMaxFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 55 }
+   
+ jnxPMDayMaxFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 56 }
+   
+ jnxPMDayAvgFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 57 }
+   
+ jnxPMDayAvgFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 58 }
+   
+ jnxPMDayMinFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 59 }
+   
+ jnxPMDayMinFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 60 }
+   
+ jnxPMDayMaxFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 61 }
+   
+ jnxPMDayMaxFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 62 }
+   
+ jnxPMDayAvgFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 63 }
+
+ jnxPMDayAvgFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset"
+        ::= { jnxOpticsPMDayEntry 64 }
+
+--
+-- Optical PM data
+-- 
+jnxIfOpticsPMCurrentTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF JnxIfOpticsPMCurrentEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A table of current PM entries."
+
+     ::= { jnxOpticsPerformanceMonitoring 9 }
+
+jnxIfOpticsPMCurrentEntry  OBJECT-TYPE
+     SYNTAX     JnxIfOpticsPMCurrentEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A conceptual row that contains information about the PM Current
+          Table."
+     INDEX    { ifIndex, jnxIfOpticsPMCurrentLaneIndex }
+     ::= { jnxIfOpticsPMCurrentTable 1 }
+
+JnxIfOpticsPMCurrentEntry  ::= SEQUENCE {
+		jnxIfOpticsPMCurrentLaneIndex 
+							Unsigned32,
+        jnxIfOpticsPMCurChromaticDispersion      
+                            Integer32,
+        jnxIfOpticsPMCurDiffGroupDelay   
+                            Integer32,
+        jnxIfOpticsPMCurPolarizationState        
+                            Integer32,
+        jnxIfOpticsPMCurPolarDepLoss
+                            Integer32,
+        jnxIfOpticsPMCurQ                        
+                            Integer32,
+        jnxIfOpticsPMCurSNR                      
+                            Integer32,
+        jnxIfOpticsPMCurTxOutputPower            
+                            Integer32,
+        jnxIfOpticsPMCurRxInputPower             
+                            Integer32,
+        jnxIfOpticsPMCurMinChromaticDispersion
+                            Integer32,
+        jnxIfOpticsPMCurMaxChromaticDispersion
+                            Integer32,
+        jnxIfOpticsPMCurAvgChromaticDispersion
+                            Integer32,
+        jnxIfOpticsPMCurMinDiffGroupDelay
+                            Integer32,
+        jnxIfOpticsPMCurMaxDiffGroupDelay
+                            Integer32,
+        jnxIfOpticsPMCurAvgDiffGroupDelay
+                            Integer32,
+        jnxIfOpticsPMCurMinPolarState
+                            Integer32,
+        jnxIfOpticsPMCurMaxPolarState
+                            Integer32,
+        jnxIfOpticsPMCurAvgPolarState
+                            Integer32,
+        jnxIfOpticsPMCurMinPolarDepLoss
+                            Integer32,
+        jnxIfOpticsPMCurMaxPolarDepLoss
+                            Integer32,
+        jnxIfOpticsPMCurAvgPolarDepLoss
+                            Integer32,
+        jnxIfOpticsPMCurMinQ
+                            Integer32,
+        jnxIfOpticsPMCurMaxQ
+                            Integer32,
+        jnxIfOpticsPMCurAvgQ
+                            Integer32,
+        jnxIfOpticsPMCurMinSNR
+                            Integer32,
+        jnxIfOpticsPMCurMaxSNR
+                            Integer32,
+        jnxIfOpticsPMCurAvgSNR
+                            Integer32,
+        jnxIfOpticsPMCurMinTxOutputPower
+                            Integer32,
+        jnxIfOpticsPMCurMaxTxOutputPower
+                            Integer32,
+        jnxIfOpticsPMCurAvgTxOutputPower
+                            Integer32,
+        jnxIfOpticsPMCurMinRxInputPower
+                            Integer32,
+        jnxIfOpticsPMCurMaxRxInputPower
+                            Integer32,
+        jnxIfOpticsPMCurAvgRxInputPower
+                            Integer32,
+        jnxIfOpticsPMCurSuspectedFlag
+                            TruthValue,
+       jnxIfOpticsPMCurSuspectReason
+                            Integer32,
+        jnxIfOpticsPMCurTxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMCurMinTxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMCurMaxTxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMCurAvgTxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMCurTemperature
+                            Integer32,
+        jnxIfOpticsPMCurMinTemperature
+                            Integer32,
+        jnxIfOpticsPMCurMaxTemperature
+                            Integer32,
+        jnxIfOpticsPMCurAvgTemperature
+                            Integer32,
+        jnxIfOpticsPMCurCarFreqOffset
+                            Integer32,
+        jnxIfOpticsPMCurMinCarFreqOffset
+                            Integer32,
+        jnxIfOpticsPMCurMaxCarFreqOffset
+                            Integer32,
+        jnxIfOpticsPMCurAvgCarFreqOffset
+                            Integer32,
+        jnxIfOpticsPMCurRxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMCurMinRxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMCurMaxRxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMCurAvgRxLaserBiasCurrent
+                            Integer32,
+   jnxIfOpticsPMCurTecCurrent
+                            Integer32,
+   jnxIfOpticsPMCurMinTecCurrent
+                            Integer32,
+   jnxIfOpticsPMCurMaxTecCurrent
+                            Integer32,
+   jnxIfOpticsPMCurAvgTecCurrent
+                            Integer32,
+   jnxIfOpticsPMCurResidualDispersion
+                            Integer32,
+   jnxIfOpticsPMCurMinResidualDispersion
+                            Integer32,
+   jnxIfOpticsPMCurMaxResidualDispersion
+                            Integer32,
+   jnxIfOpticsPMCurAvgResidualDispersion
+                            Integer32,
+   jnxIfOpticsPMCurLevelHistogram
+                            Integer32,
+   jnxIfOpticsPMCurMinLevelHistogram
+                            Integer32,
+   jnxIfOpticsPMCurMaxLevelHistogram
+                            Integer32,
+   jnxIfOpticsPMCurAvgLevelHistogram
+                            Integer32,
+   jnxIfOpticsPMCurLaserFrequencyError
+                            Integer32,
+   jnxIfOpticsPMCurMinLaserFrequencyError
+                            Integer32,
+   jnxIfOpticsPMCurMaxLaserFrequencyError
+                            Integer32,
+   jnxIfOpticsPMCurAvgLaserFrequencyError
+                            Integer32,
+   jnxIfOpticsPMCurFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxIfOpticsPMCurFECCorrectedErrorsExponent
+                            Integer32,
+   jnxIfOpticsPMCurMinFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxIfOpticsPMCurMinFECCorrectedErrorsExponent
+                            Integer32,
+   jnxIfOpticsPMCurMaxFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxIfOpticsPMCurMaxFECCorrectedErrorsExponent
+                            Integer32,
+   jnxIfOpticsPMCurAvgFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxIfOpticsPMCurAvgFECCorrectedErrorsExponent
+                            Integer32,
+   jnxIfOpticsPMCurFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxIfOpticsPMCurFECUCorrectedWordsExponent
+                            Integer32,
+   jnxIfOpticsPMCurMinFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxIfOpticsPMCurMinFECUCorrectedWordsExponent
+                            Integer32,
+   jnxIfOpticsPMCurMaxFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxIfOpticsPMCurMaxFECUCorrectedWordsExponent
+                            Integer32,
+   jnxIfOpticsPMCurAvgFECUCorrectedWordsMantissa
+                            Integer32,          
+   jnxIfOpticsPMCurAvgFECUCorrectedWordsExponent
+                            Integer32          
+    }
+
+	jnxIfOpticsPMCurrentLaneIndex OBJECT-TYPE
+        SYNTAX         Unsigned32(1..96)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "This is the optics lane number."
+        ::= { jnxIfOpticsPMCurrentEntry 1 }
+	
+    jnxIfOpticsPMCurChromaticDispersion OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Chromatic Dispersion measured at Rx Transceiver
+              port"
+        ::= { jnxIfOpticsPMCurrentEntry 2 }
+
+    jnxIfOpticsPMCurDiffGroupDelay OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential group delay "
+        ::= { jnxIfOpticsPMCurrentEntry 3 }
+
+    jnxIfOpticsPMCurPolarizationState OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            " Polarization state "
+        ::= { jnxIfOpticsPMCurrentEntry 4 }
+
+    jnxIfOpticsPMCurPolarDepLoss OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The polarisation dependent loss (PDL) is the difference (in dB)
+             between the maximum and minimum values of the channel insertion
+             loss (or gain) of the black-link from point SS to RS due to a
+             variation of the state of polarization (SOP) over all SOPs"
+        ::= { jnxIfOpticsPMCurrentEntry 5 }
+
+    jnxIfOpticsPMCurQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "'Q' factor estimated at Rx Transceiver port "
+        ::= { jnxIfOpticsPMCurrentEntry 6 }
+
+    jnxIfOpticsPMCurSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SNR - signal to noise ratio"
+        ::= { jnxIfOpticsPMCurrentEntry 7 }
+
+    jnxIfOpticsPMCurTxOutputPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "TxOutputPower  - transmit output power "
+        ::= { jnxIfOpticsPMCurrentEntry 8 }
+
+    jnxIfOpticsPMCurRxInputPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "RxInputPower   - receive output power"
+        ::= { jnxIfOpticsPMCurrentEntry 9 }
+
+    jnxIfOpticsPMCurMinChromaticDispersion OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min Residual Chromatic Dispersion measured at Rx Transceiver
+              port"
+        ::= { jnxIfOpticsPMCurrentEntry 10 }
+
+    jnxIfOpticsPMCurMaxChromaticDispersion OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max Residual Chromatic Dispersion measured at Rx Transceiver
+              port"
+        ::= { jnxIfOpticsPMCurrentEntry 11 }
+
+    jnxIfOpticsPMCurAvgChromaticDispersion OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Residual Chromatic Dispersion measured at Rx Transceiver
+              port"
+        ::= { jnxIfOpticsPMCurrentEntry 12 }
+
+    jnxIfOpticsPMCurMinDiffGroupDelay OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min Differential group delay "
+        ::= { jnxIfOpticsPMCurrentEntry 13 }
+
+    jnxIfOpticsPMCurMaxDiffGroupDelay OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max Differential group delay "
+        ::= { jnxIfOpticsPMCurrentEntry 14 }
+
+    jnxIfOpticsPMCurAvgDiffGroupDelay OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Differential group delay "
+        ::= { jnxIfOpticsPMCurrentEntry 15 }
+
+    jnxIfOpticsPMCurMinPolarState OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min Polarization state "
+        ::= { jnxIfOpticsPMCurrentEntry 16 }
+
+    jnxIfOpticsPMCurMaxPolarState OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max Polarization state "
+        ::= { jnxIfOpticsPMCurrentEntry 17 }
+
+    jnxIfOpticsPMCurAvgPolarState OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg Polarization state "
+        ::= { jnxIfOpticsPMCurrentEntry 18 }
+
+    jnxIfOpticsPMCurMinPolarDepLoss OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min - The polarisation dependent loss (PDL)"
+        ::= { jnxIfOpticsPMCurrentEntry 19 }
+
+    jnxIfOpticsPMCurMaxPolarDepLoss OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max - The polarisation dependent loss (PDL)"
+        ::= { jnxIfOpticsPMCurrentEntry 20 }
+
+    jnxIfOpticsPMCurAvgPolarDepLoss OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg - The polarisation dependent loss (PDL)"
+        ::= { jnxIfOpticsPMCurrentEntry 21 }
+
+    jnxIfOpticsPMCurMinQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min 'Q' factor estimated at Rx Transceiver port "
+        ::= { jnxIfOpticsPMCurrentEntry 22 }
+
+    jnxIfOpticsPMCurMaxQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max 'Q' factor estimated at Rx Transceiver port "
+        ::= { jnxIfOpticsPMCurrentEntry 23 }
+
+    jnxIfOpticsPMCurAvgQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg 'Q' factor estimated at Rx Transceiver port "
+        ::= { jnxIfOpticsPMCurrentEntry 24 }
+
+    jnxIfOpticsPMCurMinSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min SNR - signal to noise ratio"
+        ::= { jnxIfOpticsPMCurrentEntry 25 }
+
+    jnxIfOpticsPMCurMaxSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max SNR - signal to noise ratio"
+        ::= { jnxIfOpticsPMCurrentEntry 26 }
+
+    jnxIfOpticsPMCurAvgSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg SNR - signal to noise ratio"
+        ::= { jnxIfOpticsPMCurrentEntry 27 }
+
+    jnxIfOpticsPMCurMinTxOutputPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min TxOutputPower  - transmit output power "
+        ::= { jnxIfOpticsPMCurrentEntry 28 }
+
+    jnxIfOpticsPMCurMaxTxOutputPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max TxOutputPower  - transmit output power "
+        ::= { jnxIfOpticsPMCurrentEntry 29 }
+
+    jnxIfOpticsPMCurAvgTxOutputPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg TxOutputPower  - transmit output power "
+        ::= { jnxIfOpticsPMCurrentEntry 30 }
+
+    jnxIfOpticsPMCurMinRxInputPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min RxInputPower   - receive output power"
+        ::= { jnxIfOpticsPMCurrentEntry 31 }
+
+    jnxIfOpticsPMCurMaxRxInputPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max RxInputPower   - receive output power"
+        ::= { jnxIfOpticsPMCurrentEntry 32 }
+
+    jnxIfOpticsPMCurAvgRxInputPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg RxInputPower   - receive output power"
+        ::= { jnxIfOpticsPMCurrentEntry 33 }
+
+    jnxIfOpticsPMCurSuspectedFlag OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "If true, the data in this entry may be unreliable."
+        ::= { jnxIfOpticsPMCurrentEntry 34 }
+
+    jnxIfOpticsPMCurSuspectReason OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "If SuspectedFlag is true, the reson for the PM data being suspect.
+              0 - not applicable
+              1 - unknown
+              2 - new object
+              3 - interface disabled
+              4 - clock shift detected
+              5 - cleared by user
+              6 - interval too short secs < 890
+              7 - interval too long secs > 910
+              8 - near end unavailable
+              9 - far end unavailable
+             10 - partial data
+             11 - missing intervals due to restarts
+            "
+        ::= { jnxIfOpticsPMCurrentEntry 35 }
+
+    jnxIfOpticsPMCurTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Trasmit LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 36 }
+
+    jnxIfOpticsPMCurMinTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum trasmit LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 37 }
+
+    jnxIfOpticsPMCurMaxTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum trasmit LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 38 }
+
+    jnxIfOpticsPMCurAvgTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 39 }
 
 
+    jnxIfOpticsPMCurTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Temperature  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 40 }
 
+    jnxIfOpticsPMCurMinTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum   Temperature  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 41 }
+
+    jnxIfOpticsPMCurMaxTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Temperature measure  at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 42 }
+
+    jnxIfOpticsPMCurAvgTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Temperature measure  at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 43 }
+
+
+    jnxIfOpticsPMCurCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 44 }
+
+    jnxIfOpticsPMCurMinCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 45 }
+
+    jnxIfOpticsPMCurMaxCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 46 }
+
+    jnxIfOpticsPMCurAvgCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Carrier frequency offset measured at Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 47 }
+
+    jnxIfOpticsPMCurRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 48 }
+
+    jnxIfOpticsPMCurMinRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Minimum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 49 }
+
+    jnxIfOpticsPMCurMaxRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Maximum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 50 }
+
+    jnxIfOpticsPMCurAvgRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Average LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 51 } 
+
+ jnxIfOpticsPMCurTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received TecCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 52 }  
+   
+ jnxIfOpticsPMCurMinTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Minimum TecCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 53 }  
+   
+ jnxIfOpticsPMCurMaxTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Maximum TecCurrent measured at Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 54 }  
+   
+ jnxIfOpticsPMCurAvgTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Average TecCurrent measured at Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 55 }  
+   
+ jnxIfOpticsPMCurResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxIfOpticsPMCurrentEntry 56 } 
+   
+ jnxIfOpticsPMCurMinResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxIfOpticsPMCurrentEntry 57 }
+   
+ jnxIfOpticsPMCurMaxResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxIfOpticsPMCurrentEntry 58 }
+   
+ jnxIfOpticsPMCurAvgResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxIfOpticsPMCurrentEntry 59 }
+   
+ jnxIfOpticsPMCurLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The rate of measured signal at Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 60 }
+   
+ jnxIfOpticsPMCurMinLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Minimum rate of measured signal at Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 61 }
+   
+ jnxIfOpticsPMCurMaxLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Maximum rate of measured signal at Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 62 }
+   
+ jnxIfOpticsPMCurAvgLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Average rate of measured signal at Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 63 }
+   
+ jnxIfOpticsPMCurLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 64 }
+
+ jnxIfOpticsPMCurMinLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 65 }
+   
+ jnxIfOpticsPMCurMaxLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 66 }
+   
+ jnxIfOpticsPMCurAvgLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMCurrentEntry 67 }
+    
+ jnxIfOpticsPMCurFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 68 }
+
+ jnxIfOpticsPMCurFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 69 }
+
+ jnxIfOpticsPMCurMinFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 70 }
+   
+ jnxIfOpticsPMCurMinFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 71 }
+
+ jnxIfOpticsPMCurMaxFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 72 }
+
+ jnxIfOpticsPMCurMaxFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 73 }
+   
+ jnxIfOpticsPMCurAvgFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 74 }
+
+ jnxIfOpticsPMCurAvgFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 75 }
+   
+ jnxIfOpticsPMCurFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 76 }
+
+ jnxIfOpticsPMCurFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 77 }
+   
+ jnxIfOpticsPMCurMinFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 78 }
+
+ jnxIfOpticsPMCurMinFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 79 }
+   
+ jnxIfOpticsPMCurMaxFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 80 }
+
+ jnxIfOpticsPMCurMaxFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 81 }
+   
+ jnxIfOpticsPMCurAvgFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 82 }
+
+ jnxIfOpticsPMCurAvgFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMCurrentEntry 83 }
+
+
+--
+-- PM Interval Table
+--
+
+jnxIfOpticsPMIntervalTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF JnxIfOpticsPMIntervalEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A table of current PM  entries."
+     ::= { jnxOpticsPerformanceMonitoring 10 }
+
+jnxIfOpticsPMIntervalEntry  OBJECT-TYPE
+     SYNTAX     JnxIfOpticsPMIntervalEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A conceptual row that contains information about the PM Interval
+          Table."
+     INDEX    { ifIndex, jnxIfOpticsPMIntervalLaneIndex, jnxIfOpticsPMIntervalNumber }
+     ::= { jnxIfOpticsPMIntervalTable 1 }
+
+JnxIfOpticsPMIntervalEntry  ::= SEQUENCE {
+		jnxIfOpticsPMIntervalLaneIndex
+							Unsigned32,
+        jnxIfOpticsPMIntervalNumber                      
+                             Unsigned32,
+        jnxIfOpticsPMIntMinChromaticDispersion      
+                             Integer32,
+        jnxIfOpticsPMIntMaxChromaticDispersion      
+                             Integer32,
+        jnxIfOpticsPMIntAvgChromaticDispersion      
+                             Integer32,
+        jnxIfOpticsPMIntMinDiffGroupDelay   
+                             Integer32,
+        jnxIfOpticsPMIntMaxDiffGroupDelay   
+                             Integer32,
+        jnxIfOpticsPMIntAvgDiffGroupDelay   
+                             Integer32,
+        jnxIfOpticsPMIntMinPolarState        
+                             Integer32,
+        jnxIfOpticsPMIntMaxPolarState        
+                             Integer32,
+        jnxIfOpticsPMIntAvgPolarState        
+                             Integer32,
+        jnxIfOpticsPMIntMinPolarDependentLoss
+                             Integer32,
+        jnxIfOpticsPMIntMaxPolarDependentLoss
+                             Integer32,
+        jnxIfOpticsPMIntAvgPolarDependentLoss
+                             Integer32,
+        jnxIfOpticsPMIntMinQ                        
+                             Integer32,
+        jnxIfOpticsPMIntMaxQ                        
+                             Integer32,
+        jnxIfOpticsPMIntAvgQ                        
+                             Integer32,
+        jnxIfOpticsPMIntMinSNR                      
+                             Integer32,
+        jnxIfOpticsPMIntMaxSNR                      
+                             Integer32,
+        jnxIfOpticsPMIntAvgSNR                      
+                             Integer32,
+        jnxIfOpticsPMIntMinTxOutputPower            
+                             Integer32,
+        jnxIfOpticsPMIntMaxTxOutputPower            
+                             Integer32,
+        jnxIfOpticsPMIntAvgTxOutputPower            
+                             Integer32,
+        jnxIfOpticsPMIntMinRxInputPower              
+                             Integer32,
+        jnxIfOpticsPMIntMaxRxInputPower             
+                             Integer32,
+        jnxIfOpticsPMIntAvgRxInputPower             
+                             Integer32,
+        jnxIfOpticsPMIntTimeStamp
+                             DateAndTime,
+        jnxIfOpticsPMIntSuspectedFlag
+                             TruthValue,
+        jnxIfOpticsPMIntSuspectReason
+                             Integer32,
+        jnxIfOpticsPMIntMinTxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMIntMaxTxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMIntAvgTxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMIntMinTemperature
+                            Integer32,
+        jnxIfOpticsPMIntMaxTemperature
+                            Integer32,
+        jnxIfOpticsPMIntAvgTemperature
+                            Integer32,
+        jnxIfOpticsPMIntMinCarFreqOffset
+                            Integer32,
+        jnxIfOpticsPMIntMaxCarFreqOffset
+                            Integer32,
+        jnxIfOpticsPMIntAvgCarFreqOffset
+                            Integer32,
+        jnxIfOpticsPMIntMinRxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMIntMaxRxLaserBiasCurrent
+                            Integer32,
+        jnxIfOpticsPMIntAvgRxLaserBiasCurrent
+                            Integer32,
+   jnxIfOpticsPMIntMinTecCurrent
+                            Integer32,
+   jnxIfOpticsPMIntMaxTecCurrent
+                            Integer32,
+   jnxIfOpticsPMIntAvgTecCurrent
+                            Integer32,
+   jnxIfOpticsPMIntMinResidualDispersion
+                            Integer32,
+   jnxIfOpticsPMIntMaxResidualDispersion
+                            Integer32,
+   jnxIfOpticsPMIntAvgResidualDispersion
+                            Integer32,
+   jnxIfOpticsPMIntMinLevelHistogram
+                            Integer32,
+   jnxIfOpticsPMIntMaxLevelHistogram
+                            Integer32,
+   jnxIfOpticsPMIntAvgLevelHistogram
+                            Integer32,
+   jnxIfOpticsPMIntMinLaserFrequencyError
+                            Integer32,
+   jnxIfOpticsPMIntMaxLaserFrequencyError
+                            Integer32,
+   jnxIfOpticsPMIntAvgLaserFrequencyError
+                            Integer32,
+   jnxIfOpticsPMIntMinFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxIfOpticsPMIntMinFECCorrectedErrorsExponent
+                            Integer32,
+   jnxIfOpticsPMIntMaxFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxIfOpticsPMIntMaxFECCorrectedErrorsExponent
+                            Integer32,
+   jnxIfOpticsPMIntAvgFECCorrectedErrorsMantissa
+                            Integer32,
+   jnxIfOpticsPMIntAvgFECCorrectedErrorsExponent
+                            Integer32,
+   jnxIfOpticsPMIntMinFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxIfOpticsPMIntMinFECUCorrectedWordsExponent
+                            Integer32,
+   jnxIfOpticsPMIntMaxFECUCorrectedWordsMantissa
+                            Integer32,
+   jnxIfOpticsPMIntMaxFECUCorrectedWordsExponent
+                            Integer32,
+   jnxIfOpticsPMIntAvgFECUCorrectedWordsMantissa
+                            Integer32, 
+   jnxIfOpticsPMIntAvgFECUCorrectedWordsExponent
+                            Integer32  
+    }
+
+	jnxIfOpticsPMIntervalLaneIndex OBJECT-TYPE
+        SYNTAX         Unsigned32(1..96)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "This is the optics lane number."
+        ::= { jnxIfOpticsPMIntervalEntry 1 }
+
+    jnxIfOpticsPMIntervalNumber OBJECT-TYPE
+        SYNTAX         Unsigned32(1..96)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "This is the 15 mintute interavl number."
+        ::= { jnxIfOpticsPMIntervalEntry 2 }
+
+    jnxIfOpticsPMIntMinChromaticDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Chromatic Dispersion measured at Rx Transceiver
+             port - min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 3 }
+
+    jnxIfOpticsPMIntMaxChromaticDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Chromatic Dispersion measured at Rx Transceiver
+             port - max in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 4 }
+
+    jnxIfOpticsPMIntAvgChromaticDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Chromatic Dispersion measured at Rx Transceiver
+             port - average in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 5 }
+
+    jnxIfOpticsPMIntMinDiffGroupDelay OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential group delay measured at Rx Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 6 }
+
+    jnxIfOpticsPMIntMaxDiffGroupDelay OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential group delay measured at Rx Transceiver
+             port -- max in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 7 }
+
+    jnxIfOpticsPMIntAvgDiffGroupDelay OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential group delay measured at Rx Transceiver
+             port -- average in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 8 }
+
+    jnxIfOpticsPMIntMinPolarState OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization state -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 9 }
+
+    jnxIfOpticsPMIntMaxPolarState OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization state -- max in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 10 }
+
+    jnxIfOpticsPMIntAvgPolarState OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization state -- average in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 11 }
+
+    jnxIfOpticsPMIntMinPolarDependentLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization Dependent Loss -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 12 }
+
+    jnxIfOpticsPMIntMaxPolarDependentLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization Dependent Loss -- max in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 13 }
+
+    jnxIfOpticsPMIntAvgPolarDependentLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization Dependent Loss  -- average in the 15 minute
+              interval"
+        ::= { jnxIfOpticsPMIntervalEntry 14 }
+
+    jnxIfOpticsPMIntMinQ OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 15 }
+
+    jnxIfOpticsPMIntMaxQ OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q -- max in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 16 }
+
+    jnxIfOpticsPMIntAvgQ OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q -- Avg in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 17 }
+
+    jnxIfOpticsPMIntMinSNR OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SNR -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 18 }
+
+    jnxIfOpticsPMIntMaxSNR OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SNR -- max in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 19 }
+
+    jnxIfOpticsPMIntAvgSNR OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SNR -- avg in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 20 }
+
+    jnxIfOpticsPMIntMinTxOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "TxOutputPower -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 21 }
+
+    jnxIfOpticsPMIntMaxTxOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "TxOutputPower  -- max in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 22 }
+
+    jnxIfOpticsPMIntAvgTxOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "TxOutputPower  -- average in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 23 }
+
+    jnxIfOpticsPMIntMinRxInputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "RxInputPower -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 24 }
+
+    jnxIfOpticsPMIntMaxRxInputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "RxInputPower  -- max in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 25 }
+
+    jnxIfOpticsPMIntAvgRxInputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "RxInputPower  -- average in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 26 }
+
+    jnxIfOpticsPMIntTimeStamp OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time stamp PM interval"
+        ::= { jnxIfOpticsPMIntervalEntry 27 }
+
+    jnxIfOpticsPMIntSuspectedFlag OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "If true, the data in this entry may be unreliable."
+        ::= { jnxIfOpticsPMIntervalEntry 28 }
+
+    jnxIfOpticsPMIntSuspectReason OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "If SuspectedFlag is true, the reson for the PM data being suspect.
+              0 - not applicable
+              1 - unknown
+              2 - new object
+              3 - interface disabled
+              4 - clock shift detected
+              5 - cleared by user
+              6 - interval too short secs < 890
+              7 - interval too long secs > 910
+              8 - near end unavailable
+              9 - far end unavailable
+             10 - partial data
+             11 - missing intervals due to restarts
+            "
+        ::= { jnxIfOpticsPMIntervalEntry 29 }
+
+    jnxIfOpticsPMIntMinTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Transmit Minimum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 30 }
+
+    jnxIfOpticsPMIntMaxTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Transmit Maximum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 31 }
+
+    jnxIfOpticsPMIntAvgTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Transmit Average LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 32 }
+
+   jnxIfOpticsPMIntMinTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum   Temperature  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 33 }
+
+    jnxIfOpticsPMIntMaxTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Temperature measure  at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 34 }
+
+    jnxIfOpticsPMIntAvgTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Temperature measure  at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 35 }
+
+    jnxIfOpticsPMIntMinCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Mhz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 36 }
+
+    jnxIfOpticsPMIntMaxCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 37 }
+
+    jnxIfOpticsPMIntAvgCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 38 }
+
+    jnxIfOpticsPMIntMinRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Receive Minimum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 39 }
+
+    jnxIfOpticsPMIntMaxRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Receive Maximum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 40 }
+
+    jnxIfOpticsPMIntAvgRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Receive Average LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMIntervalEntry 41 }
+
+ jnxIfOpticsPMIntMinTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Minimum TecCurrent measured at  Transceiver
+      port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 42 }
+ 
+ jnxIfOpticsPMIntMaxTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Maximum TecCurrent measured at Transceiver
+      port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 43 }
+   
+ jnxIfOpticsPMIntAvgTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Average TecCurrent measured at Transceiver
+      port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 44 }
+   
+   
+ jnxIfOpticsPMIntMinResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Residual Dispersion measured at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 45 }
+   
+ jnxIfOpticsPMIntMaxResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Residual Dispersion measured at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 46 }
+   
+ jnxIfOpticsPMIntAvgResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Residual Dispersion measured at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 47 }
+
+ jnxIfOpticsPMIntMinLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Minimum rate of measured signal at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 48 }
+
+ jnxIfOpticsPMIntMaxLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Maximum rate of measured signal at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 49 }
+
+ jnxIfOpticsPMIntAvgLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Average rate of measured signal at Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 50 }
+
+ jnxIfOpticsPMIntMinLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Laser Frequency Error  measured at  Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 51 }
+
+ jnxIfOpticsPMIntMaxLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Laser Frequency Error  measured at  Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 52 }
+
+ jnxIfOpticsPMIntAvgLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Laser Frequency Error  measured at  Transceiver
+             port -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 53 }
+
+ jnxIfOpticsPMIntMinFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 54 }
+
+ jnxIfOpticsPMIntMinFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 55 }
+ 
+ jnxIfOpticsPMIntMaxFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 56 }
+
+ jnxIfOpticsPMIntMaxFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 57 }
+
+ jnxIfOpticsPMIntAvgFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 58 }
+
+   jnxIfOpticsPMIntAvgFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 59 }
+ 
+  jnxIfOpticsPMIntMinFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 60 }
+
+  jnxIfOpticsPMIntMinFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 61 }
+
+ jnxIfOpticsPMIntMaxFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 62 }
+
+ jnxIfOpticsPMIntMaxFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 63 }
+
+ jnxIfOpticsPMIntAvgFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 64 }
+
+ jnxIfOpticsPMIntAvgFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset
+        -- min in the 15 minute interval"
+        ::= { jnxIfOpticsPMIntervalEntry 65 }
+--
+-- Cur/Prev Day Table
+--
+jnxIfOpticsPMDayTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF JnxIfOpticsPMDayEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A table of current PM Day entries."
+
+     ::= { jnxOpticsPerformanceMonitoring 11 }
+
+jnxIfOpticsPMDayEntry  OBJECT-TYPE
+     SYNTAX     JnxIfOpticsPMDayEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A conceptual row that contains information about the PM Day
+          Table"
+     INDEX    { ifIndex, jnxIfOpticsPMDayLaneIndex, jnxIfOpticsPMDayIndex }
+     ::= { jnxIfOpticsPMDayTable 1 }
+
+JnxIfOpticsPMDayEntry  ::= SEQUENCE {
+		jnxIfOpticsPMDayLaneIndex
+		                                   Unsigned32,
+        jnxIfOpticsPMDayIndex                       
+                                           Unsigned32,
+        jnxIfOpticsPMDayMinChromaticDispersion      
+                                           Integer32,
+        jnxIfOpticsPMDayMaxChromaticDispersion      
+                                           Integer32,
+        jnxIfOpticsPMDayAvgChromaticDispersion      
+                                           Integer32,
+        jnxIfOpticsPMDayMinDiffGroupDelay   
+                                           Integer32,
+        jnxIfOpticsPMDayMaxDiffGroupDelay   
+                                           Integer32,
+        jnxIfOpticsPMDayAvgDiffGroupDelay   
+                                           Integer32,
+        jnxIfOpticsPMDayMinPolarState        
+                                           Integer32,
+        jnxIfOpticsPMDayMaxPolarState        
+                                           Integer32,
+        jnxIfOpticsPMDayAvgPolarState        
+                                           Integer32,
+        jnxIfOpticsPMDayMinPolarDependentLoss
+                                           Integer32,
+        jnxIfOpticsPMDayMaxPolarDependentLoss
+                                           Integer32,
+        jnxIfOpticsPMDayAvgPolarDependentLoss
+                                           Integer32,
+        jnxIfOpticsPMDayMinQ                        
+                                           Integer32,
+        jnxIfOpticsPMDayMaxQ                        
+                                           Integer32,
+        jnxIfOpticsPMDayAvgQ                        
+                                           Integer32,
+        jnxIfOpticsPMDayMinSNR                      
+                                           Integer32,
+        jnxIfOpticsPMDayMaxSNR                      
+                                           Integer32,
+        jnxIfOpticsPMDayAvgSNR                      
+                                           Integer32,
+        jnxIfOpticsPMDayMinTxOutputPower            
+                                           Integer32,
+        jnxIfOpticsPMDayMaxTxOutputPower            
+                                           Integer32,
+        jnxIfOpticsPMDayAvgTxOutputPower            
+                                           Integer32,
+        jnxIfOpticsPMDayMinRxInputPower             
+                                           Integer32,
+        jnxIfOpticsPMDayMaxRxInputPower             
+                                           Integer32,
+        jnxIfOpticsPMDayAvgRxInputPower             
+                                           Integer32,
+        jnxIfOpticsPMDayTimeStamp
+                                           DateAndTime,
+        jnxIfOpticsPMDaySuspectedFlag
+                                           TruthValue,
+        jnxIfOpticsPMDaySuspectReason
+                                           Integer32,
+        jnxIfOpticsPMDayMinTxLaserBiasCurrent
+                                           Integer32,
+        jnxIfOpticsPMDayMaxTxLaserBiasCurrent
+                                           Integer32,
+        jnxIfOpticsPMDayAvgTxLaserBiasCurrent
+                                           Integer32,
+        jnxIfOpticsPMDayMinTemperature
+                                           Integer32,
+        jnxIfOpticsPMDayMaxTemperature
+                                           Integer32,
+        jnxIfOpticsPMDayAvgTemperature
+                                           Integer32,
+        jnxIfOpticsPMDayMinCarFreqOffset
+                                           Integer32,
+        jnxIfOpticsPMDayMaxCarFreqOffset
+                                           Integer32,
+        jnxIfOpticsPMDayAvgCarFreqOffset
+                                           Integer32,
+        jnxIfOpticsPMDayMinRxLaserBiasCurrent
+                                           Integer32,
+        jnxIfOpticsPMDayMaxRxLaserBiasCurrent
+                                           Integer32,
+        jnxIfOpticsPMDayAvgRxLaserBiasCurrent
+                                           Integer32,
+   jnxIfOpticsPMDayMinTecCurrent
+                                           Integer32,
+   jnxIfOpticsPMDayMaxTecCurrent
+                                           Integer32,
+   jnxIfOpticsPMDayAvgTecCurrent
+                                           Integer32,
+   jnxIfOpticsPMDayMinResidualDispersion
+                                           Integer32,
+   jnxIfOpticsPMDayMaxResidualDispersion
+                                           Integer32,
+   jnxIfOpticsPMDayAvgResidualDispersion
+                                           Integer32,
+   jnxIfOpticsPMDayMinLevelHistogram
+                                           Integer32,
+   jnxIfOpticsPMDayMaxLevelHistogram
+                                           Integer32,
+   jnxIfOpticsPMDayAvgLevelHistogram
+                                           Integer32,
+   jnxIfOpticsPMDayMinLaserFrequencyError
+                                           Integer32,
+   jnxIfOpticsPMDayMaxLaserFrequencyError
+                                           Integer32,
+   jnxIfOpticsPMDayAvgLaserFrequencyError
+                                           Integer32,
+   jnxIfOpticsPMDayMinFECCorrectedErrorsMantissa
+                                           Integer32,
+   jnxIfOpticsPMDayMinFECCorrectedErrorsExponent
+                                           Integer32,
+   jnxIfOpticsPMDayMaxFECCorrectedErrorsMantissa
+                                           Integer32,
+   jnxIfOpticsPMDayMaxFECCorrectedErrorsExponent
+                                           Integer32,
+   jnxIfOpticsPMDayAvgFECCorrectedErrorsMantissa
+                                           Integer32,
+   jnxIfOpticsPMDayAvgFECCorrectedErrorsExponent
+                                           Integer32,
+   jnxIfOpticsPMDayMinFECUCorrectedWordsMantissa
+                                           Integer32,
+   jnxIfOpticsPMDayMinFECUCorrectedWordsExponent
+                                           Integer32,
+   jnxIfOpticsPMDayMaxFECUCorrectedWordsMantissa
+                                           Integer32,
+   jnxIfOpticsPMDayMaxFECUCorrectedWordsExponent
+                                           Integer32,
+   jnxIfOpticsPMDayAvgFECUCorrectedWordsMantissa
+                                           Integer32,
+   jnxIfOpticsPMDayAvgFECUCorrectedWordsExponent
+                                           Integer32
+
+    }
+	jnxIfOpticsPMDayLaneIndex OBJECT-TYPE
+        SYNTAX         Unsigned32(1..96)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "This is the optics lane number."
+        ::= { jnxIfOpticsPMDayEntry 1 }
+
+    jnxIfOpticsPMDayIndex OBJECT-TYPE
+        SYNTAX         Unsigned32(1..2)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "This is 1 - cur day/ 2 - prev day "
+        ::= { jnxIfOpticsPMDayEntry 2 }
+
+    jnxIfOpticsPMDayMinChromaticDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Chromatic Dispersion measured at Rx Transceiver
+             port - min in the day"
+        ::= { jnxIfOpticsPMDayEntry 3 }
+
+    jnxIfOpticsPMDayMaxChromaticDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Chromatic Dispersion measured at Rx Transceiver
+             port - max in the day"
+        ::= { jnxIfOpticsPMDayEntry 4 }
+
+    jnxIfOpticsPMDayAvgChromaticDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Residual Chromatic Dispersion measured at Rx Transceiver
+             port - average in the day"
+        ::= { jnxIfOpticsPMDayEntry 5 }
+
+    jnxIfOpticsPMDayMinDiffGroupDelay OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential Group Delay measured at Rx Transceiver
+             port -- min in the day"
+        ::= { jnxIfOpticsPMDayEntry 6 }
+
+    jnxIfOpticsPMDayMaxDiffGroupDelay OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential Group Delay measured at Rx Transceiver
+             port -- max in the day"
+        ::= { jnxIfOpticsPMDayEntry 7 }
+
+    jnxIfOpticsPMDayAvgDiffGroupDelay OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "ps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential Group Delay measured at Rx Transceiver
+             port -- average in the day"
+        ::= { jnxIfOpticsPMDayEntry 8 }
+
+    jnxIfOpticsPMDayMinPolarState OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization state -- min in the day"
+        ::= { jnxIfOpticsPMDayEntry 9 }
+
+    jnxIfOpticsPMDayMaxPolarState OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization state -- max in the day"
+        ::= { jnxIfOpticsPMDayEntry 10 }
+
+    jnxIfOpticsPMDayAvgPolarState OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "rad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization state -- average in the day"
+        ::= { jnxIfOpticsPMDayEntry 11 }
+
+    jnxIfOpticsPMDayMinPolarDependentLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization Dependent Loss -- min in the day"
+        ::= { jnxIfOpticsPMDayEntry 12 }
+
+    jnxIfOpticsPMDayMaxPolarDependentLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization Dependent Loss -- max in the day"
+        ::= { jnxIfOpticsPMDayEntry 13 }
+
+    jnxIfOpticsPMDayAvgPolarDependentLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Polarization Dependent Loss  -- average in the day
+             interval"
+        ::= { jnxIfOpticsPMDayEntry 14 }
+
+
+    jnxIfOpticsPMDayMinQ OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q -- min in the day"
+        ::= { jnxIfOpticsPMDayEntry 15 }
+
+    jnxIfOpticsPMDayMaxQ OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q -- max in the day"
+        ::= { jnxIfOpticsPMDayEntry 16 }
+
+    jnxIfOpticsPMDayAvgQ OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q -- Avg in the day"
+        ::= { jnxIfOpticsPMDayEntry 17 }
+
+    jnxIfOpticsPMDayMinSNR OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SNR -- min in the day"
+        ::= { jnxIfOpticsPMDayEntry 18 }
+
+    jnxIfOpticsPMDayMaxSNR OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SNR -- max in the day"
+        ::= { jnxIfOpticsPMDayEntry 19 }
+
+    jnxIfOpticsPMDayAvgSNR OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SNR -- avg in the day"
+        ::= { jnxIfOpticsPMDayEntry 20 }
+
+    jnxIfOpticsPMDayMinTxOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "TxOutputPower -- min in the day"
+        ::= { jnxIfOpticsPMDayEntry 21 }
+
+    jnxIfOpticsPMDayMaxTxOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "TxOutputPower  -- max in the day."
+        ::= { jnxIfOpticsPMDayEntry 22 }
+
+    jnxIfOpticsPMDayAvgTxOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "TxOutputPower  -- average in the day."
+        ::= { jnxIfOpticsPMDayEntry 23 }
+
+    jnxIfOpticsPMDayMinRxInputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "RxInputPower -- min in the day."
+        ::= { jnxIfOpticsPMDayEntry 24 }
+
+    jnxIfOpticsPMDayMaxRxInputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "RxInputPower  -- max in the day."
+        ::= { jnxIfOpticsPMDayEntry 25 }
+
+    jnxIfOpticsPMDayAvgRxInputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "RxInputPower  -- average in the day."
+        ::= { jnxIfOpticsPMDayEntry 26 }
+
+    jnxIfOpticsPMDayTimeStamp OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time for the Day."
+        ::= { jnxIfOpticsPMDayEntry 27 }
+
+    jnxIfOpticsPMDaySuspectedFlag OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "If true, the data in this entry may be unreliable."
+        ::= { jnxIfOpticsPMDayEntry 28 }
+
+    jnxIfOpticsPMDaySuspectReason OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "If SuspectedFlag is true, the reson for the PM data being suspect.
+              0 - not applicable
+              1 - unknown
+              2 - new object
+              3 - interface disabled
+              4 - clock shift detected
+              5 - cleared by user
+              6 - partial data
+              7 - one or more intervals are invaild
+            "
+        ::= { jnxIfOpticsPMDayEntry 29 }
+
+    jnxIfOpticsPMDayMinTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Transmit LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 30 }
+
+    jnxIfOpticsPMDayMaxTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Transmit Minimum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 31 }
+
+    jnxIfOpticsPMDayAvgTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Transmit Maximum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 32 }
+
+   jnxIfOpticsPMDayMinTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum   Temperature  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 33 }
+
+    jnxIfOpticsPMDayMaxTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Temperature measure  at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 34 }
+
+    jnxIfOpticsPMDayAvgTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Celcius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Temperature measure  at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 35 }
+
+    jnxIfOpticsPMDayMinCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Mhz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 36 }
+
+    jnxIfOpticsPMDayMaxCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 37 }
+
+    jnxIfOpticsPMDayAvgCarFreqOffset OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Carrier frequency offset measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 38 }
+
+   jnxIfOpticsPMDayMinRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Receive LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 39 }
+
+    jnxIfOpticsPMDayMaxRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Receive Minimum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 40 }
+
+    jnxIfOpticsPMDayAvgRxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Receive Maximum LaserBiasCurrent measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 41 }
+
+ jnxIfOpticsPMDayMinTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Minimum TecCurrent measured at  Transceiver
+      port"
+        ::= { jnxIfOpticsPMDayEntry 42 }
+ 
+ jnxIfOpticsPMDayMaxTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Maximum TecCurrent measured at Transceiver
+      port"
+        ::= { jnxIfOpticsPMDayEntry 43 }
+   
+ jnxIfOpticsPMDayAvgTecCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           ".1 mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Received Average TecCurrent measured at Transceiver
+      port"
+        ::= { jnxIfOpticsPMDayEntry 44 }
+   
+   
+ jnxIfOpticsPMDayMinResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxIfOpticsPMDayEntry 45 }
+   
+ jnxIfOpticsPMDayMaxResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxIfOpticsPMDayEntry 46 }
+   
+ jnxIfOpticsPMDayAvgResidualDispersion OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "0.1 ps/nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Residual Dispersion measured at Transceiver
+             port"
+        ::= { jnxIfOpticsPMDayEntry 47 }
+
+ jnxIfOpticsPMDayMinLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Minimum rate of measured signal at Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 48 }
+   
+ jnxIfOpticsPMDayMaxLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Maximum rate of measured signal at Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 49 }
+   
+ jnxIfOpticsPMDayAvgLevelHistogram OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Average rate of measured signal at Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 50 }
+
+ jnxIfOpticsPMDayMinLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 51 }
+   
+ jnxIfOpticsPMDayMaxLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 52 }
+   
+ jnxIfOpticsPMDayAvgLaserFrequencyError OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "MHz"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Laser Frequency Error  measured at  Transceiver port"
+        ::= { jnxIfOpticsPMDayEntry 53 }
+
+ jnxIfOpticsPMDayMinFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 54 }
+   
+ jnxIfOpticsPMDayMinFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 55 }
+   
+ jnxIfOpticsPMDayMaxFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 56 }
+   
+ jnxIfOpticsPMDayMaxFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 57 }
+   
+ jnxIfOpticsPMDayAvgFECCorrectedErrorsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 58 }
+   
+ jnxIfOpticsPMDayAvgFECCorrectedErrorsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Pre-FEC BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 59 }
+   
+ jnxIfOpticsPMDayMinFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 60 }
+   
+ jnxIfOpticsPMDayMinFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 61 }
+   
+ jnxIfOpticsPMDayMaxFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 62 }
+   
+ jnxIfOpticsPMDayMaxFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 63 }
+   
+ jnxIfOpticsPMDayAvgFECUCorrectedWordsMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 64 }
+
+ jnxIfOpticsPMDayAvgFECUCorrectedWordsExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Uncorrected BER since last counter reset"
+        ::= { jnxIfOpticsPMDayEntry 65 }
+
+--
+--
+-- Optics OT interface PM Config table
+--
+jnxOpticsOTIfPMFECConfigTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF JnxOpticsOTIfPMFECConfigEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A table of current PM entries."
+
+     ::= { jnxOpticsPerformanceMonitoring 8 }
+
+jnxOpticsOTIfPMFECConfigEntry  OBJECT-TYPE
+     SYNTAX     JnxOpticsOTIfPMFECConfigEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A conceptual row that contains information about the OT interface PM Current
+          Table."
+     INDEX    { ifIndex }
+     ::= { jnxOpticsOTIfPMFECConfigTable 1 }
+
+JnxOpticsOTIfPMFECConfigEntry  ::= SEQUENCE {
+        jnxOpticsOTIfPMFECValidIntervals                  Unsigned32,
+        jnxOpticsOTIfPM15MinPreFECBERMantissaThreshold    Unsigned32,
+        jnxOpticsOTIfPM15MinPreFECBERExponentThreshold      Unsigned32,
+        jnxOpticsOTIfPM24HourPreFECBERMantissaThreshold   Unsigned32,
+        jnxOpticsOTIfPM24HourPreFECBERExponentThreshold   Unsigned32,
+        jnxOpticsOTIfPMFECBEREnableTCA                    TruthValue
+    }
+
+jnxOpticsOTIfPMFECValidIntervals  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of contiguous 15 minute intervals for which valid FEC
+         PM data is available for the particular interface."
+    ::= {jnxOpticsOTIfPMFECConfigEntry  1}
+
+jnxOpticsOTIfPM15MinPreFECBERMantissaThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "BER (mantissa) by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxOpticsOTIf15MinThreshPreFECBERTCA. One notification
+         will be sent per interval per interface. A value of `0' will disable
+         the notification."
+    ::= {jnxOpticsOTIfPMFECConfigEntry  2}
+
+jnxOpticsOTIfPM15MinPreFECBERExponentThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The Pre FEC BER (exponent) by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshPreFECBERTCA. One notification
+         will be sent per interval per interface. A value of `0' will disable
+         the notification."
+    ::= {jnxOpticsOTIfPMFECConfigEntry  3}
+
+jnxOpticsOTIfPM24HourPreFECBERMantissaThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "BER (mantissa) by the interface within any
+         given 24 Hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf5s24Hour15MinThreshPreFECBERTCA. 
+         One notification will be sent per 24 hour period per interface. 
+         A value of `0' will disable the notification."
+    ::= {jnxOpticsOTIfPMFECConfigEntry  4}
+
+jnxOpticsOTIfPM24HourPreFECBERExponentThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The Pre FEC BER (exponent) by the interface within any
+         given 24 Hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf5s24Hour15MinThreshPreFECBERTCA.
+         One notification will be sent per 24 hour period per interface.
+         A value of `0' will disable the notification."
+    ::= {jnxOpticsOTIfPMFECConfigEntry  5}
+
+jnxOpticsOTIfPMFECBEREnableTCA  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Enable TCA's - 15minute and 24hr for FEC BER "
+    ::= { jnxOpticsOTIfPMFECConfigEntry 6 }
+
+
+--
+-- OT FEC PM Current Table
+--
+jnxOpticsOTIfPMFECCurrentTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxOpticsOTIfPMFECCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring FEC Current Table."
+    ::= { jnxOpticsPerformanceMonitoring 4 }
+
+jnxOpticsOTIfPMFECCurrentEntry OBJECT-TYPE
+    SYNTAX      JnxOpticsOTIfPMFECCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring FEC current table."
+    INDEX  {ifIndex}
+    ::= { jnxOpticsOTIfPMFECCurrentTable  1 }
+
+JnxOpticsOTIfPMFECCurrentEntry  ::=
+    SEQUENCE {
+        jnxOpticsOTIfPMFECCurrentSuspectedFlag            TruthValue,
+        jnxOpticsOTIfPMCurrentFECCorrectedErr             Counter64,
+        jnxOpticsOTIfPMCurrentFECUncorrectedWords         Counter64,
+        jnxOpticsOTIfPMCurrentFECBERMantissa              Unsigned32,
+        jnxOpticsOTIfPMCurrentFECBERExponent              Unsigned32,
+        jnxOpticsOTIfPMCurrentFECMinBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMCurrentFECMinBERExponent           Unsigned32,
+        jnxOpticsOTIfPMCurrentFECMaxBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMCurrentFECMaxBERExponent           Unsigned32,
+        jnxOpticsOTIfPMCurrentFECAvgBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMCurrentFECAvgBERExponent           Unsigned32,
+        jnxOpticsOTIfPMCurrentFECElapsedTime              Unsigned32,
+        jnxOpticsOTIfPMFECCurSuspectReason                Integer32
+    }
+
+jnxOpticsOTIfPMFECCurrentSuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  1}
+
+jnxOpticsOTIfPMCurrentFECCorrectedErr   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits corrected by the FEC are counted in the
+         interval."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  2}
+
+jnxOpticsOTIfPMCurrentFECUncorrectedWords   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of un-corrected words by the FEC are counted over the
+         interval."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  3}
+
+jnxOpticsOTIfPMCurrentFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Errored bits at receiving side before the FEC
+         function counted over one second .. mantissa."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  4}
+
+jnxOpticsOTIfPMCurrentFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Errored bits at receiving side before the FEC
+         function counted over one second .. exponent (eg -1)."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  5}
+
+jnxOpticsOTIfPMCurrentFECMinBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimum number of Errored bits at receiving side before the FEC
+         function counted over one second .. mantissa."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  6}
+
+jnxOpticsOTIfPMCurrentFECMinBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimum number of Errored bits at receiving side before the FEC
+         function counted over one second .. exponent (eg -1)."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  7}
+
+jnxOpticsOTIfPMCurrentFECMaxBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of Errored bits at receiving side before the FEC
+         function counted over one second .. mantissa."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  8}
+
+jnxOpticsOTIfPMCurrentFECMaxBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of Errored bits at receiving side before the FEC
+         function counted over one second .. exponent (eg -1)."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  9}
+
+jnxOpticsOTIfPMCurrentFECAvgBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average number of Errored bits at receiving side before the FEC
+         function counted over one second .. mantissa."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  10}
+
+jnxOpticsOTIfPMCurrentFECAvgBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average number of Errored bits at receiving side before the FEC
+         function counted over one second .. exponent (eg -1)."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry  11}
+
+jnxOpticsOTIfPMCurrentFECElapsedTime    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time elapsed for this 15 minute interval."
+    ::= { jnxOpticsOTIfPMFECCurrentEntry 12 }
+
+jnxOpticsOTIfPMFECCurSuspectReason OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - interface disabled
+          4 - clock shift detected
+          5 - cleared by user
+          6 - interval too short secs < 890
+          7 - interval too long secs > 910
+          8 - near end unavailable
+          9 - far end unavailable
+         10 - partial data
+         11 - missing intervals due to restarts
+        "
+    ::= { jnxOpticsOTIfPMFECCurrentEntry 13 }
+
+--
+-- FEC OT PM Interval Table
+--
+jnxOpticsOTIfPMFECIntervalTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxOpticsOTIfPMFECIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring FEC Interval Table."
+    ::= { jnxOpticsPerformanceMonitoring 5 }
+
+jnxOpticsOTIfPMFECIntervalEntry OBJECT-TYPE
+    SYNTAX      JnxOpticsOTIfPMFECIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring FEC interval table."
+    INDEX  { ifIndex,
+             jnxOpticsOTIfPMFECIntervalNumber }
+    ::= { jnxOpticsOTIfPMFECIntervalTable 1 }
+
+JnxOpticsOTIfPMFECIntervalEntry ::=
+    SEQUENCE {
+        jnxOpticsOTIfPMFECIntervalNumber                 Unsigned32,
+        jnxOpticsOTIfPMFECIntervalSuspectedFlag          TruthValue,
+        jnxOpticsOTIfPMIntervalFECCorrectedErr           Counter64,
+        jnxOpticsOTIfPMIntervalFECUncorrectedWords       Counter64,
+        jnxOpticsOTIfPMIntervalMinFECBERMantissa         Unsigned32,
+        jnxOpticsOTIfPMIntervalMinFECBERExponent         Unsigned32,
+        jnxOpticsOTIfPMIntervalMaxFECBERMantissa         Unsigned32,
+        jnxOpticsOTIfPMIntervalMaxFECBERExponent         Unsigned32,
+        jnxOpticsOTIfPMIntervalAvgFECBERMantissa         Unsigned32,
+        jnxOpticsOTIfPMIntervalAvgFECBERExponent         Unsigned32,
+        jnxOpticsOTIfPMFECIntervalTimeStamp              DateAndTime,
+        jnxOpticsOTIfPMFECIntSuspectReason               Integer32
+    }
+
+jnxOpticsOTIfPMFECIntervalNumber   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A number between 1 and 96, where 1 is the most
+         recently completed 15 minute interval and 96 is
+         the 15 minutes interval completed 23 hours and 45
+         minutes prior to interval 1."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  1}
+
+jnxOpticsOTIfPMFECIntervalSuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  2}
+
+jnxOpticsOTIfPMIntervalFECCorrectedErr   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits corrected by the FEC are counted in the
+         interval."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  3}
+jnxOpticsOTIfPMIntervalFECUncorrectedWords   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of words un-corrected words by the FEC are counted over
+         the interval."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  4}
+
+jnxOpticsOTIfPMIntervalMinFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the minimum Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  5}
+
+jnxOpticsOTIfPMIntervalMinFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the minimum Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  6}
+
+jnxOpticsOTIfPMIntervalMaxFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the maximum Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  7}
+
+jnxOpticsOTIfPMIntervalMaxFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the maximum Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  8}
+
+jnxOpticsOTIfPMIntervalAvgFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the average Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  9}
+
+jnxOpticsOTIfPMIntervalAvgFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the average Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry  10}
+
+jnxOpticsOTIfPMFECIntervalTimeStamp  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time stamp of this interval."
+    ::= { jnxOpticsOTIfPMFECIntervalEntry 11 }
+
+jnxOpticsOTIfPMFECIntSuspectReason  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - interface disabled
+          4 - clock shift detected
+          5 - cleared by user
+          6 - interval too short secs < 890
+          7 - interval too long secs > 910
+          8 - near end unavailable
+          9 - far end unavailable
+         10 - partial data
+         11 - missing intervals due to restarts
+        "
+    ::= { jnxOpticsOTIfPMFECIntervalEntry 12 }
+
+--
+-- OT interface FEC PM Current Day Table
+--
+
+jnxOpticsOTIfPMFECCurrentDayTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxOpticsOTIfPMFECCurrentDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring FEC current day table."
+    ::= { jnxOpticsPerformanceMonitoring 6 }
+
+jnxOpticsOTIfPMFECCurrentDayEntry OBJECT-TYPE
+    SYNTAX      JnxOpticsOTIfPMFECCurrentDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring FEC current day table."
+    INDEX  { ifIndex }
+    ::= { jnxOpticsOTIfPMFECCurrentDayTable 1 }
+
+JnxOpticsOTIfPMFECCurrentDayEntry ::=
+    SEQUENCE {
+        jnxOpticsOTIfPMFECCurrentDaySuspectedFlag            TruthValue,
+        jnxOpticsOTIfPMCurrentDayFECCorrectedErr             Counter64,
+        jnxOpticsOTIfPMCurrentDayFECUncorrectedWords         Counter64,
+        jnxOpticsOTIfPMCurrentDayMinFECBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMCurrentDayMinFECBERExponent           Unsigned32,
+        jnxOpticsOTIfPMCurrentDayMaxFECBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMCurrentDayMaxFECBERExponent           Unsigned32,
+        jnxOpticsOTIfPMCurrentDayAvgFECBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMCurrentDayAvgFECBERExponent           Unsigned32,
+        jnxOpticsOTIfPMFECCurrentDayElapsedTime              Unsigned32,
+        jnxOpticsOTIfPMFECCurDaySuspectReason                Integer32
+    }
+
+jnxOpticsOTIfPMFECCurrentDaySuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  1}
+
+jnxOpticsOTIfPMCurrentDayFECCorrectedErr   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits corrected by the FEC are counted in the
+         interval."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  2}
+
+jnxOpticsOTIfPMCurrentDayFECUncorrectedWords   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of words un-corrected by the FEC are counted over the
+         Day."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  3}
+
+jnxOpticsOTIfPMCurrentDayMinFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the minimum
+         PreFEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  4}
+
+jnxOpticsOTIfPMCurrentDayMinFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the minimum
+         PreFEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  5}
+
+jnxOpticsOTIfPMCurrentDayMaxFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the maximum
+         PreFEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  6}
+
+jnxOpticsOTIfPMCurrentDayMaxFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the maximum
+         PreFEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  7}
+
+jnxOpticsOTIfPMCurrentDayAvgFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the average
+         PreFEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  8}
+
+jnxOpticsOTIfPMCurrentDayAvgFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the average
+         PreFEC BER in the current 24hour period."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  9}
+
+jnxOpticsOTIfPMFECCurrentDayElapsedTime    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Time elapsed for current day."
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  10}
+
+jnxOpticsOTIfPMFECCurDaySuspectReason  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - clock shift detected
+          4 - cleared by user
+          5 - partial data
+          6 - missing intervals due to restarts
+          7 - one or more intervals are invaild
+        "
+    ::= { jnxOpticsOTIfPMFECCurrentDayEntry  11}
+
+--
+-- FEC PM  Prev day Table
+--
+jnxOpticsOTIfPMFECPrevDayTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxOpticsOTIfPMFECPrevDayEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring FEC previous day table."
+    ::= { jnxOpticsPerformanceMonitoring 7 }
+
+jnxOpticsOTIfPMFECPrevDayEntry OBJECT-TYPE
+    SYNTAX     JnxOpticsOTIfPMFECPrevDayEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring FEC previous day table."
+    INDEX  { ifIndex }
+    ::= { jnxOpticsOTIfPMFECPrevDayTable 1 }
+
+JnxOpticsOTIfPMFECPrevDayEntry::=
+    SEQUENCE {
+        jnxOpticsOTIfPMFECPrevDaySuspectedFlag            TruthValue,
+        jnxOpticsOTIfPMPrevDayFECCorrectedErr             Counter64,
+        jnxOpticsOTIfPMPrevDayFECUncorrectedWords         Counter64,
+        jnxOpticsOTIfPMPrevDayMinFECBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMPrevDayMinFECBERExponent           Unsigned32,
+        jnxOpticsOTIfPMPrevDayMaxFECBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMPrevDayMaxFECBERExponent           Unsigned32,
+        jnxOpticsOTIfPMPrevDayAvgFECBERMantissa           Unsigned32,
+        jnxOpticsOTIfPMPrevDayAvgFECBERExponent           Unsigned32,
+        jnxOpticsOTIfPMFECPrevDayTimeStamp                DateAndTime,
+        jnxOpticsOTIfPMFECPrevDaySuspectReason            Integer32
+    }
+
+jnxOpticsOTIfPMFECPrevDaySuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  1}
+
+jnxOpticsOTIfPMPrevDayFECCorrectedErr   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits corrected by the FEC are counted in the
+         previous day."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  2}
+
+jnxOpticsOTIfPMPrevDayFECUncorrectedWords   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of un-corrected words by the FEC are counted over the
+         previous Day."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  3}
+
+jnxOpticsOTIfPMPrevDayMinFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the maximum Pre
+         FEC BER in the previous 24hour period."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  4}
+
+jnxOpticsOTIfPMPrevDayMinFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the maximum Pre
+         FEC BER in the previous 24hour period."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  5}
+
+jnxOpticsOTIfPMPrevDayMaxFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the maximum Pre
+         FEC BER in the previous 24hour period (mantissa)."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  6}
+
+jnxOpticsOTIfPMPrevDayMaxFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent (eg -3).
+         This is the maximum Pre FEC BER in the previous 24hour period."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  7}
+
+jnxOpticsOTIfPMPrevDayAvgFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the average Pre
+         FEC BER during the previous 24hour period (mantissa)."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  8}
+
+jnxOpticsOTIfPMPrevDayAvgFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. exponent (eg -3).
+         This is the average Pre FEC BER during the previous 24hour period."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  9}
+
+jnxOpticsOTIfPMFECPrevDayTimeStamp OBJECT-TYPE
+    SYNTAX  DateAndTime
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Time stamp for the Prev day."
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  10}
+
+jnxOpticsOTIfPMFECPrevDaySuspectReason  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - clock shift detected
+          4 - cleared by user
+          5 - partial data
+          6 - missing intervals due to restarts
+          7 - one or more intervals are invaild
+        "
+    ::= { jnxOpticsOTIfPMFECPrevDayEntry  11}
+
+
+--
+-- OT interface Optics Table
+--
+jnxOpticsOTIfConfigTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOpticsOTIfConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Information about the OT interface optics config Table. "
+        ::= { jnxOptics 8 }
+
+jnxOpticsOTIfConfigEntry OBJECT-TYPE
+        SYNTAX     JnxOpticsOTIfConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A conceptual row that contains information about the OT interface optics
+             config Table."
+        INDEX   { jnxOpticsOTIfConfigContainerIndex, jnxOpticsOTIfConfigL1Index,
+                  jnxOpticsOTIfConfigL2Index, jnxOpticsOTIfConfigL3Index }
+        ::= { jnxOpticsOTIfConfigTable 1 }
+
+JnxOpticsOTIfConfigEntry ::=
+    SEQUENCE {
+        jnxOpticsOTIfConfigContainerIndex
+                                 Integer32,
+        jnxOpticsOTIfConfigL1Index
+                                 Integer32,
+        jnxOpticsOTIfConfigL2Index
+                                 Integer32,
+        jnxOpticsOTIfConfigL3Index
+                                 Integer32,
+        jnxOpticsOTIfLaserEnable
+                                 TruthValue,
+        jnxOpticsOTIfFecMode
+                                 JnxOpticsOTIfFecType,
+        jnxOpticsOTIfEncodingOption
+                                 JnxOpticsOTIfEncodingOptions,
+        jnxOpticsOTIfModulation
+                                 Integer32,
+        jnxOpticsOTIfAdminState
+                                 JnxOpticsOTIfAdminStates,
+        jnxOpticsOTIfOperState
+                                 JnxOpticsOTIfOperStates,
+        jnxOpticsOTIfHighPolarization
+                                 TruthValue,
+        jnxOpticsOTIfPreFecBERThresholdMantissa
+                                 Integer32,
+        jnxOpticsOTIfPreFecBERThresholdExponent
+                                 Integer32,
+        jnxOpticsOTIfPreFecBERThresholdTime
+                                 Integer32,
+        jnxOpticsOTIfPreFecBERThresholdClearMantissa
+                                 Integer32,
+        jnxOpticsOTIfPreFecBERThresholdClearExponent
+                                 Integer32
+        }
+
+    jnxOpticsOTIfConfigContainerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The associated jnxContentsContainerIndex  - eg shelf.."
+        ::= { jnxOpticsOTIfConfigEntry 1 }
+
+    jnxOpticsOTIfConfigL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The level one index associated with this subject ... eg fpc
+             slot."
+        ::= { jnxOpticsOTIfConfigEntry 2 }
+
+    jnxOpticsOTIfConfigL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The level two index associated with this subject .. eg pic
+             slot."
+        ::= { jnxOpticsOTIfConfigEntry 3 }
+
+    jnxOpticsOTIfConfigL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The level three index associated with this subject.. eg port."
+        ::= { jnxOpticsOTIfConfigEntry 4 }
+
+    jnxOpticsOTIfLaserEnable OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            " 0 - laser off
+              1 - laser on  "
+        ::= { jnxOpticsOTIfConfigEntry 5 }
+
+    jnxOpticsOTIfFecMode OBJECT-TYPE
+        SYNTAX  JnxOpticsOTIfFecType 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This parameter indicates what FEC type in the OTU frame"
+        ::= { jnxOpticsOTIfConfigEntry 6 }
+
+    jnxOpticsOTIfEncodingOption OBJECT-TYPE
+        SYNTAX  JnxOpticsOTIfEncodingOptions
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Encoding option selected"
+        ::= { jnxOpticsOTIfConfigEntry 7 } 
+
+    jnxOpticsOTIfModulation OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      read-write 
+        STATUS          current
+        DESCRIPTION
+             "Modulation formats supported on the platform 
+                Unknown - (0),
+                16QAM - (1),
+                8QAM - (2),
+                QPSK - (3)
+             "
+       ::= { jnxOpticsOTIfConfigEntry 8 }
+
+    jnxOpticsOTIfAdminState OBJECT-TYPE
+        SYNTAX          JnxOpticsOTIfAdminStates
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The Admin state of this interface"
+        ::= { jnxOpticsOTIfConfigEntry 9 }
+
+    jnxOpticsOTIfOperState OBJECT-TYPE
+        SYNTAX          JnxOpticsOTIfOperStates
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The operational state of this interface"
+        ::= { jnxOpticsOTIfConfigEntry 10 }
+
+    jnxOpticsOTIfHighPolarization OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Enable/disable high-polarization mode."
+        ::= { jnxOpticsOTIfConfigEntry 11 }
+
+    jnxOpticsOTIfPreFecBERThresholdMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will set the BER threshold(mantissa), which when
+                  crossed will trigger Signal Degrade.
+                "
+        ::= { jnxOpticsOTIfConfigEntry 12 }
+
+    jnxOpticsOTIfPreFecBERThresholdExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will set the BER threshold(exponent), which when
+                  crossed will trigger Signal Degrade.
+                "
+        ::= { jnxOpticsOTIfConfigEntry 13 }
+
+    jnxOpticsOTIfPreFecBERThresholdTime OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ms"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " Specify the interval for which the BER must stay above
+                  the signal degradation threshold or below the clear threshold
+                  for the alarm to be raised or cleared respectively.
+                "
+        ::= { jnxOpticsOTIfConfigEntry 14 }
+
+    jnxOpticsOTIfPreFecBERThresholdClearMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will set the BER threshold(mantissa) for clear signal
+                  degrade condition, which signal degrade condition will be
+                  cleared when Pre-Fec error count is below the clear
+                  threshold error count.
+                "
+        ::= { jnxOpticsOTIfConfigEntry 15 }
+
+    jnxOpticsOTIfPreFecBERThresholdClearExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will set the BER threshold(exponent) for clear signal
+                  degrade condition, which signal degrade condition will be
+                  cleared when Pre-Fec error count is below the clear threshold
+                  error count.
+                "
+        ::= { jnxOpticsOTIfConfigEntry 16 }
 
 --
 -- Optics Alarm/Alert  Table
@@ -2673,7 +7163,9 @@ JnxOpticsNotificationEntry ::= SEQUENCE {
         jnxOpticsLastNotificationId
                             JnxOpticsNotificationId,
         jnxOpticsNotificationDate         
-                            DateAndTime
+                            DateAndTime,
+        jnxOpticsNotificationLaneIndex
+                                Integer32
     }
 
     jnxOpticsNotificationLocation OBJECT-TYPE
@@ -2720,6 +7212,15 @@ JnxOpticsNotificationEntry ::= SEQUENCE {
             "This specifies the date and time when this alarm occurred."
         ::= { jnxOpticsNotificationEntry 5 }
 
+    jnxOpticsNotificationLaneIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The lane index associated with this subject..
+                 eg port.
+                "
+        ::= { jnxOpticsNotificationEntry 6 }
 --
 -- Clear PM's for Interfaces
 --
@@ -2736,7 +7237,6 @@ jnxOpticsClearAllPMs OBJECT-TYPE
                   interfaces. "
         ::= { jnxOptics  6 }
 
-
 jnxOpticsClearIfPMsTable OBJECT-TYPE
         SYNTAX     SEQUENCE OF JnxOpticsClearIfPMsEntry
         MAX-ACCESS not-accessible
@@ -2744,7 +7244,6 @@ jnxOpticsClearIfPMsTable OBJECT-TYPE
         DESCRIPTION
                 " To clear optics Performance monitoring counters on this
                   interfaces "
-        INDEX       { ifIndex }
         ::= { jnxOptics  7 }
 
 jnxOpticsClearIfPMsEntry OBJECT-TYPE
@@ -2822,7 +7321,8 @@ jnxOpticsNotificationPrefix   OBJECT IDENTIFIER ::=
             ifDescr,
             jnxOpticsLastNotificationId, 
             jnxOpticsNotificationSeverity,
-            jnxOpticsNotificationDate
+            jnxOpticsNotificationDate,
+            jnxOpticsNotificationLaneIndex
         }
         STATUS  current
         DESCRIPTION
@@ -2836,12 +7336,34 @@ jnxOpticsNotificationPrefix   OBJECT IDENTIFIER ::=
             ifDescr,
             jnxOpticsLastNotificationId, 
             jnxOpticsNotificationSeverity,
-            jnxOpticsNotificationDate
+            jnxOpticsNotificationDate,
+            jnxOpticsNotificationLaneIndex
         }
         STATUS  current
         DESCRIPTION
             "Notification of a recently cleared optics alarm."
         ::= { jnxOpticsNotificationPrefix 2 }
+
+
+    jnxIfOpticsNotificationAdminStatus NOTIFICATION-TYPE
+        OBJECTS {
+                  ifDescr,
+	              jnxOpticsOTIfAdminState
+                }
+        STATUS  current
+        DESCRIPTION
+                "Notification of the admin state of the optics interface."
+        ::= { jnxOpticsNotificationPrefix 3 }
+
+    jnxIfOpticsNotificationOperStatus NOTIFICATION-TYPE
+        OBJECTS {
+                  ifDescr,
+	              jnxOpticsOTIfOperState
+                }
+        STATUS  current
+        DESCRIPTION
+                "Notification of operational state of the optics interface"
+        ::= { jnxOpticsNotificationPrefix 4 }
 
 --
 -- Iplc Alarm/Alert Notifications
@@ -2879,6 +7401,45 @@ jnxIplcNotificationPrefix   OBJECT IDENTIFIER ::=
         DESCRIPTION
             "Notification of a recently cleared iplc alarm."
         ::= { jnxIplcNotificationPrefix 2 }
+
+--
+-- Ila Alarm/Alert Notifications
+--
+
+jnxIlaNotificationPrefix   OBJECT IDENTIFIER ::=
+                                         { jnxIlaNotifications 0 }
+
+    jnxIlaNotificationSet NOTIFICATION-TYPE
+        OBJECTS {
+            jnxIlaNotificationLocation,
+            jnxIlaNotificationDirection,
+            jnxIlaNotificationSlot,
+            jnxIlaNotificationIlaID,
+            jnxIlaLastNotificationId,
+            jnxIlaNotificationSeverity,
+            jnxIlaNotificationDate
+        }
+        STATUS  current
+        DESCRIPTION
+            "Notification of a recently set iplc alarm."
+        ::= { jnxIlaNotificationPrefix 1 }
+
+    jnxIlaNotificationCleared NOTIFICATION-TYPE
+        OBJECTS {
+            jnxIlaNotificationLocation,
+            jnxIlaNotificationDirection,
+            jnxIlaNotificationSlot,
+            jnxIlaNotificationIlaID,
+            jnxIlaLastNotificationId,
+            jnxIlaNotificationSeverity,
+            jnxIlaNotificationDate
+        }
+        STATUS  current
+        DESCRIPTION
+            "Notification of a recently cleared iplc alarm."
+        ::= { jnxIlaNotificationPrefix 2 }
+
+
 
 --
 -- Iplc Alarm/Alert  Table
@@ -2983,6 +7544,107 @@ jnxIplcNotificationLocation OBJECT-TYPE
 
 
 --
+-- Ila Alarm/Alert  Table
+--
+jnxIlaNotificationTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxIlaNotificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "A table of Notification entries."
+    ::= { jnxIlaAlarm 1 }
+
+jnxIlaNotificationEntry OBJECT-TYPE
+    SYNTAX     JnxIlaNotificationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A conceptual entry in the Notification table."
+    INDEX { jnxIlaNotificationSlot,
+            jnxIlaNotificationIlaID
+    }
+   ::= { jnxIlaNotificationTable 1 }
+
+JnxIlaNotificationEntry ::= SEQUENCE {
+        jnxIlaNotificationLocation
+                            JnxOpticsLocation,
+        jnxIlaNotificationDirection
+                            JnxOpticsDirection,
+        jnxIlaNotificationSlot
+                            Integer32,
+        jnxIlaNotificationIlaID
+                            Integer32,
+        jnxIlaLastNotificationId
+                            JnxIlaNotificationId,
+        jnxIlaNotificationSeverity
+                            JnxOpticsSeverity,
+        jnxIlaNotificationDate
+                            DateAndTime
+    }
+
+    jnxIlaNotificationLocation OBJECT-TYPE
+        SYNTAX      JnxOpticsLocation
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The object identifies indicates if this entry was for
+             Near end/Far end."
+        ::= { jnxIlaNotificationEntry 1 }
+
+    jnxIlaNotificationDirection OBJECT-TYPE
+        SYNTAX      JnxOpticsDirection
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The object identifies indicates if this entry was for
+             for the Tx/Rx or both."
+        ::= { jnxIlaNotificationEntry 2 }
+
+    jnxIlaNotificationSlot OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "The object identifies indicates if this entry was for
+             slot id."
+        ::= { jnxIlaNotificationEntry 3 }
+
+    jnxIlaNotificationIlaID OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "The object identifies indicates if this entry was for
+                       the ILA id."
+        ::= { jnxIlaNotificationEntry 4 }
+
+    jnxIlaLastNotificationId OBJECT-TYPE
+        SYNTAX      JnxIlaNotificationId
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The object identifies the Ila alarm that most recently
+             was set or cleared."
+        ::= { jnxIlaNotificationEntry 5 }
+
+    jnxIlaNotificationSeverity  OBJECT-TYPE
+        SYNTAX          JnxOpticsSeverity
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "The object identifies the severity of the last  alarm/alert
+             that most recently was set or cleared."
+        ::= { jnxIlaNotificationEntry 6 }
+
+    jnxIlaNotificationDate OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This specifies the date and time when this alarm occurred."
+        ::= { jnxIlaNotificationEntry 7 }
+
+--
 -- Optics config OCH2 table
 --
 jnxOpticsOCh2ConfigTable   OBJECT-TYPE
@@ -3061,7 +7723,7 @@ JnxOpticsOCh2ConfigEntry ::=
                                  Integer32,
         jnxOpticsOCh2RxLosPowAlarmThresh
                                  Integer32,
-        jnxOpticsOCh2OpticsCurrentStatus
+        jnxOpticsOCh2CurrentStatus
                                  BITS,
         jnxOpticsOCh2TxPowHiEnableTCA
                                  TruthValue,

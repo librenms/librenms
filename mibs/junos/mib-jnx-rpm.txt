@@ -27,7 +27,7 @@ jnxRpmMib MODULE-IDENTITY
     CONTACT-INFO
             "        Juniper Technical Assistance Center
 		     Juniper Networks, Inc.
-		     1194 N. Mathilda Avenue
+		     1133 Innovation Way
 		     Sunnyvale, CA 94089
 		     E-mail: support@juniper.net"
 
@@ -186,7 +186,13 @@ JnxRpmTimestampType ::= TEXTUAL-CONVENTION
                    clientHardware          (2),
                    clientAndServerHardware (3)
                }
- 
+
+JnxRpmPercentType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-6"
+    STATUS current
+    DESCRIPTION
+        "Displays a percentage as decimal with 6 digits precision."
+    SYNTAX     Unsigned32(0..100000000)
 
 --
 -- Sample Results Table
@@ -293,7 +299,7 @@ JnxRpmTimestampType ::= TEXTUAL-CONVENTION
             jnxRpmResSumCollection               JnxRpmCollectionType,
             jnxRpmResSumSent                     Unsigned32,
             jnxRpmResSumReceived                 Unsigned32,
-            jnxRpmResSumPercentLost              Unsigned32,
+            jnxRpmResSumPercentLost              JnxRpmPercentType,
             jnxRpmResSumDate                     DateAndTime
         }
 
@@ -327,7 +333,7 @@ JnxRpmTimestampType ::= TEXTUAL-CONVENTION
         ::= { jnxRpmResultsSummaryEntry 3 }
 
     jnxRpmResSumPercentLost OBJECT-TYPE
-        SYNTAX     Unsigned32
+        SYNTAX     JnxRpmPercentType
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION
@@ -570,7 +576,7 @@ JnxRpmTimestampType ::= TEXTUAL-CONVENTION
             jnxRpmHistSumCollection  JnxRpmCollectionType,
             jnxRpmHistSumSent        Unsigned32,
             jnxRpmHistSumReceived    Unsigned32,
-            jnxRpmHistSumPercentLost Unsigned32
+            jnxRpmHistSumPercentLost JnxRpmPercentType
         }
 
     jnxRpmHistSumCollection OBJECT-TYPE
@@ -604,7 +610,7 @@ JnxRpmTimestampType ::= TEXTUAL-CONVENTION
         ::= { jnxRpmHistorySummaryEntry 3 }
 
     jnxRpmHistSumPercentLost OBJECT-TYPE
-        SYNTAX     Unsigned32
+        SYNTAX     JnxRpmPercentType
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION

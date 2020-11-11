@@ -14,38 +14,41 @@
         Gauge32, Integer32, Unsigned32, Counter64,
         NOTIFICATION-TYPE,
     	MODULE-IDENTITY, OBJECT-TYPE,
-        OBJECT-IDENTITY, 
+        OBJECT-IDENTITY,
         Counter32
         	FROM SNMPv2-SMI
 
-        InterfaceIndex                  
+        InterfaceIndex
             FROM IF-MIB
 
-	DateAndTime, DisplayString		        
-            FROM SNMPv2-TC 
+	DateAndTime, DisplayString
+            FROM SNMPv2-TC
 
-    	InetAddressType, InetAddress, InetAddressIPv4 	        
+    	InetAddressType, InetAddress, InetAddressIPv4
             FROM INET-ADDRESS-MIB
 
-        jnxSDKApplicationsRoot          
-            FROM JUNIPER-SMI
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
 
-        SnmpAdminString                                                             
-            FROM SNMP-FRAMEWORK-MIB                                                 
-                                                                                
-        MODULE-COMPLIANCE, OBJECT-GROUP                                                            
-            FROM SNMPv2-CONF                                                
-                                                                                
-        sysName, sysLocation, sysContact                                            
-            FROM SNMPv2-MIB;                                                     
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+
+        sysName, sysLocation, sysContact
+            FROM SNMPv2-MIB
+
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+
+        jnxTLBMIBRoot, jnxTLBNotifications
+            FROM JUNIPER-SMI;
 
 	jnxTLBMIB MODULE-IDENTITY
-        LAST-UPDATED  "201402122022Z" -- Feb 12, 2014" 
+        LAST-UPDATED  "201912182022Z" -- DEC 18, 2019" 
     	ORGANIZATION  "Juniper Networks, Inc."
     	CONTACT-INFO
 					"Juniper Technical Assistance Center
 					 Juniper Networks, Inc.
-					 1194 N. Mathilda Avenue
+					 1133 Innovation Way
 					 Sunnyvale, CA 94089
 
 					 E-mail: support@juniper.net
@@ -55,15 +58,20 @@
              traffic load balancer attributes."
 
         REVISION        "201402122022Z" -- Feb 12, 2014
-    	DESCRIPTION 	"Creation Date"
+    	DESCRIPTION 	"Creation date"
 
-        ::= { jnxSDKApplicationsRoot 1 }
+	REVISION        "201912182022Z" -- DEC 18, 2019
+    	DESCRIPTION 	"Changes to integrate with native junos insted of SDK"
+
+	REVISION        "202003252022Z" -- MAR 25, 2020
+    	DESCRIPTION 	"Changes to integrate traps with junos native instead of SDK"
+        ::= { jnxTLBMIBRoot 1 }
 
     jnxTLBrealServer           OBJECT IDENTIFIER ::= { jnxTLBMIB 1 }
     jnxTLBvirtualService       OBJECT IDENTIFIER ::= { jnxTLBMIB 2 }
     jnxTLBserverGroup          OBJECT IDENTIFIER ::= { jnxTLBMIB 3 }
-    jnxTLBNetworkMonitorProfile OBJECT IDENTIFIER ::= { jnxTLBMIB 6 } 
--- jnxTLBMIB 4 and 5 are used by tlbDataMib and tlbTrapMib respectively 
+    jnxTLBNetworkMonitorProfile OBJECT IDENTIFIER ::= { jnxTLBMIB 4 }
+-- jnxTLBMIB 4 and 5 are used by tlbDataMib and tlbTrapMib respectively
 
 -- ***************************************************************
 --  Real Server Table
@@ -926,27 +934,27 @@
 
 
 
-tlbDataMib OBJECT-IDENTITY
-    STATUS  current
-    DESCRIPTION
-            "The root of Juniper's Traffic Load Balance data OIDs."
-   ::= { jnxTLBMIB 4 }
+--tlbDataMib OBJECT-IDENTITY
+--    STATUS  current
+--    DESCRIPTION
+--            "The root of Juniper's Traffic Load Balance data OIDs."
+--   ::= { jnxTLBMIB 4 }
 
    -- realServerMib OBJECT IDENTIFIER ::= { tlbDataMib 1 }
    -- virtualServiceMib OBJECT IDENTIFIER ::= { tlbDataMib 2 }
    -- tlbTrapsMib OBJECT IDENTIFIER ::= { tlbDataMib 3 }
    -- serverGroupMib OBJECT IDENTIFIER ::= { tlbDataMib 4 }
-   
-   
+
+
 tlbTrapMib OBJECT-IDENTITY
     STATUS  current
     DESCRIPTION
             "The root of Juniper's Traffic Load Balance trap OIDs."
-    ::= { jnxTLBMIB 5 }
-    
-    tlbNotificationObjMib  OBJECT IDENTIFIER ::= { tlbTrapMib 3 }
-    tlbNotificationMib OBJECT IDENTIFIER ::= { tlbTrapMib 4 }
-    
+    ::= { jnxTLBNotifications 0 }
+
+    tlbNotificationObjMib  OBJECT IDENTIFIER ::= { tlbTrapMib 1 }
+    tlbNotificationMib OBJECT IDENTIFIER ::= { tlbTrapMib 2 }
+
 --
 -- Objects used in Notifications
 --
@@ -958,7 +966,7 @@ tlbInstanceName OBJECT-TYPE
     DESCRIPTION
         "The name which uniquely identifies the TLB instance."
     ::= { tlbNotificationObjMib 1001 }
-    
+
 tlbRealServerName OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
@@ -966,15 +974,15 @@ tlbRealServerName OBJECT-TYPE
     DESCRIPTION
         "The name which uniquely identifies the real server."
     ::= { tlbNotificationObjMib 1002 }
-    
+
 tlbRealServerGroupName OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The name which uniquely identifies the real server group."
-    ::= { tlbNotificationObjMib 1003 }                                    
-    
+    ::= { tlbNotificationObjMib 1003 }
+
 tlbRealServerIpAddress OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
@@ -982,7 +990,7 @@ tlbRealServerIpAddress OBJECT-TYPE
     DESCRIPTION
         "The IP address of the real server."
     ::= { tlbNotificationObjMib 1004 }
- 
+
 tlbVirtualServiceName   OBJECT-TYPE
     SYNTAX  OCTET STRING
     MAX-ACCESS  read-only
@@ -998,7 +1006,7 @@ tlbVirtualServiceIpAddr OBJECT-TYPE
     DESCRIPTION
         "The IP address of the virtual service."
     ::= {tlbNotificationObjMib 1006}
-                            
+
 tlbVirtualServicePort   OBJECT-TYPE
     SYNTAX      INTEGER (1..65535)
     MAX-ACCESS  read-only
@@ -1006,14 +1014,22 @@ tlbVirtualServicePort   OBJECT-TYPE
     DESCRIPTION
         "The port number of the virtual service."
     ::= {tlbNotificationObjMib 1007}
-                            
+
+tlbVirtualServiceProtocol   OBJECT-TYPE
+    SYNTAX      INTEGER (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the virtual service."
+    ::= {tlbNotificationObjMib 1008}
+
 tlbProfileName  OBJECT-TYPE
     SYNTAX  OCTET STRING
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
         "The name of service probe profile."
-    ::= {tlbNotificationObjMib 1008}
+    ::= {tlbNotificationObjMib 1009}
 
 tlbMultiserviceInterface OBJECT-TYPE
     SYNTAX  OCTET STRING
@@ -1021,7 +1037,7 @@ tlbMultiserviceInterface OBJECT-TYPE
     STATUS  current
     DESCRIPTION
         "Name of the multiservice interface."
-    ::= {tlbNotificationObjMib 1009}
+    ::= {tlbNotificationObjMib 1010}
 
 tlbMultiServicePIC  OBJECT-TYPE
     SYNTAX      INTEGER (1..8)
@@ -1029,15 +1045,32 @@ tlbMultiServicePIC  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "PIC ID."
-    ::= {tlbNotificationObjMib 1010}
-
-tlbNetmonCpuUsage  OBJECT-TYPE                                                 
-    SYNTAX      Unsigned32                                                  
-    MAX-ACCESS  read-only                                                       
-    STATUS      current                                                         
-    DESCRIPTION                                                                 
-        "CPU usage of Netmond"                                                 
     ::= {tlbNotificationObjMib 1011}
+
+tlbNetmonCpuUsage  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU usage of Netmond"
+    ::= {tlbNotificationObjMib 1012}
+
+
+tlbRealServerServicePort OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "real server's service port"
+    ::= { tlbNotificationObjMib 1013}
+
+tlbRealServerServiceProtocol OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "real server's service protocol"
+    ::= { tlbNotificationObjMib 1014}
 
 tlbMonitorMode OBJECT-TYPE
     SYNTAX      OCTET STRING
@@ -1046,9 +1079,7 @@ tlbMonitorMode OBJECT-TYPE
     DESCRIPTION
         "RE or PIC based net-monitord."
     ::= { tlbNotificationObjMib 1099}
-                            
 
-                                                                                                                                                                                                                                                         
 -- ***************************************************************
 -- Trap variables
 -- ***************************************************************
@@ -1058,34 +1089,38 @@ tlbRealServerUp NOTIFICATION-TYPE
               tlbRealServerName,
               tlbRealServerIpAddress,
               tlbRealServerGroupName,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact  
+	      tlbRealServerServicePort,
+	      tlbRealServerServiceProtocol,
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when real server starts up."
-    ::= { tlbNotificationMib 1 }    
+    ::= { tlbNotificationMib 1 }
 
 tlbRealServerDown NOTIFICATION-TYPE
     OBJECTS { tlbInstanceName,
               tlbRealServerName,
               tlbRealServerIpAddress,
               tlbRealServerGroupName,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+	      tlbRealServerServicePort,
+	      tlbRealServerServiceProtocol,
+              tlbMonitorMode
             }
      STATUS  current
      DESCRIPTION
          "The trap will be sent when real server is down."
      ::= { tlbNotificationMib 2 }
-                             
+
 tlbRealServerRejoined NOTIFICATION-TYPE
     OBJECTS { tlbInstanceName,
+	      tlbVirtualServiceName,
               tlbRealServerName,
               tlbRealServerIpAddress,
               tlbRealServerGroupName,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+	      tlbRealServerServicePort,
+	      tlbRealServerServiceProtocol,
+              tlbMonitorMode
              }
     STATUS  current
     DESCRIPTION
@@ -1098,28 +1133,30 @@ tlbVirtualServiceUp NOTIFICATION-TYPE
               tlbVirtualServiceName,
               tlbVirtualServiceIpAddr,
               tlbRealServerGroupName,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
-             }
+              tlbVirtualServicePort,
+	      tlbVirtualServiceProtocol,
+              tlbMonitorMode
+            }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when at least one service is up for the
          virtual-server IP address."
-    ::= { tlbNotificationMib 5 }             
+    ::= { tlbNotificationMib 5 }
 
 tlbVirtualServiceDown NOTIFICATION-TYPE
     OBJECTS { tlbInstanceName,
               tlbVirtualServiceName,
               tlbVirtualServiceIpAddr,
               tlbRealServerGroupName,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+              tlbVirtualServicePort,
+	      tlbVirtualServiceProtocol,
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when all services is down for a virtual-server
          IP address."
-    ::= { tlbNotificationMib 6 }            
+    ::= { tlbNotificationMib 6 }
 
 
 
@@ -1132,113 +1169,109 @@ tlbRealServerServiceUp NOTIFICATION-TYPE
               tlbRealServerName,
               tlbRealServerIpAddress,
               tlbRealServerGroupName,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+	      tlbRealServerServicePort,
+	      tlbRealServerServiceProtocol,
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when real server service is up."
     ::= { tlbNotificationMib 7 }
-                                
+
 tlbRealServerServiceDown NOTIFICATION-TYPE
     OBJECTS { tlbInstanceName,
               tlbRealServerName,
               tlbRealServerIpAddress,
               tlbRealServerGroupName,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+	      tlbRealServerServicePort,
+	      tlbRealServerServiceProtocol,
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when real server service is down."
     ::= { tlbNotificationMib 8 }
-                                 
+
 tlbVirtualServerServiceUp NOTIFICATION-TYPE
     OBJECTS { tlbInstanceName,
               tlbVirtualServiceName,
               tlbVirtualServiceIpAddr,
               tlbRealServerGroupName,
               tlbVirtualServicePort,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+	      tlbVirtualServiceProtocol,
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when virtual service is up."
     ::= { tlbNotificationMib 9 }
-                                  
+
 tlbVirtualServerServiceDown NOTIFICATION-TYPE
     OBJECTS { tlbInstanceName,
               tlbVirtualServiceName,
               tlbVirtualServiceIpAddr,
               tlbRealServerGroupName,
               tlbVirtualServicePort,
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+	      tlbVirtualServiceProtocol,
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when virtual service is down."
-    ::= { tlbNotificationMib 10 }              
+    ::= { tlbNotificationMib 10 }
 
 tlbUp NOTIFICATION-TYPE
     OBJECTS {
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when TLB is started or restarted."
-    ::= { tlbNotificationMib 11 }              
+    ::= { tlbNotificationMib 11 }
 
 tlbShutdown NOTIFICATION-TYPE
     OBJECTS {
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when TLB is shutdown or restarted."
     ::= { tlbNotificationMib 12 }
-                    
+
 tlbPicConnected NOTIFICATION-TYPE
     OBJECTS {
               tlbMonitorMode,
-              tlbMultiserviceInterface,
-              sysName, sysLocation, sysContact
+              tlbMultiserviceInterface
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when TLB connects to a PIC."
     ::= { tlbNotificationMib 13 }
-                    
+
 tlbPicDisconnected NOTIFICATION-TYPE
     OBJECTS {
               tlbMonitorMode,
-              tlbMultiserviceInterface,
-              sysName, sysLocation, sysContact
+              tlbMultiserviceInterface
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when TLB disconnects from a PIC."
     ::= { tlbNotificationMib 14 }
-                    
+
 tlbCpuHigh NOTIFICATION-TYPE
     OBJECTS {
               tlbMonitorMode,
-              tlbNetmonCpuUsage,
-              sysName, sysLocation, sysContact
+              tlbNetmonCpuUsage
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent when TLB uses more than a predefined max percentage of CPU."
     ::= { tlbNotificationMib 15 }
-                    
+
 tlbCpuNormal NOTIFICATION-TYPE
     OBJECTS {
               tlbMonitorMode,
-              tlbNetmonCpuUsage,
-              sysName, sysLocation, sysContact
+              tlbNetmonCpuUsage
             }
     STATUS  current
     DESCRIPTION
@@ -1247,14 +1280,12 @@ tlbCpuNormal NOTIFICATION-TYPE
 
 tlbUnlicensedPic NOTIFICATION-TYPE
     OBJECTS {
-              tlbMonitorMode,
-              sysName, sysLocation, sysContact
+              tlbMonitorMode
             }
     STATUS  current
     DESCRIPTION
         "The trap will be sent if no license is installed and it is required."
-    ::= { tlbNotificationMib 17 }              
-                                                                                                                                                                                 
+    ::= { tlbNotificationMib 17 }
 
 -- ***************************************************************
 --  END of File 
