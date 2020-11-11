@@ -30,6 +30,7 @@ COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
 LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 
 # get the librenms user
+# shellcheck source=/opt/librenms/.env
 source "${LIBRENMS_DIR}/.env"
 LIBRENMS_USER="${LIBRENMS_USER:-librenms}"
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
@@ -46,31 +47,30 @@ LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 #######################################
 status_run() {
     # Explicitly define our arguments
-    local args="$@";
-    local arg_text=$1;
-    local arg_command=$2;
-    local arg_option=$3;
-    local log_file;
-    local exit_code;
-    local tmp;
-    local log_file=${LOG_DIR}/daily.log;
+    local args arg_text arg_command arg_option log_file exit_code tmp log_file
+
+    args=("$@")
+    arg_text=$1
+    arg_command=$2
+    arg_option=$3
+    log_file=${LOG_DIR}/daily.log
 
     # set log_file, using librenms $config['log_dir'], if set
     # otherwise we default to ./logs/daily.log
 
-    printf "%-50s" "${arg_text}";
-    echo "${arg_text}" >> ${log_file}
-    tmp=$(bash -c "${arg_command}" 2>&1);
+    printf "%-50s" "${arg_text}"
+    echo "${arg_text}" >> "${log_file}"
+    tmp=$(bash -c "${arg_command}" 2>&1)
     exit_code=$?
-    echo "${tmp}" >> ${log_file}
-    echo "Returned: ${exit_code}" >> ${log_file}
+    echo "${tmp}" >> "${log_file}"
+    echo "Returned: ${exit_code}" >> "${log_file}"
 
     # print OK if the command ran successfully
     # or FAIL otherwise (non-zero exit code)
     if [[ "${exit_code}" == "0" ]]; then
-        printf " \033[0;32mOK\033[0m\n";
+        printf " \\033[0;32mOK\\033[0m\\n"
     else
-        printf " \033[0;31mFAIL\033[0m\n";
+        printf " \\033[0;31mFAIL\\033[0m\\n"
         if [[ "${arg_option}" == "update" ]]; then
             php "${LIBRENMS_DIR}/daily.php" -f notify -o "${tmp}"
         fi
@@ -94,10 +94,12 @@ status_run() {
 #   Exit-Code of Command
 #######################################
 call_daily_php() {
-    local args=( "$@" );
+    local args
+
+    args=("$@")
 
     for arg in "${args[@]}"; do
-        php "${LIBRENMS_DIR}/daily.php" -f "${arg}";
+        php "${LIBRENMS_DIR}/daily.php" -f "${arg}"
     done
 }
 
@@ -113,11 +115,13 @@ call_daily_php() {
 #   Exit-Code of Command
 #######################################
 set_notifiable_result() {
-    local args="$@";
-    local arg_type=$1;
-    local arg_result=$2;
+    local args arg_type arg_result
 
-    php "${LIBRENMS_DIR}/daily.php" -f handle_notifiable -t ${arg_type} -r ${arg_result};
+    args=("$@")
+    arg_type=$1
+    arg_result=$2
+
+    php "${LIBRENMS_DIR}/daily.php" -f handle_notifiable -t "${arg_type}" -r "${arg_result}"
 }
 
 #######################################
@@ -126,20 +130,22 @@ set_notifiable_result() {
 #   Exit-Code: 0 >= min ver, 1 < min ver
 #######################################
 check_dependencies() {
-    local branch=$(git rev-parse --abbrev-ref HEAD)
+    local branch ver_56 ver_71 ver_72 ver_73 python3 python_deps phpver pythonver old_branches msg
+
+    branch=$(git rev-parse --abbrev-ref HEAD)
     scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
 
-    local ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
-    local ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
-    local ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
-    local ver_73=$(php -r "echo (int)version_compare(PHP_VERSION, '7.3', '<');")
-    local python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
-    local python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
-    local phpver="master"
-    local pythonver="master"
-    local old_branches="php53 php56 php71-python2 php72"
+    ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
+    ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
+    ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
+    ver_73=$(php -r "echo (int)version_compare(PHP_VERSION, '7.3', '<');")
+    python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
+    python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
+    phpver="master"
+    pythonver="master"
 
-    if [[ " $old_branches " =~ " $branch " ]] && [[ "$ver_73" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
+    old_branches="^(php53|php56|php71-python2|php72)$"
+    if [[ $branch =~ $old_branches ]] && [[ "$ver_73" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
         status_run "Supported PHP and Python version, switched back to master branch." 'git checkout master'
     elif [[ "$ver_56" != "0" ]]; then
         phpver="php53"
@@ -152,7 +158,7 @@ check_dependencies() {
             status_run "Unsupported PHP version, switched to php56 branch." 'git checkout php56'
         fi
     elif [[ "$ver_72" != "0" || "$python3" != "0" || "$python_deps" != "0" ]]; then
-        local msg=""
+        msg=""
         if [[ "$ver_72" != "0" ]]; then
             msg="Unsupported PHP version, $msg"
             phpver="php71"
@@ -179,9 +185,9 @@ check_dependencies() {
     set_notifiable_result pythonver ${pythonver}
 
     if [[ "$phpver" == "master" && "$pythonver" == "master" ]]; then
-        return 0;
+        return 0
     fi
-    return 1;
+    return 1
 }
 
 #######################################
@@ -195,13 +201,16 @@ check_dependencies() {
 #   Exit-Code: 0: if equal 1: if 1 > 2  2: if 1 < 2
 #######################################
 version_compare () {
+    local IFS i ver1 ver2 parts1 parts2
+
     if [[ "$1" == "$2" ]]; then
         return 0
     fi
-    local IFS=.
-    local i ver1=($1) ver2=($2)
+    IFS=.
+    ver1=("$1")
+    ver2=("$2")
 
-    local parts2=${#ver2[@]}
+    parts2=${#ver2[@]}
     [[ -n $3 ]] && parts2=$3
 
     # fill empty fields in ver1 with zeros
@@ -209,7 +218,7 @@ version_compare () {
         ver1[i]=0
     done
 
-    local parts1=${#ver1[@]}
+    parts1=${#ver1[@]}
     [[ -n $3 ]] && parts1=$3
 
     for ((i=0; i<parts1; i++)); do
@@ -238,12 +247,14 @@ version_compare () {
 #   Exit-Code of Command
 #######################################
 main () {
-    local arg="$1";
-    local old_version="$2";
-    local new_version="$3";
-    local old_version="${old_version:=unset}"  # if $1 is unset, make it mismatch for pre-update daily.sh
+    local arg old_version new_version branch options
 
-    cd ${LIBRENMS_DIR};
+    arg="$1"
+    old_version="$2"
+    new_version="$3"
+    old_version="${old_version:=unset}"  # if $1 is unset, make it mismatch for pre-update daily.sh
+
+    cd "${LIBRENMS_DIR}" || exit 1
 
     # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
     if [[ "$LIBRENMS_USER" != "root" ]]; then
@@ -251,11 +262,11 @@ main () {
         if [[ "$EUID" -eq 0 ]]; then
             echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
             sudo -u "$LIBRENMS_USER" "$DAILY_SCRIPT" "$@"
-            exit;
+            exit
         fi
 
         if [[ "$EUID" -ne "$LIBRENMS_USER_ID" ]]; then
-            printf "\033[0;93mWARNING\033[0m: You should run this script as ${LIBRENMS_USER}\n";
+            printf "\\033[0;93mWARNING\\033[0m: You should run this script as %s\\n" "${LIBRENMS_USER}"
         fi
     fi
 
@@ -281,7 +292,7 @@ main () {
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
-            local branch=$(git rev-parse --abbrev-ref HEAD)
+            branch=$(git rev-parse --abbrev-ref HEAD)
             if [[ "$branch" == "HEAD" ]]; then
                 # if the branch is HEAD, then we are not on a branch, checkout master
                 git checkout master
@@ -317,7 +328,7 @@ main () {
             fi
         fi
 
-        if (( $update_res > 0 )); then
+        if (( update_res > 0 )); then
             set_notifiable_result update 0
         fi
 
@@ -361,7 +372,7 @@ main () {
             ;;
             cleanup)
                 # Cleanups
-                local options=("refresh_alert_rules"
+                options=("refresh_alert_rules"
                                "refresh_os_cache"
                                "refresh_device_groups"
                                "recalculate_device_dependencies"
@@ -377,8 +388,8 @@ main () {
                                "rrd_purge"
                                "ports_fdb"
                                "route"
-                               "ports_purge");
-                call_daily_php "${options[@]}";
+                               "ports_purge")
+                call_daily_php "${options[@]}"
             ;;
             submodules)
                 # Init+Update our submodules
@@ -387,12 +398,12 @@ main () {
             ;;
             notifications)
                 # Get notifications
-                local options=("notifications");
-                call_daily_php "${options[@]}";
+                options=("notifications")
+                call_daily_php "${options[@]}"
             ;;
             peeringdb)
-                local options=("peeringdb");
-                call_daily_php "${options[@]}";
+                options=("peeringdb")
+                call_daily_php "${options[@]}"
             ;;
         esac
     fi
