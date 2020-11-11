@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\PowerState;
+
 /*
  * CONSOLE: Start the VMware discovery process.
  */
@@ -30,7 +32,7 @@ foreach ($db_info_list as $db_info) {
     $vm_info['vmwVmDisplayName'] = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmDisplayName'];
     $vm_info['vmwVmGuestOS'] = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmGuestOS'];
     $vm_info['vmwVmMemSize'] = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmMemSize'];
-    $vm_info['vmwVmState'] = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmState'];
+    $vm_info['vmwVmState'] = PowerState::STATES[$current_vminfo[$db_info['vmwVmVMID']]['vmwVmState']] ?? PowerState::UNKNOWN;
     $vm_info['vmwVmCpus'] = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmCpus'];
 
     /*

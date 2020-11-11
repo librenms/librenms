@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\PowerState;
+
 // FIXME should do the deletion etc in a common file perhaps? like for the sensors
 /*
  * Try to discover any Virtual Machines.
@@ -26,7 +28,7 @@ if (($device['os'] == 'vmware-esxi') || ($device['os'] == 'linux')) {
         $vmwVmDisplayName = $entry['vmwVmDisplayName'];
         $vmwVmGuestOS = $entry['vmwVmGuestOS'];
         $vmwVmMemSize = $entry['vmwVmMemSize'];
-        $vmwVmState = $entry['vmwVmState'];
+        $vmwVmState = PowerState::STATES[strtolower($entry['vmwVmState'])] ?? PowerState::UNKNOWN;
         $vmwVmCpus = $entry['vmwVmCpus'];
 
         /*

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Vminfo;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use LibreNMS\Enum\PowerState;
 
 class VminfoFactory extends Factory
 {
@@ -28,7 +29,7 @@ class VminfoFactory extends Factory
             'vmwVmGuestOS' => $this->faker->text(128),
             'vmwVmMemSize' => $this->faker->randomDigit,
             'vmwVmCpus' => $this->faker->randomDigit,
-            'vmwVmState' => $this->faker->randomElement(['powered on', 'powered off', 'suspended']),
+            'vmwVmState' => $this->faker->randomElement([PowerState::OFF, PowerState::ON, PowerState::SUSPENDED, PowerState::UNKNOWN]),
         ];
     }
 }
