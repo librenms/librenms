@@ -25,7 +25,7 @@ It is also a requirement that at least one locking service is in place
 to which all pollers can connect. There are currently three locking 
 mechanisms available
 - memcached
-- redis
+- redis (preferred)
 - sql locks (default)
 
 All of the above locking mechanisms are natively supported in LibreNMS.
