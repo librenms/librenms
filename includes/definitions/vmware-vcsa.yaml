@@ -14,4 +14,4 @@ discovery:
     -
         sysDescr_regex:
             - '/^VMware-vCenter-Server-Appliance/'
-            - '/^VMware vCenter Server Appliance/'
+            - '/^VMware vCenter Server/'
