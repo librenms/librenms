@@ -2351,7 +2351,7 @@ function add_parents_to_host(Illuminate\Http\Request $request)
         $hostname = trim($hostname);
         $parent_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
         if (empty($parent_id)) {
-            return api_error(400, 'Parent device IDs/Hostname does not exist: '. $hostname);
+            return api_error(400, 'Parent device IDs/Hostname does not exist: ' . $hostname);
         }
         $parent_ids[] = $parent_id;
     }
@@ -2379,7 +2379,7 @@ function del_parents_from_host(Illuminate\Http\Request $request)
             $hostname = trim($hostname);
             $parent_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
             if (empty($parent_id)) {
-                return api_error(400, 'Parent device IDs/Hostname does not exist: '. $hostname);
+                return api_error(400, 'Parent device IDs/Hostname does not exist: ' . $hostname);
             }
             $parent_ids[] = $parent_id;
         }
