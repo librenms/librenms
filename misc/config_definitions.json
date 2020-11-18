@@ -417,6 +417,12 @@
             "order": 11,
             "type": "text"
         },
+        "auth_ad_domain": {
+            "group": "auth",
+            "section": "ad",
+            "order": 12,
+            "type": "text"
+        },
         "auth_ldap_attr.uid": {
             "default": "uid",
             "group": "auth",
