@@ -24,8 +24,9 @@ class MempoolsAddOids extends Migration
         });
 
         // rediscover mempools to fill empty columns and prevent gaps
-        $ids = DB::table('mempools')->distinct()->pluck('device_id');
-        DB::table('devices')->whereIn('device_id', $ids)->update(['last_discovered' => null]);
+        DB::table('devices')->whereIn('device_id', function ($query) {
+            $query->from('mempools')->distinct()->select('device_id');
+        })->update(['last_discovered' => null]);
     }
 
     /**
