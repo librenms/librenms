@@ -94,10 +94,10 @@ if (! empty($argv[1])) {
 
         // These values are the same as in defaults.inc.php
         $v3 = [
-            'authlevel'  => 'noAuthNoPriv',
+            'authlevel'  => 'authPriv',
             'authname'   => 'root',
             'authpass'   => '',
-            'authalgo'   => 'MD5',
+            'authalgo'   => 'SHA',
             'cryptopass' => '',
             'cryptoalgo' => 'AES',
         ];
