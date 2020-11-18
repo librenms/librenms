@@ -22,6 +22,10 @@ class MempoolsAddOids extends Migration
             $table->string('mempool_free_oid')->after('mempool_free')->nullable();
             $table->string('mempool_total_oid')->after('mempool_total')->nullable();
         });
+
+        // rediscover mempools to fill empty columns and prevent gaps
+        $ids = DB::table('mempools')->distinct()->pluck('device_id');
+        DB::table('devices')->whereIn('device_id', $ids)->update(['last_discovered' => null]);
     }
 
     /**
