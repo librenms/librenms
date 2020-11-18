@@ -25,7 +25,6 @@
 namespace LibreNMS\Util;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Support\Str;
 
 class ModuleModelObserver
 {
