@@ -1367,7 +1367,7 @@ Output:
 
 Add one or more parents to a host.
 
-Route: `/api/v0/devices/:device_name/parents`
+Route: `/api/v0/devices/:device/parents`
 
 Input (JSON):
 
@@ -1390,7 +1390,7 @@ Output:
 
 Deletes some or all the parents from a host.
 
-Route: `/api/v0/devices/:device_name/parents`
+Route: `/api/v0/devices/:device/parents`
 
 Input (JSON):
 
