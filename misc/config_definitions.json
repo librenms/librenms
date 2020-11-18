@@ -4980,8 +4980,8 @@
             "type": "snmp3auth",
             "default": [
                 {
-                    "authalgo": "MD5",
-                    "authlevel": "noAuthNoPriv",
+                    "authalgo": "SHA",
+                    "authlevel": "authPriv",
                     "authname": "root",
                     "authpass": "",
                     "cryptoalgo": "AES",
