@@ -2364,7 +2364,6 @@ function del_parents_from_host(Illuminate\Http\Request $request)
     $device = Device::find($device_id);
     if (! empty($data['parent_ids'])) {
         $parents = explode(',', $data['parent_ids']);
-
         //remove parents included in the request if they are valid device ids
         $result = validateDeviceIds($parents) ? $device->parents()->detach($parents) : false;
     }
