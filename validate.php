@@ -53,6 +53,11 @@ if (isset($options['h'])) {
     exit;
 }
 
+if (function_exists('posix_getuid') && posix_getuid() === 0) {
+    echo 'Do not run validate.php as root' . PHP_EOL;
+    exit(1);
+}
+
 // Check autoload
 if (! file_exists('vendor/autoload.php')) {
     print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
