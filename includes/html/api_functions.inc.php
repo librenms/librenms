@@ -2346,15 +2346,7 @@ function add_parents_to_host(Illuminate\Http\Request $request)
     $device_id = $request->route('id');
     $device_id = ctype_digit($device_id) ? $device_id : getidbyname($device_id);
 
-    $parent_ids = [];
-    foreach (explode(',', $data['parent_ids']) as $hostname) {
-        $hostname = trim($hostname);
-        $parent_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-        if (empty($parent_id)) {
-            return api_error(400, 'Parent device IDs/Hostname does not exist: ' . $hostname);
-        }
-        $parent_ids[] = $parent_id;
-    }
+    $parent_ids = explode(',', $data['parent_ids']) as $hostname);
 
     if (validateDeviceIds($parent_ids) && validateDeviceIds([$device_id]) && (! in_array($device_id, $parent_ids))) {
         Device::find($device_id)->parents()->sync($parent_ids);
@@ -2375,17 +2367,10 @@ function del_parents_from_host(Illuminate\Http\Request $request)
     }
     $device = Device::find($device_id);
     if (! empty($data['parent_ids'])) {
-        foreach (explode(',', $data['parent_ids']) as $hostname) {
-            $hostname = trim($hostname);
-            $parent_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-            if (empty($parent_id)) {
-                return api_error(400, 'Parent device IDs/Hostname does not exist: ' . $hostname);
-            }
-            $parent_ids[] = $parent_id;
-        }
+        $parents = explode(',', $data['parent_ids']) as $hostname);
 
         //remove parents included in the request if they are valid device ids
-        $result = validateDeviceIds($parent_ids) ? $device->parents()->detach($parent_ids) : false;
+        $result = validateDeviceIds($parent) ? $device->parents()->detach($parent) : false;
     }
     if (is_null($result)) {
         //$result doesn't exist so $data['parent_ids'] is empty
