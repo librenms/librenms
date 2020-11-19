@@ -237,6 +237,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
          location ~ /\.(?!well-known).* {
           deny all;
          }
+         location /api/v0 {
+          try_files $uri $uri/ /api_v0.php?query_string;
+         }
         }
         ```
 
@@ -312,6 +315,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
          }
          location ~ /\.(?!well-known).* {
           deny all;
+         }
+         location /api/v0 {
+          try_files $uri $uri/ /api_v0.php?query_string;
          }
         }
         ```
@@ -394,6 +400,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
          }
          location ~ /\.(?!well-known).* {
           deny all;
+         }
+         location /api/v0 {
+          try_files $uri $uri/ /api_v0.php?query_string;
          }
         }
         ```
