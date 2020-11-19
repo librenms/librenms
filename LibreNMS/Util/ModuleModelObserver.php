@@ -25,21 +25,22 @@
 namespace LibreNMS\Util;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Support\Str;
 
 class ModuleModelObserver
 {
     /**
      * Install observers to output +, -, U for models being created, deleted, and updated
      *
-     * @param string $model The model name including namespace
+     * @param string|\Illuminate\Database\Eloquent\Model $model The model name including namespace
      */
     public static function observe($model)
     {
-        $model = Str::start($model, '\\');
-        // discovery output (but don't install it twice (testing can can do this)
-        if (! $model::getEventDispatcher()->hasListeners('eloquent.created: ' . ltrim('\\', $model))) {
+        static $observed_models = []; // keep track of observed models so we don't duplicate output
+        $class = ltrim($model, '\\');
+
+        if (! in_array($class, $observed_models)) {
             $model::observe(new ModuleModelObserver());
+            $observed_models[] = $class;
         }
     }
 
