@@ -274,6 +274,10 @@ return [
             'description' => 'Active Directory Server(s)',
             'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com',
         ],
+        'auth_ad_domain' => [
+            'description' => 'Active Directory Domain',
+            'help' => 'Active Directory Domain Example: example.com',
+        ],
         'auth_ldap_attr' => [
             'uid' => [
                 'description' => 'Attribute to check username against',
