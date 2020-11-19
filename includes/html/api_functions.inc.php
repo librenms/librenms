@@ -2344,9 +2344,7 @@ function add_parents_to_host(Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
     $device_id = $request->route('id');
-    $device_id = ctype_digit($device_id) ? $device_id : getidbyname($device_id);
-
-    $parent_ids = explode(',', $data['parent_ids']) as $hostname);
+    $parent_ids = explode(',', $data['parent_ids']);
 
     if (validateDeviceIds($parent_ids) && validateDeviceIds([$device_id]) && (! in_array($device_id, $parent_ids))) {
         Device::find($device_id)->parents()->sync($parent_ids);
@@ -2360,14 +2358,13 @@ function add_parents_to_host(Illuminate\Http\Request $request)
 function del_parents_from_host(Illuminate\Http\Request $request)
 {
     $device_id = $request->route('id');
-    $device_id = ctype_digit($device_id) ? $device_id : getidbyname($device_id);
     $data = json_decode($request->getContent(), true);
     if (! validateDeviceIds([$device_id])) {
         return api_error(400, 'Check your device ID!');
     }
     $device = Device::find($device_id);
     if (! empty($data['parent_ids'])) {
-        $parents = explode(',', $data['parent_ids']) as $hostname);
+        $parents = explode(',', $data['parent_ids']);
 
         //remove parents included in the request if they are valid device ids
         $result = validateDeviceIds($parent) ? $device->parents()->detach($parent) : false;
