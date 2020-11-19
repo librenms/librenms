@@ -516,7 +516,7 @@
     "name": "QNAP NAS has a bad SMART disk status"
   },
   {
-    "rule": "UNIX_TIMESTAMP(NOW())- UNIX_TIMESTAMP(devices.last_polled) > (select config_value from config WHERE config_name=\"rrd.heartbeat\")",
+    "rule": "UNIX_TIMESTAMP(NOW())- UNIX_TIMESTAMP(devices.last_polled) > 300",
     "name": "Device unpolled"
   }    
 ]
