@@ -2345,7 +2345,6 @@ function add_parents_to_host(Illuminate\Http\Request $request)
     $data = json_decode($request->getContent(), true);
     $device_id = $request->route('id');
     $parent_ids = explode(',', $data['parent_ids']);
-
     if (validateDeviceIds($parent_ids) && validateDeviceIds([$device_id]) && (! in_array($device_id, $parent_ids))) {
         Device::find($device_id)->parents()->sync($parent_ids);
 
@@ -2367,7 +2366,7 @@ function del_parents_from_host(Illuminate\Http\Request $request)
         $parents = explode(',', $data['parent_ids']);
 
         //remove parents included in the request if they are valid device ids
-        $result = validateDeviceIds($parent) ? $device->parents()->detach($parent) : false;
+        $result = validateDeviceIds($parents) ? $device->parents()->detach($parents) : false;
     }
     if (is_null($result)) {
         //$result doesn't exist so $data['parent_ids'] is empty
