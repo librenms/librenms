@@ -98,7 +98,7 @@ class MenuComposer
                 continue;
             }
             $custom_descr[] = ['name' => $custom_descr_name,
-                'icon' => is_array($descr) ? $descr[1] : 'fa-connectdevelop'
+                'icon' => is_array($descr) ? $descr[1] : 'fa-connectdevelop',
             ];
         }
         $vars['custom_port_descr'] = collect($custom_descr)->filter();
