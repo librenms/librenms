@@ -92,14 +92,14 @@ class MenuComposer
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
 
         $custom_descr = [];
-        foreach ((array)Config::get('custom_descr', []) as $descr) {
+        foreach ((array) Config::get('custom_descr', []) as $descr) {
             $custom_descr_name = is_array($descr) ? $descr[0] : $descr;
             if (empty($custom_descr_name)) {
                 continue;
             }
             $custom_descr[] = ['name' => $custom_descr_name,
-                               'icon' => is_array($descr) ? $descr[1] : 'fa-connectdevelop'
-                               ];
+                'icon' => is_array($descr) ? $descr[1] : 'fa-connectdevelop'
+            ];
         }
         $vars['custom_port_descr'] = collect($custom_descr)->filter();
         $vars['port_groups_exist'] = Config::get('int_customers') ||
