@@ -11,6 +11,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
     protected $primaryKey = 'mempool_id';
     public $timestamps = false;
     protected $fillable = [
+        'mempool_perc_warn',
         'mempool_index',
         'entPhysicalIndex',
         'mempool_type',
@@ -25,13 +26,21 @@ class Mempool extends DeviceRelatedModel implements Keyable
         'mempool_free_oid',
         'mempool_total',
         'mempool_total_oid',
-        'mempool_perc_warn',
         'mempool_largestfree',
         'mempool_lowestfree',
     ];
     protected $attributes = [
         'mempool_precision' => 1,
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        if (! $this->exists) {
+            // only allow mempool_perc_warn to be filled for new mempools
+            unset($this->fillable[array_search('mempool_perc_warn', $this->fillable)]);
+        }
+    }
 
     public function isValid()
     {
