@@ -42,7 +42,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 if (is_numeric($_POST['rowCount']) && is_numeric($_POST['current'])) {
                     $rows = $_POST['rowCount'];
                     $current = $_POST['current'];
-                    $deps_query .= ' LIMIT ' . $rows * ($current - 1) . ', ' . $rows;
+                    if ($rows > 0) {
+                        $deps_query .= ' LIMIT ' . $rows * ($current - 1) . ', ' . $rows;
+                    }
                 }
             } else {
                 $deps_query .= ' ORDER BY a.hostname';
