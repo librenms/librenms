@@ -633,6 +633,9 @@
             ]
         },
         "autodiscovery.nets-exclude": {
+            "group": "discovery",
+            "section": "networks",
+            "order": 2,
             "type": "array",
             "default": [
                 "0.0.0.0/8",
@@ -3717,7 +3720,10 @@
             "type": "directory"
         },
         "nets": {
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "networks",
+            "order": 1
         },
         "network_map_items": {
             "default": [

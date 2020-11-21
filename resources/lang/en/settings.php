@@ -39,6 +39,7 @@ return [
             'route' => 'Routes Discovery Module',
             'discovery_modules' => 'Discovery Modules',
             'storage' => 'Storage Module',
+            'networks' => 'Networks',
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -1143,6 +1144,16 @@ return [
         'routes_max_number' => [
             'description' => 'Max number of routes allowed for discovery',
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
+        ],
+        'nets' => [
+            'description' => 'Autodiscovery Networks',
+            'help' => 'Networks from which devices will be discovered automatically.',
+        ],
+        'autodiscovery' => [
+            'nets-exclude' => [
+                'description' => 'Networks/IPs to be ignored',
+                'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+            ],
         ],
         'route_purge' => [
             'description' => 'Route entries older than (days)',
