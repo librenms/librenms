@@ -326,7 +326,7 @@
                                 </li>
                                 @endconfig
                                 @foreach($custom_port_descr as $custom_descr)
-                                    <li><a href="{{ url('iftype/type=' . urlencode($custom_descr)) }}"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr) }}</a></li>
+                                    <li><a href="{{ url('iftype/type=' . urlencode($custom_descr['name'])) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
                                 @endforeach
                             @endif
 
