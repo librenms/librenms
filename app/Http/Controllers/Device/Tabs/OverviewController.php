@@ -63,6 +63,7 @@ class OverviewController implements DeviceTab
                 $graph['width'] = round(($screen_width - 390) / 2, 0);
                 $graph['height'] = round($graph['width'] / 3);
                 $graph['lazy_w'] = $graph['width'] + 80;
+
                 return $graph;
             }
 
