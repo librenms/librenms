@@ -756,8 +756,8 @@
         "core_descr": {
             "default": ["core"],
             "type": "array",
-            "group": "poller",
-            "section": "specialports",
+            "group": "webui",
+            "section": "port-descr",
             "order": 2
         },
         "cpu_details_overview": {
@@ -771,8 +771,8 @@
         "customers_descr": {
             "default": ["cust"],
             "type": "array",
-            "group": "poller",
-            "section": "specialports",
+            "group": "webui",
+            "section": "port-descr",
             "order": 3
         },
         "dateformat.byminute": {
@@ -4094,8 +4094,8 @@
                 "peering"
             ],
             "type": "array",
-            "group": "poller",
-            "section": "specialports",
+            "group": "webui",
+            "section": "port-descr",
             "order": 0
         },
         "peeringdb.enabled": {
@@ -5134,8 +5134,8 @@
         "transit_descr": {
             "default": ["transit"],
             "type": "array",
-            "group": "poller",
-            "section": "specialports",
+            "group": "webui",
+            "section": "port-descr",
             "order": 1
         },
         "twofactor": {

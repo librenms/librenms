@@ -62,7 +62,6 @@ return [
             'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
-            'specialports' => 'Interface Description Parsing',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
@@ -74,6 +73,7 @@ return [
             'availability-map' => 'Availability Map Settings',
             'graph' => 'Graph Settings',
             'dashboard' => 'Dashboard Settings',
+            'port-descr' => 'Interface Description Parsing',
             'search' => 'Search Settings',
             'style' => 'Style',
             'device' => 'Device Settings',
@@ -415,20 +415,20 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'peering_descr' => [
-            'description' => 'Peering Port Prefix',
-            'help' => 'Ports with this Prefix, seperated by a ":" from a Port description will be recognized as Peering Port',
+            'description' => 'Peering Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the peering ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
         'transit_descr' => [
-            'description' => 'Transit Port Prefix',
-            'help' => 'Ports with this Prefix, seperated by a ":" from a Port description will be recognized as Transit Port',
+            'description' => 'Transit Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
         'core_descr' => [
-            'description' => 'Core Port Prefix',
-            'help' => 'Ports with this Prefix, seperated by a ":" from a Port description will be recognized as Core Port',
+            'description' => 'Core Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
         'customers_descr' => [
-            'description' => 'Customer Port Prefix',
-            'help' => 'Ports with this Prefix, seperated by a ":" from a Port description will be recognized as Customer Port',
+            'description' => 'Customer Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
         'base_url' => [
             'description' => 'Specific URL',
