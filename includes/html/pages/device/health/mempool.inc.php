@@ -1,57 +1,33 @@
 <?php
 
-$i = '1';
+use LibreNMS\Util\Html;
+use LibreNMS\Util\Number;
 
-$mempools = dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', [$device['device_id']]);
+$mempools = DeviceCache::getPrimary()->mempools;
 
-// FIXME css alternating colours
-foreach ($mempools as $mempool) {
-    if (! is_integer($i / 2)) {
-        $row_colour = \LibreNMS\Config::get('list_colour.even');
-    } else {
-        $row_colour = \LibreNMS\Config::get('list_colour.odd');
+if ($mempools->isNotEmpty()) {
+    echo "<div class='panel panel-default'><div class='panel-heading'>";
+    echo "<h3 class='panel-title'>Overview";
+    $system = $mempools->where('mempool_class', 'system')->first();
+    if ($system) {
+        echo "<div class='pull-right'>$system->mempool_perc% used</div>";
     }
-
-    $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
-
-    $id = 'id';
-    $val = $mempool['mempool_id'];
-    $mempool_url = 'graphs/' . $id . '=' . $val . '/type=mempool_usage/';
-    $mini_url = 'graph.php?' . $id . '=' . $val . '&amp;type=mempool_usage&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . '&amp;width=80&amp;height=20&amp;bg=f4f4f4';
-
-    $mempool_popup = "onmouseover=\"return overlib('<div class=list-large>" . $device['hostname'] . ' - ' . $text_descr;
-    $mempool_popup .= "</div><img src=\'graph.php?'.$id.'=" . $val . '&amp;type=mempool_usage&amp;from=' . \LibreNMS\Config::get('time.month') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=400&amp;height=125\'>";
-    $mempool_popup .= "', RIGHT" . \LibreNMS\Config::get('overlib_defaults') . ');" onmouseout="return nd();"';
-
-    $total = formatStorage($mempool['mempool_total']);
-    $used = formatStorage($mempool['mempool_used']);
-    $free = formatStorage($mempool['mempool_free']);
-
-    // don't bother recalculating if mempools use percentage
-    if ($mempool['percentage'] === true) {
-        $perc = round($mempool['mempool_used']);
-    } else {
-        $perc = round(($mempool['mempool_used'] / $mempool['mempool_total'] * 100));
-    }
-
-    $background = get_percentage_colours($percent);
-    $right_background = $background['right'];
-    $left_background = $background['left'];
-
-    $graph_array[$id] = $val;
-    $graph_array['type'] = 'mempool_usage';
-
-    echo "<div class='panel panel-default'>
-            <div class='panel-heading'>";
-    if ($mempool['percentage'] === true) {
-        echo "                <h3 class='panel-title'>$text_descr <div class='pull-right'>$perc% used</div></h3>";
-    } else {
-        echo "                <h3 class='panel-title'>$text_descr <div class='pull-right'>$used/$total - $perc% used</div></h3>";
-    }
-    echo '            </div>';
-    echo "<div class='panel-body'>";
-    include 'includes/html/print-graphrow.inc.php';
+    echo "</h3></div><div class='panel-body'>";
+    Html::graphRow(['device' => DeviceCache::getPrimary()->device_id, 'type' => 'device_mempool'], true);
     echo '</div></div>';
+}
 
-    $i++;
-}//end foreach
+foreach ($mempools as $mempool) {
+    echo "<div class='panel panel-default'><div class='panel-heading'>";
+
+    if ($mempool->mempool_total === 100) {
+        echo "                <h3 class='panel-title'>{$mempool->mempool_descr} <div class='pull-right'>$mempool->mempool_perc% used</div></h3>";
+    } else {
+        $total = Number::formatBi($mempool->mempool_total);
+        $used = Number::formatBi($mempool->mempool_used);
+        echo "<h3 class='panel-title'>{$mempool->mempool_descr} <div class='pull-right'>$used/$total - $mempool->mempool_perc% used</div></h3>";
+    }
+    echo "</div><div class='panel-body'>";
+    Html::graphRow(['id' => $mempool->mempool_id, 'type' => 'mempool_usage'], true);
+    echo '</div></div>';
+}
