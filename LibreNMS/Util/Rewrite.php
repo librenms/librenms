@@ -410,34 +410,4 @@ class Rewrite
     {
         return str_pad($num, $length, '0', STR_PAD_LEFT);
     }
-
-    public static function formatStorage($value, int $round = 2, int $sf = 3): string
-    {
-        $value = self::format_bi($value, $round, $sf) . 'B';
-
-        return $value;
-    }
-
-    public static function format_bi($value, int $round = 2, int $sf = 3): string
-    {
-        $neg = false;
-        $sizes = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
-        $ext = $sizes[0];
-
-        if ($value < 0) {
-            $neg = true;
-            $value = $value * -1;
-        }
-
-        for ($i = 1; (($i < count($sizes)) && ($value >= 1024)); $i++) {
-            $value = $value / 1024;
-            $ext = $sizes[$i];
-        }
-
-        if ($neg) {
-            $value = $value * -1;
-        }
-
-        return (number_format(round($value, $round), $sf, '.', '') + 0) . ' ' . $ext;
-    }
 }
