@@ -489,7 +489,7 @@ function formatRates($value, $round = '2', $sf = '3')
 
 function formatStorage($value, $round = '2', $sf = '3')
 {
-    return \LibreNMS\Util\Rewrite::formatStorage($value, $round, $sf);
+    return \LibreNMS\Util\Number::formatBi($value, $round, $sf);
 }
 
 function format_si($value, $round = 2, $sf = 3)
