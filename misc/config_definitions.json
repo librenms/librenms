@@ -633,6 +633,9 @@
             ]
         },
         "autodiscovery.nets-exclude": {
+            "group": "discovery",
+            "section": "networks",
+            "order": 2,
             "type": "array",
             "default": [
                 "0.0.0.0/8",
@@ -755,7 +758,10 @@
         },
         "core_descr": {
             "default": ["core"],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 2
         },
         "cpu_details_overview": {
             "default": false,
@@ -767,7 +773,10 @@
         },
         "customers_descr": {
             "default": ["cust"],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 3
         },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
@@ -3711,7 +3720,10 @@
             "type": "directory"
         },
         "nets": {
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "networks",
+            "order": 1
         },
         "network_map_items": {
             "default": [
@@ -4087,7 +4099,10 @@
             "default": [
                 "peering"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 0
         },
         "peeringdb.enabled": {
             "default": false,
@@ -5124,7 +5139,10 @@
         },
         "transit_descr": {
             "default": ["transit"],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 1
         },
         "twofactor": {
             "type": "boolean",

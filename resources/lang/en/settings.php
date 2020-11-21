@@ -39,6 +39,7 @@ return [
             'route' => 'Routes Discovery Module',
             'discovery_modules' => 'Discovery Modules',
             'storage' => 'Storage Module',
+            'networks' => 'Networks',
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -73,6 +74,7 @@ return [
             'availability-map' => 'Availability Map Settings',
             'graph' => 'Graph Settings',
             'dashboard' => 'Dashboard Settings',
+            'port-descr' => 'Interface Description Parsing',
             'search' => 'Search Settings',
             'style' => 'Style',
             'device' => 'Device Settings',
@@ -412,6 +414,22 @@ return [
         'authlog_purge' => [
             'description' => 'Auth log entries older than (days)',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'peering_descr' => [
+            'description' => 'Peering Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the peering ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'transit_descr' => [
+            'description' => 'Transit Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'core_descr' => [
+            'description' => 'Core Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'customers_descr' => [
+            'description' => 'Customer Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
         'base_url' => [
             'description' => 'Specific URL',
@@ -1126,6 +1144,16 @@ return [
         'routes_max_number' => [
             'description' => 'Max number of routes allowed for discovery',
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
+        ],
+        'nets' => [
+            'description' => 'Autodiscovery Networks',
+            'help' => 'Networks from which devices will be discovered automatically.',
+        ],
+        'autodiscovery' => [
+            'nets-exclude' => [
+                'description' => 'Networks/IPs to be ignored',
+                'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+            ],
         ],
         'route_purge' => [
             'description' => 'Route entries older than (days)',
