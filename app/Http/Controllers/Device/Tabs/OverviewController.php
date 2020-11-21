@@ -26,6 +26,7 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use Session;
 
 class OverviewController implements DeviceTab
 {
@@ -52,5 +53,24 @@ class OverviewController implements DeviceTab
     public function data(Device $device): array
     {
         return [];
+    }
+
+    public static function setGraphWidth($graph = [])
+    {
+        // possibly the wrong spot for this
+        if ($screen_width = Session::get('screen_width')) {
+            if ($screen_width > 970) {
+                $graph['width'] = round(($screen_width - 390) / 2, 0);
+                $graph['height'] = round($graph['width'] / 3);
+                $graph['lazy_w'] = $graph['width'] + 80;
+                return $graph;
+            }
+
+            $graph['width'] = $screen_width - 190;
+            $graph['height'] = round($graph['width'] / 3);
+            $graph['lazy_w'] = $graph['width'] + 80;
+        }
+
+        return $graph;
     }
 }

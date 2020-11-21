@@ -5,18 +5,32 @@ $graph_type = 'mempool_usage';
 $mempools = \DeviceCache::getPrimary()->mempools;
 
 if ($mempools->isNotEmpty()) {
+    $mempools_url = url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=mempool/';
     echo '
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">
         ';
-    echo '<a href="device/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=mempool/">';
-    echo '<i class="fa fa-braille fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory Pools</strong></a>';
+    echo '<a href="' . $mempools_url . '">';
+    echo '<i class="fa fa-braille fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory</strong></a>';
     echo '
         </div>
         <table class="table table-hover table-condensed table-striped">
         ';
+
+    echo '<tr>
+              <td colspan="4">';
+    $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
+        'device' => DeviceCache::getPrimary()->device_id,
+        'type' => 'device_mempool',
+        'from' => \LibreNMS\Config::get('time.day'),
+        'legend' => 'no',
+        'popup_title' => DeviceCache::getPrimary()->hostname . ' - Memory Usage',
+    ]);
+    echo \LibreNMS\Util\Url::graphPopup($graph, \LibreNMS\Util\Url::lazyGraphTag($graph), $mempools_url);
+    echo '  </td>
+            </tr>';
 
     foreach ($mempools as $mempool) {
         $percent = $mempool->mempool_perc;
