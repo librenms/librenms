@@ -8,13 +8,14 @@ modules:
                  - diAlarmName
                  - doName
                  - doDeviceName
+                 - rsshtpName
     sensors:
         temperature:
             data:
                 -
-                    oid: sysTemperature
-                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.10.{{ $index }}'
-                    descr: 'Temperature {{ $index }}'
+                    oid: rsshtpTemp
+                    num_oid: '.1.3.6.1.4.1.40418.2.6.1.30.1.1.3.{{ $index }}'
+                    descr: '{{ $rsshtpName }} {{ $index }}'
         state:
             data:
                 -
@@ -39,3 +40,15 @@ modules:
                         - { descr: Off, graph: 1, value: 0, generic: 1 }
                         - { descr: On, graph: 1, value: 1, generic: 0 }
                         - { descr: Reload, graph: 1, value: 2, generic: 2 }
+        humidity:
+            data:        
+                -
+                    oid: rsshtpHum
+                    num_oid: '.1.3.6.1.4.1.40418.2.6.1.30.1.1.4.{{ $index }}'
+                    descr: '{{ $rsshtpName }} {{ $index }}'
+        pressure:
+            data:        
+                -
+                    oid: rsshtpPssr
+                    num_oid: '.1.3.6.1.4.1.40418.2.6.1.30.1.1.6.{{ $index }}'
+                    descr: '{{ $rsshtpName }} {{ $index }}'
