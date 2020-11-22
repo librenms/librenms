@@ -129,7 +129,7 @@ $options = [
     'filter' => [
         'device_id' => ['=', $device_id],
         'type' => ['=', 'portsactivity'],
-     ],
+    ],
 ];
 
 $component = new LibreNMS\Component();

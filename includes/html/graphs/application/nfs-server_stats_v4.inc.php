@@ -30,7 +30,7 @@ $rrd_filename = rrd_name($device['hostname'], ['app', 'nfs-server-proc4', $app['
 $array = [
     'proc4_null' => ['descr' => 'Null', 'colour' => '630606'], // these should be very low
     'proc4_compound' => ['descr' => 'Compound', 'colour' => '50C150'], // basically this are 1 or more ops
-                ];
+];
 
 $i = 0;
 

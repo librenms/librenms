@@ -35,7 +35,7 @@ $array = [
     'proc3_fsinfo' => ['descr' => 'FS info', 'colour' => '6E2770'],
     'proc3_pathconf' => ['descr' => 'Pathconf', 'colour' => '993555'],
     'proc3_commit' => ['descr' => 'Commit', 'colour' => '463176'],
-                ];
+];
 
 $i = 0;
 

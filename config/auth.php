@@ -85,10 +85,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
-         'legacy' => [
-             'driver' => 'legacy',
-             'model' => App\Models\User::class,
-         ],
+        'legacy' => [
+            'driver' => 'legacy',
+            'model' => App\Models\User::class,
+        ],
 
         // 'users' => [
         //     'driver' => 'database',
