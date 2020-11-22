@@ -53,6 +53,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
+            \App\Http\Middleware\EnforceJson::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             'authenticate:token',
         ],
