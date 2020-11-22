@@ -14,7 +14,7 @@ $array = [
         'descr'  => 'Used',
         'colour' => '0022FF',
     ],
-         ];
+];
 
 $i = 0;
 if (rrdtool_check_rrd_exists($rrd_filename)) {

@@ -51,33 +51,33 @@ class SmokepingCliTest extends DBTestCase
             '2600::' => [
                 'transport' => 'udp',
             ],
+        ],
+        'Psv9oZcxdC' => [
+            'oHiPfLzrmU' => [
+                'transport' => 'udp',
             ],
-            'Psv9oZcxdC' => [
-                'oHiPfLzrmU' => [
-                    'transport' => 'udp',
-                ],
-                'kEn7hZ7N37' => [
-                    'transport' => 'udp6',
-                ],
-                'PcbZ5FKtS3' => [
-                    'transport' => 'udp6',
-                ],
-                '192.168.1.1' => [
-                    'transport' => 'udp',
-                ],
-                'fe80::' => [
-                    'transport' => 'udp',
-                ],
+            'kEn7hZ7N37' => [
+                'transport' => 'udp6',
             ],
-            '4diY0pWFik' => [
-                'example.org' => [
-                    'transport' => 'udp',
-                ],
-                'host_with_under_score.example.org' => [
-                    'transport' => 'udp6',
-                ],
+            'PcbZ5FKtS3' => [
+                'transport' => 'udp6',
             ],
-        ];
+            '192.168.1.1' => [
+                'transport' => 'udp',
+            ],
+            'fe80::' => [
+                'transport' => 'udp',
+            ],
+        ],
+        '4diY0pWFik' => [
+            'example.org' => [
+                'transport' => 'udp',
+            ],
+            'host_with_under_score.example.org' => [
+                'transport' => 'udp6',
+            ],
+        ],
+    ];
 
     private $instance = null;
 

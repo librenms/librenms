@@ -20,7 +20,7 @@ $array = [
         'descr'  => 'Size',
         'colour' => '006699FF',
     ],
-                ];
+];
 
 $i = 0;
 

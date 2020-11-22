@@ -16,7 +16,7 @@ $array = [
         'descr'  => 'Hits',
         'colour' => '00FF00FF',
     ],
-                ];
+];
 
 $i = 0;
 

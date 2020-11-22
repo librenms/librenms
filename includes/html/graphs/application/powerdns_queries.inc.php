@@ -24,7 +24,7 @@ $array = [
         'descr'  => 'UDP Queries',
         'colour' => '6699CCFF',
     ],
-                ];
+];
 
 $i = 0;
 

@@ -223,7 +223,7 @@ $keys_nfs_server = [
         'v4_getdirdeleg', 'v4_getdevinfo', 'v4_getdevlist', 'v4_layoutcommit', 'v4_layoutget', 'v4_layoutreturn',
         'v4_secinfononam', 'v4_sequence', 'v4_set_ssv', 'v4_test_stateid', 'v4_want_deleg', 'v4_destroy_clid',
         'v4_reclaim_comp', ],
-                        ];
+];
 
 // parse each output line, by the id
 // then 'map' the values to the arrays from $keys_nfs_server
