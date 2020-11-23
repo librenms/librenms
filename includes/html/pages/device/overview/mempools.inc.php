@@ -80,7 +80,7 @@ if ($mempools->isNotEmpty()) {
 
         $percentageBar = $available_used_all
             ? Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", "$available_used_all%", $mempool->mempool_perc_warn, $available_used_all)
-            : Html::percentageBar(200, 20, $mempool->mempool_perc, '', "$mempool->mempool_perc%", $mempool->mempool_perc_warn);
+            : Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", '', $mempool->mempool_perc_warn);
         echo '<tr>
             <td class="col-md-4">' . overlib_link($link, $mempool->mempool_descr, $overlib_content) . '</td>
             <td class="col-md-4">' . overlib_link($link, $minigraph, $overlib_content) . '</td>
