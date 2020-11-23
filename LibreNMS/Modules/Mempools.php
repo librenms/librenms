@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\ModuleModelObserver;
+use Log;
 
 class Mempools implements Module
 {
@@ -46,7 +47,7 @@ class Mempools implements Module
                 if ($mempool->isValid()) {
                     return true;
                 }
-                d_echo("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value");
+                Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value");
 
                 return false;
             });
@@ -76,6 +77,10 @@ class Mempools implements Module
 
         $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os) {
             $this->printMempool($mempool);
+
+            if (empty($mempool->mempool_class)) {
+                Log::debug('Mempool skipped. Does not include class.');
+            }
 
             $mempool->save();
 
@@ -140,21 +145,21 @@ class Mempools implements Module
                 /** @var Mempool $mempool */
                 if ($mempool->mempool_class == 'system') {
                     if ($system !== null) {
-                        d_echo('Aborted available calculation, too many system class mempools');
+                        Log::debug('Aborted available calculation, too many system class mempools');
 
                         return $mempools; // more than one system, abort
                     }
                     $system = $mempool;
                 } elseif ($mempool->mempool_class == 'buffers') {
                     if ($buffers !== null) {
-                        d_echo('Aborted available calculation, too many buffers class mempools');
+                        Log::debug('Aborted available calculation, too many buffers class mempools');
 
                         return $mempools; // more than one buffer, abort
                     }
                     $buffers = $mempool->mempool_used;
                 } elseif ($mempool->mempool_class == 'cached') {
                     if ($cached !== null) {
-                        d_echo('Aborted available calculation, too many cached class mempools');
+                        Log::debug('Aborted available calculation, too many cached class mempools');
 
                         return $mempools; // more than one cache, abort
                     }
@@ -166,7 +171,7 @@ class Mempools implements Module
                 $old = format_bi($system->mempool_free);
                 $system->fillUsage(($system->mempool_used - $buffers - $cached) / $system->mempool_precision, $system->mempool_total / $system->mempool_precision);
                 $new = format_bi($system->mempool_free);
-                d_echo("Free memory adjusted by availability calculation: {$old}iB -> {$new}iB\n");
+                Log::debug("Free memory adjusted by availability calculation: {$old}iB -> {$new}iB\n");
             }
         }
 
