@@ -61,7 +61,8 @@ class ServiceTemplateController extends Controller
         $this->validate(
             $request, [
                 'name' => 'required|string|unique:service_templates',
-                'device_group_id' => 'required|integer',
+                'device_group_id' => 'array|required',
+                'device_group_id.*' => 'integer',
                 'type' => 'string',
                 'param' => 'nullable|string',
                 'ip' => 'nullable|string',
@@ -143,7 +144,8 @@ class ServiceTemplateController extends Controller
                         }
                     ),
                 ],
-                'device_group_id' => 'integer',
+                'device_group_id' => 'array|required',
+                'device_group_id.*' => 'integer',
                 'type' => 'string',
                 'param' => 'nullable|string',
                 'ip' => 'nullable|string',

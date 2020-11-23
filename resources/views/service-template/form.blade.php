@@ -9,7 +9,7 @@
 <div class="form-group @if($errors->has('device_group_id')) has-error @endif">
     <label for="device_group_id" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Device Group')</label>
     <div class="col-sm-9 col-md-10">
-        <select class="form-control" id="device_group_id" name="device_group_id">
+        <select class="form-control" id="device_group_id" name="device_group_id[]" multiple>
             @foreach($device_groups as $device_group)
                 <option value="{{ $device_group->id }}" @if($device_group->id == $template->device_group_id) selected @endif>{{ $device_group->name }}</option>
             @endforeach
@@ -79,6 +79,7 @@
 </div>
 
 <script>
+init_select2('#device_group_id', 'device_group', {multiple: true});
 $("[type='checkbox']").bootstrapSwitch('offColor','danger');
 $("#ignore").on( 'switchChange.bootstrapSwitch', function (e, state) {
     var value = $(this).is(':checked') ? "1": "0";
