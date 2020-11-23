@@ -70,7 +70,7 @@
 </div>
 
 <div class="form-group @if($errors->has('disabled')) has-error @endif">
-    <label for="disabled" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Disable polling and alerting')</label>
+    <label for="disabled" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Disable polling and alerting')</label>
     <div class="col-sm-9 col-md-10">
         <input type="hidden" value="0" name="disabled">
         <input type="checkbox" class="form-control" id="disabled" name="disabled" data-size="small" value="{{ old('disabled', $template->disabled) }}"@if(old('disabled', $template->disabled) == 1) checked @endif>
