@@ -18,7 +18,7 @@ class Vminfo extends DeviceRelatedModel
     protected $table = 'vminfo';
     public $timestamps = false;
 
-    public function getStateLabelAttribute(): string
+    public function getStateLabelAttribute(): array
     {
         return Html::powerStateLabel($this->vmwVmState);
     }
