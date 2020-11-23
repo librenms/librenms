@@ -27,8 +27,8 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
 use App\Models\Mempool;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
-use LibreNMS\Util\Colors;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
@@ -105,7 +105,9 @@ class MempoolsController extends TableController
             'width' => 80,
         ];
 
-        return Url::overlibLink($this->graphLink($graph), Url::lazyGraphTag($graph), Url::graphTag(['height' => 150, 'width' => 400] + $graph));
+        $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
+
+        return Url::overlibLink($link, Url::lazyGraphTag($graph), Url::graphTag(['height' => 150, 'width' => 400] + $graph));
     }
 
     private function barLink(Mempool $mempool)
@@ -119,23 +121,13 @@ class MempoolsController extends TableController
         ];
 
         $is_percent = $mempool->mempool_total == 100;
-        $free = $this->formatNumber($mempool->mempool_free, $is_percent);
-        $used = $this->formatNumber($mempool->mempool_used, $is_percent);
-        $total = $this->formatNumber($mempool->mempool_total, $is_percent);
+        $free = $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free);
+        $used = $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used);
+        $total = $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total);
 
-        $background = Colors::percentage($mempool->mempool_perc, $mempool->mempool_perc_warn);
-        $percent = Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total", 'ffffff', $background['left'], $free, 'ffffff', $background['right']);
+        $percent = Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total", $free, $mempool->mempool_perc_warn);
+        $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
 
-        return Url::overlibLink($this->graphLink($graph), $percent, Url::graphTag($graph));
-    }
-
-    private function formatNumber($number, $is_percent)
-    {
-        return $is_percent ? $number : Number::formatBi($number);
-    }
-
-    private function graphLink(array $graph)
-    {
-        return url('graphs/id=' . $graph['id'] . '/type=' . $graph['type'] . '/from=' . $graph['from']);
+        return Url::overlibLink($link, $percent, Url::graphTag($graph));
     }
 }

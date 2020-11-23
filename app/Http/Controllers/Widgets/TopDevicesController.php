@@ -35,7 +35,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
-use LibreNMS\Util\Colors;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
@@ -311,15 +310,12 @@ class TopDevicesController extends WidgetController
             unset($link_array['height'], $link_array['width'], $link_array['legend']);
             $link = Url::generate($link_array);
 
-            $percent = $storage->storage_perc;
-            $background = Colors::percentage($percent, $storage->storage_perc_warn);
-
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),
                 StringHelpers::shortenText($storage->storage_descr, 50),
                 Url::overlibLink(
                     $link,
-                    Html::percentageBar(150, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']),
+                    Html::percentageBar(150, 20, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),
                     $overlib_content
                 ),
             ];
