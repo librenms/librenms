@@ -25,8 +25,6 @@
 
 namespace LibreNMS\Exceptions;
 
-
 class InvalidNameException extends \Exception
 {
-
 }
