@@ -44,6 +44,7 @@ if (isset($options['h'])) {
           - poller: check that the poller and discovery are running properly
           - programs: check that external programs exist and are executable
           - python: check that various Python modules and functions exist
+          - system: checks system related items
           - updates: checks the status of git and updates
           - user: check that the LibreNMS user is set properly
 
