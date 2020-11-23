@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Html;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 class Vminfo extends DeviceRelatedModel
@@ -24,7 +25,7 @@ class Vminfo extends DeviceRelatedModel
 
     public function getMemoryFormattedAttribute(): string
     {
-        return Rewrite::formatStorage($this->vmwVmMemSize * 1024 * 1024);
+        return Number::formatBi($this->vmwVmMemSize * 1024 * 1024);
     }
 
     public function getOperatingSystemAttribute(): string

@@ -1,5 +1,10 @@
 mib: RUCKUS-UNLEASHED-SYSTEM-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemStatsMemoryUtil
+                descr: 'System Memory'
     os:
         hardware: RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemModel.0
         serial: RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemSerialNumber.0

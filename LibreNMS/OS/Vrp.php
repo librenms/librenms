@@ -25,10 +25,13 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Mempool;
 use App\Models\PortsNac;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
@@ -39,6 +42,7 @@ use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
 class Vrp extends OS implements
+    MempoolsDiscovery,
     OSPolling,
     ProcessorDiscovery,
     NacPolling,
@@ -46,6 +50,35 @@ class Vrp extends OS implements
     WirelessClientsDiscovery,
     OSDiscovery
 {
+    public function discoverMempools()
+    {
+        $mempools = collect();
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemSize', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityBomEnDesc', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemSizeMega', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'entPhysicalName', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+
+        foreach (Arr::wrap($mempools_array) as $index => $entry) {
+            $size = empty($entry['hwEntityMemSizeMega']) ? $entry['hwEntityMemSize'] : $entry['hwEntityMemSizeMega'];
+            $descr = empty($entry['entPhysicalName']) ? $entry['hwEntityBomEnDesc'] : $entry['entPhysicalName'];
+
+            if ($size != 0 && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
+                $mempools->push((new Mempool([
+                    'mempool_index' => $index,
+                    'mempool_type' => 'vrp',
+                    'mempool_class' => 'system',
+                    'mempool_precision' => empty($entry['hwEntityMemSizeMega']) ? 1 : 1048576,
+                    'mempool_descr' => substr("$descr Memory", 0, 64),
+                    'mempool_perc_oid' => ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.$index",
+                    'mempool_perc_warn' => 90,
+                ]))->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
+            }
+        }
+
+        return $mempools;
+    }
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml

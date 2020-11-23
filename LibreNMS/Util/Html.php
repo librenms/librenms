@@ -134,24 +134,32 @@ class Html
         return $graph_data;
     }
 
-    public static function percentageBar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
+    public static function percentageBar($width, $height, $percent, $left_text = '', $right_text = '', $warn = null, $shadow = null, $colors = null)
     {
-        if ($percent > '100') {
-            $size_percent = '100';
-        } else {
-            $size_percent = $percent;
+        $percent = min($percent, 100);
+        if ($colors === null) {
+            $colors = Colors::percentage($percent, $warn ?: null);
+        }
+        $default = Colors::percentage(0);
+        $left_text_color = $colors['left_text'] ?? 'ffffff';
+        $right_text_color = $colors['right_text'] ?? 'ffffff';
+        $left_color = $colors['left'] ?? $default['left'];
+        $right_color = $colors['right'] ?? $default['right'];
+
+        $output = '<div style="width:' . $width . 'px; height:' . $height . 'px; position: relative;">
+        <div class="progress" style="min-width: 2em; background-color:#' . $right_color . '; height:' . $height . 'px;margin-bottom:-' . $height . 'px;">';
+
+        if ($shadow !== null) {
+            $shadow = min($shadow, 100);
+            $middle_color = $colors['middle'] ?? $default['middle'];
+            $output .= '<div class="progress-bar" role="progressbar" aria-valuenow="' . $shadow . '" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:' . $shadow . '%; background-color: #' . $middle_color . ';">';
         }
 
-        $output = '
-        <div style="width:' . $width . 'px; height:' . $height . 'px; position: relative;">
-        <div class="progress" style="min-width: 2em; background-color:#' . $right_background . '; height:' . $height . 'px;margin-bottom:-' . $height . 'px;">
-        <div class="progress-bar" role="progressbar" aria-valuenow="' . $size_percent . '" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:' . $size_percent . '%; background-color: #' . $left_background . ';">
-        </div>
-        </div>
-        <b style="padding-left: 2%; position: absolute; top: 0; left: 0;color:#' . $left_colour . ';">' . $left_text . '</b>
-        <b style="padding-right: 2%; position: absolute; top: 0; right: 0;color:#' . $right_colour . ';">' . $right_text . '</b>
-        </div>
-        ';
+        $output .= '<div class="progress-bar" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:' . $percent . '%; background-color: #' . $left_color . ';">
+        </div></div>
+        <b style="padding-left: 2%; position: absolute; top: 0; left: 0;color:#' . $left_text_color . ';">' . $left_text . '</b>
+        <b style="padding-right: 2%; position: absolute; top: 0; right: 0;color:#' . $right_text_color . ';">' . $right_text . '</b>
+        </div>';
 
         return $output;
     }

@@ -783,7 +783,7 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     if (oid_is_numeric($oid)) {
         $default_options = '-Os';
     } else {
-        if ($mib != 'ALL') {
+        if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
             $oid = "$mib::$oid";
         }
         $default_options = '-On';
@@ -880,5 +880,5 @@ function get_device_max_repeaters($device)
  */
 function oid_is_numeric($oid)
 {
-    return (bool) preg_match('/^[.\d]+$/', $oid);
+    return \LibreNMS\Device\YamlDiscovery::oidIsNumeric($oid);
 }

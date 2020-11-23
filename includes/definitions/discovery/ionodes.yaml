@@ -1,5 +1,10 @@
 mib: IONODES-IONSERIES-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: IONODES-IONSERIES-MIB::ionSysMemUsage
+                descr: 'System Memory'
     processors:
         data:
             -

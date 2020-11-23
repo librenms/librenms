@@ -1,5 +1,18 @@
 mib: EQUIPMENT-MIB:DLINKSW-ENTITY-EXT-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: AGENT-GENERAL-MIB::agentDRAMutilization
+                index: 0
+            -
+                oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtMemoryUtilTable
+                total: dEntityExtMemUtilTotal
+                used: dEntityExtMemUtilUsed
+                free: dEntityExtMemUtilFree
+                descr: '{{ $subindex1 }} Memory'
+                snmp_flags: '-OQUs'
+
     os:
         sysDescr_regex: '/(D-Link )?(?<hardware>\S+) (?<version>[0-9.]+)?/'
         version:

@@ -17,7 +17,6 @@ use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 
@@ -597,102 +596,6 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
         $valid[$mib][$index] = 1;
     }//end if
 }
-
-//end discover_storage()
-
-function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $precision = '1', $current = null, $entPhysicalIndex = null, $hrDeviceIndex = null)
-{
-    d_echo("Discover Processor: $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
-
-    if ($descr) {
-        $descr = trim(str_replace('"', '', $descr));
-        if (dbFetchCell('SELECT COUNT(processor_id) FROM `processors` WHERE `processor_index` = ? AND `device_id` = ? AND `processor_type` = ?', [$index, $device['device_id'], $type]) == '0') {
-            $insert_data = [
-                'device_id' => $device['device_id'],
-                'processor_descr' => $descr,
-                'processor_index' => $index,
-                'processor_oid' => $oid,
-                'processor_usage' => $current,
-                'processor_type' => $type,
-                'processor_precision' => $precision,
-            ];
-
-            $insert_data['hrDeviceIndex'] = (int) $hrDeviceIndex;
-            $insert_data['entPhysicalIndex'] = (int) $entPhysicalIndex;
-
-            $inserted = dbInsert($insert_data, 'processors');
-            echo '+';
-            log_event('Processor added: type ' . $type . ' index ' . $index . ' descr ' . $descr, $device, 'processor', 3, $inserted);
-        } else {
-            echo '.';
-            $update_data = [
-                'processor_descr' => $descr,
-                'processor_oid' => $oid,
-                'processor_usage' => $current,
-                'processor_precision' => $precision,
-            ];
-            dbUpdate($update_data, 'processors', '`device_id`=? AND `processor_index`=? AND `processor_type`=?', [$device['device_id'], $index, $type]);
-        }//end if
-        $valid[$type][$index] = 1;
-    }//end if
-}
-
-//end discover_processor()
-
-function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = '1', $entPhysicalIndex = null, $hrDeviceIndex = null, $perc_warn = '90')
-{
-    $descr = substr($descr, 0, 64);
-
-    d_echo("Discover Mempool: $index, $type, $descr, $precision, $entPhysicalIndex, $hrDeviceIndex, $perc_warn\n");
-
-    // FIXME implement the mempool_perc, mempool_used, etc.
-    if ($descr) {
-        if (dbFetchCell('SELECT COUNT(mempool_id) FROM `mempools` WHERE `mempool_index` = ? AND `device_id` = ? AND `mempool_type` = ?', [$index, $device['device_id'], $type]) == '0') {
-            $insert_data = [
-                'device_id' => $device['device_id'],
-                'mempool_descr' => $descr,
-                'mempool_index' => $index,
-                'mempool_type' => $type,
-                'mempool_precision' => $precision,
-                'mempool_perc' => 0,
-                'mempool_used' => 0,
-                'mempool_free' => 0,
-                'mempool_total' => 0,
-                'mempool_perc_warn' => $perc_warn,
-            ];
-
-            if (is_numeric($entPhysicalIndex)) {
-                $insert_data['entPhysicalIndex'] = $entPhysicalIndex;
-            }
-
-            if (is_numeric($hrDeviceIndex)) {
-                $insert_data['hrDeviceIndex'] = $hrDeviceIndex;
-            }
-
-            $inserted = dbInsert($insert_data, 'mempools');
-            echo '+';
-            log_event('Memory pool added: type ' . $type . ' index ' . $index . ' descr ' . $descr, $device, 'mempool', 3, $inserted);
-        } else {
-            echo '.';
-            $update_data = [
-                'mempool_descr' => $descr,
-            ];
-
-            if (is_numeric($entPhysicalIndex)) {
-                $update_data['entPhysicalIndex'] = $entPhysicalIndex;
-            }
-
-            if (is_numeric($hrDeviceIndex)) {
-                $update_data['hrDeviceIndex'] = $hrDeviceIndex;
-            }
-
-            dbUpdate($update_data, 'mempools', 'device_id=? AND mempool_index=? AND mempool_type=?', [$device['device_id'], $index, $type]);
-        }//end if
-        $valid[$type][$index] = 1;
-    }//end if
-}
-
-//end discover_mempool()
 
 function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity_oid = null, $capacity = null, $current = null)
 {

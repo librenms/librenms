@@ -1,5 +1,14 @@
 mib: SMARTNODE-MIB
 modules:
+    mempools:
+        pre-cache:
+            oids:
+                - SMARTNODE-MIB::memDescr
+        data:
+            -
+                used: SMARTNODE-MIB::memAllocatedBytes
+                free: SMARTNODE-MIB::memFreeBytes
+                descr: '{{ SMARTNODE-MIB::memDescr }} Memory'
     os:
         hardware:
             - SMARTNODE-MIB::hwRelease.0

@@ -1819,6 +1819,19 @@
             ],
             "type": "array"
         },
+        "graph_colours.varied": {
+            "default": [
+                "CC0000",
+                "DC7201",
+                "FFBE55",
+                "008FEA",
+                "3CB371",
+                "708090",
+                "663399",
+                "00BFFF"
+            ],
+            "type": "array"
+        },
         "graph_descr.device_processor": {
             "default": "This is an aggregate graph of all processors in the system.",
             "type": "text"
@@ -2415,7 +2428,7 @@
             "default": {
                 "section": "system",
                 "order": 0,
-                "descr": "Memory Pool Usage"
+                "descr": "Memory Usage"
             },
             "type": "graph"
         },
@@ -3096,14 +3109,6 @@
                 "section": "system",
                 "order": 0,
                 "descr": "Load Averages"
-            },
-            "type": "graph"
-        },
-        "graph_types.device.ucd_memory": {
-            "default": {
-                "section": "system",
-                "order": 0,
-                "descr": "Detailed Memory Usage"
             },
             "type": "graph"
         },
@@ -3976,7 +3981,7 @@
                     "text": "Processor Usage"
                 },
                 {
-                    "graph": "device_ucd_memory",
+                    "graph": "device_mempool",
                     "text": "Memory Usage"
                 }
             ],

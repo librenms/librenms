@@ -1,5 +1,12 @@
 mib: FORTINET-FORTISWITCH-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: FORTINET-FORTISWITCH-MIB::fsSysMemCapacity
+                used: FORTINET-FORTISWITCH-MIB::fsSysMemUsage
+                descr: 'Main Memory'
+                precision: 1024
     os:
         serial:
             - FORTINET-CORE-MIB::fnSysSerial.0

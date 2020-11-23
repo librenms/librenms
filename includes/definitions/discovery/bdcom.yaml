@@ -1,5 +1,10 @@
 mib: BDCOM-PROCESS-MIB
 modules:
+    mempools:
+        data:
+            -
+                used: BDCOM-MEMORY-POOL-MIB::bdcomMemoryPoolUsed
+                free: BDCOM-MEMORY-POOL-MIB::bdcomMemoryPoolFree
     processors:
         data:
             -

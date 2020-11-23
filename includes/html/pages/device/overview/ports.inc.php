@@ -11,18 +11,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
             </div>
             <table class="table table-hover table-condensed table-striped">';
 
-    if ($screen_width = Session::get('screen_width')) {
-        if ($screen_width > 970) {
-            $graph_array['width'] = round(($screen_width - 390) / 2, 0);
-            $graph_array['height'] = round($graph_array['width'] / 3);
-            $graph_array['lazy_w'] = $graph_array['width'] + 80;
-        } else {
-            $graph_array['width'] = $screen_width - 190;
-            $graph_array['height'] = round($graph_array['width'] / 3);
-            $graph_array['lazy_w'] = $graph_array['width'] + 80;
-        }
-    }
-
+    $graph_array = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth();
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['device'] = $device['device_id'];
     $graph_array['type'] = 'device_bits';
