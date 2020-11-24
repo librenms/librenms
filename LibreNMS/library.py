@@ -26,8 +26,6 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 # Logging functions ########################################################
-# The following logging functions are
-# (C) 2019-2020 Orsiris de Jong under BSD 3-Clause license
 
 FORMATTER = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
 
@@ -105,76 +103,8 @@ def logger_get_logger(log_file=None, temp_log_file=None, debug=False):
                 _logger.warning('Failed to use log file [%s], %s.', log_file, err_output)
     return _logger
 
-# End of Logging functions #################################################
 
 # Generic functions ########################################################
-
-def command_runner(command, valid_exit_codes=None, timeout=300, shell=False, encoding='utf-8',
-                   windows_no_window=False, **kwargs):
-    """
-    Unix & Windows compatible subprocess wrapper that handles encoding, timeout, and
-    various exit codes.
-    Accepts subprocess.check_output and subprocess.popen arguments
-    Whenever we can, we need to avoid shell=True in order to preseve better security
-    Runs system command, returns exit code and stdout/stderr output, and logs output on error
-    valid_exit_codes is a list of codes that don't trigger an error
-    
-    (C) 2019-2020 Orsiris de Jong under BSD 3-Clause license
-    """
-
-    # Set default values for kwargs
-    errors = kwargs.pop('errors', 'backslashreplace')  # Don't let encoding issues make you mad
-    universal_newlines = kwargs.pop('universal_newlines', False)
-    creationflags = kwargs.pop('creationflags', 0)
-    if windows_no_window:
-        # Disable the following pylint error since the code also runs on nt platform, but
-        # triggers and error on Unix
-        # pylint: disable=E1101
-        creationflags = creationflags | subprocess.CREATE_NO_WINDOW
-
-    try:
-        # universal_newlines=True makes netstat command fail under windows
-        # timeout does not work under Python 2.7 with subprocess32 < 3.5
-        # decoder may be unicode_escape for dos commands or utf-8 for powershell
-        # Disabling pylint error for the same reason as above
-        # pylint: disable=E1123
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=shell,
-                                         timeout=timeout, universal_newlines=universal_newlines, encoding=encoding,
-                                         errors=errors, creationflags=creationflags, **kwargs)
-
-    except subprocess.CalledProcessError as exc:
-        exit_code = exc.returncode
-        try:
-            output = exc.output
-        except Exception:
-            output = "command_runner: Could not obtain output from command."
-        if exit_code in valid_exit_codes if valid_exit_codes is not None else [0]:
-            logger.debug('Command [%s] returned with exit code [%s]. Command output was:' % (command, exit_code))
-            if isinstance(output, str):
-                logger.debug(output)
-            return exc.returncode, output
-        else:
-            logger.error('Command [%s] failed with exit code [%s]. Command output was:' %
-                         (command, exc.returncode))
-            logger.error(output)
-            return exc.returncode, output
-    # OSError if not a valid executable
-    except (OSError, IOError) as exc:
-        logger.error('Command [%s] failed because of OS [%s].' % (command, exc))
-        return None, exc
-    except subprocess.TimeoutExpired:
-        logger.error('Timeout [%s seconds] expired for command [%s] execution.' % (timeout, command))
-        return None, 'Timeout of %s seconds expired.' % timeout
-    except Exception as exc:
-        logger.error('Command [%s] failed for unknown reasons [%s].' % (command, exc))
-        logger.debug('Error:', exc_info=True)
-        return None, exc
-    else:
-        logger.debug('Command [%s] returned with exit code [0]. Command output was:' % command)
-        if output:
-            logger.debug(output)
-        return 0, output
-
 
 def check_for_file(file):
     try:
@@ -190,12 +120,12 @@ def check_for_file(file):
 
 def get_config_data(install_dir):
     config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
-    exit_code, values = command_runner(config_cmd, timeout=10)
-    if exit_code == 0:
-        return values
-    else:
-        logger.error("ERROR: Could not execute: %s" % config_cmd)
-        logger.error("exit code: {0}. Output:\n{1}".format(exit_code, values))
+    try:
+        proc = subprocess.Popen(config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+        return proc.communicate()[0].decode()
+    except Exception as e:
+        print("ERROR: Could not execute: %s" % config_cmd)
+        print(e)
         sys.exit(2)
 
 # Database functions #######################################################
@@ -209,7 +139,7 @@ def db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname):
             options['unix_socket'] = db_socket
 
         return MySQLdb.connect(**options)
-    except Exception as exc:
-        logger.error('ERROR: Could not connect to MySQL database!')
-        logger.error('{0}'.format(exc))
+    except Exception as dbexc:
+        print('ERROR: Could not connect to MySQL database!')
+        print('ERROR: %s' % dbexc)
         sys.exit(2)
