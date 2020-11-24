@@ -157,6 +157,6 @@ class DeviceGroup extends BaseModel
 
     public function serviceTemplates()
     {
-        return $this->hasMany(\App\Models\ServiceTemplate::class, 'device_group_id', 'id');
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_template_device_group', 'device_group_id', 'service_template_id');
     }
 }

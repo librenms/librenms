@@ -77,7 +77,6 @@ class ServiceTemplateController extends Controller
             $request->only(
                 [
                     'name',
-                    'device_group_id',
                     'type',
                     'param',
                     'ip',
@@ -89,6 +88,7 @@ class ServiceTemplateController extends Controller
             )
         );
         $template->save();
+        $template->groups()->sync($request->device_group_id);
 
         Toastr::success(__('Service Template :name created', ['name' => $template->name]));
 
@@ -174,6 +174,7 @@ class ServiceTemplateController extends Controller
 
         if ($template->isDirty()) {
             if ($template->save()) {
+                $template->groups()->sync($request->device_group_id);
                 Toastr::success(__('Service Template :name updated', ['name' => $template->name]));
             } else {
                 Toastr::error(__('Failed to save'));

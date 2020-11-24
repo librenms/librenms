@@ -85,8 +85,8 @@ class ServiceTemplate extends Model implements Keyable
         return $this->belongsToMany(\App\Models\User::class, 'service_templates_perms', 'service_template_id', 'user_id');
     }
 
-    public function group()
+    public function groups()
     {
-        return $this->belongsTo(\App\Models\DeviceGroup::class, 'id', 'device_group_id');
+        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'service_template_device_group', 'service_template_id', 'device_group_id');
     }
 }
