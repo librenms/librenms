@@ -79,7 +79,7 @@
 </div>
 
 <script>
-init_select2('#device_group_id', 'device_group', {multiple: true});
+init_select2('#device_group_id', 'device-group', {multiple: true});
 $("[type='checkbox']").bootstrapSwitch('offColor','danger');
 $("#ignore").on( 'switchChange.bootstrapSwitch', function (e, state) {
     var value = $(this).is(':checked') ? "1": "0";
