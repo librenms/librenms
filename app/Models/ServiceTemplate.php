@@ -87,6 +87,6 @@ class ServiceTemplate extends Model implements Keyable
 
     public function groups()
     {
-        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'service_template_device_group', 'service_template_id', 'device_group_id');
+        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'service_templates_device_group', 'service_template_id', 'device_group_id');
     }
 }
