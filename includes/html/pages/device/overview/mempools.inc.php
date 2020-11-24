@@ -69,7 +69,7 @@ if ($mempools->isNotEmpty()) {
             'legend' => 'no',
         ];
 
-        $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
+        $link = Url::generate(['page' => 'graphs'], Arr::only($graph_array, ['id', 'type', 'from']));
         $overlib_content = generate_overlib_content($graph_array, DeviceCache::getPrimary()->hostname . ' - ' . $mempool->mempool_descr);
 
         $graph_array['width'] = 80;
