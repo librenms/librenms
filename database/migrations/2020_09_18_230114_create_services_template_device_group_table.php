@@ -12,7 +12,7 @@ class CreateServiceTemplateDeviceGroupTable extends Migration
      */
     public function up()
     {
-        Schema::create('service_template_device_group', function (Blueprint $table) {
+        Schema::create('service_templates_device_group', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->unsigned()->index();
             $table->unsignedInteger('device_group_id')->unsigned()->index();
 
@@ -27,6 +27,6 @@ class CreateServiceTemplateDeviceGroupTable extends Migration
      */
     public function down()
     {
-        Schema::drop('service_template_device_group');
+        Schema::drop('service_templates_device_group');
     }
 }
