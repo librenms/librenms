@@ -1784,6 +1784,17 @@ service_templates:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     service_templates_device_group_id_index: { Name: service_templates_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
+service_templates_device_group:
+  Columns:
+    - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [service_template_id, device_group_id], Unique: true, Type: BTREE }
+    service_templates_device_group_service_template_id_index: { Name: service_templates_device_group_service_template_id_index, Columns: [service_template_id], Unique: false, Type: BTREE }
+    service_templates_device_group_device_group_id_index: { Name: service_templates_device_group_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
+  Constraints:
+    service_templates_device_group_service_template_id_foreign: { name: service_templates_device_group_service_template_id_foreign, foreign_key: service_template_id, table: service_templates, key: id, extra: 'ON DELETE CASCADE' }
+    service_templates_device_group_device_group_id_foreign: { name: service_templates_device_group_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
 session:
   Columns:
     - { Field: session_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
