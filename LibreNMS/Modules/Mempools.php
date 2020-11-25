@@ -80,12 +80,19 @@ class Mempools implements Module
 
             if (empty($mempool->mempool_class)) {
                 Log::debug('Mempool skipped. Does not include class.');
+                return;
+            }
+
+            $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index];
+            $rrd_oldname = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
+
+            // messed up swap class in initial release
+            if ($mempool->mempool_class == 'swap' && $mempool->isDirty('mempool_class') && $mempool->getOriginal('mempool_class') == 'virtual') {
+                $rrd_oldname = ['mempool', $mempool->mempool_type, 'virtual', $mempool->mempool_index];
             }
 
             $mempool->save();
 
-            $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index];
-            $rrd_oldname = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
             $rrd_def = RrdDefinition::make()
             ->addDataset('used', 'GAUGE', 0)
             ->addDataset('free', 'GAUGE', 0);
