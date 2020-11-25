@@ -114,6 +114,7 @@ class ServiceTemplate extends BaseModel
                 ->distinct()->pluck('device_groups.id'));
         }
     }
+
     /**
      * Update the device template groups for the given device or device_id
      *
@@ -160,6 +161,7 @@ class ServiceTemplate extends BaseModel
 
         return $device->serviceTemplates()->sync($template_ids);
     }
+
     /**
      * Update the device template groups for the given device group or device_group_id
      *
@@ -206,6 +208,7 @@ class ServiceTemplate extends BaseModel
 
         return $deviceGroup->serviceTemplates()->sync($template_ids);
     }
+
     /**
      * Get a query builder parser instance from this Service Template device rule
      *
@@ -250,7 +253,6 @@ class ServiceTemplate extends BaseModel
         return $query->where('disabled', 1);
     }
 
-
     // ---- Define Relationships ----
 
     public function devices()
@@ -267,6 +269,7 @@ class ServiceTemplate extends BaseModel
     {
         return $this->belongsToMany(\App\Models\User::class, 'service_templates_perms', 'service_template_id', 'user_id');
     }
+
     public function groups()
     {
         return $this->belongsToMany(\App\Models\DeviceGroup::class, 'service_templates_device_group', 'service_template_id', 'device_group_id');
