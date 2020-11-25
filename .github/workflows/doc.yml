@@ -47,7 +47,7 @@ jobs:
       -
         name: Build docs
         run: |
-          docker run --rm -v "$(pwd):/docs" mkdocs build
+          docker run --rm -v "$(pwd):/docs" mkdocs build --strict
           sudo chown -R $(id -u):$(id -g) ./out
       -
         name: Check GitHub Pages status
