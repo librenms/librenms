@@ -47,7 +47,7 @@ Valid data entry keys:
 will be combined to calculate available memory.
 - `type` used to generate rrd filename, defaults to the os name
 - `index` used to generate rrd filename, defaults to the oid index
-- `skip_values` skip values see [Health Sensors](../Developing/os/Health-Information.md) for specification
+- `skip_values` skip values see [Health Sensors](Health-Information.md) for specification
 - `snmp_flags` additional net-snmp flags
 
 ##### Custom Processor Discovery and Polling
