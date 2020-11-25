@@ -95,10 +95,11 @@ class Mempool extends DeviceRelatedModel implements Keyable
     /**
      * Set the mempool class.  If no class is given, try to detect it from available data.
      *
-     * @param  null  $class
+     * @param  string  $class
+     * @param  string  $default
      * @return \App\Models\Mempool
      */
-    public function setClass($class = null)
+    public function setClass($class = null, $default = 'system')
     {
         if ($class) {
             $this->mempool_class = $class;
@@ -124,7 +125,14 @@ class Mempool extends DeviceRelatedModel implements Keyable
                 return $this;
             }
         }
-        $this->mempool_class = 'system'; // just call everything else system
+
+        if ($default == 'virtual' && Str::contains($this->mempool_descr, ['/dev/'])) {
+            $this->mempool_class = 'swap';
+
+            return $this;
+        }
+
+        $this->mempool_class = $default;
 
         return $this;
     }
