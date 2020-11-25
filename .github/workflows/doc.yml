@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - 'master'
-    tags:
-      - '*'
     paths:
       - '.github/workflows/doc.yml'
       - 'doc/**'
@@ -28,19 +26,6 @@ jobs:
         with:
           fetch-depth: 0
       -
-        name: Prepare
-        id: prep
-        run: |
-          VERSION=edge
-          RELEASE=false
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/}
-          fi
-          if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\. ]]; then
-            RELEASE=true
-          fi
-          echo ::set-output name=release::${RELEASE}
-      -
         name: Build mkdocs Docker image
         run: |
           docker build -t mkdocs -f ./doc/Dockerfile ./
@@ -56,7 +41,7 @@ jobs:
           pages_threshold: major_outage
       -
         name: Deploy
-        if: github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || steps.prep.outputs.release == 'true')
+        if: github.event_name != 'pull_request' && endsWith(github.ref, github.event.repository.default_branch)
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: gh-pages
