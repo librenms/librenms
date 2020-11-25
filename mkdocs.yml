@@ -29,7 +29,9 @@ plugins:
       j2_variable_end_string: '=@'
   - search
   - exclude:
-      glob: General/Changelogs/*
+      glob:
+        - "General/Changelogs/*"
+        - "Dockerfile"
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
