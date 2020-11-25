@@ -25,10 +25,10 @@
 namespace LibreNMS\Modules;
 
 use App\Models\PortsNac;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\ModuleModelObserver;
 
 class Nac implements Module
 {

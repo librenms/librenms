@@ -1,6 +1,6 @@
 <?php
-/*
- * ModuleModelObserver.php
+/**
+ * DiscoveryModelObserver.php
  *
  * Displays +,-,U,. while running discovery and adding,deleting,updating, and doing nothing.
  *
@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
- * @copyright  2020 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Observers;
+namespace LibreNMS\Util;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
