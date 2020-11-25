@@ -26,6 +26,8 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Mempool;
+use App\Observers\MempoolObserver;
+use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -33,7 +35,6 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\ModuleModelObserver;
 use Log;
 
 class Mempools implements Module
@@ -53,7 +54,7 @@ class Mempools implements Module
             });
             $this->calculateAvailable($mempools);
 
-            ModuleModelObserver::observe('\App\Models\Mempool');
+            MempoolObserver::observe('\App\Models\Mempool');
             $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
             echo PHP_EOL;
@@ -80,20 +81,12 @@ class Mempools implements Module
 
             if (empty($mempool->mempool_class)) {
                 Log::debug('Mempool skipped. Does not include class.');
-
                 return;
             }
+            $mempool->save();
 
             $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index];
             $rrd_oldname = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
-
-            // messed up swap class in initial release
-            if ($mempool->mempool_class == 'swap' && $mempool->isDirty('mempool_class') && $mempool->getOriginal('mempool_class') == 'virtual') {
-                $rrd_oldname = ['mempool', $mempool->mempool_type, 'virtual', $mempool->mempool_index];
-            }
-
-            $mempool->save();
-
             $rrd_def = RrdDefinition::make()
             ->addDataset('used', 'GAUGE', 0)
             ->addDataset('free', 'GAUGE', 0);
