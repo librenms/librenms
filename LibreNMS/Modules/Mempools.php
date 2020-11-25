@@ -27,7 +27,6 @@ namespace LibreNMS\Modules;
 
 use App\Models\Mempool;
 use App\Observers\MempoolObserver;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
