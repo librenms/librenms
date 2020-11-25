@@ -26,6 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Mempool;
+use App\Observers\MempoolObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -33,7 +34,6 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\ModuleModelObserver;
 use Log;
 
 class Mempools implements Module
@@ -53,7 +53,7 @@ class Mempools implements Module
             });
             $this->calculateAvailable($mempools);
 
-            ModuleModelObserver::observe('\App\Models\Mempool');
+            MempoolObserver::observe('\App\Models\Mempool');
             $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
             echo PHP_EOL;
@@ -80,8 +80,9 @@ class Mempools implements Module
 
             if (empty($mempool->mempool_class)) {
                 Log::debug('Mempool skipped. Does not include class.');
-            }
 
+                return;
+            }
             $mempool->save();
 
             $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index];

@@ -51,10 +51,10 @@ class MempoolsController extends TableController
     protected function baseQuery($request)
     {
         if ($request->get('view') == 'graphs') {
-            return Device::query()->has('mempools')->with('mempools');
+            return Device::hasAccess($request->user())->has('mempools')->with('mempools');
         }
 
-        $query = Mempool::query()->with('device');
+        $query = Mempool::hasAccess($request->user())->with('device');
 
         // join devices table to sort by hostname or search
         if (array_key_exists('hostname', $request->get('sort', $this->default_sort)) || $request->get('searchPhrase')) {

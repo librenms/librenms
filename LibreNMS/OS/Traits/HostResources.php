@@ -169,7 +169,7 @@ trait HostResources
                     'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
                     'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
                     'mempool_total_oid' => null,
-                ]))->setClass($storage['hrStorageType'] == 'hrStorageVirtualMemory' ? 'virtual' : null)
+                ]))->setClass(null, $storage['hrStorageType'] == 'hrStorageVirtualMemory' ? 'virtual' : 'system')
                     ->fillUsage($storage['hrStorageUsed'], $total);
             });
     }
