@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
-use App\Models\DeviceGroup;
+use App\Models\template;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
@@ -25,9 +25,16 @@ class ServiceTemplateController extends Controller
      */
     public function index()
     {
+        $this->authorize('manage', ServiceTemplate::class);
+
+        $ungrouped_devices = Device::orderBy('hostname')->whereNotIn('device_id', function ($query) {
+            $query->select('device_id')->from('service_templates_device');
+        })->get();
+
         return view(
             'service-template.index', [
-                'device_groups' => DeviceGroup::with('serviceTemplates')->orderBy('name')->get(),
+                'service_templates' => ServiceTemplate::orderBy('name')->withCount('devices')->get(),
+                'ungrouped_devices' => $ungrouped_devices,
             ]
         );
     }
@@ -42,11 +49,10 @@ class ServiceTemplateController extends Controller
         return view(
             'service-template.create', [
                 'template' => new ServiceTemplate(),
-                'device_groups' => DeviceGroup::orderBy('name')->get(),
+                'service_templates' => ServiceTemplate::orderBy('name')->get(),
                 'services' => Services::list(),
+                'filters' => json_encode(new QueryBuilderFilter('group')),
             ]
-            //'filters' => json_encode(new QueryBuilderFilter('group')),
-            //FIXME do i need the above?
         );
     }
 
@@ -63,7 +69,11 @@ class ServiceTemplateController extends Controller
                 'name' => 'required|string|unique:service_templates',
                 'device_group_id' => 'array|required',
                 'device_group_id.*' => 'integer',
+                'device_id' => 'array|required',
+                'device_id.*' => 'integer',
                 'type' => 'string',
+                'dtype' => 'required|in:dynamic,static',
+                'dgtype' => 'required|in:dynamic,static',
                 'param' => 'nullable|string',
                 'ip' => 'nullable|string',
                 'desc' => 'nullable|string',
@@ -78,6 +88,8 @@ class ServiceTemplateController extends Controller
                 [
                     'name',
                     'type',
+                    'dtype',
+                    'dgtype',
                     'param',
                     'ip',
                     'desc',
@@ -87,9 +99,16 @@ class ServiceTemplateController extends Controller
                 ]
             )
         );
+        $template->drules = json_decode($request->drules);
+        $template->dgrules = json_decode($request->dgrules);
         $template->save();
-        $template->groups()->sync($request->device_group_id);
 
+        if ($request->dtype == 'static') {
+            $template->devices()->sync($request->devices);
+        }
+        if ($request->dgtype == 'static') {
+            $template->groups()->sync($request->devices);
+        }
         Toastr::success(__('Service Template :name created', ['name' => $template->name]));
 
         return redirect()->route('services.templates.index');
@@ -117,10 +136,10 @@ class ServiceTemplateController extends Controller
         return view(
             'service-template.edit', [
                 'template' => $template,
-                'device_groups' => DeviceGroup::orderBy('name')->get(),
+                'filters' => json_encode(new QueryBuilderFilter('group')),
                 'services' => Services::list(),
             ]
-            //'filters' => json_encode(new QueryBuilderFilter('group')),
+            //
         );
     }
 
@@ -144,6 +163,12 @@ class ServiceTemplateController extends Controller
                         }
                     ),
                 ],
+                'dtype' => 'required|in:dynamic,static',
+                'drules' => 'json|required_if:dtype,dynamic',
+                'devices' => 'array|required_if:type,static',
+                'devices.*' => 'integer',
+                'dgtype' => 'required|in:dynamic,static',
+                'dgrules' => 'json|required_if:dgtype,dynamic',
                 'device_group_id' => 'array|required',
                 'device_group_id.*' => 'integer',
                 'type' => 'string',
@@ -160,8 +185,11 @@ class ServiceTemplateController extends Controller
             $request->only(
                 [
                     'name',
-                    'device_group_id',
                     'type',
+                    'dtype',
+                    'dgtype',
+                    'drules',
+                    'dgrules',
                     'param',
                     'ip',
                     'desc',
@@ -172,14 +200,44 @@ class ServiceTemplateController extends Controller
             )
         );
 
-        if ($template->isDirty()) {
-            if ($template->save()) {
-                $template->groups()->sync($request->device_group_id);
-                Toastr::success(__('Service Template :name updated', ['name' => $template->name]));
-            } else {
-                Toastr::error(__('Failed to save'));
+        $devices_updated = false;
+        if ($template->dtype == 'static') {
+            // sync device_ids from input
+            $updated = $template->devices()->sync($request->get('devices', []));
+            // check for attached/detached/updated
+            $devices_updated = array_sum(array_map(function ($device_ids) {
+                return count($device_ids);
+            }, $updated)) > 0;
+        } else {
+            $template->drules = json_decode($request->drules);
+        }
 
-                return redirect()->back()->withInput();
+        $device_groups_updated = false;
+        if ($template->dgtype == 'static') {
+            // sync device_group_ids from input
+            $updated = $template->groups()->sync($request->get('device_groups', []));
+            // check for attached/detached/updated
+            $device_groups_updated = array_sum(array_map(function ($device_group_ids) {
+                return count($device_group_ids);
+            }, $updated)) > 0;
+        } else {
+            $template->dgrules = json_decode($request->dgrules);
+        }
+
+        if ($template->isDirty() || $devices_updated || $device_groups_updated) {
+            try {
+                if ($template->save() || $devices_updated || $device_groups_updated) {
+                    Toastr::success(__('Service Template :name updated', ['name' => $template->name]));
+                } else {
+                    Toastr::error(__('Failed to save'));
+
+                    return redirect()->back()->withInput();
+                }
+            } catch (\Illuminate\Database\QueryException $e) {
+                return redirect()->back()->withInput()->withErrors([
+                    'drules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
+                    'dgrules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
+                ]);
             }
         } else {
             Toastr::info(__('No changes made'));
@@ -196,7 +254,7 @@ class ServiceTemplateController extends Controller
      */
     public function apply(ServiceTemplate $template)
     {
-        foreach (Device::inDeviceGroup($template->device_group_id)->get() as $device) {
+        foreach (Device::intemplate($template->device_group_id)->get() as $device) {
             $device->services()->updateOrCreate(
                 [
                     'service_template_id' => $template->id,
@@ -214,7 +272,7 @@ class ServiceTemplateController extends Controller
             );
         }
         // remove any remaining services no longer in the correct device group
-        foreach (Device::notInDeviceGroup($template->device_group_id)->get() as $device) {
+        foreach (Device::notIntemplate($template->device_group_id)->get() as $device) {
             Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
         }
         $msg = __('Services for Template :name have been updates', ['name' => $template->name]);

@@ -6,8 +6,62 @@
     </div>
 </div>
 
-<div class="form-group @if($errors->has('device_group_id')) has-error @endif">
-    <label for="device_group_id" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Device Group')</label>
+<div class="form-group @if($errors->has('dtype')) has-error @endif">
+    <label for="dtype" class="control-label col-sm-3 col-md-2">@lang('Device Type')</label>
+    <div class="col-sm-9 col-md-10">
+        <select class="form-control" id="dtype" name="dtype" onchange="change_st_dtype(this)">
+            <option value="dynamic"
+                    @if(old('dtype', $template->dtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
+            <option value="static"
+                    @if(old('dtype', $template->dtype) == 'static') selected @endif>@lang('Static')</option>
+        </select>
+        <span class="help-block">{{ $errors->first('dtype') }}</span>
+    </div>
+</div>
+
+<div id="dynamic-st-form" class="form-group @if($errors->has('drules')) has-error @endif">
+    <label for="pattern" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
+    <div class="col-sm-9 col-md-10">
+        <div id="builder"></div>
+        <span class="help-block">{{ $errors->first('drules') }}</span>
+    </div>
+</div>
+
+<div id="static-st-form" class="form-group @if($errors->has('devices')) has-error @endif" style="display: none">
+    <label for="devices" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Select Devices')</label>
+    <div class="col-sm-9 col-md-10">
+        <select class="form-control" id="devices" name="devices[]" multiple>
+            @foreach($device_group->devices as $device)
+                <option value="{{ $device->device_id }}" selected>{{ $device->displayName() }}</option>
+            @endforeach
+        </select>
+        <span class="help-block">{{ $errors->first('devices') }}</span>
+    </div>
+</div>
+
+<div class="form-group @if($errors->has('dgtype')) has-error @endif">
+    <label for="dgtype" class="control-label col-sm-3 col-md-2">@lang('Device Group Type')</label>
+    <div class="col-sm-9 col-md-10">
+        <select class="form-control" id="dgtype" name="dgtype" onchange="change_st_dgtype(this)">
+            <option value="dynamic"
+                    @if(old('dgtype', $template->dtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
+            <option value="static"
+                    @if(old('dgtype', $template->dtype) == 'static') selected @endif>@lang('Static')</option>
+        </select>
+        <span class="help-block">{{ $errors->first('dgtype') }}</span>
+    </div>
+</div>
+
+<div id="dynamic-st-form" class="form-group @if($errors->has('dgrules')) has-error @endif">
+    <label for="pattern" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Group Rules')</label>
+    <div class="col-sm-9 col-md-10">
+        <div id="builder2"></div>
+        <span class="help-block">{{ $errors->first('dgrules') }}</span>
+    </div>
+</div>
+
+<div id="static-st-form" class="form-group @if($errors->has('device_group_id')) has-error @endif" style="display: none">
+    <label for="device_group_id" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Groups')</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="device_group_id" name="device_group_id[]" multiple>
             @foreach($device_groups as $device_group)
@@ -79,14 +133,156 @@
 </div>
 
 <script>
-init_select2('#device_group_id', 'device-group', {multiple: true});
-$("[type='checkbox']").bootstrapSwitch('offColor','danger');
-$("#ignore").on( 'switchChange.bootstrapSwitch', function (e, state) {
-    var value = $(this).is(':checked') ? "1": "0";
-    $('#ignore').val(value);
-});
-$("#disabled").on( 'switchChange.bootstrapSwitch', function (e, state) {
-    var value = $(this).is(':checked') ? "1": "0";
-    $('#disabled').val(value);
-});
+    $("[type='checkbox']").bootstrapSwitch('offColor','danger');
+    $("#ignore").on( 'switchChange.bootstrapSwitch', function (e, state) {
+        var value = $(this).is(':checked') ? "1": "0";
+        $('#ignore').val(value);
+    });
+    $("#disabled").on( 'switchChange.bootstrapSwitch', function (e, state) {
+        var value = $(this).is(':checked') ? "1": "0";
+        $('#disabled').val(value);
+    });
+    function change_st_dtype(select) {
+        var dtype = select.options[select.selectedIndex].value;
+        document.getElementById("dynamic-st-form").style.display = (dtype === 'dynamic' ? 'block' : 'none');
+        document.getElementById("static-st-form").style.display = (dtype === 'dynamic' ? 'none' : 'block');
+    }
+
+    change_st_dtype(document.getElementById('dtype'));
+
+    function change_st_dgtype(select) {
+        var dgtype = select.options[select.selectedIndex].value;
+        document.getElementById("dynamic-st-form").style.display = (dtype === 'dynamic' ? 'block' : 'none');
+        document.getElementById("static-st-form").style.display = (dtype === 'dynamic' ? 'none' : 'block');
+    }
+
+    change_st_dgtype(document.getElementById('dgtype'));
+
+    init_select2('#devices', 'device', {multiple: true});
+    init_select2('#device_group_id', 'device-group', {multiple: true});
+    var builder = $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
+        $("[name$='_filter']").each(function () {
+            $(this).select2({
+                dropdownAutoWidth: true,
+                width: 'auto'
+            });
+        });
+    }).on('ruleToSQL.queryBuilder.filter', function (e, rule) {
+        if (rule.operator === 'regexp') {
+            e.value += ' \'' + rule.value + '\'';
+        }
+    }).queryBuilder({
+        plugins: [
+            'bt-tooltip-errors'
+            // 'not-group'
+        ],
+
+        filters: {!! $filters !!},
+        operators: [
+            'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null', 'in', 'not_in',
+            {dtype: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {dtype: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {dtype: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {dtype: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {dtype: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
+            {dtype: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
+        ],
+        lang: {
+            operators: {
+                regexp: 'regex',
+                not_regex: 'not regex'
+            }
+        },
+        sqlOperators: {
+            regexp: {op: 'REGEXP'},
+            not_regexp: {op: 'NOT REGEXP'}
+        },
+        sqlRuleOperator: {
+            'REGEXP': function (v) {
+                return {val: v, op: 'regexp'};
+            },
+            'NOT REGEXP': function (v) {
+                return {val: v, op: 'not_regexp'};
+            }
+        }
+    });
+    var builder2 = $('#builder2').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
+        $("[name$='_filter']").each(function () {
+            $(this).select2({
+                dropdownAutoWidth: true,
+                width: 'auto'
+            });
+        });
+    }).on('ruleToSQL.queryBuilder.filter', function (e, rule) {
+        if (rule.operator === 'regexp') {
+            e.value += ' \'' + rule.value + '\'';
+        }
+    }).queryBuilder({
+        plugins: [
+            'bt-tooltip-errors'
+            // 'not-group'
+        ],
+
+        filters: {!! $filters !!},
+        operators: [
+            'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null', 'in', 'not_in',
+            {dgtype: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {dgtype: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {dgtype: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {dgtype: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {dgtype: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
+            {dgtype: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
+        ],
+        lang: {
+            operators: {
+                regexp: 'regex',
+                not_regex: 'not regex'
+            }
+        },
+        sqlOperators: {
+            regexp: {op: 'REGEXP'},
+            not_regexp: {op: 'NOT REGEXP'}
+        },
+        sqlRuleOperator: {
+            'REGEXP': function (v) {
+                return {val: v, op: 'regexp'};
+            },
+            'NOT REGEXP': function (v) {
+                return {val: v, op: 'not_regexp'};
+            }
+        }
+    });
+    $('.service-template-form').submit(function (eventObj) {
+        if ($('#dtype').val() === 'static') {
+            return true;
+        } else {
+            $('<input type="hidden" name="drules" />')
+                .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
+                .appendTo(this);
+            if (!builder.queryBuilder('validate')) {
+                return false;
+            }
+        }
+        if ($('#dgtype').val() === 'static') {
+            return true;
+        } else {
+            $('<input type="hidden" name="dgrules" />')
+                .attr('value', JSON.stringify(builder2.queryBuilder('getRules')))
+                .appendTo(this);
+            if (!builder2.queryBuilder('validate')) {
+                return false;
+            }
+        }
+        return true;
+    });
+</script>
+<script>
+    var drules = {!! json_encode(old('drules') ? json_decode(old('drules')) : $template->drules) !!};
+    if (drules) {
+        builder.queryBuilder('setRules', drules);
+    }
+    var dgrules = {!! json_encode(old('dgrules') ? json_decode(old('dgrules')) : $template->dgrules) !!};
+    if (dgrules) {
+        builder2.queryBuilder('setRules', dgrules);
+    }
 </script>

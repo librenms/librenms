@@ -648,6 +648,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Sensor::class, 'device_id');
     }
 
+    public function serviceTemplates()
+    {
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
+    }
+
     public function services()
     {
         return $this->hasMany(\App\Models\Service::class, 'device_id');

@@ -17,6 +17,7 @@ class CreateServicesTemplateTable extends Migration
             $table->unsignedInteger('device_group_id')->index();
             $table->text('ip')->nullable()->default(null);
             $table->string('type');
+            $table->string('stype', 20)->default('');
             $table->text('desc')->nullable()->default(null);
             $table->text('param')->nullable()->default(null);
             $table->boolean('ignore')->default(0);
