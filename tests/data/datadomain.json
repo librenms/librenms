@@ -124,7 +124,7 @@
                     "mempool_index": "10",
                     "entPhysicalIndex": null,
                     "mempool_type": "hrstorage",
-                    "mempool_class": "swap",
+                    "mempool_class": "virtual",
                     "mempool_precision": 1024,
                     "mempool_descr": "Swap space",
                     "mempool_perc": 0,

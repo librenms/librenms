@@ -13799,7 +13799,7 @@
                     "mempool_index": "30",
                     "entPhysicalIndex": null,
                     "mempool_type": "hrstorage",
-                    "mempool_class": "swap",
+                    "mempool_class": "virtual",
                     "mempool_precision": 1024,
                     "mempool_descr": "Slot-0 Management Swap",
                     "mempool_perc": 21,
