@@ -39,7 +39,7 @@ class ModuleModelObserver
         $class = ltrim($model, '\\');
 
         if (! in_array($class, $observed_models)) {
-            $model::observe(new ModuleModelObserver());
+            $model::observe(new static());
             $observed_models[] = $class;
         }
     }
