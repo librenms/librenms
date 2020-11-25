@@ -68,19 +68,23 @@
         },
         methods: {
             addItem() {
+                if (this.disabled) return;
                 this.localList.push(this.newItem);
                 this.$emit('input', this.localList);
                 this.newItem = "";
             },
             removeItem(index) {
+                if (this.disabled) return;
                 this.localList.splice(index, 1);
                 this.$emit('input', this.localList);
             },
             updateItem(index, value) {
+                if (this.disabled || this.localList[index] === value) return;
                 this.localList[index] = value;
                 this.$emit('input', this.localList);
             },
             dragged() {
+                if (this.disabled) return;
                 this.$emit('input', this.localList);
             }
         },
