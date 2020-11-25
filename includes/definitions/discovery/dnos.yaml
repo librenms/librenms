@@ -1,5 +1,20 @@
 mib: DELL-NETWORKING-CHASSIS-MIB:DELL-NETWORKING-IF-EXTENSION-MIB
 modules:
+    mempools:
+        pre-cache:
+            snmp_flags: '-OQUs'
+            oids:
+                - DELL-NETWORKING-CHASSIS-MIB::dellNetProcessorTable
+        data:
+            -
+                snmp_flags: '-OQUs'
+                oid: DELL-NETWORKING-CHASSIS-MIB::dellNetCpuUtilTable
+                total: dellNetProcessorMemSize
+                percent_used: dellNetCpuUtilMemUsage
+                precision: 1048576
+                type: dell-net
+                descr: 'Memory Usage'
+
     os:
         sysDescr_regex:
             - '/Software Version: (?<version>\S+)/'

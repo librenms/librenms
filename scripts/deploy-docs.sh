@@ -37,7 +37,7 @@ EOF
 
 
 mkdir -p out
-cd out
+cd out || exit 1
 
 git init
 git remote add origin "$FULL_REPO"
@@ -46,13 +46,13 @@ git config user.name "librenms-docs"
 git config user.email "travis@librenms.org"
 git checkout master
 
-cd ../
+cd ../ || exit 1
 mkdocs build --clean
 build_result=$?
 
 # Only deploy after merging to master
 if [ "$build_result" == "0" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
-    cd out/
+    cd out/ || exit 1
     touch .
     git add -A .
     git commit -m "GH-Pages update by travis after $TRAVIS_COMMIT"

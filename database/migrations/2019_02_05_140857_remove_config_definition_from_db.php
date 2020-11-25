@@ -13,9 +13,6 @@ class RemoveConfigDefinitionFromDb extends Migration
      */
     public function up()
     {
-//        $schema = new \Thedevsaddam\LaravelSchema\Schema\Schema();
-//        dd($schema->databaseWrapper->getColumns('config'));
-
         Schema::table('config', function (Blueprint $table) {
             $table->dropColumn([
                 'config_default',

@@ -1,5 +1,10 @@
 mib: TPLINK-SYSMONITOR-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryUtilization
+                descr: 'Memory #{{ $index }}'
     processors:
         data:
             -

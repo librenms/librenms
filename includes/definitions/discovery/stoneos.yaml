@@ -1,5 +1,11 @@
 mib: 'HILLSTONE-FAN-MIB'
 modules:
+    mempools:
+        data:
+            -
+                total: HILLSTONE-SYSTEM-MIB::sysTotalMemory
+                used: HILLSTONE-SYSTEM-MIB::sysCurMemory
+                precision: 1024
     os:
         sysDescr_regex: '/(?<hardware>\S+)$/'
         serial: HILLSTONE-SYSTEM-MIB::sysSerialNumber.0

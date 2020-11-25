@@ -44,6 +44,7 @@ if (isset($options['h'])) {
           - poller: check that the poller and discovery are running properly
           - programs: check that external programs exist and are executable
           - python: check that various Python modules and functions exist
+          - system: checks system related items
           - updates: checks the status of git and updates
           - user: check that the LibreNMS user is set properly
 
@@ -51,6 +52,11 @@ if (isset($options['h'])) {
 
         ";
     exit;
+}
+
+if (function_exists('posix_getuid') && posix_getuid() === 0) {
+    echo 'Do not run validate.php as root' . PHP_EOL;
+    exit(1);
 }
 
 // Check autoload

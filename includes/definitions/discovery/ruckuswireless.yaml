@@ -1,5 +1,10 @@
 mib: RUCKUS-ZD-SYSTEM-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemMemoryUtil
+                descr: 'System Memory'
     os:
         features:
             - RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumRegisteredAP.0

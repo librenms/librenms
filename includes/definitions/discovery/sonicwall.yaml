@@ -1,4 +1,14 @@
 modules:
+    mempools:
+        data:
+            -
+                percent_used: SNWL-SSLVPN-MIB::memoryUtilization
+                type: sonicwall-mem
+                descr: 'Memory Utilization'
+            -
+                percent_used: SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentRAMUtil
+                type: sonicwall-mem
+                descr: 'Memory Utilization'
     os:
         hardware: SNWL-COMMON-MIB::snwlSysModel.0
         serial: SNWL-COMMON-MIB::snwlSysSerialNumber.0

@@ -40,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        \Illuminate\Pagination\Paginator::useBootstrap();
+
         $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
         $this->app->booted('\LibreNMS\Config::load');
 

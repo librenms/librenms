@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use LibreNMS\Exceptions\InvalidNameException;
 
 class PollerCluster extends Model
 {
@@ -32,6 +33,9 @@ class PollerCluster extends Model
     protected $table = 'poller_cluster';
     protected $primaryKey = 'id';
     protected $fillable = ['poller_name'];
+    protected $casts = [
+        'last_report' => 'datetime',
+    ];
 
     // ---- Accessors/Mutators ----
 
@@ -40,17 +44,45 @@ class PollerCluster extends Model
         $this->attributes['poller_groups'] = is_array($groups) ? implode(',', $groups) : $groups;
     }
 
+    // ---- Scopes ----
+
+    public function scopeIsActive($query)
+    {
+        $default = (int) \LibreNMS\Config::get('service_poller_frequency');
+        $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
+    }
+
     // ---- Helpers ----
+
+    /**
+     * Get the value of a setting (falls back to the global value if not set on this node)
+     *
+     * @param string $name
+     * @return mixed
+     * @throws \LibreNMS\Exceptions\InvalidNameException
+     */
+    public function getSettingValue(string $name)
+    {
+        $definition = $this->configDefinition(false);
+
+        foreach ($definition as $entry) {
+            if ($entry['name'] == $name) {
+                return $entry['value'];
+            }
+        }
+
+        throw new InvalidNameException("Poller group setting named \"$name\" is invalid");
+    }
 
     /**
      * Get the frontend config definition for this poller
      *
-     * @param \Illuminate\Support\Collection $groups optionally supply full list of poller groups to avoid fetching multiple times
+     * @param \Illuminate\Support\Collection|bool|null $groups optionally supply full list of poller groups to avoid fetching multiple times
      * @return array[]
      */
     public function configDefinition($groups = null)
     {
-        if (empty($groups)) {
+        if ($groups === null || $groups === true) {
             $groups = PollerGroup::list();
         }
 

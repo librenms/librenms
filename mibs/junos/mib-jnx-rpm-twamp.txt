@@ -31,7 +31,7 @@ jnxTwampMib MODULE-IDENTITY
     CONTACT-INFO
             "        Juniper Technical Assistance Center
 		     Juniper Networks, Inc.
-		     1194 N. Mathilda Avenue
+		     1133 Innovation Way
 		     Sunnyvale, CA 94089
 		     E-mail: support@juniper.net"
 
@@ -153,6 +153,13 @@ JnxTwampClientMeasurementSet ::= TEXTUAL-CONVENTION
                negIngressJitter (9)
            }
 
+JnxTwampPercentType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-6"
+    STATUS current
+    DESCRIPTION
+        "Displays a percentage as decimal with 6 digits precision."
+    SYNTAX     Unsigned32(0..100000000)
+
 
 jnxTwampClientNode	OBJECT-IDENTITY
     STATUS			current
@@ -267,7 +274,7 @@ jnxTwampRpmIdentity	OBJECT-TYPE
             jnxTwampResSumCollection               JnxTwampClientCollectionType,
             jnxTwampResSumSent                     Unsigned32,
             jnxTwampResSumReceived                 Unsigned32,
-            jnxTwampResSumPercentLost              Unsigned32,
+            jnxTwampResSumPercentLost              JnxTwampPercentType,
             jnxTwampResSumDate                     DateAndTime
         }
 
@@ -301,7 +308,7 @@ jnxTwampRpmIdentity	OBJECT-TYPE
         ::= { jnxTwampClientResultsSummaryEntry 3 }
 
     jnxTwampResSumPercentLost OBJECT-TYPE
-        SYNTAX     Unsigned32
+        SYNTAX     JnxTwampPercentType
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION
@@ -519,7 +526,7 @@ jnxTwampRpmIdentity	OBJECT-TYPE
             jnxTwampHistSumCollection  JnxTwampClientCollectionType,
             jnxTwampHistSumSent        Unsigned32,
             jnxTwampHistSumReceived    Unsigned32,
-            jnxTwampHistSumPercentLost Unsigned32
+            jnxTwampHistSumPercentLost JnxTwampPercentType
         }
 
     jnxTwampHistSumCollection OBJECT-TYPE
@@ -553,7 +560,7 @@ jnxTwampRpmIdentity	OBJECT-TYPE
         ::= { jnxTwampClientHistorySummaryEntry 3 }
 
     jnxTwampHistSumPercentLost OBJECT-TYPE
-        SYNTAX     Unsigned32
+        SYNTAX     JnxTwampPercentType
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION

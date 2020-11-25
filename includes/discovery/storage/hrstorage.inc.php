@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
-$hrstorage_array = snmpwalk_cache_oid($device, 'hrStorageEntry', null, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES:NetWare-Host-Ext-MIB');
+$hrstorage_array = $os->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
 
 if (is_array($hrstorage_array)) {
     echo 'hrStorage : ';
@@ -36,7 +37,7 @@ if (is_array($hrstorage_array)) {
             continue;
         }
 
-        if ($device['os'] == 'vmware' && $descr == 'Real Memory') {
+        if (Str::startsWith($device['os'], 'vmware') && $descr == 'Real Memory') {
             $old_rrdfile = ['storage', 'hrstorage', $descr];
             $new_rrdfile = ['mempool', 'hrstorage', $storage['hrStorageIndex']];
             rrd_file_rename($device, $old_rrdfile, $new_rrdfile);

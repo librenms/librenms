@@ -30,7 +30,7 @@ $array = [
         'descr'  => 'New Connections',
         'colour' => '0080C0',
     ],
-         ];
+];
 
 $i = 0;
 if (rrdtool_check_rrd_exists($rrd_filename)) {

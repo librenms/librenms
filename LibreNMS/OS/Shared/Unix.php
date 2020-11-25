@@ -27,10 +27,11 @@ namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\OS\Traits\ServerHardware;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 
-class Unix extends \LibreNMS\OS
+class Unix extends \LibreNMS\OS implements MempoolsDiscovery
 {
     use ServerHardware;
     use YamlOSDiscovery {

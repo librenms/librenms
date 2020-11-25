@@ -43,7 +43,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
     echo '
         <tbody>
           <tr data-toggle="collapse" data-target="#ospf-panel' . $i . '" class="accordion-toggle">
-            <td><button class="btn btn-default btn-xs"><span class="fa fa-plus"></span></button></td>
+            <td><button id="ospf-panel_button' . $i . '" class="btn btn-default btn-xs"><span id="ospf-panel_span' . $i . '" class="fa fa-plus"></span></button></td>
             <td>' . $instance['ospfRouterId'] . '</td>
             <td><span class="label label-' . $status_color . '">' . $instance['ospfAdminStat'] . '</span></td>
             <td><span class="label label-' . $abr_status_color . '">' . $instance['ospfAreaBdrRtrStatus'] . '</span></td>
@@ -52,6 +52,11 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
             <td>' . $port_count . '(' . $port_count_enabled . ')</td>
             <td>' . $nbr_count . '</td>
           </tr>
+          <script type="text/javascript">
+          $("#ospf-panel_button' . $i . '").click(function(){
+              $("#ospf-panel_span' . $i . '").toggleClass("fa-minus");
+          });
+          </script>
           <tr>
             <td colspan="12" class="hiddenRow">
             <div class="accordian-body collapse" id="ospf-panel' . $i . '">
@@ -93,6 +98,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
                           <th>Port</th>
                           <th>Port Type</th>
                           <th>Port State</th>
+                          <th>Cost</th>
                           <th>Status</th>
                           <th>Area ID</th>
                         </tr>
@@ -112,6 +118,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
                       <td>' . generate_port_link($ospfport) . '</td>
                       <td>' . $ospfport['ospfIfType'] . '</td>
                       <td>' . $ospfport['ospfIfState'] . '</td>
+                      <td>' . $ospfport['ospfIfMetricValue'] . '</td>
                       <td><span class="label label-' . $port_status_color . '">' . $ospfport['ospfIfAdminStat'] . '</span></td>
                       <td>' . $ospfport['ospfIfAreaId'] . '</td>
                     </tr>

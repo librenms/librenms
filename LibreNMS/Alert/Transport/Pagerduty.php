@@ -70,8 +70,11 @@ class Pagerduty extends Transport
         $url = 'https://events.pagerduty.com/v2/enqueue';
         $client = new Client();
 
+        $request_opts = ['json' => $data];
+        $request_opts['proxy'] = get_proxy();
+
         try {
-            $result = $client->request('POST', $url, ['json' => $data]);
+            $result = $client->request('POST', $url, $request_opts);
 
             if ($result->getStatusCode() == 202) {
                 return true;

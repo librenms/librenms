@@ -1,5 +1,39 @@
 mib: IF-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: MOXA-IKS6726A-MIB::totalMemory
+                used: MOXA-IKS6726A-MIB::usedMemory
+                free: MOXA-IKS6726A-MIB::freeMemory
+            -
+                total: MOXA-EDSG508E-MIB::totalMemory
+                used: MOXA-EDSG508E-MIB::usedMemory
+                free: MOXA-EDSG508E-MIB::freeMemory
+            -
+                total: MOXA-EDSP510A8POE-MIB::totalMemory
+                used: MOXA-EDSP510A8POE-MIB::usedMemory
+                free: MOXA-EDSP510A8POE-MIB::freeMemory
+            -
+                total: MOXA-EDSG512E8POE-MIB::totalMemory
+                used: MOXA-EDSG512E8POE-MIB::usedMemory
+                free: MOXA-EDSG512E8POE-MIB::freeMemory
+    os:
+        hardware:
+            - MOXA-IKS6726A-MIB::switchModel
+            - MOXA-EDSG508E-MIB::switchModel
+            - MOXA-EDSP510A8POE-MIB::switchModel
+            - MOXA-EDSG512E8POE-MIB::switchModel
+        version:
+            - MOXA-IKS6726A-MIB::firmwareVersion
+            - MOXA-EDSG508E-MIB::firmwareVersion
+            - MOXA-EDSP510A8POE-MIB::firmwareVersion
+            - MOXA-EDSG512E8POE-MIB::firmwareVersion
+        serial:
+            - MOXA-IKS6726A-MIB::serialNumber
+            - MOXA-EDSG508E-MIB::serialNumber
+            - MOXA-EDSP510A8POE-MIB::serialNumber
+            - MOXA-EDSG512E8POE-MIB::serialNumber
     sensors:
         pre-cache:
             data:

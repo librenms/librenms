@@ -23,7 +23,7 @@ $array = [
         'descr'  => 'Starting',
         'colour' => '157419FF',
     ],
-         ];
+];
 
 $i = 0;
 if (rrdtool_check_rrd_exists($rrd_filename)) {

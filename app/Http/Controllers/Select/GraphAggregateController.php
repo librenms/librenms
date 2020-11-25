@@ -48,6 +48,7 @@ class GraphAggregateController extends Controller
         ];
 
         foreach ((array) Config::get('custom_descr', []) as $custom) {
+            $custom = is_array($custom) ? $custom[0] : $custom;
             if ($custom) {
                 $types[] = $custom;
             }

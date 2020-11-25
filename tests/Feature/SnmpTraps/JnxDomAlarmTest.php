@@ -35,8 +35,8 @@ class JnxDomAlarmTest extends SnmpTrapTestCase
 {
     public function testJnxDomAlarmSetTrap()
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make();
+        $device = Device::factory()->create();
+        $port = Port::factory()->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
@@ -57,8 +57,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testJnxDomAlarmClearTrap()
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make();
+        $device = Device::factory()->create();
+        $port = Port::factory()->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162

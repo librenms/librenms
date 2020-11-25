@@ -1,3 +1,14 @@
 modules:
+    mempools:
+        pre-cache:
+            oids:
+                - AI-AP-MIB::aiAPSerialNum
+                - AI-AP-MIB::aiAPName
+        data:
+            -
+                total: AI-AP-MIB::aiAPTotalMemory
+                free: AI-AP-MIB::aiAPMemoryFree
+                index: '{{ AI-AP-MIB::aiAPSerialNum }}'
+                descr: '{{ AI-AP-MIB::aiAPName }} [{{ AI-AP-MIB::aiAPSerialNum }}]'
     os:
         sysDescr_regex: '/\(MODEL: (?<hardware>\S+)\), Version (?<version>\S+)/'

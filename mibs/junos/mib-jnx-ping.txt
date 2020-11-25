@@ -37,7 +37,7 @@ jnxPingMIB MODULE-IDENTITY
     CONTACT-INFO
             "        Juniper Technical Assistance Center
 		     Juniper Networks, Inc.
-		     1194 N. Mathilda Avenue
+		     1133 Innovation Way
 		     Sunnyvale, CA 94089
 		     E-mail: support@juniper.net"
 
@@ -417,7 +417,8 @@ jnxPingCtlIngressJitterThreshold  OBJECT-TYPE
                    egressJitterThreshold(5),
                    ingressThreshold(6),
                    ingressStdDevThreshold(7),
-                   ingressJitterThreshold(8)
+                   ingressJitterThreshold(8),
+                   maxrttThreshold(9)
                   }
     MAX-ACCESS  read-create
     STATUS      current
@@ -457,7 +458,10 @@ jnxPingCtlIngressJitterThreshold  OBJECT-TYPE
             configured ingress jitter threshold is exceeded.
             This applies only if the probe type supports one way measurments.
         The value of this object defaults to zero, indicating
-        that none of the above options have been selected."
+        that none of the above options have been selected.
+        maxrttThreshold(9) - Generate a jnxPingMaxRttThresholdExceeded
+            notification when the configured max rtt threshold
+            is exceeded."
     ::= { jnxPingCtlEntry 16 }
 
 jnxPingCtlTargetPort  OBJECT-TYPE
@@ -534,8 +538,16 @@ jnxPingCtlEXseriesHWTimeStamp  OBJECT-TYPE
     DEFVAL { false }
     ::= { jnxPingCtlEntry 22 }
 
-
-
+jnxPingMaxRttThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..6000000)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum round trip time allowed.  If this threshold is crossed
+        by any probe of a test, a jnxPingMaxRttThresholdExceeded trap will be sent."
+    DEFVAL { 0 }
+    ::= { jnxPingCtlEntry 23 }
 --
 -- Ping Results Table extensions
 --
@@ -1461,5 +1473,28 @@ jnxPingLastTestResultTime OBJECT-TYPE
              jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 9 }
 
-    
+    jnxPingMaxRttThresholdExceeded NOTIFICATION-TYPE
+        OBJECTS {
+          pingCtlTargetAddressType,
+          pingCtlTargetAddress,
+          pingResultsOperStatus,
+          pingResultsIpTargetAddressType,
+          pingResultsIpTargetAddress,
+          jnxPingResultsMinRttUs,
+          jnxPingResultsMaxRttUs,
+          jnxPingResultsAvgRttUs,
+          pingResultsProbeResponses,
+          pingResultsSentProbes,
+          pingResultsRttSumOfSquares,
+          pingResultsLastGoodProbe,
+          jnxPingCtlRttThreshold,
+          jnxPingResultsRttUs
+        }
+        STATUS  current
+        DESCRIPTION
+            "This notification is generated when the max round trip time
+            (jnxPingCtlMaxRttThreshold) exceeds the configured
+            threshold (jnxPingCtlMaxRttThreshold) and the maxrttThreshold bit is
+            set in jnxPingCtlTrapGeneration."
+        ::= { jnxPingNotificationPrefix 10 }
 END

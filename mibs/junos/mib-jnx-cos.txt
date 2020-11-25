@@ -26,7 +26,7 @@
         CONTACT-INFO
                 "Juniper Technical Assistance Center
                       Juniper Networks, Inc.
-                      1194 N. Mathilda Avenue
+                      1133 Innovation Way
                       Sunnyvale, CA 94089
                       E-mail: support@juniper.net"
 
@@ -40,6 +40,9 @@
                      RED  - Random Early Detection
                      PLP  - Packet Loss Priority
                      DSCP - Differential Service Code Point. "
+
+        REVISION     "201509170000Z"    -- Sept 17, 2015
+        DESCRIPTION  "Added Ingress Rate Limit stats"
 
         REVISION     "201411070000Z"    -- Nov 07, 2014
         DESCRIPTION  "Added Queue Depth stats"
@@ -2026,7 +2029,14 @@
            jnxCosIngressQstatDepthAverage                CounterBasedGauge64,
            jnxCosIngressQstatDepthCurrent                CounterBasedGauge64,
            jnxCosIngressQstatDepthPeak                   CounterBasedGauge64,
-           jnxCosIngressQstatDepthMax                    CounterBasedGauge64
+           jnxCosIngressQstatDepthMax                    CounterBasedGauge64,
+           -- Rate Limit dropped packet stats
+           jnxCosIngressQstatRateLimitDropPkts             Counter64,
+           jnxCosIngressQstatRateLimitDropPktRate          CounterBasedGauge64,
+           -- Rate Limit dropped byte stats
+           jnxCosIngressQstatRateLimitDropBytes            Counter64,
+           jnxCosIngressQstatRateLimitDropByteRate         CounterBasedGauge64
+
    }
 
    jnxCosIngressQstatIfIndex OBJECT-TYPE
@@ -2504,6 +2514,45 @@
             "Returns Max depth at ingress for a given interface and queue. 
             For unsupported platform, returns '0'"
         ::= { jnxCosIngressQstatEntry 52 }
+
+    -- Rate Limit dropped packet stats
+    jnxCosIngressQstatRateLimitDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The total number of rate-limit dropped packets
+        at the ingress on the given interface."
+        ::= { jnxCosIngressQstatEntry 53 }
+
+    jnxCosIngressQstatRateLimitDropPktRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The rate (expressed in packetes per second) at which packets
+        are rate-limit dropped at the ingress on the given interface."
+        ::= { jnxCosIngressQstatEntry 54 }
+
+    -- Rate Limit dropped Bytes stats
+    jnxCosIngressQstatRateLimitDropBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The total number of rate-limit dropped bytes
+        at the ingress on the given interface."
+        ::= { jnxCosIngressQstatEntry 55 }
+
+    jnxCosIngressQstatRateLimitDropByteRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The rate (expressed in bytes per second) at which bytes
+        are rate-limit dropped at the ingress on the given interface."
+        ::= { jnxCosIngressQstatEntry 56 }
+
 
     -- ***************************************************************
     --  Cos Traps / Notifications
@@ -3231,4 +3280,155 @@
         are rate-limit dropped at the output on the given interface."
         ::= { jnxCosIfsetQstatEntry 52 }
  
+    ---
+    --- PFC priority Table
+    ---
+
+    jnxCosPfcPriorityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxCosPfcPriorityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains the per class of priority flow control
+            information of an interface."
+    ::= { jnxCos 11 }
+
+    jnxCosPfcPriorityEntry OBJECT-TYPE
+        SYNTAX      JnxCosPfcPriorityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "A row of parameters for each class of PFC on an interface."
+        INDEX   { jnxCosPfcIfIndex, jnxCosPfcPriorityIndex }
+        ::= { jnxCosPfcPriorityTable 1 }
+
+    JnxCosPfcPriorityEntry ::= SEQUENCE {
+        jnxCosPfcIfIndex               InterfaceIndex,
+        jnxCosPfcPriorityIndex         Integer32,
+        jnxCosPfcPriorityRequestsTx    Counter64,
+        jnxCosPfcPriorityRequestsRx    Counter64
+    }
+
+    jnxCosPfcIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "This is the same value as identified by ifIndex."
+        ::= { jnxCosPfcPriorityEntry 1 }
+
+    jnxCosPfcPriorityIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The index for accessing the per-priority information of PFC on interface."
+        ::= { jnxCosPfcPriorityEntry 2 }
+
+    jnxCosPfcPriorityRequestsTx OBJECT-TYPE
+        SYNTAX      Counter64
+        UNITS       "Requests"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "A count of the invoked PFC requests primitives with
+         this priority class asserted"
+        ::= { jnxCosPfcPriorityEntry 3 }
+
+    jnxCosPfcPriorityRequestsRx OBJECT-TYPE
+        SYNTAX      Counter64
+        UNITS       "Requests"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "A count of the received PFC requests primitives with
+         this priority class asserted"
+        ::= { jnxCosPfcPriorityEntry 4 }
+
+    ---
+    --- End of PFC priority Table
+    ---
+
+    ---
+    --- PFC Watchdog Table
+    ---
+    jnxCosWatchdogTxQueueTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxCosWatchdogTxQueueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains tx-queue statistics related to the 
+             PFC Watchdog feature. Only queues for interfaces which
+             have PFC enabled appear in the table."
+    ::= { jnxCos 12 }
+
+    jnxCosWatchdogTxQueueEntry OBJECT-TYPE
+        SYNTAX      JnxCosWatchdogTxQueueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "A conceptual row in the jnxCosWatchdogTxQueueTable."
+        INDEX   { jnxCosWatchdogIfIndex, jnxCosWatchdogTxQueueId }
+        ::= { jnxCosWatchdogTxQueueTable 1 }
+
+    JnxCosWatchdogTxQueueEntry ::= SEQUENCE {
+        jnxCosWatchdogIfIndex               InterfaceIndex,
+        jnxCosWatchdogTxQueueId             Integer32,
+        jnxCosWatchdogTxQueueStuckCount     Integer32,
+        jnxCosWatchdogTxQueueRecoveredCount Integer32,
+        jnxCosWatchdogTotalPktDrop          Integer32,
+        jnxCosWatchdogLastPktDrop           Integer32
+    }
+
+    jnxCosWatchdogIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The index of an interface on which PFC and PFC Watchdog is enabled."
+        ::= { jnxCosWatchdogTxQueueEntry 1 }
+
+     jnxCosWatchdogTxQueueId OBJECT-TYPE
+        SYNTAX      Integer32 (0..15)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The ID of the queue of the PFC-enabled interface."
+        ::= { jnxCosWatchdogTxQueueEntry 2 }
+
+    jnxCosWatchdogTxQueueStuckCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Number of times a tx-queue was stuck due to a PFC storm."
+        ::= { jnxCosWatchdogTxQueueEntry 3 }
+
+    jnxCosWatchdogTxQueueRecoveredCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Number of times a tx-queue recovered after a PFC storm."
+        ::= { jnxCosWatchdogTxQueueEntry 4 }
+
+    jnxCosWatchdogTotalPktDrop OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Total number of Packets dropped due to PFC Strom Mitigation since boot."
+        ::= { jnxCosWatchdogTxQueueEntry 5 }
+
+    jnxCosWatchdogLastPktDrop OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Number of packets dropped due to PFC storm last time."
+        ::= { jnxCosWatchdogTxQueueEntry 6 }
+
+        ---
+        --- End of PFC Watchdog Table
+        ---
 END

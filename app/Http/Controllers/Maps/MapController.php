@@ -42,8 +42,8 @@ class MapController extends Controller
             ],
             'border' => Config::get('network_map_legend.di.border'),
             'background' => Config::get('network_map_legend.di.node'),
-                     ],
-               ];
+        ],
+        ];
     }
 
     protected function nodeHighlightStyle()
@@ -53,9 +53,9 @@ class MapController extends Controller
                 'border' => Config::get('network_map_legend.highlight.border'),
             ],
             'border' => Config::get('network_map_legend.highlight.border'),
-                     ],
-                'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
-               ];
+        ],
+            'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
+        ];
     }
 
     protected function nodeDownStyle()
@@ -67,8 +67,8 @@ class MapController extends Controller
             ],
             'border' => Config::get('network_map_legend.dn.border'),
             'background' => Config::get('network_map_legend.dn.node'),
-                     ],
-               ];
+        ],
+        ];
     }
 
     protected function nodeUpStyle()

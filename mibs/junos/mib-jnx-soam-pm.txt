@@ -28,7 +28,6 @@ IMPORTS
     LldpChassisIdSubtype,
     LldpPortId,
     LldpPortIdSubtype        FROM LLDP-MIB      -- [IEEExxx]
-    VlanIdOrNone, VlanId     FROM Q-BRIDGE-MIB  -- [RFC4363]
     ieee802dot1mibs, 
     IEEE8021VlanIndex        FROM IEEE8021-TC-MIB     
     dot1agCfmMdIndex,   
@@ -38,15 +37,16 @@ IMPORTS
     Dot1afCfmIndexIntegerNextFree,  
     Dot1agCfmMepIdOrZero     FROM IEEE8021-CFM-MIB
     jnxMibs                  FROM JUNIPER-SMI
+    IEEE8021PriorityValue FROM IEEE8021-TC-MIB
     ;
 
 jnxSoamPmMib MODULE-IDENTITY
-    LAST-UPDATED "201201131200Z" -- January 13, 2012
+    LAST-UPDATED "201605310000Z"     -- Tue May  31 00:00:00 2016 UTC 
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "Juniper Technical Assistance Center
          Juniper Networks, Inc.
-         1194 N. Mathilda Avenue
+         1133 Innovation Way
          Sunnyvale, CA 94089
          E-mail: support@juniper.net"
     DESCRIPTION
@@ -57,6 +57,11 @@ jnxSoamPmMib MODULE-IDENTITY
         REVISION "201201131200Z" -- January 13, 2012
         DESCRIPTION
          "Initial Version."
+
+        REVISION    "201605310000Z" -- 31-May-16
+        DESCRIPTION
+            "Removed duplicate entries"
+
         ::= { jnxMibs 78 }
 
 -- *****************************************************************************
@@ -79,13 +84,6 @@ jnxSoamPmNotificationObj OBJECT IDENTIFIER ::= { jnxSoamPmMibObjects 5 }
 -- Textual conventions
 -- ******************************************************************
 
-IEEE8021PriorityValue ::= TEXTUAL-CONVENTION 
-    DISPLAY-HINT "d"
-    STATUS      current 
-    DESCRIPTION
-        "An 802.1Q user priority value."
-    REFERENCE   "12.13.3.3"
-    SYNTAX      Unsigned32 (0..65535)
 
 JnxSoamTcTestPatternType ::= TEXTUAL-CONVENTION
     STATUS current
@@ -6165,6 +6163,81 @@ jnxSoamPmNotificationObjPriority OBJECT-TYPE
           "
      ::= { jnxSoamPmNotificationObj 8 }
 
+jnxSoamPmNotificationTotalFlaps OBJECT-TYPE
+     SYNTAX Unsigned32
+     MAX-ACCESS accessible-for-notify
+     STATUS current
+     DESCRIPTION
+         "The measured value of total number of flaps occured during the
+          flap trap timer itnerval.
+          "
+     ::= { jnxSoamPmNotificationObj 9 }
+
+jnxSoamPmNotificationAccTotalFlaps OBJECT-TYPE
+     SYNTAX Unsigned32
+     MAX-ACCESS accessible-for-notify
+     STATUS current
+     DESCRIPTION
+         "The measured value of total number of accumulated flaps occured during the
+          flap trap timer itnerval.
+          "
+     ::= { jnxSoamPmNotificationObj 10 }
+
+jnxSoamPmNotificationObjThresholdLastValue OBJECT-TYPE
+     SYNTAX Unsigned32
+     MAX-ACCESS accessible-for-notify
+     STATUS current
+     DESCRIPTION
+         "The measured value of the object at the time of the generation of the
+          last Notification during the flap trap timer interval.
+                 
+          This object is only used for the notification.
+          "
+     ::= { jnxSoamPmNotificationObj 11 }
+
+jnxSoamPmNotificationObjCurrentState OBJECT-TYPE
+     SYNTAX INTEGER {
+                aboveAlarm (1),
+                setAlarm (2),
+                clearAlarm (3)
+     }
+     MAX-ACCESS accessible-for-notify
+     STATUS current
+     DESCRIPTION
+         "The Current Notification Crossing Type of the 
+          object that caused the generation
+          of the notification at the end of timer interval 
+          from the jnxSoamLmThresholdEntry or
+          jnxSoamDmThresholdEntry.
+
+          aboveAlarm(1) indicates that the crossing type alarm was an above
+          threshold
+
+          setAlarm(2) indicates that the crossing type alarm was a set
+          threshold
+
+          clearAlarm(3) indicates that the crossing type alarm was a clear
+          threshold
+
+          This object is only used for the notification.
+          "
+     ::= { jnxSoamPmNotificationObj 12 }
+
+jnxSoamPmNotificationObjLastDateAndTime OBJECT-TYPE
+     SYNTAX DateAndTime
+     MAX-ACCESS accessible-for-notify
+     STATUS current
+     DESCRIPTION
+         "This object contains the time and date at the time that
+          the last notification event is detected, at the end of flap timer interval
+          and not the time of the first notification
+          generation.
+
+          This object is used only for notifications. The mechanism to set and keep
+          current the date and time is not specified.
+          "
+     ::= { jnxSoamPmNotificationObj 13 }
+
 -- *****************************************************************************
 -- NOTIFICATIONS (TRAPS)
 -- *****************************************************************************
@@ -6345,4 +6418,28 @@ jnxSoamPmThresholdCrossingAlarm NOTIFICATION-TYPE
 		 In such a case, another alarm interval period is started right away.
 		 "
 	 ::= { jnxSoamPmNotifications 3 } 
+
+jnxSoamPmThresholdFlapAlarm NOTIFICATION-TYPE
+         OBJECTS {
+                 jnxSoamPmNotificationObjThresholdId,
+                 jnxSoamPmNotificationObjThresholdConfig,
+                 jnxSoamPmNotificationObjThresholdLastValue,
+                 jnxSoamPmNotificationTotalFlaps,
+                 jnxSoamPmNotificationAccTotalFlaps,
+                 jnxSoamPmNotificationObjCurrentState,
+                 jnxSoamPmNotificationObjDestinationMep
+         }
+         STATUS current
+         DESCRIPTION
+                 " The jnxSoamPmThresholdFlapAlarm is sent when the CFM Threshold Flap 
+                   Notification feature is enabled which would dampen the 
+                   jnxSoamPmThresholdCrossingAlarm sent to NMS. The jnxSoamPmThresholdFlapAlarm
+                   gives details about Flaps occured during the time interval. The 
+                   jnxSoamPmThresholdFlapAlarm is sent for the follwing below conditions
+                   a) Trap is sent if  one flap sequence has occured
+                   b) Trap is sent if threshold or timer changes happens.
+                   c) Trap is sent when finite iterations counts expires.
+                 "
+
+         ::= { jnxSoamPmNotifications 4 }
 END

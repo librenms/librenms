@@ -1,5 +1,11 @@
 mib: DCN-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: DCN-MIB::switchMemorySize
+                used: DCN-MIB::switchMemoryBusy
+                descr: 'Memory Usage'
     os:
         hardware:
             - DCN-MIB::ntpEntSoftwareName.0

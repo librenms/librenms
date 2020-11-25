@@ -1,5 +1,14 @@
 mib: ZYXEL-ZYWALL-ZLD-COMMON-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: ZYXEL-ZYWALL-ZLD-COMMON-MIB::sysRAMUsage
+                index: 0
+            -
+                percent_used: ZYXEL-ES-COMMON::sysMgmtFlashUsage
+                descr: Flash
+                index: 1
     os:
         sysDescr_regex: '/(?<>.*)/'
     processors:

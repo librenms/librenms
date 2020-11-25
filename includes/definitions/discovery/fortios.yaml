@@ -1,4 +1,11 @@
 modules:
+    mempools:
+        data:
+            -
+                total: FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmSysMemCapacity
+                used: FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmSysMemUsed
+                precision: 1024
+                descr: 'Main Memory'
     os:
         version: FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmSysVersion.0
         serial:

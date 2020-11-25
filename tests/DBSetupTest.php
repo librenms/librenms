@@ -26,6 +26,7 @@ namespace LibreNMS\Tests;
 
 use Artisan;
 use DB;
+use LibreNMS\DB\Schema;
 
 class DBSetupTest extends DBTestCase
 {
@@ -118,10 +119,10 @@ class DBSetupTest extends DBTestCase
                 file_get_contents('misc/db_schema.yaml')
             );
 
-            $current_schema = dump_db_schema($this->connection);
+            $current_schema = Schema::dump($this->connection);
 
             $message = "Schema does not match the expected schema defined by misc/db_schema.yaml\n";
-            $message .= "If you have changed the schema, make sure you update it with ./scripts/build-schema.php\n";
+            $message .= "If you have changed the schema, make sure you update it with: lnms schema:dump\n";
 
             $this->assertEquals($master_schema, $current_schema, $message);
         }

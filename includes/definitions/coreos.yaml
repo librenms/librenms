@@ -6,7 +6,7 @@ icon: coreos
 processor_stacked: true
 over:
     - { graph: device_processor, text: 'Processor Usage' }
-    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
         sysDescr_regex: '/^Linux.*coreos/'

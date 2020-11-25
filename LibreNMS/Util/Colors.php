@@ -38,6 +38,7 @@ class Colors
             return [
                 'left' => 'c4323f',
                 'right' => 'c96a73',
+                'middle' => 'c75862',
             ];
         }
 
@@ -45,6 +46,7 @@ class Colors
             return [
                 'left' => 'bf5d5b',
                 'right' => 'd39392',
+                'middle' => 'c97e7d',
             ];
         }
 
@@ -52,6 +54,7 @@ class Colors
             return [
                 'left' => 'bf875b',
                 'right' => 'd3ae92',
+                'middle' => 'cca07e',
             ];
         }
 
@@ -59,12 +62,14 @@ class Colors
             return [
                 'left' => '5b93bf',
                 'right' => '92b7d3',
+                'middle' => '7da8c9',
             ];
         }
 
         return [
             'left' => '9abf5b',
             'right' => 'bbd392',
+            'middle' => 'afcc7c',
         ];
     }
 }

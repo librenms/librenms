@@ -417,6 +417,12 @@
             "order": 11,
             "type": "text"
         },
+        "auth_ad_domain": {
+            "group": "auth",
+            "section": "ad",
+            "order": 12,
+            "type": "text"
+        },
         "auth_ldap_attr.uid": {
             "default": "uid",
             "group": "auth",
@@ -627,6 +633,9 @@
             ]
         },
         "autodiscovery.nets-exclude": {
+            "group": "discovery",
+            "section": "networks",
+            "order": 2,
             "type": "array",
             "default": [
                 "0.0.0.0/8",
@@ -749,7 +758,10 @@
         },
         "core_descr": {
             "default": ["core"],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 2
         },
         "cpu_details_overview": {
             "default": false,
@@ -760,8 +772,11 @@
             "type": "array"
         },
         "customers_descr": {
-            "default": "cust",
-            "type": "text"
+            "default": ["cust"],
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 3
         },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
@@ -1804,6 +1819,19 @@
             ],
             "type": "array"
         },
+        "graph_colours.varied": {
+            "default": [
+                "CC0000",
+                "DC7201",
+                "FFBE55",
+                "008FEA",
+                "3CB371",
+                "708090",
+                "663399",
+                "00BFFF"
+            ],
+            "type": "array"
+        },
         "graph_descr.device_processor": {
             "default": "This is an aggregate graph of all processors in the system.",
             "type": "text"
@@ -2400,7 +2428,7 @@
             "default": {
                 "section": "system",
                 "order": 0,
-                "descr": "Memory Pool Usage"
+                "descr": "Memory Usage"
             },
             "type": "graph"
         },
@@ -3084,14 +3112,6 @@
             },
             "type": "graph"
         },
-        "graph_types.device.ucd_memory": {
-            "default": {
-                "section": "system",
-                "order": 0,
-                "descr": "Detailed Memory Usage"
-            },
-            "type": "graph"
-        },
         "graph_types.device.ucd_swap_io": {
             "default": {
                 "section": "system",
@@ -3705,7 +3725,11 @@
             "type": "directory"
         },
         "nets": {
-            "type": "array"
+            "type": "array",
+            "default": [],
+            "group": "discovery",
+            "section": "networks",
+            "order": 1
         },
         "network_map_items": {
             "default": [
@@ -3958,7 +3982,7 @@
                     "text": "Processor Usage"
                 },
                 {
-                    "graph": "device_ucd_memory",
+                    "graph": "device_mempool",
                     "text": "Memory Usage"
                 }
             ],
@@ -4081,7 +4105,10 @@
             "default": [
                 "peering"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 0
         },
         "peeringdb.enabled": {
             "default": false,
@@ -5118,7 +5145,10 @@
         },
         "transit_descr": {
             "default": ["transit"],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 1
         },
         "twofactor": {
             "type": "boolean",

@@ -31,14 +31,14 @@ use Log;
 
 trait YamlOSDiscovery
 {
-    private $dbFields = [
+    private $osDbFields = [
         'version',
         'hardware',
         'features',
         'serial',
     ];
 
-    private $fields = [
+    private $osFields = [
         'version',
         'hardware',
         'features',
@@ -48,8 +48,7 @@ trait YamlOSDiscovery
 
     public function discoverOS(Device $device): void
     {
-        $yaml = $this->getDiscovery();
-        $os_yaml = $yaml['modules']['os'] ?? [];
+        $os_yaml = $this->getDiscovery('os');
 
         if (isset($os_yaml['sysDescr_regex'])) {
             $this->parseRegex($os_yaml['sysDescr_regex'], $device->sysDescr);
@@ -59,7 +58,7 @@ trait YamlOSDiscovery
             $this->translateSysObjectID($os_yaml['hardware_mib'], $os_yaml['hardware_regex'] ?? null);
         }
 
-        $oids = Arr::only($os_yaml, $this->fields);
+        $oids = Arr::only($os_yaml, $this->osFields);
         $fetch_oids = array_unique(Arr::flatten($oids));
         $numeric = $this->isNumeric($fetch_oids);
         $flags = $numeric ? '-OUQn' : '-OUQ';
@@ -106,7 +105,7 @@ trait YamlOSDiscovery
 
         foreach (Arr::wrap($regexes) as $regex) {
             if (preg_match($regex, $subject, $matches)) {
-                foreach ($this->dbFields as $field) {
+                foreach ($this->osDbFields as $field) {
                     if (isset($matches[$field])) {
                         $device->$field = $matches[$field];
                     }

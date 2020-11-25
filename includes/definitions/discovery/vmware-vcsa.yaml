@@ -1,0 +1,5 @@
+modules:
+    os:
+        version: VMWARE-SYSTEM-MIB::vmwProdVersion.0
+        features: VMWARE-SYSTEM-MIB::vmwProdBuild.0
+        features_template: 'build {{ VMWARE-SYSTEM-MIB::vmwProdBuild.0 }}'

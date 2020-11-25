@@ -25,10 +25,10 @@
 namespace LibreNMS\Modules;
 
 use App\Models\PortsNac;
+use App\Observers\ModuleModelObserver;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
-use LibreNMS\Util\ModuleModelObserver;
 
 class Nac implements Module
 {
@@ -54,9 +54,7 @@ class Nac implements Module
     {
         if ($os instanceof NacPolling) {
             // discovery output (but don't install it twice (testing can can do this)
-            if (! PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
-                PortsNac::observe(new ModuleModelObserver());
-            }
+            ModuleModelObserver::observe(PortsNac::class);
 
             $nac_entries = $os->pollNac()->keyBy('mac_address');
             $existing_entries = $os->getDevice()->portsNac->keyBy('mac_address');

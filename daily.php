@@ -161,7 +161,7 @@ if ($options['f'] === 'handle_notifiable') {
             if ($options['r'] === 'php53') {
                 $phpver = '5.6.4';
                 $eol_date = 'January 10th, 2018';
-            } elseif ($options['r'] === 'php56' || $options['r'] === 'php71') {
+            } elseif ($options['r'] === 'php56' || $options['r'] === 'php71' || $options['r'] === 'php72') {
                 $phpver = Php::PHP_MIN_VERSION;
                 $eol_date = Php::PHP_MIN_VERSION_DATE;
             }

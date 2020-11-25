@@ -239,5 +239,32 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "192",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "comware",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Board",
+                    "mempool_perc": 32,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.8.192",
+                    "mempool_used": 669713695,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1423141601,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2092855296,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

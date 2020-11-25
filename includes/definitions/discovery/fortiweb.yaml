@@ -1,5 +1,12 @@
 mib: FORTINET-FORTIWEB-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: FORTINET-FORTIWEB-MIB::fwSysMemCapacity
+                percent_used: FORTINET-FORTIWEB-MIB::fwSysMemUsage
+                precision: 1048576
+                descr: 'Physical Memory'
     os:
         serial:
             - FORTINET-CORE-MIB::fnSysSerial.0

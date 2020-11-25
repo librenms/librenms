@@ -27,51 +27,51 @@ $array = [
         'descr'  => 'Set attributes',
         'colour' => '4D65A2',
     ],
-     'lookup' => [
-         'descr'  => 'Lookup',
-         'colour' => '8B64A1',
-     ],
-     'access' => [
-         'descr'  => 'Access',
-         'colour' => 'AAAA39',
-     ],
-     'read' => [
-         'descr'  => 'Read',
-         'colour' => '',
-     ],
-     'write' => [
-         'descr'  => 'Write',
-         'colour' => '457A9A',
-     ],
-     'create' => [
-         'descr'  => 'Create',
-         'colour' => '690D87',
-     ],
-     'mkdir' => [
-         'descr'  => 'Make dir',
-         'colour' => '072A3F',
-     ],
-     'remove' => [
-         'descr'  => 'Remove',
-         'colour' => 'F16464',
-     ],
-     'rmdir' => [
-         'descr'  => 'Remove dir',
-         'colour' => '57162D',
-     ],
-     'rename' => [
-         'descr'  => 'Rename',
-         'colour' => 'A40B62',
-     ],
-     'readdirplus' => [
-         'descr'  => 'Read dir plus',
-         'colour' => 'F1F164',
-     ],
-     'fsstat' => [
-         'descr'  => 'FS stat',
-         'colour' => 'F1F191',
-     ],
-                ];
+    'lookup' => [
+        'descr'  => 'Lookup',
+        'colour' => '8B64A1',
+    ],
+    'access' => [
+        'descr'  => 'Access',
+        'colour' => 'AAAA39',
+    ],
+    'read' => [
+        'descr'  => 'Read',
+        'colour' => '',
+    ],
+    'write' => [
+        'descr'  => 'Write',
+        'colour' => '457A9A',
+    ],
+    'create' => [
+        'descr'  => 'Create',
+        'colour' => '690D87',
+    ],
+    'mkdir' => [
+        'descr'  => 'Make dir',
+        'colour' => '072A3F',
+    ],
+    'remove' => [
+        'descr'  => 'Remove',
+        'colour' => 'F16464',
+    ],
+    'rmdir' => [
+        'descr'  => 'Remove dir',
+        'colour' => '57162D',
+    ],
+    'rename' => [
+        'descr'  => 'Rename',
+        'colour' => 'A40B62',
+    ],
+    'readdirplus' => [
+        'descr'  => 'Read dir plus',
+        'colour' => 'F1F164',
+    ],
+    'fsstat' => [
+        'descr'  => 'FS stat',
+        'colour' => 'F1F191',
+    ],
+];
 
 $i = 0;
 
