@@ -128,6 +128,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
 
         if ($default == 'virtual' && Str::contains($this->mempool_descr, ['/dev/'])) {
             $this->mempool_class = 'swap';
+
             return $this;
         }
 
