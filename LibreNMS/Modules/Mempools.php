@@ -80,6 +80,7 @@ class Mempools implements Module
 
             if (empty($mempool->mempool_class)) {
                 Log::debug('Mempool skipped. Does not include class.');
+
                 return;
             }
 
