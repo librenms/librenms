@@ -253,7 +253,7 @@ class ServiceTemplateController extends Controller
      */
     public function apply(ServiceTemplate $template)
     {
-        foreach (Device::intemplate($template->device_group_id)->get() as $device) {
+        foreach (Device::inServiceTemplate($template->device_group_id)->get() as $device) {
             $device->services()->updateOrCreate(
                 [
                     'service_template_id' => $template->id,
@@ -271,7 +271,7 @@ class ServiceTemplateController extends Controller
             );
         }
         // remove any remaining services no longer in the correct device group
-        foreach (Device::notIntemplate($template->device_group_id)->get() as $device) {
+        foreach (Device::notInServiceTemplate($template->device_group_id)->get() as $device) {
             Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
         }
         $msg = __('Services for Template :name have been updates', ['name' => $template->name]);
