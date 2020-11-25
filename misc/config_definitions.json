@@ -3726,6 +3726,7 @@
         },
         "nets": {
             "type": "array",
+            "default": [],
             "group": "discovery",
             "section": "networks",
             "order": 1
