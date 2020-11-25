@@ -25,11 +25,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Log;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use LibreNMS\Interfaces\Models\Keyable;
 use Permissions;
 
 class ServiceTemplate extends BaseModel

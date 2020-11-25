@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
-use App\Models\template;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
