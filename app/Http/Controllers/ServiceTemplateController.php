@@ -333,6 +333,22 @@ class ServiceTemplateController extends Controller
     }
 
     /**
+     * Apply specified Service Templates.
+     *
+     * @param  \App\Models\ServiceTemplate $template
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function apply(ServiceTemplate $template)
+    {
+        ServiceTemplateController::applyDevice($template);
+        ServiceTemplateController::applyDeviceGroup($template);
+
+        $msg = __('All Service Templates have been applied');
+
+        return response($msg, 200);
+    }
+
+    /**
      * Remove the Services for the specified Device Group.
      *
      * @param  \App\Models\ServiceTemplate $template
