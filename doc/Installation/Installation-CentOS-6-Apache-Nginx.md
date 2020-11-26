@@ -435,7 +435,7 @@ cp librenms.nonroot.cron /etc/cron.d/librenms
 > settings in config.php is possible too. The config.php file will be
 > created in the upcoming steps. Review the following URL after you
 > finished librenms install steps:
-> <https://docs.librenms.org/Support/Configuration/#proxy-support>
+> <@= config.site_url =@/Support/Configuration/#proxy-support>
 
 # Copy logrotate config
 
@@ -468,7 +468,7 @@ $config['update'] = 0;
 
 Please allow for 2-3 runs of the poller-wrapper for data to start
 appearing in the WebUI. If you don't see data after this, please refer
-to the [FAQ](http://docs.librenms.org/Support/FAQ/) for assistance.
+to the [FAQ](../Support/FAQ.md) for assistance.
 
 That's it!  You now should be able to log in to
 <http://librenms.example.com/>. Please note that we have not covered
@@ -478,7 +478,6 @@ have configured HTTPS and taken appropriate web server hardening
 steps.
 
 It would be great if you would consider opting into the stats system
-we have, please see [this
-page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on
+we have, please see [this page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
