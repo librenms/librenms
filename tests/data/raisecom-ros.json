@@ -3770,6 +3770,78 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "state_name": "rosMgmtAlarmMgmtMonitorLevel"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.8886.1.2.1.3.0",
+                    "sensor_index": "0",
+                    "sensor_type": "rosMgmtConfigLoadState",
+                    "sensor_descr": "Config 0 Load  State",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "rosMgmtConfigLoadState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.272637955.1",
+                    "sensor_index": "tx-272637955",
+                    "sensor_type": "rosMgmtOpticalTransceiverTemperature",
+                    "sensor_descr": "tengigabitethernet1/1/1 Transceiver Temperature",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 36.125,
+                    "sensor_limit": 75,
+                    "sensor_limit_warn": 70,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "272637955",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.272637959.1",
+                    "sensor_index": "tx-272637959",
+                    "sensor_type": "rosMgmtOpticalTransceiverTemperature",
+                    "sensor_descr": "tengigabitethernet1/1/2 Transceiver Temperature",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 35.875,
+                    "sensor_limit": 75,
+                    "sensor_limit_warn": 70,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "272637959",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
                 }
             ],
             "state_indexes": [
@@ -3814,9 +3886,208 @@
                     "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
+                },
+                {
+                    "state_name": "rosMgmtConfigLoadState",
+                    "state_descr": "ready",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rosMgmtConfigLoadState",
+                    "state_descr": "running",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rosMgmtConfigLoadState",
+                    "state_descr": "successful",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rosMgmtConfigLoadState",
+                    "state_descr": "failed",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 2
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.8886.60.34.1.1.7.0",
+                    "sensor_index": "0",
+                    "sensor_type": "rosMgmtAlarmMgmtMonitorLevel",
+                    "sensor_descr": "The level of Alarm Monitor",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 6,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "rosMgmtAlarmMgmtMonitorLevel"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.8886.1.2.1.3.0",
+                    "sensor_index": "0",
+                    "sensor_type": "rosMgmtConfigLoadState",
+                    "sensor_descr": "Config 0 Load  State",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 3,
+                    "user_func": null,
+                    "state_name": "rosMgmtConfigLoadState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.272637955.1",
+                    "sensor_index": "tx-272637955",
+                    "sensor_type": "rosMgmtOpticalTransceiverTemperature",
+                    "sensor_descr": "tengigabitethernet1/1/1 Transceiver Temperature",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 36.125,
+                    "sensor_limit": 75,
+                    "sensor_limit_warn": 70,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "272637955",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.272637959.1",
+                    "sensor_index": "tx-272637959",
+                    "sensor_type": "rosMgmtOpticalTransceiverTemperature",
+                    "sensor_descr": "tengigabitethernet1/1/2 Transceiver Temperature",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 35.875,
+                    "sensor_limit": 75,
+                    "sensor_limit_warn": 70,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "272637959",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "rosMgmtAlarmMgmtMonitorLevel",
+                    "state_descr": "clear",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rosMgmtAlarmMgmtMonitorLevel",
+                    "state_descr": "indeterminate",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rosMgmtAlarmMgmtMonitorLevel",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "rosMgmtAlarmMgmtMonitorLevel",
+                    "state_descr": "major",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "rosMgmtAlarmMgmtMonitorLevel",
+                    "state_descr": "minor",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rosMgmtAlarmMgmtMonitorLevel",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rosMgmtConfigLoadState",
+                    "state_descr": "ready",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rosMgmtConfigLoadState",
+                    "state_descr": "running",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "rosMgmtConfigLoadState",
+                    "state_descr": "successful",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rosMgmtConfigLoadState",
+                    "state_descr": "failed",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 2
+                }
+            ]
+        }
     }
 }
