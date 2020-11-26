@@ -173,7 +173,7 @@ cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 > settings in config.php is possible too. The config.php file will be
 > created in the upcoming steps. Review the following URL after you
 > finished librenms install steps:
-> <https://docs.librenms.org/Support/Configuration/#proxy-support>
+> <@= config.site_url =@/Support/Configuration/#proxy-support>
 
 # Copy logrotate config
 
@@ -241,19 +241,18 @@ site: <https://www.librenms.org/#support>
 Now that you've installed LibreNMS, we'd suggest that you have a read
 of a few other docs to get you going:
 
-- [Performance tuning](http://docs.librenms.org/Support/Performance)
-- [Alerting](http://docs.librenms.org/Extensions/Alerting/)
-- [Device Groups](http://docs.librenms.org/Extensions/Device-Groups/)
-- [Auto discovery](http://docs.librenms.org/Extensions/Auto-Discovery/)
+- [Performance tuning](../Support/Performance.md)
+- [Alerting](../Extensions/Alerting.md)
+- [Device Groups](../Extensions/Device-Groups.md)
+- [Auto discovery](../Extensions/Auto-Discovery.md)
 
 # Closing
 
 We hope you enjoy using LibreNMS. If you do, it would be great if you
 would consider opting into the stats system we have, please see [this
-page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on
+page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
 If you would like to help make LibreNMS better there are [many ways to
-help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You
-can also [back LibreNMS on Open
-Collective](https://t.libren.ms/donations).
+help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-helpa). You
+can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

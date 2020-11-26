@@ -20,7 +20,7 @@ Collection](../Alerting/Rules.md#alert-rules-collection).
 
 ## Setting the ping check to 1 minute
 
-1: If you are using [RRDCached](http://docs.librenms.org/Extensions/RRDCached/), stop the service.
+1: If you are using [RRDCached](../Extensions/RRDCached.md), stop the service.
 
     - This will flush all pending writes so that the rrdstep.php script can change the steps.
     
@@ -44,7 +44,7 @@ ping checks
 *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
 ```
 
-5: If applicable: Start the [RRDCached](http://docs.librenms.org/Extensions/RRDCached/) service
+5: If applicable: Start the [RRDCached](../Extensions/RRDCached.md) service
 
 
 **NOTE**: If you are using distributed pollers you can restrict a

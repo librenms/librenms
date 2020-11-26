@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 # Authentication modules
 
-LibreNMS supports multiple authentication modules along with [Two Factor Auth](http://docs.librenms.org/Extensions/Two-Factor-Auth/).
+LibreNMS supports multiple authentication modules along with [Two Factor Auth](Two-Factor-Auth.md).
 Here we will provide configuration details for these modules.
 
 # Available authentication modules

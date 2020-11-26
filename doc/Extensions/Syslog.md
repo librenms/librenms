@@ -264,8 +264,7 @@ $config['syslog_purge'] = 30;
 
 The cleanup is run by daily.sh and any entries over X days old are
 automatically purged. Values are in days. See here for more Clean Up
-Options
-[Link](https://docs.librenms.org/Support/Cleanup-options/)
+Options [Link](../Support/Cleanup-options.md)
 
 # Client configuration
 
