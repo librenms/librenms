@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateServicesTemplateTable extends Migration
+class CreateServiceTemplatesTable extends Migration
 {
     /**
      * Run the migrations.

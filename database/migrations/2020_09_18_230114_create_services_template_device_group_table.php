@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateServiceTemplateDeviceGroupTable extends Migration
+class CreateServiceTemplatesDeviceGroupTable extends Migration
 {
     /**
      * Run the migrations.
