@@ -251,7 +251,7 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Apply specified Service Template to Device Groups.
      *
      * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
@@ -287,7 +287,7 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Apply specified Service Template to Devices.
      *
      * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
@@ -336,7 +336,7 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Apply specified Service Templates.
+     * Apply specified Service Template.
      *
      * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
@@ -352,7 +352,7 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Remove specified Service Templates.
+     * Remove specified Service Template.
      *
      * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
@@ -366,8 +366,9 @@ class ServiceTemplateController extends Controller
 
         return response($msg, 200);
     }
+
     /**
-     * Remove the Services for the specified Device Group.
+     * Remove specified Service Template from Device Groups.
      *
      * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
@@ -385,7 +386,7 @@ class ServiceTemplateController extends Controller
     }
 
     /**
-     * Remove the Services for the specified Device.
+     * Remove specified Service Template from Devices.
      *
      * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
