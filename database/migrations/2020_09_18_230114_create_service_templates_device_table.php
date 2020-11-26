@@ -16,7 +16,7 @@ class CreateServiceTemplatesDeviceTable extends Migration
             $table->unsignedInteger('service_template_id')->unsigned()->index();
             $table->unsignedInteger('device_id')->unsigned()->index();
 
-            $table->primary(['service_template_id', 'device_id']);
+            $table->primary(['service_template_id', 'device_id'], 'service_templates_device_relationship_primary');
         });
     }
 
