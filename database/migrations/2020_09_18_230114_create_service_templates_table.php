@@ -29,11 +29,6 @@ class CreateServiceTemplatesTable extends Migration
             $table->boolean('disabled')->default(0);
             $table->string('name');
         });
-        Schema::create('service_templates_perms', function (Blueprint $table) {
-            $table->unsignedInteger('user_id')->index();
-            $table->unsignedInteger('service_template_id')->index();
-            $table->primary(['service_template_id', 'user_id']);
-        });
     }
 
     /**
@@ -44,6 +39,5 @@ class CreateServiceTemplatesTable extends Migration
     public function down()
     {
         Schema::drop('service_templates');
-        Schema::drop('service_templates_perms');
     }
 }
