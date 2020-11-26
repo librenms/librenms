@@ -16,10 +16,10 @@ class CreateServiceTemplatesTable extends Migration
             $table->increments('id');
             $table->text('ip')->nullable()->default(null);
             $table->string('type');
-            $table->string('dtype', 16)->default('dynamic')->after('type');
-            $table->string('dgtype', 16)->default('dynamic')->after('dtype');
-            $table->text('drules')->nullable()->after('dgtype');
-            $table->text('dgrules')->nullable()->after('drules');
+            $table->string('dtype', 16)->default('dynamic');
+            $table->string('dgtype', 16)->default('dynamic');
+            $table->text('drules')->nullable();
+            $table->text('dgrules')->nullable();
             $table->text('desc')->nullable()->default(null);
             $table->text('param')->nullable()->default(null);
             $table->boolean('ignore')->default(0);
