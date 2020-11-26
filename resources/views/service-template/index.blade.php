@@ -56,6 +56,9 @@
                                 <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
                                     onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.apply', $template->id) }}')">
                                     <i class="fa fa-refresh" aria-hidden="true"></i></button>
+                                <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Remove')"
+                                    onclick="remove_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.remove', $template->id) }}')">
+                                    <i class="fa fa-ban" aria-hidden="true"></i></button>
                                 <a type="button" title="@lang('Edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
                                     href="{{ route('services.templates.edit', $template->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
@@ -99,12 +102,6 @@
                                         <td>{{ $template->ignore }}</td>
                                         <td>{{ $template->disabled }}</td>
                                         <td>
-                                            <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
-                                                onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.applyDeviceGroup', $template->id) }}')">
-                                                <i class="fa fa-refresh" aria-hidden="true"></i></button>
-                                            <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Remove')"
-                                                onclick="remove_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.removeDeviceGroup', $template->id) }}')">
-                                                <i class="fa fa-ban" aria-hidden="true"></i></button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -144,12 +141,6 @@
                                         <td>{{ $template->ignore }}</td>
                                         <td>{{ $template->disabled }}</td>
                                         <td>
-                                            <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
-                                                onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.applyDevice', $template->id) }}')">
-                                                <i class="fa fa-refresh" aria-hidden="true"></i></button>
-                                            <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Remove')"
-                                                onclick="remove_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.removeDevice', $template->id) }}')">
-                                                <i class="fa fa-ban" aria-hidden="true"></i></button>
                                         </td>
                                     </tr>
                                 @endforeach

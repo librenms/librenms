@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
@@ -255,9 +256,45 @@ class ServiceTemplateController extends Controller
      * @param  \App\Models\ServiceTemplate $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function applyDeviceGroup(ServiceTemplate $template)
+    public function applyDeviceGroups(ServiceTemplate $template)
     {
-        foreach (Device::inServiceTemplate($template->device_group_id)->get() as $device) {
+        foreach (DeviceGroup::inServiceTemplate($template->id)->get() as $device_group) {
+            foreach (Device::inDeviceGroup($device_group->id)->get() as $device) {
+                $device->services()->updateOrCreate(
+                    [
+                        'service_template_id' => $template->id,
+                    ],
+                    [
+                        'service_name' => $template->name,
+                        'service_type' => $template->type,
+                        'service_template_id' => $template->id,
+                        'service_param' => $template->param,
+                        'service_ip' => $template->ip,
+                        'service_desc' => $template->desc,
+                        'service_disabled' => $template->disabled,
+                        'service_ignore' => $template->ignore,
+                    ]
+                );
+            }
+        }
+        // remove any remaining services no longer in the correct device group
+        //foreach (Device::notInServiceTemplate($template->device_group_id)->get() as $device) {
+        //    Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
+        //}
+        $msg = __('Services for Template :name have been updated', ['name' => $template->name]);
+
+        return response($msg, 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Models\ServiceTemplate $template
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function applyDevices(ServiceTemplate $template)
+    {
+        foreach (Device::inServiceTemplate($template->id)->get() as $device) {
             $device->services()->updateOrCreate(
                 [
                     'service_template_id' => $template->id,
@@ -274,40 +311,6 @@ class ServiceTemplateController extends Controller
                 ]
             );
         }
-        // remove any remaining services no longer in the correct device group
-        //foreach (Device::notInServiceTemplate($template->device_group_id)->get() as $device) {
-        //    Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
-        //}
-        $msg = __('Services for Template :name have been updated', ['name' => $template->name]);
-
-        return response($msg, 200);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Models\ServiceTemplate $template
-     * @param  \App\Models\Device $device
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
-     */
-    public function applyDevice(ServiceTemplate $template, Device $device)
-    {
-        $device->services()->updateOrCreate(
-            [
-                'service_template_id' => $template->id,
-            ],
-            [
-                'service_name' => $template->name,
-                'service_type' => $template->type,
-                'service_template_id' => $template->id,
-                'service_param' => $template->param,
-                'service_ip' => $template->ip,
-                'service_desc' => $template->desc,
-                'service_disabled' => $template->disabled,
-                'service_ignore' => $template->ignore,
-            ]
-        );
-
         // remove any remaining services no longer in the correct device group
         //foreach (Device::notInServiceTemplate($template->device_group_id)->get() as $device) {
         //    Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
@@ -340,8 +343,8 @@ class ServiceTemplateController extends Controller
      */
     public function apply(ServiceTemplate $template)
     {
-        ServiceTemplateController::applyDevice($template);
-        ServiceTemplateController::applyDeviceGroup($template);
+        ServiceTemplateController::applyDevices($template);
+        ServiceTemplateController::applyDeviceGroups($template);
 
         $msg = __('All Service Templates have been applied');
 
@@ -349,16 +352,32 @@ class ServiceTemplateController extends Controller
     }
 
     /**
+     * Remove specified Service Templates.
+     *
+     * @param  \App\Models\ServiceTemplate $template
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function remove(ServiceTemplate $template)
+    {
+        ServiceTemplateController::removeDevices($template);
+        ServiceTemplateController::removeDeviceGroups($template);
+
+        $msg = __('All Service Templates have been applied');
+
+        return response($msg, 200);
+    }
+    /**
      * Remove the Services for the specified Device Group.
      *
      * @param  \App\Models\ServiceTemplate $template
-     * @param  \App\Models\DeviceGroup $deviceGroup
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function removeDeviceGroup(ServiceTemplate $template, DeviceGroup $deviceGroup)
+    public function removeDeviceGroups(ServiceTemplate $template)
     {
-        foreach (Device::inDeviceGroup($deviceGroup->id)->get() as $device) {
-            Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
+        foreach (DeviceGroup::inServiceTemplate($template->id)->get() as $device_group) {
+            foreach (Device::inDeviceGroup($device_group->id)->get() as $device) {
+                Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
+            }
         }
         $msg = __('Services for Template :name have been removed', ['name' => $template->name]);
 
@@ -369,16 +388,14 @@ class ServiceTemplateController extends Controller
      * Remove the Services for the specified Device.
      *
      * @param  \App\Models\ServiceTemplate $template
-     * @param  \App\Models\Device $device
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function removeDevice(ServiceTemplate $template, Device $device)
+    public function removeDevices(ServiceTemplate $template)
     {
-        if (Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete()) {
-            $msg = __('Services for Template :name have been removed', ['name' => $template->name]);
-        } else {
-            $msg = __('No Services for Template :name were removed', ['name' => $template->name]);
+        foreach (Device::inServiceTemplate($template->id)->get() as $device) {
+            Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
         }
+        $msg = __('Services for Template :name have been removed', ['name' => $template->name]);
 
         return response($msg, 200);
     }
