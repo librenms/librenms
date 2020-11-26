@@ -13,7 +13,7 @@
                     "os": "opnsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "opnsense.png",
+                    "icon": "opnsense.svg",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "opnsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "opnsense.png",
+                    "icon": "opnsense.svg",
                     "location": null
                 }
             ]
