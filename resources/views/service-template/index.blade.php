@@ -37,7 +37,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($templates as $template)
+                    @foreach($service_templates as $template)
                         <tr id="row_{{ $template->id }}">
                             <td>{{ $template->name }}</td>
                             <td>{{ $template->desc }}</td>
