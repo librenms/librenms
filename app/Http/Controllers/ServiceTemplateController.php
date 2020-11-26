@@ -25,16 +25,11 @@ class ServiceTemplateController extends Controller
      */
     public function index()
     {
-        $this->authorize('manage', ServiceTemplate::class);
-
-        $ungrouped_devices = Device::orderBy('hostname')->whereNotIn('device_id', function ($query) {
-            $query->select('device_id')->from('service_templates_device');
-        })->get();
+        //$this->authorize('manage', ServiceTemplate::class);
 
         return view(
             'service-template.index', [
                 'service_templates' => ServiceTemplate::orderBy('name')->withCount('devices')->get(),
-                'ungrouped_devices' => $ungrouped_devices,
             ]
         );
     }
