@@ -1786,7 +1786,6 @@ service_templates:
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    service_templates_device_id_index: { Name: service_templates_device_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
 service_templates_device:
   Columns:
     - { Field: service_template_id, Type: 'int unsigned', 'Null': false, Extra: '' }
