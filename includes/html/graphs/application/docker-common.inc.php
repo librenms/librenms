@@ -1,4 +1,5 @@
 <?php
+
 $name = 'docker';
 $app_id = $app['app_id'];
 $colours = 'mega';
@@ -12,22 +13,22 @@ $bigdescrlen = 25;
 $smalldescrlen = 25;
 
 if (isset($vars['container'])) {
-    $containers=array($vars['container']);
+    $containers = [$vars['container']];
 } else {
-    $containers=get_arrays_with_application($device, $app['app_id'], 'docker');
+    $containers = get_arrays_with_application($device, $app['app_id'], 'docker');
 }
 
-$int=0;
+$int = 0;
 while (isset($containers[$int])) {
-    $container_name=$containers[$int];
-    $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id, $container_name));
+    $container_name = $containers[$int];
+    $rrd_filename = rrd_name($device['hostname'], ['app', $name, $app_id, $container_name]);
 
     if (rrdtool_check_rrd_exists($rrd_filename)) {
-        $rrd_list[]=array(
+        $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr'    => $container_name,
             'ds'       => $rrdVar,
-        );
+        ];
     }
     $int++;
 }
