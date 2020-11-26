@@ -94,9 +94,9 @@ exception):
 [11]: http://www.librenms.org/#downloads
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
-[15]: http://docs.librenms.org/General/Contributing/
-[16]: http://docs.librenms.org/
-[17]: http://docs.librenms.org/General/Acknowledgement/
+[15]: https://docs.librenms.org/General/Contributing/
+[16]: https://docs.librenms.org/
+[17]: https://docs.librenms.org/General/Acknowledgement/
 [19]: https://github.com/librenms/librenms/pulls
 
 

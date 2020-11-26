@@ -9,7 +9,7 @@ The suggestions are in a rough order of how much impact they will have.
 
 ## RRDCached
 
-**We absolutely recommend running this, it will save on IO load**. [RRDCached](http://docs.librenms.org/Extensions/RRDCached/)
+**We absolutely recommend running this, it will save on IO load**. [RRDCached](../Extensions/RRDCached.md)
 
 ## MySQL Optimisation
 
@@ -45,7 +45,7 @@ $config['poller_modules']['ospf'] = false;
 
 You can disable modules globally then re-enable the module per device
 or the opposite way. For a list of modules please see [Poller
-modules](http://docs.librenms.org/Support/Poller%20Support/)
+modules](../Support/Poller%20Support.md)
 
 ## SNMP Max Repeaters
 
@@ -122,7 +122,7 @@ librenms. Usually in `/etc/cron.d/librenms` and changing the "16"
 ```
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 ```
-Please also see [Dispatcher Service](https://docs.librenms.org/Extensions/Dispatcher-Service/)
+Please also see [Dispatcher Service](../Extensions/Dispatcher-Service.md)
 
 ## Recursive DNS
 

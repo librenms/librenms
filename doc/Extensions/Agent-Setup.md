@@ -15,8 +15,7 @@ Make sure that systemd or xinetd is installed on the host you want to
 run the agent on.
 
 The agent uses TCP-Port 6556, please allow access from the **LibreNMS
-host** and **poller nodes** if you're using the [Distributed
-Polling](http://docs.librenms.org/Extensions/Distributed-Poller/)
+host** and **poller nodes** if you're using the [Distributed Polling](Distributed-Poller.md)
 setup.
 
 On each of the hosts you would like to use the agent on, you need to do the following:

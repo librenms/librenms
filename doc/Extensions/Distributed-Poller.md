@@ -93,7 +93,7 @@ running within an OpenStack environment with some commodity hardware
 for remote pollers. Here's a diagram of how you can scale LibreNMS
 out:
 
-![Example Setup](http://docs.librenms.org/img/librenms-distributed-diagram.png)
+![Example Setup](@= config.site_url =@/img/librenms-distributed-diagram.png)
 
 ## Architecture
 
