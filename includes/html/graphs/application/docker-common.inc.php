@@ -1,14 +1,14 @@
 <?php
 $name = 'docker';
 $app_id = $app['app_id'];
-$colours       = 'mega';
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 15;
+$colours = 'mega';
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 15;
 
-$unitlen       = 20;
-$bigdescrlen   = 25;
+$unitlen = 20;
+$bigdescrlen = 25;
 $smalldescrlen = 25;
 
 if (isset($vars['container'])) {
