@@ -23,7 +23,7 @@ foreach ($domain_list as $label) {
     array_push($containers_list, generate_link($label, $link_array, ['container' => $container]));
 }
 
-printf("%s | containers: %s", generate_link('All Containers', $link_array), implode(', ', $containers_list));
+printf('%s | containers: %s', generate_link('All Containers', $link_array), implode(', ', $containers_list));
 
 print_optionbar_end();
 

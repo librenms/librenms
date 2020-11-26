@@ -362,7 +362,7 @@ $graphs['docker'] = [
     'pids',
     'mem_limit',
     'mem_used',
-    'mem_perc'
+    'mem_perc',
 ];
 
 echo '<div class="panel panel-default">';
