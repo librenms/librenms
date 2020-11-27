@@ -19,7 +19,7 @@
     </div>
 </div>
 
-<div id="dynamic-st-form" class="form-group @if($errors->has('drules')) has-error @endif">
+<div id="dynamic-st-d-form" class="form-group @if($errors->has('drules')) has-error @endif">
     <label for="pattern" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
@@ -27,11 +27,11 @@
     </div>
 </div>
 
-<div id="static-st-form" class="form-group @if($errors->has('devices')) has-error @endif" style="display: none">
+<div id="static-st-d-form" class="form-group @if($errors->has('devices')) has-error @endif" style="display: none">
     <label for="devices" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Select Devices')</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="devices" name="devices[]" multiple>
-            @foreach($device_group->devices as $device)
+            @foreach($template->devices as $device)
                 <option value="{{ $device->device_id }}" selected>{{ $device->displayName() }}</option>
             @endforeach
         </select>
@@ -52,7 +52,7 @@
     </div>
 </div>
 
-<div id="dynamic-st-form" class="form-group @if($errors->has('dgrules')) has-error @endif">
+<div id="dynamic-st-dg-form" class="form-group @if($errors->has('dgrules')) has-error @endif">
     <label for="pattern" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Group Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder2"></div>
@@ -60,15 +60,15 @@
     </div>
 </div>
 
-<div id="static-st-form" class="form-group @if($errors->has('device_group_id')) has-error @endif" style="display: none">
-    <label for="device_group_id" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Groups')</label>
+<div id="static-st-dg-form" class="form-group @if($errors->has('groups')) has-error @endif" style="display: none">
+    <label for="groups" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Groups')</label>
     <div class="col-sm-9 col-md-10">
-        <select class="form-control" id="device_group_id" name="device_group_id[]" multiple>
-            @foreach($device_groups as $device_group)
-                <option value="{{ $device_group->id }}" selected>{{ $device_group->name }}</option>
+        <select class="form-control" id="groups" name="groups[]" multiple>
+            @foreach($template->groups as $group)
+                <option value="{{ $group->id }}" selected>{{ $group->name }}</option>
             @endforeach
         </select>
-        <span class="help-block">{{ $errors->first('device_group_id') }}</span>
+        <span class="help-block">{{ $errors->first('groups') }}</span>
     </div>
 </div>
 
@@ -144,22 +144,22 @@
     });
     function change_st_dtype(select) {
         var dtype = select.options[select.selectedIndex].value;
-        document.getElementById("dynamic-st-form").style.display = (dtype === 'dynamic' ? 'block' : 'none');
-        document.getElementById("static-st-form").style.display = (dtype === 'dynamic' ? 'none' : 'block');
+        document.getElementById("dynamic-st-d-form").style.display = (dtype === 'dynamic' ? 'block' : 'none');
+        document.getElementById("static-st-d-form").style.display = (dtype === 'dynamic' ? 'none' : 'block');
     }
 
     change_st_dtype(document.getElementById('dtype'));
 
     function change_st_dgtype(select) {
         var dgtype = select.options[select.selectedIndex].value;
-        document.getElementById("dynamic-st-form").style.display = (dtype === 'dynamic' ? 'block' : 'none');
-        document.getElementById("static-st-form").style.display = (dtype === 'dynamic' ? 'none' : 'block');
+        document.getElementById("dynamic-st-dg-form").style.display = (dtype === 'dynamic' ? 'block' : 'none');
+        document.getElementById("static-st-dg-form").style.display = (dtype === 'dynamic' ? 'none' : 'block');
     }
 
     change_st_dgtype(document.getElementById('dgtype'));
 
     init_select2('#devices', 'device', {multiple: true});
-    init_select2('#device_group_id', 'device-group', {multiple: true});
+    init_select2('#groups', 'device-group', {multiple: true});
     var builder = $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
         $("[name$='_filter']").each(function () {
             $(this).select2({
