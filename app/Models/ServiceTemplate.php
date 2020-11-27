@@ -147,7 +147,7 @@ class ServiceTemplate extends BaseModel
                             ->where('devices.device_id', $device->device_id)
                             ->exists();
                     } catch (\Illuminate\Database\QueryException $e) {
-                        Log::error("Device Group '$template->name' generates invalid query: " . $e->getMessage());
+                        Log::error("Service Template '$template->name' generates invalid query: " . $e->getMessage());
 
                         return false;
                     }
@@ -182,7 +182,7 @@ class ServiceTemplate extends BaseModel
 
         $template_ids = static::query()
             ->with(['device_groups' => function ($query) {
-                $query->select('devices_groups.id');
+                $query->select('device_groups.id');
             }])
             ->get()
             ->filter(function ($template) use ($deviceGroup) {
@@ -194,7 +194,7 @@ class ServiceTemplate extends BaseModel
                             ->where('device_groups.id', $deviceGroup->id)
                             ->exists();
                     } catch (\Illuminate\Database\QueryException $e) {
-                        Log::error("Device Group '$template->name' generates invalid query: " . $e->getMessage());
+                        Log::error("Service Template '$template->name' generates invalid query: " . $e->getMessage());
 
                         return false;
                     }
@@ -252,7 +252,32 @@ class ServiceTemplate extends BaseModel
     {
         return $query->where('disabled', 1);
     }
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
 
+    public function scopeInDeviceGroup($query, $deviceGroup)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
+
+    public function scopeNotInDeviceGroup($query, $deviceGroup)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
     // ---- Define Relationships ----
 
     public function devices()

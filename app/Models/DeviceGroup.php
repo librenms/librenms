@@ -138,6 +138,28 @@ class DeviceGroup extends BaseModel
         return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
     }
 
+    public function scopeInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_group_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
+    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_group_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
     // ---- Define Relationships ----
 
     public function devices()

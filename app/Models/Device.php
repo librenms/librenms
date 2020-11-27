@@ -476,6 +476,28 @@ class Device extends BaseModel
         );
     }
 
+    public function scopeInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
+    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
     // ---- Define Relationships ----
 
     public function accessPoints()
