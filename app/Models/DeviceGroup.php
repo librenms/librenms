@@ -143,7 +143,7 @@ class DeviceGroup extends BaseModel
         return $query->whereIn(
             $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
                 $query->select('device_group_id')
-                    ->from('service_templates_device')
+                    ->from('service_templates_device_group')
                     ->where('service_template_id', $serviceTemplate);
             }
         );
@@ -154,7 +154,7 @@ class DeviceGroup extends BaseModel
         return $query->whereNotIn(
             $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
                 $query->select('device_group_id')
-                    ->from('service_templates_device')
+                    ->from('service_templates_device_group')
                     ->where('service_template_id', $serviceTemplate);
             }
         );
