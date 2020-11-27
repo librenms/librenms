@@ -252,10 +252,6 @@ class ServiceTemplate extends BaseModel
     {
         return $query->where('disabled', 1);
     }
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
