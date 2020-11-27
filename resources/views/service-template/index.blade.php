@@ -28,10 +28,11 @@
                     <tr>
                         <th>@lang('Name')</th>
                         <th>@lang('Description')</th>
-                        <th>@lang('Type')</th>
                         <th>@lang('Devices')</th>
-                        <th>@lang('Device Rules')</th>
                         <th>@lang('Device Groups')</th>
+                        <th>@lang('Device Type')</th>
+                        <th>@lang('Device Group Type')</th>
+                        <th>@lang('Device Rules')</th>
                         <th>@lang('Device Group Rules')</th>
                         <th>@lang('Actions')</th>
                     </tr>
@@ -41,16 +42,15 @@
                         <tr id="row_{{ $template->id }}">
                             <td>{{ $template->name }}</td>
                             <td>{{ $template->desc }}</td>
-                            <td>{{ __(ucfirst($template->dtype)) }}</td>
                             <td>
                                 <a href="{{ url("/devices/serviceTemplates=$template->id") }}">{{ $template->devices_count }}</a>
                             </td>
-                            <td>{{ $template->dtype == 'dynamic' ? $template->getDeviceParser()->toSql(false) : '' }}</td>
-                            <td>
-                            <td>{{ __(ucfirst($template->dgtype)) }}</td>
                             <td>
                                 <a href="{{ url("/devices-groups/serviceTemplates=$template->id") }}">{{ $template->device_groups_count }}</a>
                             </td>
+                            <td>{{ __(ucfirst($template->dtype)) }}</td>
+                            <td>{{ __(ucfirst($template->dgtype)) }}</td>
+                            <td>{{ $template->dtype == 'dynamic' ? $template->getDeviceParser()->toSql(false) : '' }}</td>
                             <td>{{ $template->dgtype == 'dynamic' ? $template->getDeviceGroupParser()->toSql(false) : '' }}</td>
                             <td>
                                 <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
