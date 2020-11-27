@@ -152,8 +152,8 @@
 
     function change_st_dgtype(select) {
         var dgtype = select.options[select.selectedIndex].value;
-        document.getElementById("dynamic-st-dg-form").style.display = (dtype === 'dynamic' ? 'block' : 'none');
-        document.getElementById("static-st-dg-form").style.display = (dtype === 'dynamic' ? 'none' : 'block');
+        document.getElementById("dynamic-st-dg-form").style.display = (dgtype === 'dynamic' ? 'block' : 'none');
+        document.getElementById("static-st-dg-form").style.display = (dgtype === 'dynamic' ? 'none' : 'block');
     }
 
     change_st_dgtype(document.getElementById('dgtype'));
