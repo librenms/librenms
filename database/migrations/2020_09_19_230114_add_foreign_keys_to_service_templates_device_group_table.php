@@ -28,7 +28,7 @@ class AddForeignKeysToServiceTemplatesDeviceGroupTable extends Migration
         if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('service_templates_device_group', function (Blueprint $table) {
                 $table->dropForeign('service_templates_device_group_service_templates_id_foreign');
-                $table->dropForeign('service_templates_device_group_device_id_foreign');
+                $table->dropForeign('service_templates_device_group_device_group_id_foreign');
             });
         }
     }
