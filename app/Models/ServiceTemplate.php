@@ -253,27 +253,6 @@ class ServiceTemplate extends BaseModel
         return $query->where('disabled', 1);
     }
 
-    public function scopeInDeviceGroup($query, $deviceGroup)
-    {
-        return $query->whereIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-                $query->select('device_id')
-                    ->from('device_group_device')
-                    ->where('device_group_id', $deviceGroup);
-            }
-        );
-    }
-
-    public function scopeNotInDeviceGroup($query, $deviceGroup)
-    {
-        return $query->whereNotIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-                $query->select('device_id')
-                    ->from('device_group_device')
-                    ->where('device_group_id', $deviceGroup);
-            }
-        );
-    }
     // ---- Define Relationships ----
 
     public function devices()
