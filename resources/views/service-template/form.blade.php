@@ -180,12 +180,12 @@
         filters: {!! $filters !!},
         operators: [
             'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null', 'in', 'not_in',
-            {dtype: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {dtype: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {dtype: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {dtype: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {dtype: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
-            {dtype: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
+            {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
+            {type: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
         ],
         lang: {
             operators: {
@@ -226,12 +226,12 @@
         filters: {!! $filters !!},
         operators: [
             'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null', 'in', 'not_in',
-            {dgtype: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {dgtype: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {dgtype: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {dgtype: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-            {dgtype: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
-            {dgtype: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
+            {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
+            {type: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
         ],
         lang: {
             operators: {
