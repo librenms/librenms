@@ -894,11 +894,6 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
 function get_port_graphs(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $columns = $request->get('columns', 'ifName');
-
-    if ($validate = validate_column_list($columns, 'ports') !== true) {
-        return $validate;
-    }
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -909,7 +904,7 @@ function get_port_graphs(Illuminate\Http\Request $request)
         array_push($params, Auth::id());
     }
 
-    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex`", $params);
+    $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex`", $params);
 
     return api_success($ports, 'ports');
 }
