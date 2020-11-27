@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Services;
 use Toastr;
 
