@@ -63,7 +63,7 @@
                                     href="{{ route('services.templates.edit', $template->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
                                 <button type="button" class="btn btn-danger btn-sm" title="@lang('Delete Service Template')" aria-label="@lang('Delete')"
-                                    onclick="delete_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.destroy', $template->id) }}', '{{ $device_group->id}}')">
+                                    onclick="delete_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.destroy', $template->id) }}')">
                                     <i class="fa fa-trash" aria-hidden="true"></i></button>
                             </td>
                         </tr>
@@ -199,7 +199,7 @@
 
             return false;
         }
-        function delete_st(button, name, id, url, dg) {
+        function delete_st(button, name, id, url) {
             var index = button.parentNode.parentNode.rowIndex;
             if (confirm('@lang('Are you sure you want to delete AND remove all Services created by ')' + name + '?')) {
                 $.ajax({
