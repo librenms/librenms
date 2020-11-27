@@ -10,7 +10,7 @@ about: To request support for a new device type or add additional data
 
 Please confirm each of the sections below by putting an `x` in the box like `[x]`.
 
-- [ ] Please provide **ALL** info asked for [here](http://docs.librenms.org/Support/FAQ/#faq20).
+- [ ] Please provide **ALL** info asked for [here](https://docs.librenms.org/Support/FAQ/#faq20).
 - [ ] Please provide as much detail as possible.
 - [ ] Please do NOT post more than 10 lines of debug information here, use a pastebin service or GitHub Gists.
 

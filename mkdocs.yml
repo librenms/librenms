@@ -10,7 +10,7 @@ theme:
     code: 'Roboto Mono'
   feature: null
 site_dir: out
-site_url: http://docs.librenms.org
+site_url: https://docs.librenms.org
 markdown_extensions:
     - pymdownx.tasklist
     - pymdownx.tilde

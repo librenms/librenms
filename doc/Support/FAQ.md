@@ -55,7 +55,7 @@ path: blob/master/doc/
 
 This is currently well documented within the doc folder of the installation files.
 
-Please see the following [doc](http://docs.librenms.org/Installation/Installing-LibreNMS/)
+Please see the following [doc](../Installation/Installing-LibreNMS.md)
 
 ## <a name="faq2"> How do I add a device?</a>
 
@@ -140,14 +140,12 @@ bottom of every page that will show you detailed debug information.
 
 ## <a name="faq11"> How do I debug the discovery process?</a>
 
-Please see the [Discovery
-Support](http://docs.librenms.org/Support/Discovery Support/) document
+Please see the [Discovery Support](Discovery%20Support.md) document
 for further details.
 
 ## <a name="faq12"> How do I debug the poller process?</a>
 
-Please see the [Poller
-Support](http://docs.librenms.org/Support/Poller Support/) document
+Please see the [Poller Support](Poller%20Support.md) document
 for further details.
 
 ## <a name="faq14"> Why do I get a lot apache or rrdtool zombies in my process list?</a>
@@ -565,8 +563,7 @@ MySQL/MariaDB.
 ## <a name='my-alert-templates-stopped-working'>My alert templates stopped working</a>
 
 You should probably have a look in the documentation concerning the
-new template syntax:
-<https://docs.librenms.org/Alerting/Templates/>. Since version 1.42,
+new [template syntax](../Alerting/Templates.md). Since version 1.42,
 syntax changed, and you basically need to convert your templates to
 this new syntax (including the titles).
 
