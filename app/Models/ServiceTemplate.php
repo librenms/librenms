@@ -74,10 +74,10 @@ class ServiceTemplate extends BaseModel
 
         static::saving(function (ServiceTemplate $template) {
             if ($template->isDirty('drules')) {
-                $template->drules = $template->getParser()->generateJoins()->toArray();
+                $template->drules = $template->getDeviceParser()->generateJoins()->toArray();
             }
             if ($template->isDirty('dgrules')) {
-                $template->dgrules = $template->getParser()->generateJoins()->toArray();
+                $template->dgrules = $template->getDeviceGroupParser()->generateJoins()->toArray();
             }
         });
 
