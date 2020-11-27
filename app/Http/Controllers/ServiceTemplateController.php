@@ -65,10 +65,10 @@ class ServiceTemplateController extends Controller
         $this->validate(
             $request, [
                 'name' => 'required|string|unique:service_templates',
-                'device_group_id' => 'array|required',
-                'device_group_id.*' => 'integer',
-                'device_id' => 'array|required',
-                'device_id.*' => 'integer',
+                'groups' => 'array|required',
+                'groups.*' => 'integer',
+                'devices' => 'array|required',
+                'devices.*' => 'integer',
                 'type' => 'string',
                 'dtype' => 'required|in:dynamic,static',
                 'dgtype' => 'required|in:dynamic,static',
@@ -109,7 +109,7 @@ class ServiceTemplateController extends Controller
             $template->devices()->sync($request->devices);
         }
         if ($request->dgtype == 'static') {
-            $template->groups()->sync($request->devices);
+            $template->groups()->sync($request->groups);
         }
         Toastr::success(__('Service Template :name created', ['name' => $template->name]));
 
@@ -171,8 +171,8 @@ class ServiceTemplateController extends Controller
                 'devices.*' => 'integer',
                 'dgtype' => 'required|in:dynamic,static',
                 'dgrules' => 'json|required_if:dgtype,dynamic',
-                'device_group_id' => 'array|required',
-                'device_group_id.*' => 'integer',
+                'groups' => 'array|required',
+                'groups.*' => 'integer',
                 'type' => 'string',
                 'param' => 'nullable|string',
                 'ip' => 'nullable|string',

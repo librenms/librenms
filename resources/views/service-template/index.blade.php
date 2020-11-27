@@ -113,7 +113,7 @@
             @foreach($devices as $device)
                 <x-panel id="manage-services-templates-panel-d">
                     <x-slot name="title">
-                        <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang($device->hostname)
+                        <i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> @lang($device->hostname)
                     </x-slot>
                     <div class="table-responsive">
                         <table id="manage-services-templates-table-d-{{ $device->id }}" class="table table-condensed table-hover">

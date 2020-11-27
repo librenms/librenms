@@ -20,7 +20,7 @@
 </div>
 
 <div id="dynamic-st-d-form" class="form-group @if($errors->has('drules')) has-error @endif">
-    <label for="pattern" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
+    <label for="drules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
         <span class="help-block">{{ $errors->first('drules') }}</span>
@@ -44,16 +44,16 @@
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="dgtype" name="dgtype" onchange="change_st_dgtype(this)">
             <option value="dynamic"
-                    @if(old('dgtype', $template->dtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
+                    @if(old('dgtype', $template->dgtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
             <option value="static"
-                    @if(old('dgtype', $template->dtype) == 'static') selected @endif>@lang('Static')</option>
+                    @if(old('dgtype', $template->dgtype) == 'static') selected @endif>@lang('Static')</option>
         </select>
         <span class="help-block">{{ $errors->first('dgtype') }}</span>
     </div>
 </div>
 
 <div id="dynamic-st-dg-form" class="form-group @if($errors->has('dgrules')) has-error @endif">
-    <label for="pattern" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Group Rules')</label>
+    <label for="dgrules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Group Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder2"></div>
         <span class="help-block">{{ $errors->first('dgrules') }}</span>
