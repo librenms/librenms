@@ -10,10 +10,10 @@
     <label for="dtype" class="control-label col-sm-3 col-md-2">@lang('Device Type')</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="dtype" name="dtype" onchange="change_st_dtype(this)">
-            <option value="dynamic"
-                    @if(old('dtype', $template->dtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
             <option value="static"
                     @if(old('dtype', $template->dtype) == 'static') selected @endif>@lang('Static')</option>
+            <option value="dynamic"
+                    @if(old('dtype', $template->dtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
         </select>
         <span class="help-block">{{ $errors->first('dtype') }}</span>
     </div>
@@ -43,10 +43,10 @@
     <label for="dgtype" class="control-label col-sm-3 col-md-2">@lang('Device Group Type')</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="dgtype" name="dgtype" onchange="change_st_dgtype(this)">
-            <option value="dynamic"
-                    @if(old('dgtype', $template->dgtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
             <option value="static"
                     @if(old('dgtype', $template->dgtype) == 'static') selected @endif>@lang('Static')</option>
+            <option value="dynamic"
+                    @if(old('dgtype', $template->dgtype) == 'dynamic') selected @endif>@lang('Dynamic')</option>
         </select>
         <span class="help-block">{{ $errors->first('dgtype') }}</span>
     </div>
