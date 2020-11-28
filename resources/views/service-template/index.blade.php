@@ -46,7 +46,7 @@
                                 <a href="{{ url("/devices/serviceTemplates=$template->id") }}">{{ $template->devices_count }}</a>
                             </td>
                             <td>
-                                <a href="{{ url("/devices-groups/serviceTemplates=$template->id") }}">{{ $template->device_groups_count }}</a>
+                                <a href="{{ url("/device-groups/serviceTemplates=$template->id") }}">{{ $template->groups_count }}</a>
                             </td>
                             <td>{{ __(ucfirst($template->dtype)) }}</td>
                             <td>{{ __(ucfirst($template->dgtype)) }}</td>
@@ -71,13 +71,13 @@
                     </tbody>
                 </table>
             </div>
-            @foreach($device_groups as $device_group)
+            @foreach($groups as $group)
                 <x-panel id="manage-services-templates-panel-dg">
                     <x-slot name="title">
-                        <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang($device_group->name)
+                        <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang($group->name)
                     </x-slot>
                     <div class="table-responsive">
-                        <table id="manage-services-templates-table-dg-{{ $device_group->id }}" class="table table-condensed table-hover">
+                        <table id="manage-services-templates-table-dg-{{ $group->id }}" class="table table-condensed table-hover">
                             <thead>
                             <tr>
                                 <th>@lang('Name')</th>
@@ -91,7 +91,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                                @foreach($device_group->serviceTemplates as $template)
+                                @foreach($group->serviceTemplates as $template)
                                     <tr id="row_{{ $template->id }}">
                                         <td>{{ $template->name }}</td>
                                         <td>{{ $template->type }}</td>
