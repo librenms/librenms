@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2020 Anthony F McInerney <bofh80>
+ * @author     Anthony F McInerney <afm404@gmail.com>
  */
 
 namespace App\Http\Controllers\Select;
