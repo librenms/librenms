@@ -217,7 +217,7 @@ class ServiceTemplateController extends Controller
         $device_groups_updated = false;
         if ($template->dgtype == 'static') {
             // sync device_group_ids from input
-            $updated = $template->groups()->sync($request->get('device_groups', []));
+            $updated = $template->groups()->sync($request->get('groups', []));
             // check for attached/detached/updated
             $device_groups_updated = array_sum(array_map(function ($device_group_ids) {
                 return count($device_group_ids);
