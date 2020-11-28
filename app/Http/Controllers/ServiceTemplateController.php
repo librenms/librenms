@@ -31,8 +31,8 @@ class ServiceTemplateController extends Controller
         return view(
             'service-template.index', [
                 'service_templates' => ServiceTemplate::orderBy('name')->withCount('devices')->withCount('groups')->get(),
-                'groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
-                'devices' => Device::orderBy('hostname')->get(),
+                'groups' => DeviceGroup::orderBy('name')->has('serviceTemplates')->get(),
+                'devices' => Device::orderBy('hostname')->has('serviceTemplates')->get(),
             ]
         );
     }
