@@ -105,7 +105,7 @@ foreach ($pre_cache['aos7_vcstatus_oids'] as $index => $data) {
         $vc_value = "virtualChassisStatus.$index";
         $descr_vc = 'Virtual-Chassis Unit ' . $index;
         $vc_chas_states = [
-        ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'Init'],
+            ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'Init'],
             ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Running'],
             ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Invalid Chassis Id'],
             ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'Hello Down'],
@@ -115,11 +115,11 @@ foreach ($pre_cache['aos7_vcstatus_oids'] as $index => $data) {
             ['value' => 7, 'generic' => 2, 'graph' => 1, 'descr' => 'Mismatch Hello Interval'],
             ['value' => 8, 'generic' => 2, 'graph' => 1, 'descr' => 'Mismatch Control Vlan'],
             ['value' => 9, 'generic' => 2, 'graph' => 1, 'descr' => 'Mismatch Group'],
-        ['value' => 10, 'generic' => 2, 'graph' => 1, 'descr' => 'Mismatch License Config'],
-        ['value' => 11, 'generic' => 2, 'graph' => 1, 'descr' => 'Invalid License'],
-        ['value' => 12, 'generic' => 2, 'graph' => 1, 'descr' => 'Split Topology'],
-        ['value' => 13, 'generic' => 2, 'graph' => 1, 'descr' => 'Command Shutdown'],
-        ['value' => 14, 'generic' => 2, 'graph' => 1, 'descr' => 'Failure Shutdown'],
+            ['value' => 10, 'generic' => 2, 'graph' => 1, 'descr' => 'Mismatch License Config'],
+            ['value' => 11, 'generic' => 2, 'graph' => 1, 'descr' => 'Invalid License'],
+            ['value' => 12, 'generic' => 2, 'graph' => 1, 'descr' => 'Split Topology'],
+            ['value' => 13, 'generic' => 2, 'graph' => 1, 'descr' => 'Command Shutdown'],
+            ['value' => 14, 'generic' => 2, 'graph' => 1, 'descr' => 'Failure Shutdown'],
         ];
         create_state_index($vc_state, $vc_chas_states);
         discover_sensor($valid['sensor'], 'state', $device, $vc_chas_oid, $index, $vc_state, $descr_vc, 1, 1, null, null, null, null, $vc_value);
@@ -170,8 +170,8 @@ foreach ($pre_cache['aos7_sync_oids'] as $index => $data) {
         $sync_chas_states = [
             ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'Unknown'],
             ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'Mono Control Module'],
-        ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'Not Synchronized'],
-        ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'Synchronized'],
+            ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'Not Synchronized'],
+            ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'Synchronized'],
         ];
         create_state_index($sync_state, $sync_chas_states);
         discover_sensor($valid['sensor'], 'state', $device, $sync_chas_oid, 1, $sync_state, $descr_sync, 1, 1, null, null, null, null, $sync_value);
@@ -205,9 +205,9 @@ foreach ($pre_cache['aos7_lag_oids'] as $index => $entry) {
     }
     $descr_lag = 'LACP Number ' . $lag_number;
     $lag_states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Redundant'],
-            ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'Not Redundant'],
-        ];
+        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Redundant'],
+        ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'Not Redundant'],
+    ];
     if (! empty($oid_mem)) {
         create_state_index($type, $lag_states);
         discover_sensor($valid['sensor'], 'state', $device, $lag_state, $index, $type, $descr_lag, 1, 1, null, null, null, null, $current);
