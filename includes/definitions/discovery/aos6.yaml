@@ -1,6 +1,6 @@
 mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB
 modules:
-    mempools:	
+    mempools:
         data:
             -
                 total: ALCATEL-IND1-SYSTEM-MIB::systemHardwareMemorySize
