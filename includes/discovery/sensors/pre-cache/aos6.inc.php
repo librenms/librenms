@@ -24,4 +24,3 @@ $pre_cache['aos6_sync_oids'] = snmpwalk_cache_multi_oid($device, 'chasControlCer
 
 echo 'alclnkaggAggEntry';
 $pre_cache['aos6_lag_oids'] = snmpwalk_cache_multi_oid($device, 'alclnkaggAggEntry', [], 'ALCATEL-IND1-LAG-MIB', 'aos6', '-OQUse');
-

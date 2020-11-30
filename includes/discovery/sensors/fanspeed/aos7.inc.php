@@ -10,7 +10,7 @@ foreach (explode("\n", $data) as $entry) {
     $value = trim($value, "\" \\\n\r");
     [$revindex, $revchass, $revdata,] = explode('.', strrev($oid), 4);
     //we don't care if the value is 0, the other fan status sensor will tell us if the fan is broken
-    if (! strstr($value, 'at this OID') && ! empty($oid ) && $value > 0) {
+    if (! strstr($value, 'at this OID') && ! empty($oid) && $value > 0) {
         $chassis = strrev($revchass);
         $index = strrev($revindex);
         $data = strrev($revdata);
@@ -30,6 +30,5 @@ foreach ($rpm as $chassis => $entry) {
         $id = "$chassis.$index";
         $oid = "$rpm_oid.4.$chassis.$index";
         discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $id, 'alcatel-lucent', $descr, '1', '1', $low_limit, null, null, $high_limit, $value);
-        }
-     }
-  
+    }
+}
