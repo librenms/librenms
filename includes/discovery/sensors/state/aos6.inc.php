@@ -78,7 +78,7 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
             $states_stacka = [
                 ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Connected'],
                 ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
-         ];
+            ];
             create_state_index($stack_state_namea, $states_stacka);
             discover_sensor($valid['sensor'], 'state', $device, $oid_stackport_a, $stackindexa, $stack_state_namea, $descr_stacka, 1, 1, null, null, null, null, $current_stacka);
             create_sensor_to_state_index($device, $stack_state_namea, $stackindexa);
@@ -94,9 +94,9 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
             $stack_state_nameb = 'alaStackMgrLocalLinkStateB';
             $descr_stackb = 'Stack Port B Chassis-' . "$stackindexb";
             $states_stackb = [
-               ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Connected'],
-               ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
-         ];
+                ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Connected'],
+                ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
+            ];
             create_state_index($stack_state_nameb, $states_stackb);
             discover_sensor($valid['sensor'], 'state', $device, $oid_stackport_b, $stackindexb, $stack_state_nameb, $descr_stackb, 1, 1, null, null, null, null, $current_stackb);
             create_sensor_to_state_index($device, $stack_state_nameb, $stackindexb);
@@ -168,7 +168,7 @@ foreach ($pre_cache['aos6_lag_oids'] as $index => $entry) {
     $lag_states = [
         ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Redundant'],
         ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'Not Redundant'],
-     ];
+    ];
     if (! empty($oid_mem)) {
         create_state_index($type, $lag_states);
         discover_sensor($valid['sensor'], 'state', $device, $lag_state, $index, $type, $descr_lag, 1, 1, null, null, null, null, $current);
