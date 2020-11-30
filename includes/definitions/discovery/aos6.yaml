@@ -1,11 +1,11 @@
 mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB
 modules:
     mempools:	
-        data:	
-            -	
-                total: ALCATEL-IND1-SYSTEM-MIB::systemHardwareMemorySize	
-                percent_used: ALCATEL-IND1-HEALTH-MIB::healthDeviceMemoryLatest	
-                descr: 'Device Memory'	
+        data:
+            -
+                total: ALCATEL-IND1-SYSTEM-MIB::systemHardwareMemorySize
+                percent_used: ALCATEL-IND1-HEALTH-MIB::healthDeviceMemoryLatest
+                descr: 'Device Memory'
 
     os:
         sysDescr_regex: '/(?<hardware>OS\S*)? ?(?<version>\d+\.\d+\.\S*)/'
