@@ -24,7 +24,7 @@ KYOCERA
 $session_rate = [
     'Print duplex front pages'=>['kyocera', '.1.3.6.1.4.1.1347.42.2.5.1.1.1.1', 'printDuplexFront', 'Print'],
     'Print duplex rear pages'=>['kyocera', '.1.3.6.1.4.1.1347.42.2.5.1.1.2.1', 'printDuplexRear', 'Print'],
-    'Total Prints'=>['kyocera', '.1.3.6.1.4.1.1347.42.2.1.1.1.6.1.1', 'printTotal', 'Print']
+    'Total Prints'=>['kyocera', '.1.3.6.1.4.1.1347.42.2.1.1.1.6.1.1', 'printTotal', 'Print'],
 ];
 
 foreach ($session_rate as $descr => $oid) {
@@ -52,4 +52,3 @@ foreach ($session_rate as $descr => $oid) {
     );
     }
 }
-
