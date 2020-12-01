@@ -22,9 +22,9 @@ KYOCERA
 .1.3.6.1.4.1.1347.42.2.1.1.1.6.1.1
 */
 $session_rate = [
-    'Print duplex front pages'=>['kyocera','.1.3.6.1.4.1.1347.42.2.5.1.1.1.1','printDuplexFront','Print'],
-    'Print duplex rear pages'=>['kyocera','.1.3.6.1.4.1.1347.42.2.5.1.1.2.1','printDuplexRear','Print'],
-    'Total Prints'=>['kyocera','.1.3.6.1.4.1.1347.42.2.1.1.1.6.1.1','printTotal','Print']
+    'Print duplex front pages'=>['kyocera', '.1.3.6.1.4.1.1347.42.2.5.1.1.1.1', 'printDuplexFront', 'Print'],
+    'Print duplex rear pages'=>['kyocera', '.1.3.6.1.4.1.1347.42.2.5.1.1.2.1', 'printDuplexRear', 'Print'],
+    'Total Prints'=>['kyocera', '.1.3.6.1.4.1.1347.42.2.1.1.1.6.1.1', 'printTotal', 'Print']
 ];
 
 foreach ($session_rate as $descr => $oid) {
@@ -32,8 +32,8 @@ foreach ($session_rate as $descr => $oid) {
     $oid_num = $oid[1];
     $oid_ref = $oid[2];
     $group = $oid[3];
-    $result = snmp_get($device, $oid_num,'-Ovq');
-    if($result>0) {
+    $result = snmp_get($device, $oid_num, '-Ovq');
+    if ($result>0) {
         discover_sensor(
         $valid['sensor'],
         'count',
