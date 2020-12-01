@@ -102,4 +102,3 @@ foreach ($session_rate as $descr => $oid) {
     );
     }
 }
-
