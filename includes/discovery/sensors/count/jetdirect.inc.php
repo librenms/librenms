@@ -27,7 +27,7 @@ foreach ($session_rate as $descr => $oid) {
     $oid_ref = $oid[2];
     $group = $oid[3];
     $result = snmp_get($device, $oid_num, '-Ovq');
-    if ($result>0) {
+    if ($result > 0) {
         discover_sensor(
         $valid['sensor'],
         'count',
