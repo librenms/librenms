@@ -18,7 +18,7 @@
 .1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.2.5.0 = INTEGER: 14904
 */
 $session_rate = [
-'Total Prints'=>['hp','.1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.2.5.0','printTotal','Print']
+    'Total Prints'=>['hp','.1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.2.5.0','printTotal','Print']
 ];
 
 foreach ($session_rate as $descr => $oid) {
@@ -27,9 +27,8 @@ foreach ($session_rate as $descr => $oid) {
     $oid_ref = $oid[2];
     $group = $oid[3];
     $result = snmp_get($device, $oid_num,'-Ovq');
-if($result>0)
-{
-    discover_sensor(
+    if($result>0) {
+        discover_sensor(
         $valid['sensor'],
         'count',
         $device,
@@ -45,6 +44,6 @@ if($result>0)
         null,
         $result
     );
-}
+    }
 }
 
