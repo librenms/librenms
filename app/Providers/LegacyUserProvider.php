@@ -188,7 +188,7 @@ class LegacyUserProvider implements UserProvider
             }
 
             if (empty($new_user)) {
-                Log::error("Auth Error ($type): No user ($auth_id) [$username]");
+                Log::error("Auth Error ($type): No user ($auth_id) [$username] from " . Request::ip());
 
                 return null;
             }
