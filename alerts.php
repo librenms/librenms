@@ -38,7 +38,7 @@ if (set_debug(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-$alerts_lock = Cache::lock('alerts');
+$alerts_lock = Cache::lock('alerts', \LibreNMS\Config::get('service_alerting_frequency'));
 if ($alerts_lock->get()) {
     $alerts = new RunAlerts();
     if (! defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
