@@ -161,6 +161,7 @@ class DeviceDependencyController extends MapController
             $group_name = $group_name->name;
         }
 
+
         $data = [
             'showparentdevicepath' => $show_device_path,
             'isolated_device_id' => $this->isolatedDeviceId,
