@@ -47,7 +47,7 @@ $devices = [];
 $group_name = '';
 $where = '';
 if (is_numeric($group) && $group) {
-    $group_name = dbFetchCell('SELECT `name` from `device_groups` WHERE `id` = ?' , [$group]);
+    $group_name = dbFetchCell('SELECT `name` from `device_groups` WHERE `id` = ?', [$group]);
     $where .= ' AND D1.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $sql_array[] = $group;
     $where .= ' OR D2.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
