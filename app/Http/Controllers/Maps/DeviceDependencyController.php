@@ -25,6 +25,7 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Url;
 
@@ -155,6 +156,11 @@ class DeviceDependencyController extends MapController
 
         array_multisort(array_column($device_list, 'label'), SORT_ASC, $device_list);
 
+        $group_name = DeviceGroup::where('id', '=', $group_id)->first('name');
+        if (!empty($group_name)) {
+            $group_name = $group_name->name;
+        }
+
         $data = [
             'showparentdevicepath' => $show_device_path,
             'isolated_device_id' => $this->isolatedDeviceId,
@@ -165,6 +171,7 @@ class DeviceDependencyController extends MapController
             'options' => $this->visOptions(),
             'nodes' => json_encode(array_values($devices_by_id)),
             'edges' => json_encode($dependencies),
+            'group_name' => $group_name,
         ];
 
         return view('map.device-dependency', $data);

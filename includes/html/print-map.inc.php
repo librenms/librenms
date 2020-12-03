@@ -44,8 +44,10 @@ $device_assoc_seen = [];
 $ports = [];
 $devices = [];
 
+$group_name = '';
 $where = '';
 if (is_numeric($group) && $group) {
+    $group_name = dbFetchCell('SELECT `name` from `device_groups` WHERE `id` = ?' , [$group]);
     $where .= ' AND D1.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $sql_array[] = $group;
     $where .= ' OR D2.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
@@ -342,6 +344,7 @@ if (count($devices_by_id) > 1 && count($links) > 0) {
 
 <form name="printmapform" method="get" action="" class="form-horizontal" role="form">
     <?php if (empty($device['hostname'])) { ?>
+<big><b><?=$group_name?></b></big>
 <div class="pull-right">
 <select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightNode()";>
 <option value="0">None</option>
