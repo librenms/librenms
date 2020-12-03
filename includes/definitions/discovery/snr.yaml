@@ -1,10 +1,10 @@
-mib: NAG-MIB
+ib: NAG-MIB
 modules:
     mempools:
         data:
             -
-                total: NAG-MIB::sysMemorySize
-                used: NAG-MIB::sysMemoryBusy
+                total: NAG-MIB::switchMemorySize
+                used: NAG-MIB::switchMemoryBusy
                 descr: 'Memory Usage'
                 index: 0
     os:
@@ -22,8 +22,8 @@ modules:
     processors:
         data:
             -
-                oid: sysCpuUsage
-                num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.11.{{ $index }}'
+                oid: switchCpuUsage
+                num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.10.{{ $index }}'
     sensors:
         temperature:
             data:
