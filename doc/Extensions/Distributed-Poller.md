@@ -174,9 +174,10 @@ need to have the same `APP_KEY` value set in the `.env` file.
 
 ### Discovery
 
-It's not necessary to run discovery services on all pollers. In fact,
-you should only run one discovery process per poller group. Designate
-a single poller to run discovery (or a separate server if required).
+When using the cron based polling, It's not necessary to run discovery services 
+on all pollers. In fact, you should only run one discovery process per poller group. 
+Designate a single poller to run discovery (or a separate server if required).
+When using the dispacher service, discovery can run on all nodes.
 
 ### Configuration
 
