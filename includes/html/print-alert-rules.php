@@ -193,12 +193,12 @@ foreach ($rule_list as $rule) {
     $status_msg = '';
     if (sizeof($sub) == 1) {
         $sub = $sub[0];
-        if ((int) $sub['state'] === 0) {
+        if ((int) $sub['state'] === AlertState::CLEAR) {
             $ico = 'check';
             $col = 'success';
             $status_msg = 'All devices matching ' . $rule['name'] . '  are OK';
         }
-        if ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
+        if ((int) $sub['state'] === AlertState::ACTIVE || (int) $sub['state'] === AlertState::ACKNOWLEDGED) {
             $alert_style = alert_layout($severity);
             $ico = $alert_style['icon'];
             $col = $alert_style['icon_color'];
@@ -282,7 +282,7 @@ foreach ($rule_list as $rule) {
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
             $locations .= "$except_device_or_group<a href=\"devices\/location=" . $location_map['id'] . "\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">" . $location_map['location'] . '</a><br>';
-        }
+        /}
     }
 
     $groups = null;
@@ -385,8 +385,12 @@ foreach ($rule_list as $rule) {
 
     echo "<td><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span> ";
     if ($rule_extra['mute'] === true) {
-        echo "<div data-toggle='popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div></td>";
+        echo "<div data-toggle='popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
     }
+    if ($sub['state'] == AlertState::ACKNOWLEDGED) {
+        echo "<div data-toggle='popover' data-content='Some Alerts for " . $rule['name'] . " are acknowledged' class='fa fa-fw fa-2x fa-sticky-note text-info' aria-hidden='true'></div>";
+    }
+    echo '</td>';
 
     // Enabled
 
