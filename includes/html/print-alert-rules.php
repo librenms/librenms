@@ -283,7 +283,7 @@ foreach ($rule_list as $rule) {
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
             $locations .= "$except_device_or_group<a href=\"devices\/location=" . $location_map['id'] . "\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">" . $location_map['location'] . '</a><br>';
-        /}
+        }
     }
 
     $groups = null;

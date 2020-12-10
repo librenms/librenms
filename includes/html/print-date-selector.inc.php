@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\Config;
-
 $request_uri = url()->current();
 
 echo "<div style='text-align: center;'>
