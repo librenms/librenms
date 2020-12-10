@@ -391,7 +391,6 @@ foreach ($rule_list as $rule) {
         echo "<div data-toggle='popover' data-content='Some Alerts for " . $rule['name'] . " are acknowledged' class='fa fa-fw fa-2x fa-sticky-note text-info' aria-hidden='true'></div>";
     }
     echo '</td>';
-
     // Enabled
 
     $enabled_popover = 'top';
