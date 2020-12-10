@@ -27,6 +27,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 }
 
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Enum\AlertState;
 
 $no_refresh = true;
 
