@@ -82,7 +82,7 @@ $pagetitle[] = 'Oxidized';
         formatters: {
             "hostname": function(column, row) {
                 if (row.id) {
-                    return '<a href="/device/device=' + row.id + '">' + row.hostname + '</a>';
+                    return '<a href="device/device=' + row.id + '">' + row.hostname + '</a>';
                 } else {
                     return row.hostname;
                 }

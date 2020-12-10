@@ -27,7 +27,6 @@ if (! Auth::user()->hasGlobalAdmin()) {
 }
 
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Enum\AlertState;
 
 $no_refresh = true;
 
@@ -91,9 +90,9 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device['device_id'] . '">Create new alert rule</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device['device_id'] . '"><i class="fa fa-plus"></i> Create new alert rule</button>';
 echo '<i> - OR - </i>';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device['device_id'] . '">Create rule from collection</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device['device_id'] . '"><i class="fa fa-plus"></i> Create rule from collection</button>';
 echo '</div>';
 
 echo '<div class="col pull-right">';
@@ -194,12 +193,12 @@ foreach ($rule_list as $rule) {
     $status_msg = '';
     if (sizeof($sub) == 1) {
         $sub = $sub[0];
-        if ((int) $sub['state'] === AlertState::CLEAR) {
+        if ((int) $sub['state'] === 0) {
             $ico = 'check';
             $col = 'success';
             $status_msg = 'All devices matching ' . $rule['name'] . '  are OK';
         }
-        if ((int) $sub['state'] === AlertState::ACTIVE || (int) $sub['state'] === AlertState::ACKNOWLEDGED) {
+        if ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
             $alert_style = alert_layout($severity);
             $ico = $alert_style['icon'];
             $col = $alert_style['icon_color'];
@@ -282,7 +281,7 @@ foreach ($rule_list as $rule) {
         $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
-            $locations .= "$except_device_or_group<a href=\"/devices\/location=" . $location_map['id'] . "\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">" . $location_map['location'] . '</a><br>';
+            $locations .= "$except_device_or_group<a href=\"devices\/location=" . $location_map['id'] . "\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">" . $location_map['location'] . '</a><br>';
         }
     }
 
@@ -291,7 +290,7 @@ foreach ($rule_list as $rule) {
         $group_query = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
         $group_maps = dbFetchRows($group_query, [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $group_map['name'] . "' title='$groups_msg' target=\"_blank\">" . $group_map['name'] . '</a><br>';
+            $groups .= "$except_device_or_group<a href=\"device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $group_map['name'] . "' title='$groups_msg' target=\"_blank\">" . $group_map['name'] . '</a><br>';
         }
     }
 
@@ -300,7 +299,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $device_map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $device_map['hostname'] . '</a><br>';
+            $devices .= "$except_device_or_group<a href=\"device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $device_map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $device_map['hostname'] . '</a><br>';
         }
     }
 
@@ -316,7 +315,7 @@ foreach ($rule_list as $rule) {
     }
     if (! $devices && ! $groups && ! $locations) {
         // All Devices
-        echo "<a href=\"/devices\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View All Devices' target=\"_blank\">All Devices</a><br>";
+        echo "<a href=\"devices\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View All Devices' target=\"_blank\">All Devices</a><br>";
     }
 
     echo '</td>';
@@ -386,12 +385,9 @@ foreach ($rule_list as $rule) {
 
     echo "<td><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span> ";
     if ($rule_extra['mute'] === true) {
-        echo "<div data-toggle='popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
+        echo "<div data-toggle='popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div></td>";
     }
-    if ($sub['state'] == AlertState::ACKNOWLEDGED) {
-        echo "<div data-toggle='popover' data-content='Some Alerts for " . $rule['name'] . " are acknowledged' class='fa fa-fw fa-2x fa-sticky-note text-info' aria-hidden='true'></div>";
-    }
-    echo '</td>';
+
     // Enabled
 
     $enabled_popover = 'top';

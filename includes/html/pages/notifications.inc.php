@@ -28,7 +28,7 @@ $notifications = new ObjectCache('notifications');
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <h1><a href="/notifications">Notifications</a></h1>
+      <h1><a href="notifications">Notifications</a></h0>
       <h4>
 <?php
 echo '<strong class="count-notif">' . $notifications['count'] . '</strong> Unread Notifications ';

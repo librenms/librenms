@@ -14,6 +14,8 @@
 // Auth
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
+Route::get('/', 'OverviewController@index')->name('home');
+
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
