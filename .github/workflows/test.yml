@@ -1,0 +1,143 @@
+name: test
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'ghactions-test' # remove when merged
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/doc.yml'
+      - 'doc/**'
+      - 'mkdocs.yml'
+  pull_request:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/doc.yml'
+      - 'doc/**'
+      - 'mkdocs.yml'
+
+env:
+  APP_ENV: testing
+  DB_NAME: db
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          -
+            php-version: 7.4
+            skip-style-check: 1
+            skip-web-check: 1
+          -
+            php-version: 7.3
+            skip-unit-check: 1
+          -
+            php-version: 7.3
+            skip-style-check: 1
+            skip-web-check: 1
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: ${{ env.DB_NAME }}
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Get composer cache directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      -
+        name: Cache composer
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      -
+        name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      -
+        name: Install packages
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y fping python3-pip python3-setuptools snmp
+      -
+        name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer,php-cs-fixer
+      -
+        name: Pip install
+        run: |
+          pip3 install --upgrade pip
+          pip3 install --user snmpsim pylint python-memcached mysqlclient --upgrade
+      -
+        name: Composer validate
+        run: |
+          composer validate
+      -
+        name: Composer install
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress --no-suggest
+      -
+        name: Init env
+        run: |
+          cat > .env <<EOL
+          APP_KEY=base64:vHI+YHgkyCDad31iPEErGSNEOWO21wNzV+zyENKQv04=
+          APP_URL=http://localhost:8000
+          APP_ENV=${{ env.APP_ENV }}
+          DB_HOST=mysql
+          DB_PORT=${{ job.services.mysql.ports[3306] }}
+          DB_DATABASE=${{ env.DB_NAME }}
+          DB_USERNAME=root
+          DB_PASSWORD=
+          DB_TEST_DATABASE=${{ env.DB_NAME }}
+          EOL
+      -
+        name: Artisan dusk:update
+        if: matrix.skip-web-check != '1'
+        run: |
+          php artisan dusk:update -vv --detect
+      -
+        name: Artisan serve
+        if: matrix.skip-web-check != '1'
+        run: |
+          php artisan serve -vv --env=dusk.testing >/tmp/artisan-serve.log 2>&1 &
+      -
+        name: Start SNMP
+        if: matrix.skip-unit-check != '1'
+        run: |
+          ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
+      -
+        name: Artisan dev:check ci
+        run: |
+          php artisan dev:check -vv ci
+        env:
+          SKIP_STYLE_CHECK: ${{ matrix.skip-style-check }}
+          SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
+          SKIP_WEB_CHECK: ${{ matrix.skip-web-check }}
+      -
+        name: Artisan serve logs
+        if: always() && matrix.skip-web-check != '1'
+        run: |
+          cat /tmp/artisan-serve.log
