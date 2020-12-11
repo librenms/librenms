@@ -86,7 +86,7 @@ class DeviceGroupController extends Controller
      */
     public function show(DeviceGroup $deviceGroup)
     {
-        return redirect(url('/devices/group=' . $deviceGroup->id));
+        return redirect(url('devices/group=' . $deviceGroup->id));
     }
 
     /**

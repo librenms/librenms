@@ -87,7 +87,7 @@
                 url: "{{ url('/ajax/table/location') }}",
                 formatters: {
                     "location": function (column, row) {
-                        return '<a href="{{ url('/devices') }}/location=' + row.id + '">' + row.location + '</a>';
+                        return '<a href="{{ url('devices') }}/location=' + row.id + '">' + row.location + '</a>';
                     },
                     "coordinates": function (column, row) {
                         var text;
