@@ -292,7 +292,7 @@ if ($format == 'graph') {
             <thead>
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false"><?php echo $detailed ? 'S.' : 'Status'; ?></th>
-					<th data-column-id="device_id" data-width="5px" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Id</th>
+                    <th data-column-id="device_id" data-width="5px" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Id</th>
                     <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?php echo $detailed ? 'M.' : 'Maintenance'; ?></th>
                     <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Vendor</th>
                     <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
@@ -343,7 +343,7 @@ if ($format == 'graph') {
             },
             post: function () {
                 return {
-                    format: '<?php echo mres($vars['format']); ?>',
+                    format: ' <?php echo mres($vars['format']); ?>',
                     searchPhrase: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
                     os: '<?php echo mres($vars['os']); ?>',
                     version: '<?php echo mres($vars['version']); ?>',
@@ -357,7 +357,7 @@ if ($format == 'graph') {
                     disable_notify: '<?php echo mres($vars['disable_notify']); ?>',
                     group: '<?php echo mres($vars['group']); ?>',
                     poller_group: '<?php echo mres($vars['poller_group']); ?>',
-					device_id: '<?php echo mres($vars['device_id']); ?>',
+                    device_id: '<?php echo mres($vars['device_id']); ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"
