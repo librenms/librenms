@@ -291,9 +291,10 @@ if ($format == 'graph') {
         <table id="devices" class="table table-hover table-condensed table-striped">
             <thead>
                 <tr>
-                    <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>
+                    <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false"><?php echo $detailed ? 'S.' : 'Status'; ?></th>
+                    <th data-column-id="device_id" data-width="5px" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Id</th>
+                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?php echo $detailed ? 'M.' : 'Maintenance'; ?></th>
                     <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Vendor</th>
-                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"></th>
                     <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
                     <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Metrics</th>
                     <th data-column-id="hardware">Platform</th>
@@ -313,7 +314,7 @@ if ($format == 'graph') {
             columnSelection: true,
             formatters: {
                 "status": function (column, row) {
-                    return "<span class=\"<?php echo $detailed ? 'alert-status' : 'alert-status-small' ?> " + row.extra + "\"></span>";
+                    return "<span title=\"Status: " + row.status + " : " + row.extra.replace(/^label-/,'') + "\" class=\"<?php echo $detailed ? 'alert-status' : 'alert-status-small' ?> " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
                     return "<span class=\"device-table-icon\">" + row.icon + "</span>";
@@ -339,7 +340,6 @@ if ($format == 'graph') {
             },
             templates: {
                 header: "<div class=\"devices-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\"><p class=\"{{css.actions}}\"></p></div><div class=\"row\"></div>"
-
             },
             post: function () {
                 return {
@@ -357,6 +357,7 @@ if ($format == 'graph') {
                     disable_notify: '<?php echo mres($vars['disable_notify']); ?>',
                     group: '<?php echo mres($vars['group']); ?>',
                     poller_group: '<?php echo mres($vars['poller_group']); ?>',
+                    device_id: '<?php echo mres($vars['device_id']); ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"
