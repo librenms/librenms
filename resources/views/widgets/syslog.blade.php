@@ -25,6 +25,6 @@
                 device_group: '{{ $device_group }}'
             };
         },
-        url: "{{ url('/ajax/table/syslog') }}"
+        url: "{{ url('ajax/table/syslog') }}"
     });
 </script>

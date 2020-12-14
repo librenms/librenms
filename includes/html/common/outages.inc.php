@@ -43,7 +43,7 @@ var outages_grid = $("#outages").bootgrid({
             from: "' . addcslashes($vars['from'], '"') . '",
         };
     },
-    url: "' . url('/ajax/table/outages') . '"
+    url: "' . url('ajax/table/outages') . '"
 });
 
 </script>

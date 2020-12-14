@@ -28,7 +28,7 @@
     $("#vminfo").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
-        url: "{{ url('/ajax/table/vminfo') }}"
+        url: "{{ url('ajax/table/vminfo') }}"
     });
 </script>
 @endsection

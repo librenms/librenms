@@ -139,7 +139,7 @@ $tmp_output .= '
                 loglevel: "' . (isset($_POST['loglevel']) ? mres($_POST['loglevel']) : '') . '",
             };
         },
-        url: "' . url('/ajax/table/graylog') . '",
+        url: "' . url('ajax/table/graylog') . '",
     });
     
     init_select2("#stream", "graylog-streams", {}, "' . (isset($_POST['stream']) ? mres($_POST['stream']) : '') . '");
