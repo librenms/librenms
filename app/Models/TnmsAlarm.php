@@ -18,6 +18,6 @@ class TnmsAlarm extends DeviceRelatedModel
 
     public function ne()
     {
-        return $this->belongsTo('App\Models\TnmsNeInfo', 'tnmsne_info_id');
+        return $this->belongsTo('App\Models\TnmsneInfo', 'tnmsne_info_id');
     }
 }
