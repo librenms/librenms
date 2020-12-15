@@ -25,9 +25,10 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\TnmsAlarm;
 use App\Models\TnmsneInfo;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Util\ModuleModelObserver;
 use Log;
 
 class Coriant extends \LibreNMS\OS implements OSPolling
@@ -42,7 +43,6 @@ class Coriant extends \LibreNMS\OS implements OSPolling
          */
 
         $c_list = [];
-        ModuleModelObserver::observe('\App\Models\MplsLsp\TnmsneInfo');
 
         foreach (snmpwalk_cache_multi_oid($this->getDeviceArray(), 'enmsNETable', [], 'TNMS-NBI-MIB') as $index => $ne) {
             $ne = TnmsneInfo::firstOrNew(['device_id' => $this->getDeviceId(), 'neID' => $index], [
@@ -68,5 +68,44 @@ class Coriant extends \LibreNMS\OS implements OSPolling
             $ne->delete();
             Log::event("Coriant enmsNETable Hardware $ne->neName at $ne->neLocation Removed", $this->getDevice(), 'system', $ne->neID);
         }
+
+        /* TNMS Alarm integration */
+        $device = $this->getDeviceArray();
+        $c_oids = snmpwalk_cache_multi_oid($device, 'enmsNETable', [], 'TNMS-NBI-MIB');
+        $existing_ne = TnmsNeInfo::where('device_id', $device['device_id'])->get();
+        $remove_ne = $existing_ne->keyBy('tnmsne_info_id'); // put existing ne here and remove them when we update them
+        $existing_ne = $existing_ne->keyBy('neID');
+        $ne_alarm_oids = snmpwalk_cache_multi_oid($device, 'enmsAlarmtable', [], 'TNMS-NBI-MIB', null, '-OQUsb');
+        $existing_alarms = \App\Models\TnmsAlarm::where('device_id', $device['device_id'])->get();
+        $remove_alarms = $existing_alarms->keyBy('id');
+        $existing_alarms = $existing_alarms->keyBy('alarm_num');
+
+        echo 'NE Alarms: ';
+        echo PHP_EOL;
+
+        foreach ($ne_alarm_oids as $alarm) {
+            if (!empty($alarm['enmsAlAlarmNumber'])) {
+                $fields = [
+                    'tnmsne_info_id' => $existing_ne->get($alarm['enmsAlNEId'])->tnmsne_info_id,
+                    'device_id' => $device['device_id'],
+                    'alarm_num' => $alarm['enmsAlAlarmNumber'],
+                    'alarm_cause' => $alarm['enmsAlProbableCauseString'],
+                    'alarm_location' => $alarm['enmsAlAffectedLocation'],
+                    'neAlarmtimestamp' => $alarm['enmsAlTimeStamp'],
+                ];
+                d_echo($fields);
+                if ($fields['tnmsne_info_id']) {
+                    if ($existing_alarm = $existing_alarms->get($alarm['enmsAlAlarmNumber'])) {
+                        $existing_alarm->fill($fields)->save();
+                        $remove_alarms->forget($existing_alarm->id);
+                    } else {
+                        $tnms_alarm = new TnmsAlarm($fields);
+                        $tnms_alarm->save();
+                    }
+                }
+            }
+        }
+       // delete old alarms
+        $remove_alarms->each->delete();
     }
 }
