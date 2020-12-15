@@ -74,7 +74,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             ['cn']
         );
         $result = ldap_get_entries($connection, $search);
-
         if ($result == false || $result['count'] !== 1) {
             if (Config::get('auth_ad_debug', false)) {
                 if ($result == false) {
@@ -90,19 +89,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             throw new AuthenticationException();
         }
 
-        $group_dn = $result[0]['dn'];
-
-        $search = ldap_search(
-            $connection,
-            Config::get('auth_ad_base_dn'),
-            // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
-            // limiting to "DN" for shorter array
-            '(&' . $this->userFilter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
-            ['DN']
-        );
-        $entries = ldap_get_entries($connection, $search);
-
-        return $entries['count'] > 0;
+        return $result['count'] > 0;
     }
 
     public function userExists($username, $throw_exception = false)
@@ -226,7 +213,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
         if ($bind_result) {
-            return;
+            return $bind_result;
         }
 
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ad_timeout', 5));
