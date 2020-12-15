@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TnmsneInfo extends Model
+class TnmsneInfo extends DeviceRelatedModel
 {
+    protected $primaryKey = 'tnmsne_info_id';
     protected $table = 'tnmsneinfo';
     public $timestamps = false;
     protected $fillable = [
@@ -19,3 +20,9 @@ class TnmsneInfo extends Model
         'neOpState',
     ];
 }
+   // ---- Define Relationships ----
+
+    public function alarms()
+    {
+        return $this->hasMany('App\Models\TnmsAlarm', 'tnmsne_info_id');
+    }
