@@ -2,9 +2,7 @@
 --
 -- SCHLEIFENBAUER-DATABUS-MIB.txt: Schleifenbauer MIB for databus devices
 --
--- May 2016, Marco Veeneman
---
--- Copyright (c) 2016 by Schleifenbauer Holding BV
+-- Copyright (c) 2016, 2020 by Schleifenbauer Holding BV
 -- All rights reserved.
 --
 -------------------------------------------------------------------------------
@@ -15,6 +13,7 @@ IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
     Integer32,
+    Unsigned32,
     NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     OBJECT-GROUP,
@@ -29,26 +28,33 @@ IMPORTS
 
 schleifenbauerDatabusMIB MODULE-IDENTITY
     LAST-UPDATED
-        "201703060000Z" -- March 3rd, 2017
+        "202004280000Z" -- April 28th, 2020
     ORGANIZATION
         "Schleifenbauer Engineering"
     CONTACT-INFO
         "Schleifenbauer Engineering
          Alain Schuermans
          Chief Technology Officer
-         Turnhoutseweg 22
-         5541 NX Reusel
+         Rietwaard 15
+         5236 WC 's-Hertogenbosch
          The Netherlands
-         t. +31 73 5230256
-         f. +31 73 5212383
+         t +31 (0)73 52 30256
+         f +31 (0)73 521 23 83
          alain@schleifenbauer.eu
          www.schleifenbauer.eu"
     DESCRIPTION
         "This MIB describes the SNMP functions of network enabled databus
          devices.
 
-         Copyright (c) 2016 by Schleifenbauer Holding BV
+         Copyright (c) 2016, 2020 by Schleifenbauer Holding BV
         "
+    REVISION
+        "202004280000Z" --  April 28th, 2020
+    DESCRIPTION
+        "1. Added performance monitoring registers
+         2. Added sdbDevStUsbMode register
+         3. Added sdbDevIdDeviceType register
+         4. Added sdbDevIdLocateUnit"
     REVISION
         "201703060000Z" -- March 3rd, 2017
     DESCRIPTION
@@ -176,6 +182,7 @@ sdbDevSettings         OBJECT IDENTIFIER ::= { sdbDevice 5 }
 sdbDevInput            OBJECT IDENTIFIER ::= { sdbDevice 6 }
 sdbDevOutlet           OBJECT IDENTIFIER ::= { sdbDevice 7 }
 sdbDevSensor           OBJECT IDENTIFIER ::= { sdbDevice 8 }
+sdbDevPerformance      OBJECT IDENTIFIER ::= { sdbDevice 9 }
 
 sdbMIBCompliances      OBJECT IDENTIFIER ::= { sdbMIBConformance 1 }
 sdbMIBGroups           OBJECT IDENTIFIER ::= { sdbMIBConformance 2 }
@@ -385,7 +392,9 @@ SdbDevIdEntry ::=
         sdbDevIdName                DisplayString,
         sdbDevIdLocation            DisplayString,
         sdbDevIdVanityTag           DisplayString,
-        sdbDevIdIndex               Integer32
+        sdbDevIdIndex               Integer32,
+        sdbDevIdDeviceType          Integer32,
+        sdbDevIdLocateUnit          Integer32
     }
 
 sdbDevIdSPDMVersion OBJECT-TYPE
@@ -502,6 +511,32 @@ sdbDevIdIndex OBJECT-TYPE
          The value for each device will remain constant until the next scan is
          performed."
     ::= { sdbDevIdEntry 13 }
+
+sdbDevIdDeviceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            pdu(0),
+                            dpm(1),
+                            hpdu-G3(2),
+                            dpm27e(3)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique value for each device group. 
+         Its value represents the device type of the device.
+         Refer to manual for more information."
+    ::= { sdbDevIdEntry 14 }
+
+sdbDevIdLocateUnit OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            off(0),
+                            on(1)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The LCD-backlight flashes in a heartbeat rhythm to locate the unit."
+    ::= { sdbDevIdEntry 15 }
 
 sdbDevCfTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdbDevCfEntry
@@ -840,7 +875,8 @@ SdbDevStEntry ::=
         sdbDevStMaximumTemperature      Integer32,
         sdbDevStDisplayOrientation      Integer32,
         sdbDevStLocalAlertReset         Integer32,
-        sdbDevStCurrentDropDetection    Integer32
+        sdbDevStCurrentDropDetection    Integer32,
+        sdbDevStUsbMode                 Integer32
     }
 
 sdbDevStAutoResetAlerts OBJECT-TYPE
@@ -964,6 +1000,18 @@ sdbDevStCurrentDropDetection OBJECT-TYPE
     DESCRIPTION
         "Enables the current drop detection function."
     ::= { sdbDevStEntry 11 }
+
+sdbDevStUsbMode OBJECT-TYPE
+    SYNTAX
+        INTEGER {
+            usbDisabled(0),
+            onlyFirmwareUpdates(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allow the USB port to be used for specific tasks"
+    ::= { sdbDevStEntry 13 }
 
 sdbDevInTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdbDevInEntry
@@ -1570,6 +1618,124 @@ sdbDevSnsName OBJECT-TYPE
         "User definable name for sensors."
     ::= { sdbDevSnsEntry 4 }
 
+-- ---------------------------------------------------------------------------------------------
+sdbDevPerformanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdbDevPerformanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information of sensors of devices connected to the
+         databus."
+    ::= { sdbDevPerformance 1 }
+
+sdbDevPerformanceEntry OBJECT-TYPE
+    SYNTAX      SdbDevPerformanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Performance counters of a particular databus device.
+         Note that this table has two indexes. sdbDevIdIndex to identify a
+         particular device and sdbDevPerformanceIndex to identify a particular counter
+         of the device identified by sdbDevIdIndex."
+    INDEX {
+        sdbDevIdIndex,
+        sdbDevPerformanceIndex
+    }
+    ::= { sdbDevPerformanceTable 1 }
+
+SdbDevPerformanceEntry ::=
+    SEQUENCE {
+        sdbDevPerformanceIndex  Integer32,
+        sdbDevPerformanceValue  Integer32,
+        sdbDevPerformanceMax    Integer32,
+        sdbDevPerformanceLimit  Integer32,
+        sdbDevPerformanceName   DisplayString
+    }
+
+sdbDevPerformanceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique value for each counter. Its value ranges between 1 and 16."
+    ::= { sdbDevPerformanceEntry 1 }
+
+sdbDevPerformanceValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777215)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Value of counter"
+    ::= { sdbDevPerformanceEntry 2 }
+
+sdbDevPerformanceMax OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777215)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max of counter"
+    ::= { sdbDevPerformanceEntry 3 }
+
+sdbDevPerformanceLimit OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777215)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Limit of counter"
+    ::= { sdbDevPerformanceEntry 4 }
+
+sdbDevPerformanceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..12))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User definable name for counter."
+    ::= { sdbDevPerformanceEntry 5 }
+
+-- ---------------------------------------------------------------------------------------------
+
+sdbDevPerformanceResetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdbDevPerformanceResetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the last reset reason of the device"
+    ::= { sdbDevPerformance 2 }
+
+sdbDevPerformanceResetEntry OBJECT-TYPE
+    SYNTAX      SdbDevPerformanceResetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Setting entry containing settings objects of a particular databus
+         device."
+    INDEX { sdbDevIdIndex }
+    ::= { sdbDevPerformanceResetTable 1 }
+
+SdbDevPerformanceResetEntry ::=
+    SEQUENCE {
+        sdbDevPerformanceResetReason    DisplayString,
+        sdbDevResetUptime               Unsigned32
+    }
+
+sdbDevPerformanceResetReason OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Last reset reason."
+    ::= { sdbDevPerformanceResetEntry 1 }
+
+sdbDevResetUptime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Uptime before last reset"
+    ::= { sdbDevPerformanceResetEntry 2 }
+
+-- ---------------------------------------------------------------------------------------------
+
 sdbDevSsDeviceStatusCodeChanged NOTIFICATION-TYPE
     STATUS  current
     DESCRIPTION
@@ -1744,6 +1910,9 @@ sdbMIBCompliance MODULE-COMPLIANCE
         GROUP          sdbMIBMgmtControlGroup
         DESCRIPTION
             "The databus management control group."
+        GROUP          sdbMIBDevPerformanceGroup
+        DESCRIPTION
+            "The databus management control group."
     ::= { sdbMIBCompliances 1 }
 
 sdbMIBNotificationGroup NOTIFICATION-GROUP
@@ -1777,7 +1946,9 @@ sdbMIBDevIdGroup OBJECT-GROUP
         sdbDevIdLocation,
         sdbDevIdVanityTag,
         sdbDevIdMacAddress,
-        sdbDevIdBuildNumber
+        sdbDevIdBuildNumber,
+        sdbDevIdDeviceType,
+        sdbDevIdLocateUnit
     }
     STATUS      current
     DESCRIPTION
@@ -1842,7 +2013,8 @@ sdbMIBDevStGroup OBJECT-GROUP
         sdbDevStOutletPowerUpMode,
         sdbDevStMaximumTemperature,
         sdbDevStDisplayOrientation,
-        sdbDevStCurrentDropDetection
+        sdbDevStCurrentDropDetection,
+        sdbDevStUsbMode
     }
     STATUS      current
     DESCRIPTION
@@ -1961,5 +2133,19 @@ sdbMIBMgmtControlGroup OBJECT-GROUP
         "A collection of objects providing management control information about
          the databus."
     ::= { sdbMIBGroups 14 }
+
+sdbMIBDevPerformanceGroup OBJECT-GROUP
+    OBJECTS {
+        sdbDevPerformanceValue,
+        sdbDevPerformanceMax,
+        sdbDevPerformanceLimit,
+        sdbDevPerformanceName,
+        sdbDevPerformanceResetReason,
+        sdbDevResetUptime
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing performance information about the MCU"
+    ::= { sdbMIBGroups 15 }
 
 END
