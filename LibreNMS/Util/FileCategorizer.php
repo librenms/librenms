@@ -38,6 +38,7 @@ class FileCategorizer extends Categorizer
             $this->setSkippable(function ($item) {
                 return in_array($item, [
                     '.travis.yml',
+                    '.github/workflows/test.yml',
                     'LibreNMS/Util/CiHelper.php',
                     'LibreNMS/Util/FileCategorizer.php',
                     'app/Console/Commands/DevCheckCommand.php',
@@ -65,7 +66,7 @@ class FileCategorizer extends Categorizer
             return Str::startsWith($item, 'resources/') ? $item : false;
         });
         $this->addCategory('full-checks', function ($item) {
-            return in_array($item, ['composer.lock', '.travis.yml']) ? $item : false;
+            return in_array($item, ['composer.lock', '.travis.yml', '.github/workflows/test.yml']) ? $item : false;
         });
         $this->addCategory('os-files', function ($item) {
             if (($os_name = $this->osFromFile($item)) !== null) {
