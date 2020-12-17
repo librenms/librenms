@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'master'
-      - 'ghactions-test' # remove when merged
     paths-ignore:
       - '**.md'
       - '.github/workflows/doc.yml'
@@ -19,10 +18,6 @@ on:
       - 'doc/**'
       - 'mkdocs.yml'
 
-env:
-  APP_ENV: testing
-  DB_NAME: db
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -32,6 +27,17 @@ jobs:
         include:
           -
             php-version: 7.4
+            skip-style-check: 1
+            skip-web-check: 1
+          -
+            php-version: 7.4
+            skip-unit-check: 1
+          -
+            php-version: 7.4
+            skip-style-check: 1
+            skip-web-check: 1
+          -
+            php-version: 7.3
             skip-style-check: 1
             skip-web-check: 1
           -
@@ -46,16 +52,20 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: ${{ env.DB_NAME }}
+          MYSQL_DATABASE: librenms
+          MYSQL_USER: librenms
+          MYSQL_PASSWORD: librenms
         ports:
           - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -102,14 +112,20 @@ jobs:
         run: |
           cat > .env <<EOL
           APP_KEY=base64:vHI+YHgkyCDad31iPEErGSNEOWO21wNzV+zyENKQv04=
-          APP_URL=http://localhost:8000
-          APP_ENV=${{ env.APP_ENV }}
+          APP_URL=http://127.0.0.1:8000
+          APP_ENV=testing
+          DB_DRIVER=mysql
+          DB_HOST=127.0.0.1
+          DB_PORT=${{ job.services.mysql.ports[3306] }}
+          DB_DATABASE=librenms
+          DB_USERNAME=librenms
+          DB_PASSWORD=librenms
           DB_TEST_DRIVER=mysql
-          DB_TEST_HOST=mysql
+          DB_TEST_HOST=127.0.0.1
           DB_TEST_PORT=${{ job.services.mysql.ports[3306] }}
-          DB_TEST_DB_DATABASE=${{ env.DB_NAME }}
-          DB_TEST_DB_USERNAME=root
-          DB_TEST_DB_PASSWORD=
+          DB_TEST_DB_DATABASE=librenms
+          DB_TEST_DB_USERNAME=librenms
+          DB_TEST_DB_PASSWORD=librenms
           EOL
       -
         name: Composer install
@@ -119,12 +135,13 @@ jobs:
         name: Artisan dusk:update
         if: matrix.skip-web-check != '1'
         run: |
-          php artisan dusk:update -vv --detect
+          php artisan dusk:update --detect
       -
         name: Artisan serve
         if: matrix.skip-web-check != '1'
         run: |
-          php artisan serve -vv --env=dusk.testing >/tmp/artisan-serve.log 2>&1 &
+          php artisan serve --env=dusk.testing >/tmp/artisan-serve.log 2>&1 &
+          sleep 5
       -
         name: Start SNMP
         if: matrix.skip-unit-check != '1'
@@ -133,13 +150,26 @@ jobs:
       -
         name: Artisan dev:check ci
         run: |
-          php artisan dev:check -vv ci
+          php artisan dev:check ci
         env:
           SKIP_STYLE_CHECK: ${{ matrix.skip-style-check }}
           SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
           SKIP_WEB_CHECK: ${{ matrix.skip-web-check }}
       -
-        name: Artisan serve logs
+        name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
+      -
+        name: Dump serve logs
         if: always() && matrix.skip-web-check != '1'
         run: |
           cat /tmp/artisan-serve.log
+      -
+        name: Dump snmp logs
+        if: always() && matrix.skip-unit-check != '1'
+        run: |
+          cat /tmp/snmpsimd.log
+      -
+        name: Dump context
+        if: always()
+        uses: crazy-max/ghaction-dump-context@v1
