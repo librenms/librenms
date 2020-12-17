@@ -57,6 +57,12 @@ jobs:
         with:
           fetch-depth: 0
       -
+        name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer,php-cs-fixer
+      -
         name: Get composer cache directory
         id: composer-cache
         run: |
@@ -83,12 +89,6 @@ jobs:
           sudo apt-get -qq update
           sudo apt-get install -y fping python3-pip python3-setuptools snmp
       -
-        name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          tools: composer,php-cs-fixer
-      -
         name: Pip install
         run: |
           pip3 install --upgrade pip
@@ -98,23 +98,23 @@ jobs:
         run: |
           composer validate
       -
-        name: Composer install
-        run: |
-          composer install --prefer-dist --no-interaction --no-progress --no-suggest
-      -
         name: Init env
         run: |
           cat > .env <<EOL
           APP_KEY=base64:vHI+YHgkyCDad31iPEErGSNEOWO21wNzV+zyENKQv04=
           APP_URL=http://localhost:8000
           APP_ENV=${{ env.APP_ENV }}
-          DB_HOST=mysql
-          DB_PORT=${{ job.services.mysql.ports[3306] }}
-          DB_DATABASE=${{ env.DB_NAME }}
-          DB_USERNAME=root
-          DB_PASSWORD=
-          DB_TEST_DATABASE=${{ env.DB_NAME }}
+          DB_TEST_DRIVER=mysql
+          DB_TEST_HOST=mysql
+          DB_TEST_PORT=${{ job.services.mysql.ports[3306] }}
+          DB_TEST_DB_DATABASE=${{ env.DB_NAME }}
+          DB_TEST_DB_USERNAME=root
+          DB_TEST_DB_PASSWORD=
           EOL
+      -
+        name: Composer install
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress --no-suggest
       -
         name: Artisan dusk:update
         if: matrix.skip-web-check != '1'
