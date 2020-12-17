@@ -404,7 +404,7 @@ class CiHelper
     public function detectChangedFiles()
     {
         $changed_files = trim(getenv('FILES')) ?:
-            exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
+            exec("git diff --diff-filter=d --name-only origin/master | tr '\n' ' '|sed 's/,*$//g'");
 
         $this->flags['full'] = $this->flags['full'] || empty($changed_files); // don't disable full if already set
         $files = $changed_files ? explode(' ', $changed_files) : [];
