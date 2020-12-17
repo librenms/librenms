@@ -77,7 +77,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        var ajax_url = "{{ url('ajax') }}";
+        var ajax_url = "{{ url('/ajax') }}";
     </script>
     <script src="{{ asset('js/librenms.js?ver=20200501') }}"></script>
     <script type="text/javascript">

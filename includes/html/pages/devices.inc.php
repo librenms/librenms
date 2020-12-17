@@ -359,7 +359,7 @@ if ($format == 'graph') {
                     poller_group: '<?php echo mres($vars['poller_group']); ?>',
                 };
             },
-            url: "<?php echo url('ajax/table/device') ?>"
+            url: "<?php echo url('/ajax/table/device') ?>"
         });
 
         <?php

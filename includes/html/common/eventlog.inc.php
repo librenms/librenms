@@ -39,7 +39,7 @@ var eventlog_grid = $("#eventlog").bootgrid({
             eventtype: "' . addcslashes($vars['eventtype'], '"') . '",
         };
     },
-    url: "' . url('ajax/table/eventlog') . '"
+    url: "' . url('/ajax/table/eventlog') . '"
 });
 
 </script>

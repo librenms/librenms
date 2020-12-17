@@ -56,6 +56,6 @@ $graph_view = $vars['view'] == 'graphs';
                 view: '<?php echo $vars['view']; ?>'
             };
         },
-        url: "<?php echo url('ajax/table/mempools'); ?>"
+        url: "<?php echo url('/ajax/table/mempools'); ?>"
     });
 </script>

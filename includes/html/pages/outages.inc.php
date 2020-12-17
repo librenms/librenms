@@ -118,7 +118,7 @@ $pagetitle[] = 'Outages';
         allowClear: true,
         placeholder: "All Devices",
         ajax: {
-            url: '<?php echo url('ajax/select/device'); ?>',
+            url: '<?php echo url('/ajax/select/device'); ?>',
             delay: 200
         }
     })<?php echo $device_id ? ".val($device_id).trigger('change');" : ''; ?>;

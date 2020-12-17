@@ -43,7 +43,7 @@ if (Config::get('graylog.server')) {
                 ' . ($rowCount ? 'rowCount: ' . $rowCount . ',' : '') . '
                 ' . ($loglevel ? 'loglevel: ' . $loglevel . ',' : '') . '
             },
-            url: "' . url('ajax/table/graylog') . '",
+            url: "' . url('/ajax/table/graylog') . '",
             success: function(data){
                 if (data.rowCount == 0) {
                     $("#graylog-card").remove();
