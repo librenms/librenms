@@ -306,7 +306,7 @@ class Url
             $urlargs[] = $key . '=' . urlencode($arg);
         }
 
-        return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return '<img src="' . 'graph.php' . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
     public static function graphPopup($args, $content = null, $link = null)
