@@ -130,11 +130,14 @@ jobs:
         if: matrix.skip-unit-check != '1'
         run: |
           ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
+      - id: files
+        uses: jitterbit/get-changed-files@v1
       -
         name: Artisan dev:check ci
         run: |
           php artisan dev:check -vv ci
         env:
+          FILES: ${{ steps.files.outputs.all }}
           SKIP_STYLE_CHECK: ${{ matrix.skip-style-check }}
           SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
           SKIP_WEB_CHECK: ${{ matrix.skip-web-check }}
