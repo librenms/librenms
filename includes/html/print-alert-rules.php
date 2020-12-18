@@ -91,9 +91,9 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device['device_id'] . '"><i class="fa fa-plus"></i> Create new alert rule</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device['device_id'] . '">Create new alert rule</button>';
 echo '<i> - OR - </i>';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device['device_id'] . '"><i class="fa fa-plus"></i> Create rule from collection</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device['device_id'] . '">Create rule from collection</button>';
 echo '</div>';
 
 echo '<div class="col pull-right">';

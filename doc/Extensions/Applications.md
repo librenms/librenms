@@ -1618,13 +1618,13 @@ SNMP extend script to get your PI data into your host.
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
 ```
-extend raspberry /usr/bin/sudo /bin/sh /etc/snmp/raspberry.sh
+extend raspberry sudo /etc/snmp/raspberry.sh
 ```
 
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /bin/sh /etc/snmp/raspberry.sh
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh
 ```
 
 **Note:** If you are using Raspian, the default user is
