@@ -8,7 +8,7 @@ if (count($device_groups)) {
         <div class='col-md-12'>
             <div class='panel panel-default panel-condensed device-overview'>
                 <div class='panel-heading'>
-		<a href="<? php echo url('device-groups'); ?>">
+		<a href="<?php echo url('device-groups'); ?>">
                         <i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i>
                         <strong>Device Group Membership</strong>
                     </a>
