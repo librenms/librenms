@@ -37,6 +37,7 @@ class TopInterfacesController extends WidgetController
         'time_interval' => 15,
         'interface_filter' => null,
         'device_group' => null,
+        'port_group' => null,
     ];
 
     /**
@@ -51,10 +52,13 @@ class TopInterfacesController extends WidgetController
             $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
         }])
             ->isValid()
-            ->select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
-            ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
+            ->select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias', 'port_group_id')
+            ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias', 'port_group_id')
             ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval'])->timestamp)
             ->isUp()
+            ->when($data['port_group'], function ($query) use ($data) {
+                $query->where('port_group_id', '=', $data['port_group']);
+            })
             ->when($data['device_group'], function ($query) use ($data) {
                 $query->inDeviceGroup($data['device_group']);
             }, function ($query) {

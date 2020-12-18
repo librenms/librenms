@@ -1404,6 +1404,7 @@ ports:
     - { Field: ifDescr, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifName, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: portName, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: port_group_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: ifIndex, Type: bigint, 'Null': true, Extra: '', Default: '0' }
     - { Field: ifSpeed, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifSpeed_prev, Type: bigint, 'Null': true, Extra: '' }
@@ -1472,6 +1473,14 @@ ports:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
     ports_device_id_ifindex_unique: { Name: ports_device_id_ifindex_unique, Columns: [device_id, ifIndex], Unique: true, Type: BTREE }
     ports_ifdescr_index: { Name: ports_ifdescr_index, Columns: [ifDescr], Unique: false, Type: BTREE }
+port_groups:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: name, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: desc, Type: varchar(255), 'Null': true, Extra: '', Default: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    port_groups_name_unique: { Name: port_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }
 ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }

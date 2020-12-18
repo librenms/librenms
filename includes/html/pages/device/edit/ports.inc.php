@@ -18,6 +18,7 @@
                 <th data-column-id='disabled' data-sortable='false'>Disable polling</th>
                 <th data-column-id='ignore' data-sortable='false'>Ignore alert tag</th>
                 <th data-column-id='ifSpeed'>ifSpeed (bits/s)</th>
+                <th data-column-id='portGroup'>PortGroup</th>
                 <th data-column-id='port_tune' data-sortable='false' data-searchable='false'>RRD Tune</th>
                 <th data-column-id='ifAlias'>Description</th>
             </tr>

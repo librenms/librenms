@@ -35,6 +35,8 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
+$port_groups = array(0 => 'Default') + dbFetchKeyValue('SELECT id, name from port_groups order by name');
+
 $sql = "SELECT * $sql";
 
 $response[] = [
@@ -62,6 +64,17 @@ foreach (dbFetchRows($sql, $param) as $port) {
         $checked = 'checked';
     }
 
+
+
+    $port_group_field = '<select class="input-sm" name="port_group_' . $port['port_id'] . '"  data-device_id="' . $port['device_id'] . '">';
+    foreach ($port_groups as $pg_k => $pg_v) {
+        $port_group_field .= '<option value="' . $pg_k . '"' . ($port['port_group_id'] != $pg_k ?: " selected") . '>' . $pg_v . '</option>';
+    }
+    $port_group_field .= '</select>';
+
+
+
+
     $response[] = [
         'ifIndex'          => $port['ifIndex'],
         'ifName'           => $port['label'],
@@ -74,6 +87,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
         'port_tune'        => '<input type="checkbox" id="override_config" name="override_config" data-attrib="ifName_tune:' . $port['ifName'] . '" data-device_id="' . $port['device_id'] . '" data-size="small" ' . $checked . '>',
         'ifAlias'          => '<div class="form-group"><input class="form-control input-sm" id="if-alias" name="if-alias" data-device_id="' . $port['device_id'] . '" data-port_id="' . $port['port_id'] . '" data-ifName="' . $port['ifName'] . '" value="' . $port['ifAlias'] . '"><span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span></div>',
         'ifSpeed'          => '<div class="form-group has-feedback"><input type="text" pattern="[0-9]*" inputmode="numeric" class="form-control input-sm" id="if-speed" name="if-speed" data-device_id="' . $port['device_id'] . '" data-port_id="' . $port['port_id'] . '" data-ifName="' . $port['ifName'] . '" value="' . $port['ifSpeed'] . '"><span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span></div>',
+        'portGroup'        => '<div class="form-group has-feedback">' . $port_group_field . '</div>',
     ];
 }//end foreach
 

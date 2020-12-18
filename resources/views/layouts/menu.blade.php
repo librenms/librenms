@@ -207,11 +207,21 @@
                     @endif
                     @admin
                         <li role="presentation" class="divider"></li>
+                        <li class="dropdown-submenu"><a><i class="fa fa-braille fa-fw fa-lg"
+                                                        aria-hidden="true"></i> @lang('Manage Groups')</a>
+
+                            <ul class="dropdown-menu scrollable-menu">
                         @can('manage', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> @lang('Manage Groups')
+                                                                        aria-hidden="true"></i> @lang('Device Groups')
                                 </a></li>
                         @endcan
+                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-link fa-fw fa-lg"
+                                                                        aria-hidden="true"></i> @lang('Port Groups')
+                                </a></li>
+
+                            </ul>
+                        </li>
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> @lang('Device Dependencies')</a></li>
                         @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i
