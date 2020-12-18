@@ -46,5 +46,4 @@ class PortGroup extends BaseModel
     {
         return $this->belongsto(\App\Models\Port::class, 'port_group', 'id');
     }
-
 }
