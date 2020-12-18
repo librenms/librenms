@@ -269,7 +269,7 @@ class Url
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = url(Config::get('base_url', true) . $vars['page'] . '');
+        $url = url($vars['page']);
         unset($vars['page']);
 
         return $url . self::urlParams($vars);
