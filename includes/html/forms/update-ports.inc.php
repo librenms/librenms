@@ -19,7 +19,6 @@ $device_id = intval($_POST['device']);
 $rows_updated = 0;
 
 foreach ($_POST as $key => $val) {
-
     $port_group_id = $_POST['port_group_' . $port_id];
 
     if (strncmp($key, 'oldign_', 7) == 0) {

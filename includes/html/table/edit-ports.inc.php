@@ -35,7 +35,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$port_groups = array(0 => 'Default') + dbFetchKeyValue('SELECT id, name from port_groups order by name');
+$port_groups = [0 => 'Default'] + dbFetchKeyValue('SELECT id, name from port_groups order by name');
 
 $sql = "SELECT * $sql";
 
@@ -64,16 +64,11 @@ foreach (dbFetchRows($sql, $param) as $port) {
         $checked = 'checked';
     }
 
-
-
     $port_group_field = '<select class="input-sm" name="port_group_' . $port['port_id'] . '"  data-device_id="' . $port['device_id'] . '">';
     foreach ($port_groups as $pg_k => $pg_v) {
-        $port_group_field .= '<option value="' . $pg_k . '"' . ($port['port_group_id'] != $pg_k ?: " selected") . '>' . $pg_v . '</option>';
+        $port_group_field .= '<option value="' . $pg_k . '"' . ($port['port_group_id'] != $pg_k ?: ' selected') . '>' . $pg_v . '</option>';
     }
     $port_group_field .= '</select>';
-
-
-
 
     $response[] = [
         'ifIndex'          => $port['ifIndex'],

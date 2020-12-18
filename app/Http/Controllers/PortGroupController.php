@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Port;
 use App\Models\PortGroup;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;

@@ -30,32 +30,6 @@ class PortGroup extends BaseModel
     public $timestamps = false;
     protected $fillable = ['name', 'desc'];
 
-#    TODO: bei delete -> fall back to default !
-    public static function boot()
-    {
-        parent::boot();
-#        static::deleting(function (PortGroup $portGroup) {
-#            $portGroup->ports()->detach();
-#        });
-
-#
-#        static::deleting(function (DeviceGroup $deviceGroup) {
-#            $deviceGroup->devices()->detach();
-#        });
-#
-#        static::saving(function (DeviceGroup $deviceGroup) {
-#            if ($deviceGroup->isDirty('rules')) {
-#                $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
-#            }
-#        });
-#
-#        static::saved(function (DeviceGroup $deviceGroup) {
-#            if ($deviceGroup->isDirty('rules')) {
-#                $deviceGroup->updateDevices();
-#            }
-#        });
-    }
-
     // ---- Query Scopes ----
 
     public function scopeHasAccess($query, User $user)

@@ -72,11 +72,11 @@ if ($port_details) {
 
 echo '</span>';
 
-$port_groups = array(0 => 'Default') + dbFetchKeyValue('SELECT id, name from port_groups order by name');
+$port_groups = [0 => 'Default'] + dbFetchKeyValue('SELECT id, name from port_groups order by name');
 
 echo "</td><td width=100 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
 echo $port_groups[$port['port_group_id']];
-echo "</td><td width=100>";
+echo '</td><td width=100>';
 
 if ($port_details) {
     $port['graph_type'] = 'port_bits';
