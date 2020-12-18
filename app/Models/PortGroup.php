@@ -23,6 +23,7 @@
  */
 
 namespace App\Models;
+
 use Permissions;
 
 class PortGroup extends BaseModel
