@@ -15,8 +15,8 @@
 use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\PortGroup;
 use App\Models\DeviceOutage;
+use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
