@@ -397,7 +397,7 @@ STATE;
 
 function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
 {
-    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $right_text, $left_text, null, null, [
+    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $right_text, null, null, [
         'left' => $left_background,
         'left_text' => $left_colour,
         'right' => $right_background,
