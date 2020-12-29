@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 # SNMP configuration examples
 
-[Table of Content:
+Table of Content:
 
 - [Devices](#devices)
   - [Cisco](#cisco)
@@ -31,7 +31,7 @@ path: blob/master/doc/
   - [Linux (snmpd v3)](#linux-snmpd-v3)
   - [Windows Server 2008 R2](#windows-server-2008-r2)
   - [Windows Server 2012 R2 and newer](#windows-server-2012-r2-and-newer)
-  - [Mac OSX](#Mac-OSX)]
+  - [Mac OSX](#Mac-OSX)
 
 ## Devices
 
