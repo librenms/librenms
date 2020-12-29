@@ -329,22 +329,23 @@ class Device extends BaseModel
      * @param $record  DNS Record which should be searched
      * @return array   List of matching records
      */
-    public function getDnsRecord($record='A')
+    public function getDnsRecord($record = 'A')
     {
         $dns_resolver_file = stream_resolve_include_path('Net/DNS2.php');
 
         if (! file_exists($dns_resolver_file)) {
-            d_echo("FILE NOT FOUND: " . $dns_resolver_file);
+            d_echo('FILE NOT FOUND: ' . $dns_resolver_file);
+
             return Null;
         }
-        require_once($dns_resolver_file);
+        require_once $dns_resolver_file;
 
         $r = new Net_DNS2_Resolver();
         try {
             $ret = $r->query($this->hostname, $record);
             return $ret->answer;
-        } catch(Net_DNS2_Exception $e) {
-            d_echo("::query() failed: " . $e->getMessage());
+        } catch (Net_DNS2_Exception $e) {
+            d_echo('::query() failed: ' . $e->getMessage());
         }
     }
 
