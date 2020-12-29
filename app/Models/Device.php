@@ -324,13 +324,47 @@ class Device extends BaseModel
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
     }
 
+    /**
+     * @param $domain  Domain which has to be parsed
+     * @param $record  DNS Record which should be searched
+     * @return array   List of matching records
+     */
+    public function getDnsRecord($record='A')
+    {
+        $dns_resolver_file = stream_resolve_include_path('Net/DNS2.php');
+
+        if (! file_exists($dns_resolver_file)) {
+            d_echo("FILE NOT FOUND: " . $dns_resolver_file);
+            return Null;
+        }
+        require_once($dns_resolver_file);
+
+        $r = new Net_DNS2_Resolver();
+        try {
+            $ret = $r->query($this->hostname, $record);
+            return $ret->answer;
+        } catch(Net_DNS2_Exception $e) {
+            d_echo("::query() failed: " . $e->getMessage());
+        }
+    }
+
     public function setLocation($location_text)
     {
         $location_text = $location_text ? Rewrite::location($location_text) : null;
 
         $this->location_id = null;
         if ($location_text) {
-            $location = Location::firstOrCreate(['location' => $location_text]);
+            $location_data = ['location' => $location_text];
+
+            if (\LibreNMS\Config::get('parse_dns_location_record')) {
+                $dns_record = $this->$getDnsRecord('LOC');
+                if (is_array($dns_record)) {
+                    $location_data['lat'] = $dns_record[0]->latitude;
+                    $location_data['lng'] = $dns_record[0]->longitude;
+                }
+            }
+
+            $location = Location::firstOrCreate($location_data);
             $this->location()->associate($location);
         }
     }

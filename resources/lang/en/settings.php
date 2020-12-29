@@ -1368,6 +1368,10 @@ return [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
         ],
+        'parse_dns_location_record' => [
+            'description' => 'Use DNS Location Record',
+            'help' => 'Use LOC Record from DNS Server to get geographic coordinates for Hostname',
+        ],
         'force_hostname_to_sysname' => [
             'description' => 'show SysName instead of Hostname',
             'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device',

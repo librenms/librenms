@@ -831,6 +831,13 @@
             "hidden": true,
             "type": "boolean"
         },
+        "parse_dns_location_record": {
+            "order": 3,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean"
+        },
         "device_location_map_open": {
             "order": 2,
             "group": "webui",
