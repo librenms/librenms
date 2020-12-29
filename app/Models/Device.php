@@ -343,6 +343,7 @@ class Device extends BaseModel
         $r = new Net_DNS2_Resolver();
         try {
             $ret = $r->query($this->hostname, $record);
+
             return $ret->answer;
         } catch (Net_DNS2_Exception $e) {
             d_echo('::query() failed: ' . $e->getMessage());
