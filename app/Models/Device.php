@@ -336,7 +336,7 @@ class Device extends BaseModel
         if (! file_exists($dns_resolver_file)) {
             d_echo('FILE NOT FOUND: ' . $dns_resolver_file);
 
-            return Null;
+            return null;
         }
         require_once $dns_resolver_file;
 
