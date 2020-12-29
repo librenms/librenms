@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 # Quick Guide
 
-Okay this is a very quick walk-through in writing own `commands` for the IRC-Bot.
+Okay this is a very quick walk-through in writing your own `commands` for the IRC-Bot.
 
 First of all, create a file in `includes/ircbot`, the file-name should
 be in this format: `command.inc.php`.

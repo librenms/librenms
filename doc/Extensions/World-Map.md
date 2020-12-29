@@ -24,11 +24,15 @@ Location resolution happens as follows
 
 Example:
 
+```
 [40.424521, -86.912755]
+```
 
 or
 
+```
 1100 Congress Ave, Austin, TX 78701
+```
 
 We have two current mapping engines available:
 

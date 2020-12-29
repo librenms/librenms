@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 ### `list_arp`
 
-Retrieve a specific ARP entry or all ARP enties for a device
+Retrieve a specific ARP entry or all ARP entries for a device
 
 Route: `/api/v0/resources/ip/arp/:query`
 
