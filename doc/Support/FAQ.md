@@ -183,7 +183,7 @@ ifIn/OutOctets value and record that. Now, it appears as though all of
 the traffic since it stopped getting values have occurred in the last
 5 minute interval.
 
-So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittant network connectivity, broken poller, and more.
+So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittent network connectivity, broken poller, and more.
 
 ## <a name="faq17"> Why do I see gaps in my graphs?</a>
 
@@ -197,7 +197,7 @@ Modules Performance. Take a look at what modules are taking the
 longest and disabled un used modules.
 
 If you poll a large number of devices / ports then it's recommended to
-run a local recurisve dns server such as pdns-recursor.
+run a local recursive dns server such as pdns-recursor.
 
 Running RRDCached is also highly advised in larger installs but has
 benefits no matter the size.
@@ -267,7 +267,7 @@ do so by setting `$config['uptime_warning'] = '84600';` in
 ## <a name="faq23"> Why do I not see all interfaces in the Overall traffic graph for a device?</a>
 
 By default numerous interface types and interface descriptions are
-excluded from this graph. The excluded defailts are:
+excluded from this graph. The excluded defaults are:
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
@@ -440,7 +440,7 @@ LibreNMS improve.
   own time.
 - Documentation. Documentation can always be improved and every little
   bit helps. Not all features are currently documented or documented
-  well, there's speeling mistakes etc. It's very easy to submit
+  well, there's spelling mistakes etc. It's very easy to submit
   updates [through the GitHub
   website](https://help.github.com/articles/editing-files-in-another-user-s-repository/),
   no git experience needed.
@@ -582,7 +582,7 @@ To view a prediction:
 You should now see a linear prediction line on the graph.
 ## <a name='move-db-to-another-server'>How do I move only the DB to another server?</a>
 
-There is already a reference how to move your whole LNMS installation to another server. But the following steps will help you to split up an "All-in-one" installation to one LibreNMS installation with a seperate database install. 
+There is already a reference how to move your whole LNMS installation to another server. But the following steps will help you to split up an "All-in-one" installation to one LibreNMS installation with a separate database install. 
 *Note: This section assumes you have a MySQL/MariaDB instance
 
 - Stop the apache and mysql service in you LibreNMS installation.

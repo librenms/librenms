@@ -150,7 +150,7 @@ Running `./scripts/collect-port-polling.php` will poll your devices
 with both full and selective polling, display a table with the
 difference and optionally enable or disable selected ports polling for
 devices which would benefit from a change. Note that it doesn't
-continously re-evaluate this, it will only be updated when the script
+continuously re-evaluate this, it will only be updated when the script
 is run. There are a number of options:
 
 ```
@@ -181,7 +181,7 @@ A lot of performance can be gained from setting up `php-opcache` correctly.
 
 **Note: Memory based caching with PHP cli will increase memory usage and slow things down. File based caching is not as fast as memory based and is more likely to have stale cache issues.**
 
-Some distributions allow seperate cli, mod_php and php-fpm configurations, we can use this to set the optimal config.
+Some distributions allow separate cli, mod_php and php-fpm configurations, we can use this to set the optimal config.
 
 ### For web servers using mod_php and php-fpm
 

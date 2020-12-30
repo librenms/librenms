@@ -112,7 +112,7 @@ Test config:
 `sudo /usr/lib/rancid/bin/clogin -f /var/lib/rancid/.cloginrc <device hostname>`
 
 NOTE: IF you run into a 'diffie-hellmen' kind of error, then it is
-because your Linux distro is using newer encyryprtion methods
+because your Linux distro is using newer encryption methods
 etc. This is basically just letting you know that the device you
 tested on is running an outdated encryption type. I recommend updating
 downstream device if able.  If not, the following should fix:

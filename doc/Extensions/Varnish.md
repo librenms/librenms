@@ -14,7 +14,7 @@ decrease page load times significantly.
 
 # Simplified block diagram of an Apache HTTP server with Varnish 4.0 Reverse Proxy
 
-![Block Diagram 1](@= config.site_url =@/img/varnish_block.png)
+![Block Diagram 1](/img/varnish_block.png)
 
 # CentOS 7 Varnish Installation
 
