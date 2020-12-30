@@ -116,6 +116,11 @@ server {
  charset utf-8;
  gzip on;
  gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+
+ proxy_read_timeout 300;
+ proxy_connect_timeout 300;
+ proxy_send_timeout 300;
+
  location / {
   try_files $uri $uri/ /index.php?$query_string;
  }
