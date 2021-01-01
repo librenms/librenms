@@ -359,7 +359,7 @@ class Device extends BaseModel
             $location_data = ['location' => $location_text];
 
             if (\LibreNMS\Config::get('parse_dns_location_record')) {
-                $dns_record = $this->$getDnsRecord('LOC');
+                $dns_record = $this->getDnsRecord('LOC');
                 if (is_array($dns_record)) {
                     $location_data['lat'] = $dns_record[0]->latitude;
                     $location_data['lng'] = $dns_record[0]->longitude;
