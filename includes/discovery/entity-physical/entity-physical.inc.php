@@ -118,6 +118,13 @@ if ($device['os'] == 'saf-cfm') {
     }
 }
 
+// Netgear M4300 and S3300 don't include the correct unit serial number in standard entPhysical. It's always the first one.
+// This fetches the correct ones from the special inventory mib.
+if($device['os'] == 'netgear') {
+    $netgear_unit_serialnumbers = snmpwalk_group($device, "agentInventoryUnitSerialNumber", 'NETGEAR-INVENTORY-MIB');
+}
+
+
 foreach ($entity_array as $entPhysicalIndex => $entry) {
     unset($ifIndex);
     if ($device['os'] == 'junos') {
@@ -199,6 +206,26 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         if (isset($entry['1']['entAliasMappingIdentifier'])) {
             $ifIndex = preg_replace('/ifIndex\.(\d+).*/', '$1', $entry['1']['entAliasMappingIdentifier']);
         }
+    } elseif ($device['os'] == 'netgear') {
+        // Get serial numbers for units from inventory area, instead of entPhysical
+        $entPhysicalDescr = $entry['entPhysicalDescr'];
+        $entPhysicalName = $entry['entPhysicalName'];
+        $entPhysicalFirmwareRev = $entry['entPhysicalFirmwareRev'];
+        $entPhysicalContainedIn = $entry['entPhysicalContainedIn'];
+        $entPhysicalClass = $entry['entPhysicalClass'];
+        $entPhysicalParentRelPos = $entry['entPhysicalParentRelPos'];
+        $entPhysicalSerialNum = $entry['entPhysicalSerialNum'];
+        if($entPhysicalClass == 'chassis') {
+            $entPhysicalSerialNum = $netgear_unit_serialnumbers[$entPhysicalParentRelPos]['agentInventoryUnitSerialNumber'];
+        }
+        $entPhysicalModelName = $entry['hwEntityBoardType'];
+        $entPhysicalMfgName = $entry['entPhysicalMfgName'];
+        $entPhysicalVendorType = $entry['entPhysicalVendorType'];
+        $entPhysicalHardwareRev = $entry['entPhysicalHardwareRev'];
+        $entPhysicalSoftwareRev = $entry['entPhysicalSoftwareRev'];
+        $entPhysicalIsFRU = $entry['entPhysicalIsFRU'];
+        $entPhysicalAlias = $entry['entPhysicalAlias'];
+        $entPhysicalAssetID = $entry['entPhysicalAssetID'];
     } else {
         $entPhysicalDescr = array_key_exists('entPhysicalDescr', $entry) ? $entry['entPhysicalDescr'] : '';
         $entPhysicalContainedIn = array_key_exists('entPhysicalContainedIn', $entry) ? $entry['entPhysicalContainedIn'] : '';
