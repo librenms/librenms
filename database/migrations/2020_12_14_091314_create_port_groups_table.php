@@ -14,8 +14,8 @@ class CreatePortGroupsTable extends Migration
     {
         Schema::create('port_groups', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->default('')->unique();
-            $table->string('desc')->default('');
+            $table->string('name')->unique();
+            $table->string('desc');
         });
     }
 

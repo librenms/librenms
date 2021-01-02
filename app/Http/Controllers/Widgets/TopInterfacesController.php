@@ -70,6 +70,7 @@ class TopInterfacesController extends WidgetController
         if ($data['interface_filter']) {
             $query->where('ifType', '=', $data['interface_filter']);
         }
+
         $data['ports'] = $query->get();
 
         return view('widgets.top-interfaces', $data);

@@ -30,20 +30,4 @@ class PortGroup extends BaseModel
 {
     public $timestamps = false;
     protected $fillable = ['name', 'desc'];
-
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        if ($user->hasGlobalRead()) {
-            return $query;
-        }
-
-        return $query->whereIn('id', Permissions::portGroupsForUser($user));
-    }
-
-    public function ports()
-    {
-        return $this->belongsto(\App\Models\Port::class, 'port_group', 'id');
-    }
 }

@@ -72,10 +72,10 @@ if ($port_details) {
 
 echo '</span>';
 
-$port_groups = [0 => 'Default'] + dbFetchKeyValue('SELECT id, name from port_groups order by name');
+$port_group_name = dbFetchCell('SELECT name FROM port_groups WHERE id=?', [$port['port_group_id']]) ?: 'Default';
 
 echo "</td><td width=100 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
-echo $port_groups[$port['port_group_id']];
+echo $port_group_name;
 echo '</td><td width=100>';
 
 if ($port_details) {
