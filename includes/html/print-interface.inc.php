@@ -74,7 +74,7 @@ echo '</span>';
 
 $port_group_name = dbFetchCell('SELECT name FROM port_groups WHERE id=?', [$port['port_group_id']]) ?: 'Default';
 
-echo "</td><td width=100>";
+echo '</td><td width=100>';
 echo $port_group_name;
 echo '</td><td width=100>';
 
