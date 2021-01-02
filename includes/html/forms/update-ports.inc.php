@@ -21,6 +21,7 @@ $rows_updated = 0;
 foreach ($_POST as $key => $val) {
     $port_id = intval(substr($key, 7));
     $port_group_id = $_POST['port_group_' . $port_id];
+    dbUpdate(['port_group_id' => $port_group_id], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
 
     if (strncmp($key, 'oldign_', 7) == 0) {
         // Interface identifier passed as part of the field name
@@ -63,8 +64,6 @@ foreach ($_POST as $key => $val) {
 
         $rows_updated += $n;
     }//end if
-
-    dbUpdate(['port_group_id' => $port_group_id], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
 }//end foreach
 
 if ($rows_updated > 0) {
