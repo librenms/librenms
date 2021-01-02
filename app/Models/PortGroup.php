@@ -24,8 +24,6 @@
 
 namespace App\Models;
 
-use Permissions;
-
 class PortGroup extends BaseModel
 {
     public $timestamps = false;
