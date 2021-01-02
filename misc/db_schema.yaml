@@ -1404,7 +1404,7 @@ ports:
     - { Field: ifDescr, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifName, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: portName, Type: varchar(128), 'Null': true, Extra: '' }
-    - { Field: port_group_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: 'Null' }
+    - { Field: port_group_id, Type: 'int unsigned', 'Null': true, Extra: '', Default: 'Null' }
     - { Field: ifIndex, Type: bigint, 'Null': true, Extra: '', Default: '0' }
     - { Field: ifSpeed, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifSpeed_prev, Type: bigint, 'Null': true, Extra: '' }
