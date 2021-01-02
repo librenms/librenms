@@ -52,7 +52,7 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: librenms
+          MYSQL_DATABASE: librenms_phpunit_78hunjuybybh
           MYSQL_USER: librenms
           MYSQL_PASSWORD: librenms
         ports:
@@ -66,6 +66,27 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      -
+         name: Set $FILES
+         run: |
+           FILES=$(git diff --diff-filter=d --name-only origin/master | tr '\n' ' '|sed 's/,*$//g')
+           echo $FILES
+           
+           echo 'FILES<<EOF' >> $GITHUB_ENV
+           echo $FILES >> $GITHUB_ENV
+           echo 'EOF' >> $GITHUB_ENV  
+      -
+         name: Set $PATH
+         run: |
+           echo "/home/runner/.local/bin/" >> $GITHUB_PATH
+      -
+        name: set MySQL collate
+        env:
+          PORT: ${{ job.services.mysql.ports[3306] }}
+        run: | 
+          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -117,13 +138,13 @@ jobs:
           DB_DRIVER=mysql
           DB_HOST=127.0.0.1
           DB_PORT=${{ job.services.mysql.ports[3306] }}
-          DB_DATABASE=librenms
+          DB_DATABASE=librenms_phpunit_78hunjuybybh
           DB_USERNAME=librenms
           DB_PASSWORD=librenms
           DB_TEST_DRIVER=mysql
           DB_TEST_HOST=127.0.0.1
           DB_TEST_PORT=${{ job.services.mysql.ports[3306] }}
-          DB_TEST_DB_DATABASE=librenms
+          DB_TEST_DB_DATABASE=librenms_phpunit_78hunjuybybh
           DB_TEST_DB_USERNAME=librenms
           DB_TEST_DB_PASSWORD=librenms
           EOL
