@@ -30,15 +30,7 @@ class Dns
 
     public function __construct()
     {
-        $dns_resolver_file = stream_resolve_include_path('Net/DNS2.php');
-
-        if (! file_exists($dns_resolver_file)) {
-            d_echo('FILE NOT FOUND: ' . $dns_resolver_file);
-        } else {
-            require_once $dns_resolver_file;
-
-            $this->resolver = new Net_DNS2_Resolver();
-        }
+        $this->resolver = new \Net_DNS2_Resolver();
     }
 
     /**
@@ -52,10 +44,8 @@ class Dns
             $ret = $this->resolver->query($domain, $record);
 
             return $ret->answer;
-        } catch (Net_DNS2_Exception $e) {
+        } catch (\Net_DNS2_Exception $e) {
             d_echo('::query() failed: ' . $e->getMessage());
-
-            return [];
         }
     }
 }
