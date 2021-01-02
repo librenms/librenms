@@ -76,7 +76,7 @@ $port_group_name = dbFetchCell('SELECT name FROM port_groups WHERE id=?', [$port
 
 echo '</td><td width=100>';
 echo $port_group_name;
-echo '</td><td width=100>';
+echo "</td><td width=100 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
 
 if ($port_details) {
     $port['graph_type'] = 'port_bits';
