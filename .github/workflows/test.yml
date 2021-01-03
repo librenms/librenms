@@ -27,21 +27,21 @@ jobs:
         include:
           -
             php-version: 7.4
-            name: Unit Checks
+            name: Unit
             skip-style-check: 1
             skip-web-check: 1
           -
             php-version: 7.4
-            name: Style and Web Checks
+            name: Style and Web
             skip-unit-check: 1
           -
             php-version: 7.3
-            name: Unit Checks
+            name: Unit
             skip-style-check: 1
             skip-web-check: 1
           -
             php-version: 7.3
-            name: Style and Web Checks
+            name: Style and Web
             skip-unit-check: 1
     services:
       mysql:
@@ -137,6 +137,12 @@ jobs:
           DB_DATABASE=librenms_phpunit_78hunjuybybh
           DB_USERNAME=librenms
           DB_PASSWORD=librenms
+          DB_TEST_DRIVER=mysql
+          DB_TEST_HOST=127.0.0.1
+          DB_TEST_PORT=${{ job.services.mysql.ports[3306] }}
+          DB_TEST_DATABASE=librenms_phpunit_78hunjuybybh
+          DB_TEST_USERNAME=librenms
+          DB_TEST_PASSWORD=librenms
           EOL
       -
         name: Composer install
