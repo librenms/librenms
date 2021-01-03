@@ -1,0 +1,2251 @@
+--MibName=ROSMGMT-OPTICAL-TRANSCEIVER-MIB.mib
+-- *****************************************************************
+-- ROSMGMT-OPTICAL-TRANSCEIVER-MIB.mib
+--
+-- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd. 
+-- All rights reserved.
+-- *****************************************************************       
+
+-- *****************************************************************
+-- Modi Report£ºFormat: <number>, <time>, <author>, <desc> 
+-- 01, 20110623, yangzhognhong, change the value of the node raisecomOpticalTransceiverMediaType 
+--                              for SFP+ development
+--
+-- *****************************************************************
+
+
+ROSMGMT-OPTICAL-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, Unsigned32,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,TimeTicks               FROM SNMPv2-SMI
+	rosMgmt                             FROM RAISECOM-BASE-MIB
+    TEXTUAL-CONVENTION,
+    TruthValue                          FROM SNMPv2-TC
+--    OBJECT-GROUP                        FROM SNMPv2-CONF
+    ifIndex                             FROM IF-MIB;   
+--    raisecomNotificationLocation        FROM RAISECOM-COMMON-MANAGEMENT-MIB
+--    ClearVar                            FROM SWITCH-TC;
+
+rosMgmtOpticalTransceiver MODULE-IDENTITY
+    LAST-UPDATED   "202004160000Z"
+    ORGANIZATION   "Raisecom, Inc."
+    CONTACT-INFO  
+                "       Raise Systems
+                        
+                Postal: Beijing,
+                        China
+
+                   Tel: 86-010-82884499
+
+                E-mail: chenyu@raisecom.com"
+    DESCRIPTION
+        "This MIB module defines objects to monitor optical
+        characteristics on the optical interfaces in a network element. "
+        REVISION   "202004160000Z"
+        DESCRIPTION
+            "The initial revision of this MIB."
+        ::={ rosMgmt 18 }
+           
+rosMgmtOpticalTransceiverNotifications   OBJECT IDENTIFIER ::= { rosMgmtOpticalTransceiver 0 }
+rosMgmtOpticalTransceiverObjects         OBJECT IDENTIFIER ::= { rosMgmtOpticalTransceiver 1 }
+rosMgmtOpticalTransceiverConformance     OBJECT IDENTIFIER ::= { rosMgmtOpticalTransceiver 2 }
+
+
+rosMgmtOpticalTransceiverAbsentTrap NOTIFICATION-TYPE
+    OBJECTS     { rosMgmtOpticalTransceiverHwInfoAbsStatus,
+                  rosMgmtOpticalTransceiverSpecificationCheckStatus }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module is removed from the device.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 1 }
+
+rosMgmtOpticalTransceiverPresentTrap  NOTIFICATION-TYPE
+    OBJECTS     { rosMgmtOpticalTransceiverHwInfoAbsStatus,
+                  rosMgmtOpticalTransceiverSpecificationCheckStatus }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module is plugged into the device.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 2 }
+
+rosMgmtOpticalTransceiverNRAlarmTrap  NOTIFICATION-TYPE
+    OBJECTS     { rosMgmtOpticalTransceiverHwInfoNRStatus }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the transmitted or received data of optical module is invalid.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 3 }
+
+rosMgmtOpticalTransceiverNRNormalTrap  NOTIFICATION-TYPE
+    OBJECTS     { rosMgmtOpticalTransceiverHwInfoNRStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the transmitted or received data of optical module is valid.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 4 }
+
+rosMgmtOpticalTransceiverRxLosAlarmTrap  NOTIFICATION-TYPE
+    OBJECTS     { rosMgmtOpticalTransceiverHwInfoRxLosStatus }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module receiving signal is lost.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 5 }
+
+rosMgmtOpticalTransceiverRxLosNormaTrap   NOTIFICATION-TYPE
+    OBJECTS     {rosMgmtOpticalTransceiverHwInfoRxLosStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module receiving signal is back to normal.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 6 }
+
+--raisecomOpticalTransceiverCheckPwdFailureTrap  NOTIFICATION-TYPE
+--    STATUS      current
+--    DESCRIPTION
+--        "This notification is sent when the optical module password checking is failed.
+
+--        This notification may be suppressed under the following
+--        conditions:
+--        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
+--        "
+--    ::={ rosMgmtOpticalTransceiverNotifications 7 }
+
+--raisecomOpticalTransceiverCheckPwdSucceedTrap  NOTIFICATION-TYPE
+--    STATUS      current
+--    DESCRIPTION
+--        "This notification is sent when the optical module password cheching is successful.
+
+--        This notification may be suppressed under the following
+--        conditions:
+--        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
+--        "
+--    ::={ rosMgmtOpticalTransceiverNotifications 8 }
+
+rosMgmtOpticalTransceiverParamAlarmTrap    NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module parameter value increase to above 
+         the high alarm threshold or dicrease to under the low alarm threshold.
+
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 7 }
+
+rosMgmtOpticalTransceiverParamAlarmNormalTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module parameter value dicrease to
+ 	     under the high alarm threshold or increase to above the low alarm threshold.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 8 }
+
+rosMgmtOpticalTransceiverParamWarningTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module parameter value increase to above 
+     	the high warning threshold or dicrease to under the low warning threshold.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 9 }
+
+rosMgmtOpticalTransceiverParamWarningNormalTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module parameter value dicrease to
+    	under the high warning threshold or increase to above the low warning threshold.   
+    	
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 10 }
+
+rosMgmtOpticalTransceiverLaserBackLightAlarmTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module password cheching is successful.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 11 }
+
+rosMgmtOpticalTransceiverLaserBackLightAlarmNormalTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module password cheching is successful.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 12 }
+   
+rosMgmtOpticalTransceiverLaserLifeAlarmTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module password cheching is successful.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 13 }
+   
+rosMgmtOpticalTransceiverLaserLifeAlarmNormalTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module password cheching is successful.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 14 }
+
+rosMgmtOpticalTransceiverParamLowAlarmTrap    NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module parameter value increase to above 
+         the high alarm threshold or dicrease to under the low alarm threshold.
+
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 15 }
+
+
+rosMgmtOpticalTransceiverParamLowAlarmNormalTrap    NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module parameter value increase to above 
+         the high alarm threshold or dicrease to under the low alarm threshold.
+
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 16 } 
+    
+rosMgmtOpticalTransceiverParamLowWarningTrap    NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module parameter value increase to above 
+         the high alarm threshold or dicrease to under the low alarm threshold.
+
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 17 }
+
+rosMgmtOpticalTransceiverParamLowWarningNormalTrap    NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverParameterValue,
+                   rosMgmtOpticalTransceiverParamAlarmStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the optical module parameter value increase to above 
+         the high alarm threshold or dicrease to under the low alarm threshold.
+
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 18 }
+
+rosMgmtOpticalTransceiverTxFaultTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverTxFaultStatus  }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the SFP optical module occures Tx-fault signal.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 19 }
+    
+rosMgmtOpticalTransceiverTxNormalTrap   NOTIFICATION-TYPE
+    OBJECTS     {  rosMgmtOpticalTransceiverTxFaultStatus }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the SFP optical module cancels the Tx-fault signal.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the rosMgmtOpticalNotifyEnable and rosMgmtOpticalPortNotifyEnable objects.
+        "
+    ::={ rosMgmtOpticalTransceiverNotifications 20 }
+        
+-- Textual Conventions
+EnableVar ::= TEXTUAL-CONVENTION                                
+    STATUS      current
+    DESCRIPTION
+        "enable or disable a function."
+    SYNTAX    INTEGER {
+                       enable(1),
+                       disable(2)
+                      } 
+     	
+OpticalParameterType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the optical parameter that is
+        being monitored. Valid values are -OpticalParameterType 
+
+        transceiverTemperature(1)   		:transceiver temperature
+        txbiasCurrent(2)         		:TX bias current
+        txPower(3)       			:TX output power
+        rxPower(4)       			:RX received optical power
+        laserTemperature(5)     		:laser temperature
+        p5V0supplyVoltage(6)     		:+5V supply voltage
+        p3V3supplyVoltage(7)    		:+3.3V supply voltage
+        p1V8supplyVoltage(8)     		:+1.8V supply voltage
+        n5V2supplyVoltage(9)    		:-5.2V supply voltage
+        apdBiasVoltage(10)    		:APD bias voltage
+        p5V0supplyCurrent(11)     		:+5V supply currnet
+        p3V3supplyCurrent(12)    		:+3.3V supply currnet
+        p1V8supplyCurrent(13)     		:+1.8V supply currnet
+        n5V2supplyCurrent(14)     		:-5.2V supply currnet
+        tecCurrent(15)          		:TEC currnet
+        laserWavelength(16)      		:laser wavelength
+
+       " 
+        
+    SYNTAX    INTEGER {
+			        transceiverTemperature (1),   
+        			txbiasCurrent (2),          
+        			txPower (3),       
+       			    rxPower (4),       
+        			laserTemperature(5),     
+        			p5V0supplyVoltage(6),     
+        			p3V3supplyVoltage(7),    
+        			p1V8supplyVoltage(8),     
+        			n5V2supplyVoltage(9),     
+        			apdBiasVoltage(10),     
+        			p5V0supplyCurrent(11),     
+        			p3V3supplyCurrent(12),    
+        			p1V8supplyCurrent(13),     
+        			n5V2supplyCurrent(14),    
+        			tecCurrent(15),          
+       			    laserWavelength(16)
+   
+              }
+
+
+OpticalParameterValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS    current
+    DESCRIPTION
+        "The value of the optical parameter that is being monitored.
+              The range of values varies depending on the type of optical  parameter being monitored,
+        as identified by a corresponding object with syntax OpticalParameterType.
+              When the optical parameter being monitored is 'XXTemperature',the supported range 
+        is from -40000 to 125000, in units of  1/1000 degrees centigrade.
+        Example: A value of 23500 represents a temperature reading of 23.5 degrees C.
+        The temperature is shown in unit of degrees centigrade, and the precision is 0.1.        
+              When the optical parameter being monitored is 'txbiasCurrent',the supported range
+        is from 0 to 131000, in units of 1/1000 mA.
+        Example: A value of 1000 represents a TX bias current reading of 1.0mA. 
+        The 'txbiasCurrent'is shown in unit of mA, and the precision is 0.1.
+              When the optical parameter being monitored is 'txPower',the supported range
+       is from -40000 to 8200, in units of 1/1000 dbm.
+        Example: A value of 77800 represents a TX output power reading of 7.78 dBm.
+        The 'txPower' is shown in unit of dBm, and the precision is 0.1.
+              When the optical parameter being monitored is 'rxPower',the supported range
+        is from -40000 to 8200, in units of 1/1000 dbm.
+        Example: A value of 7780 represents a RX received optical power reading of 7.78 dBm. 
+        The 'rxPower' is shown in unit of dBm, and the precision is 0.1.
+              When the optical parameter being monitored is 'XXsupplyVoltage',the supported range
+        is from 0 to 6550, in units of 1/1000 V. 
+		Example: A value of 6000 represents a XX supply Voltage eading of 6.00V.
+		The 'XXsupplyVoltage'is shown in unit of V, and the precision is 0.01.
+              When the optical parameter being monitored is 'apdBiasVoltage,the supported range
+        is from 0 to 655300 , in units of 1/1000 V . 
+		Example: A value of 600000 represents a APD BiasVoltage reading of 600.0V.
+		The 'apdBiasVoltage' is shown in unit of V, and the precision is 0.1.
+              When the optical parameter being monitored is 'XXsupplyCurrent',the supported range
+        is from 0 to 6553600, in units of 1/1000 mA . 
+        Example: A value of 6000000 represents a XX supply current reading of 6000.0mA. 
+        The 'XXsupplyCurrent' is shown in unit of mA, and the precision is 0.1.
+              When the optical parameter being monitored is 'tecCurrent',the supported range
+        is from 0 to 6553600, in units of 1/1000 mA . 
+        Example: A value of 6000000 represents a TEC Current reading of 6000.0mA.
+        The 'tecCurrent' is shown in unit of mA, and the precision is 0.1.
+              When the optical parameter being monitored is 'laserWavelength,the supported range
+        is from 0 to 3276750, in units of 1/1000 nm . 
+        Example: A value of 3000000 represents a laser wavelength reading of 3000.0nm.
+        The 'laserWavelength'is shown in unit of nm, and the precision is 0.01.
+      "
+    SYNTAX    Integer32 (-1000000 | -40000..6553600)
+
+OpticalPMPeriod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This value indicates the time period over which performance
+        monitoring data has been collected."
+    SYNTAX      INTEGER {
+                    fifteenMin(1),
+                    twentyFourHour(2)
+                } 
+                
+-- MIB Scalar Group Definitions
+
+rosMgmtOpticalTransceiverScalarGroup       OBJECT IDENTIFIER ::=
+                                        {rosMgmtOpticalTransceiverObjects 1 }   
+                                        
+rosMgmtOpticalTransceiverNotifyEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the generation of device notifications,
+         enable or disable.  
+         
+         this object belongs to xfp and sfp.
+        "
+    DEFVAL { disable }
+    ::={ rosMgmtOpticalTransceiverScalarGroup 1 }
+
+rosMgmtOpticalTransceiverDDMEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable digitaldiagnotic on the device.
+        
+        this object belongs to xfp and sfp.
+        "
+    DEFVAL { disable}
+    ::={ rosMgmtOpticalTransceiverScalarGroup 2 }
+
+rosMgmtOpticalTransceiverCheckPwdEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the status of password checking on the device,
+         enable or disable. 
+         
+         this object belongs to xfp.
+        "
+    DEFVAL { disable}
+    ::={ rosMgmtOpticalTransceiverScalarGroup 3 }
+
+rosMgmtOpticalTransceiverPollInterval OBJECT-TYPE
+    SYNTAX        Integer32  (5..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of poll-interval on the device.
+        
+        this object belongs to xfp and sfp.
+        "
+    ::={ rosMgmtOpticalTransceiverScalarGroup 4 }
+
+rosMgmtOpticalTransceiverCRCCheckEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the status of crc checking on the device,
+         enable or disable. 
+         
+         this object belongs to sfp and xfp.
+        "
+    DEFVAL { disable}
+    ::={ rosMgmtOpticalTransceiverScalarGroup 5 }    
+-- MIB Object Definitions
+
+rosMgmtOpticalTransceiverCfgObjects        OBJECT IDENTIFIER ::=
+                                        {rosMgmtOpticalTransceiverObjects 2 }
+
+-- groups in this MIB module   
+rosMgmtOpticalTransceiverInfoGroup               OBJECT IDENTIFIER ::=
+                                        {rosMgmtOpticalTransceiverCfgObjects 1 }
+
+rosMgmtOpticalTransceiverDDMGroup                OBJECT IDENTIFIER ::=
+                                        {rosMgmtOpticalTransceiverCfgObjects 2 }
+
+rosMgmtOpticalTransceiverPMGroup                 OBJECT IDENTIFIER ::=
+                                        {rosMgmtOpticalTransceiverCfgObjects 3 }  
+                                        
+rosMgmtOpticalTransceiverStatusGroup             OBJECT IDENTIFIER ::=
+                                        {rosMgmtOpticalTransceiverCfgObjects 4 }
+
+-- rosMgmtOpticalTransceiverInfoTable
+
+rosMgmtOpticalTransceiverInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RosMgmtOpticalTransceiverInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Trancetver information Table."
+        ::= { rosMgmtOpticalTransceiverInfoGroup 1 }
+
+rosMgmtOpticalTransceiverInfoEntry OBJECT-TYPE
+    SYNTAX      RosMgmtOpticalTransceiverInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rosMgmtOpticalTransceiverInfoTable."
+    INDEX        { ifIndex }
+    ::={ rosMgmtOpticalTransceiverInfoTable 1 }
+
+
+RosMgmtOpticalTransceiverInfoEntry ::= SEQUENCE {
+	rosMgmtOpticalTransceiverType                   INTEGER,
+	rosMgmtOpticalTransceiverConnectorType          INTEGER,
+	rosMgmtOpticalTransceiverVendorName             OCTET STRING,
+	rosMgmtOpticalTransceiverVendorPN               OCTET STRING,
+	rosMgmtOpticalTransceiverVendorSN               OCTET STRING,
+	rosMgmtOpticalTransceiverMediaType              INTEGER,
+	rosMgmtOpticalTransceiverTransmissionDistance   Integer32,  
+	rosMgmtOpticalTransceiverAbility                Unsigned32,
+	rosMgmtOpticalTransceiverDDM                    INTEGER,
+	rosMgmtOpticalTransceiverCalibrationType        INTEGER,
+	rosMgmtOpticalTransceiverRSSI                   INTEGER,
+	rosMgmtOpticalTransceiverVendorRev              OCTET STRING,
+	rosMgmtOpticalTransceiverBRMax                  Integer32,
+	rosMgmtOpticalTransceiverBRMin                  Integer32,
+	rosMgmtOpticalTransceiverWavelengthContrl       INTEGER,	 
+	rosMgmtOpticalTransceiverWavelength             Integer32,
+	rosMgmtOpticalTransceiverWaveTolerance          Integer32,
+	rosMgmtOpticalTransceiverCompatibility          OCTET STRING,
+	rosMgmtOpticalTransceiverPowerDissipation       INTEGER,
+	rosMgmtOpticalTransceiverCDR                    INTEGER,
+	rosMgmtOpticalTransceiverRefClock               INTEGER,
+	rosMgmtOpticalTransceiverTransmitterType        INTEGER,
+	rosMgmtOpticalTransceiverCooled	                INTEGER,
+	rosMgmtOpticalTransceiverTunalbe                INTEGER,
+	rosMgmtOpticalTransceiverDetectorType           INTEGER,
+	rosMgmtOpticalTransceiverLineLoopBack           INTEGER,
+	rosMgmtOpticalTransceiverXFILoopBack            INTEGER,
+	rosMgmtOpticalTransceiverVps                    INTEGER,
+	rosMgmtOpticalTransceiverTxDis                  INTEGER,
+	rosMgmtOpticalTransceiverStandby                INTEGER,
+	rosMgmtOpticalTransceiverInVpsLowPower          INTEGER,
+	rosMgmtOpticalTransceiverOutVpsLowPower         INTEGER,
+	rosMgmtOpticalTransceiverFEC                    INTEGER,
+	rosMgmtOpticalTransceiverCMU                    INTEGER,
+	rosMgmtOpticalTransceiverBR                     INTEGER
+
+}
+
+rosMgmtOpticalTransceiverType OBJECT-TYPE
+		SYNTAX  INTEGER{ 
+						unknown(1),
+	 			        gbic(2),
+	       			    soldered(3),
+						sfp(4),
+						xbi(5),
+						xenpak(6),
+						xfp(7),
+						xff(8),
+						xfpe(9),
+						xpak(10),
+						x2(11),
+						sfpj(12),
+						qsfp(14),
+						qsfp28(18)						
+	       			   }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object specifies the physical type of the transceiver, 
+			such as xfp or sfp , and so on.
+			
+			this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 1 }
+		
+rosMgmtOpticalTransceiverConnectorType OBJECT-TYPE
+		SYNTAX  INTEGER
+		{
+ 			unknown(1),
+       		sc (2),
+			db9(3),
+			hssdc(4),
+			bnctnc(5),
+			fibercoaxialhead(6),
+			fiberjack(7),
+			lc(8),
+			mtrj(9),
+			mu(10),
+			sg(11),  
+			fiberpigtail(12),
+			mpoparalleloptic(13),
+			hssdcII (14),
+			copper (15),
+			rj45 (16)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object specifies the connector type of the transceiver,
+             unknown, sc, db9, hssdc, bnc_tnc, fiber_coaxial_head, fiber_outlet, 
+             lc, mt_rj, mu, sg, fiber_pigtail, mpo_parallel_optic , hssdcII, 
+             copper, rj45. 
+             
+             this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 2 }
+				
+rosMgmtOpticalTransceiverVendorName OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Vendor name of the interface.
+			
+			 this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 3 }
+		
+rosMgmtOpticalTransceiverVendorPN OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Vendor part number of the interface.
+			
+			this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 4 }
+		
+rosMgmtOpticalTransceiverVendorSN OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Vendor serial number of the interface.
+			
+			this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 5 }
+		
+rosMgmtOpticalTransceiverMediaType OBJECT-TYPE
+	   SYNTAX INTEGER
+       {
+            singlemode(1),
+            multimodeE50(2),
+            multimode50(3),
+            multimode625(4),
+            copper(5),
+            singlemodeKm(6), 
+            multimodeOM3(7),
+            multimodeOM3Qsfp(8), 
+            multimodeOM2Qsfp(9), 
+            multimodeOM1Qsfp(10), 
+            multimodeOM4Qsfp(11)
+        }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Types of the fiber, 
+            single_mode, multi_modeE50, multi_mode50,multi_mode625,copper,
+            single_modeKm,multi_modeOM3,multi_modeOM3Qsfp,multi_modeOM2Qsfp, 
+            multi_modeOM1Qsfp,multi_modeOM4Qsfp. 
+            
+            this object belongs to xfp, sfp and qsfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 6 }
+		
+rosMgmtOpticalTransceiverTransmissionDistance OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The max distance which the interface could transmit,
+             measured in meter.
+             The object will be shown in unit of Km, and the precision is 0.001.
+             
+             this object belongs to xfp and sfp.
+            "
+		::= { rosMgmtOpticalTransceiverInfoEntry 7 }		
+
+rosMgmtOpticalTransceiverAbility  OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object specifies the ability of optical module digitaldiagnotic
+			 funtion. Currently, the digitaldiagnotic objects of our optical module 
+			 inculde 16 parameters.   
+			 
+			 this object has 32 bits, each bit represents a digital diagnotic parameter.
+			 if the bit value is 0, it means that the optical module does not provide 
+			 digital diagnotic funtion for relative parameter.if the bit value is 1,it 
+			 means that the optical module provides digital diagnotic funtion for
+			 relative parameter.
+			 
+			 this object belongs to xfp and sfp.
+			 
+			 The relation between parameters and bits is following: 
+			32...16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1:
+			The relation between parameters and bits is following: 
+			32...16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1:			
+			| 1bit                 | 2bit                 | 3bit                 | 4bit           
+			| APD Bias voltage     | 0(reserve)           | TEC Current          | Laser temperature
+
+			| 5bit                 | 6bit                 |7bit                  | 8bit
+			| Laser wavelength     | +5V Supply voltage   | +3.3V Supply voltage | +1.8V Supply voltage
+
+			| 9bit                 | 10bit                |11bit                 | 12bit
+			| -5.2V Supply voltage | +5V Supply current   | 0(None)              | 0(None)
+
+			| 13bit                | 14bit                | 15bit                | 16bit 
+			| +3.3V Supply current | +1.8V Supply current | -5.2V Supply current | temperature
+
+			| 17bit                | 18bit                | 19bit                | 20bit ~ 32bit 
+			| Laser bias current   | Rx power             |Tx power              |  0
+
+            But when the optical module is sfp, the 6 bit will represents 
+            the supplyVoltage of sfp.
+            "
+		::= { rosMgmtOpticalTransceiverInfoEntry 8 }		      
+		
+rosMgmtOpticalTransceiverDDM     OBJECT-TYPE
+		SYNTAX  INTEGER{
+	 			        support(1),
+	       			    notsupport(2)
+	       			   }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object specifies if the transceiver supports on digital diagnostic function, 
+			support or not support.To the xfp, the default value of this object is support.
+			
+			this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 9 }
+		
+rosMgmtOpticalTransceiverCalibrationType   OBJECT-TYPE
+		SYNTAX  INTEGER{ 
+						unknown(1),
+	 			        internal(2),
+	       			    external(3)
+	      			   }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object specifies the calibration type of the transceiver, 
+			internal, external, unknown.
+			
+			this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 10 }
+		
+rosMgmtOpticalTransceiverRSSI   OBJECT-TYPE
+		SYNTAX  INTEGER{
+	 			        support(1),
+	       			    notsupport(2)
+	       			   }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object specifies the calibration type of the transceiver, 
+			support or not support.
+			
+			this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 11 }
+ 
+rosMgmtOpticalTransceiverVendorRev    OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			" the version number of the transceiver.
+			 this object belongs to xfp and sfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 12 }   
+
+rosMgmtOpticalTransceiverBRMax      OBJECT-TYPE
+		SYNTAX	Integer32 
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			" the min data rate of the transceiver,mesured in Mbps .
+			  this object belongs to xfp and sfp.
+
+			The object will be shown in unit of Gbps, and the precision is 0.1.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 13 } 
+		
+rosMgmtOpticalTransceiverBRMin       OBJECT-TYPE
+		SYNTAX	Integer32 
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			" the min data rate of the transceiver,mesured in Mbps.
+			
+			  this object belongs to xfp and sfp.To the sfp, 
+			  the min data rate value is equal to the max data rate value. 
+			  
+			  The object will be shown in unit of Gbps, and the precision is 0.1.
+			 "
+		::= { rosMgmtOpticalTransceiverInfoEntry 14 }  
+
+rosMgmtOpticalTransceiverWavelengthContrl   OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+	       support(1),
+     	   notsupport (2)
+        }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"if the transceiver supports on wavelength control
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 15 }
+
+rosMgmtOpticalTransceiverWavelength OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Wavelength of the interface, measured in pm(0.001nm).
+			 this object belongs to xfp.
+			 The object will be shown in unit of nm, and the precision is 0.01.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 16 }
+
+rosMgmtOpticalTransceiverWaveTolerance   OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"the range of laser wavelength from nominal wavelength,mesured in pm(0.001*nm).
+			 this object belongs to xfp.
+			 The object will be shown in unit of nm, and the precision is 0.01.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 17 }    
+
+rosMgmtOpticalTransceiverCompatibility   OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"the compatibility type that the transceiver supports,such as 10GBASE-SR.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 18 } 
+
+rosMgmtOpticalTransceiverPowerDissipation   OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			p1W5(1),
+       		p2W5(2),
+			p3W5(3),
+			exceed(4)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"the max power dissipation of the transceiver, 
+			p1W5,p2W5,p3W5,exceed3W5.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 19 } 
+
+rosMgmtOpticalTransceiverCDR             OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 		   support(1),
+           notsupport(2)
+        }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"the optical module supports on CDR fundtion.
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 20 } 
+
+rosMgmtOpticalTransceiverRefClock           OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 	       required(1),
+     	   notrequired (2)
+        }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			" if the transceiver requires outside reference clock
+			required,notrequired.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 21 }
+		
+rosMgmtOpticalTransceiverTransmitterType     OBJECT-TYPE
+		SYNTAX  INTEGER
+		{
+			vcsel850nm(1),
+			vcsel1310nm(2),
+			vcsel1550nm(3),
+			fp1310nm(4),
+			dfb1310nm(5),
+			dfb1550nm(6),
+			eml1310nm(7),
+			eml1550nm(8),
+			copperothers(9)
+       }
+
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The transmitter type of the transceiver,such as 850 nm VCSEL.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 22 }
+		
+rosMgmtOpticalTransceiverCooled	         OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 	       cooled(1),
+     	   uncooled (2)
+        }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The transmitter cooled type of the transceiver
+			 cooled,uncooled.
+			 this object belongs to xfp.
+			 "
+		::= { rosMgmtOpticalTransceiverInfoEntry 24 }
+		
+rosMgmtOpticalTransceiverTunalbe            OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 	       tunable (1),
+    	   untunable (2)
+        }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The transmitter tunable type of the transceiver
+			tunable,untunable.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 25 }
+		
+rosMgmtOpticalTransceiverDetectorType       OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+	       pin(1),
+		   apd(2)
+	    }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The detector type of the transceiver
+			 pin, apd.
+			 this object belongs to xfp.
+			 "
+		::= { rosMgmtOpticalTransceiverInfoEntry 26 }
+		
+rosMgmtOpticalTransceiverLineLoopBack       OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The transceiver support status of sideline loop-back control
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 27 }
+		
+rosMgmtOpticalTransceiverXFILoopBack        OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The transceiver support status of XFI loop-back control
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 28 }
+		
+rosMgmtOpticalTransceiverVps                OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object specifies if the optical module supports on VPS
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 29 }
+		
+rosMgmtOpticalTransceiverTxDis              OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The transceiver support status of software control the transmitter status
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 30 }
+		
+rosMgmtOpticalTransceiverStandby              OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The transceiver support status of software control the standby mode.
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 31 }
+		
+rosMgmtOpticalTransceiverInVpsLowPower      OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The VPS in low power support status of the transceiver
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 32 }
+		
+rosMgmtOpticalTransceiverOutVpsLowPower     OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The VPS out low power support status of the transceiver
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 33 }
+		
+rosMgmtOpticalTransceiverFEC                OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The FEC support status of transceiver
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 34 }
+		
+rosMgmtOpticalTransceiverCMU                OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+ 			support(1),
+       		notsupport(2)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The CMU support status of transceiver
+			support,notsupport.
+			this object belongs to xfp.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 35 }
+		
+rosMgmtOpticalTransceiverBR OBJECT-TYPE
+		SYNTAX  INTEGER
+		{
+ 			unknown(0),
+ 			bitrate125Mbps(1),
+       		bitrate155Mbps (2),
+			bitrate622Mbps(6),
+			bitrate1250Mbps(12),  
+			bitrate1DOT25Gbps(13),
+			bitrate2DOT5Gbps(19),
+			bitrate10GbpsOr100Gbps1(103),
+			bitrate100Gbps2(114),
+			bitrate25Gbps(255)
+       	}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object specifies the Nominal bitrate of the transceiver,
+             125Mbps, 155Mbps, 622Mbps, 1.25Gbps, 2.5Gbps, 10Gbps, 100Gbps, 25Gbps. 
+             
+             this object belongs to xfp and sfp and qsfp and qsfp28.
+			"
+		::= { rosMgmtOpticalTransceiverInfoEntry 36 }
+		
+-- rosMgmtOpticalDDMTable
+
+rosMgmtOpticalTransceiverDDMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RosMgmtOpticalTransceiverDDMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides objects to monitor optical
+        parameters in a network element. "
+    ::={ rosMgmtOpticalTransceiverDDMGroup 1 }
+
+rosMgmtOpticalTransceiverDDMEntry OBJECT-TYPE
+    SYNTAX      RosMgmtOpticalTransceiverDDMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rosMgmtOpticalTransceiverMonTable provides objects to
+        monitor an optical parameter at an optical interface.
+        "
+    INDEX        { 	ifIndex, 
+		rosMgmtOpticalTransceiverParameterType
+	}
+    ::={ rosMgmtOpticalTransceiverDDMTable 1 }
+                         
+RosMgmtOpticalTransceiverDDMEntry ::= SEQUENCE {
+    rosMgmtOpticalTransceiverParameterType               OpticalParameterType,
+--    rosMgmtOpticalTransceiverOPType		          INTEGER,
+    rosMgmtOpticalTransceiverParameterValue              OpticalParameterValue,
+    rosMgmtOpticalTransceiverParamHighAlarmThresh        OpticalParameterValue,
+    rosMgmtOpticalTransceiverParamHighWarningThresh      OpticalParameterValue,
+    rosMgmtOpticalTransceiverParamLowAlarmThresh         OpticalParameterValue,
+    rosMgmtOpticalTransceiverParamLowWarningThresh       OpticalParameterValue,
+    rosMgmtOpticalTransceiverParamAlarmStatus            INTEGER,
+    rosMgmtOpticalTransceiverParamAlarmLastValue         OpticalParameterValue,
+    rosMgmtOpticalTransceiverParamAlarmLastChange        TimeTicks,
+    rosMgmtOpticalTransceiverDDM15MinValidIntervals      Unsigned32,
+    rosMgmtOpticalTransceiverDDM24HrValidIntervals       Unsigned32,
+    rosMgmtOpticalTransceiverDDMValidStatus              INTEGER,
+    rosMgmtOpticalTransceiverQsfpParameterValue              OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpParamHighAlarmThresh        OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpParamHighWarningThresh      OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpParamLowAlarmThresh         OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpParamLowWarningThresh       OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpParamAlarmStatus            OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpParamAlarmLastValue         OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpParamAlarmLastChange        OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpDDM15MinValidIntervals      OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpDDM24HrValidIntervals       OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpDDMValidStatus              OCTET STRING 
+}
+
+rosMgmtOpticalTransceiverParameterType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored in this entry.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 1 }
+ 
+--rosMgmtOpticalTransceiverOPType OBJECT-TYPE 
+--	 SYNTAX	INTEGER
+--	{
+--		others(1),
+--		sfp(2),
+--		xfp(3),
+--		sfpj(4),
+--		qsfp(5)
+--	}
+
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "This object specifies the optical type "
+--    ::={ rosMgmtOpticalTransceiverDDMEntry 2 }
+
+rosMgmtOpticalTransceiverParameterValue OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the value measured for the particular
+        optical parameter specified by the rosMgmtOpticalMonParameterType
+        object.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 2 }
+
+rosMgmtOpticalTransceiverParamHighAlarmThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the high alarm threshold on the
+        optical parameter being monitored.
+
+        An alarm condition will be raised if the value given by
+        rosMgmtOpticalParameterValue goes from below the value of 
+        this object to above the value of this object, or if
+        the initial value of rosMgmtOpticalParameterValue exceeds the value
+        of this object. This alarm will be indicated in the 
+        rosMgmtOpticalParamAlarmStatus object.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 3 }
+
+rosMgmtOpticalTransceiverParamHighWarningThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a high warning threshold on
+        the optical parameter being monitored.
+
+        A threshold crossing condition will be indicated if the value
+        given by rosMgmtOpticalParameterValue goes from below the value
+        of this object to above the value of this
+        object, or if the initial value of rosMgmtOpticalParameterValue
+        exceeds the value of this object. This alarm will be indicated in the 
+        rosMgmtOpticalParamAlarmStatus object.
+        This object belongs to xfp/sfp.
+        "
+    ::={ rosMgmtOpticalTransceiverDDMEntry 4 }
+
+rosMgmtOpticalTransceiverParamLowAlarmThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a low alarm threshold on the
+        optical parameter being monitored.
+
+        An alarm condition will be raised if the value given by
+        rosMgmtOpticalParameterValue goes from above the value of
+        this object to below the value of this object, or if
+        the initial value of rosMgmtOpticalParameterValue is lower than the
+        value of this object. This alarm
+        will be indicated in the rosMgmtOpticalParamAlarmStatus object ..
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 5 }
+
+rosMgmtOpticalTransceiverParamLowWarningThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a low warning threshold on
+        the optical parameter being monitored.
+
+        A threshold crossing condition will be indicated if the value
+        given by rosMgmtOpticalParameterValue goes from above the value
+        of this object to below the value of this
+        object, or if the initial value of rosMgmtOpticalParameterValue
+        object is lower than the value of this object. For
+        network elements in the status
+        indications, this threshold violation will be indicated in the
+        rosMgmtOpticalParamAlarmStatus object .
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 6 }
+
+rosMgmtOpticalTransceiverParamAlarmStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+    		              normal(1),
+    		              highalarm(2),
+                          highwarning(3),
+                          lowalarm(4),
+                          lowwarning(5)           
+                      }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to indicate the current status of
+        the thresholds for the monitored optical parameter
+        on the interface.
+
+           If a threshold is currently being exceeded on the   
+           interface, the object  will be set. Otherwise, 
+           the object will be set to 1.
+           This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 7 }
+
+rosMgmtOpticalTransceiverParamAlarmLastValue OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the optical parameter value at the last time
+        a threshold related to a particular optical parameter was
+        exceeded on the interface.
+        If no threshold value is currently being
+        exceeded, then the value '-1000000' is returned.
+        
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 8 }
+
+rosMgmtOpticalTransceiverParamAlarmLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        a threshold related to a particular optical parameter was
+        exceeded on the interface.
+        
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 9 }
+
+rosMgmtOpticalTransceiverDDM15MinValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of previous 15 minute
+        intervals for which valid performance monitoring data
+        has been stored on the interface.
+
+        The value of this object will be n (where n is the maximum
+        number of 15 minute intervals supported at this interface),
+        unless the measurement was (re-)started within the last
+        (nx15) minutes, in which case the value will be the
+        number of previous 15 minute intervals for which the agent
+        has some data.
+        
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 10 }
+
+rosMgmtOpticalTransceiverDDM24HrValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of previous 24 hour intervals
+         for which valid performance monitoring data has been stored
+          on the interface. The max value of this object is 7, it 
+          means that the user can look up 7days history information.  
+          This object belongs to xfp/sfp.
+        "
+    ::={ rosMgmtOpticalTransceiverDDMEntry 11 }
+       
+rosMgmtOpticalTransceiverDDMValidStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the parameter row is valid or invalid.
+        The object value is 'valide' when the module is present and 
+        supporting digitaldiagnotic. The object value is 'invalid' 
+        when the module is absent, or when the module is present and
+        not supporting digitaldiagnotic. 
+        This object belongs to xfp/sfp.
+       "
+    ::={ rosMgmtOpticalTransceiverDDMEntry 12 }
+rosMgmtOpticalTransceiverQsfpParameterValue OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the value measured for the particular
+        optical parameter specified by the rosMgmtOpticalMonParameterType
+        object.
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 13 }
+
+rosMgmtOpticalTransceiverQsfpParamHighAlarmThresh OBJECT-TYPE
+    SYNTAX      OCTET STRING 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the high alarm threshold on the
+        optical parameter being monitored.
+
+        An alarm condition will be raised if the value given by
+        rosMgmtOpticalParameterValue goes from below the value of 
+        this object to above the value of this object, or if
+        the initial value of rosMgmtOpticalParameterValue exceeds the value
+        of this object. This alarm will be indicated in the 
+        rosMgmtOpticalParamAlarmStatus object.
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 14 }
+
+rosMgmtOpticalTransceiverQsfpParamHighWarningThresh OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a high warning threshold on
+        the optical parameter being monitored.
+
+        A threshold crossing condition will be indicated if the value
+        given by rosMgmtOpticalParameterValue goes from below the value
+        of this object to above the value of this
+        object, or if the initial value of rosMgmtOpticalParameterValue
+        exceeds the value of this object. This alarm will be indicated in the 
+        rosMgmtOpticalParamAlarmStatus object.
+        This object belongs to Qsfp.
+        "
+    ::={ rosMgmtOpticalTransceiverDDMEntry 15 }
+
+rosMgmtOpticalTransceiverQsfpParamLowAlarmThresh OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a low alarm threshold on the
+        optical parameter being monitored.
+
+        An alarm condition will be raised if the value given by
+        rosMgmtOpticalParameterValue goes from above the value of
+        this object to below the value of this object, or if
+        the initial value of rosMgmtOpticalParameterValue is lower than the
+        value of this object. This alarm
+        will be indicated in the rosMgmtOpticalParamAlarmStatus object ..
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 16 }
+
+rosMgmtOpticalTransceiverQsfpParamLowWarningThresh OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a low warning threshold on
+        the optical parameter being monitored.
+
+        A threshold crossing condition will be indicated if the value
+        given by rosMgmtOpticalParameterValue goes from above the value
+        of this object to below the value of this
+        object, or if the initial value of rosMgmtOpticalParameterValue
+        object is lower than the value of this object. For
+        network elements in the status
+        indications, this threshold violation will be indicated in the
+        rosMgmtOpticalParamAlarmStatus object .
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 17 }
+
+rosMgmtOpticalTransceiverQsfpParamAlarmStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to indicate the current status of
+        the thresholds for the monitored optical parameter
+        on the interface.
+
+           If a threshold is currently being exceeded on the   
+           interface, the object  will be set. Otherwise, 
+           the object will be set to 1.
+           This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 18 }
+
+rosMgmtOpticalTransceiverQsfpParamAlarmLastValue OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the optical parameter value at the last time
+        a threshold related to a particular optical parameter was
+        exceeded on the interface.
+        If no threshold value is currently being
+        exceeded, then the value '-1000000' is returned.
+        
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 19 }
+
+rosMgmtOpticalTransceiverQsfpParamAlarmLastChange OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        a threshold related to a particular optical parameter was
+        exceeded on the interface.
+        
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 20 }
+
+rosMgmtOpticalTransceiverQsfpDDM15MinValidIntervals OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of previous 15 minute
+        intervals for which valid performance monitoring data
+        has been stored on the interface.
+
+        The value of this object will be n (where n is the maximum
+        number of 15 minute intervals supported at this interface),
+        unless the measurement was (re-)started within the last
+        (nx15) minutes, in which case the value will be the
+        number of previous 15 minute intervals for which the agent
+        has some data.
+        
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverDDMEntry 21 }
+
+rosMgmtOpticalTransceiverQsfpDDM24HrValidIntervals OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of previous 24 hour intervals
+         for which valid performance monitoring data has been stored
+          on the interface. The max value of this object is 7, it 
+          means that the user can look up 7days history information.  
+          This object belongs to Qsfp.
+        "
+    ::={ rosMgmtOpticalTransceiverDDMEntry 22 }
+       
+rosMgmtOpticalTransceiverQsfpDDMValidStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the parameter row is valid or invalid.
+        The object value is 'valide' when the module is present and 
+        supporting digitaldiagnotic. The object value is 'invalid' 
+        when the module is absent, or when the module is present and
+        not supporting digitaldiagnotic. 
+        This object belongs to Qsfp.
+       "
+    ::={ rosMgmtOpticalTransceiverDDMEntry 23 }
+
+-- rosMgmtOpticalTransceiverPMCurrent Table
+rosMgmtOpticalTransceiverPMCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RosMgmtOpticalTransceiverPMCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains performance monitoring data for the
+        various optical parameters, collected over the current 15
+        minute or the current 24 hour interval."
+    ::={ rosMgmtOpticalTransceiverPMGroup 1 }
+
+rosMgmtOpticalTransceiverPMCurrentEntry OBJECT-TYPE
+    SYNTAX      RosMgmtOpticalTransceiverPMCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rosMgmtOpticalTransceiverPMCurrentTable. It contains
+        performance monitoring data for a monitored optical
+        parameter at an interface, collected over the current 15
+        minute or the current 24 hour interval.
+        "
+    INDEX       { ifIndex,                  
+                  rosMgmtOpticalTransceiverPMCurrentPeriod,
+				  rosMgmtOpticalTransceiverPMCurrentParamType }
+    ::={ rosMgmtOpticalTransceiverPMCurrentTable 1 }
+
+RosMgmtOpticalTransceiverPMCurrentEntry ::= SEQUENCE {
+    rosMgmtOpticalTransceiverPMCurrentPeriod             OpticalPMPeriod,
+    rosMgmtOpticalTransceiverPMCurrentParamType          OpticalParameterType,
+--    rosMgmtOpticalTransceiverPMType          		  INTEGER,
+    rosMgmtOpticalTransceiverPMCurrentMaxParam           OpticalParameterValue,
+    rosMgmtOpticalTransceiverPMCurrentMinParam           OpticalParameterValue,
+    rosMgmtOpticalTransceiverPMCurrentMeanParam          OpticalParameterValue,
+    rosMgmtOpticalTransceiverQsfpPMCurrentMaxParam           OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpPMCurrentMinParam           OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpPMCurrentMeanParam          OCTET STRING
+}
+
+rosMgmtOpticalTransceiverPMCurrentPeriod OBJECT-TYPE
+    SYNTAX      OpticalPMPeriod
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical parameter values
+        given in this entry are collected over the current 15 minute or
+        the current 24 hour interval.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 1 }
+
+rosMgmtOpticalTransceiverPMCurrentParamType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored, in this entry.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 2 }
+-- rosMgmtOpticalTransceiverPMType OBJECT-TYPE
+--	 SYNTAX	INTEGER
+--	{
+--		others(1),
+--		sfp(2),
+--		xfp(3),
+--		sfpj(4),
+--		qsfp(5)
+--	}
+
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "This object specifies the optical type "
+--    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 3 }
+
+rosMgmtOpticalTransceiverPMCurrentMaxParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the maximum value measured for the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 3 }
+
+rosMgmtOpticalTransceiverPMCurrentMinParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the minimum value measured for the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 4 }
+
+rosMgmtOpticalTransceiverPMCurrentMeanParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the average value of the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 5 }  
+rosMgmtOpticalTransceiverQsfpPMCurrentMaxParam OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the maximum value measured for the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval.
+        This object belongs to Qsfp
+		"
+    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 6 }
+
+rosMgmtOpticalTransceiverQsfpPMCurrentMinParam OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the minimum value measured for the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval.
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 7 }
+
+rosMgmtOpticalTransceiverQsfpPMCurrentMeanParam OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the average value of the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval.
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMCurrentEntry 8 }
+
+
+-- rosMgmtOpticalTransceiverPMInterval Table
+
+rosMgmtOpticalTransceiverPMIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RosMgmtOpticalTransceiverPMIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table stores performance monitoring data for the
+        various optical parameters, collected over previous
+        intervals.
+
+        This table can have entries for one complete 24 hour
+        interval and up to 96 complete 15 minute
+        intervals. A system is required to store at least
+        4 completed 15 minute intervals. The number of valid
+        15 minute intervals in this table is indicated by the
+        rosMgmtOpticalTransceiverDDM15MinValidIntervals object 
+        and the number of valid 24 hour intervals is indicated by the
+        rosMgmtOpticalTransceiverDDM24HrValidIntervals object.
+        
+        when the optical module is removed from the device, the relative 
+        history records will be cleaned.
+        "
+    ::={ rosMgmtOpticalTransceiverPMGroup 2 }
+
+rosMgmtOpticalTransceiverPMIntervalEntry OBJECT-TYPE
+    SYNTAX      RosMgmtOpticalTransceiverPMIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rosMgmtOpticalTransceiverPMIntervalTable. It contains
+        performance monitoring data for an optical parameter,
+        collected over a previous interval.
+        "
+    INDEX      { ifIndex,
+    			 rosMgmtOpticalTransceiverPMIntervalPeriod,
+                 rosMgmtOpticalTransceiverPMIntervalNumber,                 
+                 rosMgmtOpticalTransceiverPMIntervalParamType }
+    ::={ rosMgmtOpticalTransceiverPMIntervalTable 1 }
+
+RosMgmtOpticalTransceiverPMIntervalEntry ::= SEQUENCE {
+    rosMgmtOpticalTransceiverPMIntervalPeriod            OpticalPMPeriod,
+    rosMgmtOpticalTransceiverPMIntervalNumber            Integer32,
+    rosMgmtOpticalTransceiverPMIntervalParamType         OpticalParameterType, 
+--    rosMgmtOpticalTransceiverPMIntervalType	          INTEGER,
+    rosMgmtOpticalTransceiverPMIntervalMaxParam          OpticalParameterValue,
+    rosMgmtOpticalTransceiverPMIntervalMinParam          OpticalParameterValue,
+    rosMgmtOpticalTransceiverPMIntervalMeanParam         OpticalParameterValue,
+    rosMgmtOpticalTransceiverQsfpPMIntervalMaxParam          OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpPMIntervalMinParam          OCTET STRING,
+    rosMgmtOpticalTransceiverQsfpPMIntervalMeanParam         OCTET STRING
+
+    }
+
+rosMgmtOpticalTransceiverPMIntervalPeriod OBJECT-TYPE
+    SYNTAX      OpticalPMPeriod
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical parameter values,
+        given in this entry, are collected over a period of 15 minutes
+        or 24 hours.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 1 }
+
+rosMgmtOpticalTransceiverPMIntervalNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number between 1 and 96, which identifies the
+         interval for which the set of optical parameter values is
+         available. The interval identified by 1 is the most recently
+         completed 15 minute or 24 hour interval, and the interval
+         identified by N is the interval immediately preceding the one
+         identified by N-1.
+         This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 2 }
+
+rosMgmtOpticalTransceiverPMIntervalParamType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored, in this entry.
+        This object belongs to xfp/sfp.
+ 		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 3 }
+    
+--rosMgmtOpticalTransceiverPMIntervalType OBJECT-TYPE
+--	 SYNTAX	INTEGER
+--	{
+--		others(1),
+--		sfp(2),
+--		xfp(3),
+--		sfpj(4),
+--		qsfp(5)
+--	}
+
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "This object specifies the optical type "
+--    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 4 }
+
+rosMgmtOpticalTransceiverPMIntervalMaxParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the maximum value measured for the optical
+        parameter, in a particular 15 minute or 24 hour interval.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 4 }
+
+rosMgmtOpticalTransceiverPMIntervalMinParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the minimum value measured for the optical
+        parameter, in a particular 15 minute or 24 hour interval.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 5 }
+
+rosMgmtOpticalTransceiverPMIntervalMeanParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the average value of the measured optical
+        parameter, in a particular 15 minute or 24 hour interval.
+        This object belongs to xfp/sfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 6 }
+rosMgmtOpticalTransceiverQsfpPMIntervalMaxParam OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the maximum value measured for the optical
+        parameter, in a particular 15 minute or 24 hour interval.
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 7 }
+
+rosMgmtOpticalTransceiverQsfpPMIntervalMinParam OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the minimum value measured for the optical
+        parameter, in a particular 15 minute or 24 hour interval.
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 8 }
+
+rosMgmtOpticalTransceiverQsfpPMIntervalMeanParam OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the average value of the measured optical
+        parameter, in a particular 15 minute or 24 hour interval.
+        This object belongs to Qsfp.
+		"
+    ::={ rosMgmtOpticalTransceiverPMIntervalEntry 9 }
+
+-- rosMgmtOpticalTransceiverCurrentStatus Table
+rosMgmtOpticalTransceiverCurrentStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RosMgmtOpticalTransceiverCurrentStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table stores the hard ware information and the information
+        set by user of the transceiver. 
+        This object belongs to xfp/sfp.
+        "
+    ::={ rosMgmtOpticalTransceiverStatusGroup 1 }
+
+rosMgmtOpticalTransceiverCurrentStatusEntry OBJECT-TYPE
+    SYNTAX      RosMgmtOpticalTransceiverCurrentStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rosMgmtOpticalTransceiverCurrentStatusTable. It contains
+        performance monitoring data for an optical parameter,
+        collected over a previous interval.
+        This object belongs to xfp/sfp.
+        "
+    INDEX      { ifIndex   }
+    ::={ rosMgmtOpticalTransceiverCurrentStatusTable 1 }
+
+RosMgmtOpticalTransceiverCurrentStatusEntry ::= SEQUENCE {
+    rosMgmtOpticalTransceiverHwInfoAbsStatus            INTEGER,
+    rosMgmtOpticalTransceiverHwInfoNRStatus            INTEGER,
+    rosMgmtOpticalTransceiverHwInfoRxLosStatus         INTEGER,
+    rosMgmtOpticalTransceiverHwInfoStandby          INTEGER,
+    rosMgmtOpticalTransceiverHwInfoLaser            INTEGER,
+    rosMgmtOpticalTransceiverWaveLengthError         Integer32,    
+    rosMgmtOpticalTransceiverUserWaveLength          Integer32, 
+    rosMgmtOpticalTransceiverUserDataRate                Integer32,
+    rosMgmtOpticalTransceiverUserLineLoopBack            INTEGER,
+    rosMgmtOpticalTransceiverUserXFILoopBack             INTEGER,
+    rosMgmtOpticalTransceiverPortNotifyEnable            EnableVar,
+    rosMgmtOpticalTransceiverPortDDMEnable               EnableVar,
+    rosMgmtOpticalTransceiverPortCheckPwdEnable          EnableVar,
+    rosMgmtOpticalTransceiverTxFaultCount                Integer32, 
+    rosMgmtOpticalTransceiverTxFaultCountClear           TruthValue,
+    rosMgmtOpticalTransceiverSpecificationCheckStatus    INTEGER,
+    rosMgmtOpticalTransceiverTxFaultStatus               INTEGER,
+	
+    rosMgmtOpticalTransceiverPortCRCCheckEnable          EnableVar,
+    rosMgmtOpticalTransceiverBaseCRCCheckStatus          INTEGER,
+    rosMgmtOpticalTransceiverStaticDdmCRCCheckStatus     INTEGER,  
+    rosMgmtOpticalTransceiverDynamicDdmCRCCheckStatus    INTEGER
+    }
+
+rosMgmtOpticalTransceiverHwInfoAbsStatus         OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+ 		absent(1),
+    	present(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies if the optical module is absent
+        present,absent.
+        This object belongs to xfp and sfp."
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 1 }
+
+rosMgmtOpticalTransceiverHwInfoNRStatus          OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+    	ready(1),
+       	notready(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies if the optical module is ready for operation.
+        ready,notready.
+        This object belongs to xfp.
+        "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 2 }
+
+rosMgmtOpticalTransceiverHwInfoRxLosStatus      OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+    	 normal(1),
+       	 loss(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies if the optical module operation losses the receiving signal
+        normal,loss.
+        This object belongs to xfp.
+        "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 3 }
+
+rosMgmtOpticalTransceiverHwInfoStandby       OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+ 		normal(1),
+       	standby(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies if the optical module works under standby mode.
+        normal,standby.
+        This object belongs to xfp.
+        "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 4 }
+
+rosMgmtOpticalTransceiverHwInfoLaser       OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+ 		on(1),
+       	off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies if the optical module laser is turned on
+        on,off.
+        This object belongs to xfp.
+        "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 5 }
+
+rosMgmtOpticalTransceiverWaveLengthError         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies error between the actual wavelength 
+        and the wavelength set by the user,measured in pm.
+        This object belongs to xfp.
+        The object will be shown in unit of nm, and the precision is 0.001.
+       "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 6 }   
+
+rosMgmtOpticalTransceiverUserWaveLength          OBJECT-TYPE
+    SYNTAX      Integer32(0..3276800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the wavelength value of the optical module set by user,measured in pm.
+         This object belongs to xfp.
+         The object will be shown in unit of nm, and the precision is 0.01.
+        "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 7 }
+                                
+                                 
+rosMgmtOpticalTransceiverUserDataRate                OBJECT-TYPE
+    SYNTAX      Integer32(9500..12500) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the data rate of the optical module set by user,measured in Mbps.
+         This object belongs to xfp.
+         The object will be shown in unit of Gbps, and the precision is 0.1.
+        "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 8 }    
+     
+rosMgmtOpticalTransceiverUserLineLoopBack            OBJECT-TYPE
+    SYNTAX      INTEGER
+	{
+ 		normal(1),
+       	lineLoopback(2)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies if the sideline loop-back is tuned on , 
+        user can change the loop back mode through the object.
+        normal,lineLoopback.
+        This object belongs to xfp.
+        "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 9 }
+    
+rosMgmtOpticalTransceiverUserXFILoopBack             OBJECT-TYPE
+    SYNTAX      INTEGER
+	{
+ 		normal(1),
+       	xfiLoopback(2)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies if the XFI loop-back is tuned on 
+        user can change the loop back mode through the object.
+        normal,xfiLoopback.
+        This object belongs to xfp.
+        "
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 10 }    
+
+rosMgmtOpticalTransceiverPortNotifyEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the generation of a port notifications,
+         enable or disable.  
+         This object belongs to xfp and sfp.
+        "
+    DEFVAL { enable}
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 11 }
+
+rosMgmtOpticalTransceiverPortDDMEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the status of digitaldiagnotic on a port, 
+         enable or disable.  
+         This object belongs to xfp and sfp.
+        "
+    DEFVAL { enable}
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 12 }
+
+rosMgmtOpticalTransceiverPortCheckPwdEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the status of password checking on a port, 
+        enable or disable.  
+        This object belongs to xfp.
+        "
+    DEFVAL { enable}
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 13 }  
+    
+    rosMgmtOpticalTransceiverTxFaultCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the number of tx-fault signals."
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 14 }  
+    
+    rosMgmtOpticalTransceiverTxFaultCountClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies clear the statistcs of tx-fault signals."
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 15 } 
+    
+    rosMgmtOpticalTransceiverSpecificationCheckStatus OBJECT-TYPE
+    SYNTAX      INTEGER{none(0),accord(1),notaccord(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the check status, accord(0)specifies 
+        the optical module accord with industrial. not-accord(2)
+        specifies the optical module not accord with industrial."
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 16 } 
+    
+    rosMgmtOpticalTransceiverTxFaultStatus OBJECT-TYPE
+    SYNTAX      INTEGER{normal(1),txfault(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the tx-fault status."
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 17 }
+	
+    rosMgmtOpticalTransceiverPortCRCCheckEnable OBJECT-TYPE
+    SYNTAX      EnableVar   
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the status of CRC checking on a port, enable or disable.
+         This object belongs to sfp and xfp"
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 18 }  
+    
+    rosMgmtOpticalTransceiverBaseCRCCheckStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+           none(0),
+           pass(1),
+           notpass(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the result of base information crc checking."
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 19 } 
+
+    rosMgmtOpticalTransceiverStaticDdmCRCCheckStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+           none(0),
+           pass(1),
+           notpass(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the result of static ddm crc checking."
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 20 }  
+    
+    rosMgmtOpticalTransceiverDynamicDdmCRCCheckStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+           none(0),
+           pass(1),
+           notpass(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the result of Dynamic ddm crc checking."
+    ::={ rosMgmtOpticalTransceiverCurrentStatusEntry 21 }  
+    
+END
+
