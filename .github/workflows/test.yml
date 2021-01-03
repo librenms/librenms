@@ -165,9 +165,9 @@ jobs:
         run: |
           ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
       -
-        name: Artisan dev:check ci
+        name: lnms dev:check ci
         run: |
-          php artisan dev:check ci
+          php lnms dev:check ci
         env:
           SKIP_STYLE_CHECK: ${{ matrix.skip-style-check }}
           SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
