@@ -40,9 +40,6 @@ install:
 after_failure:
   - tail /tmp/snmpsimd.log
 
-after_success:
-  - scripts/deploy-docs.sh
-
 before_script:
   - phpenv config-rm xdebug.ini
   - test -n "$SKIP_WEB_CHECK" || php artisan serve --env=dusk.testing  2>/dev/null &

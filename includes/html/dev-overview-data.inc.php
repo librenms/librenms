@@ -129,7 +129,7 @@ if ($device['location_id']) {
     echo '
     <div class="row">
         <div class="col-sm-4">Location</div>
-        <div class="col-sm-8">' . $location->location . '</div>
+        <div class="col-sm-8">' . $location->display() . '</div>
     </div>
     <div class="row" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
         <div class="col-sm-4">Lat / Lng</div>

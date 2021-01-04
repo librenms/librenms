@@ -31,7 +31,7 @@ documentation to go along with it. It's quite simple to do this:
   - If the document could cover different distros like CentOS and
     Ubuntu please try and include the information for them all. If
     that's not possible then at least put a placeholder in asking for contributions.
-  - Ensure you use the correct formating for `commands` and `code
+  - Ensure you use the correct formatting for `commands` and `code
     blocks` by wrapping one liners in backticks or blocks in ```.
   - Put content into sub-headings where possible to organise the
     content.

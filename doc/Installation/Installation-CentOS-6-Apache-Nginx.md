@@ -36,7 +36,7 @@ chkconfig mariadb on
 service mariadb start
 ```
 
-## Gneral
+## General
 
 Now continue with the installation:
 
@@ -283,7 +283,7 @@ chown -R librenms:librenms /opt/librenms
 chmod 775 rrd
 ```
 
-If you're planing on running rrdcached, make sure that the path is
+If you're planning on running rrdcached, make sure that the path is
 also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 **SELinux**

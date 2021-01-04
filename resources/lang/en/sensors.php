@@ -144,6 +144,12 @@ return [
         'unit' => 'dBm',
         'unit_long' => 'Decibal-Milliwatts',
     ],
+    'tv_signal' => [
+        'short' => 'Signal',
+        'long' => 'TV signal',
+        'unit' => 'dBmV',
+        'unit_long' => 'Decibel-Millivolts',
+    ],
     'snr' => [
         'short' => 'SNR',
         'long' => 'Signal to Noise Ratio',

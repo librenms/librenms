@@ -105,7 +105,7 @@ Output:
 
 ### `availability`
 
-Get calculated availabilites of given device.
+Get calculated availabilities of given device.
 
 Route: `/api/v0/devices/:hostname/availability`
 

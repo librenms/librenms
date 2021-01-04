@@ -30,7 +30,7 @@ Table of Content:
   - [Linux (snmpd v2)](#linux-snmpd)
   - [Linux (snmpd v3)](#linux-snmpd-v3)
   - [Windows Server 2008 R2](#windows-server-2008-r2)
-  - [Windows Server 2012 R2 and 2016](#windows-server-2012-r2-and-2016)
+  - [Windows Server 2012 R2 and newer](#windows-server-2012-r2-and-newer)
   - [Mac OSX](#Mac-OSX)
 
 ## Devices
@@ -120,7 +120,7 @@ snmp-server location <YOUR-LOCATION>
 #### Network Card-MS
 
 1. Connect to the Web UI of the device
-1. Upgrade to the lastest available manufacturer firmware which applies to your hardware revision. Refer to the releasenotes.   For devices which can use the Lx releases, *do* install LD.
+1. Upgrade to the latest available manufacturer firmware which applies to your hardware revision. Refer to the release notes.   For devices which can use the Lx releases, *do* install LD.
 1. After rebooting the card (safe for connected load), configure Network, System and Access Control. Save config for each step.
 1. Configure SNMP. The device defaults to both SNMP v1 and v3 enabled, with default credentials. Disable what you do not need. SNMP v3 works, but uses MD5/DES. You may have to add another section to your SNMP credentials table in LibreNMS. Save.
 
@@ -314,7 +314,7 @@ esxcli system snmp set -C noc@your.org
 esxcli system snmp set --enable true
 ```
 
->Note: In case of snmp timouts, disable the firewall with `esxcli
+>Note: In case of snmp timeouts, disable the firewall with `esxcli
 >network firewall set --enabled false` If snmp timeouts still occur
 >with firewall disabled, migrate VMs if needed and reboot ESXi host.
 
@@ -479,9 +479,10 @@ service snmpd restart
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
 
-### Windows Server 2012 R2 and 2016
+### Windows Server 2012 R2 and newer
 
-1. Log in to your Windows Server 2012 R2
+#### GUI
+1. Log in to your Windows Server 2012 R2 or newer
 1. Start "Server Manager" under "Administrative Tools"
 1. Click "Manage" and then "Add Roles and Features"
 1. Continue by pressing "Next" to the "Features" menu
@@ -493,6 +494,17 @@ service snmpd restart
 1. In "Accept SNMP packets from these hosts" click "Add" and add your
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
+
+#### PowerShell
+The following example will install SNMP, set the Librenms IP and set a read only community string.  
+Replace `$IP` and `$communitystring` with your values.  
+
+```Powershell
+Install-WindowsFeature -Name 'SNMP-Service','RSAT-SNMP'
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\services\SNMP\Parameters\PermittedManagers"  -Name 2 -Value $IP
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\services\SNMP\Parameters\ValidCommunities"  -Name $communitystring -Value 4
+
+```
 
 >Note: SNMPv3 can be supported on Windows platforms with the use of Net-SNMP.
 
