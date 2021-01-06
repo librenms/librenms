@@ -81,11 +81,11 @@ if ($error_msg) {
         rrdtool_graph($graphfile, $rrd_options);
         d_echo($rrd_cmd);
         if (is_file($graphfile)) {
-            if (!$debug) {
+            if (! $debug) {
                 set_image_type();
                 if ($output === 'base64') {
                     $imagedata = file_get_contents($graphfile);
-                    $base64_output =  base64_encode($imagedata);
+                    $base64_output = base64_encode($imagedata);
                 } else {
                     $fd = fopen($graphfile, 'r');
                     fpassthru($fd);
@@ -93,10 +93,10 @@ if ($error_msg) {
                 }
             } else {
                 echo `ls -l $graphfile`;
-                echo '<img src="'.data_uri($graphfile, 'image/svg+xml').'" alt="graph" />';
+                echo '<img src="' . data_uri($graphfile, 'image/svg+xml') . '" alt="graph" />';
             }
             unlink($graphfile);
-        } elseif (isset($rrd_filename) && !Rrd::checkRrdExists($rrd_filename)) {
+        } elseif (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
             graph_error($width < 200 ? 'No Data' : 'No Data file');
         } else {
             graph_error($width < 200 ? 'Draw Error' : 'Error Drawing Graph');
