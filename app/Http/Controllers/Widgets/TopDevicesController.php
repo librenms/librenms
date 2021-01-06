@@ -38,6 +38,7 @@ use Illuminate\View\View;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
+use LibreNMS\Util\Validate;
 
 class TopDevicesController extends WidgetController
 {
@@ -66,6 +67,11 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
         $sort = $settings['sort_order'];
+
+        // We use raw() function below, validate input and default to sane value.
+        if (! Validate::ascDesc($sort)) {
+            $sort = 'ASC';
+        }
 
         switch ($settings['top_query']) {
             case 'traffic':

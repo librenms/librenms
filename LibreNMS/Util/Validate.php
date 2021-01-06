@@ -49,4 +49,14 @@ class Validate
             && preg_match('/^.{1,253}$/', $hostname) //overall length check
             && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname);
     }
+
+    public static function ascDesc($direction): bool
+    {
+        $direction = strtolower($direction);
+        if (in_array($direction, ['asc', 'desc'], true)) {
+            return true;
+        }
+
+        return false;
+    }
 }
