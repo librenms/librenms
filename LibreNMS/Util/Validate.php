@@ -50,17 +50,10 @@ class Validate
             && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname);
     }
 
-    public static function ascDesc($direction, $default)
+    public static function ascDesc($direction, $default = 'ASC')
     {
-        $direction = strtolower($direction);
-        if (! in_array($direction, ['asc', 'desc'], true)) {
-            if ($default) {
-                return $default;
-            }
-
-            return false;
-        }
-
-        return true;
+        return in_array(strtolower($direction), ['asc', 'desc'], true)
+            ? $direction
+            : $default;
     }
 }
