@@ -91,8 +91,10 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         // special character handling
+        $ldap_find_chr = array();
         $ldap_find_chr[] = '(';
         $ldap_find_chr[] = ')';
+        $ldap_replace_chr = array();
         $ldap_replace_chr[] = '\(';
         $ldap_replace_chr[] = '\)';
 
@@ -125,10 +127,10 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($connection, $search);
 
         if ($entries['count']) {
-            return 1;
+            return boolval(1);
         }
 
-        return 0;
+        return boolval(0);
     }
 
     public function getUserlevel($username)
