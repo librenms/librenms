@@ -69,9 +69,7 @@ class TopDevicesController extends WidgetController
         $sort = $settings['sort_order'];
 
         // We use raw() function below, validate input and default to sane value.
-        if (! Validate::ascDesc($sort)) {
-            $sort = 'ASC';
-        }
+        $sort = Validate::ascDesc($sort, 'ASC');
 
         switch ($settings['top_query']) {
             case 'traffic':
