@@ -1,6 +1,6 @@
 [![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master)
-[![Travis Status](https://travis-ci.com/librenms/librenms.svg?branch=master)](https://travis-ci.com/librenms/librenms)
+[![Test Status](https://github.com/librenms/librenms/workflows/test/badge.svg)](https://github.com/librenms/librenms/actions?query=workflow%3Atest)
 
 Introduction
 ------------

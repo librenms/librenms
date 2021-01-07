@@ -176,7 +176,9 @@ class Proc
     public function close($command = null)
     {
         if (isset($command)) {
-            $this->sendInput($this->checkAddEOL($command));
+            if (is_resource($this->_pipes[0])) {
+                $this->sendInput($this->checkAddEOL($command));
+            }
         }
 
         $this->closePipes();

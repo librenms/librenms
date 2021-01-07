@@ -285,7 +285,7 @@ function check_service($command)
                             d_echo($normalized_ds . " collides with an existing index\n");
                             $normalized_ds = $tmp_ds_name;
                             $perf_unique = 1;
-                            break 1;
+                            break;
                         }
                     }
                     if ($perf_unique == 0) {

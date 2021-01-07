@@ -34,52 +34,69 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifName }} SFP Temperature'
                     index: 'ddmTemperature.{{ $index }}'
-                    low_limit: -40.0
-                    high_limit: 85.0
+                    low_limit: ddmTempLowAlarm
+                    low_warn_limit: ddmTempLowWarning
+                    high_limit: ddmTempHiAlarm
+                    warn_limit: ddmTempHiWarning
 
         voltage:
             data:
                 -
-                    oid: ddmSupplyVoltage
+                    oid: ddmInfoEntry
+                    value: ddmSupplyVoltage
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.6.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifName }} SFP Voltage'
                     index: 'ddmSupplyVoltage.{{ $index }}'
-                    low_limit: 3.13
-                    high_limit: 3.47
+                    low_limit: ddmSupplyVoltageLowAlarm
+                    low_warn_limit: ddmSupplyVoltageLowWarning
+                    high_limit: ddmSupplyVoltageHiAlarm
+                    warn_limit: ddmSupplyVoltageHiWarning
+
 
         current:
             data:
                 -
-                    oid: ddmTxBiasCurrent
+                    oid: ddmInfoEntry
+                    value: ddmTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.11.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifName }} Tx Bias'
                     index: 'ddmTxBiasCurrent.{{ $index }}'
+                    low_limit: ddmTxBiasCurrentLowAlarm
+                    low_warn_limit: ddmTxBiasCurrentLowWarning
+                    high_limit: ddmTxBiasCurrentHiAlarm
+                    warn_limit: ddmTxBiasCurrentHiWarning
 
         dbm:
             data:
                 -
-                    oid: ddmRxOpticalPower
+                    oid: ddmInfoEntry
+                    value: ddmRxOpticalPower
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.21.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifName }} Rx Power'
                     index: 'ddmRxOpticalPower.{{ $index }}'
-                    low_limit: -21.0
-                    high_limit: -3.0
+                    low_limit: ddmRxOpticalPowerLowAlarm
+                    low_warn_limit: ddmRxOpticalPowerLowWarning 
+                    high_limit: ddmRxOpticalPowerHiAlarm
+                    warn_limit: ddmRxOpticalPowerHiWarning
                 -
-                    oid: ddmTxOutputPower
+                    oid: ddmInfoEntry
+                    value: ddmTxOutputPower
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.16.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifName }} Tx Power'
                     index: 'ddmTxOutputPower.{{ $index }}'
-                    low_limit: -9.0
-                    high_limit: -3.0
+                    low_limit: ddmTxOutputPowerLowAlarm
+                    low_warn_limit: ddmTxOutputPowerLowWarning
+                    high_limit: ddmTxOutputPowerHiAlarm
+                    warn_limit: ddmTxOutputPowerHiWarning
