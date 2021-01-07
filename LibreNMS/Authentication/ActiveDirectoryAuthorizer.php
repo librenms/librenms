@@ -91,8 +91,8 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         // special character handling
-        $ldap_find_chr[]  = "(";
-        $ldap_find_chr[]  = ")";
+        $ldap_find_chr[] = "(";
+        $ldap_find_chr[] = ")";
         $ldap_replace_chr[] = "\(";
         $ldap_replace_chr[] = "\)";
 
