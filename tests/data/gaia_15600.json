@@ -6218,32 +6218,5 @@
                 }
             ]
         }
-    },
-    "ospf": {
-        "poller": {
-            "ospf_ports": [],
-            "ospf_instances": [
-                {
-                    "ospf_instance_id": 0,
-                    "ospfRouterId": "",
-                    "ospfAdminStat": "disabled",
-                    "ospfVersionNumber": "version2",
-                    "ospfAreaBdrRtrStatus": "false",
-                    "ospfASBdrRtrStatus": "false",
-                    "ospfExternLsaCount": 0,
-                    "ospfExternLsaCksumSum": 0,
-                    "ospfTOSSupport": "false",
-                    "ospfOriginateNewLsas": 0,
-                    "ospfRxNewLsas": 0,
-                    "ospfExtLsdbLimit": 0,
-                    "ospfMulticastExtensions": 0,
-                    "ospfExitOverflowInterval": 0,
-                    "ospfDemandExtensions": "false",
-                    "context_name": null
-                }
-            ],
-            "ospf_areas": [],
-            "ospf_nbrs": []
-        }
     }
 }
