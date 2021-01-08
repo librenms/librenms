@@ -45,9 +45,12 @@ system. See <https://redis.io/topics/security>
 
 ## Memcached (distributed polling)
 
-LibreNMS still uses memcached for locking daily update processes when using
-distributed polling.  So you will still need to configure memcached
-unless you have updates disabled.
+LibreNMS can still use memcached as a locking mechanism when using
+distributed polling.  So you can configure memcached for this purpose
+unless you have updates disabled. 
+
+See `Locking Mechanisms` at
+<https://docs.librenms.org/Extensions/Distributed-Poller/>
 
 ## MySQL
 
@@ -59,7 +62,7 @@ connections and other important health metrics.
 # Configuration
 
 Connection settings are required in `.env`. The `.env` file is
-generated after composer install and APP_KEY and NODE_ID are set.
+generated after composer install and `APP_KEY` and `NODE_ID` are set.
 Remember that the APP_KEY value must be the same on all your pollers.
 
 ```dotenv

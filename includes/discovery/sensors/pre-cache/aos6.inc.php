@@ -15,3 +15,12 @@ $pre_cache['aos6_fan_oids'] = snmpwalk_cache_multi_oid($device, 'alaChasEntPhysF
 
 echo 'chasChassisEntry';
 $pre_cache['aos6_temp_oids'] = snmpwalk_cache_multi_oid($device, 'chasChassisEntry', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
+
+echo 'alaStackMgrChassisTable';
+$pre_cache['aos6_stack_oids'] = snmpwalk_cache_multi_oid($device, 'alaStackMgrChassisTable', [], 'ALCATEL-IND1-STACK-MANAGER-MIB', 'aos6', '-OQUse');
+
+echo 'chasControlCertifyStatus';
+$pre_cache['aos6_sync_oids'] = snmpwalk_cache_multi_oid($device, 'chasControlCertifyStatus', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
+
+echo 'alclnkaggAggEntry';
+$pre_cache['aos6_lag_oids'] = snmpwalk_cache_multi_oid($device, 'alclnkaggAggEntry', [], 'ALCATEL-IND1-LAG-MIB', 'aos6', '-OQUse');

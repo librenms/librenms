@@ -240,7 +240,7 @@ class CiHelperTest extends TestCase
             'unit_svg' => true,
         ]);
 
-        putenv('FILES=.travis.yml');
+        putenv('FILES=.github/workflows/test.yml');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [

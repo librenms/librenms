@@ -28,7 +28,7 @@ Groups can be drawn with Network Map.
 
 This link will show you all the options and explain what they
 do. [Link](https://visjs.github.io/vis-network/docs/network/)
-You may also access the dyanamic configuration interface [example
+You may also access the dynamic configuration interface [example
 here](https://visjs.github.io/vis-network/examples/network/other/configuration.html)
 from within LibreNMS by adding the following to config.php
 
@@ -43,7 +43,7 @@ $config['network_map_vis_options'] = '{
 You may want to disable the automatic page refresh while you're
 tweaking your configuration, as the refresh will reset the dynamic
 configuration UI to the values currently saved in config.php This can
-be done by going clicking on the Settings Icon then Refresh Pause.
+be done by clicking on the Settings Icon then Refresh Pause.
 
 ## Configurator Output
 
@@ -51,9 +51,9 @@ Once you've achieved your desired map appearance, click the generate
 options button at the bottom to be given the necessary parameters to
 add to your config.php file. You will need to paste the genrated
 config into config.php the format will need to look something like
-this. Note that the configuartor will output the config with `var options`
-you will need strip that out and at the end of the config you need to
-add in `}';` see the example below.
+this. Note that the configurator will output the config with `var options`
+you will need to strip them out and at the end of the config you need to
+add an `}';` see the example below.
 
 ```php
 $config['network_map_vis_options'] = '{

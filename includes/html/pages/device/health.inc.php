@@ -44,6 +44,7 @@ $ber = dbFetchCell("select count(*) from sensors WHERE sensor_class='ber' AND de
 $eer = dbFetchCell("select count(*) from sensors WHERE sensor_class='eer' AND device_id = ?", [$device['device_id']]);
 $waterflow = dbFetchCell("select count(*) from sensors WHERE sensor_class='waterflow' AND device_id = ?", [$device['device_id']]);
 $percent = dbFetchCell("select count(*) from sensors WHERE sensor_class='percent' AND device_id = ?", [$device['device_id']]);
+$tv_signal = dbFetchCell("select count(*) from sensors WHERE sensor_class='tv_signal' AND device_id = ?", [$device['device_id']]);
 
 unset($datas);
 $datas[] = 'overview';
@@ -131,6 +132,10 @@ if ($signal) {
     $datas[] = 'signal';
 }
 
+if ($tv_signal) {
+    $datas[] = 'tv_signal';
+}
+
 if ($airflow) {
     $datas[] = 'airflow';
 }
@@ -200,6 +205,7 @@ $type_text['state'] = 'State';
 $type_text['count'] = 'Count';
 $type_text['load'] = 'Load';
 $type_text['signal'] = 'Signal';
+$type_text['tv_signal'] = 'TV signal';
 $type_text['airflow'] = 'Airflow';
 $type_text['snr'] = 'SNR';
 $type_text['pressure'] = 'Pressure';

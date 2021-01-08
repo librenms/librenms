@@ -36,8 +36,8 @@ community `my_company` using snmp `v2c` then you would enter: SNMP
 Port defaults to 161.
 
 By default Hostname will be used for polling data. If you want
-to get polling Device data via a specific IP-Addresse (e.g. Management IP)
-fill out the optional field `Overwrite IP` with it's IP-Addresse.
+to get polling Device data via a specific IP-Address (e.g. Management IP)
+fill out the optional field `Overwrite IP` with it's IP-Address.
 
 ![Add device](/img/webui_add_device.png)
 
@@ -59,5 +59,5 @@ If you would like to add devices automatically then you will probably
 want to read the [Auto-discovery
 Setup](../Extensions/Auto-Discovery.md) guide.
 
-You may also want to add devices programatically, if so, take a look
+You may also want to add devices programmatically, if so, take a look
 at our [API documentation](../API/index.md)

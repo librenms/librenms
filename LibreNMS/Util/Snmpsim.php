@@ -80,7 +80,7 @@ class Snmpsim
             } else {
                 echo "\nFailed to start Snmpsim. Scroll up for error.\n";
             }
-            exit;
+            exit(1);
         }
     }
 

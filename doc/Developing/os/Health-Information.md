@@ -36,6 +36,7 @@ the values we expect to see the data in:
 | snr                             | SNR                         |
 | state                           | #                           |
 | temperature                     | C                           |
+| tv_signal                       | dBmV                        |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
 | percent                         | %                           |
