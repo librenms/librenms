@@ -280,6 +280,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     public function discoverMplsSaps($svcs)
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        $mplsSapTrafficCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseStatsTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
         $saps = collect();
 
@@ -296,6 +297,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
             [$svcId, $sapPortId, $sapEncapValue] = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $traffic_id = $svcId . '.' . $sapPortId . '.'  . $this->nokiaEncap($sapEncapValue);
+
             $saps->push(new MplsSap([
                 'svc_id' => $svc_id,
                 'svc_oid' => $svcId,
@@ -309,9 +312,14 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
+                'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'],
+                'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'],
+                'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'],
+                'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'],
             ]));
         }
 
+        print($saps);
         return $saps;
     }
 
@@ -622,6 +630,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     public function pollMplsSaps($svcs)
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        $mplsSapTrafficCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseStatsTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
         $saps = collect();
 
@@ -641,6 +650,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
             [$svcId, $sapPortId, $sapEncapValue] = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $traffic_id = $svcId . '.' . $sapPortId . '.'  . $this->nokiaEncap($sapEncapValue);
 
             $saps->push(new MplsSap([
                 'svc_id' => $svc_id,
@@ -656,9 +666,14 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
+                'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'],
+                'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'],
+                'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'],
+                'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'],
             ]));
         }
 
+	print($saps);
         return $saps;
     }
 
