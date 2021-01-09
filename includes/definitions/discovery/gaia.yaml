@@ -48,7 +48,7 @@ modules:
                     oid: haStarted
                     num_oid: '.1.3.6.1.4.1.2620.1.5.5.0.{{ $index }}'
                     index: 'haStarted.{{ $index }}'
-                    descr: "Cluster mechanism started"
+                    descr: 'Cluster mechanism started'
                     group: HA
                     value: haStarted
                     states:
@@ -58,7 +58,7 @@ modules:
                     oid: haState
                     num_oid: '.1.3.6.1.4.1.2620.1.5.6.0.{{ $index }}'
                     index: 'haState.{{ $index }}'
-                    descr: "Cluster member state"
+                    descr: 'Cluster member state'
                     group: HA
                     value: haState
                     states:
@@ -70,7 +70,7 @@ modules:
                     oid: haStatCode
                     num_oid: '.1.3.6.1.4.1.2620.1.5.101.{{ $index }}'
                     index: 'haStatCode.{{ $index }}'
-                    descr: "Cluster member status code"
+                    descr: 'Cluster member status code'
                     group: HA
                     value: haStatCode
                     states:
