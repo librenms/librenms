@@ -64,7 +64,7 @@ modules:
                     states:
                         - { value: 1, descr: active , graph: 3, generic: 0 }
                         - { value: 2, descr: standby, graph: 2, generic: 0 }
-                        - { value: 3, descr: ´active attention´, graph: 1, generic: 1 }
+                        - { value: 3, descr: 'active attention', graph: 1, generic: 1 }
                         - { value: 0, descr: down, graph: 0, generic: 2 }
                 -
                     oid: haStatCode
