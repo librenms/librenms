@@ -15,8 +15,14 @@ if ($_GET['width']) {
     $width = (int) $_GET['width'];
 }
 
-if (\LibreNMS\Config::get('trim_tobias')) {
+if (Config::get('trim_tobias')) {
     $width += 12;
+}
+
+if (Config::get("webui.graph_last_values")) {
+    $use_last_values = true;
+} else {
+    $use_last_values = false;
 }
 
 if ($_GET['height']) {

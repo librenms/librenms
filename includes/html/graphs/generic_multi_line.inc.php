@@ -15,8 +15,6 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$use_last_values = \LibreNMS\Config::get("webui.graph_last_values");
-
 $stacked = generate_stacked_graphs();
 
 if (! isset($descr_len)) {
