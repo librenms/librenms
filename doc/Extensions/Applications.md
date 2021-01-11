@@ -128,6 +128,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [PureFTPd](#pureftpd) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [Redis](#redis) - SNMP extend
+1. [RRDCached](#rrdcached) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
 1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
@@ -1649,6 +1650,24 @@ SNMP extend script to monitor your Redis Server
 
 ```
 extend redis /etc/snmp/redis.py
+```
+
+# RRDCached
+
+SNMP extend script to monitor your RRDCached via snmp
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/rrdcached
+   -O /etc/snmp/rrdcached`
+
+2: Make the script executable: `chmod +x /etc/snmp/rrdcached`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend rrdcached /etc/snmp/rrdcached
 ```
 
 # Seafile
