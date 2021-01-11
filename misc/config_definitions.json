@@ -5292,6 +5292,13 @@
             "order": 0,
             "type": "integer"
         },
+        "webui.graph_last_values": {
+            "default": false,
+            "group": "webui",
+            "section": "graph",
+            "order": 3,
+            "type": "boolean"
+        },
         "webui.graph_stacked": {
             "default": false,
             "group": "webui",

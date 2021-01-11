@@ -15,6 +15,8 @@
 
 require 'includes/html/graphs/common.inc.php';
 
+$use_last_values = \LibreNMS\Config::get("webui.graph_last_values");
+
 $stacked = generate_stacked_graphs();
 
 if (! isset($descr_len)) {
@@ -54,7 +56,11 @@ foreach ($rrd_list as $rrd) {
 
     $id = 'ds' . $i;
 
-    $rrd_options .= ' DEF:' . $id . "=$filename:$ds:AVERAGE";
+    if ($use_last_values) {
+        $rrd_options .= ' DEF:' . $id . "=$filename:$ds:LAST";
+    } else {
+        $rrd_options .= ' DEF:' . $id . "=$filename:$ds:AVERAGE";
+    }
 
     if ($simple_rrd) {
         $rrd_options .= ' CDEF:' . $id . 'min=' . $id . ' ';
