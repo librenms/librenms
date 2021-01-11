@@ -46,7 +46,7 @@ modules:
                         - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
                 -
                     oid: haStarted
-                    num_oid: '.1.3.6.1.4.1.2620.1.5.5.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.5.{{ $index }}'
                     index: 'haStarted.{{ $index }}'
                     descr: 'Cluster mechanism started'
                     group: HA
@@ -56,7 +56,7 @@ modules:
                         - { value: 0, descr: no, graph: 0, generic: 2 }
                 -
                     oid: haState
-                    num_oid: '.1.3.6.1.4.1.2620.1.5.6.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.6.{{ $index }}'
                     index: 'haState.{{ $index }}'
                     descr: 'Cluster member state'
                     group: HA
