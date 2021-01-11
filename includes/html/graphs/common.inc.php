@@ -19,7 +19,7 @@ if (Config::get('trim_tobias')) {
     $width += 12;
 }
 
-if (Config::get("webui.graph_last_values")) {
+if (Config::get('webui.graph_last_values')) {
     $use_last_values = true;
 } else {
     $use_last_values = false;
