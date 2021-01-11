@@ -1343,6 +1343,10 @@ return [
                 'description' => 'Enable dynamic graphs',
                 'help' => 'Enable dynamic graphs, enables zooming and panning on graphs',
             ],
+            'graph_last_values' => [
+                'description' => 'Use last recorded values on graphs',
+                'help' => 'Use last recorded values instead of averages while drawing graphs',
+            ],
             'global_search_result_limit' => [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
