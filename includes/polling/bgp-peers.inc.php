@@ -208,10 +208,27 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 $address = IP::fromHexString($address)->compressed();
                             }
                             if($address == $peer_ip){
-                                $peer_data['bgpPeerState'] = $value["fbBgpPeerState"];
+                                switch($value["fbBgpPeerState"]){
+                                    case 0:
+                                        $peer_data['bgpPeerState'] = "Idle";
+                                        break;
+                                    case 1:
+                                    case 2:
+                                        $peer_data['bgpPeerState'] = "Active";
+                                        break;
+                                    case 3:
+                                        $peer_data['bgpPeerState'] = "OpenSent";
+                                        break;
+                                    case 4:
+                                        $peer_data['bgpPeerState'] = 5;
+                                        break;
+                                    case 5:
+                                        $peer_data['bgpPeerState'] = 6;
+                                        break;
+                                }
                                 $peer_data['bgpPeerRemoteAddr'] = $address;
                                 $peer_data['bgpPeerRemoteAs'] = $value["fbBgpPeerRemoteAS"];
-                                $peer_data['bgpPeerAdminStatus'] = $value["fbBgpPeerState"];
+                                $peer_data['bgpPeerAdminStatus'] = 2;
                                 $peer_data['bgpPeerInUpdates'] = 0;
                                 $peer_data['bgpPeerOutUpdates'] = 0;
                                 $peer_data['bgpPeerInTotalMessages'] = 0;
