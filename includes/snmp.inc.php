@@ -467,6 +467,11 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
     foreach (explode("\n", $data) as $entry) {
+        if (! Str::contains($entry, ' =') && ! empty($entry) && isset($index, $oid)) {
+            $array[$index][$oid] .= "\n$entry";
+            continue;
+        }
+
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
@@ -719,13 +724,6 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
     return $array;
 }//end snmpwalk_cache_threepart_oid()
 
-function snmp_cache_oid($oid, $device, $array, $mib = 0)
-{
-    $array = snmpwalk_cache_oid($device, $oid, $array, $mib);
-
-    return $array;
-}//end snmp_cache_oid()
-
 /**
  * generate snmp auth arguments
  * @param array $device
@@ -785,7 +783,7 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     if (oid_is_numeric($oid)) {
         $default_options = '-Os';
     } else {
-        if ($mib != 'ALL') {
+        if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
             $oid = "$mib::$oid";
         }
         $default_options = '-On';
@@ -882,5 +880,5 @@ function get_device_max_repeaters($device)
  */
 function oid_is_numeric($oid)
 {
-    return (bool) preg_match('/^[.\d]+$/', $oid);
+    return \LibreNMS\Device\YamlDiscovery::oidIsNumeric($oid);
 }

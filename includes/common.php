@@ -17,11 +17,12 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
-use LibreNMS\Util\OS;
+use Symfony\Component\Process\Process;
 
 function generate_priority_label($priority)
 {
@@ -87,7 +88,9 @@ function external_exec($command)
 {
     global $debug, $vdebug;
 
-    $proc = new \Symfony\Component\Process\Process($command);
+    $device = DeviceCache::getPrimary();
+
+    $proc = new Process($command);
     $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
     if ($debug && ! $vdebug) {
@@ -120,6 +123,16 @@ function external_exec($command)
 
     $proc->run();
     $output = $proc->getOutput();
+
+    if ($proc->getExitCode()) {
+        if (Str::startsWith($proc->getErrorOutput(), 'Invalid authentication protocol specified')) {
+            Log::event('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+        } elseif (Str::startsWith($proc->getErrorOutput(), 'Invalid privacy protocol specified')) {
+            Log::event('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+        }
+        d_echo('Exitcode: ' . $proc->getExitCode());
+        d_echo($proc->getErrorOutput());
+    }
 
     if ($debug && ! $vdebug) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
@@ -476,69 +489,22 @@ function formatRates($value, $round = '2', $sf = '3')
 
 function formatStorage($value, $round = '2', $sf = '3')
 {
-    $value = format_bi($value, $round) . 'B';
-
-    return $value;
+    return \LibreNMS\Util\Number::formatBi($value, $round, $sf);
 }
 
-function format_si($value, $round = '2', $sf = '3')
+function format_si($value, $round = 2, $sf = 3)
 {
-    $neg = 0;
-    if ($value < '0') {
-        $neg = 1;
-        $value = $value * -1;
-    }
-
-    if ($value >= '0.1') {
-        $sizes = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
-        $ext = $sizes[0];
-        for ($i = 1; (($i < count($sizes)) && ($value >= 1000)); $i++) {
-            $value = $value / 1000;
-            $ext = $sizes[$i];
-        }
-    } else {
-        $sizes = ['', 'm', 'u', 'n', 'p'];
-        $ext = $sizes[0];
-        for ($i = 1; (($i < count($sizes)) && ($value != 0) && ($value <= 0.1)); $i++) {
-            $value = $value * 1000;
-            $ext = $sizes[$i];
-        }
-    }
-
-    if ($neg == 1) {
-        $value = $value * -1;
-    }
-
-    return (number_format(round($value, $round), $sf, '.', '') + 0) . ' ' . $ext;
+    return \LibreNMS\Util\Number::formatSi($value, $round, $sf, '');
 }
 
-function format_bi($value, $round = '2', $sf = '3')
+function format_bi($value, $round = 2, $sf = 3)
 {
-    if ($value < '0') {
-        $neg = 1;
-        $value = $value * -1;
-    }
-    $sizes = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
-    $ext = $sizes[0];
-    for ($i = 1; (($i < count($sizes)) && ($value >= 1024)); $i++) {
-        $value = $value / 1024;
-        $ext = $sizes[$i];
-    }
-
-    if ($neg) {
-        $value = $value * -1;
-    }
-
-    return (number_format(round($value, $round), $sf, '.', '') + 0) . ' ' . $ext;
+    return \LibreNMS\Util\Number::formatBi($value, $round, $sf, '');
 }
 
-function format_number($value, $base = '1000', $round = 2, $sf = 3)
+function format_number($value, $base = 1000, $round = 2, $sf = 3)
 {
-    if ($base == '1000') {
-        return format_si($value, $round, $sf);
-    } else {
-        return format_bi($value, $round, $sf);
-    }
+    return \LibreNMS\Util\Number::formatBase($value, $base, $round, $sf, '');
 }
 
 function is_valid_hostname($hostname)
@@ -831,6 +797,18 @@ function version_info($remote = false)
 
     return $output;
 }//end version_info()
+
+/**
+ * checks if System is SNMPv3 SHA2 Capable for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
+ * @return bool
+ */
+function snmpv3_sha2_capable()
+{
+    $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
+    $process->run();
+
+    return Str::contains($process->getErrorOutput(), 'SHA-512');
+}
 
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.

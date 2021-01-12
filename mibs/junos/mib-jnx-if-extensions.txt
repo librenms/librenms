@@ -11,13 +11,13 @@ JUNIPER-IF-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
-    Gauge32, Integer32, Counter64, Counter32
+    Gauge32, Integer32, Counter64, Counter32, Unsigned32, TimeTicks
         FROM SNMPv2-SMI
     CounterBasedGauge64
         FROM HCNUM-TC
     ifEntry,ifIndex
         FROM IF-MIB
-    TimeStamp
+    TimeStamp, TruthValue
         FROM SNMPv2-TC    
     jnxMibs
         FROM JUNIPER-SMI;
@@ -28,7 +28,7 @@ ifJnx MODULE-IDENTITY
     CONTACT-INFO
             "        Juniper Technical Assistance Center
                      Juniper Networks, Inc.
-                     1194 N. Mathilda Avenue
+                     1133 Innovation Way
                      Sunnyvale, CA 94089
                      E-mail: support@juniper.net"
 
@@ -60,10 +60,13 @@ ifJnx MODULE-IDENTITY
     DESCRIPTION
             "Initial Version"
             
-            
+    REVISION     "201510150000Z"         -- 16 April, 2018
+    DESCRIPTION
+            "Adding table for ifJnxMediaTable"
+    REVISION     "202001010000Z"         -- 01 Jan, 2020
+    DESCRIPTION
+            "New object ifJnxInputErrors added"
     ::= { jnxMibs 3 }
-
-
 
 
 --
@@ -128,7 +131,8 @@ ifJnx MODULE-IDENTITY
         ifJnxCrcErrors         Counter64,
         ifJnxFcsErrors         Counter64,
 	    ifHCIn1SecOctets	   CounterBasedGauge64,
-	    ifHCOut1SecOctets	   CounterBasedGauge64
+	    ifHCOut1SecOctets	   CounterBasedGauge64,
+        ifJnxInputErrors       Counter64
 	}
 
     ifIn1SecRate OBJECT-TYPE
@@ -454,6 +458,14 @@ ifJnx MODULE-IDENTITY
 		This object is a 64 bit version of ifOut1SecOctets."
 	::= { ifJnxEntry 35 }
 
+    ifJnxInputErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Errors: Includes all the input errors except the L3 incompletes
+                 Same as ifJnxInErrors - ifJnxInL3Incompletes"
+    ::= { ifJnxEntry 36 }
 
 --
 -- This table augments ifTable to map to Chassis MIB tables
@@ -488,7 +500,7 @@ ifJnx MODULE-IDENTITY
 	    ifChassisPic   	   Integer32,
 	    ifChassisPort  	   Integer32,
 	    ifChassisChannel       Integer32,
-	    ifChassisLogicalUnit   Integer32,
+	    ifChassisLogicalUnit   Unsigned32,
 	    ifChassisPicIndex	   OCTET STRING
 	}
 
@@ -558,7 +570,7 @@ ifJnx MODULE-IDENTITY
 
 
     ifChassisLogicalUnit OBJECT-TYPE
-	SYNTAX      Integer32
+	SYNTAX      Unsigned32
 	MAX-ACCESS  read-only
 	STATUS      current
 	DESCRIPTION
@@ -943,5 +955,225 @@ ifJnx MODULE-IDENTITY
         DESCRIPTION
                 "Logical Interface Policer Output Drop 1 Sec Rate"
     ::= { ifJnxPolEntry 30 }
+
+--
+-- This table augments ifTable
+--
+    ifJnxMediaTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IfJnxMediaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A list of Juniper's extension to the interface media entries.
+                The number of entries is given by the value of ifNumber.
+                This table contains additional objects for the interface
+                table."
+
+
+        ::= { ifJnx 5 }
+
+    ifJnxMediaEntry      OBJECT-TYPE
+        SYNTAX      IfJnxMediaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "An entry containing additional management information
+                applicable to a particular interface."
+        INDEX  { ifIndex }
+        ::= { ifJnxMediaTable 1 }
+
+
+    IfJnxMediaEntry ::=
+        SEQUENCE {
+
+        ifJnxMediaType                    INTEGER,
+        ifJnxMediaConfigSpeed             Gauge32,
+        ifJnxMediaSpeed                   Gauge32,
+        ifJnxMediaMaxSpeed                Gauge32,
+        ifJnxMediaMode                    INTEGER,
+        ifJnxMediaConfigMode              INTEGER,
+        ifJnxMediaAutoNegotiationEnabled  TruthValue,
+        ifJnxMediaLastFlap                TimeTicks,
+        ifJnxMediaLastUpdate              TimeTicks,
+        ifJnxMediaConfigHighSpeed         Gauge32,
+        ifJnxMediaConfigSpeedMap          BITS,
+        ifJnxMediaHighSpeed               Gauge32
+
+        }
+
+    ifJnxMediaType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    copper(1),
+                    fiber(2),
+                    others(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The Media type of an interface."
+    ::= { ifJnxMediaEntry 1 }
+
+    ifJnxMediaConfigSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An estimate of the interface's configured bandwidth in bits
+            per second.  If the bandwidth of the interface is greater than the
+            maximum value reportable by this object then this object should
+            report its maximum value (4,294,967,295) and 
+            ifJnxMediaConfigHighSpeed must be used to report the interface's 
+            config speed. An interface which is configured to auto-negotiate,
+            this speed will be zero. An interface which is configured to
+            auto-negotiate with 10m-100m, this speed will be one."
+    ::= { ifJnxMediaEntry 2 }
+
+    ifJnxMediaSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An estimate of the interface's current bandwidth in bits
+            per second.  If the bandwidth of the interface is greater than the
+            maximum value reportable by this object then this object should
+            report its maximum value (4,294,967,295). For a sub-layer which has
+            no concept of bandwidth, this object should be zero."
+    ::= { ifJnxMediaEntry 3 }
+
+    ifJnxMediaMaxSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The value of maximum Speed that an interface can support in units
+             of Gbps."
+    ::= { ifJnxMediaEntry 4 }
+
+    ifJnxMediaMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    halfDuplex(1),
+                    fullDuplex(2),
+                    others(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An interface's current link mode."
+    ::= { ifJnxMediaEntry 5 }
+
+    ifJnxMediaConfigMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    halfDuplex(1),
+                    fullDuplex(2),
+                    auto(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An interface's configured link mode."
+    ::= { ifJnxMediaEntry 6 }
+
+    ifJnxMediaAutoNegotiationEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate whether port Auto-negotiation
+             is enabled on the given physical port."
+    ::= { ifJnxMediaEntry 7 }
+
+    ifJnxMediaLastFlap OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The value of time from the last flap of interface state."
+    ::= { ifJnxMediaEntry 8 }
+
+    ifJnxMediaLastUpdate OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The value of time from the last update of interface state."
+    ::= { ifJnxMediaEntry 9 }
+
+    ifJnxMediaConfigHighSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An estimate of the interface's configured bandwidth in units
+            of 1,000,000 bits per second. For interfaces
+            which do not vary in bandwidth or for those where no
+            accurate estimation can be made, this object should contain
+            the nominal bandwidth."
+    ::= { ifJnxMediaEntry 10 }
+
+    ifJnxMediaConfigSpeedMap OBJECT-TYPE
+    SYNTAX BITS {
+                  auto(0),
+                  mbps10(1),
+                  mbps100(2),
+                  mbps1000(3),
+                  mbps2500(4),
+                  mbps5000(5),
+                  mbps10000(6),
+                  mbps25000(7),
+                  mbps40000(8),
+                  mbps50000(9),
+                  mbps100000(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An estimate of the interface's configured bandwidth.
+
+                The bit 'auto(0)' indicates that the speed configured is 
+                auto-negotiation.
+
+                The bit 'mbps10(1)' indicates that the speed configured is 
+                10mbps.
+
+                The bit 'mbps100(2)' indicates that the speed configured is 
+                100mbps.
+
+                The bit 'mbps1000(3)' indicates that the speed configured is 
+                1000mbps.
+
+                The bit 'mbps2500(4)' indicates that the speed configured is 
+                2500mbps.
+                
+                The bit 'mbps5000(5)' indicates that the speed configured is 
+                5000mbps.
+
+                The bit 'mbps10000(6)' indicates that the speed configured is 
+                10000mbps.
+
+                The bit 'mbps25000(7)' indicates that the speed configured is 
+                25000mbps.
+
+                The bit 'mbps40000(8)' indicates that the speed configured is 
+                40000mbps.
+
+                The bit 'mbps50000(9)' indicates that the speed configured is 
+                50000mbps.
+
+                The bit 'mbps100000(10)' indicates that the speed configured is 
+                100000mbps."
+
+    ::= { ifJnxMediaEntry 11 }
+
+    ifJnxMediaHighSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An estimate of the interface's current bandwidth in units
+            of 1,000,000 bits per second. For interfaces
+            which do not vary in bandwidth or for those where no
+            accurate estimation can be made, this object should contain
+            the nominal bandwidth."
+    ::= { ifJnxMediaEntry 12 }
 
 END

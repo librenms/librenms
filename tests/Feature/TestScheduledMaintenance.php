@@ -16,7 +16,7 @@ class TestScheduledMaintenance extends DBTestCase
     {
         $now = CarbonImmutable::now();
 
-        $schedule = factory(AlertSchedule::class)->make();
+        $schedule = AlertSchedule::factory()->make();
         $schedule->start = $now->subHour();
         $schedule->end = $now->addHour();
         $schedule->save();
@@ -38,7 +38,7 @@ class TestScheduledMaintenance extends DBTestCase
     public function testRecurringNormal()
     {
         $this->setTimezone('America/New_York');
-        $schedule = factory(AlertSchedule::class)->state('recurring')->make();
+        $schedule = AlertSchedule::factory()->recurring()->make();
         $schedule->recurring_day = '1,2,3,4,5';
         $schedule->start = Carbon::parse('2020-09-10 2:00');
         $schedule->end = Carbon::parse('9000-09-09 20:00');

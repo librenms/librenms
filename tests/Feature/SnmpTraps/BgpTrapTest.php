@@ -33,8 +33,8 @@ class BgpTrapTest extends SnmpTrapTestCase
 {
     public function testBgpUp()
     {
-        $device = factory(Device::class)->create();
-        $bgppeer = factory(BgpPeer::class)->make(['bgpPeerState' => 'idle']);
+        $device = Device::factory()->create();
+        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'idle']);
         $device->bgppeers()->save($bgppeer);
 
         $trapText = "$device->hostname
@@ -56,8 +56,8 @@ BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n";
 
     public function testBgpDown()
     {
-        $device = factory(Device::class)->create();
-        $bgppeer = factory(BgpPeer::class)->make(['bgpPeerState' => 'established']);
+        $device = Device::factory()->create();
+        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'established']);
         $device->bgppeers()->save($bgppeer);
 
         $trapText = "$device->hostname

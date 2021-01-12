@@ -70,10 +70,10 @@ alert_log:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_log_device_id_index: { Name: alert_log_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-    alert_log_rule_id_index: { Name: alert_log_rule_id_index, Columns: [rule_id], Unique: false, Type: BTREE }
-    alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
     alert_log_rule_id_device_id_index: { Name: alert_log_rule_id_device_id_index, Columns: [rule_id, device_id], Unique: false, Type: BTREE }
     alert_log_rule_id_device_id_state_index: { Name: alert_log_rule_id_device_id_state_index, Columns: [rule_id, device_id, state], Unique: false, Type: BTREE }
+    alert_log_rule_id_index: { Name: alert_log_rule_id_index, Columns: [rule_id], Unique: false, Type: BTREE }
+    alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
 alert_rules:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -499,9 +499,9 @@ devices:
     - { Field: authlevel, Type: 'enum(''noAuthNoPriv'',''authNoPriv'',''authPriv'')', 'Null': true, Extra: '' }
     - { Field: authname, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: authpass, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: authalgo, Type: 'enum(''MD5'',''SHA'')', 'Null': true, Extra: '' }
+    - { Field: authalgo, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: cryptopass, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: cryptoalgo, Type: 'enum(''AES'',''DES'','''')', 'Null': true, Extra: '' }
+    - { Field: cryptoalgo, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: snmpver, Type: varchar(4), 'Null': false, Extra: '', Default: v2c }
     - { Field: port, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '161' }
     - { Field: transport, Type: varchar(16), 'Null': false, Extra: '', Default: udp }
@@ -896,15 +896,19 @@ mempools:
     - { Field: mempool_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: mempool_index, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: entPhysicalIndex, Type: int, 'Null': true, Extra: '' }
-    - { Field: hrDeviceIndex, Type: int, 'Null': true, Extra: '' }
     - { Field: mempool_type, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mempool_class, Type: varchar(32), 'Null': false, Extra: '', Default: system }
     - { Field: mempool_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
-    - { Field: mempool_descr, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: mempool_descr, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mempool_perc, Type: int, 'Null': false, Extra: '' }
+    - { Field: mempool_perc_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_used, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_used_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_free, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_free_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_total, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: mempool_total_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_largestfree, Type: bigint, 'Null': true, Extra: '' }
     - { Field: mempool_lowestfree, Type: bigint, 'Null': true, Extra: '' }
     - { Field: mempool_deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
@@ -1177,7 +1181,7 @@ ospf_areas:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfAreaId, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfAuthType, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: ospfAuthType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ospfImportAsExtern, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: ospfSpfRuns, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfAreaBdrRtrCount, Type: int, 'Null': false, Extra: '' }
@@ -1260,6 +1264,11 @@ ospf_ports:
     - { Field: ospfIfMulticastForwarding, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfDemand, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfAuthType, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricIpAddress, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricAddressLessIf, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricTOS, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricValue, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfMetricStatus, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -1973,7 +1982,7 @@ vminfo:
     - { Field: vmwVmGuestOS, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: vmwVmMemSize, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmCpus, Type: int, 'Null': false, Extra: '' }
-    - { Field: vmwVmState, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: vmwVmState, Type: 'smallint unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     vminfo_device_id_index: { Name: vminfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

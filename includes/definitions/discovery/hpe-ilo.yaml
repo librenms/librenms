@@ -1,5 +1,20 @@
 mib: CPQHLTH-MIB:CPQIDA-MIB:CPQSTDEQ-MIB:CPQHOST-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: CPQHOST-MIB::cpqHoPhysicalMemorySize
+                free: CPQHOST-MIB::cpqHoPhysicalMemoryFree
+                index: 0
+                precision: 1048576
+                descr: 'Physical Memory'
+            -
+                total: CPQHOST-MIB::cpqHoPagingMemorySize
+                free: CPQHOST-MIB::cpqHoPagingMemoryFree
+                index: 1
+                precision: 1048576
+                descr: 'Paging Memory'
+
     os:
         sysDescr_regex: '/Integrated Lights-Out \d (?<version>[\d.]+)/'
         hardware: CPQSINFO-MIB::cpqSiProductName.0

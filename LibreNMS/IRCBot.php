@@ -266,8 +266,11 @@ class IRCBot
                 default:
                     $severity_extended = '';
             }
+            $severity = '';
+            if (isset($alert['severity'])) {
+                $severity = str_replace(['warning', 'critical', 'normal'], [$this->_color('Warning', 'yellow'), $this->_color('Critical', 'red'), $this->_color('Info', 'lightblue')], $alert['severity']) . $severity_extended . ' ';
+            }
 
-            $severity = str_replace(['warning', 'critical'], [$this->_color('Warning', 'yellow'), $this->_color('Critical', 'red')], $alert['severity']) . $severity_extended . ' ';
             if ($alert['state'] == AlertState::RECOVERED and $this->config['irc_alert_utf8']) {
                 $severity = str_replace(['Warning', 'Critical'], ['̶W̶a̶r̶n̶i̶n̶g', '̶C̶r̶i̶t̶i̶c̶a̶l'], $severity);
             }
@@ -275,14 +278,13 @@ class IRCBot
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
                     $this->sendAlert($chan, $severity, $alert);
+                    $this->ircRaw('BOTFLOODCHECK');
                 }
-
-                return;
-            }//end if
-
-            foreach ($this->authd as $nick => $data) {
-                if ($data['expire'] >= time()) {
-                    $this->sendAlert($nick, $severity, $alert);
+            } else {
+                foreach ($this->authd as $nick => $data) {
+                    if ($data['expire'] >= time()) {
+                        $this->sendAlert($nick, $severity, $alert);
+                    }
                 }
             }
         }
@@ -393,7 +395,12 @@ class IRCBot
 
                 return $this->ircRaw('NICK ' . $this->tempnick);
             }
-
+            if ($ex[1] == 421) {
+                // Unknown command
+                if ($ex[3] == 'BOTFLOODCHECK') {
+                    $this->floodcount = 0;
+                }
+            }
             $this->command = str_replace([chr(10), chr(13)], '', $ex[3]);
             if (strstr($this->command, ':.')) {
                 $this->handleCommand();
@@ -773,22 +780,54 @@ class IRCBot
     private function _log($params)
     {
         $num = 1;
-        if ($params > 1) {
-            $num = $params;
+        $hostname = '';
+        $params = explode(' ', $params);
+        if ($params[0] > 1) {
+            $num = $params[0];
         }
-
+        if (strlen($params[1]) > 0) {
+            $hostname = preg_replace("/[^A-z0-9\.\-]/", '', $params[1]);
+        }
+        $hostname = $hostname . '%';
         if ($this->user['level'] < 5) {
-            $tmp = dbFetchRows('SELECT `event_id`,`device_id`,`datetime`,`message`,`type` FROM `eventlog` WHERE `device_id` IN (' . implode(',', $this->user['devices']) . ') ORDER BY `event_id` DESC LIMIT ' . (int) $num);
+            $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname . '" and eventlog.device_id IN (' . implode(',', $this->user['devices']) . ') ORDER BY `event_id` DESC LIMIT ' . (int) $num);
         } else {
-            $tmp = dbFetchRows('SELECT `event_id`,`device_id`,`datetime`,`message`,`type` FROM `eventlog` ORDER BY `event_id` DESC LIMIT ' . (int) $num);
+            $tmp = dbFetchRows('SELECT `event_id`, eventlog.device_id, devices.hostname, `datetime`,`message`, eventlog.type FROM `eventlog`, `devices` WHERE eventlog.device_id=devices.device_id and devices.hostname like "' . $hostname . '" ORDER BY `event_id` DESC LIMIT ' . (int) $num);
         }
 
-        foreach ($tmp as $device) {
-            $hostid = dbFetchRow('SELECT `hostname` FROM `devices` WHERE `device_id` = ' . $device['device_id']);
-            $this->respond($device['event_id'] . ' ' . $hostid['hostname'] . ' ' . $device['datetime'] . ' ' . $device['message'] . ' ' . $device['type']);
+        foreach ($tmp as $logline) {
+            $response = $logline['datetime'] . ' ';
+            $response .= $this->_color($hostid['hostname'], null, null, 'bold') . ' ';
+            if ($this->config['irc_alert_utf8']) {
+                if (preg_match('/critical alert/', $logline['message'])) {
+                    $response .= preg_replace('/critical alert/', $this->_color('critical alert', 'red'), $logline['message']) . ' ';
+                } elseif (preg_match('/warning alert/', $logline['message'])) {
+                    $response .= preg_replace('/warning alert/', $this->_color('warning alert', 'yellow'), $logline['message']) . ' ';
+                } elseif (preg_match('/recovery/', $logline['message'])) {
+                    $response .= preg_replace('/recovery/', $this->_color('recovery', 'green'), $logline['message']) . ' ';
+                } else {
+                    $response .= $logline['message'] . ' ';
+                }
+            } else {
+                $response .= $logline['message'] . ' ';
+            }
+            if ($logline['type'] != 'NULL') {
+                $response .= $logline['type'] . ' ';
+            }
+            if ($this->config['irc_floodlimit'] > 100) {
+                $this->floodcount += strlen($response);
+            } elseif ($this->config['irc_floodlimit'] > 1) {
+                $this->floodcount += 1;
+            }
+            if (($this->config['irc_floodlimit'] > 0) && ($this->floodcount > $this->config['irc_floodlimit'])) {
+                $this->ircRaw('BOTFLOODCHECK');
+                sleep(2);
+                $this->floodcount = 0;
+            }
+            $this->respond($response);
         }
 
-        if (! $hostid) {
+        if (! $tmp) {
             $this->respond('Nothing to see, maybe a bug?');
         }
 

@@ -1,5 +1,10 @@
 mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB:ZYXEL-MGS3712-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: ZYXEL-ES-COMMON::sysMgmtMemUsage
+                type: zyxel
     processors:
         data:
             -

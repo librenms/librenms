@@ -24,10 +24,41 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Models\Mempool;
+use Closure;
+use Exception;
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 
 trait HostResources
 {
+    private $hrStorage;
+    private $memoryStorageTypes = [
+        'hrStorageVirtualMemory',
+        'hrStorageRam',
+        'hrStorageOther',
+    ];
+    private $ignoreMemoryDescr = [
+        'MALLOC',
+        'UMA',
+        'procfs',
+        '/proc',
+    ];
+    private $validOtherMemory = [
+        'Memory buffers',
+        'Cached memory',
+        'Shared memory',
+    ];
+    private $memoryDescrWarn = [
+        'Cached memory' => 0,
+        'Memory buffers' => 0,
+        'Physical memory' => 99,
+        'Real memory' => 90,
+        'Shared memory' => 0,
+        'Swap space' => 10,
+        'Virtual memory' => 95,
+    ];
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -48,7 +79,7 @@ trait HostResources
             }
 
             $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
 
@@ -106,5 +137,53 @@ trait HostResources
         }
 
         return $processors;
+    }
+
+    public function discoverMempools()
+    {
+        $hr_storage = $this->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
+
+        if (! is_array($hr_storage)) {
+            return collect();
+        }
+
+        $ram_bytes = snmp_get($this->getDeviceArray(), 'hrMemorySize.0', '-OQUv', 'HOST-RESOURCES-MIB') * 1024
+            ?: (isset($hr_storage[1]['hrStorageSize']) ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits'] : 0);
+
+        return collect($hr_storage)->filter(Closure::fromCallable([$this, 'memValid']))
+            ->map(function ($storage, $index) use ($ram_bytes) {
+                $total = $storage['hrStorageSize'];
+                if (Str::contains($storage['hrStorageDescr'], 'Real Memory Metrics') || ($storage['hrStorageType'] == 'hrStorageOther' && $total != 0)) {
+                    // use total RAM for buffers, cached, and shared
+                    // bsnmp does not report the same as net-snmp, total RAM is stored in hrMemorySize
+                    if ($ram_bytes) {
+                        $total = $ram_bytes / $storage['hrStorageAllocationUnits']; // will be calculated with this entries allocation units later
+                    }
+                }
+
+                return (new Mempool([
+                    'mempool_index' => $index,
+                    'mempool_type' => 'hrstorage',
+                    'mempool_precision' => $storage['hrStorageAllocationUnits'],
+                    'mempool_descr' => $storage['hrStorageDescr'],
+                    'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
+                    'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
+                    'mempool_total_oid' => null,
+                ]))->setClass(null, $storage['hrStorageType'] == 'hrStorageVirtualMemory' ? 'virtual' : 'system')
+                    ->fillUsage($storage['hrStorageUsed'], $total);
+            });
+    }
+
+    protected function memValid($storage)
+    {
+        if (! in_array($storage['hrStorageType'], $this->memoryStorageTypes)) {
+            return false;
+        }
+
+        if ($storage['hrStorageType'] == 'hrStorageOther' && ! in_array($storage['hrStorageDescr'], $this->validOtherMemory)) {
+            return false;
+        }
+
+        return ! Str::contains($storage['hrStorageDescr'], $this->ignoreMemoryDescr);
     }
 }

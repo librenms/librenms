@@ -1,5 +1,9 @@
 mib: AH-SYSTEM-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: AH-SYSTEM-MIB::ahMemUtilization
     os:
         sysDescr_regex: '/^(?<hardware>.*), HiveOS (?<version>.*)$/'
         hardware: AH-SYSTEM-MIB::ahDeviceMode.0

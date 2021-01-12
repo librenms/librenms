@@ -54,7 +54,7 @@ if (getenv('DBTEST')) {
 
     // create testing table if needed
     $db_config = \config('database.connections.testing');
-    $connection = new PDO("mysql:host={$db_config['host']}", $db_config['username'], $db_config['password']);
+    $connection = new PDO("mysql:host={$db_config['host']};port={$db_config['port']}", $db_config['username'], $db_config['password']);
     $result = $connection->query("CREATE DATABASE IF NOT EXISTS {$db_config['database']} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
     if ($connection->errorCode() == '42000') {
         echo implode(' ', $connection->errorInfo()) . PHP_EOL;

@@ -42,6 +42,7 @@ path: blob/master/doc/
 - [My alert templates stopped working](#my-alert-templates-stopped-working)
 - [How do I use trend prediction in graphs](#how-do-i-use-trend-prediction-in-graphs)
 - [How do I move only the DB to another server](#move-db-to-another-server)
+- [What are the "optional requirements message" when I add SNMPv3 devices](#optional-requirements-for-snmpv3-sha2-auth)
 
 # Developing
 
@@ -54,7 +55,7 @@ path: blob/master/doc/
 
 This is currently well documented within the doc folder of the installation files.
 
-Please see the following [doc](http://docs.librenms.org/Installation/Installing-LibreNMS/)
+Please see the following [doc](../Installation/Installing-LibreNMS.md)
 
 ## <a name="faq2"> How do I add a device?</a>
 
@@ -139,14 +140,12 @@ bottom of every page that will show you detailed debug information.
 
 ## <a name="faq11"> How do I debug the discovery process?</a>
 
-Please see the [Discovery
-Support](http://docs.librenms.org/Support/Discovery Support/) document
+Please see the [Discovery Support](Discovery%20Support.md) document
 for further details.
 
 ## <a name="faq12"> How do I debug the poller process?</a>
 
-Please see the [Poller
-Support](http://docs.librenms.org/Support/Poller Support/) document
+Please see the [Poller Support](Poller%20Support.md) document
 for further details.
 
 ## <a name="faq14"> Why do I get a lot apache or rrdtool zombies in my process list?</a>
@@ -184,7 +183,7 @@ ifIn/OutOctets value and record that. Now, it appears as though all of
 the traffic since it stopped getting values have occurred in the last
 5 minute interval.
 
-So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittant network connectivity, broken poller, and more.
+So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittent network connectivity, broken poller, and more.
 
 ## <a name="faq17"> Why do I see gaps in my graphs?</a>
 
@@ -198,7 +197,7 @@ Modules Performance. Take a look at what modules are taking the
 longest and disabled un used modules.
 
 If you poll a large number of devices / ports then it's recommended to
-run a local recurisve dns server such as pdns-recursor.
+run a local recursive dns server such as pdns-recursor.
 
 Running RRDCached is also highly advised in larger installs but has
 benefits no matter the size.
@@ -268,7 +267,7 @@ do so by setting `$config['uptime_warning'] = '84600';` in
 ## <a name="faq23"> Why do I not see all interfaces in the Overall traffic graph for a device?</a>
 
 By default numerous interface types and interface descriptions are
-excluded from this graph. The excluded defailts are:
+excluded from this graph. The excluded defaults are:
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
@@ -441,7 +440,7 @@ LibreNMS improve.
   own time.
 - Documentation. Documentation can always be improved and every little
   bit helps. Not all features are currently documented or documented
-  well, there's speeling mistakes etc. It's very easy to submit
+  well, there's spelling mistakes etc. It's very easy to submit
   updates [through the GitHub
   website](https://help.github.com/articles/editing-files-in-another-user-s-repository/),
   no git experience needed.
@@ -564,8 +563,7 @@ MySQL/MariaDB.
 ## <a name='my-alert-templates-stopped-working'>My alert templates stopped working</a>
 
 You should probably have a look in the documentation concerning the
-new template syntax:
-<https://docs.librenms.org/Alerting/Templates/>. Since version 1.42,
+new [template syntax](../Alerting/Templates.md). Since version 1.42,
 syntax changed, and you basically need to convert your templates to
 this new syntax (including the titles).
 
@@ -584,7 +582,7 @@ To view a prediction:
 You should now see a linear prediction line on the graph.
 ## <a name='move-db-to-another-server'>How do I move only the DB to another server?</a>
 
-There is already a reference how to move your whole LNMS installation to another server. But the following steps will help you to split up an "All-in-one" installation to one LibreNMS installation with a seperate database install. 
+There is already a reference how to move your whole LNMS installation to another server. But the following steps will help you to split up an "All-in-one" installation to one LibreNMS installation with a separate database install. 
 *Note: This section assumes you have a MySQL/MariaDB instance
 
 - Stop the apache and mysql service in you LibreNMS installation.
@@ -604,3 +602,5 @@ exit;
 - Edit your `config.php` file to point the install to the new database server location.
 - **Very important**: On your LibreNMS server, inside your install directory is a `.env` file, in it you need to edit the `DBHOST` paramater to point to your new server location. 
 - After all this is done, enable all the cron entries again and start apache.
+## <a name='optional-requirements-for-snmpv3-sha2-auth'>What are the "optional requirements message" when I add SNMPv3 devices?</a>
+When you add a device via the WebUI you may see a little message stating "Optional requirements are not met so some options are disabled". Do not panic. This simply means your system does not contain **openssl >= 1.1** and **net-snmp >= 5.8**, which are the minimum specifications needed to be able to use AES-192,AES-256 as crypto algorithms and SHA-224|256|384|512 as auth algorithms. 

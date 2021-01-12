@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\PowerState;
 
 // FIXME should do the deletion etc in a common file perhaps? like for the sensors
 // Try to discover Libvirt Virtual Machines.
@@ -73,7 +74,8 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
                     $vmwVmGuestOS = '';
                     // libvirt does not supply this
                     exec(Config::get('virsh') . ' -rc ' . $uri . ' domstate ' . $dom_id, $vm_state);
-                    $vmwVmState = ucfirst($vm_state[0]);
+                    $vmwVmState = PowerState::STATES[strtolower($vm_state[0])] ?? PowerState::UNKNOWN;
+                    unset($vm_state);
 
                     $vmwVmCpus = $xml->vcpu['current'];
                     if (! isset($vmwVmCpus)) {

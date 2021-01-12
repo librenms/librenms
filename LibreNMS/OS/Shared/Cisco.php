@@ -26,8 +26,11 @@
 namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
+use App\Models\Mempool;
 use App\Models\PortsNac;
+use Illuminate\Support\Arr;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
@@ -35,7 +38,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\Util\IP;
 
-class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
+class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, MempoolsDiscovery, NacPolling
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -110,6 +113,92 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
         $device->hardware = $hardware ?: snmp_translate($device->sysObjectID, 'SNMPv2-MIB:CISCO-PRODUCTS-MIB', 'cisco');
     }
 
+    public function discoverMempools()
+    {
+        if ($this->hasYamlDiscovery('mempools')) {
+            return parent::discoverMempools(); // yaml
+        }
+
+        $mempools = collect();
+        $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
+
+        foreach (Arr::wrap($cemp) as $index => $entry) {
+            if (is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == 'true') {
+                [$entPhysicalIndex] = explode('.', $index);
+                $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entPhysicalIndex];
+                $descr = ucwords($entPhysicalName . ' - ' . $entry['cempMemPoolName']);
+                $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
+
+                $mempools->push((new Mempool([
+                    'mempool_index' => $index,
+                    'entPhysicalIndex' => $entPhysicalIndex,
+                    'mempool_type' => 'cemp',
+                    'mempool_class' => 'system',
+                    'mempool_precision' => 1,
+                    'mempool_descr' => $descr,
+                    'mempool_used_oid' => isset($entry['cempMemPoolHCUsed']) ? ".1.3.6.1.4.1.9.9.221.1.1.1.1.18.$index" : ".1.3.6.1.4.1.9.9.221.1.1.1.1.7.$index",
+                    'mempool_free_oid' => isset($entry['cempMemPoolHCFree']) ? ".1.3.6.1.4.1.9.9.221.1.1.1.1.20.$index" : ".1.3.6.1.4.1.9.9.221.1.1.1.1.8.$index",
+                    'mempool_perc_warn' => 90,
+                    'mempool_largestfree' => $entry['cempMemPoolHCLargestFree'] ?? $entry['cempMemPoolLargestFree'] ?? null,
+                    'mempool_lowestfree' => $entry['cempMemPoolHCLowestFree'] ?? $entry['cempMemPoolLowestFree'] ?? null,
+                ]))->fillUsage($entry['cempMemPoolHCUsed'] ?? $entry['cempMemPoolUsed'], null, $entry['cempMemPoolHCFree'] ?? $entry['cempMemPoolFree']));
+            }
+        }
+
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        $cmp = snmpwalk_cache_oid($this->getDeviceArray(), 'ciscoMemoryPool', [], 'CISCO-MEMORY-POOL-MIB');
+        foreach (Arr::wrap($cmp) as $index => $entry) {
+            if (is_numeric($entry['ciscoMemoryPoolUsed']) && is_numeric($index)) {
+                $mempools->push((new Mempool([
+                    'mempool_index' => $index,
+                    'mempool_type' => 'cmp',
+                    'mempool_class' => 'system',
+                    'mempool_precision' => 1,
+                    'mempool_descr' => $entry['ciscoMemoryPoolName'],
+                    'mempool_used_oid' => ".1.3.6.1.4.1.9.9.48.1.1.1.5.$index",
+                    'mempool_free_oid' => ".1.3.6.1.4.1.9.9.48.1.1.1.6.$index",
+                    'mempool_perc_warn' => 90,
+                    'mempool_largestfree' => $entry['ciscoMemoryPoolLargestFree'] ?? null,
+                ]))->fillUsage($entry['ciscoMemoryPoolUsed'], null, $entry['ciscoMemoryPoolFree']));
+            }
+        }
+
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        $cpm = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
+
+        $count = 0;
+        foreach (Arr::wrap($cpm) as $index => $entry) {
+            $count++;
+            if (is_numeric($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
+                $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
+
+                $mempools->push((new Mempool([
+                    'mempool_index' => $index,
+                    'mempool_type' => 'cpm',
+                    'mempool_class' => 'system',
+                    'mempool_precision' => 1024,
+                    'mempool_descr' => "$cpu Memory",
+                    'mempool_used_oid' => empty($entry['cpmCPUMemoryHCUsed']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.12.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.17.$index",
+                    'mempool_free_oid' => empty($entry['cpmCPUMemoryHCFree']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.13.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.19.$index",
+                    'mempool_perc_warn' => 90,
+                    'mempool_lowestfree' => $entry['cpmCPUMemoryHCLowest'] ?? $entry['cpmCPUMemoryLowest'] ?? null,
+                ]))->fillUsage(
+                    empty($entry['cpmCPUMemoryHCUsed']) ? $entry['cpmCPUMemoryUsed'] : $entry['cpmCPUMemoryHCUsed'],
+                    null,
+                    empty($entry['cpmCPUMemoryHCFree']) ? $entry['cpmCPUMemoryFree'] : $entry['cpmCPUMemoryHCFree']
+                ));
+            }
+        }
+
+        return $mempools;
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -118,7 +207,8 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
      */
     public function discoverProcessors()
     {
-        $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCPU', 'CISCO-PROCESS-MIB');
+        $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
+        $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
@@ -132,17 +222,8 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
                 continue; // skip bad data
             }
 
-            $entPhysicalIndex = $entry['cpmCPUTotalPhysicalIndex'];
-
-            if ($entPhysicalIndex) {
-                if ($this->isCached('entPhysicalName')) {
-                    $entPhysicalName_array = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
-                    $descr = $entPhysicalName_array[$entPhysicalIndex];
-                }
-
-                if (empty($descr)) {
-                    $descr = snmp_get($this->getDeviceArray(), 'entPhysicalName.' . $entPhysicalIndex, '-Oqv', 'ENTITY-MIB');
-                }
+            if (isset($entry['cpmCPUTotalPhysicalIndex'])) {
+                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']];
             }
 
             if (empty($descr)) {
@@ -161,7 +242,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
                         1,
                         $core_usage,
                         null,
-                        $entPhysicalIndex
+                        $entry['cpmCPUTotalPhysicalIndex']
                     );
                 }
             } else {
@@ -174,7 +255,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
                     1,
                     $usage,
                     null,
-                    $entPhysicalIndex
+                    $entry['cpmCPUTotalPhysicalIndex']
                 );
             }
         }
@@ -202,17 +283,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
             $qfp_usage = $entry['fiveMinute'];
 
             if ($entQfpPhysicalIndex) {
-                if ($this->isCached('entPhysicalName')) {
-                    $entPhysicalName_array = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
-                    $qfp_descr = $entPhysicalName_array[$entQfpPhysicalIndex];
-                }
-                if (empty($qfp_descr)) {
-                    $qfp_descr = snmp_get($this->getDeviceArray(), 'entPhysicalName.' . $entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
-                }
-            }
-
-            if (empty($qfp_descr)) {
-                $qfp_desc = "QFP $entQfpPhysicalIndex";
+                $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex];
             }
 
             $processors[] = Processor::discover(
@@ -220,7 +291,7 @@ class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
                 $this->getDeviceId(),
                 $qfp_usage_oid,
                 $entQfpPhysicalIndex . '.3',
-                $qfp_descr,
+                $qfp_descr ?? "QFP $entQfpPhysicalIndex",
                 1,
                 $qfp_usage,
                 null,

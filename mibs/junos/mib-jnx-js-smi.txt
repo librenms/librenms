@@ -54,4 +54,5 @@ jnxJsChassisCluster             OBJECT IDENTIFIER ::= { jnxJsSecurity 14 }
 jnxVoip                         OBJECT IDENTIFIER ::= { jnxJsSecurity 15 }
 jnxJsPacketMirror               OBJECT IDENTIFIER ::= { jnxJsSecurity 16 }
 jnxLsysSecurityProfile          OBJECT IDENTIFIER ::= { jnxJsSecurity 17 }
-END 
+jnxJsFlow                       OBJECT IDENTIFIER ::= { jnxJsSecurity 18 }
+END

@@ -124,9 +124,9 @@ class Database extends BaseValidation
         $db_name = dbFetchCell('SELECT DATABASE()');
 
         // Test for correct character set and collation
-        $db_collation_sql = "SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME 
-            FROM information_schema.SCHEMATA S 
-            WHERE schema_name = '$db_name' AND 
+        $db_collation_sql = "SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME
+            FROM information_schema.SCHEMATA S
+            WHERE schema_name = '$db_name' AND
             ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')";
         $collation = dbFetchRows($db_collation_sql);
         if (empty($collation) !== true) {
@@ -136,8 +136,8 @@ class Database extends BaseValidation
             );
         }
 
-        $table_collation_sql = "SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME 
-            FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C 
+        $table_collation_sql = "SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME
+            FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C
             WHERE C.collation_name = T.table_collation AND T.table_schema = '$db_name' AND
              ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );";
         $collation_tables = dbFetchRows($table_collation_sql);
@@ -148,7 +148,7 @@ class Database extends BaseValidation
             $validator->result($result);
         }
 
-        $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME 
+        $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
             FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$db_name' AND
             ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );";
         $collation_columns = dbFetchRows($column_collation_sql);
@@ -171,7 +171,7 @@ class Database extends BaseValidation
         }
 
         $master_schema = Yaml::parse(file_get_contents($schema_file));
-        $current_schema = dump_db_schema();
+        $current_schema = Schema::dump();
         $schema_update = [];
 
         foreach ((array) $master_schema as $table => $data) {
@@ -337,7 +337,7 @@ class Database extends BaseValidation
     }
 
     /**
-     * Generate an SQL segment to create the column based on data from dump_db_schema()
+     * Generate an SQL segment to create the column based on data from Schema::dump()
      *
      * @param array $column_data The array of data for the column
      * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
@@ -368,7 +368,7 @@ class Database extends BaseValidation
     }
 
     /**
-     * Generate an SQL segment to create the index based on data from dump_db_schema()
+     * Generate an SQL segment to create the index based on data from Schema::dump()
      *
      * @param array $index_data The array of data for the index
      * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"

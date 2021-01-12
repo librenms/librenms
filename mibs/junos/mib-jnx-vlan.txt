@@ -1,0 +1,650 @@
+--
+-- Juniper Enterprise Specific MIB: Vlan
+--
+-- Copyright (c) 2007-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-VLAN-MIB DEFINITIONS ::= BEGIN
+    
+IMPORTS
+    Integer32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY    
+	FROM SNMPv2-SMI
+    MacAddress, TruthValue, DisplayString             	
+	FROM SNMPv2-TC
+    InterfaceIndex 
+	FROM IF-MIB
+    InetAddress, InetAddressType, InetAddressPrefixLength
+	FROM INET-ADDRESS-MIB
+     Unsigned32
+         FROM SNMPv2-SMI
+    jnxExVlan                                       	
+	FROM JUNIPER-EX-SMI;
+
+jnxVlanMIBObjects  MODULE-IDENTITY
+    LAST-UPDATED "200901090000Z" -- Fri Jan 09 00:00:00 2009 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1133 Innovation Way
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module contains definitions for management information for 
+	pre-standards IEEE 802.1Q VLANs and their association with a Lan 
+	Emulation Client (lec). Devices implementing these pre-standards 
+	maintain port groupings and associated filters used to form a 
+	'virtual bridge'."
+    REVISION   
+        "200901090000Z" -- Fri Jan 09 00:00:00 2009 UTC
+    DESCRIPTION
+        "Marked the deprecated Objects of jnxVlanTable, 
+         jnxVlanInterfaceTable and jnxVlanPortGroupTable 
+         as Obsolete."
+    REVISION
+        "200901200000Z" -- Mon Jan 20 00:00:00 2009 UTC
+    DESCRIPTION
+        "Added new Object jnxExVlanTag to represent Vlan Tag information
+         for each Vlan."
+    REVISION
+        "201009070000Z" -- Tue Sep 7 00:00:00 2010 UTC
+    DESCRIPTION
+        "Added new Objects jnxExVlanPortTagness and jnxExVlanPortAccessMode as
+        part of jnxExVlanPortGroupTable."
+
+    ::= { jnxExVlan 1 }
+
+--------------------------------------------------------------------------------
+-- VLAN Configuration
+--------------------------------------------------------------------------------
+
+jnxVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "A table of VLAN names and characteristics."
+    ::= { jnxVlanMIBObjects 1 }
+
+jnxVlanEntry OBJECT-TYPE
+    SYNTAX      JnxVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "A table entry containing VLAN names and characteristics."
+    INDEX   { IMPLIED jnxVlanName }
+    ::= { jnxVlanTable 1 }
+
+JnxVlanEntry ::=
+    SEQUENCE {
+        jnxVlanName               DisplayString,
+	jnxVlanID                 Integer32,
+        jnxVlanType               INTEGER,
+        jnxVlanPortGroupInstance  Integer32,
+        jnxVlanMacListInstance    Integer32
+    }
+     
+jnxVlanName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255)) 
+    MAX-ACCESS  not-accessible 
+    STATUS      obsolete
+    DESCRIPTION
+        "Vlan name is the textual name and this is the identifier
+        that the user of a configuration utility will use."
+    ::= {  jnxVlanEntry 1 }
+
+jnxVlanID OBJECT-TYPE
+    SYNTAX      Integer32(1..4094)
+    MAX-ACCESS  read-only 
+    STATUS      obsolete
+    DESCRIPTION
+        "This is the locally significant ID that is used internally by this 
+	device to reference this VLAN."
+    ::= { jnxVlanEntry 2 }
+
+jnxVlanType OBJECT-TYPE
+    SYNTAX 	INTEGER {
+        static (1),
+        dynamic(2)
+    }
+    MAX-ACCESS 	read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The valn type can be
+        static (1)
+        Dynamic(2)"
+    DEFVAL { 1 }
+    ::= { jnxVlanEntry 3 }
+
+jnxVlanPortGroupInstance OBJECT-TYPE
+    SYNTAX 	Integer32
+    MAX-ACCESS 	read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "jnxVlanPortGroupInstance is the index that identifies that the sub 
+	tree in the jnxVlanPortGroupTable helps to retrieve the group of 
+	ports in this VLAN."
+    ::= { jnxVlanEntry 4 }
+
+jnxVlanMacListInstance OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "jnxVlanMacListInstance is the index , if this is a MAC-based VLAN 
+	which identifies the sub tree to retrieve the list of MAC address to 
+	allow into this VLAN. If this is not a MAC-based VLAN then the 
+	value is 0"
+    DEFVAL { 0 }
+    ::= { jnxVlanEntry 5 }
+
+jnxVlanInterfaceTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF JnxVlanInterfaceEntry
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+         "A table of VLAN names and characteristics in layer 3."
+     ::= { jnxVlanMIBObjects 2 }
+
+jnxVlanInterfaceEntry OBJECT-TYPE
+    SYNTAX      JnxVlanInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "A table entry containing VLAN names and characteristics in layer 3."
+    INDEX   { IMPLIED jnxVlanName }
+    ::= { jnxVlanInterfaceTable 1 }
+
+JnxVlanInterfaceEntry ::=
+    SEQUENCE {
+        jnxVlanInterfaceIpAddress            InetAddress,
+        jnxVlanInterfaceProtocol             InetAddressType,
+        jnxVlanInterfaceSubNetMask           IpAddress,
+        jnxVlanInterfaceBroadcastAddress     IpAddress,
+        jnxVlanInterfaceDescription          DisplayString,
+        jnxVlanInterfaceAdminStatus          TruthValue,
+        jnxVlanInterfaceOperStatus           DisplayString,
+        jnxVlanSnmpIfIndex		     InterfaceIndex 
+    }
+
+jnxVlanInterfaceIpAddress OBJECT-TYPE
+     SYNTAX      InetAddress 
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION
+         "This specifies the IPAddress of this interface. "
+     ::= { jnxVlanInterfaceEntry 1 }
+
+jnxVlanInterfaceProtocol OBJECT-TYPE
+    SYNTAX	InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+         "This specifies the protocol for ipv4."
+    ::= { jnxVlanInterfaceEntry 2 }
+
+jnxVlanInterfaceSubNetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This specifies the subnet mask address of the vlan ."
+    ::= { jnxVlanInterfaceEntry 3 }
+
+jnxVlanInterfaceBroadcastAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This specifies the broadcast address of the vlan."
+    ::= { jnxVlanInterfaceEntry 4 }
+
+jnxVlanInterfaceDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "jnxvlanInterfaceDescription provides the description for the vlan."
+    ::= { jnxVlanInterfaceEntry 5 }
+
+jnxVlanInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This takes care of administration status of the vlan"
+    ::= { jnxVlanInterfaceEntry 6 }
+
+jnxVlanInterfaceOperStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This specifies the operational status of the vlan"
+    ::= { jnxVlanInterfaceEntry 7 }
+
+jnxVlanSnmpIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This specifies the SNMP IF Index ."
+    ::= { jnxVlanInterfaceEntry 8 }
+
+-------------------------------------------------------------------------------
+-- Port Group Table
+--------------------------------------------------------------------------------
+
+jnxVlanPortGroupTable OBJECT-TYPE
+    SYNTAX  	SEQUENCE OF JnxVlanPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "A table of port groupings."
+    ::= { jnxVlanMIBObjects 3 }
+
+jnxVlanPortGroupEntry OBJECT-TYPE
+    SYNTAX      JnxVlanPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "A table entry containing a port number"
+    INDEX   { jnxVlanPortGroupIndex, jnxVlanPort }
+    ::= { jnxVlanPortGroupTable 1 }
+
+JnxVlanPortGroupEntry ::=
+    SEQUENCE {
+        jnxVlanPortGroupIndex      Integer32,
+        jnxVlanPort                Integer32,
+        jnxVlanPortStatus          INTEGER
+    }
+
+jnxVlanPortGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Index used so that there can be many different
+        port groups"
+    ::= { jnxVlanPortGroupEntry 1 }
+
+jnxVlanPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The vlanPort specifies the port in the vlan.By adding a port here,
+        that port will now be part of any VLAN(s) that this port group is 
+	associated with."
+    ::= { jnxVlanPortGroupEntry 2 }
+
+jnxVlanPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        autoActive      (1),
+        allowed         (2),
+        allowedActive   (3),
+        allowedNotAvail (4),
+        notAssociated   (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The status of this port relative to the VLAN that points
+        at this port group.[1.autoactive , 2.allowed, 3.allowedActive
+        4.allowedNotAvail, 5.notAssociated]
+
+        autoActive     : Means that the port is part of this VLAN
+        	    	 because the switch automatically added it.
+        allowed        : Means that the port has been configured so that
+                    	 if all other criteria (if any) are met, this port
+                    	 is allowed to be in this VLAN.
+        allowedActive  : Means the same as allowed plus the fact
+                       	 that there is a device attached to this port and
+                       	 participating in the VLAN.
+        allowedNotAvail: This value is only needed for devices
+                         that don't allow a port to be in more than one
+                         VLAN at a time.  This value means that this port
+                         also exists in some other VLAN(s) and is active
+                         in another VLAN.  Therefore this port is not
+                         available to be used in this VLAN.
+        notAssociated :  Means that the Port Group is not currently
+                         associated with any VLAN."
+    DEFVAL { allowed }
+    ::= { jnxVlanPortGroupEntry 3 }
+
+--------------------------------------------------------------------------------
+-- MAC List Table
+--------------------------------------------------------------------------------
+
+jnxVlanMacListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxVlanMacListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "jnxVlanMacListTable is the table of MAC Lists. "
+    ::= { jnxVlanMIBObjects 4 }
+
+jnxVlanMacListEntry OBJECT-TYPE
+    SYNTAX      JnxVlanMacListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry containing MAC Addresses"
+    INDEX   { jnxVlanMacListIndex }
+    ::= { jnxVlanMacListTable 1 }
+
+JnxVlanMacListEntry ::=
+    SEQUENCE {
+        jnxVlanMacListIndex        Integer32,
+        jnxVlanMacAddress          MacAddress
+    }
+
+jnxVlanMacListIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "jnxVlanMacListIndex can be used beacuse there can  be many different
+        MAC Lists"
+    ::= { jnxVlanMacListEntry 1 }
+
+jnxVlanMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "jnxVlanMacAddress is the MAC Address that belongs to this group."
+    ::= { jnxVlanMacListEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Ex VLAN Configuration
+--------------------------------------------------------------------------------
+
+jnxExVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxExVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of VLAN names and characteristics."
+    ::= { jnxVlanMIBObjects 5 }
+
+jnxExVlanEntry OBJECT-TYPE
+    SYNTAX      JnxExVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry containing VLAN names and characteristics."
+    INDEX   { jnxExVlanID }
+    ::= { jnxExVlanTable 1 }
+
+JnxExVlanEntry ::=
+    SEQUENCE {
+        jnxExVlanID                 Integer32,
+        jnxExVlanName               DisplayString,
+        jnxExVlanType               INTEGER,
+        jnxExVlanPortGroupInstance  Integer32,
+        jnxExVlanTag                Unsigned32
+    }
+
+jnxExVlanID OBJECT-TYPE
+    SYNTAX      Integer32(1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the locally significant ID that is used internally by this
+        device to reference this VLAN."
+    ::= { jnxExVlanEntry 1 }
+
+jnxExVlanName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Vlan name is the textual name."
+    ::= {  jnxExVlanEntry 2 }
+
+jnxExVlanType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        static (1),
+        dynamic(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vlan type can be
+        static (1)
+        Dynamic(2)"
+    DEFVAL { 1 }
+    ::= { jnxExVlanEntry 3 }
+
+jnxExVlanPortGroupInstance OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "jnxExVlanPortGroupInstance is the index that identifies that the sub
+        tree in the jnxVlanPortGroupTable helps to retrieve the group of
+        ports in this VLAN."
+    ::= { jnxExVlanEntry 4 }
+
+jnxExVlanTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "jnxExVlanTag gives the Vlan Tag details for each Vlan."
+    ::= { jnxExVlanEntry 5 }
+
+--------------------------------------------------------------------------------
+-- Ex VLAN Interface Table 
+--------------------------------------------------------------------------------
+
+jnxExVlanInterfaceTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF JnxExVlanInterfaceEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "A table of VLAN names and characteristics in layer 3."
+     ::= { jnxVlanMIBObjects 6 }
+
+jnxExVlanInterfaceEntry OBJECT-TYPE
+    SYNTAX      JnxExVlanInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry containing VLAN names and characteristics in layer 3."
+    INDEX   { jnxExVlanID }
+    ::= { jnxExVlanInterfaceTable 1 }
+
+JnxExVlanInterfaceEntry ::=
+    SEQUENCE {
+        jnxExVlanInterfaceProtocol             InetAddressType,
+        jnxExVlanInterfaceIpAddress            InetAddress,
+        jnxExVlanInterfacePrefixLength         InetAddressPrefixLength,
+        jnxExVlanInterfaceBroadcastAddress     InetAddress,
+        jnxExVlanInterfaceDescription          DisplayString,
+        jnxExVlanInterfaceAdminStatus          INTEGER,
+        jnxExVlanInterfaceOperStatus           INTEGER,
+        jnxExVlanSnmpIfIndex                   InterfaceIndex
+    }
+
+jnxExVlanInterfaceProtocol OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This specifies the protocol for ipv4."
+    ::= { jnxExVlanInterfaceEntry 1 }
+
+jnxExVlanInterfaceIpAddress OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This specifies the IPAddress of this interface. "
+     ::= { jnxExVlanInterfaceEntry 2 }
+
+jnxExVlanInterfacePrefixLength OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This specifies the length of subnet mask address of the vlan ."
+    ::= { jnxExVlanInterfaceEntry 3 }
+
+jnxExVlanInterfaceBroadcastAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This specifies the broadcast address of the vlan."
+    ::= { jnxExVlanInterfaceEntry 4 }
+
+jnxExVlanInterfaceDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "jnxExvlanInterfaceDescription provides the description for the vlan."
+    ::= { jnxExVlanInterfaceEntry 5 }
+
+jnxExVlanInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up(1),        -- ready to pass packets
+                    down(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This takes care of administration status of the vlan"
+    ::= { jnxExVlanInterfaceEntry 6 }
+
+jnxExVlanInterfaceOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up(1),        -- ready to pass packets
+                    down(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This specifies the operational status of the vlan"
+    ::= { jnxExVlanInterfaceEntry 7 }
+
+jnxExVlanSnmpIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This specifies the SNMP IF Index ."
+    ::= { jnxExVlanInterfaceEntry 8 }
+
+-------------------------------------------------------------------------------
+-- Ex Port Group Table
+--------------------------------------------------------------------------------
+
+jnxExVlanPortGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxExVlanPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of port groupings."
+    ::= { jnxVlanMIBObjects 7 }
+
+jnxExVlanPortGroupEntry OBJECT-TYPE
+    SYNTAX      JnxExVlanPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry containing a port number"
+    INDEX   { jnxExVlanPortGroupIndex, jnxExVlanPort }
+    ::= { jnxExVlanPortGroupTable 1 }
+
+JnxExVlanPortGroupEntry ::=
+    SEQUENCE {
+        jnxExVlanPortGroupIndex      Integer32,
+        jnxExVlanPort                Integer32,
+        jnxExVlanPortStatus          INTEGER,
+        jnxExVlanPortTagness         INTEGER,
+        jnxExVlanPortAccessMode      INTEGER
+    }
+
+jnxExVlanPortGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index used so that there can be many different
+        port groups"
+    ::= { jnxExVlanPortGroupEntry 1 }
+
+jnxExVlanPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vlanPort specifies the port in the vlan.By adding a port here,
+        that port will now be part of any VLAN(s) that this port group is
+        associated with."
+    ::= { jnxExVlanPortGroupEntry 2 }
+
+jnxExVlanPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        autoActive      (1),
+        allowed         (2),
+        allowedActive   (3),
+        allowedNotAvail (4),
+        notAssociated   (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of this port relative to the VLAN that points
+        at this port group.[1.autoactive , 2.allowed, 3.allowedActive
+        4.allowedNotAvail, 5.notAssociated]
+
+        autoActive     : Means that the port is part of this VLAN
+                         because the switch automatically added it.
+        allowed        : Means that the port has been configured so that
+                         if all other criteria (if any) are met, this port
+                         is allowed to be in this VLAN.
+        allowedActive  : Means the same as allowed plus the fact
+                         that there is a device attached to this port and
+                         participating in the VLAN.
+        allowedNotAvail: This value is only needed for devices
+                         that don't allow a port to be in more than one
+                         VLAN at a time.  This value means that this port
+                         also exists in some other VLAN(s) and is active
+                         in another VLAN.  Therefore this port is not
+                         available to be used in this VLAN.
+        notAssociated :  Means that the Port Group is not currently
+                         associated with any VLAN."
+    DEFVAL { allowed }
+    ::= { jnxExVlanPortGroupEntry 3 }
+
+jnxExVlanPortTagness  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        tagged   (1),
+        untagged (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VlanPortTaqness gives whether the Port is tagged or untagged."
+    ::= { jnxExVlanPortGroupEntry 4 }
+
+jnxExVlanPortAccessMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        access   (1),
+        trunk   (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VlanPortAccessMode gives whether the Port is Access or Trunk."
+    ::= { jnxExVlanPortGroupEntry 5 }
+
+END
+

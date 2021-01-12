@@ -31,6 +31,7 @@ loadbalancers:
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]
+        order_by: mempool_type, mempool_id
 mpls:
     mpls_lsps:
         excluded_fields: [lsp_id, device_id]

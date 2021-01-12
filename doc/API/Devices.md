@@ -105,7 +105,7 @@ Output:
 
 ### `availability`
 
-Get calculated availabilites of given device.
+Get calculated availabilities of given device.
 
 Route: `/api/v0/devices/:hostname/availability`
 
@@ -1367,11 +1367,11 @@ Output:
 
 Add one or more parents to a host.
 
-Route: `/api/v0/devices/:device_id/parents`
+Route: `/api/v0/devices/:device/parents`
 
 Input (JSON):
 
-- parent_ids: one or more parent ids
+- parent_ids: one or more parent ids or hostnames
 
 Example:
 ```curl
@@ -1390,11 +1390,11 @@ Output:
 
 Deletes some or all the parents from a host.
 
-Route: `/api/v0/devices/:device_id/parents`
+Route: `/api/v0/devices/:device/parents`
 
 Input (JSON):
 
-- parent_ids: One or more parent ids, if not specified deletes all parents from host.
+- parent_ids: One or more parent ids or hostnames, if not specified deletes all parents from host.
 
 Example:
 ```curl

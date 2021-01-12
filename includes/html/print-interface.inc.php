@@ -137,13 +137,18 @@ if ($port_adsl['adslLineCoding']) {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     echo $port_adsl['adslLineCoding'] . '/' . rewrite_adslLineType($port_adsl['adslLineType']);
     echo '<br />';
+    // ATU-C is CO       -> ATU-C TX is the download speed for the CPE
+    // ATU-R is the CPE  -> ATU-R TX is the upload speed of the CPE
     echo 'Sync:' . formatRates($port_adsl['adslAtucChanCurrTxRate']) . '/' . formatRates($port_adsl['adslAturChanCurrTxRate']);
     echo '<br />';
-    echo 'Max:' . formatRates($port_adsl['adslAtucCurrAttainableRate']) . '/' . formatRates($port_adsl['adslAturCurrAttainableRate']);
+    // This is the Receive Max AttainableRate, so :
+    //    adslAturCurrAttainableRate is DownloadMaxRate
+    //    adslAtucCurrAttainableRate is UploadMaxRate
+    echo 'Max:' . formatRates($port_adsl['adslAturCurrAttainableRate']) . '/' . formatRates($port_adsl['adslAtucCurrAttainableRate']);
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
-    echo 'Atten:' . $port_adsl['adslAtucCurrAtn'] . 'dB/' . $port_adsl['adslAturCurrAtn'] . 'dB';
+    echo 'Atten:' . $port_adsl['adslAturCurrAtn'] . 'dB/' . $port_adsl['adslAtucCurrAtn'] . 'dB';
     echo '<br />';
-    echo 'SNR:' . $port_adsl['adslAtucCurrSnrMgn'] . 'dB/' . $port_adsl['adslAturCurrSnrMgn'] . 'dB';
+    echo 'SNR:' . $port_adsl['adslAturCurrSnrMgn'] . 'dB/' . $port_adsl['adslAtucCurrSnrMgn'] . 'dB';
 } else {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {

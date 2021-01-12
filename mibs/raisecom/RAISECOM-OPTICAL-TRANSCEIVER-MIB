@@ -2,13 +2,13 @@
 -- *****************************************************************
 -- RAISECOM-OPTICAL-TRANSCEIVER-MIB.my
 --
--- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd. 
+-- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd.
 -- All rights reserved.
--- *****************************************************************       
+-- *****************************************************************
 
 -- *****************************************************************
--- Modi Report：Format: <number>, <time>, <author>, <desc> 
--- 01, 20110623, yangzhognhong, change the value of the node raisecomOpticalTransceiverMediaType 
+-- Modi Report：Format: <number>, <time>, <author>, <desc>
+-- 01, 20110623, yangzhognhong, change the value of the node raisecomOpticalTransceiverMediaType
 --                              for SFP+ development
 --
 -- *****************************************************************
@@ -22,22 +22,22 @@ IMPORTS
     NOTIFICATION-TYPE,
     OBJECT-TYPE,
     TimeTicks                       	FROM SNMPv2-SMI
-		raisecomAgent    
+		raisecomAgent
 					FROM RAISECOM-BASE-MIB
     TEXTUAL-CONVENTION                  FROM SNMPv2-TC
     MODULE-COMPLIANCE,
     NOTIFICATION-GROUP,
     OBJECT-GROUP                        FROM SNMPv2-CONF
-    ifIndex                             FROM IF-MIB   
+    ifIndex                             FROM IF-MIB
     raisecomNotificationLocation        FROM RAISECOM-COMMON-MANAGEMENT-MIB
     ClearVar                            FROM SWITCH-TC;
 
 raisecomOpticalTransceiver MODULE-IDENTITY
     LAST-UPDATED   "201005190000Z"
     ORGANIZATION   "Raisecom, Inc."
-    CONTACT-INFO  
+    CONTACT-INFO
                 "       Raise Systems
-                        
+
                 Postal: Beijing,
                         China
 
@@ -54,20 +54,20 @@ raisecomOpticalTransceiver MODULE-IDENTITY
 
 
 -- Textual Conventions
-EnableVar ::= TEXTUAL-CONVENTION                                
+EnableVar ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "enable or disable a function."
     SYNTAX    INTEGER {
                        enable(1),
                        disable(2)
-                      } 
-     	
+                      }
+
 OpticalParameterType ::= TEXTUAL-CONVENTION
     STATUS    current
     DESCRIPTION
         "This value indicates the optical parameter that is
-        being monitored. Valid values are -OpticalParameterType 
+        being monitored. Valid values are -OpticalParameterType
 
         transceiverTemperature(1)   		:transceiver temperature
         txbiasCurrent(2)         		:TX bias current
@@ -86,26 +86,26 @@ OpticalParameterType ::= TEXTUAL-CONVENTION
         tecCurrent(15)          		:TEC currnet
         laserWavelength(16)      		:laser wavelength
 
-       " 
-        
+       "
+
     SYNTAX    INTEGER {
-			        transceiverTemperature (1),   
-        			txbiasCurrent (2),          
-        			txPower (3),       
-       			    rxPower (4),       
-        			laserTemperature(5),     
-        			p5V0supplyVoltage(6),     
-        			p3V3supplyVoltage(7),    
-        			p1V8supplyVoltage(8),     
-        			n5V2supplyVoltage(9),     
-        			apdBiasVoltage(10),     
-        			p5V0supplyCurrent(11),     
-        			p3V3supplyCurrent(12),    
-        			p1V8supplyCurrent(13),     
-        			n5V2supplyCurrent(14),    
-        			tecCurrent(15),          
+			        transceiverTemperature (1),
+        			txbiasCurrent (2),
+        			txPower (3),
+       			    rxPower (4),
+        			laserTemperature(5),
+        			p5V0supplyVoltage(6),
+        			p3V3supplyVoltage(7),
+        			p1V8supplyVoltage(8),
+        			n5V2supplyVoltage(9),
+        			apdBiasVoltage(10),
+        			p5V0supplyCurrent(11),
+        			p3V3supplyCurrent(12),
+        			p1V8supplyCurrent(13),
+        			n5V2supplyCurrent(14),
+        			tecCurrent(15),
        			    laserWavelength(16)
-   
+
               }
 
 
@@ -115,13 +115,13 @@ OpticalParameterValue ::= TEXTUAL-CONVENTION
         "The value of the optical parameter that is being monitored.
               The range of values varies depending on the type of optical  parameter being monitored,
         as identified by a corresponding object with syntax OpticalParameterType.
-              When the optical parameter being monitored is 'XXTemperature',the supported range 
+              When the optical parameter being monitored is 'XXTemperature',the supported range
         is from -40000 to 125000, in units of  1/1000 degrees centigrade.
         Example: A value of 23500 represents a temperature reading of 23.5 degrees C.
-        The temperature is shown in unit of degrees centigrade, and the precision is 0.1.        
+        The temperature is shown in unit of degrees centigrade, and the precision is 0.1.
               When the optical parameter being monitored is 'txbiasCurrent',the supported range
         is from 0 to 131000, in units of 1/1000 mA.
-        Example: A value of 1000 represents a TX bias current reading of 1.0mA. 
+        Example: A value of 1000 represents a TX bias current reading of 1.0mA.
         The 'txbiasCurrent'is shown in unit of mA, and the precision is 0.1.
               When the optical parameter being monitored is 'txPower',the supported range
        is from -40000 to 8200, in units of 1/1000 dbm.
@@ -129,26 +129,26 @@ OpticalParameterValue ::= TEXTUAL-CONVENTION
         The 'txPower' is shown in unit of dBm, and the precision is 0.1.
               When the optical parameter being monitored is 'rxPower',the supported range
         is from -40000 to 8200, in units of 1/1000 dbm.
-        Example: A value of 7780 represents a RX received optical power reading of 7.78 dBm. 
+        Example: A value of 7780 represents a RX received optical power reading of 7.78 dBm.
         The 'rxPower' is shown in unit of dBm, and the precision is 0.1.
               When the optical parameter being monitored is 'XXsupplyVoltage',the supported range
-        is from 0 to 6550, in units of 1/1000 V. 
+        is from 0 to 6550, in units of 1/1000 V.
 		Example: A value of 6000 represents a XX supply Voltage eading of 6.00V.
 		The 'XXsupplyVoltage'is shown in unit of V, and the precision is 0.01.
               When the optical parameter being monitored is 'apdBiasVoltage,the supported range
-        is from 0 to 655300 , in units of 1/1000 V . 
+        is from 0 to 655300 , in units of 1/1000 V .
 		Example: A value of 600000 represents a APD BiasVoltage reading of 600.0V.
 		The 'apdBiasVoltage' is shown in unit of V, and the precision is 0.1.
               When the optical parameter being monitored is 'XXsupplyCurrent',the supported range
-        is from 0 to 6553600, in units of 1/1000 mA . 
-        Example: A value of 6000000 represents a XX supply current reading of 6000.0mA. 
+        is from 0 to 6553600, in units of 1/1000 mA .
+        Example: A value of 6000000 represents a XX supply current reading of 6000.0mA.
         The 'XXsupplyCurrent' is shown in unit of mA, and the precision is 0.1.
               When the optical parameter being monitored is 'tecCurrent',the supported range
-        is from 0 to 6553600, in units of 1/1000 mA . 
+        is from 0 to 6553600, in units of 1/1000 mA .
         Example: A value of 6000000 represents a TEC Current reading of 6000.0mA.
         The 'tecCurrent' is shown in unit of mA, and the precision is 0.1.
               When the optical parameter being monitored is 'laserWavelength,the supported range
-        is from 0 to 3276750, in units of 1/1000 nm . 
+        is from 0 to 3276750, in units of 1/1000 nm .
         Example: A value of 3000000 represents a laser wavelength reading of 3000.0nm.
         The 'laserWavelength'is shown in unit of nm, and the precision is 0.01.
       "
@@ -162,21 +162,21 @@ OpticalPMPeriod ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER {
                     fifteenMin(1),
                     twentyFourHour(2)
-                } 
-                
+                }
+
 -- MIB Global Enable Definitions
 
 raisecomOpticalTransceiverGlobalEnable       OBJECT IDENTIFIER ::=
-                                        {raisecomOpticalTransceiver 1 }   
-                                        
+                                        {raisecomOpticalTransceiver 1 }
+
 raisecomOpticalTransceiverNotifyEnable OBJECT-TYPE
     SYNTAX      EnableVar
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "This object specifies the generation of device notifications,
-         enable or disable.  
-         
+         enable or disable.
+
          this object belongs to xfp and sfp.
         "
     DEFVAL { disable }
@@ -188,7 +188,7 @@ raisecomOpticalTransceiverDDMEnable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Enable or disable digitaldiagnotic on the device.
-        
+
         this object belongs to xfp and sfp.
         "
     DEFVAL { disable}
@@ -200,8 +200,8 @@ raisecomOpticalTransceiverCheckPwdEnable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object specifies the status of password checking on the device,
-         enable or disable. 
-         
+         enable or disable.
+
          this object belongs to xfp.
         "
     DEFVAL { disable}
@@ -213,17 +213,17 @@ raisecomOpticalTransceiverPollInterval OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object specifies the value of poll-interval on the device.
-        
+
         this object belongs to xfp and sfp.
         "
     ::={ raisecomOpticalTransceiverGlobalEnable 4 }
-    
+
 -- MIB Object Definitions
 
 raisecomOpticalTransceiverObjects        OBJECT IDENTIFIER ::=
                                         {raisecomOpticalTransceiver 2 }
 
--- groups in this MIB module   
+-- groups in this MIB module
 raisecomOpticalTransceiverInfoGroup               OBJECT IDENTIFIER ::=
                                         {raisecomOpticalTransceiverObjects 1 }
 
@@ -231,8 +231,8 @@ raisecomOpticalTransceiverDDMGroup                OBJECT IDENTIFIER ::=
                                         {raisecomOpticalTransceiverObjects 2 }
 
 raisecomOpticalTransceiverPMGroup                 OBJECT IDENTIFIER ::=
-                                        {raisecomOpticalTransceiverObjects 3 }  
-                                        
+                                        {raisecomOpticalTransceiverObjects 3 }
+
 raisecomOpticalTransceiverStatusGroup             OBJECT IDENTIFIER ::=
                                         {raisecomOpticalTransceiverObjects 4 }
 
@@ -263,7 +263,7 @@ RaisecomOpticalTransceiverInfoEntry ::= SEQUENCE {
 	raisecomOpticalTransceiverVendorPN    OCTET STRING,
 	raisecomOpticalTransceiverVendorSN    OCTET STRING,
 	raisecomOpticalTransceiverMediaType INTEGER,
-	raisecomOpticalTransceiverTransmissionDistance  Integer32,  
+	raisecomOpticalTransceiverTransmissionDistance  Integer32,
 	raisecomOpticalTransceiverAbility        Unsigned32,
 	raisecomOpticalTransceiverDDM     INTEGER,
 	raisecomOpticalTransceiverCalibrationType   INTEGER,
@@ -271,7 +271,7 @@ RaisecomOpticalTransceiverInfoEntry ::= SEQUENCE {
 	raisecomOpticalTransceiverVendorRev   OCTET STRING,
 	raisecomOpticalTransceiverBRMax       INTEGER,
 	raisecomOpticalTransceiverBRMin       INTEGER,
-	raisecomOpticalTransceiverWavelengthContrl   INTEGER,	 
+	raisecomOpticalTransceiverWavelengthContrl   INTEGER,
 	raisecomOpticalTransceiverWavelength  Integer32,
 	raisecomOpticalTransceiverWaveTolerance   OCTET STRING,
 	raisecomOpticalTransceiverCompatibility   OCTET STRING,
@@ -296,7 +296,7 @@ RaisecomOpticalTransceiverInfoEntry ::= SEQUENCE {
 }
 
 raisecomOpticalTransceiverType OBJECT-TYPE
-		SYNTAX  INTEGER{ 
+		SYNTAX  INTEGER{
 						unknown(1),
 	 			        gbic(2),
 	       			    soldered(3),
@@ -305,21 +305,21 @@ raisecomOpticalTransceiverType OBJECT-TYPE
 						xenpak(6),
 						xfp(7),
 						xff(8),
-						xfp_e(9),
+						xfp-e(9),
 						xpak(10),
 						x2(11),
-						sfpj(12)						
+						sfpj(12)
 	       			   }
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
-			"This object specifies the physical type of the transceiver, 
+			"This object specifies the physical type of the transceiver,
 			such as xfp or sfp , and so on.
-			
+
 			this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 1 }
-		
+
 raisecomOpticalTransceiverConnectorType OBJECT-TYPE
 		SYNTAX  INTEGER
 		{
@@ -327,15 +327,15 @@ raisecomOpticalTransceiverConnectorType OBJECT-TYPE
        		sc (1),
 			db9(2),
 			hssdc(3),
-			bnc_tnc(4),
-			fiber_coaxial_head(5),
-			fiber_jack(6),
+			bnc-tnc(4),
+			fiber-coaxial-head(5),
+			fiber-jack(6),
 			lc(7),
-			mt_rj(8),
+			mt-rj(8),
 			mu(9),
 			sg(10),
-			fiber_pigtail(11),
-			mpo_parallel_optic(12),
+			fiber-pigtail(11),
+			mpo-parallel-optic(12),
 			hssdcII (20),
 			copper (21),
 			rj45 (22)
@@ -344,69 +344,69 @@ raisecomOpticalTransceiverConnectorType OBJECT-TYPE
 		STATUS	current
 		DESCRIPTION
 			"This object specifies the connector type of the transceiver，
-             unknown, sc, db9, hssdc, bnc_tnc, fiber_coaxial_head, fiber_outlet, 
-             lc, mt_rj, mu, sg, fiber_pigtail, mpo_parallel_optic , hssdcII, 
-             copper, rj45. 
-             
+             unknown, sc, db9, hssdc, bnc_tnc, fiber_coaxial_head, fiber_outlet,
+             lc, mt_rj, mu, sg, fiber_pigtail, mpo_parallel_optic , hssdcII,
+             copper, rj45.
+
              this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 2 }
-				
+
 raisecomOpticalTransceiverVendorName OBJECT-TYPE
 		SYNTAX	OCTET STRING
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"Vendor name of the interface.
-			
+
 			 this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 3 }
-		
+
 raisecomOpticalTransceiverVendorPN OBJECT-TYPE
 		SYNTAX	OCTET STRING
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"Vendor part number of the interface.
-			
+
 			this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 4 }
-		
+
 raisecomOpticalTransceiverVendorSN OBJECT-TYPE
 		SYNTAX	OCTET STRING
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"Vendor serial number of the interface.
-			
+
 			this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 5 }
-		
+
 raisecomOpticalTransceiverMediaType OBJECT-TYPE
 		SYNTAX INTEGER
        {
-            single_mode(1),
-            multi_modeE50(2),
-            multi_mode50(3),
-            multi_mode625(4),
+            single-mode(1),
+            multi-modeE50(2),
+            multi-mode50(3),
+            multi-mode625(4),
             copper(5),
-            single_modeKm(6), 
-            multi_modeOM3(7)                 
+            single-modeKm(6),
+            multi-modeOM3(7)
         }
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
-			"Types of the fiber, 
+			"Types of the fiber,
             single_mode, multi_modeE50, multi_mode50,multi_mode625,copper.
             single_modeKm,multi_modeOM3
-            
+
             this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 6 }
-		
+
 raisecomOpticalTransceiverTransmissionDistance OBJECT-TYPE
 		SYNTAX	Integer32
 		ACCESS	read-only
@@ -415,10 +415,10 @@ raisecomOpticalTransceiverTransmissionDistance OBJECT-TYPE
 			"The max distance which the interface could transmit,
              measured in meter.
              The object will be shown in unit of Km, and the precision is 0.001.
-             
+
              this object belongs to xfp and sfp.
             "
-		::= { raisecomOpticalTransceiverInfoEntry 7 }		
+		::= { raisecomOpticalTransceiverInfoEntry 7 }
 
 raisecomOpticalTransceiverAbility  OBJECT-TYPE
 		SYNTAX	Unsigned32
@@ -426,22 +426,22 @@ raisecomOpticalTransceiverAbility  OBJECT-TYPE
 		STATUS	current
 		DESCRIPTION
 			"This object specifies the ability of optical module digitaldiagnotic
-			 funtion. Currently, the digitaldiagnotic objects of our optical module 
-			 inculde 16 parameters.   
-			 
+			 funtion. Currently, the digitaldiagnotic objects of our optical module
+			 inculde 16 parameters.
+
 			 this object has 32 bits, each bit represents a digital diagnotic parameter.
-			 if the bit value is 0, it means that the optical module does not provide 
-			 digital diagnotic funtion for relative parameter.if the bit value is 1,it 
+			 if the bit value is 0, it means that the optical module does not provide
+			 digital diagnotic funtion for relative parameter.if the bit value is 1,it
 			 means that the optical module provides digital diagnotic funtion for
 			 relative parameter.
-			 
+
 			 this object belongs to xfp and sfp.
-			 
-			 The relation between parameters and bits is following: 
+
+			 The relation between parameters and bits is following:
 			32……16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1:
-			The relation between parameters and bits is following: 
+			The relation between parameters and bits is following:
 			32……16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1:
-			| 1bit           | 2bit           | 3bit             | 4bit           
+			| 1bit           | 2bit           | 3bit             | 4bit
 			| APD偏置电压    | 0（保留）      | TEC电流        | 激光器温度
 
 			| 5bit           | 6bit          |7bit             | 8bit
@@ -450,17 +450,17 @@ raisecomOpticalTransceiverAbility  OBJECT-TYPE
 			| 9bit           | 10bit         |11bit             | 12bit
 			| -5.2V供电电压  | +5V供电电流   | 0（无）          | 0（无）
 
-			| 13bit           | 14bit         | 15bit            | 16bit 
+			| 13bit           | 14bit         | 15bit            | 16bit
 			| +3.3V供电电流   | +1.8V供电电流 | -5.2V供电电流   | 模块温度
 
-			| 17bit           | 18bit         | 19bit            | 20bit ~ 32bit 
+			| 17bit           | 18bit         | 19bit            | 20bit ~ 32bit
 			| 激光器偏置电流  | 发送光功率    |接收光功率       |  0
 
-            But when the optical module is sfp, the 6 bit will represents 
+            But when the optical module is sfp, the 6 bit will represents
             the supplyVoltage of sfp.
             "
-		::= { raisecomOpticalTransceiverInfoEntry 8 }		      
-		
+		::= { raisecomOpticalTransceiverInfoEntry 8 }
+
 raisecomOpticalTransceiverDDM     OBJECT-TYPE
 		SYNTAX  INTEGER{
 	 			        support(1),
@@ -469,15 +469,15 @@ raisecomOpticalTransceiverDDM     OBJECT-TYPE
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
-			"This object specifies if the transceiver supports on digital diagnostic function, 
+			"This object specifies if the transceiver supports on digital diagnostic function,
 			support or not support.To the xfp, the default value of this object is support.
-			
+
 			this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 9 }
-		
+
 raisecomOpticalTransceiverCalibrationType   OBJECT-TYPE
-		SYNTAX  INTEGER{ 
+		SYNTAX  INTEGER{
 						unknown(1),
 	 			        internal(2),
 	       			    external(3)
@@ -485,13 +485,13 @@ raisecomOpticalTransceiverCalibrationType   OBJECT-TYPE
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
-			"This object specifies the calibration type of the transceiver, 
+			"This object specifies the calibration type of the transceiver,
 			internal, external, unknown.
-			
+
 			this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 10 }
-		
+
 raisecomOpticalTransceiverRSSI   OBJECT-TYPE
 		SYNTAX  INTEGER{
 	 			        support(1),
@@ -500,13 +500,13 @@ raisecomOpticalTransceiverRSSI   OBJECT-TYPE
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
-			"This object specifies the calibration type of the transceiver, 
+			"This object specifies the calibration type of the transceiver,
 			support or not support.
-			
+
 			this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 11 }
- 
+
 raisecomOpticalTransceiverVendorRev    OBJECT-TYPE
 		SYNTAX	OCTET STRING
 		ACCESS	read-only
@@ -515,7 +515,7 @@ raisecomOpticalTransceiverVendorRev    OBJECT-TYPE
 			" the version number of the transceiver.
 			 this object belongs to xfp and sfp.
 			"
-		::= { raisecomOpticalTransceiverInfoEntry 12 }   
+		::= { raisecomOpticalTransceiverInfoEntry 12 }
 
 raisecomOpticalTransceiverBRMax      OBJECT-TYPE
 		SYNTAX	INTEGER
@@ -527,21 +527,21 @@ raisecomOpticalTransceiverBRMax      OBJECT-TYPE
 
 			The object will be shown in unit of Gbps, and the precision is 0.1.
 			"
-		::= { raisecomOpticalTransceiverInfoEntry 13 } 
-		
+		::= { raisecomOpticalTransceiverInfoEntry 13 }
+
 raisecomOpticalTransceiverBRMin       OBJECT-TYPE
 		SYNTAX	INTEGER
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			" the min data rate of the transceiver,mesured in Mbps.
-			
-			  this object belongs to xfp and sfp.To the sfp, 
-			  the min data rate value is equal to the max data rate value. 
-			  
+
+			  this object belongs to xfp and sfp.To the sfp,
+			  the min data rate value is equal to the max data rate value.
+
 			  The object will be shown in unit of Gbps, and the precision is 0.1.
 			 "
-		::= { raisecomOpticalTransceiverInfoEntry 14 }  
+		::= { raisecomOpticalTransceiverInfoEntry 14 }
 
 raisecomOpticalTransceiverWavelengthContrl   OBJECT-TYPE
 		SYNTAX	INTEGER
@@ -578,7 +578,7 @@ raisecomOpticalTransceiverWaveTolerance   OBJECT-TYPE
 			 this object belongs to xfp.
 			 The object will be shown in unit of nm, and the precision is 0.01.
 			"
-		::= { raisecomOpticalTransceiverInfoEntry 17 }    
+		::= { raisecomOpticalTransceiverInfoEntry 17 }
 
 raisecomOpticalTransceiverCompatibility   OBJECT-TYPE
 		SYNTAX	OCTET STRING
@@ -588,7 +588,7 @@ raisecomOpticalTransceiverCompatibility   OBJECT-TYPE
 			"the compatibility type that the transceiver supports,such as 10GBASE-SR.
 			this object belongs to xfp.
 			"
-		::= { raisecomOpticalTransceiverInfoEntry 18 } 
+		::= { raisecomOpticalTransceiverInfoEntry 18 }
 
 raisecomOpticalTransceiverPowerDissipation   OBJECT-TYPE
 		SYNTAX	INTEGER
@@ -601,11 +601,11 @@ raisecomOpticalTransceiverPowerDissipation   OBJECT-TYPE
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
-			"the max power dissipation of the transceiver, 
+			"the max power dissipation of the transceiver,
 			p1W5,p2W5,p3W5,exceed3W5.
 			this object belongs to xfp.
 			"
-		::= { raisecomOpticalTransceiverInfoEntry 19 } 
+		::= { raisecomOpticalTransceiverInfoEntry 19 }
 
 raisecomOpticalTransceiverCDR             OBJECT-TYPE
 		SYNTAX	INTEGER
@@ -620,7 +620,7 @@ raisecomOpticalTransceiverCDR             OBJECT-TYPE
 			support,notsupport.
 			this object belongs to xfp.
 			"
-		::= { raisecomOpticalTransceiverInfoEntry 20 } 
+		::= { raisecomOpticalTransceiverInfoEntry 20 }
 
 raisecomOpticalTransceiverRefClock           OBJECT-TYPE
 		SYNTAX	INTEGER
@@ -636,7 +636,7 @@ raisecomOpticalTransceiverRefClock           OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 21 }
-		
+
 raisecomOpticalTransceiverTransmitterType     OBJECT-TYPE
 		SYNTAX  INTEGER
 		{
@@ -648,7 +648,7 @@ raisecomOpticalTransceiverTransmitterType     OBJECT-TYPE
 			dfb1550nm(6),
 			eml1310nm(7),
 			eml1550nm(8),
-			copper_others(9)
+			copper-others(9)
        }
 
 		ACCESS	read-only
@@ -658,7 +658,7 @@ raisecomOpticalTransceiverTransmitterType     OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 22 }
-		
+
 raisecomOpticalTransceiverCooled	         OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -673,7 +673,7 @@ raisecomOpticalTransceiverCooled	         OBJECT-TYPE
 			 this object belongs to xfp.
 			 "
 		::= { raisecomOpticalTransceiverInfoEntry 24 }
-		
+
 raisecomOpticalTransceiverTunalbe            OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -688,7 +688,7 @@ raisecomOpticalTransceiverTunalbe            OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 25 }
-		
+
 raisecomOpticalTransceiverDetectorType       OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -703,7 +703,7 @@ raisecomOpticalTransceiverDetectorType       OBJECT-TYPE
 			 this object belongs to xfp.
 			 "
 		::= { raisecomOpticalTransceiverInfoEntry 26 }
-		
+
 raisecomOpticalTransceiverLineLoopBack       OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -718,7 +718,7 @@ raisecomOpticalTransceiverLineLoopBack       OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 27 }
-		
+
 raisecomOpticalTransceiverXFILoopBack        OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -733,7 +733,7 @@ raisecomOpticalTransceiverXFILoopBack        OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 28 }
-		
+
 raisecomOpticalTransceiverVps                OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -748,7 +748,7 @@ raisecomOpticalTransceiverVps                OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 29 }
-		
+
 raisecomOpticalTransceiverTxDis              OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -763,7 +763,7 @@ raisecomOpticalTransceiverTxDis              OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 30 }
-		
+
 raisecomOpticalTransceiverStandby              OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -778,7 +778,7 @@ raisecomOpticalTransceiverStandby              OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 31 }
-		
+
 raisecomOpticalTransceiverInVpsLowPower      OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -793,7 +793,7 @@ raisecomOpticalTransceiverInVpsLowPower      OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 32 }
-		
+
 raisecomOpticalTransceiverOutVpsLowPower     OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -808,7 +808,7 @@ raisecomOpticalTransceiverOutVpsLowPower     OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 33 }
-		
+
 raisecomOpticalTransceiverFEC                OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -823,7 +823,7 @@ raisecomOpticalTransceiverFEC                OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 34 }
-		
+
 raisecomOpticalTransceiverCMU                OBJECT-TYPE
 		SYNTAX	INTEGER
 		{
@@ -838,7 +838,7 @@ raisecomOpticalTransceiverCMU                OBJECT-TYPE
 			this object belongs to xfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 35 }
-		
+
 raisecomOpticalTransceiverBR OBJECT-TYPE
 		SYNTAX  INTEGER
 		{
@@ -853,12 +853,12 @@ raisecomOpticalTransceiverBR OBJECT-TYPE
 		STATUS	current
 		DESCRIPTION
 			"This object specifies the Nominal bitrate of the transceiver，
-             125Mbps, 155Mbps, 622Mbps, 1.25Gbps, 2.5Gbps. 
-             
+             125Mbps, 155Mbps, 622Mbps, 1.25Gbps, 2.5Gbps.
+
              this object belongs to xfp and sfp.
 			"
 		::= { raisecomOpticalTransceiverInfoEntry 36 }
-		
+
 -- raisecomOpticalDDMTable
 
 raisecomOpticalTransceiverDDMTable OBJECT-TYPE
@@ -878,11 +878,11 @@ raisecomOpticalTransceiverDDMEntry OBJECT-TYPE
         "An entry in the raisecomOpticalTransceiverMonTable provides objects to
         monitor an optical parameter at an optical interface.
         "
-    INDEX        { 	ifIndex, 
+    INDEX        { 	ifIndex,
 		raisecomOpticalTransceiverParameterType
 	}
     ::={ raisecomOpticalTransceiverDDMTable 1 }
-                         
+
 RaisecomOpticalTransceiverDDMEntry ::= SEQUENCE {
     raisecomOpticalTransceiverParameterType            OpticalParameterType,
     raisecomOpticalTransceiverParameterValue              OpticalParameterValue,
@@ -895,7 +895,7 @@ RaisecomOpticalTransceiverDDMEntry ::= SEQUENCE {
     raisecomOpticalTransceiverParamAlarmLastChange        TimeTicks,
     raisecomOpticalTransceiverDDM15MinValidIntervals      Unsigned32,
     raisecomOpticalTransceiverDDM24HrValidIntervals       Unsigned32,
-    raisecomOpticalTransceiverDDMValidStatus        INTEGER 
+    raisecomOpticalTransceiverDDMValidStatus        INTEGER
 }
 
 raisecomOpticalTransceiverParameterType OBJECT-TYPE
@@ -930,10 +930,10 @@ raisecomOpticalTransceiverParamHighAlarmThresh OBJECT-TYPE
         optical parameter being monitored.
 
         An alarm condition will be raised if the value given by
-        raisecomOpticalParameterValue goes from below the value of 
+        raisecomOpticalParameterValue goes from below the value of
         this object to above the value of this object, or if
         the initial value of raisecomOpticalParameterValue exceeds the value
-        of this object. This alarm will be indicated in the 
+        of this object. This alarm will be indicated in the
         raisecomOpticalParamAlarmStatus object.
         This object belongs to xfp/sfp.
 		"
@@ -951,7 +951,7 @@ raisecomOpticalTransceiverParamHighWarningThresh OBJECT-TYPE
         given by raisecomOpticalParameterValue goes from below the value
         of this object to above the value of this
         object, or if the initial value of raisecomOpticalParameterValue
-        exceeds the value of this object. This alarm will be indicated in the 
+        exceeds the value of this object. This alarm will be indicated in the
         raisecomOpticalParamAlarmStatus object.
         This object belongs to xfp/sfp.
         "
@@ -1002,7 +1002,7 @@ raisecomOpticalTransceiverParamAlarmStatus OBJECT-TYPE
     		              high-alarm(2),
                           high-warning(3),
                           low-alarm(4),
-                          low-warning(5)           
+                          low-warning(5)
                       }
     MAX-ACCESS  read-only
     STATUS      current
@@ -1011,8 +1011,8 @@ raisecomOpticalTransceiverParamAlarmStatus OBJECT-TYPE
         the thresholds for the monitored optical parameter
         on the interface.
 
-           If a threshold is currently being exceeded on the   
-           interface, the object  will be set. Otherwise, 
+           If a threshold is currently being exceeded on the
+           interface, the object  will be set. Otherwise,
            the object will be set to 1.
            This object belongs to xfp/sfp.
 		"
@@ -1028,7 +1028,7 @@ raisecomOpticalTransceiverParamAlarmLastValue OBJECT-TYPE
         exceeded on the interface.
         If no threshold value is currently being
         exceeded, then the value '-1000000' is returned.
-        
+
         This object belongs to xfp/sfp.
 		"
     ::={ raisecomOpticalTransceiverDDMEntry 8 }
@@ -1041,7 +1041,7 @@ raisecomOpticalTransceiverParamAlarmLastChange OBJECT-TYPE
         "This object specifies the value of sysUpTime at the last time
         a threshold related to a particular optical parameter was
         exceeded on the interface.
-        
+
         This object belongs to xfp/sfp.
 		"
     ::={ raisecomOpticalTransceiverDDMEntry 9 }
@@ -1061,7 +1061,7 @@ raisecomOpticalTransceiverDDM15MinValidIntervals OBJECT-TYPE
         (nx15) minutes, in which case the value will be the
         number of previous 15 minute intervals for which the agent
         has some data.
-        
+
         This object belongs to xfp/sfp.
 		"
     ::={ raisecomOpticalTransceiverDDMEntry 10 }
@@ -1073,12 +1073,12 @@ raisecomOpticalTransceiverDDM24HrValidIntervals OBJECT-TYPE
     DESCRIPTION
         "This object gives the number of previous 24 hour intervals
          for which valid performance monitoring data has been stored
-          on the interface. The max value of this object is 7, it 
-          means that the user can look up 7days history information.  
+          on the interface. The max value of this object is 7, it
+          means that the user can look up 7days history information.
           This object belongs to xfp/sfp.
         "
     ::={ raisecomOpticalTransceiverDDMEntry 11 }
-       
+
 raisecomOpticalTransceiverDDMValidStatus OBJECT-TYPE
     SYNTAX      INTEGER {
                     unknown(0),
@@ -1089,10 +1089,10 @@ raisecomOpticalTransceiverDDMValidStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object indicates the parameter row is valid or invalid.
-        The object value is 'valide' when the module is present and 
-        supporting digitaldiagnotic. The object value is 'invalid' 
+        The object value is 'valide' when the module is present and
+        supporting digitaldiagnotic. The object value is 'invalid'
         when the module is absent, or when the module is present and
-        not supporting digitaldiagnotic. 
+        not supporting digitaldiagnotic.
         This object belongs to xfp/sfp.
        "
     ::={ raisecomOpticalTransceiverDDMEntry 12 }
@@ -1118,7 +1118,7 @@ raisecomOpticalTransceiverPMCurrentEntry OBJECT-TYPE
         parameter at an interface, collected over the current 15
         minute or the current 24 hour interval.
         "
-    INDEX       { ifIndex,                  
+    INDEX       { ifIndex,
                   raisecomOpticalTransceiverPMCurrentPeriod,
 				  raisecomOpticalTransceiverPMCurrentParamType }
     ::={ raisecomOpticalTransceiverPMCurrentTable 1 }
@@ -1206,11 +1206,11 @@ raisecomOpticalTransceiverPMIntervalTable OBJECT-TYPE
         intervals. A system is required to store at least
         4 completed 15 minute intervals. The number of valid
         15 minute intervals in this table is indicated by the
-        raisecomOpticalTransceiverDDM15MinValidIntervals object 
+        raisecomOpticalTransceiverDDM15MinValidIntervals object
         and the number of valid 24 hour intervals is indicated by the
         raisecomOpticalTransceiverDDM24HrValidIntervals object.
-        
-        when the optical module is removed from the device, the relative 
+
+        when the optical module is removed from the device, the relative
         history records will be cleaned.
         "
     ::={ raisecomOpticalTransceiverPMGroup 2 }
@@ -1226,7 +1226,7 @@ raisecomOpticalTransceiverPMIntervalEntry OBJECT-TYPE
         "
     INDEX      { ifIndex,
     			 raisecomOpticalTransceiverPMIntervalPeriod,
-                 raisecomOpticalTransceiverPMIntervalNumber,                 
+                 raisecomOpticalTransceiverPMIntervalNumber,
                  raisecomOpticalTransceiverPMIntervalParamType }
     ::={ raisecomOpticalTransceiverPMIntervalTable 1 }
 
@@ -1317,7 +1317,7 @@ raisecomOpticalTransceiverCurrentStatusTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This table stores the hard ware information and the information
-        set by user of the transceiver. 
+        set by user of the transceiver.
         This object belongs to xfp/sfp.
         "
     ::={ raisecomOpticalTransceiverStatusGroup 1 }
@@ -1341,15 +1341,15 @@ RaisecomOpticalTransceiverCurrentStatusEntry ::= SEQUENCE {
     raisecomOpticalTransceiverHwInfoRxLosStatus         INTEGER,
     raisecomOpticalTransceiverHwInfoStandby          INTEGER,
     raisecomOpticalTransceiverHwInfoLaser            INTEGER,
-    raisecomOpticalTransceiverWaveLengthError         Integer32,    
-    raisecomOpticalTransceiverUserWaveLength          Integer32, 
+    raisecomOpticalTransceiverWaveLengthError         Integer32,
+    raisecomOpticalTransceiverUserWaveLength          Integer32,
     raisecomOpticalTransceiverUserDataRate                INTEGER,
     raisecomOpticalTransceiverUserLineLoopBack            INTEGER,
     raisecomOpticalTransceiverUserXFILoopBack             INTEGER,
     raisecomOpticalTransceiverPortNotifyEnable            EnableVar,
     raisecomOpticalTransceiverPortDDMEnable               EnableVar,
     raisecomOpticalTransceiverPortCheckPwdEnable          EnableVar,
-    raisecomOpticalTransceiverTxFaultCount                Integer32, 
+    raisecomOpticalTransceiverTxFaultCount                Integer32,
     raisecomOpticalTransceiverTxFaultCountClear           ClearVar,
     raisecomOpticalTransceiverSpecificationCheckStatus    INTEGER,
     raisecomOpticalTransceiverTxFaultStatus               INTEGER
@@ -1434,12 +1434,12 @@ raisecomOpticalTransceiverWaveLengthError         OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This object specifies error between the actual wavelength 
+        "This object specifies error between the actual wavelength
         and the wavelength set by the user,measured in pm.
         This object belongs to xfp.
         The object will be shown in unit of nm, and the precision is 0.001.
        "
-    ::={ raisecomOpticalTransceiverCurrentStatusEntry 6 }   
+    ::={ raisecomOpticalTransceiverCurrentStatusEntry 6 }
 
 raisecomOpticalTransceiverUserWaveLength          OBJECT-TYPE
     SYNTAX      Integer32(0..3276800)
@@ -1451,10 +1451,10 @@ raisecomOpticalTransceiverUserWaveLength          OBJECT-TYPE
          The object will be shown in unit of nm, and the precision is 0.01.
         "
     ::={ raisecomOpticalTransceiverCurrentStatusEntry 7 }
-                                
-                                 
+
+
 raisecomOpticalTransceiverUserDataRate                OBJECT-TYPE
-    SYNTAX      INTEGER(9500..12500) 
+    SYNTAX      INTEGER(9500..12500)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -1462,8 +1462,8 @@ raisecomOpticalTransceiverUserDataRate                OBJECT-TYPE
          This object belongs to xfp.
          The object will be shown in unit of Gbps, and the precision is 0.1.
         "
-    ::={ raisecomOpticalTransceiverCurrentStatusEntry 8 }    
-     
+    ::={ raisecomOpticalTransceiverCurrentStatusEntry 8 }
+
 raisecomOpticalTransceiverUserLineLoopBack            OBJECT-TYPE
     SYNTAX      INTEGER
 	{
@@ -1473,13 +1473,13 @@ raisecomOpticalTransceiverUserLineLoopBack            OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "This object specifies if the sideline loop-back is tuned on , 
+        "This object specifies if the sideline loop-back is tuned on ,
         user can change the loop back mode through the object.
         normal,lineLoopback.
         This object belongs to xfp.
         "
     ::={ raisecomOpticalTransceiverCurrentStatusEntry 9 }
-    
+
 raisecomOpticalTransceiverUserXFILoopBack             OBJECT-TYPE
     SYNTAX      INTEGER
 	{
@@ -1489,12 +1489,12 @@ raisecomOpticalTransceiverUserXFILoopBack             OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "This object specifies if the XFI loop-back is tuned on 
+        "This object specifies if the XFI loop-back is tuned on
         user can change the loop back mode through the object.
         normal,xfiLoopback.
         This object belongs to xfp.
         "
-    ::={ raisecomOpticalTransceiverCurrentStatusEntry 10 }    
+    ::={ raisecomOpticalTransceiverCurrentStatusEntry 10 }
 
 raisecomOpticalTransceiverPortNotifyEnable OBJECT-TYPE
     SYNTAX      EnableVar
@@ -1502,7 +1502,7 @@ raisecomOpticalTransceiverPortNotifyEnable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object specifies the generation of a port notifications,
-         enable or disable.  
+         enable or disable.
          This object belongs to xfp and sfp.
         "
     DEFVAL { enable}
@@ -1513,8 +1513,8 @@ raisecomOpticalTransceiverPortDDMEnable OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "This object specifies the status of digitaldiagnotic on a port, 
-         enable or disable.  
+        "This object specifies the status of digitaldiagnotic on a port,
+         enable or disable.
          This object belongs to xfp and sfp.
         "
     DEFVAL { enable}
@@ -1525,39 +1525,39 @@ raisecomOpticalTransceiverPortCheckPwdEnable OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "This object specifies the status of password checking on a port, 
-        enable or disable.  
+        "This object specifies the status of password checking on a port,
+        enable or disable.
         This object belongs to xfp.
         "
     DEFVAL { enable}
-    ::={ raisecomOpticalTransceiverCurrentStatusEntry 13 }  
-    
+    ::={ raisecomOpticalTransceiverCurrentStatusEntry 13 }
+
     raisecomOpticalTransceiverTxFaultCount OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "This object specifies the number of tx-fault signals."
-    ::={ raisecomOpticalTransceiverCurrentStatusEntry 14 }  
-    
+    ::={ raisecomOpticalTransceiverCurrentStatusEntry 14 }
+
     raisecomOpticalTransceiverTxFaultCountClear OBJECT-TYPE
     SYNTAX      ClearVar
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "This object specifies clear the statistcs of tx-fault signals."
-    ::={ raisecomOpticalTransceiverCurrentStatusEntry 15 } 
-    
+    ::={ raisecomOpticalTransceiverCurrentStatusEntry 15 }
+
     raisecomOpticalTransceiverSpecificationCheckStatus OBJECT-TYPE
     SYNTAX      INTEGER{none(0),accord(1),not-accord(2)}
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This object specifies the check status, accord(0)specifies 
+        "This object specifies the check status, accord(0)specifies
         the optical module accord with industrial. not-accord(2)
         specifies the optical module not accord with industrial."
-    ::={ raisecomOpticalTransceiverCurrentStatusEntry 16 } 
-    
+    ::={ raisecomOpticalTransceiverCurrentStatusEntry 16 }
+
     raisecomOpticalTransceiverTxFaultStatus OBJECT-TYPE
     SYNTAX      INTEGER{normal(1),tx-fault(2)}
     MAX-ACCESS  read-only
@@ -1565,8 +1565,8 @@ raisecomOpticalTransceiverPortCheckPwdEnable OBJECT-TYPE
     DESCRIPTION
         "This object specifies the tx-fault status."
     ::={ raisecomOpticalTransceiverCurrentStatusEntry 17 }
-    
- 
+
+
 -- Notifications
 
 raisecomOpticalTransceiverNotifications OBJECT IDENTIFIER ::=
@@ -1672,7 +1672,7 @@ raisecomOpticalTransceiverParamAlarmTrap    NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module parameter value increase to above 
+        "This notification is sent when the optical module parameter value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
 
@@ -1701,7 +1701,7 @@ raisecomOpticalTransceiverParamWarningTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module parameter value increase to above 
+        "This notification is sent when the optical module parameter value increase to above
      	the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -1716,8 +1716,8 @@ raisecomOpticalTransceiverParamWarningNormalTrap   NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION
         "This notification is sent when the optical module parameter value dicrease to
-    	under the high warning threshold or increase to above the low warning threshold.   
-    	
+    	under the high warning threshold or increase to above the low warning threshold.
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
@@ -1750,7 +1750,7 @@ raisecomOpticalTransceiverLaserBackLightAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverNotifications 14 }
-   
+
 raisecomOpticalTransceiverLaserLifeAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
@@ -1764,7 +1764,7 @@ raisecomOpticalTransceiverLaserLifeAlarmTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverNotifications 15 }
-   
+
 raisecomOpticalTransceiverLaserLifeAlarmNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
@@ -1784,7 +1784,7 @@ raisecomOpticalTransceiverParamLowAlarmTrap    NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module parameter value increase to above 
+        "This notification is sent when the optical module parameter value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
 
@@ -1800,7 +1800,7 @@ raisecomOpticalTransceiverParamLowAlarmNormalTrap    NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module parameter value increase to above 
+        "This notification is sent when the optical module parameter value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
 
@@ -1808,14 +1808,14 @@ raisecomOpticalTransceiverParamLowAlarmNormalTrap    NOTIFICATION-TYPE
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
-    ::={ raisecomOpticalTransceiverNotifications 18 } 
-    
+    ::={ raisecomOpticalTransceiverNotifications 18 }
+
 raisecomOpticalTransceiverParamLowWarningTrap    NOTIFICATION-TYPE
     OBJECTS     {  raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module parameter value increase to above 
+        "This notification is sent when the optical module parameter value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
 
@@ -1830,7 +1830,7 @@ raisecomOpticalTransceiverParamLowWarningNormalTrap    NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module parameter value increase to above 
+        "This notification is sent when the optical module parameter value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
 
@@ -1840,19 +1840,19 @@ raisecomOpticalTransceiverParamLowWarningNormalTrap    NOTIFICATION-TYPE
         "
     ::={ raisecomOpticalTransceiverNotifications 20 }
 
-      
+
 -- Parameters and Notifications
 
 raisecomOpticalTransceiverParamNotifications OBJECT IDENTIFIER ::=
                                  { raisecomOpticalTransceiver 4 }
-                                 
+
 raisecomOpticalTransceiverTemperatureAlarmTrap    NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Temperature value increase to above 
+        "This notification is sent when the optical module Temperature value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -1883,7 +1883,7 @@ raisecomOpticalTransceiverTemperatureWarningTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Temperature value increase to above 
+        "This notification is sent when the optical module Temperature value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -1913,7 +1913,7 @@ raisecomOpticalTransceiverTxbiasCurrentAlarmTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Tx bias Current value increase to above 
+        "This notification is sent when the optical module Tx bias Current value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -1930,20 +1930,20 @@ raisecomOpticalTransceiverTxbiasCurrentAlarmNormalTrap   NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the optical module Tx bias Current value dicrease to
          under the high alarm threshold or increase to above the low alarm threshold.
-         
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 6 }
- 
+
 raisecomOpticalTransceiverTxbiasCurrentWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Tx bias Current value increase to above 
+        "This notification is sent when the optical module Tx bias Current value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -1973,7 +1973,7 @@ raisecomOpticalTransceiverTxPowerAlarmTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Tx Power value increase to above 
+        "This notification is sent when the optical module Tx Power value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2004,9 +2004,9 @@ raisecomOpticalTransceiverTxPowerWarningTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module  Tx Power value increase to above 
+        "This notification is sent when the optical module  Tx Power value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
-                  
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
@@ -2035,7 +2035,7 @@ raisecomOpticalTransceiverRxPowerAlarmTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Rx Power value increase to above 
+        "This notification is sent when the optical module Rx Power value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2050,7 +2050,7 @@ raisecomOpticalTransceiverRxPowerWarningTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Rx Power value increase to above 
+        "This notification is sent when the optical module Rx Power value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2058,7 +2058,7 @@ raisecomOpticalTransceiverRxPowerWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 14 }
- 
+
 raisecomOpticalTransceiverRxPowerWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2067,7 +2067,7 @@ raisecomOpticalTransceiverRxPowerWarningNormalTrap   NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the optical module Rx Power value dicrease to
          under the high warning threshold or increase to above the low warning threshold.
-         
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
@@ -2088,7 +2088,7 @@ raisecomOpticalTransceiverRxPowerAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 16 }
-   
+
 raisecomOpticalTransceiverLaserTemperatureAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2096,7 +2096,7 @@ raisecomOpticalTransceiverLaserTemperatureAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Laser Temperature value increase to above 
+        "This notification is sent when the optical module Laser Temperature value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2104,14 +2104,14 @@ raisecomOpticalTransceiverLaserTemperatureAlarmTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 17 }
-   
+
 raisecomOpticalTransceiverLaserTemperatureWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module Laser Temperature  value increase to above 
+        "This notification is sent when the optical module Laser Temperature  value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2119,7 +2119,7 @@ raisecomOpticalTransceiverLaserTemperatureWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 18 }
-   
+
 raisecomOpticalTransceiverLaserTemperatureWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2129,13 +2129,13 @@ raisecomOpticalTransceiverLaserTemperatureWarningNormalTrap   NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the optical module Laser Temperature value dicrease to
          under the high warning threshold or increase to above the low warning threshold.
-         
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 19 }
-   
+
 raisecomOpticalTransceiverLaserTemperatureAlarmNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2150,21 +2150,21 @@ raisecomOpticalTransceiverLaserTemperatureAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 20 }
-   
+
 raisecomOpticalTransceiverP5V0supplyVoltageAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +5.0V supply Voltage value increase to above 
+        "This notification is sent when the optical module +5.0V supply Voltage value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 21 }
-   
+
 raisecomOpticalTransceiverP5V0supplyVoltageWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2172,7 +2172,7 @@ raisecomOpticalTransceiverP5V0supplyVoltageWarningTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +5.0V supply Voltage value increase to above 
+        "This notification is sent when the optical module +5.0V supply Voltage value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2180,7 +2180,7 @@ raisecomOpticalTransceiverP5V0supplyVoltageWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 22 }
-   
+
 raisecomOpticalTransceiverP5V0supplyVoltageWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2210,14 +2210,14 @@ raisecomOpticalTransceiverP5V0supplyVoltageAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 24 }
- 
+
 raisecomOpticalTransceiverP3V3supplyVoltageAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module  +3.3V supply Voltage  value increase to above 
+        "This notification is sent when the optical module  +3.3V supply Voltage  value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2232,14 +2232,14 @@ raisecomOpticalTransceiverP3V3supplyVoltageWarningTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +3.3V supply Voltage value increase to above 
+        "This notification is sent when the optical module +3.3V supply Voltage value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 26 }
-   
+
 raisecomOpticalTransceiverP3V3supplyVoltageWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2253,7 +2253,7 @@ raisecomOpticalTransceiverP3V3supplyVoltageWarningNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 27 }
-   
+
 raisecomOpticalTransceiverP3V3supplyVoltageAlarmNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2268,7 +2268,7 @@ raisecomOpticalTransceiverP3V3supplyVoltageAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 28 }
-   
+
 raisecomOpticalTransceiverP1V8supplyVoltageAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2276,15 +2276,15 @@ raisecomOpticalTransceiverP1V8supplyVoltageAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +1.8v supply Voltage value increase to above 
+        "This notification is sent when the optical module +1.8v supply Voltage value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
-         
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 29 }
-   
+
 raisecomOpticalTransceiverP1V8supplyVoltageWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2292,7 +2292,7 @@ raisecomOpticalTransceiverP1V8supplyVoltageWarningTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module  +1.8v supply Voltage value increase to above 
+        "This notification is sent when the optical module  +1.8v supply Voltage value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2300,7 +2300,7 @@ raisecomOpticalTransceiverP1V8supplyVoltageWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 30 }
-   
+
 raisecomOpticalTransceiverP1V8supplyVoltageWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2316,7 +2316,7 @@ raisecomOpticalTransceiverP1V8supplyVoltageWarningNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 31 }
-   
+
 raisecomOpticalTransceiverP1V8supplyVoltageAlarmNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2332,7 +2332,7 @@ raisecomOpticalTransceiverP1V8supplyVoltageAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 32 }
-   
+
 raisecomOpticalTransceiverN5V2supplyVoltageAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2340,7 +2340,7 @@ raisecomOpticalTransceiverN5V2supplyVoltageAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module -5.2v supply Voltage  value increase to above 
+        "This notification is sent when the optical module -5.2v supply Voltage  value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2356,7 +2356,7 @@ raisecomOpticalTransceiverN5V2supplyVoltageWarningTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module -5.2v supply Voltage value increase to above 
+        "This notification is sent when the optical module -5.2v supply Voltage value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2364,7 +2364,7 @@ raisecomOpticalTransceiverN5V2supplyVoltageWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 34 }
- 
+
 raisecomOpticalTransceiverN5V2supplyVoltageWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2396,7 +2396,7 @@ raisecomOpticalTransceiverN5V2supplyVoltageAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 36 }
-   
+
 raisecomOpticalTransceiverApdBiasVoltageAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2404,15 +2404,15 @@ raisecomOpticalTransceiverApdBiasVoltageAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module APD Bias Voltage value increase to above 
-         the high alarm threshold or dicrease to under the low alarm threshold.       
-         
+        "This notification is sent when the optical module APD Bias Voltage value increase to above
+         the high alarm threshold or dicrease to under the low alarm threshold.
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 37 }
-   
+
 raisecomOpticalTransceiverApdBiasVoltageWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2420,15 +2420,15 @@ raisecomOpticalTransceiverApdBiasVoltageWarningTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module APD Bias Voltage  value increase to above 
+        "This notification is sent when the optical module APD Bias Voltage  value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
-         
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 38 }
-   
+
 raisecomOpticalTransceiverApdBiasVoltageWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2443,7 +2443,7 @@ raisecomOpticalTransceiverApdBiasVoltageWarningNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 39 }
-   
+
 raisecomOpticalTransceiverApdBiasVoltageAlarmNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2460,14 +2460,14 @@ raisecomOpticalTransceiverApdBiasVoltageAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 40 }
-   
+
 raisecomOpticalTransceiverP5V0supplyCurrentAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +5.0V supply Current  value increase to above 
+        "This notification is sent when the optical module +5.0V supply Current  value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2475,7 +2475,7 @@ raisecomOpticalTransceiverP5V0supplyCurrentAlarmTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 41 }
-   
+
 raisecomOpticalTransceiverP5V0supplyCurrentWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2483,7 +2483,7 @@ raisecomOpticalTransceiverP5V0supplyCurrentWarningTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +5.0V supply Current  value increase to above 
+        "This notification is sent when the optical module +5.0V supply Current  value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2491,7 +2491,7 @@ raisecomOpticalTransceiverP5V0supplyCurrentWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 42 }
-   
+
 raisecomOpticalTransceiverP5V0supplyCurrentWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2523,7 +2523,7 @@ raisecomOpticalTransceiverP5V0supplyCurrentAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 44 }
- 
+
 raisecomOpticalTransceiverP3V3supplyCurrentAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2531,7 +2531,7 @@ raisecomOpticalTransceiverP3V3supplyCurrentAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +3.3V supply Current value increase to above 
+        "This notification is sent when the optical module +3.3V supply Current value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2547,7 +2547,7 @@ raisecomOpticalTransceiverP3V3supplyCurrentWarningTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +3.3V supply Current value increase to above 
+        "This notification is sent when the optical module +3.3V supply Current value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2555,7 +2555,7 @@ raisecomOpticalTransceiverP3V3supplyCurrentWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 46 }
-   
+
 raisecomOpticalTransceiverP3V3supplyCurrentWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2571,7 +2571,7 @@ raisecomOpticalTransceiverP3V3supplyCurrentWarningNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 47 }
-   
+
 raisecomOpticalTransceiverP3V3supplyCurrentAlarmNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2587,7 +2587,7 @@ raisecomOpticalTransceiverP3V3supplyCurrentAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 48 }
-   
+
 raisecomOpticalTransceiverP1V8supplyCurrentAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2595,7 +2595,7 @@ raisecomOpticalTransceiverP1V8supplyCurrentAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +1.8V supply Current value increase to above 
+        "This notification is sent when the optical module +1.8V supply Current value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2603,7 +2603,7 @@ raisecomOpticalTransceiverP1V8supplyCurrentAlarmTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 49 }
-   
+
 raisecomOpticalTransceiverP1V8supplyCurrentWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2611,7 +2611,7 @@ raisecomOpticalTransceiverP1V8supplyCurrentWarningTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module +1.8V supply Current value increase to above 
+        "This notification is sent when the optical module +1.8V supply Current value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2619,7 +2619,7 @@ raisecomOpticalTransceiverP1V8supplyCurrentWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 50 }
-   
+
 raisecomOpticalTransceiverP1V8supplyCurrentWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2634,7 +2634,7 @@ raisecomOpticalTransceiverP1V8supplyCurrentWarningNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 51 }
-   
+
 raisecomOpticalTransceiverP1V8supplyCurrentAlarmNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2650,7 +2650,7 @@ raisecomOpticalTransceiverP1V8supplyCurrentAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 52 }
-   
+
 raisecomOpticalTransceiverN5V2supplyCurrentAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2658,7 +2658,7 @@ raisecomOpticalTransceiverN5V2supplyCurrentAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module -5.2V supply Current value increase to above 
+        "This notification is sent when the optical module -5.2V supply Current value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2673,15 +2673,15 @@ raisecomOpticalTransceiverN5V2supplyCurrentWarningTrap   NOTIFICATION-TYPE
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module  -5.2V supply Current value increase to above 
+        "This notification is sent when the optical module  -5.2V supply Current value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
-         
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 54 }
- 
+
 raisecomOpticalTransceiverN5V2supplyCurrentWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2713,7 +2713,7 @@ raisecomOpticalTransceiverN5V2supplyCurrentAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 56 }
-   
+
 raisecomOpticalTransceiverTecCurrentAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2721,7 +2721,7 @@ raisecomOpticalTransceiverTecCurrentAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module TecCurrent value increase to above 
+        "This notification is sent when the optical module TecCurrent value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
         This notification may be suppressed under the following
@@ -2729,7 +2729,7 @@ raisecomOpticalTransceiverTecCurrentAlarmTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 57 }
-   
+
 raisecomOpticalTransceiverTecCurrentWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2737,7 +2737,7 @@ raisecomOpticalTransceiverTecCurrentWarningTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module TecCurrent value increase to above 
+        "This notification is sent when the optical module TecCurrent value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
         This notification may be suppressed under the following
@@ -2745,7 +2745,7 @@ raisecomOpticalTransceiverTecCurrentWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 58 }
-   
+
 raisecomOpticalTransceiverTecCurrentWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2761,7 +2761,7 @@ raisecomOpticalTransceiverTecCurrentWarningNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 59 }
-   
+
 raisecomOpticalTransceiverTecCurrentAlarmNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2777,7 +2777,7 @@ raisecomOpticalTransceiverTecCurrentAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 60 }
-   
+
 raisecomOpticalTransceiverLaserWavelengthAlarmTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2785,7 +2785,7 @@ raisecomOpticalTransceiverLaserWavelengthAlarmTrap   NOTIFICATION-TYPE
 
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value increase to above 
+        "This notification is sent when the optical module laserWavelength value increase to above
          the high alarm threshold or dicrease to under the low alarm threshold.
 
 
@@ -2794,14 +2794,14 @@ raisecomOpticalTransceiverLaserWavelengthAlarmTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 61 }
-   
+
 raisecomOpticalTransceiverLaserWavelengthWarningTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
                    raisecomOpticalTransceiverParamAlarmStatus  }
     STATUS      current
     DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value increase to above 
+        "This notification is sent when the optical module laserWavelength value increase to above
          the high warning threshold or dicrease to under the low warning threshold.
 
 
@@ -2810,7 +2810,7 @@ raisecomOpticalTransceiverLaserWavelengthWarningTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 62 }
-   
+
 raisecomOpticalTransceiverLaserWavelengthWarningNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomNotificationLocation,
                    raisecomOpticalTransceiverParameterValue,
@@ -2819,7 +2819,7 @@ raisecomOpticalTransceiverLaserWavelengthWarningNormalTrap   NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the optical module laserWavelength value dicrease to
          under the high warning threshold or increase to above the low warning threshold.
-         
+
         This notification may be suppressed under the following
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
@@ -2839,8 +2839,8 @@ raisecomOpticalTransceiverLaserWavelengthAlarmNormalTrap   NOTIFICATION-TYPE
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
-    ::={ raisecomOpticalTransceiverParamNotifications 64 }  
-    
+    ::={ raisecomOpticalTransceiverParamNotifications 64 }
+
     raisecomOpticalTransceiverTxFaultTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomOpticalTransceiverTxFaultStatus  }
     STATUS      current
@@ -2852,7 +2852,7 @@ raisecomOpticalTransceiverLaserWavelengthAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 65 }
-    
+
     raisecomOpticalTransceiverTxNormalTrap   NOTIFICATION-TYPE
     OBJECTS     {  raisecomOpticalTransceiverTxFaultStatus }
     STATUS      current
@@ -2864,5 +2864,5 @@ raisecomOpticalTransceiverLaserWavelengthAlarmNormalTrap   NOTIFICATION-TYPE
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
     ::={ raisecomOpticalTransceiverParamNotifications 66 }
-    
+
 END

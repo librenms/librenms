@@ -26,6 +26,7 @@ namespace LibreNMS\Device;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 
@@ -107,9 +108,18 @@ class YamlDiscovery
         return $items;
     }
 
-    public static function replaceValues($name, $index, $count, $data, $pre_cache)
+    /**
+     * @param string $name Name of the field in yaml
+     * @param string $index index in the snmp table
+     * @param int $count current count of snmp table entries
+     * @param array $def yaml definition
+     * @param array $pre_cache snmp data fetched from device
+     * @return mixed|string|string[]|null
+     */
+    public static function replaceValues($name, $index, $count, $def, $pre_cache)
     {
-        $value = static::getValueFromData($name, $index, $data, $pre_cache);
+        $value = static::getValueFromData($name, $index, $def, $pre_cache);
+
         if (is_null($value)) {
             // built in replacements
             $search = [
@@ -127,11 +137,11 @@ class YamlDiscovery
                 $replace[] = $subindex;
             }
 
-            $value = str_replace($search, $replace, $data[$name]);
+            $value = str_replace($search, $replace, $def[$name]);
 
             // search discovery data for values
-            $value = preg_replace_callback('/{{ \$([a-zA-Z0-9\-.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
-                $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
+            $value = preg_replace_callback('/{{ \$?([a-zA-Z0-9\-.:]+) }}/', function ($matches) use ($index, $def, $pre_cache) {
+                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache, null);
                 if (is_null($replace)) {
                     d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
 
@@ -169,12 +179,14 @@ class YamlDiscovery
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
 
-        if (isset($pre_cache[$name])) {
+        if (isset($pre_cache[$index][$name])) {
+            return $pre_cache[$index][$name];
+        }
+
+        if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
                     return $pre_cache[$name][$index][$name];
-                } elseif (isset($pre_cache[$index][$name])) {   //probably makes no sense here
-                    return $pre_cache[$index][$name];           //same
                 } elseif (isset($pre_cache[$name][$index])) {
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
@@ -250,7 +262,7 @@ class YamlDiscovery
      * @param mixed $value
      * @param array $yaml_item_data The data key from this item
      * @param array $group_options The options key from this group of items
-     * @param array $item_snmp_data The pre-cache data array
+     * @param array $pre_cache The pre-cache data array
      * @return bool
      */
     public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
@@ -290,5 +302,39 @@ class YamlDiscovery
         }
 
         return false;
+    }
+
+    /**
+     * Translate an oid to numeric format (if already numeric, return as-is)
+     *
+     * @param string $oid
+     * @param array|null $device
+     * @param string $mib
+     * @param string|null $mibdir
+     * @return string numeric oid
+     * @throws \LibreNMS\Exceptions\InvalidOidException
+     */
+    public static function oidToNumeric($oid, $device = null, $mib = 'ALL', $mibdir = null)
+    {
+        if (self::oidIsNumeric($oid)) {
+            return $oid;
+        }
+
+        foreach (explode(':', $mib) as $mib_name) {
+            if ($numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device)) {
+                break;
+            }
+        }
+
+        if (empty($numeric_oid)) {
+            throw new InvalidOidException("Unable to translate oid $oid");
+        }
+
+        return $numeric_oid;
+    }
+
+    public static function oidIsNumeric($oid)
+    {
+        return (bool) preg_match('/^[.\d]+$/', $oid);
     }
 }

@@ -1,0 +1,7 @@
+modules:
+    mempools:
+        data:
+            -
+                used: F5-BIGIP-SYSTEM-MIB::sysStatMemoryUsed
+                total: F5-BIGIP-SYSTEM-MIB::sysStatMemoryTotal
+                descr: 'TMM Memory'

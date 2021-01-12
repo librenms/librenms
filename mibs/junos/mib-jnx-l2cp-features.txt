@@ -11,12 +11,12 @@ IMPORTS
     jnxL2cpMibRoot FROM JUNIPER-SMI;
 
 jnxL2cpFeaturesMIB MODULE-IDENTITY
-    LAST-UPDATED "201206250000Z"
+    LAST-UPDATED "201609230000Z"
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "Juniper Technical Assistance Center
          Juniper Networks, Inc.
-         1194 N. Mathilda Avenue
+         1133 Innovation Way
          Sunnyvale, CA 94089
          E-mail: support@juniper.net"
     DESCRIPTION
@@ -31,6 +31,9 @@ jnxL2cpFeaturesMIB MODULE-IDENTITY
 
     REVISION     "201006110000Z"    -- June 11, 2010
     DESCRIPTION  "Added new trap jnxLacpTimeOut."
+
+    REVISION     "201609230000Z"    -- Sep 23, 2016
+    DESCRIPTION  "Adding  jnxL2cpLoopDetectObjects"
 
     ::= { jnxL2cpMibRoot 1 }
 
@@ -370,5 +373,56 @@ dot3adInterfaceTimeout OBJECT-TYPE
     REFERENCE
         "IEEE 802.3"
     ::= { dot3adAggPortTimeoutEntry 4 }
+
+jnxL2cpLoopDetectObjects  OBJECT IDENTIFIER ::=  { jnxL2cpObjects 5 }
+
+jnxL2cpLoopDetectPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxL2cpLoopDetectPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines a Port Table for Loop Detect information. This contains
+         only those ports on which Loop Detect is configured."
+    ::= { jnxL2cpLoopDetectObjects 1 }
+
+jnxL2cpLoopDetectPortEntry OBJECT-TYPE
+    SYNTAX      JnxL2cpLoopDetectPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the jnxL2cpLoopDetectPortTable.  A list
+         containing Loop Detect information for each Port."
+    INDEX  { ifIndex }
+    ::= { jnxL2cpLoopDetectPortTable 1 }
+
+JnxL2cpLoopDetectPortEntry ::=
+    SEQUENCE {
+        jnxL2cpLoopDetectPortEnabled  TruthValue,
+        jnxL2cpLoopDetectPduError INTEGER
+    }
+
+jnxL2cpLoopDetectPortEnabled  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management indicating whether Loop Detect
+         functionality is enabled on the port. If TRUE causes the Port to be
+         disabled (link down) upon receipt of a Loop Detect PDU. This parameter should be
+         FALSE by default. "
+    ::= { jnxL2cpLoopDetectPortEntry 1 }
+
+jnxL2cpLoopDetectPduError OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-error (0),
+                    detected (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a Loop Detect PDU was received on the port.
+         This parameter will always return 'no-error (0)' if
+         jnxL2cpLoopDetectPortEnabled is FALSE. "
+    ::= { jnxL2cpLoopDetectPortEntry 2 }
 
 END

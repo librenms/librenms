@@ -20,7 +20,7 @@ $array = [
         'descr'  => 'Timedout',
         'colour' => 'FFFF00FF',
     ],
-                ];
+];
 
 $i = 0;
 

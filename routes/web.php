@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
+    Route::view('vminfo', 'vminfo');
 
     // Device Tabs
     Route::group(['prefix' => 'device/{device}', 'namespace' => 'Device\Tabs', 'as' => 'device.'], function () {
@@ -117,13 +118,15 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('customers', 'CustomersController');
             Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
-            Route::post('outages', 'OutagesController');
             Route::post('fdb-tables', 'FdbTablesController');
-            Route::post('routes', 'RoutesTablesController');
             Route::post('graylog', 'GraylogController');
             Route::post('location', 'LocationController');
+            Route::post('mempools', 'MempoolsController');
+            Route::post('outages', 'OutagesController');
             Route::post('port-nac', 'PortNacController');
+            Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
+            Route::post('vminfo', 'VminfoController');
         });
 
         // dashboard widgets

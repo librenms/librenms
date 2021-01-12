@@ -24,8 +24,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class OspfPort extends PortRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $fillable = [
         'device_id',
@@ -52,6 +56,11 @@ class OspfPort extends PortRelatedModel
         'ospfIfMulticastForwarding',
         'ospfIfDemand',
         'ospfIfAuthType',
+        'ospfIfMetricIpAddress',
+        'ospfIfMetricAddressLessIf',
+        'ospfIfMetricTOS',
+        'ospfIfMetricValue',
+        'ospfIfMetricStatus',
     ];
 
     // ---- Define Relationships ----

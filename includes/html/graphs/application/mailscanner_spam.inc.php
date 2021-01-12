@@ -15,7 +15,7 @@ $array = [
         'descr'  => 'Virus',
         'colour' => 'FF0000',
     ],
-                ];
+];
 
 $i = 0;
 

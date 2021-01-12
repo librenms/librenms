@@ -51,37 +51,37 @@ class SmokepingCliTest extends DBTestCase
             '2600::' => [
                 'transport' => 'udp',
             ],
+        ],
+        'Psv9oZcxdC' => [
+            'oHiPfLzrmU' => [
+                'transport' => 'udp',
             ],
-            'Psv9oZcxdC' => [
-                'oHiPfLzrmU' => [
-                    'transport' => 'udp',
-                ],
-                'kEn7hZ7N37' => [
-                    'transport' => 'udp6',
-                ],
-                'PcbZ5FKtS3' => [
-                    'transport' => 'udp6',
-                ],
-                '192.168.1.1' => [
-                    'transport' => 'udp',
-                ],
-                'fe80::' => [
-                    'transport' => 'udp',
-                ],
+            'kEn7hZ7N37' => [
+                'transport' => 'udp6',
             ],
-            '4diY0pWFik' => [
-                'example.org' => [
-                    'transport' => 'udp',
-                ],
-                'host_with_under_score.example.org' => [
-                    'transport' => 'udp6',
-                ],
+            'PcbZ5FKtS3' => [
+                'transport' => 'udp6',
             ],
-        ];
+            '192.168.1.1' => [
+                'transport' => 'udp',
+            ],
+            'fe80::' => [
+                'transport' => 'udp',
+            ],
+        ],
+        '4diY0pWFik' => [
+            'example.org' => [
+                'transport' => 'udp',
+            ],
+            'host_with_under_score.example.org' => [
+                'transport' => 'udp6',
+            ],
+        ],
+    ];
 
     private $instance = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         // We need an app instance available for these tests to load the translation machinary
         $this->app = $this->createApplication();
@@ -332,7 +332,7 @@ class SmokepingCliTest extends DBTestCase
 
         // Generate a ridiculous number of random devices for testing
         foreach (range(1, 1000) as $i) {
-            $device = factory(Device::class)->create();
+            $device = Device::factory()->create();
             $data[$device->type][] = $device->hostname;
         }
 

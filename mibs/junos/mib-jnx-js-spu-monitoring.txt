@@ -20,12 +20,12 @@ IMPORTS
         FROM JUNIPER-JS-SMI;
 
 jnxJsSPUMonitoringMIB MODULE-IDENTITY
-    LAST-UPDATED "201003250000Z" -- Mar 25 00:00:00 2010 UTC
+    LAST-UPDATED "201912090000Z" -- Dec 09 00:00:00 2019 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
                      Juniper Networks, Inc.
-                     1194 N. Mathilda Avenue
+                     1133 Innovation Way
                      Sunnyvale, CA 94089
                      E-mail: support@juniper.net"
     DESCRIPTION
@@ -35,6 +35,10 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         "201207040000Z" -- Jul 04 00:00:00 2012 UTC
     DESCRIPTION
         "add MIB for session counters of IPv4 and IPv6 respectively."
+    REVISION
+        "201912090000Z" -- Dec 09 00:00:00 2019 UTC
+    DESCRIPTION
+        "add SPU thread statistics."
 
     ::= { jnxJsSPUMonitoringRoot 1 }
 
@@ -71,7 +75,8 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         jnxJsSPUMonitoringFlowSessIPv4	Unsigned32,
         jnxJsSPUMonitoringFlowSessIPv6	Unsigned32,
         jnxJsSPUMonitoringCPSessIPv4	Unsigned32,
-        jnxJsSPUMonitoringCPSessIPv6	Unsigned32
+        jnxJsSPUMonitoringCPSessIPv6	Unsigned32,
+        jnxJsSPUMonitoringSPUThreadsNumber  Unsigned32
     }
 
     jnxJsSPUMonitoringIndex OBJECT-TYPE
@@ -203,8 +208,15 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
           DESCRIPTION
                   "Current IPv6 CP session number of SPU."
           ::= { jnxJsSPUMonitoringObjectsEntry 15 }
- 
-                   
+
+    jnxJsSPUMonitoringSPUThreadsNumber OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of threads for an SPU."
+        ::= { jnxJsSPUMonitoringObjectsEntry 16 }
+
     jnxJsSPUMonitoringCurrentTotalSession OBJECT-TYPE
         SYNTAX Unsigned32
         MAX-ACCESS  read-only
@@ -347,5 +359,66 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         DESCRIPTION
                 "System level total IPv6 session in use."
         ::= { jnxJsSPUMonitoringMIB 6 }
+
+    jnxJsSPUMonitoringSPUThreadsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxJsSPUMonitoringSPUThreadsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table exposes threads utilization statistics for an SPU."
+        ::= { jnxJsSPUMonitoringMIB 7 }
+
+    jnxJsSPUMonitoringSPUThreadsEntry OBJECT-TYPE
+        SYNTAX          JnxJsSPUMonitoringSPUThreadsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entry collects CPU utilization statistics for a thread."
+        INDEX
+        {
+            jnxJsSPUMonitoringIndex,
+            jnxJsSPUMonitoringSPUThreadIndex
+        }
+        ::= { jnxJsSPUMonitoringSPUThreadsTable 1 }
+
+    JnxJsSPUMonitoringSPUThreadsEntry ::= SEQUENCE {
+        jnxJsSPUMonitoringSPUThreadIndex            Unsigned32,
+        jnxJsSPUMonitoringSPUThreadLastMinUsage     Unsigned32,
+        jnxJsSPUMonitoringSPUThreadLastHourUsage    Unsigned32,
+        jnxJsSPUMonitoringSPUThreadLastDayUsage     Unsigned32
+    }
+
+    jnxJsSPUMonitoringSPUThreadIndex OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Thread index on an SPU."
+        ::= { jnxJsSPUMonitoringSPUThreadsEntry 1 }
+
+    jnxJsSPUMonitoringSPUThreadLastMinUsage OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Thread utilization of last minute."
+        ::= { jnxJsSPUMonitoringSPUThreadsEntry 2 }
+
+    jnxJsSPUMonitoringSPUThreadLastHourUsage OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Thread utilization of last hour."
+        ::= { jnxJsSPUMonitoringSPUThreadsEntry 3 }
+
+    jnxJsSPUMonitoringSPUThreadLastDayUsage OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Thread utilization of last day."
+        ::= { jnxJsSPUMonitoringSPUThreadsEntry 4 }
+
 END
 

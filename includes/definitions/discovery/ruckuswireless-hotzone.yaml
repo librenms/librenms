@@ -1,5 +1,10 @@
 mib: RUCKUS-SYSTEM-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: RUCKUS-SYSTEM-MIB::ruckusSystemMemoryUtil
+                descr: 'System Memory'
     os:
         hardware: RUCKUS-HWINFO-MIB::ruckusHwInfoModelNumber.0
         serial: RUCKUS-HWINFO-MIB::ruckusHwInfoSerialNumber.0

@@ -16,7 +16,7 @@ $array = [
         'descr'  => 'Failed',
         'colour' => '880000FF',
     ],
-                ];
+];
 
 $i = 0;
 

@@ -182,7 +182,7 @@ class FileCategorizerTest extends TestCase
     public function testFullChecks()
     {
         $this->assertCategorized(['full-checks' => ['composer.lock']]);
-        $this->assertCategorized(['full-checks' => ['.travis.yml']], ['other', '.travis.yml']);
+        $this->assertCategorized(['full-checks' => ['.github/workflows/test.yml']], ['other', '.github/workflows/test.yml']);
 
         $this->assertCategorized([
             'os' => ['3com', 'calix', 'ptp650', 'dd-wrt', 'arista_eos'],

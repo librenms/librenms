@@ -49,6 +49,7 @@ $type_text = [
     'state' => 'State',
     'count' => 'Count',
     'signal' => 'Signal',
+    'tv_signal' => 'TV signal',
     'snr' => 'SNR',
     'pressure' => 'Pressure',
     'cooling' => 'Cooling',

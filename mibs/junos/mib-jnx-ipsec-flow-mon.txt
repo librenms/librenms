@@ -11,9 +11,9 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
          MODULE-IDENTITY, OBJECT-TYPE, Counter32, 
-		 Counter64, Integer32, Unsigned32 
+		 Counter64, Integer32, Unsigned32, NOTIFICATION-TYPE
            FROM SNMPv2-SMI
-         InetAddress, InetAddressType
+         InetAddress, InetAddressType, InetPortNumber
            FROM INET-ADDRESS-MIB
         TEXTUAL-CONVENTION, DisplayString, TimeInterval
            FROM SNMPv2-TC
@@ -22,12 +22,12 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
 
 
     jnxIpSecFlowMonMIB  MODULE-IDENTITY
-        LAST-UPDATED "200705112153Z"     -- May 16, 2007 
+        LAST-UPDATED "202004290000Z"     -- Wed Apr 29 00:00:00 2020 UTC
         ORGANIZATION "Juniper Networks, Inc."
         CONTACT-INFO
                      "Juniper Technical Assistance Center
                       Juniper Networks, Inc.
-                      1194 N. Mathilda Avenue
+                      1133 Innovation Way
                       Sunnyvale, CA 94089
                       E-mail: support@juniper.net"
         DESCRIPTION
@@ -43,11 +43,59 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
 	         Building on the existing IKE infrastruature, the  
 	         security IKE implementation integrates the value-added 
 	         features for the security products"
+        
+        REVISION    "202004290000Z" -- April 29, 2020
+        DESCRIPTION
+            "Added New field for jnxIkeGlobalInitiatorIkev2SaInitStats for
+             the global IKE stats"
+
+        REVISION    "202004280000Z" -- April 28, 2020
+        DESCRIPTION
+            "A new field jnxIkeTunMonTunType of type JnxIkeTunType is added to
+             table jnxIkeTunnelMonTableunder which will identify the tunnel as
+             regular(1) or halink(2).
+
+             A new field jnxIpSecTunMonTunType of type JnxIkeTunType is added to
+             table jnxIpSecTunnelMonTable which will identify the tunnel as
+             regular(1) or halink(2).
+
+             A new table jnxIkeHaLinkGlobalStats is added which lists IKE
+             global stats for ha-link tunnels.
+
+             A new table jnxIpSecHaLinkGlobalStats is added which lists IPSec
+             global stats for ha-link tunnels.
+
+             A new field jnxIkePeerStatsTunType of type JnxIkeTunType is added
+             to table jnxIkePeerStatsTable which will identify the tunnel as
+             regular(1) or halink(2)."
+
+        REVISION    "202004190000Z" -- April 19, 2020
+        DESCRIPTION
+            "Added New MIB jnxIpSecGlobalStats for the global IPsec stats"
+
+        REVISION    "201909100000Z" -- September 10, 2019
+        DESCRIPTION
+            "Added IPSec-tunnel statistics counters to IPSec Tunnel monitor
+            entry table"
+
+        REVISION    "201908220000Z" -- August 22, 2019
+        DESCRIPTION
+            "Added the IKE tunnel statistics counters to IKE tunnel monitor table"
+
+        REVISION    "201606220000Z" -- June 22, 2016
+        DESCRIPTION 
+            "Added traffic-selector-name and vpn-name to ipsec-tunnel
+            -monitor-entry table"
+
         REVISION    "200705160000Z" -- May 16, 2007
         DESCRIPTION 
             "Revised the MIB to exlude platform/product specific attributes"
-        ::= { jnxIpSecMibRoot 1 } 
 
+        REVISION    "201605310000Z" -- 31-May-16
+        DESCRIPTION
+            "Consolidated TC duplicated b/n jnx-ipsec-flow-mon.mib, jnx-ipsec-monitor-asp.mib"
+
+        ::= { jnxIpSecMibRoot 1 } 
 
     --
     -- Branch tree objects
@@ -92,7 +140,8 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
              not provide identity protection"
          SYNTAX INTEGER {
                    main         (1),
-                   aggressive   (2)
+                   aggressive   (2),
+                   ikev2(3)
          }
 
     JnxIkeHashAlgo ::= TEXTUAL-CONVENTION
@@ -102,7 +151,9 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          SYNTAX INTEGER {
                    md5(1),
                    sha(2),
-                   sha256(3)
+                   sha256(3),
+                   sha384(4),
+                   sha512(5)
          }
 
     JnxIkeAuthMethod ::= TEXTUAL-CONVENTION
@@ -120,7 +171,10 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    xauthDssSignature      (7),
                    xauthRsaSignature      (8),
                    xauthRsaEncryption     (9),
-                   xauthRevRsaEncryption  (10)
+                   xauthRevRsaEncryption  (10),
+                   ecdsa256Signature      (11),
+                   ecdsa384Signature      (12),
+                   ecdsa521Signature      (13)
          }
 
     JnxIkePeerRole ::= TEXTUAL-CONVENTION
@@ -149,13 +203,27 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
             "The Diffie Hellman Group used in negotiations.
                    modp768        -- 768-bit MODP
                    modp1024       -- 1024-bit MODP
-                   modp1536       -- 1536-bit MODP; voyager only
+                   modp1536       -- 1536-bit MODP
+                   modp2048       -- 2048-bit MODP
+                   modp3072       -- 3072-bit MODP
+                   modp4096       -- 4096-bit MODP
+                   ec-modp256     -- 256-bit EC-MODP
+                   ec-modp384     -- 384-bit EC-MODP
+                   ec-modp521     -- 521-bit EC-MODP
+                   modp2048s256   -- 2048-bit MODP group with 256 bit subgroup
             "
          SYNTAX INTEGER {
-                   unknown	(0),
-                   modp768	(1),
-                   modp1024	(2),
-                   modp1536     (5)
+                   unknown(0),
+                   modp768(1),
+                   modp1024(2),
+                   modp1536(5),
+                   modp2048(14),
+                   modp3072(15),
+                   modp4096(16),
+                   ecmodp256(19),
+                   ecmodp384(20),
+                   ecmodp521(21),
+                   modp2048s256(24)
          }
 
     JnxKeyType    ::= TEXTUAL-CONVENTION
@@ -188,7 +256,10 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    espNull              (3),
                    espAes128            (4),  
                    espAes192            (5),
-                   espAes256            (6)
+                   espAes256            (6),
+                   espAesGcm128         (7),
+                   espAesGcm192         (8),
+                   espAesGcm256         (9)
          }
 
     JnxAuthAlgo      ::= TEXTUAL-CONVENTION
@@ -200,7 +271,9 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    unknown            (0),
                    hmacMd5            (1),
                    hmacSha            (2),
-                   hmacSha256         (3)
+                   hmacSha256         (3),
+                   hmacSha384         (4),
+                   hmacSha512         (5)
 
          }
 
@@ -219,6 +292,16 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    dynamic              (2)
          }
 
+    JnxPeerStateType ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "State of the IKE peer with which the managed entity
+            is currently associated."
+        SYNTAX INTEGER {
+            active     (1),
+            inactive   (2)
+        }
+
     JnxSpiType  ::= TEXTUAL-CONVENTION
          STATUS     current
          DESCRIPTION
@@ -236,6 +319,261 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    manual    (1),
                    dynamic   (2)
         }
+
+    JnxEsnMode   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "ESN mode Enable or Disable"
+        SYNTAX INTEGER {
+                   none      (0),
+                   enable    (1),
+                   disable   (2)
+        }
+
+    JnxIkeTunType ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "Type of the tunnel."
+         SYNTAX INTEGER {
+                   regular (1),
+                   halink  (2)
+         }
+
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- Notifications
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIkeNotificationType OBJECT IDENTIFIER ::= { jnxIpSecFlowMonNotifications 0 }
+
+    jnxIkeNotificationObj OBJECT IDENTIFIER ::= { jnxIpSecFlowMonNotifications 1 }
+
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- Notifications - Variables
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIkeTrapPeerRemoteGwAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address type of the remote gateway (endpoint) for the
+            IKE SA negotiaton."
+        ::= { jnxIkeNotificationObj 1 }
+
+    jnxIkeTrapPeerRemoteGwAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address of the remote gateway (endpoint) for the IKE SA
+            negotiation."
+        ::= { jnxIkeNotificationObj 2 }
+
+    jnxIkeTrapPeerRemotePort OBJECT-TYPE
+        SYNTAX          InetPortNumber
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The port number of the remote gateway (endpoint) for the IKE
+            SA negotiation. The port number zero means the input value is
+            ignored for this object and the default port is considered."
+        ::= { jnxIkeNotificationObj 3 }
+
+    jnxIkeTrapPeerLocalGwAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address type of the local endpoint (gateway) for the
+            IKE SA negotiation."
+        ::= { jnxIkeNotificationObj 4 }
+
+    jnxIkeTrapPeerLocalGwAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address of the local endpoint (gateway) for the IKE SA
+            negotiation."
+        ::= { jnxIkeNotificationObj 5 }
+
+    jnxIkeTrapPeerLocalPort OBJECT-TYPE
+        SYNTAX          InetPortNumber
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The port number of the local gateway (endpoint) for the IKE SA
+            negotiation. The port number zero means the input value is
+            ignored for this object and the default port is considered."
+        ::= { jnxIkeNotificationObj 6 }
+
+    jnxIkeTrapPeerRoutingInstance OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Name of the routing instance."
+        ::= { jnxIkeNotificationObj 7 }
+
+    jnxIkeTrapPeerLocalIdType OBJECT-TYPE
+        SYNTAX          JnxIkePeerType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The type of local peer identity.  The local
+            peer may be identified by:
+            1. an IP address, or
+            2. or a fully qualified domain name string.
+            3. or a distinguished name string."
+        ::= { jnxIkeNotificationObj 8 }
+
+    jnxIkeTrapPeerLocalIdValue OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value of the local peer identity.
+
+            If the local peer type is an IP Address, then this
+            is the IP Address used to identify the local peer.
+
+            If the local peer type is id_fqdn, then this is
+            the FQDN of the remote peer.
+
+            If the local peer type is a id_dn, then this is
+            the distinguished name string of the local peer."
+        ::= { jnxIkeNotificationObj 9 }
+
+    jnxIkeTrapPeerRemoteIdType OBJECT-TYPE
+        SYNTAX          JnxIkePeerType
+        MAX-ACCESS      read-only
+        STATUS current
+        DESCRIPTION
+            "The type of remote peer identity.
+            The remote peer may be identified by:
+            1. an IP address, or
+            2. or a fully qualified domain name string.
+            3. or a distinguished name string."
+        ::= { jnxIkeNotificationObj 10 }
+
+    jnxIkeTrapPeerRemoteIdValue OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value of the remote peer identity.
+
+            If the remote peer type is an IP Address, then this
+            is the IP Address used to identify the remote peer.
+
+            If the remote peer type is id_fqdn, then this is
+            the FQDN of the remote peer.
+
+            If the remote peer type is a id_dn, then this is
+            the distinguished named string of the remote peer."
+        ::= { jnxIkeNotificationObj 11 }
+
+    jnxIkeTrapPeerAAAUserName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Identifies the user with the specified authentication,
+            authorization and accounting (AAA) username, associated
+            with the IKE SA negotiation."
+        ::= { jnxIkeNotificationObj 12 }
+
+    jnxIkeTrapPeerGwName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Name of the IKE gateway."
+        ::= { jnxIkeNotificationObj 13 }
+
+    jnxIkeTrapIpSecTunVpnName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "IPsec tunnel VPN name."
+        ::= { jnxIkeNotificationObj 14 }
+
+    jnxIkeTrapIpSecTunTsName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "IPsec tunnel Traffic Selector name."
+        ::= { jnxIkeNotificationObj 15 }
+
+    jnxIkeTrapIpSecTunLocalTS OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Identifier for the local end of IPsec tunnel."
+        ::= { jnxIkeNotificationObj 16 }
+
+    jnxIkeTrapIpSecTunRemoteTS OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Identifier for the remote end of IPsec tunnel."
+        ::= { jnxIkeNotificationObj 17 }
+
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- Notifications - Traps
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIkePeerDown NOTIFICATION-TYPE
+        OBJECTS         {
+                            jnxIkeTrapPeerRemoteGwAddrType,
+                            jnxIkeTrapPeerRemoteGwAddr,
+                            jnxIkeTrapPeerRemotePort,
+                            jnxIkeTrapPeerLocalGwAddrType,
+                            jnxIkeTrapPeerLocalGwAddr,
+                            jnxIkeTrapPeerLocalPort,
+                            jnxIkeTrapPeerRoutingInstance,
+                            jnxIkeTrapPeerLocalIdType,
+                            jnxIkeTrapPeerLocalIdValue,
+                            jnxIkeTrapPeerRemoteIdType,
+                            jnxIkeTrapPeerRemoteIdValue,
+                            jnxIkeTrapPeerAAAUserName,
+                            jnxIkeTrapPeerGwName
+                        }
+        STATUS          current
+        DESCRIPTION
+            "To provide notification for the event when Peer goes down."
+        ::= { jnxIkeNotificationType 1 }
+
+    jnxIkePeerIPSecTunnelDown NOTIFICATION-TYPE
+        OBJECTS         {
+                            jnxIkeTrapPeerRemoteGwAddrType,
+                            jnxIkeTrapPeerRemoteGwAddr,
+                            jnxIkeTrapPeerRemotePort,
+                            jnxIkeTrapPeerLocalGwAddrType,
+                            jnxIkeTrapPeerLocalGwAddr,
+                            jnxIkeTrapPeerLocalPort,
+                            jnxIkeTrapPeerRoutingInstance,
+                            jnxIkeTrapPeerLocalIdType,
+                            jnxIkeTrapPeerLocalIdValue,
+                            jnxIkeTrapPeerRemoteIdType,
+                            jnxIkeTrapPeerRemoteIdValue,
+                            jnxIkeTrapPeerAAAUserName,
+                            jnxIkeTrapPeerGwName,
+                            jnxIkeTrapIpSecTunVpnName,
+                            jnxIkeTrapIpSecTunTsName,
+                            jnxIkeTrapIpSecTunLocalTS,
+                            jnxIkeTrapIpSecTunRemoteTS
+                        }
+        STATUS          current
+        DESCRIPTION
+            "To provide notification for the event of IPSec Tunnels
+            going down for a peer. These traps are not generated
+            if the corresponding peer has gone down."
+        ::= { jnxIkeNotificationType 2 }
 
 
     -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -314,8 +652,25 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          jnxIkeTunMonInPkts                Counter32,
          jnxIkeTunMonOutOctets             Counter64,
          jnxIkeTunMonOutPkts               Counter32,
-         jnxIkeTunMonXAuthUserId           DisplayString, 
-         jnxIkeTunMonDPDDownCount          Counter32	
+         jnxIkeTunMonXAuthUserId           DisplayString,
+         jnxIkeTunMonDPDDownCount          Counter32,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyRequestOut            Counter64,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResponseIn            Counter64,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyNoProposalChosenIn    Counter64,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyInvalidKeIn           Counter64,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyTsUnacceptableIn      Counter64,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResVerifySaFail       Counter64,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResVerifyDhGroupFail  Counter64,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResVerifyTsFail       Counter64,
+         jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResDhComputeKeyFail   Counter64,
+         jnxIkeTunMonResponderIkev2IPSecSaRekeyRequestIn             Counter64,
+         jnxIkeTunMonResponderIkev2IPSecSaRekeyResponseOut           Counter64,
+         jnxIkeTunMonResponderIkev2IPSecSaRekeyNoProposalChosenOut   Counter64,
+         jnxIkeTunMonResponderIkev2IPSecSaRekeyInvalidKeOut          Counter64,
+         jnxIkeTunMonResponderIkev2IPSecSaRekeyTsUnacceptableOut     Counter64,
+         jnxIkeTunMonResponderIkev2IPSecSaRekeyResDhComputeKeyFail   Counter64,
+         jnxIkeTunMonGwName                                          DisplayString,
+         jnxIkeTunMonTunType                                         JnxIkeTunType
       }
 
 
@@ -597,7 +952,2763 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
              in a dead (or down) state. This attribute is obsolete"   
          ::= { jnxIkeTunnelMonEntry 27 }
 
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyRequestOut OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA request
+            message sent by Initiator."
+         ::= { jnxIkeTunnelMonEntry 28 }
 
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResponseIn OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response
+            message received by Initiator."
+         ::= { jnxIkeTunnelMonEntry 29 }
+
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyNoProposalChosenIn OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA NO_PROPSAL_CHOSEN
+            Notification received by Initiator."
+         ::= { jnxIkeTunnelMonEntry 30 }
+
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyInvalidKeIn OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA INVALID_KE_PAYLOAD
+            received by Initiator."
+         ::= { jnxIkeTunnelMonEntry 31 }
+
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyTsUnacceptableIn OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA TS_UNACCEPTABLE
+            notification received by Initiator."
+         ::= { jnxIkeTunnelMonEntry 32 }
+
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResVerifySaFail OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+            verification of peer SA failed at Initiator."
+         ::= { jnxIkeTunnelMonEntry 33 }
+
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResVerifyDhGroupFail OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+            verification of DH group failed at Initiator."
+         ::= { jnxIkeTunnelMonEntry 34 }
+
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResVerifyTsFail OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+            verification of TS failed at Initiator."
+         ::= { jnxIkeTunnelMonEntry 35 }
+
+      jnxIkeTunMonInitiatorIkev2IPSecSaRekeyResDhComputeKeyFail OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+            Diffie-Hellman compute key failed at Initiator."
+         ::= { jnxIkeTunnelMonEntry 36 }
+
+      jnxIkeTunMonResponderIkev2IPSecSaRekeyRequestIn OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA request
+            message received by Responder."
+         ::= { jnxIkeTunnelMonEntry 37 }
+
+      jnxIkeTunMonResponderIkev2IPSecSaRekeyResponseOut OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response
+            message sent by Responder."
+         ::= { jnxIkeTunnelMonEntry 38 }
+
+      jnxIkeTunMonResponderIkev2IPSecSaRekeyNoProposalChosenOut OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA NO_PROPSAL_CHOSEN
+            Notification sent by Responder."
+         ::= { jnxIkeTunnelMonEntry 39 }
+
+      jnxIkeTunMonResponderIkev2IPSecSaRekeyInvalidKeOut OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA INVALID_KE_PAYLOAD
+            Notification sent by Responder."
+         ::= { jnxIkeTunnelMonEntry 40 }
+
+      jnxIkeTunMonResponderIkev2IPSecSaRekeyTsUnacceptableOut OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA TS_UNACCEPTABLE
+            notification sent by Responder."
+         ::= { jnxIkeTunnelMonEntry 41 }
+
+      jnxIkeTunMonResponderIkev2IPSecSaRekeyResDhComputeKeyFail OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Messages"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+            Diffie-Hellman compute key failed at Responder."
+         ::= { jnxIkeTunnelMonEntry 42 }
+
+      jnxIkeTunMonGwName OBJECT-TYPE
+         SYNTAX          DisplayString
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION
+            "The gateway name"
+         ::= { jnxIkeTunnelMonEntry 43 }
+
+      jnxIkeTunMonTunType OBJECT-TYPE
+         SYNTAX          JnxIkeTunType
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION
+            "The Tunnel type. It can be regular (1) or ha-link (2)"
+         ::= { jnxIkeTunnelMonEntry 44 }
+
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   -- The IKEv2 global Statistics
+   -- Provides global statistics for all IKE tunnels, active and previous.
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIkeGlobalStats OBJECT IDENTIFIER
+        ::= { jnxIpSecFlowMonPhaseOne 3 }
+
+
+    -- Initiator IKE_SA_INIT exchange stats
+
+    jnxIkeGlobalInitiatorIkev2SaInitStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 1 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT request message sent by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 1 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 2 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitResInvalidIkeSpi OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message containing invalid
+            SPI received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 3 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitInvalidKePayloadIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT INVALID_KE_PAYLOAD received
+             by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 4 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitNoProposalChosenIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT NO_PROPSAL_CHOSEN received
+            by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 5 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitResVerifySaFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Number of IKE_SA_INIT response message verification
+            of peer SA failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 6 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitResIkeSaFillFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message IKE SA fill
+            operation failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 7 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitResVerifyDhGroupFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message verification of
+            DH group failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 8 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitCookieRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT COOKIE notification request
+            message received by Initiator."
+         ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 9 }
+
+    jnxIkeGlobalInitiatorIkev2SaInitCookieResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT COOKIE notification
+            response message sent by Responder."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 10 }
+
+     jnxIkeGlobalInitiatorIkev2SaInitResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message Diffie-Hellman
+            compute key failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2SaInitStats 11 }
+
+    -- Responder IKE_SA_INIT exchange stats
+
+    jnxIkeGlobalResponderIkev2SaInitStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 2 }
+
+    jnxIkeGlobalResponderIkev2SaInitRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT request message received by Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 1 }
+
+    jnxIkeGlobalResponderIkev2SaInitResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 2 }
+
+    jnxIkeGlobalResponderIkev2SaInitNoProposalChosenOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT NO_PROPSAL_CHOSEN notification
+            sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 3 }
+
+    jnxIkeGlobalResponderIkev2SaInitInvalidKePayloadOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT INVALID_KE_PAYLOAD notification
+            sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 4 }
+
+    jnxIkeGlobalResponderIkev2SaInitResInvalidDhGroupConf OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message invalid DH group
+            configured at Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 5 }
+
+    jnxIkeGlobalResponderIkev2SaInitResDhGenKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message Diffie-Hellman
+            generate key failed at Responder"
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 6 }
+
+    jnxIkeGlobalResponderIkev2SaInitResGetCAsFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message get CAs failed at
+            Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 7 }
+
+    jnxIkeGlobalResponderIkev2SaInitResGetVidFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message get vendor ID
+            request failed at Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 8 }
+
+    jnxIkeGlobalResponderIkev2SaInitResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message Diffie-Hellman
+            compute key failed at Responder"
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 9 }
+
+    jnxIkeGlobalResponderIkev2SaInitCookieRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT COOKIE notification request message
+            sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 10 }
+
+    jnxIkeGlobalResponderIkev2SaInitCookieResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT COOKIE notification response
+            message received by Responder."
+        ::= { jnxIkeGlobalResponderIkev2SaInitStats 11 }
+
+
+    -- Initiator IKE_AUTH exchange stats
+
+    jnxIkeGlobalInitiatorIkev2AuthStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 3 }
+
+    jnxIkeGlobalInitiatorIkev2AuthRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH request message sent by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2AuthStats 1 }
+
+    jnxIkeGlobalInitiatorIkev2AuthResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH response message received by
+            Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2AuthStats 2 }
+
+    jnxIkeGlobalInitiatorIkev2AuthNoProposalChosenIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH NO_PROPSAL_CHOSEN notification
+            received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2AuthStats 3 }
+
+    jnxIkeGlobalInitiatorIkev2AuthTsUnacceptableIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH TS_UNACCEPTABLE notification
+            received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2AuthStats 4 }
+
+    jnxIkeGlobalInitiatorIkev2AuthAuthenticationFailedIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH AUTHENTICATION_FAILED
+            notification received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2AuthStats 5 }
+
+
+    -- Responder IKE_AUTH exchange stats
+
+    jnxIkeGlobalResponderIkev2AuthStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 4 }
+
+    jnxIkeGlobalResponderIkev2AuthRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH request message received by Responder."
+        ::= { jnxIkeGlobalResponderIkev2AuthStats 1 }
+
+    jnxIkeGlobalResponderIkev2AuthResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH response message sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2AuthStats 2 }
+
+    jnxIkeGlobalResponderIkev2AuthNoProposalChosenOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH NO_PROPSAL_CHOSEN notification
+            sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2AuthStats 3 }
+
+    jnxIkeGlobalResponderIkev2AuthTsUnacceptableOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH TS_UNACCEPTABLE notification
+            sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2AuthStats 4 }
+
+    jnxIkeGlobalResponderIkev2AuthAuthenticationFailedOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH request message AUTHENTICATION_FAILED
+            notification sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2AuthStats 5 }
+
+
+    --- Initiator IKE SA rekey CREATE_CHILD_SA exchange stats
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 5 }
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey CREATE_CHILD_SA request message
+            sent by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats 1 }
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey CREATE_CHILD_SA response message
+            received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats 2 }
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyNoProposalChosenIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey NO_PROPSAL_CHOSEN notification
+            received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats 3 }
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyInvalidKeIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey INVALID_KE_PAYLOAD notification
+            received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats 4 }
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            Diffie-Hellman compute key failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats 5 }
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyResVerifySaFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            verification of peer SA failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats 6 }
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyResFillIkeSaFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            fill IKE SA failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats 7 }
+
+    jnxIkeGlobalInitiatorIkev2IkeSaRekeyResVerifyDhGroupFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            verification of DH group failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IkeSaRekeyStats 8 }
+
+
+    --- Responder IKE SA rekey CREATE_CHILD_SA exchange stats
+
+    jnxIkeGlobalResponderIkev2IkeSaRekeyStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 6 }
+
+    jnxIkeGlobalResponderIkev2IkeSaRekeyRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey request message
+            received by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IkeSaRekeyStats 1 }
+
+    jnxIkeGlobalResponderIkev2IkeSaRekeyResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IkeSaRekeyStats 2 }
+
+    jnxIkeGlobalResponderIkev2IkeSaRekeyNoProposalChosenOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey NO_PROPSAL_CHOSEN
+            notification sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IkeSaRekeyStats 3 }
+
+    jnxIkeGlobalResponderIkev2IkeSaRekeyInvalidKeOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey INVALID_KE_PAYLOAD
+            notification sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IkeSaRekeyStats 4 }
+
+    jnxIkeGlobalResponderIkev2IkeSaRekeyResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            Diffie-Hellman compute key failed at Responder."
+        ::= { jnxIkeGlobalResponderIkev2IkeSaRekeyStats 5 }
+
+
+    --- Initiator IPSec SA rekey CREATE_CHILD_SA exchange stats
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 7 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey request
+            message sent by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 1 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response
+            message received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 2 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyNoProposalChosenIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey NO_PROPSAL_CHOSEN
+            notification received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 3 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyInvalidKeIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey INVALID_KE_PAYLOAD
+            notification received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 4 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyTsUnacceptableIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey TS_UNACCEPTABLE
+            notification received by Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 5 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyResVerifySaFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             verification of peer SA failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 6 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             Diffie-Hellman compute key failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 7 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyResVerifyDhGroupFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             verification of DH group failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 8 }
+
+    jnxIkeGlobalInitiatorIkev2IpsecSaRekeyResVerifyTsFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             verification of TS failed at Initiator."
+        ::= { jnxIkeGlobalInitiatorIkev2IpsecSaRekeyStats 9 }
+
+
+    --- Responder IPSec SA rekey CREATE_CHILD_SA exchange stats
+
+    jnxIkeGlobalResponderIkev2IpsecSaRekeyStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 8 }
+
+    jnxIkeGlobalResponderIkev2IpsecSaRekeyRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey request
+            message received by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IpsecSaRekeyStats 1 }
+
+    jnxIkeGlobalResponderIkev2IpsecSaRekeyResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response
+            message sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IpsecSaRekeyStats 2 }
+
+    jnxIkeGlobalResponderIkev2IpsecSaRekeyNoProposalChosenOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey NO_PROPSAL_CHOSEN
+            notification sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IpsecSaRekeyStats 3 }
+
+    jnxIkeGlobalResponderIkev2IpsecSaRekeyInvalidKeOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey INVALID_KE_PAYLOAD
+            notification sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IpsecSaRekeyStats 4 }
+
+    jnxIkeGlobalResponderIkev2IpsecSaRekeyTsUnacceptableOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey TS_UNACCEPTABLE
+             notification sent by Responder."
+        ::= { jnxIkeGlobalResponderIkev2IpsecSaRekeyStats 5 }
+
+    jnxIkeGlobalResponderIkev2IpsecSaRekeyResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             Diffie-Hellman compute key failed at Responder."
+        ::= { jnxIkeGlobalResponderIkev2IpsecSaRekeyStats 6 }
+
+
+    --- Message failure stats
+
+    jnxIkeGlobalIkev2MsgFailStats OBJECT IDENTIFIER
+        ::= { jnxIkeGlobalStats 9 }
+
+    jnxIkeGlobalIkev2TotalDiscarded OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of discarded messages. Includes the failures
+            encountered during decode of IKEv2 packets that is failures
+            before the IKEv2 exchange payload processing. Also this
+            counter encompasses all the other message failure counters."
+        ::= { jnxIkeGlobalIkev2MsgFailStats 1 }
+
+    jnxIkeGlobalIkev2TotalIdError OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with ID error. Message ID is not
+            compliant with what is expected. For ex. IKE_SA_INIT message
+            with message ID larger than zero is encountered."
+        ::= { jnxIkeGlobalIkev2MsgFailStats 2 }
+
+    jnxIkeGlobalIkev2TotalIntegrityFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with Integrity check failure."
+        ::= { jnxIkeGlobalIkev2MsgFailStats 3 }
+
+    jnxIkeGlobalIkev2TotalInvalidSPI OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with Invalid SPI failure. Used one
+            of the SPIs to find the SA, but the other SPI is not matching.
+            Invalid IKE SPIs in IKE_SA_INIT response message at Initiator."
+        ::= { jnxIkeGlobalIkev2MsgFailStats 4 }
+
+    jnxIkeGlobalIkev2TotalInvalidExchgType OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with unknown / unexpected exchange type
+            encountered during message exchange."
+        ::= { jnxIkeGlobalIkev2MsgFailStats 5 }
+
+    jnxIkeGlobalIkev2TotalInvalidLength OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with Invalid length failure. During
+            decode a malformed message where length is inconsistent with
+            that indicated in header is encountered."
+        ::= { jnxIkeGlobalIkev2MsgFailStats 6 }
+
+    jnxIkeGlobalIkev2TotalDisorder OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages failure due to disorder. Packet message
+            ID is out of window. For a response packet the corresponding
+            request with given message ID is not found."
+        ::= { jnxIkeGlobalIkev2MsgFailStats 7 }
+
+
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- The Internet Key Exchange Peer Table
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIkePeerAddrTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF JnxIkePeerAddrEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The IKE Key Exchange Peer Address Table. There is one entry in this table
+             for each IKE peer with which the managed entity is currently associated."
+         ::= { jnxIpSecFlowMonPhaseOne 4 }
+
+    jnxIkePeerAddrEntry OBJECT-TYPE
+        SYNTAX     JnxIkePeerAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry contains the attributes associated with
+            an IKE Peer."
+        INDEX { jnxIkePeerAddrState,
+                jnxIkePeerAddrRemoteGwAddrType,
+                jnxIkePeerAddrRemoteGwAddr,
+                jnxIkePeerAddrRemotePort,
+                jnxIkePeerAddrLocalGwAddrType,
+                jnxIkePeerAddrLocalGwAddr,
+                jnxIkePeerAddrLocalPort,
+                jnxIkePeerAddrRoutingInstance }
+        ::= { jnxIkePeerAddrTable 1 }
+
+    JnxIkePeerAddrEntry::= SEQUENCE {
+        jnxIkePeerAddrState                 JnxPeerStateType,
+        jnxIkePeerAddrRemoteGwAddrType      InetAddressType,
+        jnxIkePeerAddrRemoteGwAddr          InetAddress,
+        jnxIkePeerAddrRemotePort            InetPortNumber,
+        jnxIkePeerAddrLocalGwAddrType       InetAddressType,
+        jnxIkePeerAddrLocalGwAddr           InetAddress,
+        jnxIkePeerAddrLocalPort             InetPortNumber,
+        jnxIkePeerAddrRoutingInstance       DisplayString,
+        jnxIkePeerAddrIndex                 Integer32
+    }
+
+    jnxIkePeerAddrState OBJECT-TYPE
+        SYNTAX          JnxPeerStateType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The state of the peer, it can be:
+            1. active - The IKE peer is currently associated by an active IKE SA.
+                        There is at least one active IKE SA or Tunnel
+                        termination on the managed entity from the peer.
+            2. down - The IKE peer was associated with a previously
+                      active IKE SA."
+         ::= { jnxIkePeerAddrEntry 1 }
+
+    jnxIkePeerAddrRemoteGwAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address type of the remote gateway (endpoint) for the IPSec
+             Phase-1 IKE Tunnel."
+        ::= { jnxIkePeerAddrEntry 2 }
+
+    jnxIkePeerAddrRemoteGwAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address of the remote gateway (endpoint) for the IPSec
+            Phase-1 IKE Tunnel."
+        ::= { jnxIkePeerAddrEntry 3 }
+
+    jnxIkePeerAddrRemotePort OBJECT-TYPE
+        SYNTAX          InetPortNumber
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The port number of the remote gateway (endpoint) for the IKE
+            SA negotiation. The port number zero means the input value is
+            ignored for this object and the default port is considered."
+        ::= { jnxIkePeerAddrEntry 4 }
+
+    jnxIkePeerAddrLocalGwAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address type of the local endpoint (gateway) for the IPSec
+            Phase-1 IKE Tunnel."
+        ::= { jnxIkePeerAddrEntry 5 }
+
+    jnxIkePeerAddrLocalGwAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address of the local endpoint (gateway) for the IPSec
+            Phase-1 IKE Tunnel."
+        ::= { jnxIkePeerAddrEntry 6 }
+
+    jnxIkePeerAddrLocalPort OBJECT-TYPE
+        SYNTAX          InetPortNumber
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The port number of the local gateway (endpoint) for the IKE SA
+            negotiation. The port number zero means the input value is
+            ignored for this object and the default port is considered."
+        ::= { jnxIkePeerAddrEntry 7 }
+
+    jnxIkePeerAddrRoutingInstance OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The VR ID."
+        ::= { jnxIkePeerAddrEntry 8 }
+
+    jnxIkePeerAddrIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The index of the IPSec Phase-1 key exchange Peer Table.
+            The value of the index is a number which begins
+            at one and is incremented with each peer that is created
+            due to an association. The value of this object will wrap
+            at 2,147,483,647."
+        ::= { jnxIkePeerAddrEntry 9 }
+
+
+    jnxIkePeerIdTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF JnxIkePeerIdEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The IKE Key Exchange Peer ID Table. There is one entry in this table
+             for each IKE peer with which the managed entity is currently associated.
+             In the index truncated value for Remote ID value, Local ID value and AAA
+             username is used to restrict the length of the SNMP index to a legal
+             size. In the index, for jnxIkePeerIdRemoteId and jnxIkePeerIdLocalId, any
+             string longer than 41 bytes will be truncated and only 41 bytes would be
+             considered. Similarly in the index, for jnxIkePeerIdAAAUserName, any
+             string longer than 25 bytes will be truncated and only 25 bytes would be
+             considered. Because of the truncation, the index may become same for
+             different peers, to keep the index unique, jnxIkePeerInternalIndex is
+             used to uniquely identify each peer."
+
+         ::= { jnxIpSecFlowMonPhaseOne 5 }
+
+    jnxIkePeerIdEntry OBJECT-TYPE
+        SYNTAX     JnxIkePeerIdEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry contains the attributes associated with
+            an IKE Peer."
+        INDEX { jnxIkePeerIdState,
+                jnxIkePeerIdRemoteIdType,
+                jnxIkePeerIdRemoteIdValue,
+                jnxIkePeerIdLocalIdType,
+                jnxIkePeerIdLocalIdValue,
+                jnxIkePeerIdAAAUserName,
+                jnxIkePeerInternalIndex }
+        ::= { jnxIkePeerIdTable 1 }
+
+    JnxIkePeerIdEntry::= SEQUENCE {
+        jnxIkePeerIdState               JnxPeerStateType,
+        jnxIkePeerIdRemoteIdType        JnxIkePeerType,
+        jnxIkePeerIdRemoteIdValue       DisplayString,
+        jnxIkePeerIdLocalIdType         JnxIkePeerType,
+        jnxIkePeerIdLocalIdValue        DisplayString,
+        jnxIkePeerIdAAAUserName         DisplayString,
+        jnxIkePeerIdIndex               Integer32,
+        jnxIkePeerInternalIndex         Integer32
+    }
+
+    jnxIkePeerIdState OBJECT-TYPE
+        SYNTAX          JnxPeerStateType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The state of the peer, it can be:
+            1. active - The IKE peer is currently associated by an active IKE SA.
+                        There is at least one active IKE SA or Tunnel
+                        termination on the managed entity from the peer.
+            2. down - The IKE peer was associated with a previously
+                      active IKE SA."
+         ::= { jnxIkePeerIdEntry 1 }
+
+    jnxIkePeerIdRemoteIdType OBJECT-TYPE
+        SYNTAX          JnxIkePeerType
+        MAX-ACCESS      read-only
+        STATUS current
+        DESCRIPTION
+            "The type of remote peer identity.
+            The remote peer may be identified by:
+            1. an IP address, or
+            2. or a fully qualified domain name string.
+            3. or a distinguished name string."
+        ::= { jnxIkePeerIdEntry 2 }
+
+    jnxIkePeerIdRemoteIdValue OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value of the remote peer identity.
+
+            If the remote peer type is an IP Address, then this
+            is the IP Address used to identify the remote peer.
+
+            If the remote peer type is id_fqdn, then this is
+            the FQDN of the remote peer.
+
+            If the remote peer type is a id_dn, then this is
+            the distinguished named string of the remote peer."
+       ::= { jnxIkePeerIdEntry 3 }
+
+    jnxIkePeerIdLocalIdType OBJECT-TYPE
+        SYNTAX          JnxIkePeerType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The type of local peer identity.  The local
+            peer may be identified by:
+            1. an IP address, or
+            2. or a fully qualified domain name string.
+            3. or a distinguished name string."
+        ::= { jnxIkePeerIdEntry 4 }
+
+    jnxIkePeerIdLocalIdValue OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value of the local peer identity.
+
+            If the local peer type is an IP Address, then this
+            is the IP Address used to identify the local peer.
+
+            If the local peer type is id_fqdn, then this is
+            the FQDN of the remote peer.
+
+            If the local peer type is a id_dn, then this is
+            the distinguished name string of the local peer."
+        ::= { jnxIkePeerIdEntry 5 }
+
+    jnxIkePeerIdAAAUserName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Identifies the user with the specified authentication,
+            authorization and accounting (AAA) username, associated
+            with the IKE SA negotiation."
+        ::= { jnxIkePeerIdEntry 6 }
+
+    jnxIkePeerInternalIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The internal index of the Peer Id table.
+            This index is used to uniquely identify multiple
+            entry for the same truncated ids."
+        ::= { jnxIkePeerIdEntry 7 }
+
+    jnxIkePeerIdIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The index of the IPSec Phase-1 key exchange Peer Table.
+            The value of the index is a number which begins
+            at one and is incremented with each peer that is created
+            due to an association. The value of this object will wrap
+            at 2,147,483,647."
+        ::= { jnxIkePeerIdEntry 8 }
+
+
+    jnxIkePeerStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF JnxIkePeerStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The IKE Key Exchange Peer Stats Table. There is one entry in this table
+             for each IKE peer with which the managed entity is currently associated."
+         ::= { jnxIpSecFlowMonPhaseOne 6 }
+
+    jnxIkePeerStatsEntry OBJECT-TYPE
+        SYNTAX     JnxIkePeerStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry contains the attributes associated with an IKE Peer."
+        INDEX { jnxIkePeerStatsState,
+                jnxIkePeerStatsIndex }
+        ::= { jnxIkePeerStatsTable 1 }
+
+    JnxIkePeerStatsEntry::= SEQUENCE {
+        jnxIkePeerStatsState                    JnxPeerStateType,
+        jnxIkePeerStatsIndex                    Integer32,
+        jnxIkePeerStatsRemoteGwAddrType         InetAddressType,
+        jnxIkePeerStatsRemoteGwAddr             InetAddress,
+        jnxIkePeerStatsRemotePort               InetPortNumber,
+        jnxIkePeerStatsLocalGwAddrType          InetAddressType,
+        jnxIkePeerStatsLocalGwAddr              InetAddress,
+        jnxIkePeerStatsLocalPort                InetPortNumber,
+        jnxIkePeerStatsRoutingInstance          DisplayString,
+        jnxIkePeerStatsRemoteIdType             JnxIkePeerType,
+        jnxIkePeerStatsRemoteIdValue            DisplayString,
+        jnxIkePeerStatsLocalIdType              JnxIkePeerType,
+        jnxIkePeerStatsLocalIdValue             DisplayString,
+        jnxIkePeerStatsAAAUserName              DisplayString,
+        jnxIkePeerStatsGwName                   DisplayString,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitRequestOut                   Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResponseIn                   Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResInvalidIkeSpi             Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitInvalidKePayloadIn           Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitNoProposalChosenIn           Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResVerifySaFail              Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResIkeSaFillFail             Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResVerifyDhGroupFail         Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitCookieRequestIn              Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitCookieResponseOut            Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResDhComputeKeyFail          Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitRequestIn                    Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitResponseOut                  Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitNoProposalChosenOut          Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitInvalidKePayloadOut          Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitResInvalidDhGroupConf        Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitResDhGenKeyFail              Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitResGetCAsFail                Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitResGetVidFail                Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitResDhComputeKeyFail          Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitCookieRequestOut             Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2SaInitCookieResponseIn             Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2AuthRequestOut                     Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2AuthResponseIn                     Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2AuthNoProposalChosenIn             Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2AuthTsUnacceptableIn               Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2AuthAuthenticationFailedIn         Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2AuthRequestIn                      Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2AuthResponseOut                    Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2AuthAuthenticationFailedOut        Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2AuthNoProposalChosenOut            Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2AuthTsUnacceptableOut              Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyRequestOut               Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResponseIn               Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyNoProposalChosenIn       Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyInvalidKeIn              Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResVerifySaFail          Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResFillIkeSaFail         Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResVerifyDhGroupFail     Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResDhComputeKeyFail      Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyRequestIn                Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyResponseOut              Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyNoProposalChosenOut      Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyInvalidKeOut             Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyResDhComputeKeyFail      Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyRequestOut             Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResponseIn             Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyNoProposalChosenIn     Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyInvalidKeIn            Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyTsUnacceptableIn       Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResVerifySaFail        Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResVerifyDhGrpFail     Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResVerifyTsFail        Counter64,
+        jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResDhCompKeyFail       Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyRequestIn              Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyResponseOut            Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyNoPropChosenOut        Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyInvalidKeOut           Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyTsUnacceptableOut      Counter64,
+        jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyResDhCompKeyFail       Counter64,
+        jnxIkePeerStatsTunType                                               JnxIkeTunType
+    }
+
+    jnxIkePeerStatsState OBJECT-TYPE
+        SYNTAX          JnxPeerStateType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The state of the peer, it can be:
+            1. active - The IKE peer is currently associated by an active IKE SA.
+                        There is at least one active IKE SA or Tunnel
+                        termination on the managed entity from the peer.
+            2. down - The IKE peer was associated with a previously
+                      active IKE SA."
+         ::= { jnxIkePeerStatsEntry 1 }
+
+    jnxIkePeerStatsIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The index of the IPSec Phase-1 key exchange Peer Table.
+            The value of the index is a number which begins
+            at one and is incremented with each peer that is created
+            due to an association. The value of this object will wrap
+            at 2,147,483,647."
+         ::= { jnxIkePeerStatsEntry 2 }
+
+    jnxIkePeerStatsRemoteGwAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address type of the remote gateway (endpoint) for the IPSec
+             Phase-1 IKE Tunnel."
+        ::= { jnxIkePeerStatsEntry 3 }
+
+    jnxIkePeerStatsRemoteGwAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address of the remote gateway (endpoint) for the IPSec
+            Phase-1 IKE Tunnel."
+        ::= { jnxIkePeerStatsEntry 4 }
+
+    jnxIkePeerStatsRemotePort OBJECT-TYPE
+        SYNTAX          InetPortNumber
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value specifying a port associated with the remote gateway
+            (endpoint) for the IKE Tunnel. A value of zero means that the port should
+            be ignored."
+        ::= { jnxIkePeerStatsEntry 5 }
+
+    jnxIkePeerStatsLocalGwAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address type of the local endpoint (gateway) for the IPSec
+            Phase-1 IKE Tunnel."
+        ::= { jnxIkePeerStatsEntry 6 }
+
+    jnxIkePeerStatsLocalGwAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The IP address of the local endpoint (gateway) for the IPSec
+            Phase-1 IKE Tunnel."
+        ::= { jnxIkePeerStatsEntry 7 }
+
+    jnxIkePeerStatsLocalPort OBJECT-TYPE
+        SYNTAX          InetPortNumber
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value specifying a port associated with the local endpoint
+            (gateway) for the IKE Tunnel. A value of zero means that the port should
+            be ignored."
+        ::= { jnxIkePeerStatsEntry 8 }
+
+    jnxIkePeerStatsRoutingInstance OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The VR ID."
+        ::= { jnxIkePeerStatsEntry 9 }
+
+    jnxIkePeerStatsRemoteIdType OBJECT-TYPE
+        SYNTAX          JnxIkePeerType
+        MAX-ACCESS      read-only
+        STATUS current
+        DESCRIPTION
+            "The type of remote peer identity.
+            The remote peer may be identified by:
+            1. an IP address, or
+            2. or a fully qualified domain name string.
+            3. or a distinguished name string."
+        ::= { jnxIkePeerStatsEntry 10 }
+
+    jnxIkePeerStatsRemoteIdValue OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value of the remote peer identity.
+            If the remote peer type is an IP Address, then this
+            is the IP Address used to identify the remote peer.
+            If the remote peer type is id_fqdn, then this is
+            the FQDN of the remote peer.
+            If the remote peer type is a id_dn, then this is
+            the distinguished named string of the remote peer."
+       ::= { jnxIkePeerStatsEntry 11 }
+
+    jnxIkePeerStatsLocalIdType OBJECT-TYPE
+        SYNTAX          JnxIkePeerType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The type of local peer identity.  The local
+            peer may be identified by:
+            1. an IP address, or
+            2. or a fully qualified domain name string.
+            3. or a distinguished name string."
+        ::= { jnxIkePeerStatsEntry 12 }
+
+    jnxIkePeerStatsLocalIdValue OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value of the local peer identity.
+            If the local peer type is an IP Address, then this
+            is the IP Address used to identify the local peer.
+            If the local peer type is id_fqdn, then this is
+            the FQDN of the remote peer.
+            If the local peer type is a id_dn, then this is
+            the distinguished name string of the local peer."
+        ::= { jnxIkePeerStatsEntry 13 }
+
+    jnxIkePeerStatsAAAUserName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The extended authentication User Name, identifies the
+            user associated with the IKE SA negotiation."
+        ::= { jnxIkePeerStatsEntry 14 }
+
+    jnxIkePeerStatsGwName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The gateway name"
+        ::= { jnxIkePeerStatsEntry 15 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitRequestOut OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Messages"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of IKE_SA_INIT request message sent by
+            Initiator."
+         ::= { jnxIkePeerStatsEntry  16 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResponseIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message received by
+            Initiator."
+         ::= { jnxIkePeerStatsEntry  17 }
+
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResInvalidIkeSpi OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message containing invalid
+            SPI received by Initiator."
+         ::= { jnxIkePeerStatsEntry  18 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitInvalidKePayloadIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The total number of IKE_SA_INIT INVALID_KE_PAYLOAD received by
+            Initiator."
+         ::= { jnxIkePeerStatsEntry  19 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitNoProposalChosenIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT NO_PROPSAL_CHOSEN received
+            by Initiator."
+         ::= { jnxIkePeerStatsEntry  20 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResVerifySaFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message verification
+            of peer SA failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  21 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResIkeSaFillFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message IKE_SA fill operation
+            failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  22 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResVerifyDhGroupFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message verification of
+            DH group failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  23 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitCookieRequestIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The total number of IKE_SA_INIT COOKIE notification request
+            message received by Initiator."
+         ::= { jnxIkePeerStatsEntry  24 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitCookieResponseOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The total number of IKE_SA_INIT COOKIE notification
+            response message sent by Responder."
+         ::= { jnxIkePeerStatsEntry  25 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2SaInitResDhComputeKeyFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "Number of IKE SA rekey response message
+            Diffie-Hellman compute key failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  26 }
+
+    -- Responder IKE_SA_INIT exchange stats
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitRequestIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT request message received by
+            Responder."
+         ::= { jnxIkePeerStatsEntry  27 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitResponseOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message sent by
+            Responder."
+         ::= { jnxIkePeerStatsEntry  28 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitNoProposalChosenOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT NO_PROPSAL_CHOSEN notification
+            sent by Responder"
+         ::= { jnxIkePeerStatsEntry  29 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitInvalidKePayloadOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT INVALID_KE_PAYLOAD notification sent by
+            Responder."
+         ::= { jnxIkePeerStatsEntry  30 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitResInvalidDhGroupConf OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message invalid DH group
+            configured at Responder."
+         ::= { jnxIkePeerStatsEntry  31 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitResDhGenKeyFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message Diffie-Hellman
+            generate key failed at Responder"
+         ::= { jnxIkePeerStatsEntry  32 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitResGetCAsFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message get CAs failed at
+            Responder."
+         ::= { jnxIkePeerStatsEntry  33 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitResGetVidFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message get vendor ID request
+            failed at Responder."
+         ::= { jnxIkePeerStatsEntry  34 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitResDhComputeKeyFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT response message Diffie-Hellman
+            compute key failed at Responder"
+         ::= { jnxIkePeerStatsEntry  35 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitCookieRequestOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT COOKIE notification request
+            sent by Responder."
+         ::= { jnxIkePeerStatsEntry  36 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2SaInitCookieResponseIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA_INIT COOKIE notification response
+            message received by Responder."
+         ::= { jnxIkePeerStatsEntry  37 }
+
+    -- Initiator IKE_AUTH exchange stats
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2AuthRequestOut OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Messages"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of IKE_AUTH request message sent by Initiator."
+         ::= { jnxIkePeerStatsEntry  38 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2AuthResponseIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The total number of IKE_AUTH response message received by
+            Initiator."
+         ::= { jnxIkePeerStatsEntry  39 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2AuthNoProposalChosenIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_AUTH NO_PROPSAL_CHOSEN notification
+            received by Initiator."
+         ::= { jnxIkePeerStatsEntry  40 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2AuthTsUnacceptableIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_AUTH TS_UNACCEPTABLE notification
+            received by Initiator."
+         ::= { jnxIkePeerStatsEntry  41 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2AuthAuthenticationFailedIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_AUTH AUTHENTICATION_FAILED
+            notification received by Initiator."
+         ::= { jnxIkePeerStatsEntry  42 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2AuthRequestIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_AUTH request message received by
+            Responder."
+         ::= { jnxIkePeerStatsEntry  43 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2AuthResponseOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_AUTH response message sent by Responder."
+         ::= { jnxIkePeerStatsEntry  44 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2AuthAuthenticationFailedOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_AUTH request message AUTHENTICATION_FAILED
+            notification sent by Responder."
+         ::= { jnxIkePeerStatsEntry  45 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2AuthNoProposalChosenOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_AUTH NO_PROPSAL_CHOSEN notification
+            sent by Responder."
+         ::= { jnxIkePeerStatsEntry  46 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2AuthTsUnacceptableOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_AUTH TS_UNACCEPTABLE notification
+            sent by Responder."
+         ::= { jnxIkePeerStatsEntry  47 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyRequestOut OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Messages"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of IKE_SA rekey CREATE_CHILD_SA request message
+            sent by Initiator."
+         ::= { jnxIkePeerStatsEntry  48 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResponseIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA rekey CREATE_CHILD_SA response message
+            received by Initiator."
+         ::= { jnxIkePeerStatsEntry  49 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyNoProposalChosenIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of CREATE_CHILD_SA IKE SA rekey NO_PROPSAL_CHOSEN
+            notification received by Initiator."
+         ::= { jnxIkePeerStatsEntry  50 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyInvalidKeIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of CREATE_CHILD_SA IKE SA rekey INVALID_KE_PAYLOAD
+            received by Initiator."
+         ::= { jnxIkePeerStatsEntry  51 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResVerifySaFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of CREATE_CHILD_SA IKE SA rekey response message
+            verification of peer SA failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  52 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResFillIkeSaFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA rekey CREATE_CHILD_SA response message
+            fill IKE_SA failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  53 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResVerifyDhGroupFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of CREATE_CHILD_SA IKE SA rekey response message
+            verification of DH group failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  54 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IkeSaRekeyResDhComputeKeyFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of CREATE_CHILD_SA IKE SA rekey response message
+            Diffie-Hellman compute key failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  55 }
+
+    --- Responder Rekeying IKE SA CREATE_CHILD_SA Exchange
+
+    jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyRequestIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA rekey CREATE_CHILD_SA request message
+            received by Responder."
+         ::= { jnxIkePeerStatsEntry  56 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyResponseOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA rekey CREATE_CHILD_SA response message
+            sent by Responder."
+         ::= { jnxIkePeerStatsEntry  57 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyNoProposalChosenOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of CREATE_CHILD_SA IKE rekey NO_PROPSAL_CHOSEN
+            notification sent by Responder"
+         ::= { jnxIkePeerStatsEntry  58 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyInvalidKeOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IKE_SA rekey CREATE_CHILD_SA
+            INVALID_KE_PAYLOAD sent by Responder."
+         ::= { jnxIkePeerStatsEntry  59 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IkeSaRekeyResDhComputeKeyFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of CREATE_CHILD_SA IKE rekey response message
+            Diffie-Hellman compute key failed at Responder."
+         ::= { jnxIkePeerStatsEntry  60 }
+
+    --- Initiator Rekeying IPSec SA CREATE_CHILD_SA Exchange
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyRequestOut OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Messages"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA request
+            message sent by Initiator."
+         ::= { jnxIkePeerStatsEntry  61 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResponseIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response
+            message received by Initiator."
+         ::= { jnxIkePeerStatsEntry  62 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyNoProposalChosenIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA NO_PROPSAL_CHOSEN
+             notification received by Initiator."
+         ::= { jnxIkePeerStatsEntry  63 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyInvalidKeIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA INVALID_KE_PAYLOAD
+            received by Initiator."
+         ::= { jnxIkePeerStatsEntry  64 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyTsUnacceptableIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA TS_UNACCEPTABLE
+            notification received by Initiator."
+         ::= { jnxIkePeerStatsEntry  65 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResVerifySaFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+             verification of peer SA failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  66 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResVerifyDhGrpFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+             verification of DH group failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  67 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResVerifyTsFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+             verification of TS failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  68 }
+
+    jnxIkePeerStatsIkeSaInitiatorIkev2IPSecSaRekeyResDhCompKeyFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+             Diffie-Hellman compute key failed at Initiator."
+         ::= { jnxIkePeerStatsEntry  69 }
+
+    --- Responder Rekeying IPSec SAs CREATE_CHILD_SA Exchange
+
+    jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyRequestIn OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The total number of IPSec SA rekey CREATE_CHILD_SA request
+            message received by Responder."
+         ::= { jnxIkePeerStatsEntry  70 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyResponseOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The total number of IPSec SA rekey CREATE_CHILD_SA response
+            message sent by Responder."
+         ::= { jnxIkePeerStatsEntry  71 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyNoPropChosenOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA NO_PROPSAL_CHOSEN
+             Notification sent by Responder."
+         ::= { jnxIkePeerStatsEntry  72 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyInvalidKeOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA INVALID_KE_PAYLOAD
+             Notification sent by Responder."
+         ::= { jnxIkePeerStatsEntry  73 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyTsUnacceptableOut OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA TS_UNACCEPTABLE
+            notification sent by Responder."
+         ::= { jnxIkePeerStatsEntry  74 }
+
+    jnxIkePeerStatsIkeSaResponderIkev2IPSecSaRekeyResDhCompKeyFail OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Messages"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The number of IPSec SA rekey CREATE_CHILD_SA response message
+             Diffie-Hellman compute key failed at Responder."
+         ::= { jnxIkePeerStatsEntry  75 }
+
+    jnxIkePeerStatsTunType OBJECT-TYPE
+         SYNTAX JnxIkeTunType
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "The Tunnel type. It can be regular (1) or ha-link (2)."
+         ::= { jnxIkePeerStatsEntry  76 }
+
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- The Peer association to active IKE SA - Correlation Table
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxPeerIkeSaCorrTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxPeerIkeSaCorrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The Peer Association to active IKE SA - Correlation Table.
+            There is one entry in this table for each active IKE SA."
+        ::= { jnxIpSecFlowMonPhaseOne 7 }
+
+    jnxPeerIkeSaCorrEntry OBJECT-TYPE
+        SYNTAX          JnxPeerIkeSaCorrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry contains the attributes of an
+            Peer Association to active IKE SA Correlation."
+        INDEX { jnxPeerIkeSaCorrPeerIndex,
+                jnxPeerIkeSaCorrIntIndex }
+        ::= { jnxPeerIkeSaCorrTable 1 }
+
+    JnxPeerIkeSaCorrEntry ::= SEQUENCE {
+        jnxPeerIkeSaCorrPeerIndex           Integer32,
+        jnxPeerIkeSaCorrIntIndex            Integer32,
+        jnxPeerIkeSaCorrIkeTunMonIndex      Integer32
+    }
+
+    jnxPeerIkeSaCorrPeerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The index of the Peer (jnxPeerIndex in the
+            jnxIkePeerTable)."
+        ::= { jnxPeerIkeSaCorrEntry 1 }
+
+    jnxPeerIkeSaCorrIntIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The internal index of the Peer and IKE SA association.
+            This internal index is used to uniquely identify multiple
+            Instances of a unique association between the peer
+            and IKE SA."
+        ::= { jnxPeerIkeSaCorrEntry 2 }
+
+    jnxPeerIkeSaCorrIkeTunMonIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The index of the active IKE SA (jnxIkeTunMonIndex in
+            the jnxIkeTunnelMonTable) for this Peer association."
+        ::= { jnxPeerIkeSaCorrEntry 3 }
+
+
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- The Peer association to IPSec Tunnel Correlation Table
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxPeerIPSecTunnelCorrTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxPeerIPSecTunnelCorrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The Peer Association to IPSec Tunnel Correlation Table.
+            There is one entry in this table
+            for each active IPSec Tunnel."
+        ::= { jnxIpSecFlowMonPhaseOne 8 }
+
+    jnxPeerIPSecTunnelCorrEntry OBJECT-TYPE
+        SYNTAX          JnxPeerIPSecTunnelCorrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry contains the attributes of an
+            Peer Association to active IPSec Tunnel Correlation."
+        INDEX { jnxPeerIPSecTunnelCorrPeerIndex,
+                jnxPeerIPSecTunnelCorrIntIndex }
+        ::= { jnxPeerIPSecTunnelCorrTable 1 }
+
+    JnxPeerIPSecTunnelCorrEntry ::= SEQUENCE {
+        jnxPeerIPSecTunnelCorrPeerIndex             Integer32,
+        jnxPeerIPSecTunnelCorrIntIndex              Integer32,
+        jnxPeerIPSecTunnelCorrIPSecTunMonIndex      Integer32
+    }
+
+    jnxPeerIPSecTunnelCorrPeerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The index of the Peer (jnxPeerIndex in the
+            jnxIkePeerTable)."
+        ::= { jnxPeerIPSecTunnelCorrEntry 1 }
+
+    jnxPeerIPSecTunnelCorrIntIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The internal index of the Peer and IPSec Tunnel association.
+            This index is used to uniquely identify multiple
+            association between the peer and IPSec Tunnel."
+        ::= { jnxPeerIPSecTunnelCorrEntry 2 }
+
+    jnxPeerIPSecTunnelCorrIPSecTunMonIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The index of the active IPSec Tunnel (jnxIpSecTunMonIndex in
+            the jnxIpSecTunnelMonTable) for this association between
+            Peer and IPSec Tunnel."
+        ::= { jnxPeerIPSecTunnelCorrEntry 3 }
+
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   -- The IKEv2 global HA Link Statistics
+   -- Provides global statistics for all HA Link IKE tunnels, active and previous.
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIkeHaLinkGlobalStats OBJECT IDENTIFIER
+        ::= { jnxIpSecFlowMonPhaseOne 9 }
+
+
+    -- Initiator IKE_SA_INIT exchange stats
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 1 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT request message sent by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 1 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 2 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitResInvalidIkeSpi OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message containing invalid
+            SPI received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 3 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitInvalidKePayloadIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT INVALID_KE_PAYLOAD received
+             by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 4 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitNoProposalChosenIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT NO_PROPSAL_CHOSEN received
+            by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 5 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitResVerifySaFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "Number of IKE_SA_INIT response message verification
+            of peer SA failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 6 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitResIkeSaFillFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message IKE SA fill
+            operation failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 7 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitResVerifyDhGroupFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message verification of
+            DH group failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 8 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitCookieRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT COOKIE notification request
+            message received by Initiator."
+         ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 9 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2SaInitCookieResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT COOKIE notification
+            response message sent by Responder."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2SaInitStats 10 }
+
+
+    -- Responder IKE_SA_INIT exchange stats
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 2 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT request message received by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 1 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 2 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitNoProposalChosenOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT NO_PROPSAL_CHOSEN notification
+            sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 3 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitInvalidKePayloadOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT INVALID_KE_PAYLOAD notification
+            sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 4 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitResInvalidDhGroupConf OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message invalid DH group
+            configured at Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 5 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitResDhGenKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message Diffie-Hellman
+            generate key failed at Responder"
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 6 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitResGetCAsFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message get CAs failed at
+            Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 7 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitResGetVidFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message get vendor ID
+            request failed at Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 8 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT response message Diffie-Hellman
+            compute key failed at Responder"
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 9 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitCookieRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT COOKIE notification request message
+            sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 10 }
+
+    jnxIkeHaLinkGlobalResponderIkev2SaInitCookieResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_SA_INIT COOKIE notification response
+            message received by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2SaInitStats 11 }
+
+
+    -- Initiator IKE_AUTH exchange stats
+
+    jnxIkeHaLinkGlobalInitiatorIkev2AuthStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 3 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2AuthRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH request message sent by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2AuthStats 1 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2AuthResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH response message received by
+            Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2AuthStats 2 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2AuthNoProposalChosenIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH NO_PROPSAL_CHOSEN notification
+            received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2AuthStats 3 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2AuthTsUnacceptableIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH TS_UNACCEPTABLE notification
+            received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2AuthStats 4 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2AuthAuthenticationFailedIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH AUTHENTICATION_FAILED
+            notification received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2AuthStats 5 }
+
+
+    -- Responder IKE_AUTH exchange stats
+
+    jnxIkeHaLinkGlobalResponderIkev2AuthStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 4 }
+
+    jnxIkeHaLinkGlobalResponderIkev2AuthRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH request message received by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2AuthStats 1 }
+
+    jnxIkeHaLinkGlobalResponderIkev2AuthResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH response message sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2AuthStats 2 }
+
+    jnxIkeHaLinkGlobalResponderIkev2AuthNoProposalChosenOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH NO_PROPSAL_CHOSEN notification
+            sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2AuthStats 3 }
+
+    jnxIkeHaLinkGlobalResponderIkev2AuthTsUnacceptableOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH TS_UNACCEPTABLE notification
+            sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2AuthStats 4 }
+
+    jnxIkeHaLinkGlobalResponderIkev2AuthAuthenticationFailedOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE_AUTH request message AUTHENTICATION_FAILED
+            notification sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2AuthStats 5 }
+
+
+    --- Initiator IKE SA rekey CREATE_CHILD_SA exchange stats
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 5 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey CREATE_CHILD_SA request message
+            sent by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats 1 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey CREATE_CHILD_SA response message
+            received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats 2 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyNoProposalChosenIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey NO_PROPSAL_CHOSEN notification
+            received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats 3 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyInvalidKeIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey INVALID_KE_PAYLOAD notification
+            received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats 4 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            Diffie-Hellman compute key failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats 5 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyResVerifySaFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            verification of peer SA failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats 6 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyResFillIkeSaFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            fill IKE SA failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats 7 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyResVerifyDhGroupFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            verification of DH group failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IkeSaRekeyStats 8 }
+
+
+    --- Responder IKE SA rekey CREATE_CHILD_SA exchange stats
+
+    jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 6 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey request message
+            received by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyStats 1 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyStats 2 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyNoProposalChosenOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey NO_PROPSAL_CHOSEN
+            notification sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyStats 3 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyInvalidKeOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey INVALID_KE_PAYLOAD
+            notification sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyStats 4 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IKE SA rekey response message
+            Diffie-Hellman compute key failed at Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IkeSaRekeyStats 5 }
+
+
+    --- Initiator IPSec SA rekey CREATE_CHILD_SA exchange stats
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 7 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyRequestOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey request
+            message sent by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 1 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyResponseIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response
+            message received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 2 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyNoProposalChosenIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey NO_PROPSAL_CHOSEN
+            notification received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 3 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyInvalidKeIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey INVALID_KE_PAYLOAD
+            notification received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 4 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyTsUnacceptableIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey TS_UNACCEPTABLE
+            notification received by Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 5 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyResVerifySaFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             verification of peer SA failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 6 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             Diffie-Hellman compute key failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 7 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyResVerifyDhGroupFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             verification of DH group failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 8 }
+
+    jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyResVerifyTsFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             verification of TS failed at Initiator."
+        ::= { jnxIkeHaLinkGlobalInitiatorIkev2IpsecSaRekeyStats 9 }
+
+
+    --- Responder IPSec SA rekey CREATE_CHILD_SA exchange stats
+
+    jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 8 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyRequestIn OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey request
+            message received by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyStats 1 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyResponseOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response
+            message sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyStats 2 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyNoProposalChosenOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey NO_PROPSAL_CHOSEN
+            notification sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyStats 3 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyInvalidKeOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey INVALID_KE_PAYLOAD
+            notification sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyStats 4 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyTsUnacceptableOut OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey TS_UNACCEPTABLE
+             notification sent by Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyStats 5 }
+
+    jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyResDhComputeKeyFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Number of IPSec SA rekey response message
+             Diffie-Hellman compute key failed at Responder."
+        ::= { jnxIkeHaLinkGlobalResponderIkev2IpsecSaRekeyStats 6 }
+
+
+    --- Message failure stats
+
+    jnxIkeHaLinkGlobalIkev2MsgFailStats OBJECT IDENTIFIER
+        ::= { jnxIkeHaLinkGlobalStats 9 }
+
+    jnxIkeHaLinkGlobalIkev2TotalDiscarded OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of discarded messages. Includes the failures
+            encountered during decode of IKEv2 packets that is failures
+            before the IKEv2 exchange payload processing. Also this
+            counter encompasses all the other message failure counters."
+        ::= { jnxIkeHaLinkGlobalIkev2MsgFailStats 1 }
+
+    jnxIkeHaLinkGlobalIkev2TotalIdError OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with ID error. Message ID is not
+            compliant with what is expected. For ex. IKE_SA_INIT message
+            with message ID larger than zero is encountered."
+        ::= { jnxIkeHaLinkGlobalIkev2MsgFailStats 2 }
+
+    jnxIkeHaLinkGlobalIkev2TotalIntegrityFail OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with Integrity check failure."
+        ::= { jnxIkeHaLinkGlobalIkev2MsgFailStats 3 }
+
+    jnxIkeHaLinkGlobalIkev2TotalInvalidSPI OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with Invalid SPI failure. Used one
+            of the SPIs to find the SA, but the other SPI is not matching.
+            Invalid IKE SPIs in IKE_SA_INIT response message at Initiator."
+        ::= { jnxIkeHaLinkGlobalIkev2MsgFailStats 4 }
+
+    jnxIkeHaLinkGlobalIkev2TotalInvalidExchgType OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with unknown / unexpected exchange type
+            encountered during message exchange."
+        ::= { jnxIkeHaLinkGlobalIkev2MsgFailStats 5 }
+
+    jnxIkeHaLinkGlobalIkev2TotalInvalidLength OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages with Invalid length failure. During
+            decode a malformed message where length is inconsistent with
+            that indicated in header is encountered."
+        ::= { jnxIkeHaLinkGlobalIkev2MsgFailStats 6 }
+
+    jnxIkeHaLinkGlobalIkev2TotalDisorder OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Total number of messages failure due to disorder. Packet message
+            ID is out of window. For a response packet the corresponding
+            request with given message ID is not found."
+        ::= { jnxIkeHaLinkGlobalIkev2MsgFailStats 7 }
 
    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    -- The IPsec Phase-2 Tunnel Table
@@ -669,8 +3780,15 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          jnxIpSecTunMonDecryptFails         Counter64,
          jnxIpSecTunMonBadHeaders           Counter64,
          jnxIpSecTunMonBadTrailers          Counter64,
-         jnxIpSecTunMonDroppedPkts          Counter64   -- obsolete        
-      }											
+         jnxIpSecTunMonDroppedPkts          Counter64,  -- obsolete        
+         jnxIpSecTunMonVpnName              DisplayString,
+         jnxIpSecTunMonTsName               DisplayString,
+         jnxIpSecTunMonMultiSa              INTEGER,
+         jnxIpSecTunMonInvalidSpi           Counter64,
+         jnxIpSecTunMonTsCheckFail          Counter64,
+         jnxIpSecTunMonDiscarded            Counter64,
+         jnxIpSecTunMonTunType              JnxIkeTunType
+      }
 
       jnxIpSecTunMonRemoteGwAddrType OBJECT-TYPE
          SYNTAX        InetAddressType
@@ -900,6 +4018,67 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
              This attribute is obsolete."
          ::= { jnxIpSecTunnelMonEntry 26 }
 
+      jnxIpSecTunMonVpnName OBJECT-TYPE
+         SYNTAX        DisplayString
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "VPN tunnel name."
+         ::= { jnxIpSecTunnelMonEntry 27 }
+
+      jnxIpSecTunMonTsName OBJECT-TYPE
+         SYNTAX        DisplayString
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Traffic selector name."
+         ::= { jnxIpSecTunnelMonEntry 28 }
+
+      jnxIpSecTunMonMultiSa OBJECT-TYPE
+         SYNTAX INTEGER{
+                   disable(0),
+                   enable(1)
+                }
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Multi-SA Configuration Status."
+         ::= { jnxIpSecTunnelMonEntry 29 }
+
+      jnxIpSecTunMonInvalidSpi OBJECT-TYPE
+         SYNTAX        Counter64
+         UNITS         "Packets"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Total number of Invalid SPI for this IPSec tunnel."
+         ::= { jnxIpSecTunnelMonEntry 30 }
+
+      jnxIpSecTunMonTsCheckFail OBJECT-TYPE
+         SYNTAX        Counter64
+         UNITS         "Packets"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Total number of TS check fail for this IPSec tunnel."
+         ::= { jnxIpSecTunnelMonEntry 31 }
+
+      jnxIpSecTunMonDiscarded OBJECT-TYPE
+         SYNTAX        Counter64
+         UNITS         "Packets"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Total number of discarded packets for this IPSec tunnel."
+         ::= { jnxIpSecTunnelMonEntry 32 }
+
+      jnxIpSecTunMonTunType OBJECT-TYPE
+         SYNTAX        JnxIkeTunType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "The Tunnel type. It can be regular (1) or ha-link (2)."
+         ::= { jnxIpSecTunnelMonEntry 33 }
 
    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
    -- The IPsec Phase-2 Security Association (SA) Table
@@ -958,8 +4137,10 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          jnxIpSecSaMonLifeSizeThreshold     Integer32,  
          jnxIpSecSaMonLifeTimeThreshold     Integer32, 
          jnxIpSecSaMonEncryptAlgo           JnxEncryptAlgo,
-         jnxIpSecSaMonAuthAlgo              JnxAuthAlgo,	  
-         jnxIpSecSaMonState                 INTEGER
+         jnxIpSecSaMonAuthAlgo              JnxAuthAlgo,
+         jnxIpSecSaMonState                 INTEGER,
+         jnxIpSecSaMonFcName                DisplayString,
+         jnxIpSecSaMonEsnMode               JnxEsnMode
       }
 
       jnxIpSecSaMonIndex OBJECT-TYPE
@@ -1065,8 +4246,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS read-only 
          STATUS     current
          DESCRIPTION
-            "The Encryption algorithm used to encrypt 
-			 the packets which can be either es-cbc or 3des-cbc. "
+            "The Encryption algorithm used to encrypt the packets. "
          ::= { jnxIpSecSaMonEntry 12 }
 
       jnxIpSecSaMonAuthAlgo OBJECT-TYPE
@@ -1093,6 +4273,333 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
             'expiring' represents any of the various states that the
             security association transitions through before being purged."
          ::= { jnxIpSecSaMonEntry 14 }
+
+      jnxIpSecSaMonFcName OBJECT-TYPE
+         SYNTAX        DisplayString
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Class-Of-Service Forwarding Class name."
+         ::= { jnxIpSecSaMonEntry 15 }
+
+      jnxIpSecSaMonEsnMode OBJECT-TYPE
+         SYNTAX     JnxEsnMode
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This field represents whether IPSec extended sequence number
+              support is enabled or disabled"
+         ::= { jnxIpSecSaMonEntry 16 }
+
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   -- The IPsec Phase-2 Global Statistics
+   -- Provides global statistics for all phase 2 tunnels.
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+      jnxIpSecGlobalStats  OBJECT IDENTIFIER
+                        ::= { jnxIpSecFlowMonPhaseTwo 4 }
+
+      jnxIpSecGlobalOutEncryptedBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of bytes encrypted by all Phase-2 tunnel."
+         ::= { jnxIpSecGlobalStats 1 }
+
+      jnxIpSecGlobalOutEncryptedPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets encrypted by all Phase-2 tunnel."
+         ::= { jnxIpSecGlobalStats 2 }
+
+      jnxIpSecGlobalInDecryptedBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of bytes decrypted by all Phase-2 tunnel."
+         ::= { jnxIpSecGlobalStats 3 }
+
+      jnxIpSecGlobalInDecryptedPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets decrypted by all Phase-2 tunnel."
+         ::= { jnxIpSecGlobalStats 4 }
+
+      jnxIpSecGlobalAHInBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of incoming bytes authenticated using AH by all Phase-2
+             tunnel."
+         ::= { jnxIpSecGlobalStats 5 }
+
+      jnxIpSecGlobalAHInPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of incoming packets authenticated using AH by all
+            Phase-2 tunnel."
+         ::= { jnxIpSecGlobalStats 6 }
+
+      jnxIpSecGlobalAHOutBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of outgoing bytes applied AH by all Phase-2 tunnel."
+         ::= { jnxIpSecGlobalStats 7 }
+
+      jnxIpSecGlobalAHOutPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of outgoing packets applied AH by all Phase-2 tunnel."
+         ::= { jnxIpSecGlobalStats 8 }
+
+      jnxIpSecGlobalReplayDropPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets dropped by all Phase-2 tunnel due to
+             anti-replay check failure."
+         ::= { jnxIpSecGlobalStats 9 }
+
+      jnxIpSecGlobalAhAuthFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed AH authentication."
+         ::= { jnxIpSecGlobalStats 10 }
+
+      jnxIpSecGlobalEspAuthFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed ESP authentication."
+         ::= { jnxIpSecGlobalStats 11 }
+
+      jnxIpSecGlobalDecryptFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed decryption."
+         ::= { jnxIpSecGlobalStats 12 }
+
+      jnxIpSecGlobalBadHeaders OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed due to bad headers."
+         ::= { jnxIpSecGlobalStats 13 }
+
+      jnxIpSecGlobalBadTrailers OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed due to bad ESP trailers."
+         ::= { jnxIpSecGlobalStats 14 }
+
+      jnxIpSecGlobalInvalidSpi  OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Packets"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "Total number of Invalid SPI."
+         ::= { jnxIpSecGlobalStats 15 }
+
+      jnxIpSecGlobalTsCheckFail  OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Packets"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "Total number of TS check fail."
+         ::= { jnxIpSecGlobalStats 16 }
+
+      jnxIpSecGlobalDiscarded  OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Packets"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "Total number of discarded packets."
+         ::= { jnxIpSecGlobalStats 17 }
+
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   -- The IPsec Phase-2 HA Link Global Statistics
+   -- Provides global statistics for all HA Link phase 2 tunnels.
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+      jnxIpSecHaLinkGlobalStats  OBJECT IDENTIFIER
+                        ::= { jnxIpSecFlowMonPhaseTwo 5 }
+
+      jnxIpSecHaLinkGlobalOutEncryptedBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of bytes encrypted by all Phase-2 tunnel."
+         ::= { jnxIpSecHaLinkGlobalStats 1 }
+
+      jnxIpSecHaLinkGlobalOutEncryptedPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets encrypted by all Phase-2 tunnel."
+         ::= { jnxIpSecHaLinkGlobalStats 2 }
+
+      jnxIpSecHaLinkGlobalInDecryptedBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of bytes decrypted by all Phase-2 tunnel."
+         ::= { jnxIpSecHaLinkGlobalStats 3 }
+
+      jnxIpSecHaLinkGlobalInDecryptedPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets decrypted by all Phase-2 tunnel."
+         ::= { jnxIpSecHaLinkGlobalStats 4 }
+
+      jnxIpSecHaLinkGlobalAHInBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of incoming bytes authenticated using AH by all Phase-2
+             tunnel."
+         ::= { jnxIpSecHaLinkGlobalStats 5 }
+
+      jnxIpSecHaLinkGlobalAHInPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of incoming packets authenticated using AH by all
+            Phase-2 tunnel."
+         ::= { jnxIpSecHaLinkGlobalStats 6 }
+
+      jnxIpSecHaLinkGlobalAHOutBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of outgoing bytes applied AH by all Phase-2 tunnel."
+         ::= { jnxIpSecHaLinkGlobalStats 7 }
+
+      jnxIpSecHaLinkGlobalAHOutPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of outgoing packets applied AH by all Phase-2 tunnel."
+         ::= { jnxIpSecHaLinkGlobalStats 8 }
+
+      jnxIpSecHaLinkGlobalReplayDropPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets dropped by all Phase-2 tunnel due to
+             anti-replay check failure."
+         ::= { jnxIpSecHaLinkGlobalStats 9 }
+
+      jnxIpSecHaLinkGlobalAhAuthFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed AH authentication."
+         ::= { jnxIpSecHaLinkGlobalStats 10 }
+
+      jnxIpSecHaLinkGlobalEspAuthFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed ESP authentication."
+         ::= { jnxIpSecHaLinkGlobalStats 11 }
+
+      jnxIpSecHaLinkGlobalDecryptFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed decryption."
+         ::= { jnxIpSecHaLinkGlobalStats 12 }
+
+      jnxIpSecHaLinkGlobalBadHeaders OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed due to bad headers."
+         ::= { jnxIpSecHaLinkGlobalStats 13 }
+
+      jnxIpSecHaLinkGlobalBadTrailers OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed due to bad ESP trailers."
+         ::= { jnxIpSecHaLinkGlobalStats 14 }
+
+      jnxIpSecHaLinkGlobalInvalidSpi  OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Packets"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "Total number of Invalid SPI."
+         ::= { jnxIpSecHaLinkGlobalStats 15 }
+
+      jnxIpSecHaLinkGlobalTsCheckFail  OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Packets"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "Total number of TS check fail."
+         ::= { jnxIpSecHaLinkGlobalStats 16 }
+
+      jnxIpSecHaLinkGlobalDiscarded  OBJECT-TYPE
+         SYNTAX Counter64
+         UNITS "Packets"
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+            "Total number of discarded packets."
+         ::= { jnxIpSecHaLinkGlobalStats 17 }
 
 END
 

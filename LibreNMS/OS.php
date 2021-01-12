@@ -30,22 +30,27 @@ use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\UcdResources;
+use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 
-class OS implements ProcessorDiscovery, OSDiscovery
+class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
+        HostResources::discoverMempools as discoverHrMempools;
     }
     use UcdResources {
         UcdResources::discoverProcessors as discoverUcdProcessors;
+        UcdResources::discoverMempools as discoverUcdMempools;
     }
     use YamlOSDiscovery;
+    use YamlMempoolsDiscovery;
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
@@ -285,13 +290,31 @@ class OS implements ProcessorDiscovery, OSDiscovery
         return $processors;
     }
 
-    public function getDiscovery()
+    public function discoverMempools()
+    {
+        if ($this->hasYamlDiscovery('mempools')) {
+            return $this->discoverYamlMempools();
+        }
+
+        $mempools = $this->discoverHrMempools();
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        return $this->discoverUcdMempools();
+    }
+
+    public function getDiscovery($module = null)
     {
         if (! array_key_exists('dynamic_discovery', $this->device)) {
             $file = base_path('/includes/definitions/discovery/' . $this->getName() . '.yaml');
             if (file_exists($file)) {
                 $this->device['dynamic_discovery'] = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
             }
+        }
+
+        if ($module) {
+            return $this->device['dynamic_discovery']['modules'][$module] ?? [];
         }
 
         return $this->device['dynamic_discovery'] ?? [];

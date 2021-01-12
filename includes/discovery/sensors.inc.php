@@ -8,10 +8,14 @@ $valid['sensor'] = [];
 /** @var OS $os */
 $pre_cache = $os->preCache();
 
-// Run custom sensors
-require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
-require 'includes/discovery/sensors/entity-sensor.inc.php';
-require 'includes/discovery/sensors/ipmi.inc.php';
+if ($device['os'] == 'rittal-cmc-iii-pu') {
+    include 'includes/discovery/sensors/rittal-cmc-iii-sensors.inc.php';
+} else {
+    // Run custom sensors
+    require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
+    require 'includes/discovery/sensors/entity-sensor.inc.php';
+    require 'includes/discovery/sensors/ipmi.inc.php';
+}
 
 if ($device['os'] == 'netscaler') {
     include 'includes/discovery/sensors/netscaler.inc.php';
@@ -59,6 +63,7 @@ $run_sensors = [
     'state',
     'count',
     'temperature',
+    'tv_signal',
     'voltage',
     'snr',
     'pressure',

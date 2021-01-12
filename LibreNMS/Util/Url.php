@@ -315,33 +315,33 @@ class Url
         return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
-    public static function graphPopup($args)
+    public static function graphPopup($args, $content = null, $link = null)
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
         $original_from = $args['from'];
         $now = CarbonImmutable::now();
 
-        $graph = self::graphTag($args);
-        $content = '<div class=list-large>' . $args['popup_title'] . '</div>';
-        $content .= '<div style="width: 850px">';
+        $graph = $content ?: self::graphTag($args);
+        $popup = '<div class=list-large>' . $args['popup_title'] . '</div>';
+        $popup .= '<div style="width: 850px">';
         $args['width'] = 340;
         $args['height'] = 100;
         $args['legend'] = 'yes';
         $args['from'] = $now->subDay()->timestamp;
-        $content .= self::graphTag($args);
+        $popup .= self::graphTag($args);
         $args['from'] = $now->subWeek()->timestamp;
-        $content .= self::graphTag($args);
+        $popup .= self::graphTag($args);
         $args['from'] = $now->subMonth()->timestamp;
-        $content .= self::graphTag($args);
+        $popup .= self::graphTag($args);
         $args['from'] = $now->subYear()->timestamp;
-        $content .= self::graphTag($args);
-        $content .= '</div>';
+        $popup .= self::graphTag($args);
+        $popup .= '</div>';
 
         $args['from'] = $original_from;
 
-        $args['link'] = self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
+        $args['link'] = $link ?: self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
 
-        return self::overlibLink($args['link'], $graph, $content, null);
+        return self::overlibLink($args['link'], $graph, $popup, null);
     }
 
     public static function lazyGraphTag($args)

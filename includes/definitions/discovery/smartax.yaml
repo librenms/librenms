@@ -1,5 +1,18 @@
 mib: HUAWEI-DEVICE-MIB:HUAWEI-POWER-MIB:HWMUSA-DEV-MIB:HUAWEI-XPON-MIB:IF-MIB
 modules:
+    mempools:
+        pre-cache:
+            oids:
+                - HWMUSA-DEV-MIB::hwMusaBoardSlotDesc
+        data:
+            -
+                percent_used: HWMUSA-DEV-MIB::hwMusaBoardRamUseRate
+                descr: 'Slot {{ $subindex1 }} {{ HWMUSA-DEV-MIB::hwMusaBoardSlotDesc }}'
+                skip_values:
+                    -
+                        oid: HWMUSA-DEV-MIB::hwMusaBoardRamUseRate
+                        op: '='
+                        value: -1
     os:
         hardware:
             - ENTITY-MIB::entPhysicalDescr.36

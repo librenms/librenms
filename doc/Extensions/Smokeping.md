@@ -66,7 +66,7 @@ remark = Welcome to the SmokePing website of <b>Insert Company Name Here</b>. \
 Note there may be other stanza's (possibly `*** Slaves ***`) between the
 `*** Probes ***` and `*** Targets ***` stanza's - leave these intact.
 
-Leave everything else untouched. If you need to add other confiruation, make
+Leave everything else untouched. If you need to add other configuration, make
 sure it comes *after* the LibreNMS configuration, and keep in mind that
 Smokeping does not allow duplicate modules, and cares about the configuration
 file sequence.
@@ -120,7 +120,7 @@ remark = Welcome to the SmokePing website of <b>Insert Company Name Here</b>. \
 @include /etc/smokeping/config.d/librenms-targets.conf
 ```
 
-Leave everything else untouched. If you need to add other confiruation, make
+Leave everything else untouched. If you need to add other configuration, make
 sure it comes *after* the LibreNMS configuration, and keep in mind that
 Smokeping does not allow duplicate modules, and cares about the configuration
 file sequence.
@@ -184,7 +184,7 @@ You should be able to load the Smokeping web interface at `http://yourhost/cgi-b
 ### Nginx Configuration - Ubuntu, Debian and alike
 
 This section assumes you have configured LibreNMS with Nginx as
-specified in [Configure Nginx](https://docs.librenms.org/Installation/Installation-Ubuntu-1804-Nginx/).
+specified in [Configure Nginx](../Installation/Installation-Ubuntu-1804-Nginx.md).
 
 Add the following configuration to your `/etc/nginx/conf.d/librenms` config file.
 
@@ -229,7 +229,7 @@ is OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl restart ngin
 
 You should be able to load the Smokeping web interface at `http://yourhost/smokeping`
 
-#### Nginx Password Authentification
+#### Nginx Password Authentication
 
 You can use the purpose-made htpasswd utility included in the
 apache2-utils package (Nginx password files use the same format as
@@ -321,8 +321,8 @@ definitions.
 
 ### File '/usr/sbin/sendmail' does not exist`
 
-If you got this error at the end of the installation, simply edit
-commend out the sendmail entry in the configuration:
+If you got this error at the end of the installation, simply edit or
+comment out the sendmail entry in the configuration:
 
 ```diff
 -sendmail = /usr/sbin/sendmail
