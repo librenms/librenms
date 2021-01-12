@@ -249,6 +249,12 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                     case 5:
                                         $peer_data['bgpPeerState'] = "established";
                                         break;
+                                    case 6:
+                                        $peer_data['bgpPeerState'] = "closed";
+                                        break;
+                                    case 7:
+                                        $peer_data['bgpPeerState'] = "free";
+                                        break;
                                 }
                                 $peer_data['bgpPeerRemoteAddr'] = $address;
                                 $peer_data['bgpPeerRemoteAs'] = $value["fbBgpPeerRemoteAS"];
