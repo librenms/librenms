@@ -569,7 +569,12 @@ function generate_peer_url($peer, $vars = [])
 function generate_bill_url($bill, $vars = [])
 {
     return generate_url(['page' => 'bill', 'bill_id' => $bill['bill_id']], $vars);
-}//end generate_bill_url()
+}//end generate_sap_url()
+    
+function generate_sap_url($sap, $vars = [])
+{
+    return generate_url(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
+}//end generate_sap_url()
 
 function generate_port_image($args)
 {

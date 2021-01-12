@@ -456,7 +456,6 @@ if ($vars['view'] == 'saps') {
     foreach (dbFetchRows('SELECT * FROM `mpls_saps` ORDER BY `device_id`, `svc_oid`, `sapPortId`, `sapEncapValue`') as $sap) {
         $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifName` = ?', [$sap['device_id'], $sap['ifName']]);
         $port = cleanPort($port);
-
         $device = device_by_id_cache($sap['device_id']);
         if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
@@ -475,11 +474,9 @@ if ($vars['view'] == 'saps') {
         } elseif ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
-
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
-            <td>' . $sap['svc_oid'] . '</td>
-            <td>' . generate_port_link($port) . '</td>
+            <td><a href=' .  generate_sap_url($sap) . '>'. $sap['svc_oid'] . '</td>
             <td>' . $sap['sapEncapValue'] . '</td>
             <td>' . $sap['sapType'] . '</td>
             <td>' . $sap['sapDescription'] . '</td>

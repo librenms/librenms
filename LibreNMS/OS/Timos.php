@@ -674,24 +674,24 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
 		//create SAP graphs
 		$rrd_name = safename('sap-' . $traffic_id);
 		$rrd_def = RrdDefinition::make()
-                    ->addDataset('sapIngressBytes', 'COUNTER', 0)
+            ->addDataset('sapIngressBytes', 'COUNTER', 0)
 		    ->addDataset('sapEgressBytes', 'COUNTER', 0)
 		    ->addDataset('sapIngressDroppedBytes', 'COUNTER', 0)
 		    ->addDataset('sapEgressDroppedBytes', 'COUNTER', 0);
 
 		$fields = [
-			'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'],
-			'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'],
-			'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'],
-			'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'],
+			'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] * 8,
+			'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] * 8,
+			'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] * 8,
+			'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] * 8,
 		];
 
 		$tags = [
-                    'traffic_id' => $traffic_id,
-	    	    'rrd_name' => $rrd_name,
+            'traffic_id' => $traffic_id,
+	        'rrd_name' => $rrd_name,
 		    'rrd_def' => $rrd_def,
 		];
-
+		
 		data_update($this->getDeviceArray(), 'sap', $tags, $fields);
 		$this->enableGraph('sap');
 
