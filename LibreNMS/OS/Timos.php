@@ -298,7 +298,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
             [$svcId, $sapPortId, $sapEncapValue] = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
-            $traffic_id = $svcId . '.' . $sapPortId . '.'  . $this->nokiaEncap($sapEncapValue);
+            $traffic_id = $svcId . '.' . $sapPortId . '.' . $this->nokiaEncap($sapEncapValue);
 
             $saps->push(new MplsSap([
                 'svc_id' => $svc_id,
@@ -650,7 +650,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
             [$svcId, $sapPortId, $sapEncapValue] = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
-            $traffic_id = $svcId . '.' . $sapPortId . '.'  . $this->nokiaEncap($sapEncapValue);
+            $traffic_id = $svcId . '.' . $sapPortId . '.' . $this->nokiaEncap($sapEncapValue);
 
             $saps->push(new MplsSap([
                 'svc_id' => $svc_id,
@@ -671,32 +671,30 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'],
                 'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'],
             ]));
-		//create SAP graphs
-		$rrd_name = safename('sap-' . $traffic_id);
-		$rrd_def = RrdDefinition::make()
-            ->addDataset('sapIngressBytes', 'COUNTER', 0)
-		    ->addDataset('sapEgressBytes', 'COUNTER', 0)
-		    ->addDataset('sapIngressDroppedBytes', 'COUNTER', 0)
-		    ->addDataset('sapEgressDroppedBytes', 'COUNTER', 0);
+            //create SAP graphs
+            $rrd_name = safename('sap-' . $traffic_id);
+            $rrd_def = RrdDefinition::make()
+            ->addDataset('sapIngressBits', 'COUNTER', 0)
+            ->addDataset('sapEgressBits', 'COUNTER', 0)
+            ->addDataset('sapIngressDroppedBits', 'COUNTER', 0)
+            ->addDataset('sapEgressDroppedBits', 'COUNTER', 0);
 
-		$fields = [
-			'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] * 8,
-			'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] * 8,
-			'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] * 8,
-			'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] * 8,
-		];
+            $fields = [
+            'sapIngressBits' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] * 8,
+            'sapEgressBits' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] * 8,
+            'sapIngressDroppedBits' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] * 8,
+            'sapEgressDroppedBits' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] * 8,
+        ];
 
-		$tags = [
+            $tags = [
             'traffic_id' => $traffic_id,
-	        'rrd_name' => $rrd_name,
-		    'rrd_def' => $rrd_def,
-		];
-		
-		data_update($this->getDeviceArray(), 'sap', $tags, $fields);
-		$this->enableGraph('sap');
+            'rrd_name' => $rrd_name,
+            'rrd_def' => $rrd_def,
+        ];
 
+            data_update($this->getDeviceArray(), 'sap', $tags, $fields);
+            $this->enableGraph('sap');
         }
-
 
         return $saps;
     }
