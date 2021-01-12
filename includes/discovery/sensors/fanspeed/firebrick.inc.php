@@ -24,7 +24,7 @@ foreach($monitoringMib as $idx => $mibEntry){
             $idx,
             'firebrick',
             $cfg["description"],
-            (isset($cfg["divisor"]) ? $cfg["divisor"] : '1000'),
+            (isset($cfg["divisor"]) ? $cfg["divisor"] : '1'),
             '1',
             (isset($cfg["crit_low"]) ? $cfg["crit_low"] : 0),
             (isset($cfg["warn_low"]) ? $cfg["warn_low"] : 0),
