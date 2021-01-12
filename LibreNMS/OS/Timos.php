@@ -666,10 +666,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
-                'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'],
-                'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'],
-                'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'],
-                'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'],
             ]));
             //create SAP graphs
             $rrd_name = safename('sap-' . $traffic_id);

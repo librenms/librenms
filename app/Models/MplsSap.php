@@ -23,10 +23,6 @@ class MplsSap extends Model implements Keyable
         'sapOperStatus',
         'sapLastMgmtChange',
         'sapLastStatusChange',
-        'sapIngressBytes',
-        'sapEgressBytes',
-        'sapIngressDroppedBytes',
-        'sapEgressDroppedBytes',
     ];
 
     // ---- Helper Functions ----
