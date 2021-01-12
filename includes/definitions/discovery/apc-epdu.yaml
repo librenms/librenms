@@ -1,10 +1,9 @@
 mib: PowerNet-MIB
 modules:
     os:
-        hardware:
-            - ePDUDeviceStatusModelNumber
-        version: ePDUDeviceStatusVersion
-        serial: ePDUDeviceStatusSerialNumber
+        hardware: PowerNet-MIB::ePDUDeviceStatusModelNumber.1
+        version: PowerNet-MIB::ePDUDeviceStatusVersion.1
+        serial: PowerNet-MIB::ePDUDeviceStatusSerialNumber.1
     sensors:
         current:
             data:
