@@ -5,7 +5,7 @@ $l2tpTable = snmpwalk_cache_multi_oid($device, 'fbL2tpPeerTable', [], 'FIREBRICK
 if($l2tpTable){
 
     $tunnels = array(
-        0 => array("description" => "Free Tunnels"),
+        0 => array("description" => "Free Tunnels", "crit_low" => 10, "warn_low" => 20, "warn_high" => 30000, "crit_high" => 30000),
         1 => array("description" => "Opening Tunnels"),
         2 => array("description" => "Live Incoming Tunnels"),
         3 => array("description" => "Live Outgoing Tunnels"),
@@ -14,7 +14,7 @@ if($l2tpTable){
         6 => array("description" => "Closed Tunnels"),
     );
     $sessions = array(
-        1 => array("description" => "Free Sessions"),
+        1 => array("description" => "Free Sessions", "crit_low" => 10, "warn_low" => 20, "warn_high" => 0, "crit_high" => 0),
         2 => array("description" => "Waiting Sessions"),
         3 => array("description" => "Opening Sessions"),
         4 => array("description" => "Negotiating Sessions"),
@@ -23,8 +23,8 @@ if($l2tpTable){
         7 => array("description" => "Live Sessions"),
         8 => array("description" => "Accounting Pending Sessions"),
         9 => array("description" => "Closing Sessions"),
-        10 => array("description" => "Closed Sessions"),
-        11 => array("description" => "Free Session Slots"),
+        10 => array("description" => "Closed Sessions", "crit_low" => 0, "warn_low" => 0, "warn_high" => 0, "crit_high" => 0),
+        11 => array("description" => "Free Session Slots", "crit_low" => 10, "warn_low" => 20, "warn_high" => 0, "crit_high" => 0),
     );
 
     foreach($tunnels as $idx => $cfg){
