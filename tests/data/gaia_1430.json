@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux A-10144014 3.10.20-al-5.0-pr2 #1 SMP Sun May 21 15:23:45 IDT 2017 armv7l",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "gaia",
+                    "type": "firewall",
+                    "serial": null,
+                    "icon": "checkpoint.png",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
