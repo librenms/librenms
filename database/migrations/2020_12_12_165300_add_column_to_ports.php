@@ -13,7 +13,7 @@ class AddColumnToPorts extends Migration
     public function up()
     {
         Schema::table('ports', function (Blueprint $table) {
-            $table->unsignedInteger('port_group_id')->default(null)->after('portName');
+            $table->unsignedInteger('port_group_id')->nullable()->after('portName');
         });
     }
 
