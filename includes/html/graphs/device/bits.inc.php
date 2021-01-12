@@ -66,4 +66,3 @@ require 'includes/html/graphs/generic_multi_seperated.inc.php';
 
 // include("includes/html/graphs/generic_multi_bits_separated.inc.php");
 // include("includes/html/graphs/generic_multi_data_separated.inc.php");
-
