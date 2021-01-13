@@ -1476,7 +1476,7 @@ ports:
 port_groups:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: name, Type: varchar(255), 'Null': false, Extra: '', Unique: true}
+    - { Field: name, Type: varchar(255), 'Null': false, Extra: ''}
     - { Field: desc, Type: varchar(255), 'Null': true, Extra: ''}
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
