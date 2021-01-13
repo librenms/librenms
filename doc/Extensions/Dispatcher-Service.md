@@ -62,7 +62,7 @@ connections and other important health metrics.
 # Configuration
 
 Connection settings are required in `.env`. The `.env` file is
-generated after composer install and APP_KEY and NODE_ID are set.
+generated after composer install and `APP_KEY` and `NODE_ID` are set.
 Remember that the APP_KEY value must be the same on all your pollers.
 
 ```dotenv

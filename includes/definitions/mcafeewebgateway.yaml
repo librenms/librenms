@@ -1,0 +1,13 @@
+os: mcafeewebgateway
+text: 'Mcafee Web Gateway'
+type: firewall
+icon: mcafeewebgateway
+mib_dir: mcafee
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1230.2.7.1.1

@@ -36,6 +36,7 @@ class Sensor extends DeviceRelatedModel
         'snr'                  => 'signal',
         'state'                => 'bullseye',
         'temperature'          => 'thermometer-three-quarters',
+        'tv_signal'            => 'signal',
         'voltage'              => 'bolt',
         'waterflow'            => 'tint',
         'percent'              => 'percent',

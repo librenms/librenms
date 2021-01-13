@@ -44,6 +44,39 @@ modules:
                         - { value: 0, descr: 'false', graph: 1, generic: 0 }
                         - { value: 1, descr: 'true', graph: 1, generic: 2 }
                         - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
+                -
+                    oid: haStarted
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.5.{{ $index }}'
+                    index: 'haStarted.{{ $index }}'
+                    descr: 'Cluster mechanism started'
+                    group: HA
+                    value: haStarted
+                    states:
+                        - { value: 1, descr: yes, graph: 1, generic: 0 }
+                        - { value: 0, descr: no, graph: 0, generic: 2 }
+                -
+                    oid: haState
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.6.{{ $index }}'
+                    index: 'haState.{{ $index }}'
+                    descr: 'Cluster member state'
+                    group: HA
+                    value: haState
+                    states:
+                        - { value: 1, descr: active , graph: 3, generic: 0 }
+                        - { value: 2, descr: standby, graph: 2, generic: 0 }
+                        - { value: 3, descr: 'active attention', graph: 1, generic: 1 }
+                        - { value: 0, descr: down, graph: 0, generic: 2 }
+                -
+                    oid: haStatCode
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.101.{{ $index }}'
+                    index: 'haStatCode.{{ $index }}'
+                    descr: 'Cluster member status code'
+                    group: HA
+                    value: haStatCode
+                    states:
+                        - { value: 0, descr: Up , graph: 2, generic: 0 }
+                        - { value: 1, descr: Attention, graph: 1, generic: 3 }
+                        - { value: 2, descr: Down, graph: 0, generic: 1 }
         temperature:
             data:
                 -

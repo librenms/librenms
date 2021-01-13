@@ -6,10 +6,10 @@ path: blob/master/doc/
 
 Services within LibreNMS provides the ability to leverage Nagios plugins to
 perform additional monitoring outside of SNMP. Services can also be used
-in conjuction with your SNMP monitoring for larger monitoring functionality.
+in conjunction with your SNMP monitoring for larger monitoring functionality.
 
 **Services must be tied to a device to function properly. A good generic
-option is to use `localhost`, but it is suggest to attach the check to 
+option is to use `localhost`, but it is suggested to attach the check to 
 the device you are monitoring.**
 
 ## Nagios plugins source
