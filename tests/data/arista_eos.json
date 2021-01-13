@@ -5775,7 +5775,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -5882,7 +5883,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -5989,7 +5991,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6096,7 +6099,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6203,7 +6207,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6310,7 +6315,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6417,7 +6423,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6524,7 +6531,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6631,7 +6639,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6738,7 +6747,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6845,7 +6855,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -6952,7 +6963,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -7059,7 +7071,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -7166,7 +7179,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -7273,7 +7287,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 }
             ]
         },
@@ -7384,7 +7399,8 @@
                     "ifOutMulticastPkts": 1791188,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -7491,7 +7507,8 @@
                     "ifOutMulticastPkts": 3067863,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -7598,7 +7615,8 @@
                     "ifOutMulticastPkts": 2943188,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -7705,7 +7723,8 @@
                     "ifOutMulticastPkts": 1694080,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -7812,7 +7831,8 @@
                     "ifOutMulticastPkts": 2042180,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -7919,7 +7939,8 @@
                     "ifOutMulticastPkts": 2442830,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8026,7 +8047,8 @@
                     "ifOutMulticastPkts": 2636216,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8133,7 +8155,8 @@
                     "ifOutMulticastPkts": 6426002,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8240,7 +8263,8 @@
                     "ifOutMulticastPkts": 3248554,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8347,7 +8371,8 @@
                     "ifOutMulticastPkts": 13464201246,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8454,7 +8479,8 @@
                     "ifOutMulticastPkts": 6202193175,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8561,7 +8587,8 @@
                     "ifOutMulticastPkts": 8063750478,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8668,7 +8695,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8775,7 +8803,8 @@
                     "ifOutMulticastPkts": 9674547,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 },
                 {
                     "port_descr_type": null,
@@ -8882,7 +8911,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "port_group_id": null
                 }
             ]
         }
