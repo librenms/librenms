@@ -478,7 +478,7 @@ if ($vars['view'] == 'saps') {
 
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
-            <td><a href=' . generate_sap_url($sap) . '>' . $sap['svc_oid'] . '</td>
+            <td>' . generate_sap_url($sap, $sap['svc_oid']) . '</td>
             <td>' . generate_port_link($port) . '</td>
             <td>' . $sap['sapEncapValue'] . '</td>
             <td>' . $sap['sapType'] . '</td>

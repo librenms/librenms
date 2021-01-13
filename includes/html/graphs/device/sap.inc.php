@@ -5,8 +5,8 @@ $rrd_filename = rrd_name($device['hostname'], 'sap-' . $vars['traffic_id']);
 $stats = [
     'sapIngressBits' => 'Ingress Bits',
     'sapEgressBits' => 'Egress Bits',
-    'sapIngressDroppedBi' => 'Ingress Dropped Bits',
-    'sapEgressDroppedBit' => 'Egress Dropped Bits',
+    'sapIngressDroppedBi' => 'Ingress Drops Bits',
+    'sapEgressDroppedBit' => 'Egress Drops Bits',
 ];
 
 foreach ($stats as $stat => $descr) {
