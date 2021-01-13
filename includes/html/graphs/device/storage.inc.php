@@ -8,7 +8,13 @@ require 'includes/html/graphs/common.inc.php';
 $iter = '1';
 $rrd_options .= " COMMENT:'                        Size      Used    % Used\\l'";
 
-foreach (dbFetchRows('SELECT * FROM storage where device_id = ?', [$device['device_id']]) as $storage) {
+$storages = dbFetchRows('SELECT * FROM storage where device_id = ?', [$device['device_id']]);
+
+if (empty($storages)) {
+    graph_text_and_exit('No Storage');
+}
+
+foreach ($storages as $storage) {
     // FIXME generic colour function
     if ($iter == '1') {
         $colour = 'CC0000';
