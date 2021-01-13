@@ -1661,7 +1661,7 @@ Securing RRCached: Please see [RRDCached Security](RRDCached-Security.md)
 Polling:
 For local Polling the 'RRDCached' Application (librenms-localhost) the usual is either to:
 
-1. Use unix:socket;
+1. Use unix:socket as described: [RRDCached](RRDCached.md)
 2. or Monitor thru port listen 42217 as described: [RRDCached Security](RRDCached-Security.md)
 
 For remote Polling the 'RRDCached' Application, you have two options:
