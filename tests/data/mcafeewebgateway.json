@@ -253,12 +253,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -365,12 +361,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -477,12 +469,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -589,12 +577,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -701,12 +685,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -813,12 +793,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -925,12 +901,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -1037,12 +1009,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -1149,12 +1117,8 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 }
             ]
         },
@@ -1265,12 +1229,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": "intel corporation 82545em gigabit ethernet controller ",
@@ -1377,12 +1337,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -1489,12 +1445,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -1601,12 +1553,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -1713,12 +1661,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -1825,12 +1769,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -1937,12 +1877,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -2049,12 +1985,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -2161,12 +2093,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 },
                 {
                     "port_descr_type": null,
@@ -2273,12 +2201,8 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-<<<<<<< HEAD
                     "ifOutMulticastPkts_rate": null,
                     "port_group_id": null
-=======
-                    "ifOutMulticastPkts_rate": null
->>>>>>> master
                 }
             ]
         }
