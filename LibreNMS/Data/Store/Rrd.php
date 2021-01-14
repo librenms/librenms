@@ -604,6 +604,29 @@ class Rrd extends BaseDatastore
         return $image_suffixes[$type] ?? '';
     }
 
+    public function xport($definition, $start, $end)
+    {
+        if ($this->init(false)) {
+            $cmd = $this->buildCommand('xport', '', "--json -s $start -e $end " . $definition);
+            $output = $this->sync_process->sendCommand($cmd);
+
+            $last_line = strrpos($output[0], "\nOK"); // remove OK
+            $json = json_decode(substr($output[0], 0, $last_line), true);
+            if ($output[1] || json_last_error()) {
+                return [
+                    'error' => $output[1],
+                    'output' => $output[0],
+                    'cmd' => $cmd,
+                    'json_error' => json_last_error_msg(),
+                ];
+            }
+
+            return $json;
+        }
+
+        return [];
+    }
+
     public function __destruct()
     {
         $this->close();

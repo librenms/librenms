@@ -25,7 +25,9 @@
 
 namespace App\Graphing\Graphs;
 
+use App\Facades\Rrd;
 use App\Graphing\BaseGraph;
+use App\Models\Port;
 use Carbon\CarbonImmutable;
 
 class PortBits extends BaseGraph
@@ -47,9 +49,9 @@ class PortBits extends BaseGraph
     private function getDygraph()
     {
         return [
-            'data' => $this->genDataDygraph(2),
+            'data' => $this->formatRrdData($this->fetchData(101)),
             'config' => [
-                'labels' => ['x', 'Port 1', 'Port 2'],
+                'labels' => ['x', 'In', 'Out'],
                 'legend' => 'always',
                 'showRoller' => true,
                 'rollPeriod' => 2,
@@ -61,25 +63,24 @@ class PortBits extends BaseGraph
 
     private function getChartJs()
     {
+        $actual = $this->formatRrdDataChartjs($this->fetchData(101));
+
         $data = [
             [
-                'label' => 'Port 1',
-                'data' => [],
+                'label' => 'In',
+                'data' => $actual[0],
                 'backgroundColor' => 'rgba(255, 99, 132, 0.2)',
                 'borderColor' => 'rgba(255, 99, 132, 1)',
                 'borderWidth' => 1,
             ],
             [
-                'label' => 'Port 2',
-                'data' => [],
+                'label' => 'Out',
+                'data' => $actual[1],
                 'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
                 'borderColor' => 'rgba(54, 162, 235, 1)',
                 'borderWidth' => 1,
             ],
         ];
-
-        $this->fillDataChartJs($data[0]['data']);
-        $this->fillDataChartJs($data[1]['data']);
 
         return [
             'type' => 'line',
@@ -110,6 +111,46 @@ class PortBits extends BaseGraph
                 ],
             ],
         ];
+    }
+
+    private function fetchData($id)
+    {
+        $port = Port::with('device')->find($id);
+
+        $rrd_file = Rrd::name($port->device->hostname, Rrd::portName($id));
+        $defs = "DEF:outoctets$id=$rrd_file:OUTOCTETS:AVERAGE DEF:inoctets$id=$rrd_file:INOCTETS:AVERAGE CDEF:doutoctets$id=outoctets$id,-1,* CDEF:doutbits$id=doutoctets$id,8,* CDEF:inbits$id=inoctets$id,8,* XPORT:inbits$id:'In' XPORT:doutbits$id:'Out' ";
+
+        return Rrd::xport($defs, $this->now->subHours(2)->timestamp, $this->now->timestamp);
+    }
+
+    private function formatRrdData($data)
+    {
+        $timestamp = $data['meta']['start'];
+        $step = $data['meta']['step'];
+        $output = [];
+
+        foreach ($data['data'] as $entry) {
+            $output[] = array_merge([$timestamp], $entry);
+            $timestamp += $step;
+        }
+
+        return $output;
+    }
+
+    private function formatRrdDataChartjs($data)
+    {
+        $timestamp = $data['meta']['start'] * 1000;
+        $step = $data['meta']['step'] * 1000;
+        $in = [];
+        $out = [];
+
+        foreach ($data['data'] as $entry) {
+            $in[] = ['x' => $timestamp, 'y' => $entry[0]];
+            $out[] = ['x' => $timestamp, 'y' => $entry[1]];
+            $timestamp += $step;
+        }
+
+        return [$in, $out];
     }
 
     private function genDataDygraph($count = 2)
