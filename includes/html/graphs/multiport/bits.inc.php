@@ -21,7 +21,7 @@ $ds_out = 'OUTOCTETS';
 
 $colour_line_in  = '006600';
 $colour_line_out = '000099';
-$colour_area_in  = 'CDEB8B';
-$colour_area_out = 'C3D9FF';
+$colour_area_in = '55BC1A';
+$colour_area_out = '4D5AFF';
 
 require 'includes/html/graphs/generic_multi_data.inc.php';
