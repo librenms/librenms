@@ -186,6 +186,7 @@ return [
          * LibreNMS Service Providers...
          */
         App\Providers\SnmptrapProvider::class,
+        App\Providers\GraphsServiceProvider::class,
     ],
 
     /*
@@ -242,6 +243,7 @@ return [
         'Toastr' => Kamaln7\Toastr\Facades\Toastr::class,
 
         // LibreNMS
+        'Graph' => \App\Facades\Graph::class,
         'Permissions' => \App\Facades\Permissions::class,
         'DeviceCache' => \App\Facades\DeviceCache::class,
         'Rrd' => App\Facades\Rrd::class,
