@@ -1,5 +1,10 @@
 mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB:ZYXEL-MGS3712-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: ZYXEL-ES-COMMON::sysMgmtMemUsage
+                type: zyxel
     processors:
         data:
             -
@@ -23,7 +28,7 @@ modules:
     sensors:
         fanspeed:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: zyxelHwMonitorFanRpmTable
@@ -43,8 +48,6 @@ modules:
                     index: 'fanRpmCurValue.{{ $index }}'
                     low_limit: fanRpmLowThresh
         temperature:
-            options:
-                skip_values_lt: 0
             data:
                 -
                     oid: zyxelHwMonitorTemperatureTable
@@ -84,7 +87,7 @@ modules:
                             value: 'Temperature'
         voltage:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
                 divisor: 1000
             data:
                 -

@@ -4,7 +4,7 @@ text: 'EnGenius Access Point'
 icon: engenius
 over:
     - { graph: device_ucd_cpu, text: 'Processor Usage' }
-    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     -

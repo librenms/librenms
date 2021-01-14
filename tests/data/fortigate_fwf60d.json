@@ -5,16 +5,16 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.101.1.626",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "v5.6.5,build1600,180620 (GA)",
+                    "hardware": "FWF_60D",
                     "features": null,
                     "os": "fortigate",
                     "type": "firewall",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "fortinet.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -23,11 +23,11 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.101.1.626",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": "<private>",
-                    "version": "v5.6.5",
+                    "version": "v5.6.5,build1600,180620 (GA)",
                     "hardware": "FWF_60D",
-                    "features": "build1600",
+                    "features": null,
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "<private>",
@@ -1997,14 +1997,18 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fortigate",
-                    "mempool_precision": 1,
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
                     "mempool_descr": "Main Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 17,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.12356.101.4.1.4.0",
+                    "mempool_used": 327083786,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1596938486,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1924022272,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -2012,26 +2016,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fortigate",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Main Memory",
-                    "mempool_perc": 17,
-                    "mempool_used": 319418,
-                    "mempool_free": 1559510,
-                    "mempool_total": 1878928,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

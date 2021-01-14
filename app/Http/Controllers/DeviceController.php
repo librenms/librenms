@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
-use App\Models\Port;
 use App\Models\Vminfo;
 use Auth;
 use Carbon\Carbon;
@@ -61,11 +60,12 @@ class DeviceController extends Controller
         $device = str_replace('device=', '', $device);
         $device = is_numeric($device) ? DeviceCache::get($device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
-        DeviceCache::setPrimary($device_id);
 
-        if (!$device->exists) {
+        if (! $device->exists) {
             abort(404);
         }
+
+        DeviceCache::setPrimary($device_id);
 
         $current_tab = str_replace('tab=', '', $current_tab);
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
@@ -79,7 +79,7 @@ class DeviceController extends Controller
         }
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
-        $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->value('device_id');
+        $parent_id = Vminfo::guessFromDevice($device)->value('device_id');
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
         $tabs = array_map(function ($class) {
@@ -91,7 +91,7 @@ class DeviceController extends Controller
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device);
         $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
-        if (!isset($device_links[$primary_device_link_name])) {
+        if (! isset($device_links[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($device_links);
         }
         $primary_device_link = $device_links[$primary_device_link_name];
@@ -102,6 +102,7 @@ class DeviceController extends Controller
         }
 
         $tab_content = $this->renderLegacyTab($current_tab, $device, $data);
+
         return view('device.tabs.legacy', get_defined_vars());
     }
 

@@ -26,13 +26,13 @@
                     "sysDescr": "GS1900-8",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "GS1900-8",
                     "features": null,
                     "os": "zynos",
                     "type": "network",
                     "serial": null,
                     "icon": "zyxel.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

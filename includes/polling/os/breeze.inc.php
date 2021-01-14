@@ -17,10 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 $version = trim(snmp_get($device, 'brzaccVLRunningSoftwareVersion.0', '-Oqv', 'ALVARION-DOT11-WLAN-MIB'), '"');

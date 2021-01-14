@@ -3,8 +3,7 @@ text: 'Blue Coat PacketShaper'
 type: network
 ifname: true
 icon: bluecoat
-mib_dir:
-    - bluecoat
+mib_dir: bluecoat
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

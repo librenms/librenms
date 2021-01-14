@@ -6,7 +6,7 @@ echo 'RFC1628 ';
 $value = snmp_get($device, 'upsEstimatedChargeRemaining.0', '-OvqU', 'UPS-MIB');
 
 if (is_numeric($value)) {
-        discover_sensor(
+    discover_sensor(
             $valid['sensor'],
             'charge',
             $device,

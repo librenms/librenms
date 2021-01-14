@@ -1,0 +1,8 @@
+modules:
+    os:
+        hardware:
+            - SIAE-UNIT-MIB::unitPartNumber.1
+            - SIAE-UNIT-MIB::unitLabel.1
+        hardware_template: '{{ SIAE-UNIT-MIB::unitLabel.1 }} ({{ SIAE-UNIT-MIB::unitPartNumber.1 }})'
+        serial: SIAE-UNIT-MIB::unitParentSerialNumber.1
+        version: SIAE-SOFT-MIB::softwareEquipmentReleaseBench1.0

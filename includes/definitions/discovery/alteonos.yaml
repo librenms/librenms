@@ -1,5 +1,19 @@
 mib: ALTEON-CHEETAH-SWITCH-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: ALTEON-CHEETAH-SWITCH-MIB::mpMemStatsTotal
+                free: ALTEON-CHEETAH-SWITCH-MIB::mpMemStatsFree
+                descr: 'Main Memory'
+    os:
+        features: ALTEON-CHEETAH-SWITCH-MIB::agEnabledSwFeatures.0
+        hardware:
+            - ALTEON-CHEETAH-SWITCH-MIB::hwMainBoardNumber.0
+            - ALTEON-CHEETAH-SWITCH-MIB::hwMainBoardRevision.0
+        hardware_template: '{{ ALTEON-CHEETAH-SWITCH-MIB::hwMainBoardNumber.0 }} Vers. {{ ALTEON-CHEETAH-SWITCH-MIB::hwMainBoardRevision.0 }}'
+        serial: ALTEON-CHEETAH-SWITCH-MIB::hwSerialNumber.0
+        version: ALTEON-CHEETAH-SWITCH-MIB::agSoftwareVersion.0
     processors:
         data:
             -

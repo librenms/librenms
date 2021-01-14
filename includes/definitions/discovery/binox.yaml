@@ -1,5 +1,13 @@
 mib: PRVT-INTERWORKING-OS-MIB:PRVT-SYS-MON-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: PRVT-SYS-MON-MIB::prvtSysMonCurrentRamUsage
+    os:
+        hardware: PRVT-SWITCH-MIB::sysPartNumber.0
+        serial: PRVT-SWITCH-MIB::sysSerialNumber.0
+        version: PRVT-INTERWORKING-OS-MIB::oSversionNumber.0
     processors:
         data:
             -

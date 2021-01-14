@@ -1,5 +1,9 @@
 mib: CISCO-DMN-DSG-TUNING-MIB:CISCO-DMN-DSG-DIAG-MIB
 modules:
+    os:
+        version: .1.3.6.1.4.1.1429.2.2.5.1.1.1.0
+        hardware: .1.3.6.1.4.1.1429.2.2.5.1.1.4.0
+        serial: .1.3.6.1.4.1.1429.2.2.5.42.2.1.1.6.1
     sensors:
         state:
             data:

@@ -1,5 +1,30 @@
 mib: FOUNDRY-SN-AGENT-MIB:FOUNDRY-SN-SWITCH-GROUP-MIB:FOUNDRY-SN-STACKING-MIB
 modules:
+    mempools:
+        pre-cache:
+            oids:
+                - FOUNDRY-SN-AGENT-MIB::snAgentBrdMainBrdDescription
+        data:
+#            -
+#                total: FOUNDRY-SN-AGENT-MIB::snAgGblDynMemTotal
+#                free: FOUNDRY-SN-AGENT-MIB::snAgGblDynMemFree
+#                type: ironware-dyn
+#                descr: 'Dynamic Memory'
+            -
+                total: FOUNDRY-SN-AGENT-MIB::snAgSystemDRAMTotal
+                free: FOUNDRY-SN-AGENT-MIB::snAgSystemDRAMFree
+                descr: 'System Memory'
+                type: ironware-system
+            -
+                total: FOUNDRY-SN-AGENT-MIB::snAgentBrdMemoryTotal
+                percent_used: FOUNDRY-SN-AGENT-MIB::snAgentBrdMemoryUtil100thPercent
+                type: ironware-dyn
+                descr: '{{ FOUNDRY-SN-AGENT-MIB::snAgentBrdMainBrdDescription }}'
+    os:
+        hardware_mib: FOUNDRY-SN-ROOT-MIB
+        sysDescr_regex: '/IronWare Version V(?<version>.*) Compiled on/'
+        serial: FOUNDRY-SN-AGENT-MIB::snChasSerNum.0
+#        version: FOUNDRY-SN-AGENT-MIB::snAgBuildVer.0
     sensors:
         pre-cache:
             data:

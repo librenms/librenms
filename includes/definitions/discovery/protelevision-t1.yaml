@@ -1,5 +1,9 @@
 mib: PT3080-MIB
 modules:
+    os:
+        hardware: PT3080-MIB::pt3080SystemInstrumentType.0
+        serial: PT3080-MIB::pt3080SystemInstrumentKU.0
+        version: PT3080-MIB::pt3080SystemInstrumentSWRev.0
     sensors:
         state:
             data:

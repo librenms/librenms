@@ -4,12 +4,9 @@ group: unix
 text: Linux
 ifXmcbc: true
 ifname: true
-mib_dir:
-    - supermicro
-    - dell
 over:
     - { graph: device_processor, text: 'Processor Usage' }
-    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
 poller_modules:
     bgp-peers: false

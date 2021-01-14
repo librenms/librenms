@@ -1,6 +1,6 @@
 [![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master)
-[![Travis Status](https://travis-ci.com/librenms/librenms.svg?branch=master)](https://travis-ci.com/librenms/librenms)
+[![Test Status](https://github.com/librenms/librenms/workflows/test/badge.svg)](https://github.com/librenms/librenms/actions?query=workflow%3Atest)
 
 Introduction
 ------------
@@ -94,9 +94,9 @@ exception):
 [11]: http://www.librenms.org/#downloads
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
-[15]: http://docs.librenms.org/General/Contributing/
-[16]: http://docs.librenms.org/
-[17]: http://docs.librenms.org/General/Acknowledgement/
+[15]: https://docs.librenms.org/General/Contributing/
+[16]: https://docs.librenms.org/
+[17]: https://docs.librenms.org/General/Acknowledgement/
 [19]: https://github.com/librenms/librenms/pulls
 
 

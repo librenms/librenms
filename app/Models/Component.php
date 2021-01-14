@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,8 +24,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Component extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $table = 'component';
     protected $fillable = ['device_id', 'type', 'label', 'status', 'disabled', 'ignore', 'error'];
@@ -35,17 +38,17 @@ class Component extends DeviceRelatedModel
 
     public function setStatusAttribute($status)
     {
-        $this->attributes['status'] = (int)$status;
+        $this->attributes['status'] = (int) $status;
     }
 
     public function setDisabledAttribute($disabled)
     {
-        $this->attributes['disabled'] = (int)$disabled;
+        $this->attributes['disabled'] = (int) $disabled;
     }
 
     public function setIgnoreAttribute($ignore)
     {
-        $this->attributes['ignore'] = (int)$ignore;
+        $this->attributes['ignore'] = (int) $ignore;
     }
 
     // ---- Define Relationships ----

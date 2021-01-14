@@ -4,7 +4,7 @@ path: blob/master/doc/
 # SNMP trap handling
 
 Currently, LibreNMS supports a lot of trap handlers. You can check them on 
-GitHub [there](https://github.com/librenms/librenms/tree/master/LibreNMS/Snmptrap/Handlers).
+GitHub [here](https://github.com/librenms/librenms/tree/master/LibreNMS/Snmptrap/Handlers).
 To add more see [Adding new SNMP Trap handlers](../Developing/SNMP-Traps.md). Traps are handled via snmptrapd. 
 
 snmptrapd is an SNMP application that receives and logs SNMP TRAP and INFORM messages.
@@ -77,7 +77,7 @@ WantedBy=multi-user.target
 ```
 > In Ubuntu 18 is service located by default in ```/etc/systemd/system/multi-user.target.wants/snmptrapd.service```
 
-There is a list of snmptrapd options:
+Here is a list of snmptrapd options:
 
 | Option | Description                                                                                      |
 | -------| ------------------------------------------------------------------------------------------------ |
@@ -94,21 +94,21 @@ as well as BGP traps, use `-m IF-MIB:BGP4-MIB`. Multiple files can be added, sep
 
 If you want to test or store original TRAPS in log then:
 
-Create folder for storing traps for example in file `traps.log`
+Create a folder for storing traps for example in file `traps.log`
 
 ```
 sudo mkdir /var/log/snmptrap
 
 ```
 
-Add following config to your snmptrapd.service after `ExecStart=/usr/sbin/snmptrapd -f -m ALL -M /opt/librenms/mibs`
+Add the following config to your snmptrapd.service after `ExecStart=/usr/sbin/snmptrapd -f -m ALL -M /opt/librenms/mibs`
 
 ```
 -tLf /var/log/snmptrap/traps.log
 
 ```
 
-After succesfuly configured service reload service files, enable, and start the snmptrapd service:
+After successfully configuring the service, reload service files, enable, and start the snmptrapd service:
 
 ```
 sudo systemctl daemon-reload
@@ -159,16 +159,21 @@ So what value should you type in the commands below? Oddly enough, simply supply
 ### Event logging
 
 You can configure generic event logging for snmp traps.  This will log
-an event of the type trap for received traps. These events can be utilized for alerting.
+an event of the type trap for received traps. These events can be used for alerting.
+By default, only the TrapOID is logged. But you can enable the "detailed" variant,
+and all the data received with the trap will be logged.
 
-In config.php
+The parameter can be found in General Settings / External / SNMP Traps Integration.
+
+It can also be configured in ```config.php```
 
 ```php
-$config['snmptraps']['eventlog'] = 'unhandled';
+$config['snmptraps']['eventlog'] = 'unhandled'; //default value
+$config['snmptraps']['eventlog_detailed'] = 'false'; //default value
 ```
 
 Valid options are:
 
-- `unhandled` only unhandled traps will be logged
+- `unhandled` only unhandled traps will be logged (default value)
 - `all` log all traps
 - `none` no traps will create a generic event log (handled traps may still log events)

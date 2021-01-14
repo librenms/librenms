@@ -1,5 +1,15 @@
 mib: ZYXEL-ZYWALL-ZLD-COMMON-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: ZYXEL-ZYWALL-ZLD-COMMON-MIB::sysRAMUsage
+                type: zywall
+    os:
+        features: ZYXEL-ES-ZyxelAPMgmt::operationMode.0
+        hardware: ZYXEL-ES-COMMON::sysProductModel.0
+        version: ZYXEL-ES-COMMON::sysSwVersionString.0
+        serial: ZYXEL-ES-COMMON::sysProductSerialNumber.0
     processors:
         data:
             -

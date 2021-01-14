@@ -6,8 +6,7 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_temperature, text: Temperatures }
     - { graph: device_state, text: States }
-mib_dir:
-    - exalt
+mib_dir: exalt
 discovery:
     -
         sysObjectID:

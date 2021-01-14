@@ -19,7 +19,6 @@
  *
  * Tests vmwVmHBLost and vmwVmHBDetected traps from VMWare ESXi hosts.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -30,14 +29,13 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class VmwHBTest extends SnmpTrapTestCase
 {
     public function testVmwVmHBLostTrap()
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Device::class)->create();
+        $device = Device::factory()->create();
+        $guest = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
@@ -58,8 +56,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
     public function testVmwVmHBDetectedTrap()
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Device::class)->create();
+        $device = Device::factory()->create();
+        $guest = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162

@@ -26,7 +26,7 @@ jnxVpnMIB MODULE-IDENTITY
     CONTACT-INFO
         "        Kireeti Kompella
          Postal: Juniper Networks, Inc.
-                 1194 Mathilda Ave
+                 1133 Innovation Way
                  Sunnyvale, CA 94089
             Tel: +1 408 745 2000
          E-mail: kireeti@juniper.net"

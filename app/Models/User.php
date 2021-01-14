@@ -4,14 +4,16 @@ namespace App\Models;
 
 use App\Events\UserCreated;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use Permissions;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasFactory;
 
     protected $primaryKey = 'user_id';
     protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
@@ -38,7 +40,7 @@ class User extends Authenticatable
      * Test if this user has global read access
      * these users have a level of 5, 10 or 11 (demo).
      *
-     * @return boolean
+     * @return bool
      */
     public function hasGlobalRead()
     {
@@ -49,7 +51,7 @@ class User extends Authenticatable
      * Test if this user has global admin access
      * these users have a level of 10 or 11 (demo).
      *
-     * @return boolean
+     * @return bool
      */
     public function hasGlobalAdmin()
     {
@@ -59,7 +61,7 @@ class User extends Authenticatable
     /**
      * Test if the User is an admin.
      *
-     * @return boolean
+     * @return bool
      */
     public function isAdmin()
     {
@@ -94,7 +96,7 @@ class User extends Authenticatable
      */
     public function setPassword($password)
     {
-        $this->attributes['password'] = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
+        $this->attributes['password'] = $password ? Hash::make($password) : null;
     }
 
     /**
@@ -146,17 +148,17 @@ class User extends Authenticatable
 
     public function setRealnameAttribute($realname)
     {
-        $this->attributes['realname'] = (string)$realname;
+        $this->attributes['realname'] = (string) $realname;
     }
 
     public function setDescrAttribute($descr)
     {
-        $this->attributes['descr'] = (string)$descr;
+        $this->attributes['descr'] = (string) $descr;
     }
 
     public function setEmailAttribute($email)
     {
-        $this->attributes['email'] = (string)$email;
+        $this->attributes['email'] = (string) $email;
     }
 
     public function setCanModifyPasswdAttribute($modify)
@@ -172,9 +174,10 @@ class User extends Authenticatable
     public function getDevicesAttribute()
     {
         // pseudo relation
-        if (!array_key_exists('devices', $this->relations)) {
+        if (! array_key_exists('devices', $this->relations)) {
             $this->setRelation('devices', $this->devices()->get());
         }
+
         return $this->getRelation('devices');
     }
 
@@ -188,7 +191,7 @@ class User extends Authenticatable
     public function devices()
     {
         // pseudo relation
-        return Device::query()->when(!$this->hasGlobalRead(), function ($query) {
+        return Device::query()->when(! $this->hasGlobalRead(), function ($query) {
             return $query->whereIn('device_id', Permissions::devicesForUser($this));
         });
     }

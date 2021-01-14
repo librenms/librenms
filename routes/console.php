@@ -15,7 +15,7 @@ use App\Models\Device;
 use LibreNMS\Exceptions\HostUnreachableException;
 use Symfony\Component\Process\Process;
 
-Artisan::command('device:rename 
+Artisan::command('device:rename
     {old hostname : ' . __('The existing hostname, IP, or device id') . '}
     {new hostname : ' . __('The new hostname or IP') . '}
 ', function () {
@@ -25,7 +25,7 @@ Artisan::command('device:rename
         $this->argument('old hostname'),
         $this->argument('new hostname'),
     ]))->setTty(true)->run();
-})->describe(__('Rename a device, this can be used to change the hostname or IP of a device'));
+})->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
 Artisan::command('device:add
     {device spec : Hostname or IP to add}
@@ -51,23 +51,23 @@ Artisan::command('device:add
 ', function () {
     /** @var \Illuminate\Console\Command $this */
     // Value Checks
-    if (!in_array($this->option('port-association-mode'), ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
+    if (! in_array($this->option('port-association-mode'), ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
         $this->error(__('Invalid port association mode'));
     }
 
-    if (!in_array($this->option('transport'), ['udp', 'udp6', 'tcp', 'tcp6'])) {
+    if (! in_array($this->option('transport'), ['udp', 'udp6', 'tcp', 'tcp6'])) {
         $this->error(__('Invalid SNMP transport'));
     }
 
-    if (!in_array($this->option('auth-protocol'), ['md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224'])) {
+    if (! in_array($this->option('auth-protocol'), ['md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224'])) {
         $this->error(__('Invalid authentication protocol'));
     }
 
-    if (!in_array($this->option('privacy-protocol'), ['des', 'aes'])) {
+    if (! in_array($this->option('privacy-protocol'), ['des', 'aes'])) {
         $this->error(__('Invalid privacy protocol'));
     }
 
-    $port = (int)$this->option('port');
+    $port = (int) $this->option('port');
     if ($port < 1 || $port > 65535) {
         $this->error(__('Port should be 1-65535'));
     }
@@ -104,7 +104,7 @@ Artisan::command('device:add
 
     try {
         $init_modules = [];
-        include(base_path('includes/init.php'));
+        include base_path('includes/init.php');
 
         if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
             set_debug();
@@ -126,15 +126,18 @@ Artisan::command('device:add
         );
         $hostname = Device::where('device_id', $device_id)->value('hostname');
         $this->info("Added device $hostname ($device_id)");
+
         return 0;
     } catch (HostUnreachableException $e) {
         $this->error($e->getMessage() . PHP_EOL . implode(PHP_EOL, $e->getReasons()));
+
         return 1;
     } catch (Exception $e) {
         $this->error($e->getMessage());
+
         return 3;
     }
-})->describe('Add a new device');
+})->purpose('Add a new device');
 
 Artisan::command('device:remove
     {device spec : ' . __('Hostname, IP, or device id to remove') . '}
@@ -144,13 +147,13 @@ Artisan::command('device:remove
         base_path('delhost.php'),
         $this->argument('device spec'),
     ]))->setTty(true)->run();
-})->describe('Remove a device');
+})->purpose('Remove a device');
 
 Artisan::command('update', function () {
-    (new Process(base_path('daily.sh')))->setTty(true)->run();
-})->describe(__('Update LibreNMS and run maintenance routines'));
+    (new Process([base_path('daily.sh')]))->setTty(true)->run();
+})->purpose(__('Update LibreNMS and run maintenance routines'));
 
-Artisan::command('poller:ping 
+Artisan::command('poller:ping
     {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
 ', function () {
 //    PingCheck::dispatch(new PingCheck($this->argument('groups')));
@@ -166,7 +169,7 @@ Artisan::command('poller:ping
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Check if devices are up or down via icmp'));
+})->purpose(__('Check if devices are up or down via icmp'));
 
 Artisan::command('poller:discovery
     {device spec : ' . __('Device spec to discover: device_id, hostname, wildcard, odd, even, all, new') . '}
@@ -194,7 +197,7 @@ Artisan::command('poller:discovery
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Discover information about existing devices, defines what will be polled'));
+})->purpose(__('Discover information about existing devices, defines what will be polled'));
 
 Artisan::command('poller:poll
     {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, odd, even, all') . '}
@@ -216,7 +219,7 @@ Artisan::command('poller:poll
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Poll data from devices as defined by discovery'));
+})->purpose(__('Poll data from devices as defined by discovery'));
 
 Artisan::command('poller:alerts', function () {
     $command = [base_path('alerts.php')];
@@ -228,7 +231,7 @@ Artisan::command('poller:alerts', function () {
     }
 
     (new Process($command))->setTty(true)->run();
-})->describe(__('Check for any pending alerts and deliver them via defined transports'));
+})->purpose(__('Check for any pending alerts and deliver them via defined transports'));
 
 Artisan::command('poller:billing
     {bill id? : ' . __('The bill id to poll') . '}
@@ -247,7 +250,7 @@ Artisan::command('poller:billing
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Collect billing data'));
+})->purpose(__('Collect billing data'));
 
 Artisan::command('poller:services
     {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, all') . '}
@@ -270,7 +273,7 @@ Artisan::command('poller:services
         }
     }
     (new Process($command))->setTty(true)->run();
-})->describe(__('Update LibreNMS and run maintenance routines'));
+})->purpose(__('Update LibreNMS and run maintenance routines'));
 
 Artisan::command('poller:billing-calculate
     {--c|clear-history : ' . __('Delete all billing history') . '}
@@ -282,7 +285,7 @@ Artisan::command('poller:billing-calculate
     }
 
     (new Process($command))->setTty(true)->run();
-})->describe(__('Run billing calculations'));
+})->purpose(__('Run billing calculations'));
 
 Artisan::command('scan
     {network?* : ' . __('CIDR notation network(s) to scan, can be ommited if \'nets\' config is set') . '}
@@ -293,8 +296,9 @@ Artisan::command('scan
     /** @var \Illuminate\Console\Command $this */
     $command = [base_path('snmp-scan.py')];
 
-    if (empty($this->argument('network')) && !Config::has('nets')) {
+    if (empty($this->argument('network')) && ! Config::has('nets')) {
         $this->error(__('Network is required if \'nets\' is not set in the config'));
+
         return 1;
     }
 
@@ -323,4 +327,4 @@ Artisan::command('scan
     $command = array_merge($command, $this->argument('network'));
 
     (new Process($command))->setTty(true)->run();
-})->describe(__('Scan the network for hosts and try to add them to LibreNMS'));
+})->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));

@@ -9,5 +9,4 @@ over:
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.33555.1.1
-mib_dir:
-    - ray
+mib_dir: ray

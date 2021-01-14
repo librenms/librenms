@@ -1,5 +1,20 @@
 mib: ASAM-SYSTEM-MIB:ASAM-EQUIP-MIB
 modules:
+    mempools:
+        pre-cache:
+            oids:
+                - ASAM-EQUIP-MIB::eqptBoardTable
+        data:
+            -
+                total: ASAM-SYSTEM-MIB::totalMemSize
+                used: ASAM-SYSTEM-MIB::memAbsoluteUsage
+                precision: 1048576
+                descr: '{{ ASAM-EQUIP-MIB::eqptBoardInventoryTypeName }}: {{ ASAM-EQUIP-MIB::eqptBoardIfSlotId }} Memory ({{ $index }})'
+                warn_percent: 98
+    os:
+        hardware: ASAM-EQUIP-MIB::eqptHolderActualType.17
+        serial: ASAM-EQUIP-MIB::eqptHolderSerialNumber.17
+        version: ASAM-SYSTEM-MIB::swEtsiVersion.0
     processors:
         data:
             -

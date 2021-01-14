@@ -1,5 +1,18 @@
 mib: FORTINET-FORTISANDBOX-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: FORTINET-FORTISANDBOX-MIB::fsaSysMemCapacity
+                percent_used: FORTINET-FORTISANDBOX-MIB::fsaSysMemUsage
+                precision: 1024
+                descr: 'Physical Memory'
+    os:
+        version: FORTINET-FORTISANDBOX-MIB::fsaSysVersion.0
+        hardware: ENTITY-MIB::entPhysicalModelName.1
+        serial:
+            - FORTINET-CORE-MIB::fnSysSerial.0
+            - ENTITY-MIB::entPhysicalSerialNum.1
     processors:
         data:
             -

@@ -3,7 +3,7 @@
 $oids = snmp_walk($device, 'sysChassisFanSpeed', '-OsqU', 'F5-BIGIP-SYSTEM-MIB');
 
 if ($oids) {
-    d_echo($oids."\n");
+    d_echo($oids . "\n");
     echo 'sysChassisFanSpeed ';
 
     $divisor = 1;
@@ -12,7 +12,7 @@ if ($oids) {
     foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
         if ($data) {
-            list($oid, $fanspeed) = explode(' ', $data, 2);
+            [$oid, $fanspeed] = explode(' ', $data, 2);
             $split_oid = explode('.', $oid);
             $split_count = (count($split_oid) - 1);
             $index = $split_oid[$split_count];

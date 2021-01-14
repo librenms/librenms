@@ -4,12 +4,15 @@ namespace App\Models;
 
 use DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Rewrite;
 use Permissions;
 
 class Port extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'port_id';
 
@@ -46,7 +49,7 @@ class Port extends DeviceRelatedModel
         });
     }
 
-        // ---- Helper Functions ----
+    // ---- Helper Functions ----
 
     /**
      * Returns a human readable label for this port
@@ -71,14 +74,14 @@ class Port extends DeviceRelatedModel
             }
         }
 
-        foreach ((array)\LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
+        foreach ((array) \LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
             if (Str::contains(strtolower($label), strtolower($src))) {
                 $label = $val;
             }
         }
 
-        foreach ((array)\LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
-            $label = preg_replace($reg.'i', $val, $label);
+        foreach ((array) \LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
+            $label = preg_replace($reg . 'i', $val, $label);
         }
 
         return $label;
@@ -102,7 +105,7 @@ class Port extends DeviceRelatedModel
      */
     public function canAccess($user)
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -117,9 +120,10 @@ class Port extends DeviceRelatedModel
 
     public function getIfPhysAddressAttribute($mac)
     {
-        if (!empty($mac)) {
+        if (! empty($mac)) {
             return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
         }
+
         return null;
     }
 

@@ -22,6 +22,7 @@ behaviour only found in Python3.4+.
   install. MySQLclient can also be used, but does require compilation.
 - python-dotenv .env loader
 - redis-py 3.0+ and Redis 5.0+ server (if using distributed polling)
+- psutil
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
 
@@ -44,9 +45,12 @@ system. See <https://redis.io/topics/security>
 
 ## Memcached (distributed polling)
 
-LibreNMS still uses memcached for locking daily update processes when using
-distributed polling.  So you will still need to configure memcached
-unless you have updates disabled.
+LibreNMS can still use memcached as a locking mechanism when using
+distributed polling.  So you can configure memcached for this purpose
+unless you have updates disabled. 
+
+See `Locking Mechanisms` at
+<https://docs.librenms.org/Extensions/Distributed-Poller/>
 
 ## MySQL
 
@@ -58,7 +62,7 @@ connections and other important health metrics.
 # Configuration
 
 Connection settings are required in `.env`. The `.env` file is
-generated after composer install and APP_KEY and NODE_ID are set.
+generated after composer install and `APP_KEY` and `NODE_ID` are set.
 Remember that the APP_KEY value must be the same on all your pollers.
 
 ```dotenv
@@ -73,7 +77,7 @@ DB_PASSWORD=
 
 ## Distributed Polling Configuration
 
-Once you have your Redis database set up, configure it in the .env file on each node.
+Once you have your Redis database set up, configure it in the .env file on each node. Configure the redis cache driver for distributed locking.
 
 ```dotenv
 REDIS_HOST=127.0.0.1
@@ -85,6 +89,8 @@ REDIS_SENTINEL_SERVICE=myservice
 REDIS_DB=0
 #REDIS_PASSWORD=
 #REDIS_TIMEOUT=60
+
+CACHE_DRIVER=redis
 ```
 
 ## Basic Configuration
@@ -196,7 +202,7 @@ First, enable SCL's on your system:
 Then install and configure the runtime and service:
 
 ```
-# yum install rh-python36 epel-release
+# yum install gcc rh-python36 rh-python36-python-devel epel-release
 # yum --enablerepo=remi install redis
 # vi /opt/librenms/config.php
 # vi /etc/redis.conf

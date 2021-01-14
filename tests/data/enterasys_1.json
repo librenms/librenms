@@ -1,0 +1,130 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.5624.2.1.137",
+                    "sysDescr": "Extreme Networks, Inc. B5G124-48P2 Rev 06.81.05.0003",
+                    "sysContact": null,
+                    "version": "06.81.05.0003",
+                    "hardware": "B5G124-48P2",
+                    "features": null,
+                    "os": "enterasys",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "enterasys.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.5624.1.2.49.1.1.1.1.4.10011001.1",
+                    "processor_index": "1",
+                    "processor_type": "enterasys",
+                    "processor_usage": 3,
+                    "processor_descr": "Processor",
+                    "processor_precision": 10,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.5624.1.2.49.1.1.1.1.4.10011002.1",
+                    "processor_index": "2",
+                    "processor_type": "enterasys",
+                    "processor_usage": 2,
+                    "processor_descr": "Processor",
+                    "processor_precision": 10,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.5624.1.2.49.1.1.1.1.4.10011003.1",
+                    "processor_index": "3",
+                    "processor_type": "enterasys",
+                    "processor_usage": 5,
+                    "processor_descr": "Processor",
+                    "processor_precision": 10,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "10011001",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "enterasys",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Slot #1 RAM device 1",
+                    "mempool_perc": 86,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 230596608,
+                    "mempool_used_oid": null,
+                    "mempool_free": 37838848,
+                    "mempool_free_oid": ".1.3.6.1.4.1.5624.1.2.49.1.3.1.1.5.10011001.2.1",
+                    "mempool_total": 268435456,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "10011002",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "enterasys",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Slot #2 RAM device 1",
+                    "mempool_perc": 86,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 230316032,
+                    "mempool_used_oid": null,
+                    "mempool_free": 38119424,
+                    "mempool_free_oid": ".1.3.6.1.4.1.5624.1.2.49.1.3.1.1.5.10011002.2.1",
+                    "mempool_total": 268435456,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "10011003",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "enterasys",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Slot #3 RAM device 1",
+                    "mempool_perc": 85,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 229292032,
+                    "mempool_used_oid": null,
+                    "mempool_free": 39143424,
+                    "mempool_free_oid": ".1.3.6.1.4.1.5624.1.2.49.1.3.1.1.5.10011003.2.1",
+                    "mempool_total": 268435456,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

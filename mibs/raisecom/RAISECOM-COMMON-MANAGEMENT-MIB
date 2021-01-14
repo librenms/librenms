@@ -1,9 +1,9 @@
 --MibName=raisecomCommonManagement
 -- =======================================================================
--- Version info 
+-- Version info
 --
 -- Version 0.1 Created 2002.5.24 by GONGGUIDONG
--- This version of MIB is created just for management of base and user.   
+-- This version of MIB is created just for management of base and user.
 -- Added raisecomClockGroup.raisecomClockMode sub-node by XueChaomin 20081220
 -- remove UserManage and OnlineUpgrade group by guoxiaodan 20070716
 -- removed keepalve group by LIAOBIN 20070709
@@ -13,14 +13,14 @@
 -- add rcNotificationGroup   by gongguidong 20041208
 -- add raisecomUserStatus    by gongguidong 20040205
 -- add online Upgrade group   by gongguidong 20040205
--- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd. 
+-- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd.
 -- =======================================================================
 
 -- ===========================================================================
 
 --
 -- RAISECOM base management objects
---            
+--
 
 RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 
@@ -36,33 +36,33 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 		TimeStamp,
 		RowStatus,
 		TruthValue
-			FROM SNMPv2-TC    
+			FROM SNMPv2-TC
 		DateAndTime,
 		EnableVar
-			FROM SWITCH-TC       
-		raisecomAgent		
+			FROM SWITCH-TC
+		raisecomAgent
 			FROM RAISECOM-BASE-MIB;
-	
+
 	raisecomCommonManagement    MODULE-IDENTITY
 		LAST-UPDATED 	"200412170000Z"
 		ORGANIZATION 	"RAISECOM TECH, Ltd."
 		CONTACT-INFO 	"www.raisecom.com"
-		DESCRIPTION  	
+		DESCRIPTION
 		    "The MIB module defining objects for common management"
-		::= { raisecomAgent  2}  
-                
-	--groups                 
+		::= { raisecomAgent  2}
+
+	--groups
 	raisecomCommonFunctionGroup	OBJECT IDENTIFIER ::= {raisecomCommonManagement 1}
-	
+
 	raisecomNotificationGroup	OBJECT IDENTIFIER ::= {raisecomCommonManagement 4}
-	     
+
 	raisecomClockGroup	OBJECT IDENTIFIER ::= {raisecomCommonManagement 5}
 
 
-  	
+
    -- raisecomCommonFunctionGroup
 
-    
+
     raisecomConfigLoadOperation    OBJECT-TYPE
         SYNTAX          INTEGER{
         			ready(1),
@@ -85,21 +85,21 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION     "Syetem Load Configuration .Includes to erase the start-up config,
                          or to save the running config."
     ::= { raisecomCommonFunctionGroup 1 }
-    
+
     raisecomConfigLoadNotificationOnCompletion OBJECT-TYPE
     	SYNTAX TruthValue
     	ACCESS read-write
     	STATUS mandatory
    		DESCRIPTION
 		        "Specifies whether or not a  raisecomConfigLoadOnCompletion
-		        notification should be issued on completion of some 
+		        notification should be issued on completion of some
 		        operation . If such a notification is desired, it is the
 		        responsibility of the management entity to ensure that the
 		        SNMP administrative model is configured in such a way as to
 		        allow the notification to be delivered."
 		DEFVAL { false }
 			::= {  raisecomCommonFunctionGroup 2 }
-	
+
     raisecomConfigLoadState OBJECT-TYPE
 		SYNTAX  INTEGER {
 		        ready(1),
@@ -111,21 +111,21 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 		STATUS mandatory
 		DESCRIPTION
 			"Specifies the state of this load configuration."
-			::= {  raisecomCommonFunctionGroup 3 } 
-    
+			::= {  raisecomCommonFunctionGroup 3 }
+
 	raisecomSystemClock     OBJECT-TYPE
-        SYNTAX INTEGER       
+        SYNTAX INTEGER
         UNITS "second"
         MAX-ACCESS read-write
         STATUS obsolete
         DESCRIPTION
             "Seconds elapsed from Jan. 1,1970,same as UNIX TIME. "
-        ::= { raisecomCommonFunctionGroup 4 }    
-    
-    
-  	raisecomConfigLoadMIBTraps      OBJECT IDENTIFIER ::= {raisecomCommonFunctionGroup 5} 
-  	   
-    raisecomConfigLoadCompletion NOTIFICATION-TYPE 
+        ::= { raisecomCommonFunctionGroup 4 }
+
+
+  	raisecomConfigLoadMIBTraps      OBJECT IDENTIFIER ::= {raisecomCommonFunctionGroup 5}
+
+    raisecomConfigLoadCompletion NOTIFICATION-TYPE
                		    		    OBJECTS {
 		        raisecomConfigLoadOperation, raisecomConfigLoadState }
 		STATUS     current
@@ -143,17 +143,17 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 		  ::= { raisecomCommonFunctionGroup 6}
 
     raisecomClearRunningConfig        OBJECT-TYPE
-        SYNTAX	INTEGER{                             
+        SYNTAX	INTEGER{
                         clearAll(1)
                        }
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-            "the operation to clear running-config" 
+            "the operation to clear running-config"
           ::= { raisecomCommonFunctionGroup 7 }
 
-    raisecomReloadStartupConfig        OBJECT-TYPE 
-    	SYNTAX	INTEGER{                             
+    raisecomReloadStartupConfig        OBJECT-TYPE
+    	SYNTAX	INTEGER{
                         clearAndReload(1)
     			       }
         MAX-ACCESS  read-write
@@ -161,9 +161,9 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The operation to reload startup-config file"
          ::= { raisecomCommonFunctionGroup 8 }
-                          
+
     raisecomCfgUpdateState OBJECT-TYPE
-	    SYNTAX  INTEGER { 
+	    SYNTAX  INTEGER {
 	                    none(0),
 	                    noupdate(1),
 	                    cliupdate(2),
@@ -177,20 +177,20 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 		    ::= {  raisecomCommonFunctionGroup 9 }
 
     raisecomCfgUpdateModID OBJECT-TYPE
-        SYNTAX  INTEGER 
+        SYNTAX  INTEGER
         ACCESS read-write
         STATUS current
         DESCRIPTION
             "Specifies ID of the module which has updated."
             ::= {  raisecomCommonFunctionGroup 10 }
 
-    raisecomAutoWritecfgEnable OBJECT-TYPE           
+    raisecomAutoWritecfgEnable OBJECT-TYPE
         SYNTAX       EnableVar
         MAX-ACCESS   read-write
         STATUS       current
         DESCRIPTION  "Set/get auto writing configuration status."
         DEFVAL      { enable }
-            ::= { raisecomCommonFunctionGroup 12 }   
+            ::= { raisecomCommonFunctionGroup 12 }
 
     raisecomMibCommandString OBJECT-TYPE
 		SYNTAX	OCTET STRING (SIZE(0..255))
@@ -199,76 +199,76 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION
 			"comnmand string executed by mib user"
 		::=	{ raisecomCommonFunctionGroup 13 }
-		
+
     raisecomMibCommandMode  OBJECT-TYPE
 		SYNTAX	Integer32 {
-			user_node(0),               
-			auth_node(1),           
-			view_node(2),           
-			auth_enable_node(3),    
-			enable_node(4),         
-			vlan_node(5),           
-			interface_node(6),      
-			interface_range_node(7),
-			aggregator_node(8),     
-			 tdm_node(9),           
-			 ip_node(10),           
-			 lbip_node(11), 
-			 mpls_exppath_node(12),
-			 tunnel_node(13),
-			 vlanif_node(14),
-			 subif_node(15),
-			 vrf_node(16),        
-			 config_node(17),       
-			 rip_node(18),          
-			 bgp_node(19) 
+			user-node(0),
+			auth-node(1),
+			view-node(2),
+			auth-enable-node(3),
+			enable-node(4),
+			vlan-node(5),
+			interface-node(6),
+			interface-range-node(7),
+			aggregator-node(8),
+			 tdm-node(9),
+			 ip-node(10),
+			 lbip-node(11),
+			 mpls-exppath-node(12),
+			 tunnel-node(13),
+			 vlanif-node(14),
+			 subif-node(15),
+			 vrf-node(16),
+			 config-node(17),
+			 rip-node(18),
+			 bgp-node(19)
 		}
 		ACCESS	read-write
 		STATUS	current
 		DESCRIPTION
 			"command run on specific mode"
-		::=	{ raisecomCommonFunctionGroup 14 }   
+		::=	{ raisecomCommonFunctionGroup 14 }
 
     raisecomMibCommandState  OBJECT-TYPE
 		SYNTAX	Integer32 {
-			cmd_success(0),
-			cmd_warning(1),
-			cmd_err_no_match(2),
-			cmd_err_ambiguous(3),
-			cmd_err_incomplete(4),
-			cmd_err_exeed_argc_max(5),
-			cmd_err_nothing_todo(6),	
-			cmd_complete_full_match(7),	
-			--(8),
-			--(9),
-			--(10),
-			cmd_no_right(11),
-			cmd_err_author_failure(12)
+			cmd-success(0),
+			cmd-warning(1),
+			cmd-err-no-match(2),
+			cmd-err-ambiguous(3),
+			cmd-err-incomplete(4),
+			cmd-err-exeed-argc-max(5),
+			cmd-err-nothing-todo(6),
+			cmd-complete-full-match(7),
+			-- (8),
+			-- (9),
+			-- (10),
+			cmd-no-right(11),
+			cmd-err-author-failure(12)
 		}
 		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"the state of comnmand executed"
-		::=	{ raisecomCommonFunctionGroup 15 } 
-		
+		::=	{ raisecomCommonFunctionGroup 15 }
+
        raisecomAutoWritecfgInterval OBJECT-TYPE
-        SYNTAX  Integer32 
+        SYNTAX  Integer32
         ACCESS read-write
         STATUS current
         DESCRIPTION
             " Interval time of auto save  module."
             ::= {  raisecomCommonFunctionGroup 16 }
-			
+
 	raisecomConfigFileOperationTableGroup   OBJECT IDENTIFIER ::= {raisecomCommonFunctionGroup 17}
-	
-  	raisecomConfigFileOperationTable      OBJECT-TYPE 
+
+  	raisecomConfigFileOperationTable      OBJECT-TYPE
         SYNTAX   SEQUENCE OF RaisecomConfigFileOperationEntry
         ACCESS	 not-accessible
         STATUS   current
         DESCRIPTION
                  "Config file operation table."
-        ::= { raisecomConfigFileOperationTableGroup   1 }  
-        
+        ::= { raisecomConfigFileOperationTableGroup   1 }
+
    	raisecomConfigFileOperationEntry      OBJECT-TYPE
         SYNTAX   RaisecomConfigFileOperationEntry
         ACCESS   not-accessible
@@ -277,33 +277,33 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
                  "An entry in raisecomConfigFileOperationTable"
         INDEX { raisecomConfigFileNodeType,
                 raisecomConfigFileNodeInfo}
-        ::= { raisecomConfigFileOperationTable  1 } 
+        ::= { raisecomConfigFileOperationTable  1 }
 
    	RaisecomConfigFileOperationEntry ::= SEQUENCE {
 		raisecomConfigFileNodeType	          INTEGER,
 		raisecomConfigFileNodeInfo          OCTET STRING,
 		raisecomConfigFileOperationType        INTEGER
-  	}   
-  
-   	raisecomConfigFileNodeType       OBJECT-TYPE 
+  	}
+
+   	raisecomConfigFileNodeType       OBJECT-TYPE
         SYNTAX   INTEGER{
-                         slot_type (1)
+                         slot-type (1)
                         }
         ACCESS	 not-accessible
         STATUS   current
         DESCRIPTION
                  "Config file operation node type."
-        ::= { raisecomConfigFileOperationEntry 1}    
-        
-   	raisecomConfigFileNodeInfo       OBJECT-TYPE 
+        ::= { raisecomConfigFileOperationEntry 1}
+
+   	raisecomConfigFileNodeInfo       OBJECT-TYPE
         SYNTAX   OCTET STRING (SIZE(0..100))
         ACCESS	 not-accessible
         STATUS   current
         DESCRIPTION
                  "Config file operation node info."
-        ::= { raisecomConfigFileOperationEntry 2}    
-  
-   	raisecomConfigFileOperationType       OBJECT-TYPE 
+        ::= { raisecomConfigFileOperationEntry 2}
+
+   	raisecomConfigFileOperationType       OBJECT-TYPE
         SYNTAX   INTEGER{
                          erase (1)
                         }
@@ -311,8 +311,8 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
         STATUS   current
         DESCRIPTION
                  "Config file operation type."
-        ::= { raisecomConfigFileOperationEntry 3}    
- 	
+        ::= { raisecomConfigFileOperationEntry 3}
+
 --raisecomNotificationGroup
 	raisecomObjectStatusDesc    OBJECT-TYPE
 		SYNTAX          OCTET STRING
@@ -345,20 +345,20 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION     "The notification category of the notification
              			currently being sent.such as Environment,Complement"
 		::= { raisecomNotificationGroup 4 }
-               
+
 	raisecomNotificationLocation    OBJECT-TYPE
 		SYNTAX          DisplayString
 		MAX-ACCESS      accessible-for-notify
 		STATUS          current
-		DESCRIPTION     "The description of location which notification generates. 
+		DESCRIPTION     "The description of location which notification generates.
 						This is a display string which can be showned on NMS such like OpenView"
 		::= { raisecomNotificationGroup 101 }
-		
+
 --raisecomClockGroup
     raisecomClockDateAndTime OBJECT-TYPE
     SYNTAX      DateAndTime
     MAX-ACCESS  read-write
-    STATUS      current                
+    STATUS      current
     DESCRIPTION
         "The current local date and time for the system.
 
@@ -388,39 +388,39 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 
         A value of 'false' indicates the system has the ability to
         keep time across reboots."
-    ::= { raisecomClockGroup 2 }   
-     
+    ::= { raisecomClockGroup 2 }
+
 --raisecom Summer Time
 raisecomSummerTime          OBJECT IDENTIFIER ::= { raisecomClockGroup 3 }
-  
+
 	raisecomSummerTimeEnable OBJECT-TYPE
-        SYNTAX        EnableVar 
+        SYNTAX        EnableVar
         MAX-ACCESS    read-write
         STATUS        current
-        DESCRIPTION   "An indication of whether the summertime feature 
+        DESCRIPTION   "An indication of whether the summertime feature
                        is enabled on this device. When this object
-                       is set to enable, then raisecomSummerTimeOffset, 
+                       is set to enable, then raisecomSummerTimeOffset,
                        raisecomSummerTimeRecurringStart and
-                       raisecomSummerTimeRecurringEnd  objects are set 
-                       to default values. When this object is set 
-                       to disable, then raisecomSummerTimeOffset, 
+                       raisecomSummerTimeRecurringEnd  objects are set
+                       to default values. When this object is set
+                       to disable, then raisecomSummerTimeOffset,
                        raisecomSummerTimeRecurringStart,
-                       raisecomSummerTimeRecurringEnd objects are 
-                       not instantiated and the summertime feature 
+                       raisecomSummerTimeRecurringEnd objects are
+                       not instantiated and the summertime feature
                        is disabled"
         DEFVAL { disable }
         ::= { raisecomSummerTime 1 }
 
 	raisecomSummerTimeOffset  OBJECT-TYPE
-        SYNTAX        INTEGER ( 1 .. 1440) 
+        SYNTAX        INTEGER ( 1 .. 1440)
         UNITS         "Minutes"
         MAX-ACCESS    read-write
         STATUS        current
-        DESCRIPTION   "The value of this object indicates number of 
+        DESCRIPTION   "The value of this object indicates number of
                        minutes to add  or to subtract during summertime.
-                       This object is not instantiated when 
+                       This object is not instantiated when
                        raisecomSummerTimeEnable object is set to disable."
-                       
+
         DEFVAL { 60 }
         ::= { raisecomSummerTime 2 }
 
@@ -430,22 +430,22 @@ raisecomSummerTime          OBJECT IDENTIFIER ::= { raisecomClockGroup 3 }
         STATUS        current
         DESCRIPTION   "Indicates summertime starts at this time every year.
                        octets    contents     range
-                       1         week        1..5,ff last = ff 
-                       2       	 day         1..7 
+                       1         week        1..5,ff last = ff
+                       2       	 day         1..7
                                              where sunday = 1 saturday = 7
-                       4         month       1..12 
+                       4         month       1..12
                                              where january = 1 december = 12
                        5         hour        0..23
                        6         min         0..59
-                       For example, the first Monday in Feb at 13:30pm  
+                       For example, the first Monday in Feb at 13:30pm
                        should be given as
-                           01 02 00 02 0e 1e  
+                           01 02 00 02 0e 1e
                        For the last Tuesday in dec at 1:20am should be
                        given as
-                          ff 03 00 0c 01 14 
-                       This object is not instantiated when 
+                          ff 03 00 0c 01 14
+                       This object is not instantiated when
                        raisecomSummerTimeEnable object is set to disable."
-        ::= { raisecomSummerTime 3 } 
+        ::= { raisecomSummerTime 3 }
 
 	raisecomSummerTimeRecurringEnd OBJECT-TYPE
         SYNTAX        OCTET STRING (SIZE (6))
@@ -453,35 +453,35 @@ raisecomSummerTime          OBJECT IDENTIFIER ::= { raisecomClockGroup 3 }
         STATUS        current
         DESCRIPTION   "Indicates summertime ends at this time every year.
                        octets    contents      range
-                       1         week        1..5,ff where ff = last 
-                       2-3       day         1..7 
+                       1         week        1..5,ff where ff = last
+                       2-3       day         1..7
                                              where sunday = 1 saturday = 7
-                       4         month       1..12 
+                       4         month       1..12
                                              where january = 1 december = 12
                        5         hour        0..23
                        6         min         0..59
-                      For example, the third friday in February at 3:30am 
+                      For example, the third friday in February at 3:30am
                       should be given as
                             03 06 00 02 03 1e
-                          
-                       For the first Tuesday in May at 1:20am  should 
+
+                       For the first Tuesday in May at 1:20am  should
                        be given as
                            01 03 00 05 01 14
-                       This object is not instantiated when 
+                       This object is not instantiated when
                        raisecomSummerTimeEnable object is set to disable."
         ::= { raisecomSummerTime 4 }
-           
+
     raisecomClockMode OBJECT-TYPE
     SYNTAX      INTEGER{
-        			sysclk_dflt(1),
-        			sysclk_ts(2),
-        			sysclk_aux(3)        			
+        			sysclk-dflt(1),
+        			sysclk-ts(2),
+        			sysclk-aux(3)
         			}
     MAX-ACCESS  read-write
-    STATUS      current                
+    STATUS      current
     DESCRIPTION
         "System clock mode, which range from 1 to 3, stands for default mode, timestamp mode
-        and auxiliary clock mode respectively. It allows network administrator to change 
+        and auxiliary clock mode respectively. It allows network administrator to change
         system clock mechanism by setting this variable. For instance, if administrator intend
         to use auxiliary clock as system timer, whom is required to set this variable's value
         as 3, i.e SYSCLK_AUX.
@@ -489,21 +489,21 @@ raisecomSummerTime          OBJECT IDENTIFIER ::= { raisecomClockGroup 3 }
         1: SYSCLK_DFLT   default mode
         2: SYSCLK_TS     timestamp mode
         3: SYSCLK_AUX    auxiliary clock mode."
-    ::= { raisecomClockGroup 4 }   
+    ::= { raisecomClockGroup 4 }
 
     raisecomClockDisplay OBJECT-TYPE
     SYNTAX      INTEGER{
-        			eraisecomClockDisplay_DFLT(1),
-        			eraisecomClockDisplay_UTC(2),
-        			eraisecomClockDisplay_other(3)        			
+        			eraisecomClockDisplay-DFLT(1),
+        			eraisecomClockDisplay-UTC(2),
+        			eraisecomClockDisplay-other(3)
         			}
     MAX-ACCESS  read-write
-    STATUS      current                
+    STATUS      current
     DESCRIPTION
         "System clock  display mode, which range from 1 to 3, stands for default mode, UTC mode
-        and other clock mode which is made to prepare for fulture respectively. It allows network administrator to change 
+        and other clock mode which is made to prepare for fulture respectively. It allows network administrator to change
         system clock mechanism by setting this variable. For instance, if administrator intend
-        to use default display mode, the time will be shown as 'yyyy-mm-dd, hh:mm:ss'. 
+        to use default display mode, the time will be shown as 'yyyy-mm-dd, hh:mm:ss'.
         else if if administrator intend to use UTC display mode,
         the time will be shown as'dd.mm.yyyy-hh:mm:ss'
         All supported values of this variable are listed as follows:
@@ -511,11 +511,11 @@ raisecomSummerTime          OBJECT IDENTIFIER ::= { raisecomClockGroup 3 }
         2: EraisecomClockDisplay_UTC     UTC mode
         3: EraisecomClockDisplay_other   other mode."
     ::= { raisecomClockGroup 5 }
-    
+
     raisecomClockTimezoneName OBJECT-TYPE
  	SYNTAX        OCTET STRING (SIZE (8))
     MAX-ACCESS  read-write
-    STATUS      current                
+    STATUS      current
     DESCRIPTION
         "The name of the time zone "
     ::= { raisecomClockGroup 6 }

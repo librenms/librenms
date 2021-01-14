@@ -26,16 +26,14 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\DBTestCase;
 
 class FgTrapAvOversizeTest extends SnmpTrapTestCase
 {
     public function testAvOversize()
     {
-        $device = factory(Device::class)->create();
+        $device = Device::factory()->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162

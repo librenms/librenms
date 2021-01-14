@@ -1,5 +1,13 @@
 mib: TRAPEZE-NETWORKS-SYSTEM-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: TRAPEZE-NETWORKS-SYSTEM-MIB::trpzSysCpuMemorySize
+                used: TRAPEZE-NETWORKS-SYSTEM-MIB::trpzSysCpuMemoryInstantUsage
+                precision: 1024
+    os:
+        sysDescr_regex: '/Juniper Networks, Inc (?<hardware>\S+) (?<version>\S+)/'
     processors:
         data:
             -

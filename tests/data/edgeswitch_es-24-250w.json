@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.4413",
                     "sysDescr": "EdgeSwitch 24-Port 250W, 1.8.0.5106045, Linux 3.6.5-1b505fb7, 0.0.0.0000000",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "1.8.0.5106045",
+                    "hardware": "EdgeSwitch 24-Port 250W",
                     "features": null,
                     "os": "edgeswitch",
                     "type": "network",
-                    "serial": null,
+                    "serial": "F03E34F342C3",
                     "icon": "ubiquiti.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -7133,14 +7133,18 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "edgeswitch",
-                    "mempool_precision": 1,
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
                     "mempool_descr": "Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 67,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 175448064,
+                    "mempool_used_oid": null,
+                    "mempool_free": 87109632,
+                    "mempool_free_oid": ".1.3.6.1.4.1.4413.1.1.1.1.4.1.0",
+                    "mempool_total": 262557696,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -7148,26 +7152,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "edgeswitch",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 67,
-                    "mempool_used": 171336,
-                    "mempool_free": 85068,
-                    "mempool_total": 256404,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

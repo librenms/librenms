@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,10 +35,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
-use LibreNMS\Util\Colors;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
+use LibreNMS\Util\Validate;
 
 class TopDevicesController extends WidgetController
 {
@@ -56,6 +55,7 @@ class TopDevicesController extends WidgetController
     public function title()
     {
         $settings = $this->getSettings();
+
         return isset($settings['title']) ? $settings['title'] : $this->title;
     }
 
@@ -67,6 +67,9 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
         $sort = $settings['sort_order'];
+
+        // We use raw() function below, validate input and default to sane value.
+        $sort = Validate::ascDesc($sort, 'ASC');
 
         switch ($settings['top_query']) {
             case 'traffic':
@@ -110,7 +113,7 @@ class TopDevicesController extends WidgetController
     private function formatData($headers, $rows)
     {
         return [
-            'headers' => (array)$headers,
+            'headers' => (array) $headers,
             'rows' => $rows,
         ];
     }
@@ -311,17 +314,14 @@ class TopDevicesController extends WidgetController
             unset($link_array['height'], $link_array['width'], $link_array['legend']);
             $link = Url::generate($link_array);
 
-            $percent = $storage->storage_perc;
-            $background = Colors::percentage($percent, $storage->storage_perc_warn);
-
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),
                 StringHelpers::shortenText($storage->storage_descr, 50),
                 Url::overlibLink(
                     $link,
-                    Html::percentageBar(150, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']),
+                    Html::percentageBar(150, 20, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),
                     $overlib_content
-                )
+                ),
             ];
         });
 

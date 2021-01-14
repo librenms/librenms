@@ -10,17 +10,22 @@ JNX-IPSEC-MONITOR-MIB DEFINITIONS ::= BEGIN
          jnxMibs
            FROM JUNIPER-SMI
         jnxSpSvcSetName 
-           FROM JUNIPER-SP-MIB;
+           FROM JUNIPER-SP-MIB
+        JnxIkePeerRole, JnxIkePeerType, JnxIkeNegoMode, JnxDiffHellmanGrp, JnxEncryptAlgo, 
+        JnxIkeAuthMethod, JnxKeyType, JnxRemotePeerType, JnxSAType, JnxIkeHashAlgo, JnxEncapMode, JnxAuthAlgo
+           FROM JUNIPER-IPSEC-FLOW-MON-MIB;
       jnxIpSecMonitorMIB MODULE-IDENTITY
-         LAST-UPDATED "201202102100Z" --  2012 UTC      
+         LAST-UPDATED "201605310000Z"     -- Tue May  31 00:00:00 2016 UTC      
          ORGANIZATION "Juniper Networks, Inc."
          CONTACT-INFO
                 "Juniper Technical Assistance Center
                       Juniper Networks, Inc.
-                      1194 N. Mathilda Avenue
+                      1133 Innovation Way
                       Sunnyvale, CA 94089
                       E-mail: support@juniper.net"
-	     DESCRIPTION " "
+
+	 DESCRIPTION " "
+
          REVISION "201202102100Z"
          DESCRIPTION
                    "Initial version implements only the following
@@ -29,6 +34,9 @@ JNX-IPSEC-MONITOR-MIB DEFINITIONS ::= BEGIN
                     - IPSec tunnel table
                     - IPSec security associations table
                     "
+         REVISION    "201605310000Z" -- 31-May-16
+         DESCRIPTION
+                     "Consolidated TC duplicated b/n jnx-ipsec-flow-mon.mib, jnx-ipsec-monitor-asp.mib"
 
          ::= { jnxMibs 22 } 
 
@@ -36,65 +44,6 @@ JNX-IPSEC-MONITOR-MIB DEFINITIONS ::= BEGIN
    -- +++++++++++++++++++++++++++++++++++++++++++++++++++
    -- Local Textual Conventions
    -- +++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-      JnxIkePeerType  ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The type of IPsec Phase-1 IKE peer identity.
-            The IKE peer may be identified by one of the
-            ID types defined in IPSEC DOI."
-         SYNTAX INTEGER {
-                   unknown(0),
-                   idIpv4Addr(1),
-                   idFqdn(2),
-                   idDn(3)
-         }
-
-      JnxIkeNegoMode  ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The IPsec Phase-1 IKE negotiation mode."
-         SYNTAX INTEGER {
-                   main(1),
-                   aggressive(2),
-                   ikev2(3)
-         }
-
-      JnxIkeHashAlgo   ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The hash algorithm used in IPsec Phase-1
-            IKE negotiations."
-         SYNTAX INTEGER {
-                   md5(1),
-                   sha(2),
-                   sha256(3),
-                   sha384(4)
-         }
-
-      JnxIkeAuthMethod ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The authentication method used in IPsec Phase-1 IKE
-             negotiations."
-         SYNTAX INTEGER {
-                   preSharedKey(1),
-                   dssSignature(2),
-                   rsaSignature(3),
-                   rsaEncryption(4),
-                   revRsaEncryption(5)
-         }
-
-      JnxIkePeerRole ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "Role of the local endpoint in negotiating the IPsec Phase-1 IKE
-             security association. It can be either Initiator or Responder."
-         SYNTAX INTEGER {
-                   initiator(1),
-                   responder(2)
-         }
 
       JnxIkeNegState ::= TEXTUAL-CONVENTION
          STATUS     current
@@ -105,62 +54,6 @@ JNX-IPSEC-MONITOR-MIB DEFINITIONS ::= BEGIN
                    notmatured(2)
          }
 
-
-      JnxDiffHellmanGrp ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The Diffie Hellman Group used in negotiations.
-                   modp768        -- 768-bit MODP
-                   modp1024       -- 1024-bit MODP
-                   modp1536       -- 1536-bit MODP
-                   modp2048       -- 2048-bit MODP
-                   ec-modp256     -- 256-bit EC-MODP
-                   ec-modp384     -- 384-bit EC-MODP
-            "
-         SYNTAX INTEGER {
-                   unknown(0),
-                   modp768(1),
-                   modp1024(2),
-                   modp1536(5),
-                   modp2048(14),
-                   ecmodp256(19),
-                   ecmodp384(20)
-         }
-
-      JnxKeyType    ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The type of key used by an IPsec Phase-2 Tunnel."
-         SYNTAX INTEGER{
-                  unknown(0),
-                  keyIke(1),
-                  keyManual(2)
-         }
-
-      JnxEncapMode  ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The encapsulation mode used by an IPsec Phase-2
-            Tunnel."
-         SYNTAX INTEGER{
-                  unknown(0),
-                  tunnel(1),
-                  transport(2)
-         }
-
-      JnxEncryptAlgo   ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The encryption algorithm used in negotiations."
-         SYNTAX INTEGER {
-                   espDes(1),
-                   esp3des(2),
-                   espNull(3),
-                   espAes128 (4),  
-                   espAes192 (5),
-                   espAes256 (6)
-         }
-
       JnxSpi  ::= TEXTUAL-CONVENTION
          STATUS     current
          DESCRIPTION
@@ -169,41 +62,6 @@ JNX-IPSEC-MONITOR-MIB DEFINITIONS ::= BEGIN
          SYNTAX Unsigned32 (256..4294967295)
       -- Umesh  SYNTAX INTEGER (256..4294967295)
 
-      JnxAuthAlgo      ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The authentication algorithm used by a
-             security association of an IPsec Phase-2 Tunnel."
-         SYNTAX INTEGER{
-                   unknown(0),
-                   hmacMd5(2),
-                   hmacSha(3),
-                   hmacSha256(4)
-         }
-
-      JnxRemotePeerType  ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "The type of the remote peer gateway (endpoint). It can be one
-             of the following two types:
-               - static (Remote peer whose IP address is known beforehand)
-               - dynamic (Remote peer whose IP address is not known
-                          beforehand)"
-         SYNTAX INTEGER {
-                   unknown(0),
-                   static(1),
-                   dynamic(2)
-         }
-
-      JnxSAType   ::= TEXTUAL-CONVENTION
-         STATUS     current
-         DESCRIPTION
-            "SA Type manual or dynamic"
-         SYNTAX INTEGER {
-                   unknown(0),
-                   manual(1),
-                   dynamic(2)
-         }
       
 
 

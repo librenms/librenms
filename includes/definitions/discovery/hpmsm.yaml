@@ -1,5 +1,14 @@
 mib: COLUBRIS-USAGE-INFORMATION-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: COLUBRIS-USAGE-INFORMATION-MIB::coUsInfoRamTotal
+                free: COLUBRIS-USAGE-INFORMATION-MIB::coUsInfoRamFree
+                precision: 1024
+                descr: 'Memory Utilization'
+    os:
+        sysDescr_regex: '/(?<hardware>MSM\S+) .* Serial number (?<serial>\S+) - Firmware version (?<version>\S+)/'
     processors:
         data:
             -

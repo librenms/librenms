@@ -7,6 +7,8 @@ We now have support for polling data at intervals to fit your needs.
 
 > Please be aware of the following:
 
+- If you just want faster up/down alerts, [Fast Ping](..Extensions/Fast-Ping-Check/) is a much
+  easier path to that goal. 
 - You must also change your cron entry for `poller-wrapper.py` for
   this to work (if you change from the default 300 seconds).
 - Your polling _MUST_ complete in the time you configure for the

@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,11 +25,15 @@
 
 namespace LibreNMS\Interfaces\Discovery;
 
+use App\Models\Device;
+
 interface OSDiscovery
 {
     /**
      * Discover additional information about the OS.
      * Primarily this is just version, hardware, features, serial, but could be anything
+     *
+     * @param \App\Models\Device $device
      */
-    public function discoverOS(): void;
+    public function discoverOS(Device $device): void;
 }

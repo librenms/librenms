@@ -7,8 +7,7 @@ over:
     - { graph: sensor_current, text: Current }
     - { graph: sensor_power, text: Power }
     - { graph: sensor_frequency, text: Frequency }
-mib_dir:
-    - schneider
+mib_dir: schneider
 discovery:
     -
         sysObjectID:

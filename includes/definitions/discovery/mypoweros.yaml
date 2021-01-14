@@ -1,5 +1,14 @@
 mib: MPIOS-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: MPIOS-MIB::memoryTotalBytes
+                used: MPIOS-MIB::numBytesAlloc
+                free: MPIOS-MIB::numBytesFree
+
+    os:
+        sysDescr_regex: '/MyPower (?<hardware>.*) version (?<version>[\d.]+)/'
     processors:
         data:
             -

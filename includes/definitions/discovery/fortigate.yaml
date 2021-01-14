@@ -1,5 +1,16 @@
 mib: FORTINET-FORTIGATE-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: FORTINET-FORTIGATE-MIB::fgSysMemCapacity
+                percent_used: FORTINET-FORTIGATE-MIB::fgSysMemUsage
+                precision: 1024
+                descr: 'Main Memory'
+    os:
+        version: FORTINET-FORTIGATE-MIB::fgSysVersion.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        hardware: ENTITY-MIB::entPhysicalModelName.1
     processors:
         data:
             -

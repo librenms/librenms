@@ -11,7 +11,6 @@
  * the source code distribution for details.
  */
 
-
 $no_refresh = true;
 
 $pagetitle[] = 'Device Dependencies';

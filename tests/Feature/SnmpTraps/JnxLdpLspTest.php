@@ -19,7 +19,6 @@
  *
  * Tests JnxLdpLspDown and JnxLdpLspUp traps from Juniper devices.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -31,14 +30,13 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class JnxLdpLspTest extends SnmpTrapTestCase
 {
     public function testLdpLspDownTrap()
     {
-        $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
+        $device = Device::factory()->create();
+        $ipv4 = Ipv4Address::factory()->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
@@ -60,8 +58,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testLdpLspUpTrap()
     {
-        $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
+        $device = Device::factory()->create();
+        $ipv4 = Ipv4Address::factory()->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162

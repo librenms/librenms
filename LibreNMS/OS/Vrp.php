@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,79 +24,255 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+use App\Models\Mempool;
+use App\Models\PortsNac;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
-use LibreNMS\Interfaces\Polling\NacPolling;
-use LibreNMS\OS;
-use App\Models\PortsNac;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
+use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 
 class Vrp extends OS implements
+    MempoolsDiscovery,
+    OSPolling,
     ProcessorDiscovery,
     NacPolling,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
     OSDiscovery
 {
-
-    /**
-     * Discover OS Vrp
-     *
-     */
-    public function discoverOS(): void
+    public function discoverMempools()
     {
-        $device = $this->getDeviceModel();
-        //Huawei VRP devices are not providing the HW description in a unified way
-        preg_match("/Version [^\s]*/m", $device->sysDescr, $matches);
-        $device->version = trim(str_replace('Version ', '', $matches[0]));
+        $mempools = collect();
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemSize', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityBomEnDesc', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemSizeMega', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'entPhysicalName', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
 
-        preg_match("/\(([^\s]*) (V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/m", $device->sysDescr, $matches);
-        if (!empty($matches[2])) {
-            $device->version .= " (" . trim($matches[2]) . ")";
-        }
+        foreach (Arr::wrap($mempools_array) as $index => $entry) {
+            $size = empty($entry['hwEntityMemSizeMega']) ? $entry['hwEntityMemSize'] : $entry['hwEntityMemSizeMega'];
+            $descr = empty($entry['entPhysicalName']) ? $entry['hwEntityBomEnDesc'] : $entry['entPhysicalName'];
 
-        $patch = snmp_getnext($this->getDevice(), 'HUAWEI-SYS-MAN-MIB::hwPatchVersion', '-OQv');
-        if ($patch) {
-            $device->version .= " [$patch]";
-        }
-
-        $oidList = [
-            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityExtentMIB.6.5.0',
-            'HUAWEI-DEVICE-EXT-MIB::hwProductName.0',
-            'HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1',
-            'HUAWEI-MIB::mlsr.20.1.1.1.3.0',
-            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardName.9',
-        ];
-
-        foreach ($oidList as $oid) {
-            $hardware_tmp = snmp_get($this->getDevice(), $oid, '-OQv');
-
-            if (!empty($hardware_tmp)) {
-                $device->hardware = "Huawei " . $hardware_tmp;
-                break;
+            if ($size != 0 && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
+                $mempools->push((new Mempool([
+                    'mempool_index' => $index,
+                    'mempool_type' => 'vrp',
+                    'mempool_class' => 'system',
+                    'mempool_precision' => empty($entry['hwEntityMemSizeMega']) ? 1 : 1048576,
+                    'mempool_descr' => substr("$descr Memory", 0, 64),
+                    'mempool_perc_oid' => ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.$index",
+                    'mempool_perc_warn' => 90,
+                ]))->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
             }
         }
 
-        // Let's use sysDescr if nothing else is found in the OIDs. sysDescr is less detailled than OIDs most of the time
-        if (empty($hardware_tmp) && !empty($matches[1])) {
-            $device->hardware = "Huawei " . trim($matches[1]);
+        return $mempools;
+    }
+
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml
+
+        //Huawei VRP devices are not providing the HW description in a unified way
+        preg_match('/Version (\S+)/', $device->sysDescr, $matches);
+        $device->version = isset($matches[1]) ? ($matches[1] . ($device->version ? " ($device->version)" : '')) : null; // version from yaml sysDescr
+
+        if ($device->version) {
+            $patch = snmp_getnext($this->getDeviceArray(), 'HUAWEI-SYS-MAN-MIB::hwPatchVersion', '-OQv');
+            if ($patch) {
+                $device->version .= " [$patch]";
+            }
         }
 
-        // Serial
-        // Multiple possible OIDs to grab the serial number
+        if ($device->hardware && preg_match("/$device->hardware\S+/", $device->sysDescr, $matches)) {
+            $device->hardware = $matches[0];
+        }
+    }
 
-        $oidList = [
-            'ENTITY-MIB::entPhysicalSerialNum.9',
-        ];
-        foreach ($oidList as $oid) {
-            $serial_tmp = snmp_get($this->getDevice(), $oid, '-OQv');
-            if (!empty($serial_tmp)) {
-                $device->serial = $serial_tmp;
-                break;
+    public function pollOS()
+    {
+        // Polling the Wireless data TODO port to module
+        $apTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
+
+        //Check for existence of at least 1 AP to continue the polling)
+        if (! empty($apTable)) {
+            $apTableOids = [
+                'hwWlanApSn',
+                'hwWlanApTypeInfo',
+            ];
+            foreach ($apTableOids as $apTableOid) {
+                $apTable = snmpwalk_group($this->getDeviceArray(), $apTableOid, 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
+            }
+
+            $apRadioTableOids = [ // hwWlanRadioInfoTable
+                'hwWlanRadioMac',
+                'hwWlanRadioChUtilizationRate',
+                'hwWlanRadioChInterferenceRate',
+                'hwWlanRadioActualEIRP',
+                'hwWlanRadioFreqType',
+                'hwWlanRadioWorkingChannel',
+            ];
+
+            $clientPerRadio = [];
+            $radioTable = [];
+            foreach ($apRadioTableOids as $apRadioTableOid) {
+                $radioTable = snmpwalk_group($this->getDeviceArray(), $apRadioTableOid, 'HUAWEI-WLAN-AP-RADIO-MIB', 2, $radioTable);
+            }
+
+            $numClients = 0;
+            $vapInfoTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanVapStaOnlineCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
+            foreach ($vapInfoTable as $ap_id => $ap) {
+                //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
+                //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
+                foreach ($ap as $r_id => $radio) {
+                    foreach ($radio as $s_index => $ssid) {
+                        $clientPerRadio[$ap_id][$r_id] += $ssid['hwWlanVapStaOnlineCnt'];
+                        $numClients += $ssid['hwWlanVapStaOnlineCnt'];
+                    }
+                }
+            }
+
+            $numRadios = count($radioTable);
+
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
+                ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
+
+            $fields = [
+                'NUMAPS' => $numRadios,
+                'NUMCLIENTS' => $numClients,
+            ];
+
+            $tags = compact('rrd_def');
+            data_update($this->getDeviceArray(), 'vrp', $tags, $fields);
+
+            $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', [$this->getDeviceArray()['device_id']]);
+
+            foreach ($radioTable as $ap_id => $ap) {
+                foreach ($ap as $r_id => $radio) {
+                    $channel = $radio['hwWlanRadioWorkingChannel'];
+                    $mac = $radio['hwWlanRadioMac'];
+                    $name = $apTable[$ap_id]['hwWlanApName'] . ' Radio ' . $r_id;
+                    $radionum = $r_id;
+                    $txpow = $radio['hwWlanRadioActualEIRP'];
+                    $interference = $radio['hwWlanRadioChInterferenceRate'];
+                    $radioutil = $radio['hwWlanRadioChUtilizationRate'];
+                    $numasoclients = $clientPerRadio[$ap_id][$r_id];
+
+                    switch ($radio['hwWlanRadioFreqType']) {
+                        case 1:
+                            $type = '2.4Ghz';
+                            break;
+                        case 2:
+                            $type = '5Ghz';
+                            break;
+                        default:
+                            $type = 'unknown (huawei ' . $radio['hwWlanRadioFreqType'] . ')';
+                    }
+
+                    // TODO
+                    $numactbssid = 0;
+                    $nummonbssid = 0;
+                    $nummonclients = 0;
+
+                    d_echo("  name: $name\n");
+                    d_echo("  radionum: $radionum\n");
+                    d_echo("  type: $type\n");
+                    d_echo("  channel: $channel\n");
+                    d_echo("  txpow: $txpow\n");
+                    d_echo("  radioutil: $radioutil\n");
+                    d_echo("  numasoclients: $numasoclients\n");
+                    d_echo("  interference: $interference\n");
+
+                    $rrd_name = ['arubaap', $name . $radionum];
+                    $rrd_def = RrdDefinition::make()
+                        ->addDataset('channel', 'GAUGE', 0, 200)
+                        ->addDataset('txpow', 'GAUGE', 0, 200)
+                        ->addDataset('radioutil', 'GAUGE', 0, 100)
+                        ->addDataset('nummonclients', 'GAUGE', 0, 500)
+                        ->addDataset('nummonbssid', 'GAUGE', 0, 200)
+                        ->addDataset('numasoclients', 'GAUGE', 0, 500)
+                        ->addDataset('interference', 'GAUGE', 0, 2000);
+
+                    $fields = [
+                        'channel' => $channel,
+                        'txpow' => $txpow,
+                        'radioutil' => $radioutil,
+                        'nummonclients' => $nummonclients,
+                        'nummonbssid' => $nummonbssid,
+                        'numasoclients' => $numasoclients,
+                        'interference' => $interference,
+                    ];
+
+                    $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
+                    data_update($this->getDeviceArray(), 'arubaap', $tags, $fields);
+
+                    $foundid = 0;
+
+                    for ($z = 0; $z < sizeof($ap_db); $z++) {
+                        if ($ap_db[$z]['name'] == $name && $ap_db[$z]['radio_number'] == $radionum) {
+                            $foundid = $ap_db[$z]['accesspoint_id'];
+                            $ap_db[$z]['seen'] = 1;
+                            continue;
+                        }
+                    }
+
+                    if ($foundid == 0) {
+                        $ap_id = dbInsert(
+                            [
+                                'device_id' => $this->getDeviceArray()['device_id'],
+                                'name' => $name,
+                                'radio_number' => $radionum,
+                                'type' => $type,
+                                'mac_addr' => $mac,
+                                'channel' => $channel,
+                                'txpow' => $txpow,
+                                'radioutil' => $radioutil,
+                                'numasoclients' => $numasoclients,
+                                'nummonclients' => $nummonclients,
+                                'numactbssid' => $numactbssid,
+                                'nummonbssid' => $nummonbssid,
+                                'interference' => $interference,
+                            ],
+                            'access_points'
+                        );
+                    } else {
+                        dbUpdate(
+                            [
+                                'mac_addr' => $mac,
+                                'type' => $type,
+                                'deleted' => 0,
+                                'channel' => $channel,
+                                'txpow' => $txpow,
+                                'radioutil' => $radioutil,
+                                'numasoclients' => $numasoclients,
+                                'nummonclients' => $nummonclients,
+                                'numactbssid' => $numactbssid,
+                                'nummonbssid' => $nummonbssid,
+                                'interference' => $interference,
+                            ],
+                            'access_points',
+                            '`accesspoint_id` = ?',
+                            [$foundid]
+                        );
+                    }
+                }//end foreach 1
+            }//end foreach 2
+
+            for ($z = 0; $z < sizeof($ap_db); $z++) {
+                if (! isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
+                    dbUpdate(['deleted' => 1], 'access_points', '`accesspoint_id` = ?', [$ap_db[$z]['accesspoint_id']]);
+                }
             }
         }
     }
@@ -110,23 +285,23 @@ class Vrp extends OS implements
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
+        $device = $this->getDeviceArray();
 
-        $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityCpuUsage', array(), 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+        $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityCpuUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
 
-        if (!empty($processors_data)) {
+        if (! empty($processors_data)) {
             $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityMemSize', $processors_data, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
             $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityBomEnDesc', $processors_data, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
         }
 
         d_echo($processors_data);
 
-        $processors = array();
+        $processors = [];
         foreach ($processors_data as $index => $entry) {
             if ($entry['hwEntityMemSize'] != 0) {
-                d_echo($index.' '.$entry['hwEntityBomEnDesc'].' -> '.$entry['hwEntityCpuUsage'].' -> '.$entry['hwEntityMemSize']."\n");
+                d_echo($index . ' ' . $entry['hwEntityBomEnDesc'] . ' -> ' . $entry['hwEntityCpuUsage'] . ' -> ' . $entry['hwEntityMemSize'] . "\n");
 
-                $usage_oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.'.$index;
+                $usage_oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.' . $index;
                 $descr = $entry['hwEntityBomEnDesc'];
                 $usage = $entry['hwEntityCpuUsage'];
 
@@ -150,26 +325,40 @@ class Vrp extends OS implements
     }
 
     /**
-    * Discover the Network Access Control informations (dot1X etc etc)
-    *
-    */
+     * Discover the Network Access Control informations (dot1X etc etc)
+     */
     public function pollNac()
     {
         $nac = collect();
         // We collect the first table
-        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'hwAccessTable', [], 'HUAWEI-AAA-MIB');
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'hwAccessInterface', [], 'HUAWEI-AAA-MIB');
 
-        if (!empty($portAuthSessionEntry)) {
-            // If it is not empty, lets add the Extended table
-            $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'hwAccessExtTable', $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
+        if (! empty($portAuthSessionEntry)) {
+            // If it is not empty, lets add all the necessary OIDs
+            $hwAccessOids = [
+                'hwAccessMACAddress',
+                'hwAccessDomain',
+                'hwAccessUserName',
+                'hwAccessIPAddress',
+                'hwAccessType',
+                'hwAccessAuthorizetype',
+                'hwAccessSessionTimeout',
+                'hwAccessOnlineTime',
+                'hwAccessCurAuthenPlace',
+                'hwAccessAuthtype',
+                'hwAccessVLANID',
+            ];
+            foreach ($hwAccessOids as $hwAccessOid) {
+                $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), $hwAccessOid, $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
+            }
             // We cache a port_ifName -> port_id map
-            $ifName_map = $this->getDeviceModel()->ports()->pluck('port_id', 'ifName');
+            $ifName_map = $this->getDevice()->ports()->pluck('port_id', 'ifName');
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
                 $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
-                if ($port_id <=0) {
+                if ($port_id <= 0) {
                     continue; //this would happen for an SSH session for instance
                 }
                 $nac->put($mac_address, new PortsNac([
@@ -177,26 +366,27 @@ class Vrp extends OS implements
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
                     'domain' => $portAuthSessionEntryParameters['hwAccessDomain'],
-                    'username' => ''.$portAuthSessionEntryParameters['hwAccessUserName'],
+                    'username' => '' . $portAuthSessionEntryParameters['hwAccessUserName'],
                     'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'],
-                    'authz_by' => ''.$portAuthSessionEntryParameters['hwAccessType'],
-                    'authz_status' => ''.$portAuthSessionEntryParameters['hwAccessAuthorizetype'],
-                    'host_mode' => is_null($portAuthSessionEntryParameters['hwAccessAuthType'])?'default':$portAuthSessionEntryParameters['hwAccessAuthType'],
+                    'authz_by' => '' . $portAuthSessionEntryParameters['hwAccessType'],
+                    'authz_status' => '' . $portAuthSessionEntryParameters['hwAccessAuthorizetype'],
+                    'host_mode' => is_null($portAuthSessionEntryParameters['hwAccessAuthType']) ? 'default' : $portAuthSessionEntryParameters['hwAccessAuthType'],
                     'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'],
                     'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'],
                     'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'],
-                    'method' => ''.$portAuthSessionEntryParameters['hwAccessAuthtype'],
+                    'method' => '' . $portAuthSessionEntryParameters['hwAccessAuthtype'],
                     'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'],
                 ]));
             }
         }
+
         return $nac;
     }
 
     public function discoverWirelessApCount()
     {
-        $sensors = array();
-        $ap_number = snmpwalk_cache_oid($this->getDevice(), 'hwWlanCurJointApNum.0', array(), 'HUAWEI-WLAN-GLOBAL-MIB');
+        $sensors = [];
+        $ap_number = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanCurJointApNum.0', [], 'HUAWEI-WLAN-GLOBAL-MIB');
 
         $sensors[] = new WirelessSensor(
             'ap-count',
@@ -207,22 +397,23 @@ class Vrp extends OS implements
             'AP Count',
             $ap_number[0]['hwWlanCurJointApNum']
         );
+
         return $sensors;
     }
 
     public function discoverWirelessClients()
     {
-        $sensors = array();
-        $total_oids = array();
+        $sensors = [];
+        $total_oids = [];
 
         $vapInfoTable = $this->getCacheTable('hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB', 3);
-        
+
         foreach ($vapInfoTable as $a_index => $ap) {
             //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
-            $a_index_oid = implode(".", array_map("hexdec", explode(":", $a_index)));
+            $a_index_oid = implode('.', array_map('hexdec', explode(':', $a_index)));
             foreach ($ap as $r_index => $radio) {
                 foreach ($radio as $s_index => $ssid) {
-                    $oid = '.1.3.6.1.4.1.2011.6.139.17.1.1.1.9.' . $a_index_oid . '.' . $r_index . '.' . $s_index ;
+                    $oid = '.1.3.6.1.4.1.2011.6.139.17.1.1.1.9.' . $a_index_oid . '.' . $r_index . '.' . $s_index;
                     $total_oids[] = $oid;
                     $sensors[] = new WirelessSensor(
                         'clients',
@@ -236,6 +427,7 @@ class Vrp extends OS implements
                 }
             }
         }
+
         return $sensors;
     }
 }

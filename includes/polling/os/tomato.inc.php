@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
-list($ignore, $version) = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
+[$ignore, $version] = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
 
 unset($ignore);

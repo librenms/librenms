@@ -1,5 +1,16 @@
 mib: DASAN-SWITCH-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: DASAN-SWITCH-MIB::dsTotalMem
+                used: DASAN-SWITCH-MIB::dsUsedMem
+                free: DASAN-SWITCH-MIB::dsFreeMem
+                descr: 'Memory Utilization'
+    os:
+        sysDescr_regex: '#(?<hardware>.+) NOS (?<version>[^/]+)#'
+        serial: DASAN-SWITCH-MIB::dsSerialNumber.0
+        version: DASAN-SWITCH-MIB::dsFirmwareVersion.0
     processors:
         data:
             -

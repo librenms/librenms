@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.7465",
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "3.2.8",
+                    "hardware": "GT01W",
                     "features": null,
                     "os": "wisi-tangram",
                     "type": "network",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "wisi.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

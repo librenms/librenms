@@ -7,7 +7,7 @@ use LibreNMS\Config;
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     echo 'IPMI : ';
 
-    $ipmi['user']     = get_dev_attrib($device, 'ipmi_username');
+    $ipmi['user'] = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
 
     $cmd = [Config::get('ipmitool', 'ipmitool')];
@@ -19,10 +19,10 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
         array_filter($results, function ($line) {
-            return !Str::contains($line, 'discrete');
+            return ! Str::contains($line, 'discrete');
         });
 
-        if (!empty($results)) {
+        if (! empty($results)) {
             set_dev_attrib($device, 'ipmi_type', $ipmi_type);
             echo "$ipmi_type ";
             break;
@@ -35,7 +35,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     foreach ($results as $sensor) {
         // BB +1.1V IOH     | 1.089      | Volts      | ok    | na        | 1.027     | 1.054     | 1.146     | 1.177     | na
         $values = array_map('trim', explode('|', $sensor));
-        list($desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable) = $values;
+        [$desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable] = $values;
 
         $index++;
         if ($current != 'na' && Config::has("ipmi_unit.$unit")) {

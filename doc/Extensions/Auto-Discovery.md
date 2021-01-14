@@ -31,7 +31,7 @@ $config['snmp']['community'][] = "another_community";
 $config['snmp']['v3'][0]['authlevel'] = 'authPriv';
 $config['snmp']['v3'][0]['authname'] = 'my_username';
 $config['snmp']['v3'][0]['authpass'] = 'my_password';
-$config['snmp']['v3'][0]['authalgo'] = 'MD5';
+$config['snmp']['v3'][0]['authalgo'] = 'SHA';
 $config['snmp']['v3'][0]['cryptopass'] = 'my_crypto';
 $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 ```

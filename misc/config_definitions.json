@@ -417,6 +417,12 @@
             "order": 11,
             "type": "text"
         },
+        "auth_ad_domain": {
+            "group": "auth",
+            "section": "ad",
+            "order": 12,
+            "type": "text"
+        },
         "auth_ldap_attr.uid": {
             "default": "uid",
             "group": "auth",
@@ -627,6 +633,9 @@
             ]
         },
         "autodiscovery.nets-exclude": {
+            "group": "discovery",
+            "section": "networks",
+            "order": 2,
             "type": "array",
             "default": [
                 "0.0.0.0/8",
@@ -749,7 +758,10 @@
         },
         "core_descr": {
             "default": ["core"],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 2
         },
         "cpu_details_overview": {
             "default": false,
@@ -760,8 +772,11 @@
             "type": "array"
         },
         "customers_descr": {
-            "default": "cust",
-            "type": "text"
+            "default": ["cust"],
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 3
         },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
@@ -1261,7 +1276,7 @@
         "graphing.availability": {
             "group": "poller",
             "section": "availability",
-            "order": 10,
+            "order": 1,
             "default": [
                 "86400",
                 "604800",
@@ -1269,6 +1284,13 @@
                 "31536000"
             ],
             "type": "array"
+        },
+        "graphing.availability_consider_maintenance": {
+            "group": "poller",
+            "section": "availability",
+            "order": 2,
+            "default": false,
+            "type": "boolean"
         },
         "dot": {
             "default": "/usr/bin/dot",
@@ -1794,6 +1816,19 @@
                 "773177",
                 "5B185B",
                 "3F003F"
+            ],
+            "type": "array"
+        },
+        "graph_colours.varied": {
+            "default": [
+                "CC0000",
+                "DC7201",
+                "FFBE55",
+                "008FEA",
+                "3CB371",
+                "708090",
+                "663399",
+                "00BFFF"
             ],
             "type": "array"
         },
@@ -2393,7 +2428,7 @@
             "default": {
                 "section": "system",
                 "order": 0,
-                "descr": "Memory Pool Usage"
+                "descr": "Memory Usage"
             },
             "type": "graph"
         },
@@ -3077,14 +3112,6 @@
             },
             "type": "graph"
         },
-        "graph_types.device.ucd_memory": {
-            "default": {
-                "section": "system",
-                "order": 0,
-                "descr": "Detailed Memory Usage"
-            },
-            "type": "graph"
-        },
         "graph_types.device.ucd_swap_io": {
             "default": {
                 "section": "system",
@@ -3698,7 +3725,11 @@
             "type": "directory"
         },
         "nets": {
-            "type": "array"
+            "type": "array",
+            "default": [],
+            "group": "discovery",
+            "section": "networks",
+            "order": 1
         },
         "network_map_items": {
             "default": [
@@ -3951,7 +3982,7 @@
                     "text": "Processor Usage"
                 },
                 {
-                    "graph": "device_ucd_memory",
+                    "graph": "device_mempool",
                     "text": "Memory Usage"
                 }
             ],
@@ -4024,6 +4055,33 @@
                 "value": "url"
             }
         },
+        "snmptraps.eventlog": {
+            "default": "unhandled",
+            "group": "external",
+            "section": "snmptrapd",
+            "order": 0,
+            "type": "select",
+            "options": {
+                "none": "None",
+                "unhandled": "Only unhandled",
+                "all": "All"
+            }
+        },
+        "snmptraps.eventlog_detailed": {
+            "default": false,
+            "order": 1,
+            "group": "external",
+            "section": "snmptrapd",
+            "type": "boolean",
+            "when": {
+                "setting": "snmptraps.eventlog",
+                "operator": "in",
+                "value": [
+                    "all",
+                    "unhandled"
+                ]
+            }
+        },
         "page_refresh": {
             "default": 300,
             "type": "integer",
@@ -4047,7 +4105,10 @@
             "default": [
                 "peering"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 0
         },
         "peeringdb.enabled": {
             "default": false,
@@ -4476,6 +4537,13 @@
             "section": "prometheus",
             "order": 2
         },
+        "prometheus.attach_sysname": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 3
+        },
         "public_status": {
             "default": false,
             "group": "auth",
@@ -4893,6 +4961,10 @@
             "type": "integer",
             "units": "pings"
         },
+        "smokeping.probes": {
+            "default": 2,
+            "type": "integer"
+        },
         "snmp.community": {
             "group": "poller",
             "section": "snmp",
@@ -4944,7 +5016,8 @@
                 }
             ],
             "validate": {
-                "value.*.authalgo": "in:MD5,SHA"
+                "value.*.authalgo": "in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512",
+                "value.*.cryptoalgo": "in:AES,AES-192,AES-256,DES"
             }
         },
         "snmp.version": {
@@ -4988,14 +5061,6 @@
             "section": "binaries",
             "order": 11,
             "type": "executable"
-        },
-        "snmptraps.eventlog": {
-            "default": "unhandled",
-            "type": "select",
-            "options": {
-                "unhandled": "Unhandled Traps",
-                "all": "All Traps"
-            }
         },
         "snmpwalk": {
             "default": "/usr/bin/snmpwalk",
@@ -5080,7 +5145,10 @@
         },
         "transit_descr": {
             "default": ["transit"],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 1
         },
         "twofactor": {
             "type": "boolean",

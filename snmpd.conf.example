@@ -5,12 +5,18 @@ group MyROGroup v2c        readonly
 view all    included  .1                               80
 access MyROGroup ""      any       noauth    exact  all    none   none
 
-syslocation Rack, Room, Building, City, Country [GPSX,Y]
+syslocation Rack, Room, Building, City, Country [Lat, Lon]
 syscontact Your Name <your@email.address>
 
-#Distro Detection
-extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
-#Hardware Detection (uncomment to enable)
-#extend .1.3.6.1.4.1.2021.7890.2 hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
-#extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
-#extend .1.3.6.1.4.1.2021.7890.4 serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
+#OS Distribution Detection
+extend distro /usr/bin/distro
+
+#Hardware Detection
+# (uncomment for x86 platforms)
+#extend manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
+#extend hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
+#extend serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
+
+# (uncomment for ARM platforms)
+#extend hardware '/bin/cat /sys/firmware/devicetree/base/model'
+#extend serial '/bin/cat /sys/firmware/devicetree/base/serial-number'

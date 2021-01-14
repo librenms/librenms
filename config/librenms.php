@@ -32,7 +32,6 @@ return [
 
     'group' => env('LIBRENMS_GROUP', env('LIBRENMS_USER', 'librenms')),
 
-
     /*
     |--------------------------------------------------------------------------
     | Install
@@ -43,5 +42,15 @@ return [
     */
 
     'install' => env('INSTALL', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | NODE ID
+    |--------------------------------------------------------------------------
+    |
+    | Unique value to identify this node. Primarily used for distributed polling.
+    */
+
+    'node_id' => env('NODE_ID'),
 
 ];

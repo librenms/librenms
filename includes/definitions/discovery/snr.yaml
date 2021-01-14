@@ -1,5 +1,19 @@
 mib: NAG-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NAG-MIB::sysMemorySize
+                used: NAG-MIB::sysMemoryBusy
+                descr: 'Memory Usage'
+                index: 0
+    os:
+        hardware:
+            - NAG-MIB::sysHardwareVersion.0
+            - NAG-MIB::sysHardwareVersion.1
+        version:
+            - NAG-MIB::sysSoftwareVersion.0
+            - NAG-MIB::sysSoftwareVersion.1
     pre-cache:
         data:
             -
@@ -67,7 +81,7 @@ modules:
                 -
                     oid: ddmTranscDiagnosisTable
                     value: ddmDiagnosisRXPower
-                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.12.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.17.{{ $index }}'
                     descr: "{{ $portName }}"
                     index: "ddmDiagnosisRXPower.{{ $index }}"
                     group: "Optical RX"

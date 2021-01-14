@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.674.10892.5",
                     "sysDescr": "Dell Out-of-band SNMP Agent for Remote Access Controller",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "6.20.200.201810113973",
+                    "hardware": "PowerEdge M1000e",
                     "features": null,
                     "os": "drac",
                     "type": "appliance",
-                    "serial": null,
+                    "serial": "1234ABC",
                     "icon": "dell.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

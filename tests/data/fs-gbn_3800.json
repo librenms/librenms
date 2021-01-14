@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.13464.1.3.38.3",
                     "sysDescr": "FS Switch",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "S3800-24F4S V100R001B01D001P004SP3",
+                    "hardware": "S3800-24F4S Switch Product",
                     "features": null,
                     "os": "fs-gbn",
                     "type": "network",
-                    "serial": null,
+                    "serial": "F170823DN051",
                     "icon": "fs.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -23825,14 +23825,18 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "fs-gbn",
-                    "mempool_precision": 1,
+                    "mempool_class": "system",
+                    "mempool_precision": 1048576,
                     "mempool_descr": "ARM Cortex-A9, 400MHz Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 44,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 234881024,
+                    "mempool_used_oid": null,
+                    "mempool_free": 301989888,
+                    "mempool_free_oid": ".1.3.6.1.4.1.13464.1.2.1.1.2.13.0",
+                    "mempool_total": 536870912,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -23840,25 +23844,6 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "fs-gbn",
-                    "mempool_precision": 1,
-                    "mempool_descr": "ARM Cortex-A9, 400MHz Memory",
-                    "mempool_perc": 44,
-                    "mempool_used": 234881024,
-                    "mempool_free": 301989888,
-                    "mempool_total": 536870912,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

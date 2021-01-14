@@ -1,7 +1,7 @@
 <?php
 
 $oids = snmpwalk_cache_oid($device, 'sensorProbeTempTable', [], 'SPAGENT-MIB');
-d_echo($oids."\n");
+d_echo($oids . "\n");
 
 foreach ($oids as $index => $entry) {
     if ($entry['sensorProbeTempOnline'] == 'online') {

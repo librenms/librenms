@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
@@ -34,5 +33,12 @@ class AlertTemplate extends BaseModel
     public function map()
     {
         return $this->hasMany(\App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id');
+    }
+
+    public function alert_rules()
+    {
+        return $this->hasManyThrough(\App\Models\AlertRule::class, \App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id', 'id', 'alert_rule_id')
+                    ->select(['id' => 'alert_rules.id', 'name' => 'alert_rules.name'])
+                    ->orderBy('alert_rules.name');
     }
 }

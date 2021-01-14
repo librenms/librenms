@@ -1,5 +1,15 @@
 mib: EXTREME-SOFTWARE-MONITOR-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: EXTREME-SOFTWARE-MONITOR-MIB::extremeMemoryMonitorSystemTotal
+                free: EXTREME-SOFTWARE-MONITOR-MIB::extremeMemoryMonitorSystemFree
+                precision: 1024
+                type: extreme-mem
+                descr: 'Dynamic Memory'
+    os:
+        sysDescr_regex: '/(\((?<hardware>[^)]+)\))? version (?<version>[\d.]+) (?<features>\S+)/'
     processors:
         data:
             -

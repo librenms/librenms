@@ -2,6 +2,7 @@
 -- =======================================================================
 -- Version info 
 -- 
+-- Version 1.0 modified 2020.4.17 by QiYianqin, add ROS Mgmt
 -- Version 1.0 modified 2012.4.18 by WangMingjuan, add gazelle series 
 -- Version 1.0 modified 2011.12.14 by WangMingjuan
 -- Version 0.1 Created 2003.5.24 by GONGGUIDONG
@@ -13,7 +14,8 @@ RAISECOM-BASE-MIB    DEFINITIONS ::= BEGIN
 
 IMPORTS
         enterprises   FROM RFC1155-SMI;
-		
+
+
 -- =======================================================================
 --
 --  Organization  branches
@@ -98,14 +100,15 @@ IMPORTS
   gazelleRouterSeries     OBJECT IDENTIFIER ::= { raisecom 28 }
     
 --  SHENLANXUNTONG Series 
-  shenlanxuntongSeries   OBJECT IDENTIFIER ::= { raisecom 29 }
-	
+	shenlanxuntongSeries   OBJECT IDENTIFIER ::= { raisecom 29 }
 --  SHENLANXUNTONG Transmit Series 
-  sltSeries   OBJECT IDENTIFIER ::= { shenlanxuntongSeries   1 }
-  
+	sltSeries   OBJECT IDENTIFIER ::= { shenlanxuntongSeries   1 }
+	
 -- OTN Product Series
-  otnSeries  OBJECT IDENTIFIER ::= { raisecom 30 }
+	OTNSeries  OBJECT IDENTIFIER ::= { raisecom 30 }
 
+--ROS Mgmt 
+    rosMgmt  OBJECT IDENTIFIER ::= { raisecom 60 }
   
 -- =======================================================================
 --

@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.171.10.133.11.2",
                     "sysDescr": "DGS-3000-28XMP Gigabit Ethernet Switch",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "Build 4.00.017",
+                    "hardware": "DGS-3000-28XMP Rev. B1",
                     "features": null,
                     "os": "dlink",
                     "type": "network",
-                    "serial": null,
+                    "serial": "SY331IC000040",
                     "icon": "dlink.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -7133,14 +7133,18 @@
                 {
                     "mempool_index": "0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "dlink",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 65,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.171.12.1.1.9.1.4.1",
+                    "mempool_used": 65,
+                    "mempool_used_oid": null,
+                    "mempool_free": 35,
+                    "mempool_free_oid": null,
+                    "mempool_total": 100,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -7148,26 +7152,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "dlink",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 65,
-                    "mempool_used": 65,
-                    "mempool_free": 35,
-                    "mempool_total": 100,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

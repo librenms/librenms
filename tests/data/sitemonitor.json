@@ -14,7 +14,7 @@
                     "type": "appliance",
                     "serial": null,
                     "icon": "packetflux.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

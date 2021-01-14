@@ -9,7 +9,7 @@ applications:
         order_by: metric
 arp-table:
     ipv4_mac:
-        excluded_fields: [device_id, port_id]
+        excluded_fields: [id, device_id, port_id]
         order_by: ipv4_mac.context_name, ipv4_mac.ipv4_address, ipv4_mac.mac_address
 bgp-peers:
     bgpPeers:
@@ -31,6 +31,7 @@ loadbalancers:
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]
+        order_by: mempool_type, mempool_id
 mpls:
     mpls_lsps:
         excluded_fields: [lsp_id, device_id]
@@ -57,6 +58,17 @@ mpls:
         joins:
             - { left: mpls_saps.svc_id, right: mpls_services.svc_id, select: [mpls_services.svc_oid] }
         order_by: mpls_services.svc_oid, mpls_saps.sapPortId, mpls_saps.sapEncapValue
+ospf:
+    ospf_ports:
+        excluded_fields: [id, device_id, port_id]
+        joins:
+            - { left: ospf_ports.port_id, right: ports.port_id, select: [ ifIndex ] }
+    ospf_instances:
+        excluded_fields: [id, device_id]
+    ospf_areas:
+        excluded_fields: [id, device_id]
+    ospf_nbrs:
+        excluded_fields: [id, device_id]
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]

@@ -31,21 +31,21 @@ var grid = $("#ipv6-search").bootgrid({
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
 $param = [];
 
-if (!Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " WHERE `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= ' WHERE `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 $sql .= " $where ORDER BY `hostname`";
 
 foreach (dbFetchRows($sql, $param) as $data) {
-    echo '"<option value=\"'.$data['device_id'].'\""+';
+    echo '"<option value=\"' . $data['device_id'] . '\""+';
     if ($data['device_id'] == $_POST['device_id']) {
         echo '" selected"+';
     }
 
-    echo '">'.format_hostname($data, $data['hostname']).'</option>"+';
+    echo '">' . format_hostname($data, $data['hostname']) . '</option>"+';
 }
 ?>
                 "</select>"+

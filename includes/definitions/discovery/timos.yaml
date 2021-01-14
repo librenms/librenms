@@ -1,5 +1,16 @@
 mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB
 modules:
+    mempools:
+        data:
+            -
+                used: TIMETRA-SYSTEM-MIB::sgiMemoryUsed
+                free: TIMETRA-SYSTEM-MIB::sgiMemoryAvailable
+    os:
+        version:
+            - TIMETRA-SYSTEM-MIB::sgiSwMajorVersion.0
+            - TIMETRA-SYSTEM-MIB::sgiSwMinorVersion.0
+            - TIMETRA-SYSTEM-MIB::sgiSwVersionModifier.0
+        version_template: '{{ TIMETRA-SYSTEM-MIB::sgiSwMajorVersion.0 }}.{{ TIMETRA-SYSTEM-MIB::sgiSwMinorVersion.0 }}.{{ TIMETRA-SYSTEM-MIB::sgiSwVersionModifier.0 }}'
     processors:
         data:
             -

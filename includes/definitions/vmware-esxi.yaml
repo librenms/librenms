@@ -1,0 +1,14 @@
+os: vmware-esxi
+type: server
+group: unix
+text: VMware ESXi
+icon: vmware
+mib_dir: vmware
+ifXmcbc: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery_modules:
+    vmware-vminfo: true
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.6876.4.1

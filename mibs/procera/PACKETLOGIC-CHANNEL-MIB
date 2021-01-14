@@ -9,11 +9,11 @@ IMPORTS
 	CounterBasedGauge64 FROM HCNUM-TC;
 
 channelstats MODULE-IDENTITY
-	LAST-UPDATED "201212131322Z"
+	LAST-UPDATED "201909121500Z"
 	ORGANIZATION "Procera Networks, Inc."
 	CONTACT-INFO "support@proceranetworks.com"
 	DESCRIPTION "MIB for PacketLogic2 channels"
-	REVISION "201212131322Z"
+	REVISION "201909121500Z"
 	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
 
 	::={packetlogic2 2}
@@ -29,7 +29,17 @@ ChannelInfoEntry ::= SEQUENCE {
 	channelActive INTEGER,
 	channelName DisplayString,
 	channelInternalNegotiatedMediaTime Unsigned32,
-	channelexternalNegotiatedMediaTime Unsigned32,
+	channelExternalNegotiatedMediaTime Unsigned32,
+	channelInternalTransceiverVendor DisplayString,
+	channelInternalTransceiverPartNumber DisplayString,
+	channelInternalTransceiverSerial DisplayString,
+	channelInternalTransceiverType DisplayString,
+	channelInternalTransceiverWavelength DisplayString,
+	channelExternalTransceiverVendor DisplayString,
+	channelExternalTransceiverPartNumber DisplayString,
+	channelExternalTransceiverSerial DisplayString,
+	channelExternalTransceiverType DisplayString,
+	channelExternalTransceiverWavelength DisplayString,
 	channelInfoEntryIndex Integer32
 }
 
@@ -64,25 +74,35 @@ channelInfoEntryIndex	OBJECT-TYPE
 
 
 
+
+
+
+
+
+
+
+
+
+
 NetDeviceEntry ::= SEQUENCE {
-	channelRxPackets None,
-	channelTxPackets None,
-	channelRxBytes None,
-	channelTxBytes None,
-	channelRxErrors None,
-	channelTxErrors None,
-	channelRxDrops None,
-	channelTxDrops None,
-	channelCollisions None,
-	channelMulticast None,
-	channelRxLengthErrors None,
-	channelRxCrcErrors None,
-	channelRxFrameErrors None,
-	channelRxFifoErrors None,
-	channelRxMissedErrors None,
-	channelTxAborted None,
-	channelTxWindowErrors None,
-	channelTxCarrierErrors None,
+	channelRxPackets OBJECT IDENTIFIER,
+	channelTxPackets OBJECT IDENTIFIER,
+	channelRxBytes OBJECT IDENTIFIER,
+	channelTxBytes OBJECT IDENTIFIER,
+	channelRxErrors OBJECT IDENTIFIER,
+	channelTxErrors OBJECT IDENTIFIER,
+	channelRxDrops OBJECT IDENTIFIER,
+	channelTxDrops OBJECT IDENTIFIER,
+	channelCollisions OBJECT IDENTIFIER,
+	channelMulticast OBJECT IDENTIFIER,
+	channelRxLengthErrors OBJECT IDENTIFIER,
+	channelRxCrcErrors OBJECT IDENTIFIER,
+	channelRxFrameErrors OBJECT IDENTIFIER,
+	channelRxFifoErrors OBJECT IDENTIFIER,
+	channelRxMissedErrors OBJECT IDENTIFIER,
+	channelTxAborted OBJECT IDENTIFIER,
+	channelTxWindowErrors OBJECT IDENTIFIER,
+	channelTxCarrierErrors OBJECT IDENTIFIER,
 	netDeviceEntryIndex Integer32
 }
 
@@ -108,75 +128,165 @@ netDeviceEntryIndex	OBJECT-TYPE
 	DESCRIPTION "Unique Row Index for Conceptual Table"
 	::={netDeviceEntry 999}
 
-channelRxPackets	OBJECT IDENTIFIER ::={netDeviceEntry 1}
+channelRxPackets	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 1}
 
 
 
-channelTxPackets	OBJECT IDENTIFIER ::={netDeviceEntry 2}
+channelTxPackets	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 2}
 
 
 
-channelRxBytes	OBJECT IDENTIFIER ::={netDeviceEntry 3}
+channelRxBytes	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 3}
 
 
 
-channelTxBytes	OBJECT IDENTIFIER ::={netDeviceEntry 4}
+channelTxBytes	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 4}
 
 
 
-channelRxErrors	OBJECT IDENTIFIER ::={netDeviceEntry 5}
+channelRxErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 5}
 
 
 
-channelTxErrors	OBJECT IDENTIFIER ::={netDeviceEntry 6}
+channelTxErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 6}
 
 
 
-channelRxDrops	OBJECT IDENTIFIER ::={netDeviceEntry 7}
+channelRxDrops	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 7}
 
 
 
-channelTxDrops	OBJECT IDENTIFIER ::={netDeviceEntry 8}
+channelTxDrops	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 8}
 
 
 
-channelCollisions	OBJECT IDENTIFIER ::={netDeviceEntry 9}
+channelCollisions	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 9}
 
 
 
-channelMulticast	OBJECT IDENTIFIER ::={netDeviceEntry 10}
+channelMulticast	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 10}
 
 
 
-channelRxLengthErrors	OBJECT IDENTIFIER ::={netDeviceEntry 11}
+channelRxLengthErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 11}
 
 
 
-channelRxCrcErrors	OBJECT IDENTIFIER ::={netDeviceEntry 12}
+channelRxCrcErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 12}
 
 
 
-channelRxFrameErrors	OBJECT IDENTIFIER ::={netDeviceEntry 13}
+channelRxFrameErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 13}
 
 
 
-channelRxFifoErrors	OBJECT IDENTIFIER ::={netDeviceEntry 14}
+channelRxFifoErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 14}
 
 
 
-channelRxMissedErrors	OBJECT IDENTIFIER ::={netDeviceEntry 15}
+channelRxMissedErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 15}
 
 
 
-channelTxAborted	OBJECT IDENTIFIER ::={netDeviceEntry 16}
+channelTxAborted	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 16}
 
 
 
-channelTxWindowErrors	OBJECT IDENTIFIER ::={netDeviceEntry 17}
+channelTxWindowErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 17}
 
 
 
-channelTxCarrierErrors	OBJECT IDENTIFIER ::={netDeviceEntry 18}
+channelTxCarrierErrors	OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+	::={netDeviceEntry 18}
 
 
 
@@ -245,13 +355,93 @@ channelInternalNegotiatedMediaTime	OBJECT-TYPE
 
 	::={channelInfoEntry 7}
 
-channelexternalNegotiatedMediaTime	OBJECT-TYPE
+channelExternalNegotiatedMediaTime	OBJECT-TYPE
 	SYNTAX	 Unsigned32
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION "external_negotiated_media_time"
 
 	::={channelInfoEntry 8}
+
+channelInternalTransceiverVendor	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "internal_transcevier_vendor"
+
+	::={channelInfoEntry 9}
+
+channelInternalTransceiverPartNumber	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "internal_transcevier_part_nbr"
+
+	::={channelInfoEntry 10}
+
+channelInternalTransceiverSerial	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "internal_transcevier_serial"
+
+	::={channelInfoEntry 11}
+
+channelInternalTransceiverType	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "internal_transcevier_type"
+
+	::={channelInfoEntry 12}
+
+channelInternalTransceiverWavelength	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "internal_transcevier_wavelength"
+
+	::={channelInfoEntry 13}
+
+channelExternalTransceiverVendor	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "external_transcevier_vendor"
+
+	::={channelInfoEntry 14}
+
+channelExternalTransceiverPartNumber	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "external_transcevier_part_nbr"
+
+	::={channelInfoEntry 15}
+
+channelExternalTransceiverSerial	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "external_transcevier_serial"
+
+	::={channelInfoEntry 16}
+
+channelExternalTransceiverType	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "external_transcevier_type"
+
+	::={channelInfoEntry 17}
+
+channelExternalTransceiverWavelength	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "external_transcevier_wavelength"
+
+	::={channelInfoEntry 18}
 
 channelInternalRxPackets	OBJECT-TYPE
 	SYNTAX	 Counter64

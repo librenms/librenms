@@ -9,6 +9,5 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.7262.4.
-mib_dir:
-    - dragonwave
+mib_dir: dragonwave
 

@@ -8,13 +8,13 @@
                     "sysDescr": "S3290-42 GigaBit Ethernet Switch",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "SM8TAT2SA",
                     "features": null,
                     "os": "transition",
                     "type": "network",
                     "serial": null,
                     "icon": "transition.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

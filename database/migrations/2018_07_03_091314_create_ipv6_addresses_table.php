@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateIpv6AddressesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

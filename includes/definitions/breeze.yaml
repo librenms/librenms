@@ -4,8 +4,7 @@ type: wireless
 icon: alvarion
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-mib_dir:
-    - alvarion
+mib_dir: alvarion
 discovery:
     -
         sysObjectID:

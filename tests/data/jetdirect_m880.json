@@ -8,13 +8,13 @@
                     "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,ROM none,JETDIRECT,JD149,EEPROM JDI99999999,CIDATE 05/28/2018",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Color LaserJet flow MFP M880",
                     "features": null,
                     "os": "jetdirect",
                     "type": "printer",
                     "serial": null,
                     "icon": "hp.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -651,7 +651,7 @@
                     "toner_index": 1,
                     "toner_type": "tonerCartridge",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Black Cartridge",
+                    "toner_descr": "Black Cartridge827A HP CF300A",
                     "toner_capacity": 100,
                     "toner_current": 92,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
@@ -660,7 +660,7 @@
                     "toner_index": 10,
                     "toner_type": "fuser",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
-                    "toner_descr": "Fuser Kit HP 110",
+                    "toner_descr": "Fuser Kit HP 110V-C1N54A, 220V-C",
                     "toner_capacity": 100,
                     "toner_current": 84,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
@@ -669,7 +669,7 @@
                     "toner_index": 11,
                     "toner_type": "other",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.11",
-                    "toner_descr": "Document Feeder",
+                    "toner_descr": "Document FeederKit HP C1P70A",
                     "toner_capacity": 100,
                     "toner_current": 99,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.11"
@@ -678,7 +678,7 @@
                     "toner_index": 12,
                     "toner_type": "other",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.12",
-                    "toner_descr": "Clean Rollers HP",
+                    "toner_descr": "Clean Rollers HP None",
                     "toner_capacity": 100,
                     "toner_current": 97,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.12"
@@ -687,7 +687,7 @@
                     "toner_index": 13,
                     "toner_type": "staples",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.13",
-                    "toner_descr": "Stapler 1 HP C80",
+                    "toner_descr": "Stapler 1 HP C8091A",
                     "toner_capacity": 100,
                     "toner_current": 50,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.13"
@@ -696,7 +696,7 @@
                     "toner_index": 14,
                     "toner_type": "staples",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.14",
-                    "toner_descr": "Stapler 2 HP CC3",
+                    "toner_descr": "Stapler 2 HP CC383A",
                     "toner_capacity": 100,
                     "toner_current": 50,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.14"
@@ -705,7 +705,7 @@
                     "toner_index": 15,
                     "toner_type": "staples",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.15",
-                    "toner_descr": "Stapler 3 HP CC3",
+                    "toner_descr": "Stapler 3 HP CC383A",
                     "toner_capacity": 100,
                     "toner_current": 50,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.15"
@@ -714,7 +714,7 @@
                     "toner_index": 2,
                     "toner_type": "tonerCartridge",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "toner_descr": "Cyan Cartridge 8",
+                    "toner_descr": "Cyan Cartridge 827A HP CF301A",
                     "toner_capacity": 100,
                     "toner_current": 16,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
@@ -723,7 +723,7 @@
                     "toner_index": 3,
                     "toner_type": "tonerCartridge",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "toner_descr": "Magenta Cartridg",
+                    "toner_descr": "Magenta Cartridge 827A HP CF303A",
                     "toner_capacity": 100,
                     "toner_current": 100,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
@@ -732,7 +732,7 @@
                     "toner_index": 4,
                     "toner_type": "tonerCartridge",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "toner_descr": "Yellow Cartridge",
+                    "toner_descr": "Yellow Cartridge 827A HP CF302A",
                     "toner_capacity": 100,
                     "toner_current": 70,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
@@ -741,7 +741,7 @@
                     "toner_index": 5,
                     "toner_type": "opc",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
-                    "toner_descr": "Black Drum 828A",
+                    "toner_descr": "Black Drum 828AHP CF358A",
                     "toner_capacity": 100,
                     "toner_current": 53,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
@@ -750,7 +750,7 @@
                     "toner_index": 6,
                     "toner_type": "opc",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
-                    "toner_descr": "Cyan Drum 828A H",
+                    "toner_descr": "Cyan Drum 828A HP CF359A",
                     "toner_capacity": 100,
                     "toner_current": 58,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
@@ -759,7 +759,7 @@
                     "toner_index": 7,
                     "toner_type": "opc",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
-                    "toner_descr": "Magenta Drum 828",
+                    "toner_descr": "Magenta Drum 828A HP CF365A",
                     "toner_capacity": 100,
                     "toner_current": 58,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
@@ -768,7 +768,7 @@
                     "toner_index": 8,
                     "toner_type": "opc",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
-                    "toner_descr": "Yellow Drum 828A",
+                    "toner_descr": "Yellow Drum 828A HP CF364A",
                     "toner_capacity": 100,
                     "toner_current": 58,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
@@ -777,7 +777,7 @@
                     "toner_index": 9,
                     "toner_type": "transferUnit",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
-                    "toner_descr": "Transfer Kit HP",
+                    "toner_descr": "Transfer Kit HPD7H14A",
                     "toner_capacity": 100,
                     "toner_current": 89,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
@@ -817,15 +817,6 @@
                     "toner_capacity": 2000,
                     "toner_current": 20,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.5"
-                },
-                {
-                    "toner_index": 0,
-                    "toner_type": "markerSupply",
-                    "toner_oid": ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.",
-                    "toner_descr": "0",
-                    "toner_capacity": 100,
-                    "toner_current": 0,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8."
                 }
             ]
         },

@@ -8,13 +8,13 @@
                     "sysDescr": "ApexPlus-3.2.0",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "ApexPlus-3.2.0",
                     "features": null,
                     "os": "apex-plus",
                     "type": "wireless",
                     "serial": null,
                     "icon": "trango.png",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },
@@ -26,7 +26,7 @@
                     "sysDescr": "ApexPlus-3.2.0",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "Trango ApexPlus-3.2.0",
+                    "hardware": "ApexPlus-3.2.0",
                     "features": null,
                     "os": "apex-plus",
                     "type": "wireless",

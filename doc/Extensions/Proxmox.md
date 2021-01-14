@@ -22,7 +22,7 @@ $config['enable_proxmox'] = 1;
 ```
 
 Then, install git and
-[librenms-agent](http://docs.librenms.org/Extensions/Applications/) on
+[librenms-agent](Applications.md) on
 the machines running Proxmox and enable the Proxmox-script using:
 
 ```bash

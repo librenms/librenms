@@ -19,7 +19,6 @@
  *
  * Tests vmwVmPoweredOff, vmwVmPoweredOn, and vmwVmSuspended traps from VMWare ESXi hosts.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -31,14 +30,13 @@ use App\Models\Device;
 use App\Models\Vminfo;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class VmwPowerStateTest extends SnmpTrapTestCase
 {
     public function testVmwVmPoweredOffTrap()
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
+        $device = Device::factory()->create();
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
@@ -59,8 +57,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
     public function testVmwVmPoweredONTrap()
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
+        $device = Device::factory()->create();
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
@@ -81,8 +79,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
     public function testVmwVmSuspendedTrap()
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
+        $device = Device::factory()->create();
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162

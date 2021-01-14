@@ -1,5 +1,8 @@
 mib: ADVANTECH-EKI-PRONEER-MIB
 modules:
+    os:
+        hardware: ADVANTECH-COMMON-MIB::sysModuleID.0
+        version: ADVANTECH-COMMON-MIB::sysImageVersion.0
     sensors:
         pre-cache:
             data:

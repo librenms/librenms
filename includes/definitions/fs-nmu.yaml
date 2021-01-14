@@ -3,8 +3,7 @@ text: 'Network Management Unit'
 type: network
 icon: fs
 group: fs
-mib_dir:
-    - fs
+mib_dir: fs
 discovery:
     -
         sysObjectID:

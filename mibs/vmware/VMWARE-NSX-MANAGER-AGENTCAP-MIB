@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2016-2017 VMware, Inc.  All rights reserved.
+-- Copyright 2016-2020 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-NSX-MANAGER-AGENTCAP-MIB DEFINITIONS ::= BEGIN
@@ -12,7 +12,7 @@ IMPORTS
     AGENT-CAPABILITIES
        FROM  SNMPv2-CONF;
 vmwNSXAgentCapabilityMIB MODULE-IDENTITY
-   LAST-UPDATED "201610240001Z"
+   LAST-UPDATED "202006030000Z"
    ORGANIZATION "VMware, Inc"
    CONTACT-INFO
       "VMware, Inc
@@ -24,6 +24,9 @@ vmwNSXAgentCapabilityMIB MODULE-IDENTITY
       "
    DESCRIPTION
      "This module defines agent capabilities for deployed VMware NSX Manager agents by release."
+   REVISION     "202006030000Z"
+   DESCRIPTION
+         "Capabilities for NSX Manager 6.4.x releases."
    REVISION     "201610240001Z"
    DESCRIPTION
          "Capabilities for NSX Manager 6.3.x releases."
@@ -37,7 +40,190 @@ vmwNSXAgentCapabilityMIB MODULE-IDENTITY
 
 vmwNSXMCapability OBJECT IDENTIFIER ::= { vmwNSXAgentCapabilityMIB 1 }
 
-vmwNSXManager2017-630 AGENT-CAPABILITIES
+vmwNSXManager2020x647 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "6.4.7"
+  STATUS  current
+  DESCRIPTION
+     "Release 6.4.7 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the NSX Manager appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     SUPPORTS VMWARE-NSX-MANAGER-MIB
+     INCLUDES {
+         vmwNsxManagerNotificationGroup1,
+         vmwNsxManagerNotificationGroup2,
+         vmwNsxManagerNotificationGroup3,
+         vmwNsxManagerNotificationGroup5,
+         vmwNsxManagerNotificationGroup7,
+         vmwNsxManagerNotificationGroup8,
+         vmwNsxManagerNotificationGroup9,
+         vmwNsxManagerNotificationGroup10
+     }
+   ::= { vmwNSXMCapability 14 }
+
+vmwNSXManager2019x646 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "6.4.6"
+  STATUS  current
+  DESCRIPTION
+     "Release 6.4.6 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the NSX Manager appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     SUPPORTS VMWARE-NSX-MANAGER-MIB
+     INCLUDES {
+         vmwNsxManagerNotificationGroup1,
+         vmwNsxManagerNotificationGroup2,
+         vmwNsxManagerNotificationGroup3,
+         vmwNsxManagerNotificationGroup5,
+         vmwNsxManagerNotificationGroup7,
+         vmwNsxManagerNotificationGroup8,
+         vmwNsxManagerNotificationGroup9
+     }
+   ::= { vmwNSXMCapability 13 }
+
+vmwNSXManager2019x645 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "6.4.5"
+  STATUS  current
+  DESCRIPTION
+     "Release 6.4.5 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the NSX Manager appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     SUPPORTS VMWARE-NSX-MANAGER-MIB
+     INCLUDES {
+         vmwNsxManagerNotificationGroup1,
+         vmwNsxManagerNotificationGroup2,
+         vmwNsxManagerNotificationGroup3,
+         vmwNsxManagerNotificationGroup5,
+         vmwNsxManagerNotificationGroup7,
+         vmwNsxManagerNotificationGroup8
+     }
+   ::= { vmwNSXMCapability 12 }
+
+vmwNSXManager2018x642 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "6.4.2"
+  STATUS  current
+  DESCRIPTION
+     "Release 6.4.2 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the NSX Manager appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     SUPPORTS VMWARE-NSX-MANAGER-MIB
+     INCLUDES {
+         vmwNsxManagerNotificationGroup1,
+         vmwNsxManagerNotificationGroup2,
+         vmwNsxManagerNotificationGroup3,
+         vmwNsxManagerNotificationGroup5,
+         vmwNsxManagerNotificationGroup7
+     }
+   ::= { vmwNSXMCapability 11 }
+
+vmwNSXManager2018x637 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "6.3.7"
+  STATUS  current
+  DESCRIPTION
+     "Release 6.3.7 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the NSX Manager appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     SUPPORTS VMWARE-NSX-MANAGER-MIB
+     INCLUDES {
+         vmwNsxManagerNotificationGroup1,
+         vmwNsxManagerNotificationGroup2,
+         vmwNsxManagerNotificationGroup3,
+         vmwNsxManagerNotificationGroup4,
+         vmwNsxManagerNotificationGroup6
+     }
+   ::= { vmwNSXMCapability 10 }
+
+--
+-- Applies to 2018 Release and follow up patch releases
+--
+
+vmwNSXManager2018x641 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "6.4.1"
+  STATUS  current
+  DESCRIPTION
+     "Release 6.4.1 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the NSX Manager appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     SUPPORTS VMWARE-NSX-MANAGER-MIB
+     INCLUDES {
+         vmwNsxManagerNotificationGroup1,
+         vmwNsxManagerNotificationGroup2,
+         vmwNsxManagerNotificationGroup3,
+         vmwNsxManagerNotificationGroup5
+     }
+   ::= { vmwNSXMCapability 9 }
+
+--
+-- Applies to 2018 Release and follow up patch releases
+--
+
+vmwNSXManager2018x636 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "6.3.6"
+  STATUS  current
+  DESCRIPTION
+     "Release 6.3.6 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the NSX Manager appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     SUPPORTS VMWARE-NSX-MANAGER-MIB
+     INCLUDES {
+         vmwNsxManagerNotificationGroup1,
+         vmwNsxManagerNotificationGroup2,
+         vmwNsxManagerNotificationGroup3,
+         vmwNsxManagerNotificationGroup4
+     }
+   ::= { vmwNSXMCapability 8 }
+
+--
+-- Applies to 2017 Release and follow up patch releases
+--
+
+vmwNSXManager2017x640 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "6.4.0"
+  STATUS  current
+  DESCRIPTION
+     "Release 6.4.0 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the NSX Manager appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     SUPPORTS VMWARE-NSX-MANAGER-MIB
+     INCLUDES {
+         vmwNsxManagerNotificationGroup1,
+         vmwNsxManagerNotificationGroup2,
+         vmwNsxManagerNotificationGroup3
+     }
+   ::= { vmwNSXMCapability 7 }
+
+
+vmwNSXManager2017x630 AGENT-CAPABILITIES
   PRODUCT-RELEASE
      "6.3.0"
   STATUS  current

@@ -1,4 +1,6 @@
 modules:
+    os:
+        sysDescr_regex: '/(?<version>\d+\.\d\S+)/'
     sensors:
         temperature:
             data:

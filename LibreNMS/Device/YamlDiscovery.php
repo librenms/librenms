@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -27,6 +26,7 @@ namespace LibreNMS\Device;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 
@@ -41,14 +41,14 @@ class YamlDiscovery
     public static function discover(OS $os, $class, $yaml_data)
     {
         $pre_cache = $os->preCache();
-        $items = array();
+        $items = [];
 
         // convert to class name for static call below
         if (is_object($class)) {
             $class = get_class($class);
         }
 
-        d_echo("YAML Discovery Data: ");
+        d_echo('YAML Discovery Data: ');
         d_echo($yaml_data);
 
         foreach ($yaml_data as $first_key => $first_yaml) {
@@ -56,7 +56,7 @@ class YamlDiscovery
                 continue;
             }
 
-            $group_options = isset($first_yaml['options']) ? $first_yaml['options'] : array();
+            $group_options = isset($first_yaml['options']) ? $first_yaml['options'] : [];
 
             // find the data array, we could already be at for simple modules
             if (isset($data['data'])) {
@@ -66,7 +66,7 @@ class YamlDiscovery
             }
 
             foreach ($first_yaml as $data) {
-                $raw_data = (array)$pre_cache[$data['oid']];
+                $raw_data = (array) $pre_cache[$data['oid']];
 
                 d_echo("Data {$data['oid']}: ");
                 d_echo($raw_data);
@@ -74,9 +74,9 @@ class YamlDiscovery
                 $count = 0;
                 foreach ($raw_data as $index => $snmp_data) {
                     $count++;
-                    $current_data = array();
+                    $current_data = [];
 
-                    if (!isset($data['value'])) {
+                    if (! isset($data['value'])) {
                         $data['value'] = $data['oid'];
                     }
 
@@ -104,13 +104,22 @@ class YamlDiscovery
                 }
             }
         }
+
         return $items;
     }
 
-
-    public static function replaceValues($name, $index, $count, $data, $pre_cache)
+    /**
+     * @param string $name Name of the field in yaml
+     * @param string $index index in the snmp table
+     * @param int $count current count of snmp table entries
+     * @param array $def yaml definition
+     * @param array $pre_cache snmp data fetched from device
+     * @return mixed|string|string[]|null
+     */
+    public static function replaceValues($name, $index, $count, $def, $pre_cache)
     {
-        $value = static::getValueFromData($name, $index, $data, $pre_cache);
+        $value = static::getValueFromData($name, $index, $def, $pre_cache);
+
         if (is_null($value)) {
             // built in replacements
             $search = [
@@ -128,22 +137,23 @@ class YamlDiscovery
                 $replace[] = $subindex;
             }
 
-            $value = str_replace($search, $replace, $data[$name]);
+            $value = str_replace($search, $replace, $def[$name]);
 
             // search discovery data for values
-            $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
-                $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
+            $value = preg_replace_callback('/{{ \$?([a-zA-Z0-9\-.:]+) }}/', function ($matches) use ($index, $def, $pre_cache) {
+                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache, null);
                 if (is_null($replace)) {
                     d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
+
                     return ''; // remove the unavailable variable
                 }
+
                 return $replace;
             }, $value);
         }
 
         return $value;
     }
-
 
     /**
      * Helper function for dynamic discovery to search for data from pre_cached snmp data
@@ -169,12 +179,14 @@ class YamlDiscovery
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
 
-        if (isset($pre_cache[$name])) {
+        if (isset($pre_cache[$index][$name])) {
+            return $pre_cache[$index][$name];
+        }
+
+        if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
                     return $pre_cache[$name][$index][$name];
-                } elseif (isset($pre_cache[$index][$name])) {   //probably makes no sense here
-                    return $pre_cache[$index][$name];           //same
                 } elseif (isset($pre_cache[$name][$index])) {
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
@@ -193,8 +205,8 @@ class YamlDiscovery
     public static function preCache(OS $os)
     {
         // Pre-cache data for later use
-        $pre_cache = array();
-        $device = $os->getDevice();
+        $pre_cache = [];
+        $device = $os->getDeviceArray();
 
         $pre_cache_file = 'includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php';
         if (is_file($pre_cache_file)) {
@@ -209,8 +221,8 @@ class YamlDiscovery
             return $pre_cache;
         }
 
-        if (!empty($device['dynamic_discovery']['modules'])) {
-            echo "Caching data: ";
+        if (! empty($device['dynamic_discovery']['modules'])) {
+            echo 'Caching data: ';
             foreach ($device['dynamic_discovery']['modules'] as $module => $discovery_data) {
                 echo "$module ";
                 foreach ($discovery_data as $key => $data_array) {
@@ -222,8 +234,8 @@ class YamlDiscovery
                     }
 
                     foreach ($data_array as $data) {
-                        foreach ((array)$data['oid'] as $oid) {
-                            if (!array_key_exists($oid, $pre_cache)) {
+                        foreach ((array) $data['oid'] as $oid) {
+                            if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } else {
@@ -250,20 +262,20 @@ class YamlDiscovery
      * @param mixed $value
      * @param array $yaml_item_data The data key from this item
      * @param array $group_options The options key from this group of items
-     * @param array $item_snmp_data The pre-cache data array
+     * @param array $pre_cache The pre-cache data array
      * @return bool
      */
-    public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = array())
+    public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
     {
-        $skip_values = array_replace((array)$group_options['skip_values'], (array)$yaml_item_data['skip_values']);
+        $skip_values = array_replace((array) $group_options['skip_values'], (array) $yaml_item_data['skip_values']);
 
         foreach ($skip_values as $skip_value) {
             if (is_array($skip_value) && $pre_cache) {
                 // Dynamic skipping of data
-                $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
+                $op = $skip_value['op'] ?? '!=';
                 $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
                 if (Str::contains($skip_value['oid'], '.')) {
-                    list($skip_value['oid'], $targeted_index) = explode('.', $skip_value['oid'], 2);
+                    [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
                     $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
                 }
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {
@@ -275,14 +287,14 @@ class YamlDiscovery
             }
         }
 
-        $skip_value_lt = array_replace((array)$group_options['skip_value_lt'], (array)$yaml_item_data['skip_value_lt']);
+        $skip_value_lt = array_replace((array) $group_options['skip_value_lt'], (array) $yaml_item_data['skip_value_lt']);
         foreach ($skip_value_lt as $skip_value) {
             if ($value < $skip_value) {
                 return true;
             }
         }
 
-        $skip_value_gt = array_replace((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
+        $skip_value_gt = array_replace((array) $group_options['skip_value_gt'], (array) $yaml_item_data['skip_value_gt']);
         foreach ($skip_value_gt as $skip_value) {
             if ($value > $skip_value) {
                 return true;
@@ -290,5 +302,39 @@ class YamlDiscovery
         }
 
         return false;
+    }
+
+    /**
+     * Translate an oid to numeric format (if already numeric, return as-is)
+     *
+     * @param string $oid
+     * @param array|null $device
+     * @param string $mib
+     * @param string|null $mibdir
+     * @return string numeric oid
+     * @throws \LibreNMS\Exceptions\InvalidOidException
+     */
+    public static function oidToNumeric($oid, $device = null, $mib = 'ALL', $mibdir = null)
+    {
+        if (self::oidIsNumeric($oid)) {
+            return $oid;
+        }
+
+        foreach (explode(':', $mib) as $mib_name) {
+            if ($numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device)) {
+                break;
+            }
+        }
+
+        if (empty($numeric_oid)) {
+            throw new InvalidOidException("Unable to translate oid $oid");
+        }
+
+        return $numeric_oid;
+    }
+
+    public static function oidIsNumeric($oid)
+    {
+        return (bool) preg_match('/^[.\d]+$/', $oid);
     }
 }

@@ -5,8 +5,6 @@
  *
  *   This file is part of LibreNMS
  *
- * @package    librenms
- * @subpackage functions
  * @author     LibreNMS Contributors <librenms-project@google.groups.com>
  * @copyright  (C) 2006 - 2012 Adam Armstrong (as Observium)
  * @copyright  (C) 2013 LibreNMS Group
@@ -18,7 +16,7 @@ use LibreNMS\Config;
  * Compare $t with the value of $vars[$v], if that exists
  * @param string $v Name of the var to test
  * @param string $t Value to compare $vars[$v] to
- * @return boolean true, if values are the same, false if $vars[$v]
+ * @return bool true, if values are the same, false if $vars[$v]
  * is unset or values differ
  */
 function var_eq($v, $t)
@@ -34,7 +32,7 @@ function var_eq($v, $t)
 /**
  * Get the value of $vars[$v], if it exists
  * @param string $v Name of the var to get
- * @return string|boolean The value of $vars[$v] if it exists, false if it does not exist
+ * @return string|bool The value of $vars[$v] if it exists, false if it does not exist
  */
 function var_get($v)
 {
@@ -46,14 +44,13 @@ function var_get($v)
     return false;
 }
 
-
 function data_uri($file, $mime)
 {
     $contents = file_get_contents($file);
     $base64 = base64_encode($contents);
-    return ('data:' . $mime . ';base64,' . $base64);
-}//end data_uri()
 
+    return 'data:' . $mime . ';base64,' . $base64;
+}//end data_uri()
 
 /**
  * Convert string to nice case, mostly used for applications
@@ -65,7 +62,6 @@ function nicecase($item)
 {
     return \LibreNMS\Util\StringHelpers::niceCase($item);
 }
-
 
 function toner2colour($descr, $percent)
 {
@@ -99,7 +95,6 @@ function toner2colour($descr, $percent)
     return $colour;
 }//end toner2colour()
 
-
 /**
  * Find all links in some text and turn them into html links.
  *
@@ -113,29 +108,25 @@ function linkify($text)
     return preg_replace($regex, '<a href="$0">$0</a>', $text);
 }
 
-
-function generate_link($text, $vars, $new_vars = array())
+function generate_link($text, $vars, $new_vars = [])
 {
     return '<a href="' . generate_url($vars, $new_vars) . '">' . $text . '</a>';
 }//end generate_link()
-
 
 function generate_url($vars, $new_vars = [])
 {
     return \LibreNMS\Util\Url::generate($vars, $new_vars);
 }
 
-
 function escape_quotes($text)
 {
     return str_replace('"', "\'", str_replace("'", "\'", $text));
 }//end escape_quotes()
 
-
 function generate_overlib_content($graph_array, $text)
 {
     $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
-    foreach (array('day', 'week', 'month', 'year') as $period) {
+    foreach (['day', 'week', 'month', 'year'] as $period) {
         $graph_array['from'] = Config::get("time.$period");
         $overlib_content .= escape_quotes(generate_graph_tag($graph_array));
     }
@@ -145,31 +136,28 @@ function generate_overlib_content($graph_array, $text)
     return $overlib_content;
 }//end generate_overlib_content()
 
-
 function get_percentage_colours($percentage, $component_perc_warn = null)
 {
     return \LibreNMS\Util\Colors::percentage($percentage, $component_perc_warn);
 }//end get_percentage_colours()
 
-
 function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
 {
-    return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="graph.php?' . implode($sep, array('device=' . $device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")) . '">';
+    return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="graph.php?' . implode($sep, ['device=' . $device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"]) . '">';
 }//end generate_minigraph_image()
 
-
-function generate_device_url($device, $vars = array())
+function generate_device_url($device, $vars = [])
 {
-    return \LibreNMS\Util\Url::deviceUrl((int)$device['device_id'], $vars);
+    return \LibreNMS\Util\Url::deviceUrl((int) $device['device_id'], $vars);
 }
 
-function generate_device_link($device, $text = null, $vars = array(), $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
-    if (!$start) {
+    if (! $start) {
         $start = Config::get('time.day');
     }
 
-    if (!$end) {
+    if (! $end) {
         $end = Config::get('time.now');
     }
 
@@ -232,7 +220,6 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
     }
 }//end generate_device_link()
 
-
 function overlib_link($url, $text, $contents, $class = null)
 {
     return \LibreNMS\Util\Url::overlibLink($url, $text, $contents, $class);
@@ -254,7 +241,7 @@ function bill_permitted($bill_id)
 
 function port_permitted($port_id, $device_id = null)
 {
-    if (!is_numeric($device_id)) {
+    if (! is_numeric($device_id)) {
         $device_id = get_device_id_by_port_id($port_id);
     }
 
@@ -267,11 +254,11 @@ function port_permitted($port_id, $device_id = null)
 
 function application_permitted($app_id, $device_id = null)
 {
-    if (!is_numeric($app_id)) {
+    if (! is_numeric($app_id)) {
         return false;
     }
 
-    if (!$device_id) {
+    if (! $device_id) {
         $device_id = get_device_id_by_app_id($app_id);
     }
 
@@ -283,6 +270,7 @@ function device_permitted($device_id)
     if (Auth::user() && Auth::user()->hasGlobalRead()) {
         return true;
     }
+
     return \Permissions::canAccessDevice($device_id, Auth::id());
 }
 
@@ -314,9 +302,10 @@ function alert_layout($severity)
             $color = 'info';
             $background = 'info';
     }
+
     return ['icon' => $icon,
-            'icon_color' => $color,
-            'background_color' => $background];
+        'icon_color' => $color,
+        'background_color' => $background, ];
 }
 
 function generate_graph_tag($args)
@@ -331,28 +320,28 @@ function generate_lazy_graph_tag($args)
 
 function generate_dynamic_graph_tag($args)
 {
-    $urlargs = array();
+    $urlargs = [];
     $width = 0;
     foreach ($args as $key => $arg) {
         switch (strtolower($key)) {
             case 'width':
                 $width = $arg;
-                $value = "{{width}}";
+                $value = '{{width}}';
                 break;
             case 'from':
-                $value = "{{start}}";
+                $value = '{{start}}';
                 break;
             case 'to':
-                $value = "{{end}}";
+                $value = '{{end}}';
                 break;
             default:
                 $value = $arg;
                 break;
         }
-        $urlargs[] = $key . "=" . $value;
+        $urlargs[] = $key . '=' . $value;
     }
 
-    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+    return '<img style="width:' . $width . 'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
 }//end generate_dynamic_graph_tag()
 
 function generate_dynamic_graph_js($args)
@@ -379,6 +368,7 @@ function generate_dynamic_graph_js($args)
               // needed for dynamic height
               window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
           </script>';
+
     return $output;
 }//end generate_dynamic_graph_js()
 
@@ -405,12 +395,15 @@ STATE;
     return $state;
 }//end generate_graph_js_state()
 
-
 function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
 {
-    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background);
+    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $right_text, null, null, [
+        'left' => $left_background,
+        'left_text' => $left_colour,
+        'right' => $right_background,
+        'right_text' => $right_colour,
+    ]);
 }
-
 
 function generate_entity_link($type, $entity, $text = null, $graph_type = null)
 {
@@ -430,14 +423,14 @@ function generate_entity_link($type, $entity, $text = null, $graph_type = null)
                 $text = $entity['storage_descr'];
             }
 
-            $link = generate_link($text, array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage'));
+            $link = generate_link($text, ['page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage']);
             break;
 
         default:
             $link = $entity[$type . '_id'];
     }
 
-    return ($link);
+    return $link;
 }//end generate_entity_link()
 
 /**
@@ -450,14 +443,15 @@ function extract_graph_type($type): array
     preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);
     $type = basename($graphtype['type']);
     $subtype = basename($graphtype['subtype']);
+
     return [$type, $subtype];
 }
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
-    $graph_array = array();
+    $graph_array = [];
 
-    if (!$text) {
+    if (! $text) {
         $text = fixifName($port['label']);
     }
 
@@ -465,13 +459,13 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port['graph_type'] = $type;
     }
 
-    if (!isset($port['graph_type'])) {
+    if (! isset($port['graph_type'])) {
         $port['graph_type'] = 'port_bits';
     }
 
     $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
-    if (!isset($port['hostname'])) {
+    if (! isset($port['hostname'])) {
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
@@ -513,19 +507,17 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
 function generate_sensor_link($args, $text = null, $type = null)
 {
-    $args = cleanPort($args);
-
-    if (!$text) {
-        $text = fixIfName($args['sensor_descr']);
+    if (! $text) {
+        $text = $args['sensor_descr'];
     }
 
-    if (!$type) {
-        $args['graph_type'] = "sensor_" . $args['sensor_class'];
+    if (! $type) {
+        $args['graph_type'] = 'sensor_' . $args['sensor_class'];
     } else {
-        $args['graph_type'] = "sensor_" . $type;
+        $args['graph_type'] = 'sensor_' . $type;
     }
 
-    if (!isset($args['hostname'])) {
+    if (! isset($args['hostname'])) {
         $args = array_merge($args, device_by_id_cache($args['device_id']));
     }
 
@@ -540,7 +532,7 @@ function generate_sensor_link($args, $text = null, $type = null)
         'to' => Config::get('time.now'),
         'from' => Config::get('time.day'),
         'id' => $args['sensor_id'],
-        ];
+    ];
     $content .= generate_graph_tag($graph_array);
 
     $graph_array['from'] = Config::get('time.week');
@@ -555,47 +547,38 @@ function generate_sensor_link($args, $text = null, $type = null)
     $content .= '</div>';
 
     $url = generate_sensor_url($args);
-    if (port_permitted($args['interface_id'], $args['device_id'])) {
-        return overlib_link($url, $text, $content, null);
-    } else {
-        return fixifName($text);
-    }
+
+    return overlib_link($url, $text, $content, null);
 }//end generate_sensor_link()
 
-
-function generate_sensor_url($sensor, $vars = array())
+function generate_sensor_url($sensor, $vars = [])
 {
-    return generate_url(array('page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')), $vars);
+    return generate_url(['page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')], $vars);
 }//end generate_sensor_url()
 
-
-function generate_port_url($port, $vars = array())
+function generate_port_url($port, $vars = [])
 {
-    return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
+    return generate_url(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
 }//end generate_port_url()
 
-
-function generate_peer_url($peer, $vars = array())
+function generate_peer_url($peer, $vars = [])
 {
-    return generate_url(array('page' => 'device', 'device' => $peer['device_id'], 'tab' => 'routing', 'proto' => 'bgp'), $vars);
+    return generate_url(['page' => 'device', 'device' => $peer['device_id'], 'tab' => 'routing', 'proto' => 'bgp'], $vars);
 }//end generate_peer_url()
 
-
-function generate_bill_url($bill, $vars = array())
+function generate_bill_url($bill, $vars = [])
 {
-    return generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id']), $vars);
+    return generate_url(['page' => 'bill', 'bill_id' => $bill['bill_id']], $vars);
 }//end generate_bill_url()
-
 
 function generate_port_image($args)
 {
-    if (!$args['bg']) {
+    if (! $args['bg']) {
         $args['bg'] = 'FFFFFF00';
     }
 
     return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
 }//end generate_port_image()
-
 
 function generate_port_thumbnail($port)
 {
@@ -604,15 +587,70 @@ function generate_port_thumbnail($port)
     $port['to'] = Config::get('time.now');
     $port['width'] = 150;
     $port['height'] = 21;
+
     return generate_port_image($port);
 }//end generate_port_thumbnail()
 
+/**
+ * Create image to output text instead of a graph.
+ *
+ * @param string $text
+ * @param int[] $color
+ */
+function graph_error($text, $color = [128, 0, 0])
+{
+    global $vars, $debug;
+
+    if (! $debug) {
+        set_image_type();
+    }
+
+    $width = $vars['width'] ?? 150;
+    $height = $vars['height'] ?? 60;
+
+    if (Config::get('webui.graph_type') === 'svg') {
+        $rgb = implode(', ', $color);
+        $font_size = 20;
+        $svg_x = 100;
+        $svg_y = min($font_size, $width ? (($height / $width) * $svg_x) : 1);
+        echo "<svg viewBox=\"0 0 $svg_x $svg_y\" xmlns=\"http://www.w3.org/2000/svg\"><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" style=\"font-family: sans-serif; fill: rgb($rgb);\">$text</text></svg>";
+    } else {
+        $img = imagecreate($width, $height);
+        imagecolorallocatealpha($img, 255, 255, 255, 127); // transparent background
+
+        $px = ((imagesx($img) - 7.5 * strlen($text)) / 2);
+        $font = $width < 200 ? 3 : 5;
+        imagestring($img, $font, $px, ($height / 2 - 8), $text, imagecolorallocate($img, ...$color));
+
+        // Output the image
+        imagepng($img);
+        imagedestroy($img);
+    }
+}
+
+/**
+ * Output message to user in image format.
+ *
+ * @param string $text string to display
+ */
+function graph_text_and_exit($text)
+{
+    global $vars;
+
+    if ($vars['showcommand'] == 'yes') {
+        echo $text;
+
+        return;
+    }
+
+    graph_error($text, [13, 21, 210]);
+    exit;
+}
 
 function print_port_thumbnail($args)
 {
     echo generate_port_link($args, generate_port_image($args));
 }//end print_port_thumbnail()
-
 
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
 {
@@ -622,7 +660,6 @@ function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
         ';
 }//end print_optionbar_start()
 
-
 function print_optionbar_end()
 {
     echo '
@@ -631,20 +668,18 @@ function print_optionbar_end()
         ';
 }//end print_optionbar_end()
 
-
 function overlibprint($text)
 {
     return "onmouseover=\"return overlib('" . $text . "');\" onmouseout=\"return nd();\"";
 }//end overlibprint()
 
-
 function humanmedia($media)
 {
     global $rewrite_iftype;
     array_preg_replace($rewrite_iftype, $media);
+
     return $media;
 }//end humanmedia()
-
 
 function humanspeed($speed)
 {
@@ -655,7 +690,6 @@ function humanspeed($speed)
 
     return $speed;
 }//end humanspeed()
-
 
 function devclass($device)
 {
@@ -679,7 +713,6 @@ function devclass($device)
     return $class;
 }//end devclass()
 
-
 function getlocations()
 {
     if (Auth::user()->hasGlobalRead()) {
@@ -688,7 +721,6 @@ function getlocations()
 
     return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [Auth::id()]);
 }
-
 
 /**
  * Get the recursive file size and count for a directory
@@ -701,9 +733,9 @@ function foldersize($path)
     $total_size = 0;
     $total_files = 0;
 
-    foreach (glob(rtrim($path, '/').'/*', GLOB_NOSORT) as $item) {
+    foreach (glob(rtrim($path, '/') . '/*', GLOB_NOSORT) as $item) {
         if (is_dir($item)) {
-            list($folder_size, $file_count) = foldersize($item);
+            [$folder_size, $file_count] = foldersize($item);
             $total_size += $folder_size;
             $total_files += $file_count;
         } else {
@@ -715,11 +747,10 @@ function foldersize($path)
     return [$total_size, $total_files];
 }
 
-
 function generate_ap_link($args, $text = null, $type = null)
 {
     $args = cleanPort($args);
-    if (!$text) {
+    if (! $text) {
         $text = fixIfName($args['label']);
     }
 
@@ -727,11 +758,11 @@ function generate_ap_link($args, $text = null, $type = null)
         $args['graph_type'] = $type;
     }
 
-    if (!isset($args['graph_type'])) {
+    if (! isset($args['graph_type'])) {
         $args['graph_type'] = 'port_bits';
     }
 
-    if (!isset($args['hostname'])) {
+    if (! isset($args['hostname'])) {
         $args = array_merge($args, device_by_id_cache($args['device_id']));
     }
 
@@ -741,7 +772,7 @@ function generate_ap_link($args, $text = null, $type = null)
     }
 
     $content .= "<div style=\'width: 850px\'>";
-    $graph_array = array();
+    $graph_array = [];
     $graph_array['type'] = $args['graph_type'];
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
@@ -766,19 +797,16 @@ function generate_ap_link($args, $text = null, $type = null)
     }
 }//end generate_ap_link()
 
-
-function generate_ap_url($ap, $vars = array())
+function generate_ap_url($ap, $vars = [])
 {
-    return generate_url(array('page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']), $vars);
+    return generate_url(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']], $vars);
 }//end generate_ap_url()
-
 
 // Find all the files in the given directory that match the pattern
 
-
 function get_matching_files($dir, $match = '/\.php$/')
 {
-    $list = array();
+    $list = [];
     if ($handle = opendir($dir)) {
         while (false !== ($file = readdir($handle))) {
             if ($file != '.' && $file != '..' && preg_match($match, $file) === 1) {
@@ -792,9 +820,7 @@ function get_matching_files($dir, $match = '/\.php$/')
     return $list;
 }//end get_matching_files()
 
-
 // Include all the files in the given directory that match the pattern
-
 
 function include_matching_files($dir, $match = '/\.php$/')
 {
@@ -802,7 +828,6 @@ function include_matching_files($dir, $match = '/\.php$/')
         include_once $file;
     }
 }//end include_matching_files()
-
 
 function generate_pagination($count, $limit, $page, $links = 2)
 {
@@ -833,14 +858,14 @@ function generate_pagination($count, $limit, $page, $links = 2)
     $return .= "<li class='$link_class'><a href='' onClick='changePage($page + 1,event);'>&gt;</a></li>";
     $return .= "<li class='$link_class'><a href='' onClick='changePage($end_page,event);'>&raquo;</a></li>";
     $return .= '</ul>';
-    return ($return);
+
+    return $return;
 }//end generate_pagination()
 
 function demo_account()
 {
     print_error("You are logged in as a demo account, this page isn't accessible to you");
 }//end demo_account()
-
 
 function get_client_ip()
 {
@@ -866,31 +891,31 @@ function shorten_text($string, $max = 30)
 function shorten_interface_type($string)
 {
     return str_ireplace(
-        array(
+        [
             'FastEthernet',
             'TenGigabitEthernet',
             'GigabitEthernet',
             'Port-Channel',
             'Ethernet',
             'Bundle-Ether',
-        ),
-        array(
+        ],
+        [
             'Fa',
             'Te',
             'Gi',
             'Po',
             'Eth',
             'BE',
-        ),
+        ],
         $string
     );
 }//end shorten_interface_type()
 
-
 function clean_bootgrid($string)
 {
-    $output = str_replace(array("\r", "\n"), '', $string);
+    $output = str_replace(["\r", "\n"], '', $string);
     $output = addslashes($output);
+
     return $output;
 }//end clean_bootgrid()
 
@@ -906,10 +931,9 @@ function get_url()
     );
 }//end get_url()
 
-
 function alert_details($details)
 {
-    if (!is_array($details)) {
+    if (! is_array($details)) {
         $details = json_decode(gzuncompress($details), true);
     }
 
@@ -934,20 +958,20 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['sensor_id']) {
-            $details = "Current Value: " . $tmp_alerts['sensor_current'] . " (" . $tmp_alerts['sensor_class'] . ")<br>  ";
+            $details = 'Current Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
             $details_a = [];
 
             if ($tmp_alerts['sensor_limit_low']) {
-                $details_a[] = "low: " . $tmp_alerts['sensor_limit_low'];
+                $details_a[] = 'low: ' . $tmp_alerts['sensor_limit_low'];
             }
             if ($tmp_alerts['sensor_limit_low_warn']) {
-                $details_a[]= "low_warn: " . $tmp_alerts['sensor_limit_low_warn'];
+                $details_a[] = 'low_warn: ' . $tmp_alerts['sensor_limit_low_warn'];
             }
             if ($tmp_alerts['sensor_limit_warn']) {
-                $details_a[]= "high_warn: " . $tmp_alerts['sensor_limit_warn'];
+                $details_a[] = 'high_warn: ' . $tmp_alerts['sensor_limit_warn'];
             }
             if ($tmp_alerts['sensor_limit']) {
-                $details_a[]= "high: " . $tmp_alerts['sensor_limit'];
+                $details_a[] = 'high: ' . $tmp_alerts['sensor_limit'];
             }
             $details .= implode(', ', $details_a);
 
@@ -958,18 +982,18 @@ function alert_details($details)
         if ($tmp_alerts['bgpPeer_id']) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
-                generate_url(array('page' => 'device',
-                            'device' => $tmp_alerts['device_id'],
-                            'tab' => 'routing',
-                            'proto' => 'bgp')) .
-                "'>" . $tmp_alerts['bgpPeerIdentifier'] . "</a>";
-            $fault_detail .= ", AS" . $tmp_alerts['bgpPeerRemoteAs'];
-            $fault_detail .= ", State " . $tmp_alerts['bgpPeerState'];
+                generate_url(['page' => 'device',
+                    'device' => $tmp_alerts['device_id'],
+                    'tab' => 'routing',
+                    'proto' => 'bgp', ]) .
+                "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
+            $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
+            $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
             $fallback = false;
         }
 
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
-            if ($tmp_alerts['error'] == "") {
+            if ($tmp_alerts['error'] == '') {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
             } else {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
@@ -978,14 +1002,14 @@ function alert_details($details)
         }
 
         if (in_array('app_id', array_keys($tmp_alerts))) {
-            $fault_detail .= "<a href='" . generate_url(array('page' => 'device',
-                                                              'device' => $tmp_alerts['device_id'],
-                                                              'tab' => 'apps',
-                                                              'app' => $tmp_alerts['app_type'])) . "'>";
+            $fault_detail .= "<a href='" . generate_url(['page' => 'device',
+                'device' => $tmp_alerts['device_id'],
+                'tab' => 'apps',
+                'app' => $tmp_alerts['app_type'], ]) . "'>";
             $fault_detail .= $tmp_alerts['metric'];
-            $fault_detail .= "</a>";
+            $fault_detail .= '</a>';
 
-            $fault_detail .= " => ". $tmp_alerts['value'];
+            $fault_detail .= ' => ' . $tmp_alerts['value'];
             $fallback = false;
         }
 
@@ -995,7 +1019,7 @@ function alert_details($details)
                 if (in_array($k, ['device_id', 'sysObjectID', 'sysDescr', 'location_id'])) {
                     continue;
                 }
-                if (!empty($v) && str_i_contains($k, ['id', 'desc', 'msg', 'last'])) {
+                if (! empty($v) && str_i_contains($k, ['id', 'desc', 'msg', 'last'])) {
                     $fault_detail_data[] = "$k => '$v'";
                 }
             }
@@ -1034,15 +1058,15 @@ function dynamic_override_config($type, $name, $device)
  */
 function get_ports_from_type($given_types)
 {
-    # Make the arg an array if it isn't, so subsequent steps only have to handle arrays.
-    if (!is_array($given_types)) {
-        $given_types = array($given_types);
+    // Make the arg an array if it isn't, so subsequent steps only have to handle arrays.
+    if (! is_array($given_types)) {
+        $given_types = [$given_types];
     }
 
-    # Check the config for a '_descr' entry for each argument. This is how a 'custom_descr' entry can
-    #  be key/valued to some other string that's actually searched for in the DB. Merge or append the
-    #  configured value if it's an array or a string. Or append the argument itself if there's no matching
-    #  entry in config.
+    // Check the config for a '_descr' entry for each argument. This is how a 'custom_descr' entry can
+    //  be key/valued to some other string that's actually searched for in the DB. Merge or append the
+    //  configured value if it's an array or a string. Or append the argument itself if there's no matching
+    //  entry in config.
     $search_types = [];
     foreach ($given_types as $type) {
         if (Config::has($type . '_descr')) {
@@ -1057,15 +1081,15 @@ function get_ports_from_type($given_types)
         }
     }
 
-    # Using the full list of strings to search the DB for, build the 'where' portion of a query that
-    #  compares 'port_descr_type' with entry in the list. Also, since '@' is the convential wildcard,
-    #  replace it with '%' so it functions as a wildcard in the SQL query.
+    // Using the full list of strings to search the DB for, build the 'where' portion of a query that
+    //  compares 'port_descr_type' with entry in the list. Also, since '@' is the convential wildcard,
+    //  replace it with '%' so it functions as a wildcard in the SQL query.
     $type_where = ' (';
     $or = '';
-    $type_param = array();
+    $type_param = [];
 
     foreach ($search_types as $type) {
-        if (!empty($type)) {
+        if (! empty($type)) {
             $type = strtr($type, '@', '%');
             $type_where .= " $or `port_descr_type` LIKE ?";
             $or = 'OR';
@@ -1074,8 +1098,9 @@ function get_ports_from_type($given_types)
     }
     $type_where .= ') ';
 
-    # Run the query with the generated 'where' and necessary parameters, and send it back.
+    // Run the query with the generated 'where' and necessary parameters, and send it back.
     $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
+
     return $ports;
 }
 
@@ -1104,23 +1129,22 @@ function get_rules_from_json()
 
 function search_oxidized_config($search_in_conf_textbox)
 {
-    if (!Auth::user()->hasGlobalRead()) {
+    if (! Auth::user()->hasGlobalRead()) {
         return false;
     }
 
     $oxidized_search_url = Config::get('oxidized.url') . '/nodes/conf_search?format=json';
     $postdata = http_build_query(
-        array(
+        [
             'search_in_conf_textbox' => $search_in_conf_textbox,
-        )
+        ]
     );
-    $opts = array('http' =>
-        array(
-            'method' => 'POST',
-            'header' => 'Content-type: application/x-www-form-urlencoded',
-            'content' => $postdata
-        )
-    );
+    $opts = ['http' => [
+        'method' => 'POST',
+        'header' => 'Content-type: application/x-www-form-urlencoded',
+        'content' => $postdata,
+    ],
+    ];
     $context = stream_context_create($opts);
 
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
@@ -1148,6 +1172,7 @@ function array_to_htmljson($data)
 {
     if (is_array($data)) {
         $data = htmlentities(json_encode($data));
+
         return str_replace(',', ',<br />', $data);
     } else {
         return false;
@@ -1162,23 +1187,20 @@ function eventlog_severity($eventlog_severity)
 {
     switch ($eventlog_severity) {
         case 1:
-            return "label-success"; //OK
+            return 'label-success'; //OK
         case 2:
-            return "label-info"; //Informational
+            return 'label-info'; //Informational
         case 3:
-            return "label-primary"; //Notice
+            return 'label-primary'; //Notice
         case 4:
-            return "label-warning"; //Warning
+            return 'label-warning'; //Warning
         case 5:
-            return "label-danger"; //Critical
+            return 'label-danger'; //Critical
         default:
-            return "label-default"; //Unknown
+            return 'label-default'; //Unknown
     }
 } // end eventlog_severity
 
-/**
- *
- */
 function set_image_type()
 {
     return header('Content-type: ' . get_image_type());
@@ -1195,11 +1217,11 @@ function get_image_type()
 
 function get_oxidized_nodes_list()
 {
-    $context = stream_context_create(array(
-        'http' => array(
-            'header' => "Accept: application/json",
-        )
-    ));
+    $context = stream_context_create([
+        'http' => [
+            'header' => 'Accept: application/json',
+        ],
+    ]);
 
     $data = json_decode(file_get_contents(Config::get('oxidized.url') . '/nodes?format=json', false, $context), true);
 
@@ -1210,23 +1232,23 @@ function get_oxidized_nodes_list()
             continue;
         }
 
-        echo "<tr>
-        <td>" . $device['device_id'] . "</td>
-        <td>" . $object['name'] . "</td>
-        <td>" . $device['sysName'] . "</td>
-        <td>" . $object['status'] . "</td>
-        <td>" . $object['time'] . "</td>
-        <td>" . $object['model'] . "</td>
-        <td>" . $object['group'] . "</td>
+        echo '<tr>
+        <td>' . $device['device_id'] . '</td>
+        <td>' . $object['name'] . '</td>
+        <td>' . $device['sysName'] . '</td>
+        <td>' . $object['status'] . '</td>
+        <td>' . $object['time'] . '</td>
+        <td>' . $object['model'] . '</td>
+        <td>' . $object['group'] . '</td>
         <td></td>
-        </tr>";
+        </tr>';
     }
 }
 
 // fetches disks for a system
 function get_disks($device)
 {
-    return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
+    return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', [$device]);
 }
 
 /**
@@ -1237,21 +1259,22 @@ function get_disks($device)
  */
 function get_fail2ban_jails($device_id)
 {
-    $options = array(
-        'filter' => array(
-            'type' => array('=', 'fail2ban'),
-        ),
-    );
+    $options = [
+        'filter' => [
+            'type' => ['=', 'fail2ban'],
+        ],
+    ];
 
     $component = new LibreNMS\Component();
     $f2bc = $component->getComponents($device_id, $options);
 
     if (isset($f2bc[$device_id])) {
         $id = $component->getFirstComponentID($f2bc, $device_id);
+
         return json_decode($f2bc[$device_id][$id]['jails']);
     }
 
-    return array();
+    return [];
 }
 
 /**
@@ -1262,21 +1285,22 @@ function get_fail2ban_jails($device_id)
  */
 function get_postgres_databases($device_id)
 {
-    $options = array(
-        'filter' => array(
-            'type' => array('=', 'postgres'),
-        ),
-    );
+    $options = [
+        'filter' => [
+            'type' => ['=', 'postgres'],
+        ],
+    ];
 
     $component = new LibreNMS\Component();
     $pgc = $component->getComponents($device_id, $options);
 
     if (isset($pgc[$device_id])) {
         $id = $component->getFirstComponentID($pgc, $device_id);
+
         return json_decode($pgc[$device_id][$id]['databases']);
     }
 
-    return array();
+    return [];
 }
 
 /**
@@ -1290,7 +1314,7 @@ function get_postgres_databases($device_id)
  */
 function get_arrays_with_application($device, $app_id, $app_name, $category = null)
 {
-    $entries = array();
+    $entries = [];
     $separator = '-';
 
     if ($category) {
@@ -1299,7 +1323,7 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
         $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id);
     }
 
-    # app_name contains a separator character? consider it
+    // app_name contains a separator character? consider it
     $offset = substr_count($app_name, $separator);
 
     foreach (glob($pattern) as $rrd) {
@@ -1321,13 +1345,12 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
  * @param string $transparency value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
-
 function generate_stacked_graphs($transparency = '88')
 {
     if (Config::get('webui.graph_stacked') == true) {
-        return array('transparency' => $transparency, 'stacked' => '1');
+        return ['transparency' => $transparency, 'stacked' => '1'];
     } else {
-        return array('transparency' => '', 'stacked' => '-1');
+        return ['transparency' => '', 'stacked' => '-1'];
     }
 }
 
@@ -1353,10 +1376,11 @@ function parse_at_time($time)
         $unit = substr($time, -1);
 
         $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+
         return time() + $offset;
     }
 
-    return (int)strtotime($time);
+    return (int) strtotime($time);
 }
 
 /**
@@ -1367,21 +1391,22 @@ function parse_at_time($time)
  */
 function get_zfs_pools($device_id)
 {
-    $options=array(
-        'filter' => array(
-             'type' => array('=', 'zfs'),
-        ),
-    );
+    $options = [
+        'filter' => [
+            'type' => ['=', 'zfs'],
+        ],
+    ];
 
-    $component=new LibreNMS\Component();
-    $zfsc=$component->getComponents($device_id, $options);
+    $component = new LibreNMS\Component();
+    $zfsc = $component->getComponents($device_id, $options);
 
     if (isset($zfsc[$device_id])) {
         $id = $component->getFirstComponentID($zfsc, $device_id);
+
         return json_decode($zfsc[$device_id][$id]['pools']);
     }
 
-    return array();
+    return [];
 }
 
 /**
@@ -1392,21 +1417,22 @@ function get_zfs_pools($device_id)
  */
 function get_portactivity_ports($device_id)
 {
-    $options=array(
-        'filter' => array(
-             'type' => array('=', 'portsactivity'),
-        ),
-    );
+    $options = [
+        'filter' => [
+            'type' => ['=', 'portsactivity'],
+        ],
+    ];
 
-    $component=new LibreNMS\Component();
-    $portsc=$component->getComponents($device_id, $options);
+    $component = new LibreNMS\Component();
+    $portsc = $component->getComponents($device_id, $options);
 
     if (isset($portsc[$device_id])) {
         $id = $component->getFirstComponentID($portsc, $device_id);
+
         return json_decode($portsc[$device_id][$id]['ports']);
     }
 
-    return array();
+    return [];
 }
 
 /**
@@ -1432,29 +1458,29 @@ function get_device_name($device)
 /**
  * Returns state generic label from value with optional text
  */
-
 function get_state_label($sensor)
 {
-    $state_translation = dbFetchRow('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
+    $state_translation = dbFetchRow('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', [$sensor['sensor_id'], $sensor['sensor_current']]);
 
     switch ($state_translation['state_generic_value']) {
         case 0:  // OK
-            $state_text = $state_translation['state_descr'] ?: "OK";
-            $state_label = "label-success";
+            $state_text = $state_translation['state_descr'] ?: 'OK';
+            $state_label = 'label-success';
             break;
         case 1:  // Warning
-            $state_text = $state_translation['state_descr'] ?: "Warning";
-            $state_label = "label-warning";
+            $state_text = $state_translation['state_descr'] ?: 'Warning';
+            $state_label = 'label-warning';
             break;
         case 2:  // Critical
-            $state_text = $state_translation['state_descr'] ?: "Critical";
-            $state_label = "label-danger";
+            $state_text = $state_translation['state_descr'] ?: 'Critical';
+            $state_label = 'label-danger';
             break;
         case 3:  // Unknown
         default:
-            $state_text = $state_translation['state_descr'] ?: "Unknown";
-            $state_label = "label-default";
+            $state_text = $state_translation['state_descr'] ?: 'Unknown';
+            $state_label = 'label-default';
     }
+
     return "<span class='label $state_label'>$state_text</span>";
 }
 
@@ -1466,31 +1492,33 @@ function get_state_label($sensor)
  */
 function get_sensor_label_color($sensor, $type = 'sensors')
 {
-    $label_style = "label-success";
+    $label_style = 'label-success';
     if (is_null($sensor)) {
-        return "label-unknown";
+        return 'label-unknown';
     }
-    if (!is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
-        $label_style = "label-warning";
+    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
+        $label_style = 'label-warning';
     }
-    if (!is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
-        $label_style = "label-warning";
+    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
+        $label_style = 'label-warning';
     }
-    if (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
-        $label_style = "label-danger";
+    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
+        $label_style = 'label-danger';
     }
-    if (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
-        $label_style = "label-danger";
+    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
+        $label_style = 'label-danger';
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
     if ($sensor['sensor_class'] == 'runtime') {
         $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
-        return "<span class='label $label_style'>".trim($sensor['sensor_current'])."</span>";
+
+        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . '</span>';
     }
     if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
-        return "<span class='label $label_style'>".trim($sensor['sensor_current'])." ".$unit."</span>";
+        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
     }
-    return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
+
+    return "<span class='label $label_style'>" . trim(format_si($sensor['sensor_current']) . $unit) . '</span>';
 }
 
 /**
@@ -1536,11 +1564,11 @@ function lowest_time($time, $seconds = 300)
  */
 function time_to_nfsen_subpath($time)
 {
-    $time=lowest_time($time);
-    $layout=Config::get('nfsen_subdirlayout');
+    $time = lowest_time($time);
+    $layout = Config::get('nfsen_subdirlayout');
 
     if ($layout == 0) {
-        return 'nfcapd.'.date('YmdHi', $time);
+        return 'nfcapd.' . date('YmdHi', $time);
     } elseif ($layout == 1) {
         return date('Y\/m\/d\/\n\f\c\a\p\d\.YmdHi', $time);
     } elseif ($layout == 2) {
@@ -1566,14 +1594,15 @@ function time_to_nfsen_subpath($time)
  *
  * Takes a hostname and transforms it to the name
  * used by nfsen.
-*/
+ */
 function nfsen_hostname($hostname)
 {
-    $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
+    $nfsen_hostname = str_replace('.', Config::get('nfsen_split_char'), $hostname);
 
-    if (!is_null(Config::get('nfsen_suffix'))) {
-        $nfsen_hostname=str_replace(Config::get('nfsen_suffix'), '', $nfsen_hostname);
+    if (! is_null(Config::get('nfsen_suffix'))) {
+        $nfsen_hostname = str_replace(Config::get('nfsen_suffix'), '', $nfsen_hostname);
     }
+
     return $nfsen_hostname;
 }
 
@@ -1583,14 +1612,14 @@ function nfsen_hostname($hostname)
  *
  * Takes a hostname and returns the path to the nfsen
  * live dir.
-*/
+ */
 function nfsen_live_dir($hostname)
 {
-    $hostname=nfsen_hostname($hostname);
+    $hostname = nfsen_hostname($hostname);
 
     foreach (Config::get('nfsen_base') as $base_dir) {
         if (file_exists($base_dir) && is_dir($base_dir)) {
-            return $base_dir.'/profiles-data/live/'.$hostname;
+            return $base_dir . '/profiles-data/live/' . $hostname;
         }
     }
 }

@@ -12,7 +12,7 @@
                     "features": null,
                     "os": "xerox",
                     "type": "printer",
-                    "serial": null,
+                    "serial": "TC101180620073",
                     "icon": "xerox.svg",
                     "location": null
                 }

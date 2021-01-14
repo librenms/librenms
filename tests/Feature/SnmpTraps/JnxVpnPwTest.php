@@ -20,7 +20,6 @@
  *
  * Tests JnxVpnPwDown and JnxVpnPwUp traps from Juniper devices.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -32,14 +31,13 @@ use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class JnxVpnPwTest extends SnmpTrapTestCase
 {
     public function testVpnPwDown()
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create();
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
         $device->ports()->save($port);
 
         $trapText = "$device->hostname
@@ -60,8 +58,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testVpnPwUp()
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create();
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
         $device->ports()->save($port);
 
         $trapText = "$device->hostname

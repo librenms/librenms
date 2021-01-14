@@ -36,8 +36,10 @@ the values we expect to see the data in:
 | snr                             | SNR                         |
 | state                           | #                           |
 | temperature                     | C                           |
+| tv_signal                       | dBmV                        |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
+| percent                         | %                           |
 
 #### Simple health discovery
 
@@ -62,7 +64,7 @@ modules:
     sensors:
         airflow:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: airFlowSensorTable
@@ -456,6 +458,7 @@ Chromatic_dispersion:
 Ber:
 Eer:
 Waterflow:
+Percent:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]

@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2016-2017 VMware, Inc.  All rights reserved.
+-- Copyright 2016-2020 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-NSX-MANAGER-MIB DEFINITIONS ::= BEGIN
@@ -17,7 +17,7 @@ IMPORTS
        FROM VMWARE-ROOT-MIB;
 
      vmwNsxManagerMIB MODULE-IDENTITY
-     LAST-UPDATED "201704270000Z"
+     LAST-UPDATED "202006030001Z"
      ORGANIZATION "VMware, Inc"
      CONTACT-INFO
      "VMware, Inc
@@ -60,7 +60,56 @@ IMPORTS
          To reach NSX Manager Service Composer UI, login to
          vSphere UI(https://<vsphere-ip>)->Networking & Security->Service
          Composer"
+    REVISION     "202006030001Z"
+    DESCRIPTION
+                 "Addition of traps for releases 6.4.7"
+    REVISION     "201907090001Z"
+    DESCRIPTION
+                 "Addition of traps for releases 6.4.6"
+    REVISION     "201902120001Z"
+    DESCRIPTION
+                 "Addition of traps for releases 6.4.5"
+    REVISION     "201805310001Z"
+    DESCRIPTION
+                 "Addition of traps for releases 6.4.2"
+    REVISION     "201804250001Z"
+    DESCRIPTION
+                 "Addition of traps for releases 6.3.7"
+    REVISION     "201803080000Z"
+    DESCRIPTION
+                 "Addition of traps for releases 6.3.6 and 6.4.1."
+    REVISION     "201712080000Z"
+    DESCRIPTION
+                 "Addition of one new trap for capacity dashbard events."
+    REVISION     "201711220000Z"
+    DESCRIPTION
+                 "Addition of one new varbinds : vmwNsxMVxlanHostEvents.
+                  Represents the security events received from host to NSX Manager."
+    REVISION     "201711010000Z"
+    DESCRIPTION
+     "See VMWARE-NSX-MANAGER-AGENTCAP-MIB.mib for Versions of NSX manager which support this MIB version.
+      This file describes all the notifications sent from the NSX Manager appliance. Includes
+      Addition of three new varbinds: vmwNsxMEventSourceID, vmwNsxMEventSourceType and
+      vmwNsxMEventSourceIP
+      to vmwNsxMMessagingConfigFailed, vmwNsxMMessagingConfigFailed, vmwNsxMMessagingReconfigFailed,
+      vmwNsxMMessagingConfigFailedNotifSkip, vmwNsxMMessagingInfraUp, vmwNsxMMessagingInfraDown,
+      vmwNsxMMessagingDisabled, vmwNsxMVxlanControllerDisconnected, vmwNsxMVxlanControllerConnected,
+      vmwNsxMVxlanControllerVmPoweredOn.
+      Represents the Controller VM connected or disconnected, and Controller
+      VM Powered On respectively.
+      WARNING: This mib module will not be backward compatible with next version."
 
+    REVISION     "201707050000Z"
+    DESCRIPTION
+                 "Addition of two new varbinds : vmwNsxMVxlanPortgroupDeleted, vmwNsxMVxlanVDSandPgMismatch.
+                  Represents the Vxlan Port Group Deleted and DVS, Vxlan PG Mismatch respectively."
+    REVISION     "201707030000Z"
+    DESCRIPTION
+                 "Addition of traps for capacity dashboard events."
+    REVISION     "201706010000Z"
+    DESCRIPTION
+                 "Addition of three new varbinds : vmwNsxMEventSourceID, vmwNsxMEventSourceType and vmwNsxMEventSourceIP.
+                  Represents the event source's ID, Type and IP address respectively."
     REVISION     "201704270000Z"
     DESCRIPTION
                "This is the 6.3.0 version of the NSX Manager MIB.
@@ -85,6 +134,33 @@ VmwNsxManagerTypeSeverity ::= TEXTUAL-CONVENTION
     SYNTAX  INTEGER { informational(1), low(2), medium(3), major(4),
     critical(5), high(6) }
 
+VmwNsxManagerSourceID ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "256a"
+   STATUS       current
+   DESCRIPTION
+           "The event sources' IDs for the NSX Manager system event. This data type can be used to
+            specify multiple event source IDs seperated by a semicolon. In NSX Manager, we can have
+            multiple event sources and hence multiple event source IDs."
+   SYNTAX  OCTET STRING (SIZE (0..256))
+
+VmwNsxManagerSourceType ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "256a"
+   STATUS       current
+   DESCRIPTION
+           "The event sources' types for the NSX Manager system event. This data type can be used to
+            specify multiple event source types seperated by a semicolon. In NSX Manager, we can have
+            multiple event sources and hence multiple event source types."
+   SYNTAX  OCTET STRING (SIZE (0..256))
+
+VmwNsxManagerSourceIPAddress ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "256a"
+   STATUS       current
+   DESCRIPTION
+          "The IP address(es) of the source(s) of the NSX Manager event. This data type can be used to
+           specify multiple IP addresses seperated by a semicolon. Using InetAddress and InetAddressType
+           from  INET-ADDRESS-MIB would have been relevant in case there was a single event source.
+           In NSX Manager, we can have multiple event sources and hence multiple IP addresses."
+   SYNTAX  OCTET STRING (SIZE (0..256))
 
 --
 -- Top-level MIB groups
@@ -171,6 +247,30 @@ vmwNsxMCount OBJECT-TYPE
    last 5 minute interval."
    ::= { vmwNsxMAlertData 7 }
 
+vmwNsxMEventSourceID OBJECT-TYPE
+   SYNTAX VmwNsxManagerSourceID
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The object ID(s) of the source(s) of the event."
+   ::= { vmwNsxMAlertData 8 }
+
+vmwNsxMEventSourceType OBJECT-TYPE
+   SYNTAX VmwNsxManagerSourceType
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The object type(s) of the source(s) of the event."
+   ::= { vmwNsxMAlertData 9 }
+
+vmwNsxMEventSourceIP OBJECT-TYPE
+   SYNTAX VmwNsxManagerSourceIPAddress
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The IP address(es) of the source(s) of the event."
+   ::= { vmwNsxMAlertData 10 }
+
 --
 -- Groups related traps
 --
@@ -229,7 +329,10 @@ vmwNsxMSnmpDisabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -249,7 +352,10 @@ vmwNsxMSnmpManagerConfigUpdated NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -284,7 +390,10 @@ vmwNsxMIpAddedBlackList NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -303,7 +412,10 @@ vmwNsxMIpRemovedBlackList NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -320,7 +432,10 @@ vmwNsxMSsoConfigFailure NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -339,7 +454,10 @@ vmwNsxMSsoUnconfigured NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -355,7 +473,10 @@ vmwNsxMUserRoleAssigned NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -371,7 +492,10 @@ vmwNsxMUserRoleUnassigned NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -387,7 +511,10 @@ vmwNsxMGroupRoleAssigned NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -403,7 +530,10 @@ vmwNsxMGroupRoleUnassigned NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -419,7 +549,10 @@ vmwNsxMVcLoginFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -436,7 +569,10 @@ vmwNsxMVcDisconnected NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -453,7 +589,10 @@ vmwNsxMLostVcConnectivity NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -470,7 +609,10 @@ vmwNsxMSsoDisconnected NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -483,6 +625,30 @@ vmwNsxMSsoDisconnected NOTIFICATION-TYPE
    Frequency of traps: Once per disconnect event, default frequency to check
    SSO connection state is 1 hour."
    ::= { vmwNsxMSecurityPrefix 12 }
+
+vmwNsxMSsoTimeout NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "When we try to configure VC on a system where SSO is already configured,
+   we fetch the token to login to the VC using SSO. If it times out during
+   that, this trap is raised.
+   Action required: Try reconnecting to the SSO server and if the service remains
+   unresponsive, try restarting the NSX management service from the NSX appliance
+   management UI. Contact the SSO administrator if the issue persists.
+   Frequency of traps: Whenever we try to configure VC on a system where
+   SSO is already configured."
+   ::= { vmwNsxMSecurityPrefix 13 }
 
 --
 -- Distributed Firewall related traps
@@ -508,7 +674,10 @@ vmwNsxMFltrCnfgUpdateFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -523,7 +692,10 @@ vmwNsxMFltrCnfgNotAppliedToVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -538,7 +710,10 @@ vmwNsxMFltrCnfgAppliedToVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -553,7 +728,10 @@ vmwNsxMFltrCreatedForVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -569,7 +747,10 @@ vmwNsxMFltrDeletedForVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -584,7 +765,10 @@ vmwNsxMFirewallConfigUpdateFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -601,7 +785,10 @@ vmwNsxMFirewallRuleFailedVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -620,7 +807,10 @@ vmwNsxMFirewallRuleAppliedVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -636,7 +826,10 @@ vmwNsxMCntnrCnfgUpdateFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -653,7 +846,10 @@ vmwNsxMFlowMissed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -671,7 +867,10 @@ vmwNsxMSpoofGuardCnfgUpdateFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -688,7 +887,10 @@ vmwNsxMSpoofGuardFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -706,7 +908,10 @@ vmwNsxMSpoofGuardApplied NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -721,7 +926,10 @@ vmwNsxMSpoofGuardDisableFail NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -737,7 +945,10 @@ vmwNsxMSpoofGuardDisabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -752,7 +963,10 @@ vmwNsxMLegacyAppServiceDeletionFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -767,7 +981,10 @@ vmwNsxMFirewallCpuThresholdCrossed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -782,7 +999,10 @@ vmwNsxMFirewallMemThresholdCrossed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -797,7 +1017,10 @@ vmwNsxMConnPerSecThrshldCrossed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -812,7 +1035,10 @@ vmwNsxMFirewallCnfgUpdateTimedOut NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -829,7 +1055,10 @@ vmwNsxMSpoofGuardCnfgUpdateTmOut NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -846,7 +1075,10 @@ vmwNsxMFirewallPublishFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -862,7 +1094,10 @@ vmwNsxMCntnrUpdatePublishFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -878,7 +1113,10 @@ vmwNsxMSpoofGuardUpdatePublishFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -893,7 +1131,10 @@ vmwNsxMExcludeListPublishFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -908,7 +1149,10 @@ vmwNsxMFirewallCnfgUpdateOnDltCntnr NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -925,7 +1169,10 @@ vmwNsxMHostSyncFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -940,7 +1187,10 @@ vmwNsxMHostSynced NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -955,7 +1205,10 @@ vmwNsxMFirewallInstalled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -969,7 +1222,10 @@ vmwNsxMFirewallInstallFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -984,7 +1240,10 @@ vmwNsxMFirewallClusterInstalled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -998,7 +1257,10 @@ vmwNsxMFirewallClusterUninstalled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1012,7 +1274,10 @@ vmwNsxMFirewallClusterDisabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1026,7 +1291,10 @@ vmwNsxMFirewallForceSyncClusterFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1043,7 +1311,10 @@ vmwNsxMFirewallForceSyncClusterSuccess NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1058,7 +1329,10 @@ vmwNsxMFirewallVsfwdProcessStarted NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1073,7 +1347,10 @@ vmwNsxMFirewallRulesetApplyAllFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1089,7 +1366,10 @@ vmwNsxMFirewallRulesetAppliedAll NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1104,7 +1384,10 @@ vmwNsxMCntnrCnfgApplyFailedToVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1120,7 +1403,10 @@ vmwNsxMCntnrCnfgApplyAllFailedToVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1136,7 +1422,10 @@ vmwNsxMCntnrCnfgAppliedAllToVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1151,7 +1440,10 @@ vmwNsxMSpoofGuardApplyAllFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1169,7 +1461,10 @@ vmwNsxMSpoofGuardAppliedAll NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1184,7 +1479,10 @@ vmwNsxMFirewallTimeoutUpdateFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1199,7 +1497,10 @@ vmwNsxMFirewallTimeoutApplyFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1214,7 +1515,10 @@ vmwNsxMFirewallTimeoutApplied NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1229,7 +1533,10 @@ vmwNsxMFirewallTimeoutApplyAllFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1244,7 +1551,10 @@ vmwNsxMFirewallTimeoutAppliedAll NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -1259,13 +1569,197 @@ vmwNsxMCntnrCnfgAppliedToVnic NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
    "Successfully applied container config to all vnics.
    Action required: None."
    ::= { vmwNsxMFirewallPrefix 49 }
+
+vmwNsxMFirewallMaxConcurrentConnectionsThresholdCrossed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd maximum concurrent connections threshold was exceeded for the specified vnic.
+   Reduce the amount of traffic on the vnic in question."
+   ::= { vmwNsxMFirewallPrefix 50 }
+
+vmwNsxMFirewallProcessMemoryThresholdCrossed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd memory utilization threshold was exceeded for the specified process.
+   Reduce the number of rules or containers in firewall config. If persists, there may be memory leaks in the process so restarting it may be necessary."
+   ::= { vmwNsxMFirewallPrefix 51 }
+
+vmwNsxMFirewallCpuThresholdCrossCleared NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd CPU usage is back to below threshold level.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 52 }
+
+vmwNsxMFirewallMemThresholdCrossCleared NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd heap memory usage is back to below threshold level for the specified heap.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 53 }
+
+vmwNsxMConnPerSecThrshldCrossCleared NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd Connectons Per Second (CPS) is back to below threshold level for the specified vnic.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 54 }
+
+vmwNsxMFirewallMaxConcurrentConnectionsThresholdCrossCleared NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd maximum concurrent connections is back to below threshold level for the specified vnic.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 55 }
+
+vmwNsxMFirewallProcessMemoryThresholdCrossCleared NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd memory utilization is back to below threshold level for the specified process.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 56 }
+
+vmwNsxMFirewallThresholdConfigApplied NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "Successfully applied all threshold config.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 57 }
+
+vmwNsxMFirewallThresholdConfigApplyFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "Firewall threshold configuration apply failed. Certain threshold values are unchanged. Contextual data provided with this event may indicate the cause of this failure. Collect error logs (vsfwd.log) when the host received firewall config. Force sync firewall config using ForceSync API/UI. See kb.vmware.com/kb/2125437 .
+   If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and http://kb.vmware.com/kb/653."
+   ::= { vmwNsxMFirewallPrefix 58 }
+
+vmwNsxMUnsupportedIPsetConfigured NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "Whenever an IP address 0.0.0.0 or 0.0.0.0/32 is configured as IPSet.
+   KB article: https://ikb.vmware.com/kb/53157
+   Action: Information-only event. No action required. Workaround to this issue documented in KB article."
+   ::= { vmwNsxMFirewallPrefix 59 }
 
 --
 -- Edge related traps
@@ -1291,7 +1785,9 @@ vmwNsxMEdgeNoVmServing NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1308,8 +1804,10 @@ vmwNsxMEdgeGatewayCreated NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
-    }
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
    STATUS current
    DESCRIPTION
    "Edge Gateway created.
@@ -1323,7 +1821,9 @@ vmwNsxMEdgeVmBadState NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1340,7 +1840,9 @@ vmwNsxMEdgeVmCommFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1356,7 +1858,9 @@ vmwNsxMEdgeVmCnfgChanged NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1372,7 +1876,9 @@ vmwNsxMEdgeGatewayDeleted NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1387,7 +1893,9 @@ vmwNsxMEdgeGatewayReDeployed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1402,7 +1910,9 @@ vmwNsxMEdgeVmPowerOff NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1417,7 +1927,9 @@ vmwNsxMEdgeApplianceSizeChanged NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1433,7 +1945,9 @@ vmwNsxMEdgeUpgrade51x NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1449,7 +1963,9 @@ vmwNsxMEdgeLicenseChanged NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1465,7 +1981,9 @@ vmwNsxMEdgeApplianceMoved NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1480,7 +1998,9 @@ vmwNsxMEdgeApplianceNotFound NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1496,7 +2016,9 @@ vmwNsxMEdgeVMHealthCheckMiss NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1513,7 +2035,9 @@ vmwNsxMEdgeHealthCheckMiss NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1530,7 +2054,9 @@ vmwNsxMEdgeCommAgentNotConnected NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1546,7 +2072,9 @@ vmwNsxMApplianceWithDifferentId NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1562,7 +2090,9 @@ vmwNsxMFirewallRuleModified NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1577,7 +2107,9 @@ vmwNsxMEdgeAntiAffinityRuleViolated NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1595,7 +2127,9 @@ vmwNsxMEdgeHaEnabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1611,7 +2145,9 @@ vmwNsxMEdgeHaDisabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1627,7 +2163,9 @@ vmwNsxMEdgeGatewayRecovered NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1643,7 +2181,9 @@ vmwNsxMEdgeVmRecovered NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1659,7 +2199,9 @@ vmwNsxMEdgeGatewayUpgraded NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1674,7 +2216,9 @@ vmwNsxMEdgeVmHlthChkDisabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1694,7 +2238,9 @@ vmwNsxMEdgePrePublishFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1711,7 +2257,9 @@ vmwNsxMEdgeForcedSync NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1726,7 +2274,9 @@ vmwNsxMEdgeVmBooted NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1741,7 +2291,9 @@ vmwNsxMEdgeVmInBadState NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1757,7 +2309,9 @@ vmwNsxMEdgeVmCpuUsageIncreased NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1774,7 +2328,9 @@ vmwNsxMEdgeVmMemUsageIncreased NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1791,7 +2347,9 @@ vmwNsxMEdgeVmProcessFailure NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1808,7 +2366,9 @@ vmwNsxMEdgeVmSysTimeBad NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1823,7 +2383,9 @@ vmwNsxMEdgeVmSysTimeSync NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1838,7 +2400,9 @@ vmwNsxMEdgeAesniCryptoEngineUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1853,7 +2417,9 @@ vmwNsxMEdgeAesniCryptoEngineDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1868,7 +2434,9 @@ vmwNsxMEdgeVmOom NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1884,7 +2452,9 @@ vmwNsxMEdgeFileSysRo NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1900,7 +2470,9 @@ vmwNsxMEdgeHaCommDisconnected NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1918,7 +2490,9 @@ vmwNsxMEdgeHaSwitchOverSelf NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1942,7 +2516,9 @@ vmwNsxMEdgeHaSwitchOverActive NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1964,7 +2540,9 @@ vmwNsxMEdgeHaSwitchOverStandby NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -1987,7 +2565,9 @@ vmwNsxMEdgeMonitorProcessFailure NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2003,7 +2583,9 @@ vmwNsxMLbVirtualServerPoolUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2019,7 +2601,9 @@ vmwNsxMLbVirtualServerPoolDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2034,7 +2618,9 @@ vmwNsxMLbVirtualServerPoolWrong NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2049,7 +2635,9 @@ vmwNsxMLbPoolWarning NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2064,7 +2652,9 @@ vmwNsxMIpsecChannelUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2079,7 +2669,9 @@ vmwNsxMIpsecChannelDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2094,7 +2686,9 @@ vmwNsxMIpsecTunnelUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2109,7 +2703,9 @@ vmwNsxMIpsecTunnelDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2124,7 +2720,9 @@ vmwNsxMIpsecChannelUnknown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2140,7 +2738,9 @@ vmwNsxMIpsecTunnelUnknown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2155,7 +2755,9 @@ vmwNsxMGlobalLbMemberUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2171,7 +2773,9 @@ vmwNsxMGlobalLbMemberWarning NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2186,7 +2790,9 @@ vmwNsxMGlobalLbMemberDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2201,7 +2807,9 @@ vmwNsxMGlobalLbMemberUnknown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2216,7 +2824,9 @@ vmwNsxMGlobalLbPeerUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2232,7 +2842,9 @@ vmwNsxMGlobalLbPeerDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2247,7 +2859,9 @@ vmwNsxMDhcpServiceDisabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2262,7 +2876,9 @@ vmwNsxMEdgeResourceReservationFailure NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2284,7 +2900,9 @@ vmwNsxMEdgeSplitBrainDetected NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2305,7 +2923,9 @@ vmwNsxMEdgeSplitBrainRecovered NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2324,7 +2944,9 @@ vmwNsxMEdgeSplitBrainRecoveryAttempt NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2340,7 +2962,9 @@ vmwNsxMEdgeResourceReservationSuccess NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2354,7 +2978,7 @@ vmwNsxMEdgeResourceReservationSuccess NOTIFICATION-TYPE
    Home > Hosts and Clusters > [Cluster-name] > Monitor > Resource Reservation.
    Action required: None"
    ::= { vmwNsxMEdgePrefix 65 }
-
+   
 vmwNsxMEdgeSddcChannelUp NOTIFICATION-TYPE
    OBJECTS {
       vmwNsxMEventCode,
@@ -2362,7 +2986,9 @@ vmwNsxMEdgeSddcChannelUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2379,7 +3005,9 @@ vmwNsxMEdgeSddcChannelDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2392,6 +3020,332 @@ vmwNsxMEdgeSddcChannelDown NOTIFICATION-TYPE
    ::= { vmwNsxMEdgePrefix 67 }
 
 
+vmwNsxMEdgeDuplicateIpDetected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "The NSX Edge IP has been assigned to another device on the network. MAC address of the conflicting device is provided.
+   Action required: Change the IP address of the other device on network.
+   Frequency: Once when the Edge detects the duplication of its IP by another macAddress in the same network.
+   URL: Nil"
+   ::= { vmwNsxMEdgePrefix 68 }
+
+
+vmwNsxMEdgeDuplicateIpResolved NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Edge Duplicate IP address issue is resolved.
+   Action required: None
+   Frequency: Once when the Edge detects the duplication is resolved
+   URL: Nil"
+   ::= { vmwNsxMEdgePrefix 69 }
+
+vmwNsxMEdgeBgpNeighborUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when BGP neighbor is up.
+    BGP neighbor IP address in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 70 }
+
+vmwNsxMEdgeBgpNeighborDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   
+   "Raised when BGP neighbor is down. Once per neighbor.
+    BGP neighbor IP address in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 71 }
+
+vmwNsxMEdgeBgpNeighborASMismatch NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when there is a mismatch in AS number configured. Raised repeatedly when BGP neighbor is getting established.
+    BGP neighbor IP address in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: Correct the configured AS number"
+   ::= { vmwNsxMEdgePrefix 72 }
+
+vmwNsxMEdgeOSPFNeighborUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when OSPF neighbor is up.
+    OSPF router Id in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 73 }
+
+vmwNsxMEdgeOSPFNeighborDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when OSPF neighbor is down.
+   OSPF router Id in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 74 }
+
+vmwNsxMEdgeOSPFNeighborMTUMismatch NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when there is a MTU mismatch in neighbor ship request.
+    OSPF router Id in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: Correct the MTU configured."
+   ::= { vmwNsxMEdgePrefix 75 }
+
+vmwNsxMEdgeOSPFNeighborAreaIdMisMatch NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when there is a areaId mismatch in neighbor ship request.
+    OSPF router Id in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: Correct the areaId configured."
+   ::= { vmwNsxMEdgePrefix 76 }
+
+vmwNsxMEdgeOSPFNeighborHelloTimerMisMatch NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when there is hello timer mismatch in neighbor ship request.
+    OSPF router Id in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: Correct the hello timer configured."
+   ::= { vmwNsxMEdgePrefix 77 }
+
+vmwNsxMEdgeOSPFNeighborDeadTimerMisMatch NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when there is dead timer mismatch in neighbor ship request.
+    OSPF router Id in the eventSourceId tells us for which neighbor this event is getting raised.
+   Action required: Correct the dead timer configured."
+   ::= { vmwNsxMEdgePrefix 78 }
+
+vmwNsxMEdgeL2vpnTunnelUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when the l2vpn tunnel is up.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 79 }
+
+vmwNsxMEdgeL2vpnTunnelDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when the l2vpn tunnel is down.
+    We can debug why the l2vpn tunnel is down using the following cli commands,
+    show service l2vpn,
+    show configuration l2vpn,
+    show service l2vpn bridge
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 80 }
+
+vmwNsxMEdgeHAForceStandbyRemoved NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "A notification generated when forced standby for edge
+   enforced by NSX Manager gets removed.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 81 }
+
+vmwNsxMEdgeHAForceStandbyRemovalFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when the force standby removal for edge failed.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 82 }
+
+
+vmwNsxMEdgeVmBADStateRecovered NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when edge VM is recovered from bad state.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 83 }
+
+vmwNsxMEdgeVmBADStateAutoHealRecoveryDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+
+   "Raised when VM can not be recovered from bad state after system specified retry of auto recovery ForceSync operation.
+   Action required: Trigger force sync to recover edge VM from bad state. To trigger force sync from UI see
+   (https://docs.vmware.com/en/VMware-NSX-for-vSphere/6.2/com.vmware.nsx.admin.doc/GUID-21FF2937-4CDF-491C-933E-8F44E21ED55E.html)
+   or call the API (POST https://<nsx-manager-host>/api/4.0/edges/<edge-id>?action=forcesync)"
+   ::= { vmwNsxMEdgePrefix 84 }
+
 vmwNsxMEdgeHaInUseVnicChanged NOTIFICATION-TYPE
    OBJECTS {
       vmwNsxMEventCode,
@@ -2399,7 +3353,9 @@ vmwNsxMEdgeHaInUseVnicChanged NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
    }
    STATUS current
    DESCRIPTION
@@ -2409,6 +3365,182 @@ vmwNsxMEdgeHaInUseVnicChanged NOTIFICATION-TYPE
    have changed.
    Action required: None."
    ::= { vmwNsxMEdgePrefix 85 }
+
+vmwNsxMEdgeHaCommConnected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge HighAvailability
+   communication channel is established with peer node.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 86 }
+
+vmwNsxMEdgeVmRenameFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Raised when Edge VM rename operation failed.
+   Given Edge name has invalid characters or exceeds
+   maximum number of characters permitted. There is
+   no functionality effect on the Edge. User may
+   choose a shorter name and rename the Edge.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 87 }
+
+vmwNsxMEdgeBgpNeighborshipError NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Raised when something goes wrong in neighborship establishment.
+   Error message will have error code and sub error code. BGP neighbor IP
+   address in the eventSourceId tells us for which neighbor this event is
+   getting raised.
+   vmwNsxMEventMessage for example will contain following details:
+   (Error when establishing BGP neighborship with neighbor 10.20.30.40
+   having AS number 1201 with error code 6, error sub code 5.)
+   Action required: The error code given in message are standard error codes.
+   Act accordingly as per the error codes."
+   ::= { vmwNsxMEdgePrefix 88 }
+
+vmwNsxMEdgeVmBadStateNotRecovered NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Raised when failed to recover NSX Edge VM from Bad State after force sync.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 89 }
+
+vmwNsxMEdgeVmDcnOutOfSync NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Raised when GroupingObject sync is timed out on NSX Edge VM.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 90 }
+
+vmwNsxMEdgeConsumedResourcesMissingInInventory NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Raised when missing or deleted resources from inventory are found used
+   in NSX Edges.
+   Action required: Please reconfigure these NSX Edges to use existing
+   resources. Refer to NSX Manager logs for the complete list of missing
+   resources."
+   ::= { vmwNsxMEdgePrefix 91 }
+
+
+vmwNsxMEdgeIpsecDeprecatedComplianceSuiteInUse NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Raised when a deprecated compliance suite is used in an IPSec site in
+   NSX Edges.
+   Action required: Please reconfigure IPSec site to use supported
+   compliance suite."
+   ::= { vmwNsxMEdgePrefix 92 }
+
+vmwNsxMEdgeConnectedToMultipleTZHavingSameClusters NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Raised when a NSX Distributed Logical Router is connected to multiple
+   transport zones having same clusters.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 93 }
+
+vmwNsxMEdgeConnectedToMultipleTZHavingDifferentClusters NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Raised when a NSX Distributed Logical Router is connected to multiple
+   transport zones having different clusters. This may cause network
+   disruption on clusters which are not common to all transport zones.
+   Action required: Please fix the configuration by either reconfiguring
+   transport zones to have same clusters or by connecting NSX Distributed
+   Logical Router to a single transport zone."
+   ::= { vmwNsxMEdgePrefix 94 }
 
 --
 -- Endpoint related traps
@@ -2434,7 +3566,10 @@ vmwNsxMEndpointThinAgentEnabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2448,7 +3583,10 @@ vmwNsxMGuestIntrspctnEnabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2463,7 +3601,10 @@ vmwNsxMGuestIntrspctnIncompatibleEsx NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2478,7 +3619,10 @@ vmwNsxMGuestIntrspctnEsxConnFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2493,7 +3637,10 @@ vmwNsxMGuestIntrspctnStatusRcvFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2508,7 +3655,10 @@ vmwNsxMEsxModuleEnabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2522,7 +3672,10 @@ vmwNsxMEsxModuleUninstalled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2536,7 +3689,10 @@ vmwNsxMGuestIntrspctnHstMxMssngRep NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2551,7 +3707,10 @@ vmwNsxMEndpointUndefined NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2582,7 +3741,10 @@ vmwNsxMEamGenericAlarm NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2617,7 +3779,10 @@ vmwNsxMFabricDplymntStatusChanged NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2637,7 +3802,10 @@ vmwNsxMFabricDplymntUnitCreated NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2655,7 +3823,10 @@ vmwNsxMFabricDplymntUnitUpdated NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2673,7 +3844,10 @@ vmwNsxMFabricDplymntUnitDestroyed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2690,7 +3864,10 @@ vmwNsxMDataStoreNotCnfgrdOnHost NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2708,7 +3885,10 @@ vmwNsxMFabricDplymntInstallationFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2728,7 +3908,10 @@ vmwNsxMFabricAgentCreated NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2745,7 +3928,10 @@ vmwNsxMFabricAgentDestroyed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2762,7 +3948,10 @@ vmwNsxMFabricSrvceNeedsRedplymnt NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2781,7 +3970,10 @@ vmwNsxMUpgradeOfDplymntFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2802,7 +3994,10 @@ vmwNsxMFabricDependenciesNotInstalled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2819,7 +4014,10 @@ vmwNsxMFabricErrorNotifSecBfrUpgrade NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2837,7 +4035,10 @@ vmwNsxMFabricErrCallbackNtRcvdUpgrade NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2856,7 +4057,10 @@ vmwNsxMFabricErrCallbackNtRcvdUninstall NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2874,7 +4078,10 @@ vmwNsxMFabricUninstallServiceFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2893,7 +4100,10 @@ vmwNsxMFabricErrorNotifSecBfrUninstall NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2912,7 +4122,10 @@ vmwNsxMFabricServerRebootUninstall NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2930,7 +4143,10 @@ vmwNsxMFabricServerRebootUpgrade NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2948,7 +4164,10 @@ vmwNsxMFabricConnEamFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2969,7 +4188,10 @@ vmwNsxMFabricConnEamRestored NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -2987,7 +4209,10 @@ vmwNsxMFabricPreUninstallCleanUpFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3003,7 +4228,10 @@ vmwNsxMFabricBackingEamNotFound NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3015,6 +4243,46 @@ vmwNsxMFabricBackingEamNotFound NOTIFICATION-TYPE
    backing agency exists in EAM, else delete the deployment entry from NSX.
    Frequency of traps: Once per cluster."
    ::= { vmwNsxMFabricPrefix 22 }
+
+vmwNsxMFabricVibManualInstallationRequired NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "This trap is generated when an attempt is made to upgrade or uninstall
+    NSX vibs on stateless host using EAM. All stateless host should be
+    prepared using the auto deploy feature (Refer : https://kb.vmware.com/s/article/2005131).
+    Fix configuration using auto deploy feature and use the resolve API to resolve the alarm.
+   Action required: Use the resolve API to resolve the alarm.
+   Frequency of traps: Once per host."
+   ::= { vmwNsxMFabricPrefix 23 }
+
+vmwNsxMFabricUninstallDeploymentUnit NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "Deployment unit fabric state is UNINSTALLED and health Status is SUCCEEDED. Resolve this alarm to complete uninstallation.
+   Frequency of traps: Once per cluster."
+   ::= { vmwNsxMFabricPrefix 24 }
 
 --
 -- DeploymentPlugin related traps
@@ -3041,7 +4309,10 @@ vmwNsxMDepPluginIpPoolExhausted NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3066,7 +4337,10 @@ vmwNsxMDepPluginGenericAlarm NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3084,7 +4358,10 @@ vmwNsxMDepPluginGenericException NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3102,7 +4379,10 @@ vmwNsxMDepPluginVmReboot NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3137,7 +4417,10 @@ vmwNsxMMessagingConfigFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3152,7 +4435,10 @@ vmwNsxMMessagingReconfigFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3167,7 +4453,10 @@ vmwNsxMMessagingConfigFailedNotifSkip NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3182,7 +4471,10 @@ vmwNsxMMessagingInfraUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3204,7 +4496,10 @@ vmwNsxMMessagingInfraDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3225,7 +4520,10 @@ vmwNsxMMessagingDisabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3266,7 +4564,10 @@ vmwNsxMServiceComposerPolicyOutOfSync NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3288,7 +4589,10 @@ vmwNsxMServiceComposerPolicyDeleted NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3306,7 +4610,10 @@ vmwNsxMServiceComposerFirewallPolicyOutOfSync NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3329,7 +4636,10 @@ vmwNsxMServiceComposerNetworkPolicyOutOfSync NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3353,7 +4663,10 @@ vmwNsxMServiceComposerGuestPolicyOutOfSync NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3377,7 +4690,10 @@ vmwNsxMServiceComposerOutOfSync NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3400,7 +4716,10 @@ vmwNsxMServiceComposerOutOfSync NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3422,7 +4741,10 @@ vmwNsxMServiceComposerOutOfSyncDraftRollback NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3443,7 +4765,10 @@ vmwNsxMServiceComposerOutOfSyncSectionDeletionFailure NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3465,7 +4790,10 @@ vmwNsxMServiceComposerOutOfSyncPrecedenceChangeFailure NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3487,7 +4815,10 @@ vmwNsxMServiceComposerOutOfSyncDraftSettingFailure NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3525,7 +4856,10 @@ vmwNsxMInconsistentSvmAlarm NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3549,7 +4883,10 @@ vmwNsxMSvmRestartAlarm NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3571,7 +4908,10 @@ vmwNsxMSvmAgentUnavailable NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3606,7 +4946,10 @@ vmwNsxMVmAddedToSg NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3621,7 +4964,10 @@ vmwNsxMVmRemovedFromSg NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3654,7 +5000,10 @@ vmwNsxMFullUniversalSyncFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3674,7 +5023,10 @@ vmwNsxMSecondaryDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3693,7 +5045,10 @@ vmwNsxMUniversalSyncFailedForEntity NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3706,6 +5061,46 @@ vmwNsxMUniversalSyncFailedForEntity NOTIFICATION-TYPE
    a NSX manager on which sync failure is seen."
    ::= { vmwNsxMUniversalSyncPrefix 3 }
 
+vmwNsxMUniversalSyncStoppedOnSecondary NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "Secondary NSX manager is no longer receiving periodic universal sync updates.
+   IP address of the NSX manager is present in event's message variable.
+   Action required: Kindly check NSX manager logs and universal configuration on
+   the primary NSX manager to check if the secondary NSX manager has got removed.
+   Frequency of traps: This trap is generated one every 4 hours if secondary NSX
+   manager has not received universal sync updates for more than 4 hours."
+   ::= { vmwNsxMUniversalSyncPrefix 4 }
+
+vmwNsxMUniversalSyncResumedOnSecondary NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "Secondary NSX manager has resumed receiving periodic universal sync updates.
+   Frequency of traps: This trap is generated whenever communication between
+   primary and secondary managers resumes."
+   ::= { vmwNsxMUniversalSyncPrefix 5 }
 --
 -- AsyncRest related traps
 --
@@ -3730,7 +5125,10 @@ vmwNsxMServerUp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3765,7 +5163,10 @@ vmwNsxMExtensionRegistered NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3784,7 +5185,10 @@ vmwNsxMExtensionUpdated NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3869,7 +5273,10 @@ vmwNsxMSamDataCollectionEnabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3886,7 +5293,10 @@ vmwNsxMSamDataCollectionDisabled NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3904,7 +5314,10 @@ vmwNsxMSamDataStoppedFlowing NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3926,7 +5339,10 @@ vmwNsxMSamDataResumedFlowing NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3959,7 +5375,10 @@ vmwNsxMUsvmHeartbeatStopped NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3977,7 +5396,10 @@ vmwNsxMUsvmHeartbeatResumed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -3994,7 +5416,10 @@ vmwNsxMUsvmReceivedHello NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4028,7 +5453,10 @@ vmwNsxMUpgradeSuccess NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4043,7 +5471,10 @@ vmwNsxMRestoreSuccess NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4058,7 +5489,10 @@ vmwNsxMDuplicateIp NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4068,6 +5502,47 @@ vmwNsxMDuplicateIp NOTIFICATION-TYPE
    address is being used by another machine in the same network"
    ::= { vmwNsxMVsmCorePrefix 3 }
 
+vmwNsxMCPUHigh NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager CPU usage is currently high.CPU usage is based on load across all cores.
+   Action: If NSX Manager is facing performance issue, please collect the technical
+   support logs for NSX Manager and the host, and contact VMware technical support.
+   Frequency: This is triggered whenever NSX Manager CPU is above high threshold for consecutive 5 intervals.
+   Default value of high threshold and interval are 80% and 1 minute respectively."
+   ::= { vmwNsxMVsmCorePrefix 12 }
+
+vmwNsxMCPUNormal NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager CPU usage is back to normal.CPU usage is based on load across all cores.
+   Action: None
+   Frequency: This is triggered whenever NSX Manager CPU is below high threshold after 1 interval from CPU being above high threshold.
+   Default value of high threshold and interval are 80% and 1 minute respectively."
+   ::= { vmwNsxMVsmCorePrefix 13 }
+
 vmwNsxMVirtualMachineMarkedAsSystemResource NOTIFICATION-TYPE
    OBJECTS {
       vmwNsxMEventCode,
@@ -4075,7 +5550,10 @@ vmwNsxMVirtualMachineMarkedAsSystemResource NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4092,7 +5570,10 @@ vmwNsxMScaleAboveSupportedLimits NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4108,7 +5589,10 @@ vmwNsxMScaleAboveThreshold NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4117,6 +5601,7 @@ vmwNsxMScaleAboveThreshold NOTIFICATION-TYPE
     Frequency: This is triggered every hour if any new parameters cross the set threshold value"
    ::= { vmwNsxMVsmCorePrefix 6 }
 
+
 vmwNsxMScaleNormalized NOTIFICATION-TYPE
    OBJECTS {
       vmwNsxMEventCode,
@@ -4124,7 +5609,10 @@ vmwNsxMScaleNormalized NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4132,6 +5620,61 @@ vmwNsxMScaleNormalized NOTIFICATION-TYPE
     Action: No action required.
     Frequency: This is triggered every hour if any new parameters return to normal after being above the set threshold or the supported value"
    ::= { vmwNsxMVsmCorePrefix 7 }
+
+vmwNsxMScaleNotEqualToRecommendedValue NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "The scale value(s) of the mentioned parameter(s) is not matching the recommended value
+    Action: Increase/Decrease number of objects  for the parameter(s) mentioned, to match with recommended value. Please refer NSX Administration guide.
+    Frequency: This is triggered every hour if any new parameters does not match the recommended value"
+   ::= { vmwNsxMVsmCorePrefix 8 }
+
+vmwNsxMCertificateExpired NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Certificate with mentioned id has expired.
+    Action: Replace expired certificate. Please refer to NSX Administration and API guide for details on certificate related operations.
+    Frequency: This is triggered every day until expired certificate is replaced."
+   ::= { vmwNsxMVsmCorePrefix 10 }
+
+vmwNsxMCertificateAboutToExpire NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType
+   }
+   STATUS current
+   DESCRIPTION
+   "Certificate with mentioned id will expire on mentioned date.
+   Action: Replace expiring certificate. Please refer to NSX Administration and API guide for details on certificate related operations.
+    Frequency: This is triggered every day until expiring certificate is replaced."
+   ::= { vmwNsxMVsmCorePrefix 11 }
 
 --
 -- Vxlan related traps
@@ -4157,7 +5700,10 @@ vmwNsxMVxlanLogicalSwitchImproperlyCnfg NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4183,7 +5729,10 @@ vmwNsxMVxlanLogicalSwitchProperlyCnfg NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4202,7 +5751,10 @@ vmwNsxMVxlanInitFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4221,7 +5773,10 @@ vmwNsxMVxlanPortInitFailed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4240,7 +5795,10 @@ vmwNsxMVxlanInstanceDoesNotExist NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4260,7 +5818,10 @@ vmwNsxMVxlanLogicalSwitchWrkngImproperly NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4282,7 +5843,10 @@ vmwNsxMVxlanTransportZoneIncorrectlyWrkng NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4298,7 +5862,10 @@ vmwNsxMVxlanTransportZoneNotUsed NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4316,7 +5883,10 @@ vmwNsxMVxlanOverlayClassMissingOnDvs NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4336,7 +5906,10 @@ vmwNsxMVxlanControllerRemoved NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4352,7 +5925,10 @@ vmwNsxMVxlanControllerConnProblem NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4371,7 +5947,10 @@ vmwNsxMVxlanControllerInactive NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4392,7 +5971,10 @@ vmwNsxMVxlanControllerActive NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4411,7 +5993,10 @@ vmwNsxMVxlanVmknicMissingOrDeleted NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4431,7 +6016,10 @@ vmwNsxMVxlanInfo NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4455,7 +6043,10 @@ vmwNsxMVxlanVmknicPortGrpMissing NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4475,7 +6066,10 @@ vmwNsxMVxlanVmknicPortGrpAppears NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4493,7 +6087,10 @@ vmwNsxMVxlanConnDown NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4526,7 +6123,10 @@ vmwNsxMBackingPortgroupMissing NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4547,7 +6147,10 @@ vmwNsxMBackingPortgroupReappears NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4565,7 +6168,10 @@ vmwNsxMManagedObjectIdChanged NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4583,7 +6189,10 @@ vmwNsxMHighLatencyOnDisk NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4603,7 +6212,10 @@ vmwNsxMHighLatencyOnDiskResolved NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4620,7 +6232,10 @@ vmwNsxMControllerVmPoweredOff NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4643,7 +6258,10 @@ vmwNsxMControllerVmDeleted NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4666,7 +6284,10 @@ vmwNsxMVxlanConfigNotSet NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4687,7 +6308,10 @@ vmwNsxMVxlanPortgroupDeleted NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
@@ -4707,13 +6331,16 @@ vmwNsxMVxlanVDSandPgMismatch NOTIFICATION-TYPE
       vmwNsxMEventMessage,
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
-      vmwNsxMUuid
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
    }
    STATUS current
    DESCRIPTION
    "DESCRIPTION: NSX Manager will raise this event when the teaming policies of
    a VDS and it's associated VXLAN portgroup are not the same.
-   ACTION: Set the VXLAN portgroup teaming policy back to the original value.
+   ACTION: Set the VXLAN portgroup teaming policy back to the original value. 
    Below is the workaround to correctly update the teaming policy in a deployed
    cluster: The supported method to correct teaming policy inconsistencies is
    to create and prepare a new NSX cluster with the required teaming policy,
@@ -4725,6 +6352,95 @@ vmwNsxMVxlanVDSandPgMismatch NOTIFICATION-TYPE
    AFFECTS: The VXLAN traffic on the switch may be interrupted."
    ::= { vmwNsxMVxlanPrefix 28 }
 
+vmwNsxMVxlanControllerDisconnected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "DESCRIPTION: NSX Manager raises this event when the Controller VM is
+   Disconnected ie the controller can not reached from the NSX Manager.
+   ACTION: Make sure the IP is assigned to the controller VM and it is
+   reachable form the NSX Manager.
+   FREQUENCY: The event occurs when the Controller VM is powered off or not responding.
+   Minimum 40 secs between two disconnecet events.
+   AFFECTS: Controller cluster status might go to disconnected if a controller
+   Virtual Machine is disconnected. Any operation that requires an active
+   Controller Cluster may be affected."
+   ::= { vmwNsxMVxlanPrefix 29 }
+
+vmwNsxMVxlanControllerConnected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "DESCRIPTION: NSX Manager will raise this informational event when the
+   controller VM is connected to controller cluster.
+   ACTION: No action to be taken.
+   FREQUENCY: Event occurs as controller is connected to controller-cluster.
+   Minimum 40 secs between two connecet events.
+   AFFECTS: None."
+   ::= { vmwNsxMVxlanPrefix 30 }
+
+vmwNsxMVxlanControllerVmPoweredOn NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "DESCRIPTION: NSX manager detected a Controller Virtual Machine is powered on from vCenter.
+   ACTION: None.
+   FREQUENCY: This event occurs when Controller Virtual Machine is powered On.
+   AFFECTS: Controller cluster status might go to disconnected if a controller Virtual Machine
+   is powered off. Any operation that requires an active Controller Cluster may be affected."
+   ::= { vmwNsxMVxlanPrefix 31 }
+
+vmwNsxMVxlanHostEvents NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
+   }
+   STATUS current
+   DESCRIPTION
+   "DESCRIPTION: NSX manager receives a notification from the host informing MAC mismatch occurred.
+   ACTION: Contact the administrator to take following action:
+            (1) Look for VMs that caused this issue at hosts.
+            (2) If VMs are rouge, shut dowm these VMs.
+   FREQUENCY: Event is triggerred as MAC mismatch occurs at switchport on the hosts.
+   AFFECTS: Identify the VMs causing this issue."
+   ::= { vmwNsxMVxlanPrefix 32 }
 
 --
 --  Domain Controller Event Log server related trap
@@ -4837,13 +6553,13 @@ vmwNsxManagerMIBGroups OBJECT IDENTIFIER ::= { vmwNsxManagerMIBConformance 2 }
 
 -- compliance statements
 vmwNsxManagerMIBBasicCompliance MODULE-COMPLIANCE
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
         "The compliance statement for entities which implement
         VMWARE-NSX-MANAGER-MIB."
     MODULE -- this module
     MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
-                             vmwNsxManagerNotificationGroup1 }
+                       vmwNsxManagerNotificationGroup1 }
     ::= { vmwNsxManagerMIBCompliances 3 }
 
 vmwNsxManagerNotificationInfoGroup1 OBJECT-GROUP
@@ -4854,7 +6570,10 @@ vmwNsxManagerNotificationInfoGroup1 OBJECT-GROUP
       vmwNsxMEventSeverity,
       vmwNsxMEventComponent,
       vmwNsxMUuid,
-      vmwNsxMCount
+      vmwNsxMCount,
+      vmwNsxMEventSourceID,
+      vmwNsxMEventSourceType,
+      vmwNsxMEventSourceIP
     }
     STATUS current
     DESCRIPTION
@@ -5000,6 +6719,7 @@ vmwNsxManagerNotificationGroup1 NOTIFICATION-GROUP
        vmwNsxMFabricConnEamRestored,
        vmwNsxMFabricPreUninstallCleanUpFailed,
        vmwNsxMFabricBackingEamNotFound,
+       vmwNsxMFabricUninstallDeploymentUnit,
        vmwNsxMDepPluginIpPoolExhausted,
        vmwNsxMDepPluginGenericAlarm,
        vmwNsxMDepPluginGenericException,
@@ -5096,7 +6816,7 @@ vmwNsxManagerNotificationGroup1 NOTIFICATION-GROUP
 
 
 vmwNsxManagerMIB630Compliance MODULE-COMPLIANCE
-    STATUS     current
+    STATUS     deprecated
     DESCRIPTION
         "The compliance statement for entities which implement
         VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB"
@@ -5139,5 +6859,241 @@ vmwNsxManagerNotificationGroup2 NOTIFICATION-GROUP
        DESCRIPTION
            "Group of objects describing notifications (traps, informs)."
        ::= { vmwNsxManagerMIBGroups 4 }
+
+
+
+vmwNsxManagerMIB64Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB"
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2,
+                       vmwNsxManagerNotificationGroup3 }
+    ::= { vmwNsxManagerMIBCompliances 5 }
+
+
+vmwNsxManagerNotificationGroup3 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMEdgeDuplicateIpDetected,
+       vmwNsxMEdgeDuplicateIpResolved,
+       vmwNsxMEdgeBgpNeighborUp,
+       vmwNsxMEdgeBgpNeighborDown,
+       vmwNsxMEdgeBgpNeighborASMismatch,
+       vmwNsxMEdgeOSPFNeighborUp,
+       vmwNsxMEdgeOSPFNeighborDown,
+       vmwNsxMEdgeOSPFNeighborMTUMismatch,
+       vmwNsxMEdgeOSPFNeighborAreaIdMisMatch,
+       vmwNsxMEdgeOSPFNeighborHelloTimerMisMatch,
+       vmwNsxMEdgeOSPFNeighborDeadTimerMisMatch,
+       vmwNsxMEdgeL2vpnTunnelUp,
+       vmwNsxMEdgeL2vpnTunnelDown,
+       vmwNsxMEdgeHAForceStandbyRemoved,
+       vmwNsxMEdgeHAForceStandbyRemovalFailed,
+       vmwNsxMEdgeVmBADStateRecovered,
+       vmwNsxMEdgeVmBADStateAutoHealRecoveryDisabled,
+       vmwNsxMFirewallMaxConcurrentConnectionsThresholdCrossed,
+       vmwNsxMFirewallProcessMemoryThresholdCrossed,
+       vmwNsxMFirewallCpuThresholdCrossCleared,
+       vmwNsxMFirewallMemThresholdCrossCleared,
+       vmwNsxMConnPerSecThrshldCrossCleared,
+       vmwNsxMFirewallMaxConcurrentConnectionsThresholdCrossCleared,
+       vmwNsxMFirewallProcessMemoryThresholdCrossCleared,
+       vmwNsxMFirewallThresholdConfigApplied,
+       vmwNsxMFirewallThresholdConfigApplyFailed,
+       vmwNsxMEdgeHaCommConnected,
+       vmwNsxMVxlanControllerDisconnected,
+       vmwNsxMVxlanControllerConnected,
+       vmwNsxMVxlanControllerVmPoweredOn,
+       vmwNsxMVxlanHostEvents,
+       vmwNsxMScaleNotEqualToRecommendedValue
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 5 }
+
+vmwNsxManagerMIB636Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB"
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2,
+                       vmwNsxManagerNotificationGroup3,
+                       vmwNsxManagerNotificationGroup4 }
+    ::= { vmwNsxManagerMIBCompliances 6 }
+
+
+vmwNsxManagerNotificationGroup4 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMUniversalSyncStoppedOnSecondary,
+       vmwNsxMUniversalSyncResumedOnSecondary
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 6 }
+
+vmwNsxManagerMIB641Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB"
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2,
+                       vmwNsxManagerNotificationGroup3,
+                       vmwNsxManagerNotificationGroup5 }
+    ::= { vmwNsxManagerMIBCompliances 7 }
+
+
+vmwNsxManagerNotificationGroup5 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMUniversalSyncStoppedOnSecondary,
+       vmwNsxMUniversalSyncResumedOnSecondary,
+       vmwNsxMCertificateExpired,
+       vmwNsxMCertificateAboutToExpire,
+       vmwNsxMCPUHigh,
+       vmwNsxMCPUNormal,
+       vmwNsxMUnsupportedIPsetConfigured
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 7 }
+
+vmwNsxManagerMIB637Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2,
+                       vmwNsxManagerNotificationGroup3,
+                       vmwNsxManagerNotificationGroup4,
+                       vmwNsxManagerNotificationGroup6}
+    ::= { vmwNsxManagerMIBCompliances 8 }
+
+
+vmwNsxManagerNotificationGroup6 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMUnsupportedIPsetConfigured
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 8 }
+
+vmwNsxManagerMIB642Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2,
+                       vmwNsxManagerNotificationGroup3,
+                       vmwNsxManagerNotificationGroup5,
+                       vmwNsxManagerNotificationGroup7}
+    ::= { vmwNsxManagerMIBCompliances 9 }
+
+vmwNsxManagerNotificationGroup7 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMSsoTimeout,
+       vmwNsxMFabricVibManualInstallationRequired
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 9 }
+
+vmwNsxManagerMIB645Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2,
+                       vmwNsxManagerNotificationGroup3,
+                       vmwNsxManagerNotificationGroup5,
+                       vmwNsxManagerNotificationGroup7,
+                       vmwNsxManagerNotificationGroup8}
+    ::= { vmwNsxManagerMIBCompliances 10 }
+
+vmwNsxManagerNotificationGroup8 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMEdgeVmRenameFailed,
+       vmwNsxMEdgeBgpNeighborshipError
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 10 }
+
+vmwNsxManagerMIB646Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2,
+                       vmwNsxManagerNotificationGroup3,
+                       vmwNsxManagerNotificationGroup5,
+                       vmwNsxManagerNotificationGroup7,
+                       vmwNsxManagerNotificationGroup8,
+                       vmwNsxManagerNotificationGroup9}
+    ::= { vmwNsxManagerMIBCompliances 11 }
+
+vmwNsxManagerNotificationGroup9 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMEdgeVmBadStateNotRecovered,
+       vmwNsxMEdgeVmDcnOutOfSync,
+       vmwNsxMEdgeConsumedResourcesMissingInInventory
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 11 }
+
+vmwNsxManagerMIB647Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2,
+                       vmwNsxManagerNotificationGroup3,
+                       vmwNsxManagerNotificationGroup5,
+                       vmwNsxManagerNotificationGroup7,
+                       vmwNsxManagerNotificationGroup8,
+                       vmwNsxManagerNotificationGroup9,
+                       vmwNsxManagerNotificationGroup10}
+    ::= { vmwNsxManagerMIBCompliances 12 }
+
+vmwNsxManagerNotificationGroup10 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMEdgeIpsecDeprecatedComplianceSuiteInUse,
+       vmwNsxMEdgeConnectedToMultipleTZHavingSameClusters,
+       vmwNsxMEdgeConnectedToMultipleTZHavingDifferentClusters
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 12 }
 
 END

@@ -2,8 +2,7 @@ os: ruckuswireless-sz
 text: 'Ruckus Wireless SmartZone'
 type: wireless
 icon: ruckus
-mib_dir:
-    - ruckus
+mib_dir: ruckus
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_wireless_ap-count, text: 'Number of APs' }

@@ -28,19 +28,33 @@ jnxIfOtnMib MODULE-IDENTITY
     CONTACT-INFO
             "        Juniper Technical Assistance Center
                      Juniper Networks, Inc.
-                     1194 N. Mathilda Avenue
+                     1133 Innovation Way
                      Sunnyvale, CA 94089
                      E-mail: support@juniper.net"
 
     DESCRIPTION " Deprecated OCh2 tables and entries"
+    REVISION      "201609122015Z"
+    DESCRIPTION
+               "Removed INDEX clause from unwanted places"
     REVISION    "201609122015Z"
-    DESCRIPTION 
-            " Added OTN table entries for handling sub-port
-             in the interface name. With suffix OCH2"
-    REVISION   "201506241227Z" 
     DESCRIPTION
             "This MIB module defines objects used for managing the
              OTN interface for Juniper products."
+    REVISION      "201607271100Z"
+    DESCRIPTION
+               "Added config to leave fist byte of TTI as NULL
+               per the G.709 recommendation."
+    REVISION   "201506241227Z" 
+    DESCRIPTION
+               "Removed INDEX clause from unwanted places"
+    REVISION    "201609122015Z"
+    DESCRIPTION 
+            "This MIB module defines objects used for managing the
+             OTN interface for Juniper products."
+    REVISION   "201506241227Z" 
+    DESCRIPTION
+            " Added OTN table entries for handling sub-port
+             in the interface name. With suffix OCH2"
     REVISION      "201201270000Z"
     DESCRIPTION
                "Added OTN Alarms and PM data."
@@ -114,7 +128,8 @@ JnxIfOtnFecType ::= TEXTUAL-CONVENTION
                      efecI9(9),
                      gfecandsdfec(10),
                      sdfec(11),
-                     hgfec(12)
+                     hgfec(12),
+                     sdfec15(13)
                  }
 
 JnxIfOtnLayer  ::= TEXTUAL-CONVENTION
@@ -390,7 +405,15 @@ JnxIfOtnOTUkCfgEntry ::=
             jnxIfOtnOTUkPreFecBERThresholdClearMantissa
                                   Integer32,
             jnxIfOtnOTUkPreFecBERThresholdClearExponent
-                                  Integer32
+                                  Integer32,
+            jnxIfOtnOTUkTxSapiTTIFstByteNul
+                                  TruthValue,
+            jnxIfOtnOTUkTxDapiTTIFstByteNul
+                                  TruthValue,
+            jnxIfOtnOTUkExpectedRxSapiFstByteNul
+                                  TruthValue,
+            jnxIfOtnOTUkExpectedRxDapiFstByteNul
+                                  TruthValue
     }
 
     jnxIfOtnOTUkCfgContainerIndex OBJECT-TYPE
@@ -563,7 +586,8 @@ JnxIfOtnOTUkCfgEntry ::=
                             tsf(7),
                             ssf(8),
                             fecexcessive(9),
-                            fecdegrade(10)
+                            fecdegrade(10),
+                            fefecerr(11)
                         }
         MAX-ACCESS      read-only
         STATUS          current
@@ -594,6 +618,46 @@ JnxIfOtnOTUkCfgEntry ::=
                   error count.
                 "
         ::= { jnxIfOtnOTUkCfgEntry 19 }
+
+    jnxIfOtnOTUkTxSapiTTIFstByteNul OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will fill the first byte of TTI with all zero 
+                  as per the G.709 recommendation.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 20 }
+
+    jnxIfOtnOTUkTxDapiTTIFstByteNul OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will fill the first byte of TTI with all zero 
+                  as per the G.709 recommendation.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 21 }
+
+    jnxIfOtnOTUkExpectedRxSapiFstByteNul OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will fill the first byte of TTI with all zero 
+                  as per the G.709 recommendation.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 22 }
+
+    jnxIfOtnOTUkExpectedRxDapiFstByteNul OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will fill the first byte of TTI with all zero 
+                  as per the G.709 recommendation.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 23 }
 
 --
 -- ODUk config table
@@ -653,7 +717,15 @@ JnxIfOtnODUkCfgEntry ::=
             jnxIfOtnODUkStatus
                                   BITS,
             jnxIfOtnODUkRxPayloadType      
-                                  Integer32
+                                  Integer32,
+            jnxIfOtnODUkTxSapiTTIFstByteNul
+                                  TruthValue,
+            jnxIfOtnODUkTxDapiTTIFstByteNul
+                                  TruthValue,
+            jnxIfOtnODUkExpectedRxSapiFstByteNul
+                                  TruthValue,
+            jnxIfOtnODUkExpectedRxDapiFstByteNul
+                                  TruthValue
      }
 
     jnxIfOtnODUkCfgContainerIndex OBJECT-TYPE
@@ -831,6 +903,46 @@ JnxIfOtnODUkCfgEntry ::=
                   Receive  Payload Type for ODUk only.
                 "
         ::= { jnxIfOtnODUkCfgEntry 16 }
+
+    jnxIfOtnODUkTxSapiTTIFstByteNul OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will fill the first byte of TTI with all zero 
+                  as per the G.709 recommendation.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 17 }
+
+    jnxIfOtnODUkTxDapiTTIFstByteNul OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will fill the first byte of TTI with all zero 
+                  as per the G.709 recommendation.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 18 }
+
+    jnxIfOtnODUkExpectedRxSapiFstByteNul OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will fill the first byte of TTI with all zero 
+                  as per the G.709 recommendation.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 19 }
+
+    jnxIfOtnODUkExpectedRxDapiFstByteNul OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will fill the first byte of TTI with all zero 
+                  as per the G.709 recommendation.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 20 }
 
 --
 -- TCM Config Table
@@ -1228,6 +1340,15 @@ JnxIfOtnODUkTcmDMEntry ::=
                 "
         ::= { jnxIfOtnODUkTcmDMEntry 6 }
 
+    jnxIfOtnDMRemoteLoopEnable OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Remote Loop Enable/Disable 
+                "
+        ::= { jnxIfOtnODUkTcmDMEntry 7 }
 
 
 
@@ -1453,7 +1574,6 @@ jnxOtnClearInterfacePMs OBJECT-TYPE
         DESCRIPTION
                 " To clear all Performance monitoring counters on this OTN
                   interfaces "
-        INDEX       { ifIndex }
         ::= { jnxIfOtn  11 }
 
 jnxOtnClearInterfaceCurrentPM OBJECT-TYPE
@@ -1463,7 +1583,6 @@ jnxOtnClearInterfaceCurrentPM OBJECT-TYPE
         DESCRIPTION
                 " To clear the current Performance monitoring counters on 
                   this OTN interfaces "
-        INDEX       { ifIndex }
         ::= { jnxIfOtn  12 }
 
 
@@ -1475,7 +1594,6 @@ jnxOtnClearIfPMsTable OBJECT-TYPE
         DESCRIPTION
                 " To clear OTN Performance monitoring counters on this OTN
                   interfaces "
-        INDEX       { ifIndex }
         ::= { jnxIfOtn  13 }
 
 jnxOtnClearIfPMsEntry OBJECT-TYPE

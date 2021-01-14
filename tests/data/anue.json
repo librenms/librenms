@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": null,
                     "icon": "ixia.svg",
-                    "location": null
+                    "location": "<private>"
                 }
             ]
         },

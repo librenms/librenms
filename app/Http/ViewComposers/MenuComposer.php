@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -91,7 +90,18 @@ class MenuComposer
         $vars['port_counts']['pseudowire'] = Config::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
 
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
-        $vars['custom_port_descr'] = collect(Config::get('custom_descr', []))->filter();
+
+        $custom_descr = [];
+        foreach ((array) Config::get('custom_descr', []) as $descr) {
+            $custom_descr_name = is_array($descr) ? $descr[0] : $descr;
+            if (empty($custom_descr_name)) {
+                continue;
+            }
+            $custom_descr[] = ['name' => $custom_descr_name,
+                'icon' => is_array($descr) ? $descr[1] : 'fa-connectdevelop',
+            ];
+        }
+        $vars['custom_port_descr'] = collect($custom_descr)->filter();
         $vars['port_groups_exist'] = Config::get('int_customers') ||
             Config::get('int_transit') ||
             Config::get('int_peering') ||
@@ -109,6 +119,7 @@ class MenuComposer
             ->get(['sensor_class'])
             ->sortBy(function ($wireless_sensor) use ($wireless_menu_order) {
                 $pos = array_search($wireless_sensor->sensor_class, $wireless_menu_order);
+
                 return $pos === false ? 100 : $pos; // unknown at bottom
             });
 
@@ -127,7 +138,7 @@ class MenuComposer
                         'url' => 'vrf',
                         'icon' => 'arrows',
                         'text' => 'VRFs',
-                    ]
+                    ],
                 ];
             }
 
@@ -137,7 +148,7 @@ class MenuComposer
                         'url' => 'mpls',
                         'icon' => 'tag',
                         'text' => 'MPLS',
-                    ]
+                    ],
                 ];
             }
 
@@ -147,7 +158,7 @@ class MenuComposer
                         'url' => 'ospf',
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPF Devices',
-                    ]
+                    ],
                 ];
             }
 
@@ -157,7 +168,7 @@ class MenuComposer
                         'url' => 'cisco-otv',
                         'icon' => 'exchange',
                         'text' => 'Cisco OTV',
-                    ]
+                    ],
                 ];
             }
 
@@ -192,7 +203,7 @@ class MenuComposer
                         'url' => 'cef',
                         'icon' => 'exchange',
                         'text' => 'Cisco CEF',
-                    ]
+                    ],
                 ];
             }
         }

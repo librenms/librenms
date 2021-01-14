@@ -7,33 +7,33 @@
  *
 */
 
-$oids = array(
-    0 => array(
+$oids = [
+    0 => [
         'type'  => 'dhcpatriotDatabaseThreads',
         'descr' => 'Database Threads',
-        'oid'   => '.1.3.6.1.4.1.2021.50.45'
-    ),
-    1 => array(
+        'oid'   => '.1.3.6.1.4.1.2021.50.45',
+    ],
+    1 => [
         'type'  => 'dhcpatriotDatabaseQueriesPerSecond',
         'descr' => 'Database Queries Per Second',
-        'oid'   => '.1.3.6.1.4.1.2021.50.46'
-    ),
-    2 => array(
+        'oid'   => '.1.3.6.1.4.1.2021.50.46',
+    ],
+    2 => [
         'type'  => 'dhcpatriotDHCPv4LeasesPerSecond',
         'descr' => 'DHCPv4 Leases Per Second',
-        'oid'   => '.1.3.6.1.4.1.2021.50.70'
-    ),
-    3 => array(
+        'oid'   => '.1.3.6.1.4.1.2021.50.70',
+    ],
+    3 => [
         'type'  => 'dhcpatriotDHCPv6LeasesPerSecond',
         'descr' => 'DHCPv6 Leases Per Second',
-        'oid'   => '.1.3.6.1.5.1.2021.50.140'
-    ),
-    4 => array(
+        'oid'   => '.1.3.6.1.5.1.2021.50.140',
+    ],
+    4 => [
         'type'  => 'dhcpatriotLicenseExpiration',
         'descr' => 'License Expiration Days Remaining',
-        'oid'   => '.1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1'
-    )
-);
+        'oid'   => '.1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1',
+    ],
+];
 
 $class = 'count';
 $divisor = 1;
@@ -64,7 +64,7 @@ foreach ($oids as $index => $entry) {
         $current = round((intval($epoch_time[1]) - $current_time) / (60 * 60 * 24));
     }
 
-    if (!empty($current) && $current !== 'FULL:0') {
+    if (! empty($current) && $current !== 'FULL:0') {
         discover_sensor(
             $valid['sensor'],
             $class,
