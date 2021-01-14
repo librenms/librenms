@@ -54,9 +54,6 @@ foreach ($rrd_list as $rrd) {
 
     $id = 'ds' . $i;
 
-    echo("##LAST## " . $use_last_values);
-    var_dump($use_last_values);
-
     if ($use_last_values) {
         $rrd_options .= ' DEF:' . $id . "=$filename:$ds:LAST";
     } else {
