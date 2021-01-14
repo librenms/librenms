@@ -46,6 +46,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "IEEE 802.11abgn Wireless LAN (Atheros AR9160/AR9106)",
                     "ifName": "WLAN-1",
                     "portName": null,
@@ -145,8 +146,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -154,6 +154,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Freescale TSEC Ethernet 1",
                     "ifName": "LAN-1",
                     "portName": null,
@@ -253,8 +254,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -262,6 +262,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-1",
                     "ifName": "WLAN-1",
                     "portName": null,
@@ -361,8 +362,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -370,6 +370,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-1",
                     "ifName": "P2P-1-1",
                     "portName": null,
@@ -469,8 +470,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -478,6 +478,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-2",
                     "ifName": "P2P-1-2",
                     "portName": null,
@@ -577,8 +578,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -586,6 +586,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-3",
                     "ifName": "P2P-1-3",
                     "portName": null,
@@ -685,8 +686,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -694,6 +694,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-4",
                     "ifName": "P2P-1-4",
                     "portName": null,
@@ -793,8 +794,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -802,6 +802,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-5",
                     "ifName": "P2P-1-5",
                     "portName": null,
@@ -901,8 +902,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -910,6 +910,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-6",
                     "ifName": "P2P-1-6",
                     "portName": null,
@@ -1009,8 +1010,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1018,6 +1018,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-7",
                     "ifName": "P2P-1-7",
                     "portName": null,
@@ -1117,8 +1118,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1126,6 +1126,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-8",
                     "ifName": "P2P-1-8",
                     "portName": null,
@@ -1225,8 +1226,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1234,6 +1234,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-9",
                     "ifName": "P2P-1-9",
                     "portName": null,
@@ -1333,8 +1334,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1342,6 +1342,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-10",
                     "ifName": "P2P-1-10",
                     "portName": null,
@@ -1441,8 +1442,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1450,6 +1450,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-11",
                     "ifName": "P2P-1-11",
                     "portName": null,
@@ -1549,8 +1550,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1558,6 +1558,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-12",
                     "ifName": "P2P-1-12",
                     "portName": null,
@@ -1657,8 +1658,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1666,6 +1666,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-13",
                     "ifName": "P2P-1-13",
                     "portName": null,
@@ -1765,8 +1766,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1774,6 +1774,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-14",
                     "ifName": "P2P-1-14",
                     "portName": null,
@@ -1873,8 +1874,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1882,6 +1882,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-15",
                     "ifName": "P2P-1-15",
                     "portName": null,
@@ -1981,8 +1982,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1990,6 +1990,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-16",
                     "ifName": "P2P-1-16",
                     "portName": null,
@@ -2089,8 +2090,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2098,6 +2098,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-2",
                     "ifName": "WLAN-1-2",
                     "portName": null,
@@ -2197,8 +2198,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2206,6 +2206,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-3",
                     "ifName": "WLAN-1-3",
                     "portName": null,
@@ -2305,8 +2306,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2314,6 +2314,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-4",
                     "ifName": "WLAN-1-4",
                     "portName": null,
@@ -2413,8 +2414,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2422,6 +2422,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-5",
                     "ifName": "WLAN-1-5",
                     "portName": null,
@@ -2521,8 +2522,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2530,6 +2530,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-6",
                     "ifName": "WLAN-1-6",
                     "portName": null,
@@ -2629,8 +2630,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2638,6 +2638,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-7",
                     "ifName": "WLAN-1-7",
                     "portName": null,
@@ -2737,8 +2738,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2746,6 +2746,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-8",
                     "ifName": "WLAN-1-8",
                     "portName": null,
@@ -2845,8 +2846,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2854,6 +2854,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 1",
                     "ifName": "WLC-TUNNEL-1",
                     "portName": null,
@@ -2953,8 +2954,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2962,6 +2962,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 2",
                     "ifName": "WLC-TUNNEL-2",
                     "portName": null,
@@ -3061,8 +3062,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3070,6 +3070,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 3",
                     "ifName": "WLC-TUNNEL-3",
                     "portName": null,
@@ -3169,8 +3170,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3178,6 +3178,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 4",
                     "ifName": "WLC-TUNNEL-4",
                     "portName": null,
@@ -3277,8 +3278,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3286,6 +3286,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 5",
                     "ifName": "WLC-TUNNEL-5",
                     "portName": null,
@@ -3385,8 +3386,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3394,6 +3394,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 6",
                     "ifName": "WLC-TUNNEL-6",
                     "portName": null,
@@ -3493,8 +3494,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3502,6 +3502,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 7",
                     "ifName": "WLC-TUNNEL-7",
                     "portName": null,
@@ -3601,8 +3602,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3610,6 +3610,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 8",
                     "ifName": "WLC-TUNNEL-8",
                     "portName": null,
@@ -3709,8 +3710,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3718,6 +3718,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 9",
                     "ifName": "WLC-TUNNEL-9",
                     "portName": null,
@@ -3817,8 +3818,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3826,6 +3826,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 10",
                     "ifName": "WLC-TUNNEL-10",
                     "portName": null,
@@ -3925,8 +3926,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -3934,6 +3934,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 11",
                     "ifName": "WLC-TUNNEL-11",
                     "portName": null,
@@ -4033,8 +4034,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4042,6 +4042,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 12",
                     "ifName": "WLC-TUNNEL-12",
                     "portName": null,
@@ -4141,8 +4142,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4150,6 +4150,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 13",
                     "ifName": "WLC-TUNNEL-13",
                     "portName": null,
@@ -4249,8 +4250,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4258,6 +4258,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 14",
                     "ifName": "WLC-TUNNEL-14",
                     "portName": null,
@@ -4357,8 +4358,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4366,6 +4366,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 15",
                     "ifName": "WLC-TUNNEL-15",
                     "portName": null,
@@ -4465,8 +4466,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4474,6 +4474,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 16",
                     "ifName": "WLC-TUNNEL-16",
                     "portName": null,
@@ -4573,8 +4574,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4582,6 +4582,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 17",
                     "ifName": "WLC-TUNNEL-17",
                     "portName": null,
@@ -4681,8 +4682,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4690,6 +4690,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 18",
                     "ifName": "WLC-TUNNEL-18",
                     "portName": null,
@@ -4789,8 +4790,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4798,6 +4798,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 19",
                     "ifName": "WLC-TUNNEL-19",
                     "portName": null,
@@ -4897,8 +4898,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -4906,6 +4906,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 20",
                     "ifName": "WLC-TUNNEL-20",
                     "portName": null,
@@ -5005,8 +5006,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5014,6 +5014,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 21",
                     "ifName": "WLC-TUNNEL-21",
                     "portName": null,
@@ -5113,8 +5114,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5122,6 +5122,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 22",
                     "ifName": "WLC-TUNNEL-22",
                     "portName": null,
@@ -5221,8 +5222,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5230,6 +5230,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 23",
                     "ifName": "WLC-TUNNEL-23",
                     "portName": null,
@@ -5329,8 +5330,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5338,6 +5338,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 24",
                     "ifName": "WLC-TUNNEL-24",
                     "portName": null,
@@ -5437,8 +5438,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5446,6 +5446,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 25",
                     "ifName": "WLC-TUNNEL-25",
                     "portName": null,
@@ -5545,8 +5546,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5554,6 +5554,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 26",
                     "ifName": "WLC-TUNNEL-26",
                     "portName": null,
@@ -5653,8 +5654,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5662,6 +5662,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 27",
                     "ifName": "WLC-TUNNEL-27",
                     "portName": null,
@@ -5761,8 +5762,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5770,6 +5770,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 28",
                     "ifName": "WLC-TUNNEL-28",
                     "portName": null,
@@ -5869,8 +5870,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5878,6 +5878,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 29",
                     "ifName": "WLC-TUNNEL-29",
                     "portName": null,
@@ -5977,8 +5978,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -5986,6 +5986,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 30",
                     "ifName": "WLC-TUNNEL-30",
                     "portName": null,
@@ -6085,8 +6086,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6094,6 +6094,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 31",
                     "ifName": "WLC-TUNNEL-31",
                     "portName": null,
@@ -6193,8 +6194,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6202,6 +6202,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 32",
                     "ifName": "WLC-TUNNEL-32",
                     "portName": null,
@@ -6301,8 +6302,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6310,6 +6310,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 33",
                     "ifName": "WLC-TUNNEL-AUTOWDS",
                     "portName": null,
@@ -6409,8 +6410,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6418,6 +6418,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-9",
                     "ifName": "WLAN-1-9",
                     "portName": null,
@@ -6517,8 +6518,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6526,6 +6526,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-10",
                     "ifName": "WLAN-1-10",
                     "portName": null,
@@ -6625,8 +6626,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6634,6 +6634,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-11",
                     "ifName": "WLAN-1-11",
                     "portName": null,
@@ -6733,8 +6734,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6742,6 +6742,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-12",
                     "ifName": "WLAN-1-12",
                     "portName": null,
@@ -6841,8 +6842,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6850,6 +6850,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-13",
                     "ifName": "WLAN-1-13",
                     "portName": null,
@@ -6949,8 +6950,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -6958,6 +6958,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-14",
                     "ifName": "WLAN-1-14",
                     "portName": null,
@@ -7057,8 +7058,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7066,6 +7066,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-15",
                     "ifName": "WLAN-1-15",
                     "portName": null,
@@ -7165,8 +7166,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7174,6 +7174,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-16",
                     "ifName": "WLAN-1-16",
                     "portName": null,
@@ -7273,8 +7274,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7282,6 +7282,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-1",
                     "ifName": "GRE-TUNNEL-1",
                     "portName": null,
@@ -7381,8 +7382,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7390,6 +7390,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-2",
                     "ifName": "GRE-TUNNEL-2",
                     "portName": null,
@@ -7489,8 +7490,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7498,6 +7498,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-3",
                     "ifName": "GRE-TUNNEL-3",
                     "portName": null,
@@ -7597,8 +7598,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7606,6 +7606,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-4",
                     "ifName": "GRE-TUNNEL-4",
                     "portName": null,
@@ -7705,8 +7706,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7714,6 +7714,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-5",
                     "ifName": "GRE-TUNNEL-5",
                     "portName": null,
@@ -7813,8 +7814,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7822,6 +7822,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-6",
                     "ifName": "GRE-TUNNEL-6",
                     "portName": null,
@@ -7921,8 +7922,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -7930,6 +7930,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-7",
                     "ifName": "GRE-TUNNEL-7",
                     "portName": null,
@@ -8029,8 +8030,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8038,6 +8038,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-8",
                     "ifName": "GRE-TUNNEL-8",
                     "portName": null,
@@ -8137,8 +8138,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8146,6 +8146,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #1",
                     "ifName": "BRG-1",
                     "portName": null,
@@ -8245,8 +8246,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8254,6 +8254,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #2",
                     "ifName": "BRG-2",
                     "portName": null,
@@ -8353,8 +8354,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8362,6 +8362,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #3",
                     "ifName": "BRG-3",
                     "portName": null,
@@ -8461,8 +8462,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8470,6 +8470,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #4",
                     "ifName": "BRG-4",
                     "portName": null,
@@ -8569,8 +8570,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8578,6 +8578,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #5",
                     "ifName": "BRG-5",
                     "portName": null,
@@ -8677,8 +8678,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8686,6 +8686,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #6",
                     "ifName": "BRG-6",
                     "portName": null,
@@ -8785,8 +8786,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8794,6 +8794,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #7",
                     "ifName": "BRG-7",
                     "portName": null,
@@ -8893,8 +8894,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -8902,6 +8902,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #8",
                     "ifName": "BRG-8",
                     "portName": null,
@@ -9001,8 +9002,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9010,6 +9010,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "DSL-Channel #0",
                     "ifName": "DSL-CH-1",
                     "portName": null,
@@ -9109,8 +9110,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9118,6 +9118,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Serial Interface",
                     "ifName": "SER-1",
                     "portName": null,
@@ -9217,8 +9218,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         },
@@ -9329,8 +9329,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9338,6 +9337,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Freescale TSEC Ethernet 1",
                     "ifName": "LAN-1",
                     "portName": null,
@@ -9437,8 +9437,7 @@
                     "ifOutMulticastPkts": 100019,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9446,6 +9445,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-1",
                     "ifName": "WLAN-1",
                     "portName": null,
@@ -9545,8 +9545,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9554,6 +9553,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-1",
                     "ifName": "P2P-1-1",
                     "portName": null,
@@ -9653,8 +9653,7 @@
                     "ifOutMulticastPkts": 8215996,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9662,6 +9661,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-2",
                     "ifName": "P2P-1-2",
                     "portName": null,
@@ -9761,8 +9761,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9770,6 +9769,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-3",
                     "ifName": "P2P-1-3",
                     "portName": null,
@@ -9869,8 +9869,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9878,6 +9877,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-4",
                     "ifName": "P2P-1-4",
                     "portName": null,
@@ -9977,8 +9977,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -9986,6 +9985,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-5",
                     "ifName": "P2P-1-5",
                     "portName": null,
@@ -10085,8 +10085,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10094,6 +10093,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-6",
                     "ifName": "P2P-1-6",
                     "portName": null,
@@ -10193,8 +10193,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10202,6 +10201,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-7",
                     "ifName": "P2P-1-7",
                     "portName": null,
@@ -10301,8 +10301,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10310,6 +10309,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-8",
                     "ifName": "P2P-1-8",
                     "portName": null,
@@ -10409,8 +10409,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10418,6 +10417,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-9",
                     "ifName": "P2P-1-9",
                     "portName": null,
@@ -10517,8 +10517,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10526,6 +10525,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-10",
                     "ifName": "P2P-1-10",
                     "portName": null,
@@ -10625,8 +10625,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10634,6 +10633,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-11",
                     "ifName": "P2P-1-11",
                     "portName": null,
@@ -10733,8 +10733,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10742,6 +10741,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-12",
                     "ifName": "P2P-1-12",
                     "portName": null,
@@ -10841,8 +10841,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10850,6 +10849,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-13",
                     "ifName": "P2P-1-13",
                     "portName": null,
@@ -10949,8 +10949,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -10958,6 +10957,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-14",
                     "ifName": "P2P-1-14",
                     "portName": null,
@@ -11057,8 +11057,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11066,6 +11065,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-15",
                     "ifName": "P2P-1-15",
                     "portName": null,
@@ -11165,8 +11165,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11174,6 +11173,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Point-2-Point Link 1-16",
                     "ifName": "P2P-1-16",
                     "portName": null,
@@ -11273,8 +11273,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11282,6 +11281,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-2",
                     "ifName": "WLAN-1-2",
                     "portName": null,
@@ -11381,8 +11381,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11390,6 +11389,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-3",
                     "ifName": "WLAN-1-3",
                     "portName": null,
@@ -11489,8 +11489,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11498,6 +11497,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-4",
                     "ifName": "WLAN-1-4",
                     "portName": null,
@@ -11597,8 +11597,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11606,6 +11605,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-5",
                     "ifName": "WLAN-1-5",
                     "portName": null,
@@ -11705,8 +11705,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11714,6 +11713,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-6",
                     "ifName": "WLAN-1-6",
                     "portName": null,
@@ -11813,8 +11813,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11822,6 +11821,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-7",
                     "ifName": "WLAN-1-7",
                     "portName": null,
@@ -11921,8 +11921,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -11930,6 +11929,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-8",
                     "ifName": "WLAN-1-8",
                     "portName": null,
@@ -12029,8 +12029,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12038,6 +12037,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 1",
                     "ifName": "WLC-TUNNEL-1",
                     "portName": null,
@@ -12137,8 +12137,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12146,6 +12145,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 2",
                     "ifName": "WLC-TUNNEL-2",
                     "portName": null,
@@ -12245,8 +12245,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12254,6 +12253,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 3",
                     "ifName": "WLC-TUNNEL-3",
                     "portName": null,
@@ -12353,8 +12353,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12362,6 +12361,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 4",
                     "ifName": "WLC-TUNNEL-4",
                     "portName": null,
@@ -12461,8 +12461,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12470,6 +12469,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 5",
                     "ifName": "WLC-TUNNEL-5",
                     "portName": null,
@@ -12569,8 +12569,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12578,6 +12577,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 6",
                     "ifName": "WLC-TUNNEL-6",
                     "portName": null,
@@ -12677,8 +12677,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12686,6 +12685,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 7",
                     "ifName": "WLC-TUNNEL-7",
                     "portName": null,
@@ -12785,8 +12785,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12794,6 +12793,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 8",
                     "ifName": "WLC-TUNNEL-8",
                     "portName": null,
@@ -12893,8 +12893,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -12902,6 +12901,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 9",
                     "ifName": "WLC-TUNNEL-9",
                     "portName": null,
@@ -13001,8 +13001,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13010,6 +13009,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 10",
                     "ifName": "WLC-TUNNEL-10",
                     "portName": null,
@@ -13109,8 +13109,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13118,6 +13117,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 11",
                     "ifName": "WLC-TUNNEL-11",
                     "portName": null,
@@ -13217,8 +13217,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13226,6 +13225,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 12",
                     "ifName": "WLC-TUNNEL-12",
                     "portName": null,
@@ -13325,8 +13325,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13334,6 +13333,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 13",
                     "ifName": "WLC-TUNNEL-13",
                     "portName": null,
@@ -13433,8 +13433,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13442,6 +13441,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 14",
                     "ifName": "WLC-TUNNEL-14",
                     "portName": null,
@@ -13541,8 +13541,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13550,6 +13549,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 15",
                     "ifName": "WLC-TUNNEL-15",
                     "portName": null,
@@ -13649,8 +13649,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13658,6 +13657,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 16",
                     "ifName": "WLC-TUNNEL-16",
                     "portName": null,
@@ -13757,8 +13757,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13766,6 +13765,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 17",
                     "ifName": "WLC-TUNNEL-17",
                     "portName": null,
@@ -13865,8 +13865,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13874,6 +13873,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 18",
                     "ifName": "WLC-TUNNEL-18",
                     "portName": null,
@@ -13973,8 +13973,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -13982,6 +13981,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 19",
                     "ifName": "WLC-TUNNEL-19",
                     "portName": null,
@@ -14081,8 +14081,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14090,6 +14089,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 20",
                     "ifName": "WLC-TUNNEL-20",
                     "portName": null,
@@ -14189,8 +14189,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14198,6 +14197,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 21",
                     "ifName": "WLC-TUNNEL-21",
                     "portName": null,
@@ -14297,8 +14297,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14306,6 +14305,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 22",
                     "ifName": "WLC-TUNNEL-22",
                     "portName": null,
@@ -14405,8 +14405,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14414,6 +14413,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 23",
                     "ifName": "WLC-TUNNEL-23",
                     "portName": null,
@@ -14513,8 +14513,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14522,6 +14521,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 24",
                     "ifName": "WLC-TUNNEL-24",
                     "portName": null,
@@ -14621,8 +14621,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14630,6 +14629,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 25",
                     "ifName": "WLC-TUNNEL-25",
                     "portName": null,
@@ -14729,8 +14729,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14738,6 +14737,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 26",
                     "ifName": "WLC-TUNNEL-26",
                     "portName": null,
@@ -14837,8 +14837,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14846,6 +14845,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 27",
                     "ifName": "WLC-TUNNEL-27",
                     "portName": null,
@@ -14945,8 +14945,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -14954,6 +14953,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 28",
                     "ifName": "WLC-TUNNEL-28",
                     "portName": null,
@@ -15053,8 +15053,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15062,6 +15061,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 29",
                     "ifName": "WLC-TUNNEL-29",
                     "portName": null,
@@ -15161,8 +15161,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15170,6 +15169,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 30",
                     "ifName": "WLC-TUNNEL-30",
                     "portName": null,
@@ -15269,8 +15269,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15278,6 +15277,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 31",
                     "ifName": "WLC-TUNNEL-31",
                     "portName": null,
@@ -15377,8 +15377,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15386,6 +15385,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 32",
                     "ifName": "WLC-TUNNEL-32",
                     "portName": null,
@@ -15485,8 +15485,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15494,6 +15493,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "CAPWAP Tunnel 33",
                     "ifName": "WLC-TUNNEL-AUTOWDS",
                     "portName": null,
@@ -15593,8 +15593,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15602,6 +15601,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-9",
                     "ifName": "WLAN-1-9",
                     "portName": null,
@@ -15701,8 +15701,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15710,6 +15709,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-10",
                     "ifName": "WLAN-1-10",
                     "portName": null,
@@ -15809,8 +15809,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15818,6 +15817,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-11",
                     "ifName": "WLAN-1-11",
                     "portName": null,
@@ -15917,8 +15917,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -15926,6 +15925,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-12",
                     "ifName": "WLAN-1-12",
                     "portName": null,
@@ -16025,8 +16025,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16034,6 +16033,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-13",
                     "ifName": "WLAN-1-13",
                     "portName": null,
@@ -16133,8 +16133,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16142,6 +16141,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-14",
                     "ifName": "WLAN-1-14",
                     "portName": null,
@@ -16241,8 +16241,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16250,6 +16249,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-15",
                     "ifName": "WLAN-1-15",
                     "portName": null,
@@ -16349,8 +16349,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16358,6 +16357,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Logical Network 1-16",
                     "ifName": "WLAN-1-16",
                     "portName": null,
@@ -16457,8 +16457,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16466,6 +16465,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-1",
                     "ifName": "GRE-TUNNEL-1",
                     "portName": null,
@@ -16565,8 +16565,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16574,6 +16573,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-2",
                     "ifName": "GRE-TUNNEL-2",
                     "portName": null,
@@ -16673,8 +16673,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16682,6 +16681,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-3",
                     "ifName": "GRE-TUNNEL-3",
                     "portName": null,
@@ -16781,8 +16781,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16790,6 +16789,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-4",
                     "ifName": "GRE-TUNNEL-4",
                     "portName": null,
@@ -16889,8 +16889,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -16898,6 +16897,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-5",
                     "ifName": "GRE-TUNNEL-5",
                     "portName": null,
@@ -16997,8 +16997,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17006,6 +17005,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-6",
                     "ifName": "GRE-TUNNEL-6",
                     "portName": null,
@@ -17105,8 +17105,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17114,6 +17113,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-7",
                     "ifName": "GRE-TUNNEL-7",
                     "portName": null,
@@ -17213,8 +17213,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17222,6 +17221,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GRE-TUNNEL-8",
                     "ifName": "GRE-TUNNEL-8",
                     "portName": null,
@@ -17321,8 +17321,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17330,6 +17329,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #1",
                     "ifName": "BRG-1",
                     "portName": null,
@@ -17429,8 +17429,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17438,6 +17437,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #2",
                     "ifName": "BRG-2",
                     "portName": null,
@@ -17537,8 +17537,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17546,6 +17545,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #3",
                     "ifName": "BRG-3",
                     "portName": null,
@@ -17645,8 +17645,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17654,6 +17653,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #4",
                     "ifName": "BRG-4",
                     "portName": null,
@@ -17753,8 +17753,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17762,6 +17761,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #5",
                     "ifName": "BRG-5",
                     "portName": null,
@@ -17861,8 +17861,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17870,6 +17869,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #6",
                     "ifName": "BRG-6",
                     "portName": null,
@@ -17969,8 +17969,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -17978,6 +17977,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #7",
                     "ifName": "BRG-7",
                     "portName": null,
@@ -18077,8 +18077,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -18086,6 +18085,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Bridge Group #8",
                     "ifName": "BRG-8",
                     "portName": null,
@@ -18185,8 +18185,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -18194,6 +18193,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "DSL-Channel #0",
                     "ifName": "DSL-CH-1",
                     "portName": null,
@@ -18293,8 +18293,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -18302,6 +18301,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Serial Interface",
                     "ifName": "SER-1",
                     "portName": null,
@@ -18401,8 +18401,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         }

@@ -8,6 +8,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Vlan1",
                     "ifName": "Vl1",
                     "portName": null,
@@ -107,8 +108,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -116,6 +116,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Vlan100",
                     "ifName": "Vl100",
                     "portName": null,
@@ -215,8 +216,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -224,6 +224,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/1",
                     "ifName": "Fa0/1",
                     "portName": null,
@@ -323,8 +324,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -332,6 +332,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/2",
                     "ifName": "Fa0/2",
                     "portName": null,
@@ -431,8 +432,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -440,6 +440,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/3",
                     "ifName": "Fa0/3",
                     "portName": null,
@@ -539,8 +540,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -548,6 +548,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/4",
                     "ifName": "Fa0/4",
                     "portName": null,
@@ -647,8 +648,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -656,6 +656,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/5",
                     "ifName": "Fa0/5",
                     "portName": null,
@@ -755,8 +756,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -764,6 +764,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/6",
                     "ifName": "Fa0/6",
                     "portName": null,
@@ -863,8 +864,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -872,6 +872,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/7",
                     "ifName": "Fa0/7",
                     "portName": null,
@@ -971,8 +972,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -980,6 +980,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/8",
                     "ifName": "Fa0/8",
                     "portName": null,
@@ -1079,8 +1080,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1088,6 +1088,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GigabitEthernet0/1",
                     "ifName": "Gi0/1",
                     "portName": null,
@@ -1187,8 +1188,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1196,6 +1196,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Null0",
                     "ifName": "Nu0",
                     "portName": null,
@@ -1295,8 +1296,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         },
@@ -1308,6 +1308,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Vlan1",
                     "ifName": "Vl1",
                     "portName": null,
@@ -1407,8 +1408,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1416,6 +1416,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Vlan100",
                     "ifName": "Vl100",
                     "portName": null,
@@ -1515,8 +1516,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1524,6 +1524,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/1",
                     "ifName": "Fa0/1",
                     "portName": null,
@@ -1623,8 +1624,7 @@
                     "ifOutMulticastPkts": 158,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1632,6 +1632,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/2",
                     "ifName": "Fa0/2",
                     "portName": null,
@@ -1731,8 +1732,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1740,6 +1740,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/3",
                     "ifName": "Fa0/3",
                     "portName": null,
@@ -1839,8 +1840,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1848,6 +1848,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/4",
                     "ifName": "Fa0/4",
                     "portName": null,
@@ -1947,8 +1948,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1956,6 +1956,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/5",
                     "ifName": "Fa0/5",
                     "portName": null,
@@ -2055,8 +2056,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2064,6 +2064,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/6",
                     "ifName": "Fa0/6",
                     "portName": null,
@@ -2163,8 +2164,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2172,6 +2172,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/7",
                     "ifName": "Fa0/7",
                     "portName": null,
@@ -2271,8 +2272,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2280,6 +2280,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "FastEthernet0/8",
                     "ifName": "Fa0/8",
                     "portName": null,
@@ -2379,8 +2380,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2388,6 +2388,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "GigabitEthernet0/1",
                     "ifName": "Gi0/1",
                     "portName": null,
@@ -2487,8 +2488,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2496,6 +2496,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Null0",
                     "ifName": "Nu0",
                     "portName": null,
@@ -2595,8 +2596,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         }

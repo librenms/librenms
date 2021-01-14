@@ -46,6 +46,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "lo",
                     "ifName": "lo",
                     "portName": null,
@@ -145,8 +146,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -154,6 +154,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "Intel Corporation 82545EM Gigabit Ethernet Controller (Copper)",
                     "ifName": "eth0",
                     "portName": null,
@@ -253,8 +254,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -262,6 +262,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "ifb0",
                     "ifName": "ifb0",
                     "portName": null,
@@ -361,8 +362,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -370,6 +370,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "ifb1",
                     "ifName": "ifb1",
                     "portName": null,
@@ -469,8 +470,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -478,6 +478,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "gre0",
                     "ifName": "gre0",
                     "portName": null,
@@ -577,8 +578,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -586,6 +586,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "gretap0",
                     "ifName": "gretap0",
                     "portName": null,
@@ -685,8 +686,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -694,6 +694,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "erspan0",
                     "ifName": "erspan0",
                     "portName": null,
@@ -793,8 +794,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -802,6 +802,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "ip6tnl0",
                     "ifName": "ip6tnl0",
                     "portName": null,
@@ -901,8 +902,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -910,6 +910,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "ip6gre0",
                     "ifName": "ip6gre0",
                     "portName": null,
@@ -1009,8 +1010,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1018,6 +1018,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "gre1",
                     "ifName": "gre1",
                     "portName": null,
@@ -1117,8 +1118,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         },
@@ -1130,6 +1130,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "lo",
                     "ifName": "lo",
                     "portName": null,
@@ -1229,8 +1230,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": "intel corporation 82545em gigabit ethernet controller ",
@@ -1337,8 +1337,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1346,6 +1345,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "ifb0",
                     "ifName": "ifb0",
                     "portName": null,
@@ -1445,8 +1445,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1454,6 +1453,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "ifb1",
                     "ifName": "ifb1",
                     "portName": null,
@@ -1553,8 +1553,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1562,6 +1561,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "gre0",
                     "ifName": "gre0",
                     "portName": null,
@@ -1661,8 +1661,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1670,6 +1669,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "gretap0",
                     "ifName": "gretap0",
                     "portName": null,
@@ -1769,8 +1769,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1778,6 +1777,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "erspan0",
                     "ifName": "erspan0",
                     "portName": null,
@@ -1877,8 +1877,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1886,6 +1885,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "ip6tnl0",
                     "ifName": "ip6tnl0",
                     "portName": null,
@@ -1985,8 +1985,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1994,6 +1993,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "ip6gre0",
                     "ifName": "ip6gre0",
                     "portName": null,
@@ -2093,8 +2093,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -2102,6 +2101,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
+                    "port_group_id": null,
                     "ifDescr": "gre1",
                     "ifName": "gre1",
                     "portName": null,
@@ -2201,8 +2201,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         }
