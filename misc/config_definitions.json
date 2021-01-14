@@ -5292,7 +5292,7 @@
             "order": 0,
             "type": "integer"
         },
-        "webui.graph_last_values": {
+        "webui.graph_processor_last_values": {
             "default": false,
             "group": "webui",
             "section": "graph",

@@ -27,4 +27,10 @@ $scale_max = '100';
 
 $nototal = 1;
 
+if (Config::get('webui.graph_processor_last_values')) {
+    $use_last_values = true;
+} else {
+    $use_last_values = false;
+}
+
 require 'includes/html/graphs/generic_multi_line.inc.php';
