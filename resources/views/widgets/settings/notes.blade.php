@@ -13,7 +13,7 @@
 
     <br />
     <div class="form-group">
-            The following html tags are supported: &lta&rt;, &lt;b&gt;, &lt;iframe&gt;, &lt;i&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;h4&gt;, &lt;br&gt;, &lt;p&gt;.<br />
+            The following html tags are supported: &lta&gt;, &lt;b&gt;, &lt;iframe&gt;, &lt;i&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;h4&gt;, &lt;br&gt;, &lt;p&gt;.<br />
             If you want just text then wrap in &lt;pre&gt;&lt;/pre&gt;
     </div>
 @endsection
