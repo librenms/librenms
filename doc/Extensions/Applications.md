@@ -1658,16 +1658,16 @@ Install/Setup:
 For Install/Setup Local Librenms RRDCached: Please see [RRDCached](RRDCached.md)
 Securing RRCached: Please see [RRDCached Security](RRDCached-Security.md)
 
-Polling:
+Local Polling:
 For local Polling the 'RRDCached' Application (librenms-localhost) the usual is either to:
 
-1. Use unix:socket as described: [RRDCached](RRDCached.md)
-2. or Monitor thru port listen 42217 as described: [RRDCached Security](RRDCached-Security.md)
+1: Use unix:socket as described: [RRDCached](RRDCached.md)
+2: or Monitor thru port listen 42217 as described: [RRDCached Security](RRDCached-Security.md)
 
-For remote Polling the 'RRDCached' Application, you have two options:
+For Remote Polling the 'RRDCached' Application, you have two options:
 
-1. Monitor thru exposing rrdcached port, listen 42217 as described: [RRDCached Security](RRDCached-Security.md)
-2. Monitor thru snmp with Snmp Extend as described, here:
+1: Monitor thru exposing rrdcached port, listen 42217 as described: [RRDCached Security](RRDCached-Security.md)
+2: Monitor thru snmp with Snmp Extend as described, here:
 
 SNMP extend script to monitor your (remote) RRDCached via snmp
 
