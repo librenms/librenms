@@ -39,6 +39,28 @@ class PortBits extends BaseGraph
 
     public function data(): array
     {
+        return \Request::get('renderer') == 'dygraph'
+            ? $this->getDygraph()
+            : $this->getChartJs();
+    }
+
+    private function getDygraph()
+    {
+        return [
+            'data' => $this->genDataDygraph(2),
+            'config' => [
+                'labels' => ['x', 'Port 1', 'Port 2'],
+                'legend' => 'always',
+                'showRoller' => true,
+                'rollPeriod' => 2,
+                'customBars' => false,
+                'ylabel' => 'bps',
+            ],
+        ];
+    }
+
+    private function getChartJs()
+    {
         $data = [
             [
                 'label' => 'Port 1',
@@ -56,13 +78,55 @@ class PortBits extends BaseGraph
             ],
         ];
 
-        $this->fillData($data[0]['data']);
-        $this->fillData($data[1]['data']);
+        $this->fillDataChartJs($data[0]['data']);
+        $this->fillDataChartJs($data[1]['data']);
 
-        return $data;
+        return [
+            'type' => 'line',
+            'data' => ['datasets' => $data],
+            'options' => [
+                'responsive' => true,
+                'scales' => [
+                    'xAxes' => [
+                        [
+                            'type' => 'time',
+                            'time' => [
+                                'unit' => 'hour',
+                                'displayFormats' => ['hour' => 'M-D-YYYY hh:mm'],
+                            ],
+                            'ticks' => [
+                                'min' => $this->now->subHours(2)->timestamp * 1000,
+                                'max' => $this->now->timestamp * 1000,
+                            ],
+                        ],
+                    ],
+                    'yAxes' => [
+                        [
+                            'ticks' => [
+                                'beginAtZero' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
-    private function fillData(&$array)
+    private function genDataDygraph($count = 2)
+    {
+        $array = [];
+        for ($x = 200; $x >= 0; $x -= 5) {
+            $data = [$this->now->subMinutes($x)->timestamp];
+            for ($i = 0; $i < $count; $i++) {
+                $data[] = rand(0, 32);
+            }
+            $array[] = $data;
+        }
+
+        return $array;
+    }
+
+    private function fillDataChartJs(&$array)
     {
         for ($x = 200; $x >= 0; $x -= 5) {
             $array[] = ['x' => $this->now->subMinutes($x)->timestamp * 1000, 'y' => rand(0, 32)];
