@@ -30,16 +30,42 @@ use Carbon\CarbonImmutable;
 
 class PortBits extends BaseGraph
 {
+    private $now;
+
+    public function __construct()
+    {
+        $this->now = CarbonImmutable::now();
+    }
+
     public function data(): array
     {
-        $now = CarbonImmutable::now();
-        return [
-            ['x' => $now->subMinutes(25)->timestamp, 'y' => rand(0, 32)],
-            ['x' => $now->subMinutes(20)->timestamp, 'y' => rand(0, 32)],
-            ['x' => $now->subMinutes(15)->timestamp, 'y' => rand(0, 32)],
-            ['x' => $now->subMinutes(10)->timestamp, 'y' => rand(0, 32)],
-            ['x' => $now->subMinutes(5)->timestamp, 'y' => rand(0, 32)],
-            ['x' => $now->timestamp, 'y' => rand(0, 32)],
+        $data = [
+            [
+                'label' => 'Port 1',
+                'data' => [],
+                'backgroundColor' => 'rgba(255, 99, 132, 0.2)',
+                'borderColor' => 'rgba(255, 99, 132, 1)',
+                'borderWidth' => 1,
+            ],
+            [
+                'label' => 'Port 2',
+                'data' => [],
+                'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                'borderColor' => 'rgba(54, 162, 235, 1)',
+                'borderWidth' => 1,
+            ],
         ];
+
+        $this->fillData($data[0]['data']);
+        $this->fillData($data[1]['data']);
+
+        return $data;
+    }
+
+    private function fillData(&$array)
+    {
+        for ($x = 200; $x >= 0; $x -= 5) {
+            $array[] = ['x' => $this->now->subMinutes($x)->timestamp * 1000, 'y' => rand(0, 32)];
+        }
     }
 }

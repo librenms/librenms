@@ -1,6 +1,6 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Graph'))
+@section('title', __('TEST Graph'))
 
 @section('content')
     <div class="container-fluid">
@@ -23,35 +23,11 @@
             .then(function (response) {
                 // JSON responses are automatically parsed.
                 chartData = response.data;
-                chartData.forEach(function(entry) {
-                    entry.x = new Date(entry.x*1000);
-                });
                 console.log(chartData);
                 var myChart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                        datasets: [{
-                            label: 'Some data',
-                            data: chartData,
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
+                        datasets: chartData
                     },
                     options: {
                         responsive: true,
@@ -59,7 +35,12 @@
                             xAxes: [{
                                 type: 'time',
                                 time: {
-                                    unit: 'month'
+                                    unit: 'hour',
+                                    displayFormats: {hour: 'M-D-YYYY hh:mm', minute: 'DD MM YYYY hh:mm'}
+                                },
+                                ticks: {
+                                    min: moment().subtract(2, 'hour'),
+                                    max: moment()
                                 }
                             }],
                             yAxes: [{
@@ -69,7 +50,8 @@
                             }]
                         }
                     }
-                });            })
+                });
+            })
             .catch(function (e) {
                 this.errors.push(e)
             })
