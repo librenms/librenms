@@ -29,19 +29,23 @@ use App\Facades\Rrd;
 use App\Graphing\BaseGraph;
 use App\Models\Port;
 use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
 
 class PortBits extends BaseGraph
 {
     private $now;
+    private $start;
+    private $end;
 
-    public function __construct()
+    public function data(Request $request): array
     {
         $this->now = CarbonImmutable::now();
-    }
+        $start = $request->get('start', $this->now->subHours(2));
+        $this->start = CarbonImmutable::parse(is_numeric($start) ? intval($start) : $start);
+        $end = $request->get('end', $this->now);
+        $this->end = CarbonImmutable::parse(is_numeric($end) ? intval($end) : $end);
 
-    public function data(): array
-    {
-        return \Request::get('renderer') == 'dygraph'
+        return $request->get('renderer') == 'dygraph'
             ? $this->getDygraph()
             : $this->getChartJs();
     }
@@ -49,7 +53,7 @@ class PortBits extends BaseGraph
     private function getDygraph()
     {
         return [
-            'data' => $this->formatRrdData($this->fetchData(101)),
+            'data' => $this->formatRrdData($this->fetchData(2)),
             'config' => [
                 'labels' => ['x', 'In', 'Out'],
                 'legend' => 'always',
@@ -63,7 +67,7 @@ class PortBits extends BaseGraph
 
     private function getChartJs()
     {
-        $actual = $this->formatRrdDataChartjs($this->fetchData(101));
+        $actual = $this->formatRrdDataChartjs($this->fetchData(2));
 
         $data = [
             [
@@ -118,9 +122,17 @@ class PortBits extends BaseGraph
         $port = Port::with('device')->find($id);
 
         $rrd_file = Rrd::name($port->device->hostname, Rrd::portName($id));
-        $defs = "DEF:outoctets$id=$rrd_file:OUTOCTETS:AVERAGE DEF:inoctets$id=$rrd_file:INOCTETS:AVERAGE CDEF:doutoctets$id=outoctets$id,-1,* CDEF:doutbits$id=doutoctets$id,8,* CDEF:inbits$id=inoctets$id,8,* XPORT:inbits$id:'In' XPORT:doutbits$id:'Out' ";
+        $defs = [
+            "DEF:outoctets$id=$rrd_file:OUTOCTETS:AVERAGE",
+            "DEF:inoctets$id=$rrd_file:INOCTETS:AVERAGE",
+            "CDEF:doutoctets$id=outoctets$id,-1,*",
+            "CDEF:doutbits$id=doutoctets$id,8,*",
+            "CDEF:inbits$id=inoctets$id,8,*",
+            "XPORT:inbits$id:'In'",
+            "XPORT:doutbits$id:'Out'",
+        ];
 
-        return Rrd::xport($defs, $this->now->subHours(2)->timestamp, $this->now->timestamp);
+        return Rrd::xport($defs, $this->start->timestamp, $this->end->timestamp);
     }
 
     private function formatRrdData($data)

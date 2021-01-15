@@ -30,6 +30,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Exceptions\RrdExportFailedException;
 use LibreNMS\Proc;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
@@ -604,27 +605,27 @@ class Rrd extends BaseDatastore
         return $image_suffixes[$type] ?? '';
     }
 
-    public function xport($definition, $start, $end)
+    public function xport($definition, $start, $end = null)
     {
-        if ($this->init(false)) {
-            $cmd = $this->buildCommand('xport', '', "--json -s $start -e $end " . $definition);
-            $output = $this->sync_process->sendCommand($cmd);
+        $cmd = [Config::get('rrdtool', 'rrdtool'), 'xport', '--json', '-s', $start];
+        if ($end) {
+            array_push($cmd, '-e', $end);
+        }
+        if ($this->rrdcached) {
+            array_push($cmd, '--daemon', $this->rrdcached);
+        }
+        $cmd = array_merge($cmd, $definition);
 
-            $last_line = strrpos($output[0], "\nOK"); // remove OK
-            $json = json_decode(substr($output[0], 0, $last_line), true);
-            if ($output[1] || json_last_error()) {
-                return [
-                    'error' => $output[1],
-                    'output' => $output[0],
-                    'cmd' => $cmd,
-                    'json_error' => json_last_error_msg(),
-                ];
-            }
+        $proc = new Process($cmd);
+        $ret = $proc->run();
 
-            return $json;
+        $json = json_decode($proc->getOutput(), true);
+
+        if ($ret || json_last_error()) {
+            throw new RrdExportFailedException(implode(' ', $cmd), $proc->getErrorOutput(), $proc->getOutput(), json_last_error_msg());
         }
 
-        return [];
+        return $json;
     }
 
     public function __destruct()

@@ -25,12 +25,13 @@
 
 namespace App\Graphing;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-class GraphDataController
+class GraphDataController extends Controller
 {
     public function __invoke(BaseGraph $graph)
     {
-        return new JsonResponse($graph->data());
+        return new JsonResponse(app()->call([$graph, 'data']));
     }
 }

@@ -22,27 +22,58 @@
 @push('scripts')
     <script>
         var ctx = document.getElementById('chart').getContext('2d');
-        var div = document.getElementById('dygraph');
-
         axios.get('{{ route('graph_data.port_bits', ['renderer' => 'chartjs']) }}')
             .then(function (response) {
-                console.log(response.data);
                 new Chart(ctx, response.data);
             }).catch(function (e) {
-                this.errors.push(e)
-            })
+                console.log(e)
+            });
 
-        axios.get('{{ route('graph_data.port_bits', ['renderer' => 'dygraph']) }}')
+        var div = document.getElementById('dygraph');
+        var dygraph;
+        var updateDygraph;
+        updateDygraph = function (start, end) {
+            axios.get('{{ route('graph_data.port_bits') }}', {params: {renderer: 'dygraph', start: start/1000, end: end/1000}})
+                .then(function (response) {
+                    var config = response.data.config;
+                    var data = response.data.data;
+                    data.forEach(function (item) {
+                        item[0] = new Date(item[0] * 1000)
+                    })
+                    config['file'] = data;
+                    dygraph.updateOptions(config);
+                }).catch(function (e) {
+                console.log(e)
+            });
+        };
+        axios.get('{{ route('graph_data.port_bits') }}', {params: {renderer: 'dygraph'}})
             .then(function (response) {
                 var json = response.data;
                 json.data.forEach(function (item) {
                     item[0] = new Date(item[0]*1000)
                 })
-                console.log(response.data);
-                new Dygraph(div, json.data, json.config);
+                json.config['zoomCallback'] = debounce(updateDygraph, 500, false);
+
+                dygraph = new Dygraph(div, json.data, json.config);
             }).catch(function (e) {
-            this.errors.push(e)
-        })
+                console.log(e)
+            });
+
+
+        function debounce(func, wait, immediate) {
+            var timeout;
+            return function() {
+                var context = this, args = arguments;
+                var later = function() {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                };
+                var callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(context, args);
+            };
+        };
     </script>
 @endpush
 

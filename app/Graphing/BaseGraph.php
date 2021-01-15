@@ -25,27 +25,22 @@
 
 namespace App\Graphing;
 
-use ReflectionClass;
+use App\Http\Controllers\Controller;
 
-abstract class BaseGraph
+abstract class BaseGraph extends Controller
 {
     public $group;
     public $name;
 
-    abstract public function data(): array;
+//    abstract public function data(): array;
 
     public static function __set_state(array $properties)
     {
         $class = new static();
 
-        $reflection = new ReflectionClass($class);
-
-        foreach ($properties as $name => $value) {
-            $property = $reflection->getProperty($name);
-            $property->setAccessible(true);
-
-            $property->setValue($class, $value);
-        }
+        // hardcoded vars for route
+        $class->group = $properties['group'];
+        $class->name = $properties['name'];
 
         return $class;
     }
