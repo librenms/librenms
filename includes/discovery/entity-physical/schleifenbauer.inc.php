@@ -95,6 +95,13 @@ foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDe
                 $entPhysicalName = 'Outlet #' . $sdbDevOutIndex;
 
                 discover_entity_physical($valid, $device, $outletIndex, 'PDU outlet', 'powerSupply', $entPhysicalName, null, null, $outletBackplaneIndex, 'Schleifenbauer Products B.V.', $sdbDevOutIndex, null, null, null, null, 'false', $sdbDevOutName, null, null);
+
+                // Enumerate sensors under the Outlet
+                discover_entity_physical($valid, $device, $outletIndex + 110, $entPhysicalName . ' voltage sensor (V)', 'sensor', 'Voltage Sensor', null, null, $outletIndex, 'Schleifenbauer Products B.V.', 1, null, null, null, null, 'false', null, null, null);
+                discover_entity_physical($valid, $device, $outletIndex + 120, $entPhysicalName . ' RMS current sensor (A)', 'sensor', 'Current Sensor', null, null, $outletIndex, 'Schleifenbauer Products B.V.', 2, null, null, null, null, 'false', null, null, null);
+                discover_entity_physical($valid, $device, $outletIndex + 130, $entPhysicalName . ' apparent power sensor (W)', 'sensor', 'Power Sensor', null, null, $outletIndex, 'Schleifenbauer Products B.V.', 3, null, null, null, null, 'false', null, null, null);
+                discover_entity_physical($valid, $device, $outletIndex + 140, $entPhysicalName . ' lifetime power consumed sensor (kWh)', 'sensor', 'Power Consumed Sensor', null, null, $outletIndex, 'Schleifenbauer Products B.V.', 4, null, null, null, null, 'false', null, null, null);
+                discover_entity_physical($valid, $device, $outletIndex + 150, $entPhysicalName . ' power factor sensor (ratio)', 'sensor', 'Power Factor Sensor', null, null, $outletIndex, 'Schleifenbauer Products B.V.', 5, null, null, null, null, 'false', null, null, null);
             } // end Outlet discovery foreach sdbDevOutNameArray
         } // end of Outlet Backplane detection
     }
