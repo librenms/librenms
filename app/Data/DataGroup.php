@@ -114,6 +114,7 @@ abstract class DataGroup
             $ds->setValue(array_key_exists($name, $data) ? $data[$name] : (array_key_exists($position, $data) ? $data[$position] : null));
             $position++;
         }
+        return $this;
     }
 
     /**

@@ -167,35 +167,34 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     public static function poll(OS $os)
     {
-        $processors = dbFetchRows('SELECT * FROM processors WHERE device_id=?', [$os->getDeviceId()]);
+        $processors = \App\Models\Processor::where('device_id', $os->getDeviceId())->with('device')->get();
+        $poll_time = time();
 
         if ($os instanceof ProcessorPolling) {
-            $data = $os->pollProcessors($processors);
+            $data = $os->pollProcessors($processors->toArray()); // FIXME pass model
         } else {
-            $data = static::pollProcessors($os, $processors);
+            $data = static::pollProcessors($os, $processors->toArray());
         }
 
         $rrd_def = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
 
-        foreach ($processors as $index => $processor) {
-            extract($processor); // extract db fields to variables
-            /** @var int $processor_id */
-            /** @var string $processor_type */
-            /** @var int $processor_index */
-            /** @var int $processor_usage */
-            /** @var string $processor_descr */
-            if (array_key_exists($processor_id, $data)) {
-                $usage = round($data[$processor_id], 2);
-                echo "$processor_descr: $usage%\n";
+        /** @var \App\Models\Processor $processor */
+        foreach ($processors as $processor) {
+            if (array_key_exists($processor->processor_id, $data)) {
+                $processor->processor_usage = round($data[$processor->processor_id], 2);
+                echo "$processor->processor_descr: $processor->processor_usage%\n";
 
-                $rrd_name = ['processor', $processor_type, $processor_index];
-                $fields = compact('usage');
-                $tags = compact('processor_type', 'processor_index', 'rrd_name', 'rrd_def');
+                $tags = [
+                    'processor_type' => $processor->processor_type,
+                    'processor_index' => $processor->processor_index,
+                    'rrd_name' => ['processor', $processor->processor_type, $processor->processor_index],
+                    'rrd_def' => $rrd_def,
+                ];
+                $fields = ['usage' => $processor->processor_usage];
                 data_update($os->getDeviceArray(), 'processors', $tags, $fields);
+                app('Datastore')->record(\App\Data\Sets\Processor::make($processor)->fillData($poll_time, $fields));
 
-                if ($usage != $processor_usage) {
-                    dbUpdate(['processor_usage' => $usage], 'processors', '`processor_id` = ?', [$processor_id]);
-                }
+                $processor->save();
             }
         }
     }

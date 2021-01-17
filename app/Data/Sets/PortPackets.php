@@ -47,21 +47,21 @@ class PortPackets extends DataGroup
                 'ifIndex' => $port->ifIndex,
                 'port_descr_type' => $port->port_descr_type,
             ])
-            ->addDataSet('ifInOctets', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifOutOctets', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifInErrors', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifOutErrors', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifInUcastPkts', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifOutUcastPkts', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifInNUcastPkts', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifOutNUcastPkts', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifInDiscards', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifOutDiscards', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifInUnknownProtos', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifInBroadcastPkts', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifOutBroadcastPkts', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifInMulticastPkts', DataRateType::COUNTER, DataType::INT, 0)
-            ->addDataSet('ifOutMulticastPkts', DataRateType::COUNTER, DataType::INT, 0);
+            ->addDataSet('ifInOctets', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifOutOctets', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifInErrors', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifOutErrors', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifInUcastPkts', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifOutUcastPkts', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifInNUcastPkts', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifOutNUcastPkts', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifInDiscards', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifOutDiscards', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifInUnknownProtos', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifInBroadcastPkts', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifOutBroadcastPkts', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifInMulticastPkts', DataRateType::DERIVE, DataType::INT, 0)
+            ->addDataSet('ifOutMulticastPkts', DataRateType::DERIVE, DataType::INT, 0);
 
         // enable migration
         $old_file = Rrd::name($port->device->hostname, Rrd::portName($port->port_id));

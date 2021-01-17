@@ -113,4 +113,9 @@ class DataSet
     {
         return $this->value;
     }
+
+    public function getType()
+    {
+        return $this->type;
+    }
 }

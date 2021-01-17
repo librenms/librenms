@@ -30,6 +30,8 @@ use App\Data\DataSet;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
+use LibreNMS\Enum\DataRateType;
+use LibreNMS\Enum\DataType;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdExportFailedException;
@@ -166,7 +168,7 @@ class Rrd extends BaseDatastore
     private function genDef(DataSet $ds)
     {
         $types = ['GAUGE', 'COUNTER', 'DERIVE', 'ABSOLUTE'];  // order matches enum values
-        $type = $types[$ds->getRateType()] ?? 'GAUGE';
+        $type = $this->getType($ds);
         $min = $ds->getMin() ?? 'U';
         $max = $ds->getMax() ?? 'U';
 
@@ -182,6 +184,20 @@ class Rrd extends BaseDatastore
         $def .= ":$type:$this->heartbeat:$min:$max";
 
         return "$def $this->rra";
+    }
+
+    private function getType(DataSet $ds)
+    {
+        $type = $ds->getRateType();
+        if ($type === DataRateType::COUNTER) {
+            return $ds->getType() === DataType::INT ? 'COUNTER' : 'DCOUNTER';
+        }
+
+        if ($type === DataRateType::DERIVE) {
+            return $ds->getType() === DataType::INT ? 'DERIVE' : 'DDERIVE';
+        }
+
+        return $type === DataRateType::ABSOLUTE ? 'ABSOLUTE' : 'GAUGE';
     }
 
     /**
