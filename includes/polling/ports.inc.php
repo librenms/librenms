@@ -942,6 +942,10 @@ foreach ($ports as $port) {
             $globally_updated_port_ids[] = $port_id;
         }
         // End Update Database
+
+        $portsData = \App\Data\Sets\PortPackets::make(\App\Models\Port::with('device')->find($port_id));
+        $portsData->fillData($polled, $this_port);
+        app('Datastore')->record($portsData);
     }
 
     echo "\n";
