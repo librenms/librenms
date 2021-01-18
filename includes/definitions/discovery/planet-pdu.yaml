@@ -1,5 +1,7 @@
 mib: DIGIPDU-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+) (?<version>\S+)?/'
     sensors:
         voltage:
             data:
