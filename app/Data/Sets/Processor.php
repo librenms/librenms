@@ -43,7 +43,7 @@ class Processor extends DataGroup
                 'hostname' => $processor->device->hostname,
                 'description' => $processor->processor_descr,
             ])
-            ->addDataSet('usage', DataRateType::NONE, DataType::FLOAT, 0, 1);
+            ->addDataSet('usage', DataRateType::NONE, DataType::FLOAT, 0, 100);
 
         $dg->getDataSet('usage')->migrateFrom(Rrd::name($processor->device->hostname, ['processor', $processor->processor_type, $processor->processor_index]), 'usage');
 

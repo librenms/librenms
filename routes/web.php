@@ -191,5 +191,5 @@ Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
 Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth');
 Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummy');
 Route::any('/{path?}', 'LegacyController@index')
-    ->where('path', '^((?!_debugbar|graphs).)*')
+    ->where('path', '^((?!_debugbar|graph).)*')
     ->middleware('auth');

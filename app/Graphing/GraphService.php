@@ -53,11 +53,11 @@ class GraphService
         $group = $instance->group ?? $group;
         $name = $instance->name ?? $name;
 
-        $this->route->prefix('graphs/data')
+        $this->route->prefix('graph/data')
             ->get("$group/$name", GraphDataController::class)
             ->name("graph_data.{$group}_$name")
             ->defaults('graph', $instance);
-        $this->route->prefix('graphs')
+        $this->route->prefix('graph')
             ->get("$group/$name", GraphViewController::class)
             ->name("graph_view.{$group}_$name")
             ->defaults('graph', $instance);
