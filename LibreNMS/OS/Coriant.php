@@ -27,7 +27,6 @@ namespace LibreNMS\OS;
 
 use App\Models\TnmsAlarm;
 use App\Models\TnmsneInfo;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Util\ModuleModelObserver;
 use Log;
