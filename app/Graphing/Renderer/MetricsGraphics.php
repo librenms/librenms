@@ -38,8 +38,8 @@ class MetricsGraphics implements \App\Graphing\Interfaces\Renderer
             'width' => 1000,
             'height' => 500,
             'right' => 40,
-            'x_accessor' => 't',
-            'y_accessor' => 'v',
+            'x_accessor' => 0,
+            'y_accessor' => 1,
             'legend' => [],
         ];
     }
@@ -68,8 +68,8 @@ class MetricsGraphics implements \App\Graphing\Interfaces\Renderer
             foreach ($this->config['legend'] as $index => $label) {
                 $dataIndex = $index + $index * 3;
                 $output[$index][] = $rangeValues
-                    ? ['t' => $timestamp, 'v' => $values[$dataIndex + 1], 'l' => $values[$dataIndex], 'u' => $values[$dataIndex + 2]]
-                    : ['t' => $timestamp, 'v' => $values[$index]];
+                    ? [$timestamp, $values[$dataIndex + 1], $values[$dataIndex], $values[$dataIndex + 2]]
+                    : [$timestamp, $values[$index]];
             }
 
             $timestamp += $step;
@@ -82,7 +82,7 @@ class MetricsGraphics implements \App\Graphing\Interfaces\Renderer
 
     public function enableRangeValues()
     {
-        $this->config['show_confidence_band'] = ['l', 'u'];
+        $this->config['show_confidence_band'] = [2, 3];
     }
 
     public function setTimeRange($start, $end)

@@ -70,14 +70,13 @@
         d3.json('{!! $url !!}&renderer=metrics-graphics', function(config) {
             for (var i = 0; i < config.data.length; i++) {
                 for (var j = 0; j < config.data[i].length; j++) {
-                    config.data[i][j]['t'] = new Date(config.data[i][j]['t'] * 1000);
+                    config.data[i][j][0] = new Date(config.data[i][j][0] * 1000);
                 }
             }
             if (config['yax_format']) {
                 config['yax_format'] = d3.format(config['yax_format']);
             }
             config['target'] = document.getElementById('metrics-graphics');
-            console.log(config);
             MG.data_graphic(config);
         });
 
