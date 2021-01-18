@@ -25,7 +25,11 @@
 
 namespace App\Graphing;
 
+use App\Graphing\Renderer\Chartjs;
+use App\Graphing\Renderer\Dygraph;
 use App\Http\Controllers\Controller;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
 
 abstract class BaseGraph extends Controller
 {
@@ -33,6 +37,33 @@ abstract class BaseGraph extends Controller
     public $name;
 
 //    abstract public function data(): array;
+    /**
+     * @var \Carbon\CarbonImmutable
+     */
+    protected $now;
+    /**
+     * @var \Carbon\CarbonImmutable
+     */
+    protected $end;
+    /**
+     * @var \Carbon\CarbonImmutable
+     */
+    protected $start;
+    /**
+     * @var \App\Graphing\Interfaces\Renderer
+     */
+    protected $renderer;
+
+    protected function init(Request $request)
+    {
+        $this->now = CarbonImmutable::now();
+        $start = $request->get('start', $this->now->subHours(2));
+        $this->start = CarbonImmutable::parse(is_numeric($start) ? intval($start) : $start);
+        $end = $request->get('end', $this->now);
+        $this->end = CarbonImmutable::parse(is_numeric($end) ? intval($end) : $end);
+
+        $this->renderer = $request->get('renderer') == 'dygraph' ? new Dygraph() : new Chartjs();
+    }
 
     public static function __set_state(array $properties)
     {

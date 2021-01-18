@@ -1,6 +1,6 @@
 <?php
 /*
- * ChartServiceProvider.php
+ * Renderer.php
  *
  * -Description-
  *
@@ -23,18 +23,13 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Providers;
+namespace App\Graphing\Interfaces;
 
-use App\Graphing\Graphs\PortBits;
-use App\Graphing\Graphs\ProcessorUsage;
-use App\Graphing\GraphService;
-use Illuminate\Support\ServiceProvider;
-
-class GraphsServiceProvider extends ServiceProvider
+interface Renderer
 {
-    public function boot(GraphService $graph)
-    {
-        $graph->register(PortBits::class);
-        $graph->register(ProcessorUsage::class);
-    }
+    public function setLabels($labels, $yLabel);
+    public function formatRrdData($data): array;
+    public function enableRangeValues();
+    public function setTimeRange($start, $end);
+    public function setYRange($min = null, $max = null);
 }

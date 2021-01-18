@@ -1,6 +1,6 @@
 <?php
 /*
- * PortBits.php
+ * ProcessorUsage.php
  *
  * -Description-
  *
@@ -25,33 +25,35 @@
 
 namespace App\Graphing\Graphs;
 
-use App\Facades\Rrd;
-use App\Graphing\BaseGraph;
-use App\Models\Port;
+use App\Data\Sets\Processor;
 use Illuminate\Http\Request;
+use Rrd;
 
-class PortBits extends BaseGraph
+class ProcessorUsage extends \App\Graphing\BaseGraph
 {
     public function data(Request $request): array
     {
         $this->init($request);
-        $this->renderer->setLabels(['In', 'Out'], 'bps');
-        return $this->renderer->formatRrdData($this->fetchData(2));
+        $this->renderer->setLabels(['Usage'], 'Percent');
+        $this->renderer->enableRangeValues();
+        $this->renderer->setYRange(0, 100);
+        return $this->renderer->formatRrdData($this->fetchData(1));
     }
 
     private function fetchData($id)
     {
-        $port = Port::with('device')->find($id);
+        $processor = \App\Models\Processor::with('device')->find($id);
+        /** @var \App\Models\Processor $processor */
+        $dg = Processor::make($processor);
+        $rrd_file = Rrd::fileName($dg, $dg->getDataSet('usage'));
 
-        $rrd_file = Rrd::name($port->device->hostname, Rrd::portName($id));
         $defs = [
-            "DEF:outoctets$id=$rrd_file:OUTOCTETS:AVERAGE",
-            "DEF:inoctets$id=$rrd_file:INOCTETS:AVERAGE",
-            "CDEF:doutoctets$id=outoctets$id,-1,*",
-            "CDEF:doutbits$id=doutoctets$id,8,*",
-            "CDEF:inbits$id=inoctets$id,8,*",
-            "XPORT:inbits$id:'In'",
-            "XPORT:doutbits$id:'Out'",
+            "DEF:minusage$id=$rrd_file:value:MIN",
+            "DEF:usage$id=$rrd_file:value:AVERAGE",
+            "DEF:maxusage$id=$rrd_file:value:MAX",
+            "XPORT:minusage$id:'min'",
+            "XPORT:usage$id:'avg'",
+            "XPORT:maxusage$id:'max'",
         ];
 
         return Rrd::xport($defs, $this->start->timestamp, $this->end->timestamp);

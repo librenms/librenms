@@ -89,7 +89,7 @@ abstract class DataGroup
      * @param  string  $name
      * @return DataSet|null
      */
-    protected function getDataSet($name)
+    public function getDataSet($name)
     {
         return $this->dataSets[$name] ?? null;
     }

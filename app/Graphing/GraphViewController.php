@@ -25,10 +25,14 @@
 
 namespace App\Graphing;
 
+use Illuminate\Http\Request;
+
 class GraphViewController
 {
-    public function __invoke()
+    public function __invoke(Request $request)
     {
-        return view('graph');
+        [$_, $group, $graph] = explode('/', $request->path(), 3);
+
+        return view('graph', ['url' => route("graph_data.{$group}_{$graph}")]);
     }
 }
