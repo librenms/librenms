@@ -32,7 +32,9 @@ class GraphViewController
     public function __invoke(Request $request)
     {
         [$_, $group, $graph] = explode('/', $request->path(), 3);
+        $options = $request->only(['start', 'end']);
+        $options['fudge'] = 'yes';
 
-        return view('graph', ['url' => route("graph_data.{$group}_{$graph}")]);
+        return view('graph', ['url' => route("graph_data.{$group}_{$graph}", $options)]);
     }
 }
