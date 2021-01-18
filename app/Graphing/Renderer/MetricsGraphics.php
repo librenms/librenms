@@ -40,6 +40,7 @@ class MetricsGraphics implements \App\Graphing\Interfaces\Renderer
             'right' => 40,
             'x_accessor' => 0,
             'y_accessor' => 1,
+            'brush' => 'x',
             'legend' => [],
         ];
     }
@@ -47,13 +48,17 @@ class MetricsGraphics implements \App\Graphing\Interfaces\Renderer
     public function setLabels($labels, $yLabel)
     {
         $this->config['legend'] = $labels;
-        $this->config['y_label'] = $yLabel;
 
         if ($yLabel == 'bps') {
-            // FIXME not working?
-            $this->config['yax_format'] = '.2s';
+//            $this->config['yax_format'] = '.2s';
+//            $this->config['y_rollover_format'] = '.2s';
             $this->config['yax_units'] = $yLabel;
             $this->config['yax_units_append'] = true;
+        } elseif ($yLabel == 'Percent') {
+            $this->config['yax_units'] = '%';
+            $this->config['yax_units_append'] = true;
+        } else {
+            $this->config['y_label'] = $yLabel;
         }
     }
 

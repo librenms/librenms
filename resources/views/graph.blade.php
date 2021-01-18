@@ -76,6 +76,9 @@
             if (config['yax_format']) {
                 config['yax_format'] = d3.format(config['yax_format']);
             }
+            if (config['y_rollover_format']) {
+                config['y_rollover_format'] = d3.format(config['y_rollover_format']);
+            }
             config['target'] = document.getElementById('metrics-graphics');
             MG.data_graphic(config);
         });
