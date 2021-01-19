@@ -16,6 +16,11 @@
         </div>
         <div class="row">
             <div class="col-md-12">
+                <div id="plotly" class="chart-container" style="position: relative; height:40vh; width:80vw"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 <div class="chart-container" style="position: relative; height:40vh; width:80vw">
                     <canvas id="chartjs"></canvas>
                 </div>
@@ -27,16 +32,14 @@
 @push('scripts')
     <script>
         // ------  ChartJS
-        var ctx = document.getElementById('chartjs').getContext('2d');
         axios.get('{!! $url !!}',{params: {renderer: 'chartjs'}})
             .then(function (response) {
-                new Chart(ctx, response.data);
+                new Chart(document.getElementById('chartjs').getContext('2d'), response.data);
             }).catch(function (e) {
                 console.log(e)
             });
 
         // ------  Dygraph
-        var div = document.getElementById('dygraph');
         var dygraph;
         var updateDygraph;
         updateDygraph = function (start, end) {
@@ -61,12 +64,12 @@
                 })
                 json.config['zoomCallback'] = debounce(updateDygraph, 500, false);
 
-                dygraph = new Dygraph(div, json.data, json.config);
+                dygraph = new Dygraph(document.getElementById('dygraph'), json.data, json.config);
             }).catch(function (e) {
                 console.log(e)
             });
 
-        // ------ Metrics graphics
+        // ------ Metrics Graphics
         d3.json('{!! $url !!}&renderer=metrics-graphics', function(config) {
             for (var i = 0; i < config.data.length; i++) {
                 for (var j = 0; j < config.data[i].length; j++) {
@@ -83,6 +86,27 @@
             MG.data_graphic(config);
         });
 
+        // ------ Plotly.js
+        axios.get('{!! $url !!}', {params: {renderer: 'plotly'}})
+            .then(function (response) {
+                data = response.data.data;
+                for (var i = 0; i < data.length; i++) {
+                    console.log(data);
+                    for (var j = 0; j < data[i]['x'].length; j++) {
+                        data[i]['x'][j] = new Date(data[i]['x'][j] * 1000)
+                    }
+                }
+                console.log(data);
+
+                Plotly.newPlot( document.getElementById('plotly'), data /*, response.data.layout */);
+            }).catch(function (e) {
+            console.log(e)
+        });
+
+
+        function unpack(rows, key) {
+            return rows.map(function(row) { return row[key]; });
+        }
 
         function debounce(func, wait, immediate) {
             var timeout;
@@ -106,6 +130,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" integrity="sha512-RJJ1NNC88QhN7dwpCY8rm/6OxI+YdQP48DrLGe/eSAd+n+s1PXwQkkpzzAgoJe4cZFW2GALQoxox61gSY2yQfg==" crossorigin="anonymous"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js" integrity="sha512-opAQpVko4oSCRtt9X4IgpmRkINW9JFIV3An2bZWeFwbsVvDxEkl4TEDiQ2vyhO2TDWfk/lC+0L1dzC5FxKFeJw==" crossorigin="anonymous"></script>
+    <script src="https://cdn.plot.ly/plotly-1.58.4.min.js" charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.15.6/metricsgraphics.min.js" integrity="sha512-ajcrSc3e0yOZ8tbLioR0G0rrcMvXoJku+UZfOXq2gtwbNLJGhbuzyxo/mAlxHfTegrN51YGvZXT/Gxp7NsIXXw==" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha256-t9UJPrESBeG2ojKTIcFLPGF7nHi2vEc7f5A2KpH/UBU=" crossorigin="anonymous"></script>
 @endsection

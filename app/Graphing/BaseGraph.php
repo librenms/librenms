@@ -25,9 +25,7 @@
 
 namespace App\Graphing;
 
-use App\Graphing\Renderer\Chartjs;
-use App\Graphing\Renderer\Dygraph;
-use App\Graphing\Renderer\MetricsGraphics;
+use App\Graphing\Renderer\RendererFactory;
 use App\Http\Controllers\Controller;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
@@ -62,8 +60,7 @@ abstract class BaseGraph extends Controller
         $end = $request->get('end', $this->now);
         $this->end = CarbonImmutable::parse(is_numeric($end) ? intval($end) : $end);
 
-        $renderer = $request->get('renderer');
-        $this->renderer = $renderer == 'dygraph' ? new Dygraph() : ($renderer == 'metrics-graphics' ? new MetricsGraphics() : new Chartjs());
+        $this->renderer = RendererFactory::make($request->get('renderer'));
     }
 
     public static function __set_state(array $properties)
