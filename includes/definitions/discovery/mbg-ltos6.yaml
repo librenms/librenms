@@ -12,7 +12,7 @@ modules:
                     descr: 'Reference clock type'
                     index: 'mbgLtNgRefclockType.{{ $index }}'
                     states:
-                    - { value: 30, descr: gps180, graph: 30, generic: 0}
+                        - { value: 30, descr: gps180, graph: 30, generic: 0}
                 -
                     oid: mbgLtNgRefclockTable
                     value: mbgLtNgRefclockUsage
