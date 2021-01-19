@@ -25,7 +25,9 @@
 
 namespace App\Graphing\Renderer;
 
-class MetricsGraphics implements \App\Graphing\Interfaces\Renderer
+use App\Graphing\Interfaces\Renderer;
+
+class MetricsGraphics implements Renderer
 {
     private $config;
 
@@ -40,6 +42,7 @@ class MetricsGraphics implements \App\Graphing\Interfaces\Renderer
             'right' => 40,
             'x_accessor' => 0,
             'y_accessor' => 1,
+            'aggregate_rollover' => true,
             'brush' => 'x',
             'legend' => [],
         ];
