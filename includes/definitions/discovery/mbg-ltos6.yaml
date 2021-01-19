@@ -2,8 +2,6 @@ mib: MBG-SNMP-LTNG-MIB
 modules:
     sensors:
         state:
-            options:
-                skip_value_lt: -1
             data:
                 -
                     oid: mbgLtNgRefclockTable
