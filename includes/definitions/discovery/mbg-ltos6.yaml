@@ -32,5 +32,5 @@ modules:
                     index: 'mbgLtNgRefclockState.{{ $index }}'
                     states:
                         - { value: 0, descr: notAvailable, graph: 0, generic: 3}
-                        - { value: 2, descr: synchronized, graph: 1, generic: 0}
-                        - { value: 3, descr: notSynchronized, graph: 2, generic: 2}
+                        - { value: 1, descr: synchronized, graph: 1, generic: 0}
+                        - { value: 2, descr: notSynchronized, graph: 2, generic: 2}
