@@ -1,0 +1,41 @@
+mib: TRIPPLITE:TRIPPLITE_PRODUCTS:TRIPLIGHT-12x
+modules:
+    sensors:
+        humidity:
+            data:
+                -
+                    oid: tlEnvHumidity
+                    num_oid: '.1.3.6.1.4.1.850.101.1.2.1.{{ $index }}'
+                    descr: 'The ambient humidity (%)'
+                    divisor: 10
+                    multiplier: 100
+                    low_limit:  10
+                    high_limit:  90
+                    group: 'EnviroSense'
+                    skip_values:
+                        -
+                            oid: tlEnvHumidity
+                            op: 'exists'
+                            value: false
+        temperature:
+            data:
+                -
+                    oid: tlEnvTemperatureC
+                    num_oid: '.1.3.6.1.4.1.850.101.1.1.1.{{ $index }}'
+                    descr: 'The ambient temperature (C)'
+                    divisor: 10
+                    multiplier: 10
+                    low_limit:  0
+                    high_limit:  40
+                    group: 'EnviroSense'
+                    skip_values:
+                        -
+                            oid: tlEnvTemperatureC
+                            op: 'exists'
+                            value: false
+        count:
+            data:
+                -
+                    oid: tlUpsBatteryAge
+                    num_oid: '.1.3.6.1.4.1.850.100.1.2.1.{{ $index }}'
+                    descr: 'The age of the battery in years'

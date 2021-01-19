@@ -5,6 +5,7 @@ over:
     - { graph: device_current, text: Current }
 icon: tripplite
 rfc1628_compat: true
+mib_dir: poweralert
 discovery:
     -
         sysDescr_regex:
