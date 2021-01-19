@@ -3,7 +3,7 @@ modules:
     sensors:
         state:
             options:
-                skip_value_lt: 0
+                skip_value_lt: -1
             data:
                 -
                     oid: mbgLtNgRefclockTable
