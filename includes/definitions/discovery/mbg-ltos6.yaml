@@ -24,9 +24,9 @@ modules:
                         - { value: 3, descr: primary, graph: 3, generic: 0}
                 -
                     oid: mbgLtNgRefclockTable
-                    value: mbgLtNgRefclockState
-                    num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.4.{{ $index }}'
-                    descr: 'Clock status'
+                    value: mbgLtNgRefclockSubstate
+                    num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.5.{{ $index }}'
+                    descr: 'Reference clock substate'
                     index: 'mbgLtNgRefclockSubstate.{{ $index }}'
                     states:
                         - { value: -1, descr: mrsRefNone, graph: -1, generic: 3}
@@ -60,9 +60,3 @@ modules:
                         - { value: 165, descr: mrsHavequickSync, graph: 165, generic: 0}
                         - { value: 166, descr: mrsExtOscSync, graph: 166, generic: 0}
                         - { value: 167, descr: mrsIntOscSync, graph: 167, generic: 0}
-                -
-                    oid: mbgLtNgRefclockTable
-                    value: mbgLtNgRefclockSubstate
-                    num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.5.{{ $index }}'
-                    descr: 'Reference clock substate'
-                    index: 'mbgLtNgRefclockSubstate.{{ $index }}'
