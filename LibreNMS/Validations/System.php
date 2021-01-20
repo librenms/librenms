@@ -40,7 +40,7 @@ class System extends BaseValidation
 
         $lnms = `which lnms 2>/dev/null`;
         if (empty($lnms)) {
-            $validator->warn('Global lnms shortcut not installed. lnms command must be run with full path', "sudo ln -s $install_dir/lnms /usr/local/bin/lnms");
+            $validator->warn('Global lnms shortcut not installed. lnms command must be run with full path', "sudo ln -s $install_dir/lnms /usr/bin/lnms");
         }
 
         $bash_completion_dir = '/etc/bash_completion.d/';
