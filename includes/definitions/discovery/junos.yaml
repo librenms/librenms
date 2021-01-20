@@ -15,12 +15,8 @@ modules:
                         value: 0
                     -
                         oid: JUNIPER-MIB::jnxOperatingDescr
-                        op: 'contains'
-                        value: 'Fan'
-                    -
-                        oid: JUNIPER-MIB::jnxOperatingDescr
-                        op: 'contains'
-                        value: 'Sensor'
+                        op: 'regex'
+                        value: '/(fan|sensor)/i'
     processors:
         data:
             -
@@ -33,6 +29,10 @@ modules:
                         oid: jnxOperatingBuffer
                         op: '='
                         value: 0
+                    -
+                        oid: jnxOperatingDescr
+                        op: 'regex'
+                        value: '/(fan|sensor)/i'
             -
                 oid: jnxJsSPUMonitoringObjectsEntry
                 value: jnxJsSPUMonitoringCPUUsage
