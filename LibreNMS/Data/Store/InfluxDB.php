@@ -26,8 +26,10 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\DataGroup;
 use InfluxDB\Client;
 use InfluxDB\Driver\UDP;
+use InfluxDB\Point;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use Log;
@@ -62,6 +64,34 @@ class InfluxDB extends BaseDatastore
         return Config::get('influxdb.enable', false);
     }
 
+    public function record(DataGroup $dg)
+    {
+        $stat = Measurement::start('write');
+        $fields = [];
+
+        /** @var \App\Data\DataSet $ds */
+        foreach ($dg->getDataSets() as $ds) {
+            $fields[$ds->getName()] = $ds->getValue();
+        }
+
+        $tags = array_merge($dg->getTags(), $dg->getFields());
+
+        try {
+            $this->connection->writePoints([new Point(
+                $dg->getName(),
+                null,
+                $tags,
+                $fields,
+                $dg->getTimestamp() * 1000000000,
+            )]);
+
+            $this->recordStatistic($stat->end());
+        } catch (\Exception $e) {
+            Log::error('InfluxDB exception: ' . $e->getMessage());
+            Log::debug($e->getTraceAsString());
+        }
+    }
+
     /**
      * Datastore-independent function which should be used for all polled metrics.
      *
@@ -79,6 +109,7 @@ class InfluxDB extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
+//        return; // no traditional storage
         $stat = Measurement::start('write');
         $tmp_fields = [];
         $tmp_tags['hostname'] = $device['hostname'];
@@ -112,7 +143,7 @@ class InfluxDB extends BaseDatastore
 
         try {
             $points = [
-                new \InfluxDB\Point(
+                new Point(
                     $measurement,
                     null, // the measurement value
                     $tmp_tags,

@@ -65,15 +65,16 @@ class DataSet
 
     public function setValue($value)
     {
-        $this->value = $value;
+        $this->value = $this->type === DataType::INT ? (int) $value : (float) $value;
     }
 
     /**
      * Set this to allow data to be migrated from an old RRD file
-     * @param string $file
-     * @param string $ds
+     *
+     * @param  string  $file
+     * @param  string  $ds
      */
-    public function migrateFrom($file, $ds)
+    public function migrateFrom(string $file, string $ds)
     {
         $this->oldDsFile = $file;
         $this->oldDsName = $ds;

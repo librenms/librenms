@@ -192,7 +192,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
                 ];
                 $fields = ['usage' => $processor->processor_usage];
                 data_update($os->getDeviceArray(), 'processors', $tags, $fields);
-                app('Datastore')->record(\App\Data\Sets\Processor::make($processor)->fillData($poll_time, $fields));
+                app('Datastore')->record(\App\Data\Sets\Processor::make($processor)->setData($fields, $poll_time));
 
                 $processor->save();
             }

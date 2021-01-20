@@ -59,6 +59,11 @@ abstract class DataGroup
         return $this->fields;
     }
 
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
+
     /**
      * Add dataset (convenience for nicer code)
      *
@@ -100,12 +105,24 @@ abstract class DataGroup
     }
 
     /**
-     * Fill data to be stored.  Must use numeric keys in the same order as the definition or keys that match the DataSet names.
+     * Fill data.  Must use numeric keys in the same order as the definition or keys that match the DataSet names.
      *
-     * @param  int  $timestamp
-     * @param  array  $data
+     * @param  array  $data keys should match the dataset name or be in the same order
+     * @return \App\Data\DataGroup
      */
-    public function fillData(int $timestamp, array $data)
+    public function fillData(array $data): DataGroup
+    {
+        return $this->setData($data, time());
+    }
+
+    /**
+     * Fill data to be stored with a timestamp.  Must use numeric keys in the same order as the definition or keys that match the DataSet names.
+     *
+     * @param  array  $data keys should match the dataset name or be in the same order
+     * @param  int  $timestamp  in seconds
+     * @return \App\Data\DataGroup
+     */
+    public function setData(array $data, int $timestamp): DataGroup
     {
         $this->timestamp = $timestamp;
         $position = 0;

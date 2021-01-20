@@ -167,7 +167,6 @@ class Rrd extends BaseDatastore
 
     private function genDef(DataSet $ds)
     {
-        $types = ['GAUGE', 'COUNTER', 'DERIVE', 'ABSOLUTE'];  // order matches enum values
         $type = $this->getType($ds);
         $min = $ds->getMin() ?? 'U';
         $max = $ds->getMax() ?? 'U';
