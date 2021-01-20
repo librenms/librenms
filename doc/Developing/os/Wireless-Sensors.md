@@ -12,8 +12,9 @@ with the values we expect to see the data in:
 | ap-count    | %           | WirelessApCountDiscovery     | The number of APs attached to this controller                                                   |
 | capacity    | %           | WirelessCapacityDiscovery    | The % of operating rate vs theoretical max                                                      |
 | ccq         | %           | WirelessCcqDiscovery         | The Client Connection Quality                                                                   |
+| ccrx        | count       | WirelessCcrxDiscovery        | The operational cellular channel rx                                                             |
 | cellband    | count       | WirelessCellbandDiscovery    | The operational cellular band                                                                   |
-| cellid      | count       | WirelessCellidDiscovery      | The operational cellular band                                                                   |
+| cellid      | count       | WirelessCellidDiscovery      | The operational cell id                                                                         |
 | clients     | count       | WirelessClientsDiscovery     | The number of clients connected to/managed by this device                                       |
 | distance    | km          | WirelessDistanceDiscovery    | The distance of a radio link in Kilometers                                                      |
 | error-rate  | bps         | WirelessErrorRateDiscovery   | The rate of errored packets or bits, etc                                                        |
@@ -21,7 +22,7 @@ with the values we expect to see the data in:
 | errors      | count       | WirelessErrorsDiscovery      | The total bits of errored packets or bits, etc                                                  |
 | frequency   | MHz         | WirelessFrequencyDiscovery   | The frequency of the radio in MHz, channels can be converted                                    |
 | mse         | dB          | WirelessMseDiscovery         | The Mean Square Error                                                                           |
-| noise-floor | dBm      | WirelessNoiseFloorDiscovery  | The amount of noise received by the radio                                                       |
+| noise-floor | dBm         | WirelessNoiseFloorDiscovery  | The amount of noise received by the radio                                                       |
 | power       | dBm         | WirelessPowerDiscovery       | The power of transmit or receive, including signal level                                        |
 | quality     | %           | WirelessQualityDiscovery     | The % of quality of the link, 100% = perfect link                                               |
 | rate        | bps         | WirelessRateDiscovery        | The negotiated rate of the connection (not data transfer)                                       |
