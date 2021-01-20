@@ -16,6 +16,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os'] === 'timos') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
+        } elseif ($device['os'] === 'aos7') {
+            $peer_data_check = snmpwalk_cache_multi_oid($device, 'alaBgpPeerAS', [], 'ALCATEL-IND1-BGP-MIB', 'aos7');
         } elseif ($device['os'] === 'vrp') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
         } elseif ($device['os_group'] == 'cisco') {
@@ -248,7 +250,23 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'aristaBgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
                                 'aristaBgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
                                 'aristaBgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
-                            ];
+			];
+			    } elseif ($device['os'] === 'aos7') {
+                            $peer_identifier = $peer['bgpPeerIdentifier'];
+                            $mib = 'ALCATEL-IND1-BGP-MIB';
+                            $oid_map = [
+                                'alaBgpPeerRowStatus' => 'bgpPeerState',
+                                'alaBgpPeerRcvdUpdMsgs' => 'bgpPeerInUpdates',
+                                'alaBgpPeerSentUpdMsgs' => 'bgpPeerOutUpdates',
+                                'alaBgpPeerRcvdMsgs' => 'bgpPeerInTotalMessages',
+                                'alaBgpPeerSentMsgs' => 'bgpPeerOutTotalMessages',
+                                'alaBgpPeerLastTransitionTime' => 'bgpPeerFsmEstablishedTime',
+                                'alaBgpPeerLastWriteTime' => 'bgpPeerInUpdateElapsedTime',
+                                'alaBgpPeerLocalAddr' => 'bgpLocalAddr',
+                                'alaBgpPeerName' => 'bgpPeerDescr',
+                                'alaBgpPeerLastDownReason' => 'bgpPeerLastErrorText',
+			];
+
                         } elseif ($device['os_group'] == 'cisco') {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
                             $mib = 'CISCO-BGP4-MIB';
@@ -381,7 +399,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista') {
+            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
                 foreach ($peer_afis as $peer_afi) {
@@ -510,7 +528,14 @@ if (\LibreNMS\Config::get('enable_bgp')) {
 
                         $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
                         $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
-                    }
+		    }
+
+		    if ($device['os'] === 'aos7') {
+			    $al_prefixes = snmpwalk_cache_multi_oid($device, 'alaBgpPeerRcvdPrefixes', $al_prefixes, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQnU');
+			    $tmp_peer = $peer['bgpPeerIdentifier'];
+			    $cbgpPeerAcceptedPrefixes = $al_prefixes . $peer['bgpPeerIdentifier'];
+		     d_echo($al_prefixes);
+		    }
 
                     if ($device['os_group'] === 'vrp') {
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixRcvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
