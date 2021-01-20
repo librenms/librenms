@@ -1461,6 +1461,9 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
     }
+    if ($sensor['sensor_class'] == 'count') {
+        return "<span class='label $label_style'>" . trim(intval($sensor['sensor_current'])) . ' ' . $unit . '</span>';
+    }
 
     return "<span class='label $label_style'>" . trim(format_si($sensor['sensor_current']) . $unit) . '</span>';
 }

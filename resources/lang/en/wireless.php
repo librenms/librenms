@@ -123,13 +123,18 @@ return [
         'unit' => 'dB',
     ],
     'cellband' => [
-        'short' => 'Cellband',
+        'short' => 'CellBand',
         'long' => 'Cellular Operating Band',
         'unit' => '',
     ],
     'cellid' => [
         'short' => 'CellId',
         'long' => 'Cellular Cell Id',
+        'unit' => '',
+    ],
+    'ccrx' => [
+        'short' => 'CellChRx',
+        'long' => 'Cellular RX Channel',
         'unit' => '',
     ],
 ];

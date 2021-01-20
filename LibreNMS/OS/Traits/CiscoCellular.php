@@ -31,8 +31,13 @@ trait CiscoCellular
     public function profileApn($index)
     {
         $cwceLteProfileApn = snmpwalk_cache_oid($this->getDeviceArray(), 'cwceLteProfileApn', [], 'CISCO-WAN-CELL-EXT-MIB');
+        $device = snmp_get($this->getDeviceArray(), 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
+        $device = ($device == "" ? strval($index) : preg_replace("/Modem(.*)Cellular/", "Ce", $device));
         $apn = $cwceLteProfileApn[$index . '.1']['cwceLteProfileApn'];
-        return $apn;
+        if ($apn == "") {
+            return $device;
+        }
+        return $device . " " . $apn;
     }
 
     /**
@@ -54,7 +59,6 @@ trait CiscoCellular
                 'ios',
                 $index,
                 'RSSI: ' . $this->profileApn($index),
-                //'RSSI: ' . str_replace('1.', '', $index),
                 $entry['c3gCurrentGsmRssi.1']
             );
         }
@@ -150,20 +154,20 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessSinr()
+    public function discoverWirelessCcrx()
     {
         $sensors = [];
 
-        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'cwceLteCurrSinr', [], 'CISCO-WAN-CELL-EXT-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gGsmChannelNumber', [], 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'sinr',
+                'ccrx',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.4.' . $index,
+                '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.4.' . $index,
                 'ios',
                 $index,
-                'SNIR: ' . $this->profileApn($index),
-                $entry['cwceLteCurrSinr.1']
+                'CCRX: ' . $this->profileApn($index),
+                $entry['c3gGsmChannelNumber.1']
             );
         }
 
@@ -176,7 +180,7 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessCellband()
+    public function discoverWirelessCellBand()
     {
         $sensors = [];
 
@@ -188,7 +192,7 @@ trait CiscoCellular
                 '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.6.' . $index,
                 'ios',
                 $index,
-                'Cellular band: ' . $this->profileApn($index),
+                'CellBand: ' . $this->profileApn($index),
                 $entry['cwceLteCurrOperatingBand.1']
             );
         }
@@ -202,7 +206,7 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessCellid()
+    public function discoverWirelessCellId()
     {
         $sensors = [];
 
@@ -214,7 +218,7 @@ trait CiscoCellular
                 '.1.3.6.1.4.1.9.9.661.1.3.2.1.13.' . $index,
                 'ios',
                 $index,
-                'Cellular Cell Id: ' . $this->profileApn($index),
+                'CellId: ' . $this->profileApn($index),
                 $entry['c3gGsmCurrentCellId.1']
             );
         }

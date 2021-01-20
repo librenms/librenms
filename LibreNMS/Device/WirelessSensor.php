@@ -206,6 +206,9 @@ class WirelessSensor extends Sensor
             'cellid' => [
                 'icon' => 'line-chart',
             ],
+            'ccrx' => [
+                'icon' => 'line-chart',
+            ],
         ];
 
         if ($valid) {
