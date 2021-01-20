@@ -25,6 +25,8 @@
 
 namespace App\Graphing\Renderer;
 
+use InfluxDB\ResultSet;
+
 class Plotly implements \App\Graphing\Interfaces\Renderer
 {
     private $layout;
@@ -142,5 +144,10 @@ class Plotly implements \App\Graphing\Interfaces\Renderer
     public function setYRange($min = null, $max = null)
     {
         $this->layout['yaxis']['range'] = [$min, $max];
+    }
+
+    public function formatInfluxData(ResultSet $data): array
+    {
+        return [];
     }
 }

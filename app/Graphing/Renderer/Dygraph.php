@@ -26,6 +26,7 @@
 namespace App\Graphing\Renderer;
 
 use App\Graphing\Interfaces\Renderer;
+use InfluxDB\ResultSet;
 
 class Dygraph implements Renderer
 {
@@ -82,5 +83,10 @@ class Dygraph implements Renderer
     public function setYRange($min = null, $max = null)
     {
         $this->config['config']['valueRange'] = [$min, $max];
+    }
+
+    public function formatInfluxData(ResultSet $data): array
+    {
+        return [];
     }
 }

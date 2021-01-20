@@ -26,6 +26,7 @@
 namespace App\Graphing\Renderer;
 
 use App\Graphing\Interfaces\Renderer;
+use InfluxDB\ResultSet;
 
 class MetricsGraphics implements Renderer
 {
@@ -81,6 +82,22 @@ class MetricsGraphics implements Renderer
             }
 
             $timestamp += $step;
+        }
+
+        $this->config['data'] = $output;
+
+        return $this->config;
+    }
+
+    public function formatInfluxData(ResultSet $data): array
+    {
+        $rangeValues = isset($this->config['show_confidence_band']);
+
+        $output = [];
+        foreach ($data->getSeries()[0]['values'] as $point) {
+            foreach ($this->config['legend'] as $index => $label) {
+                $output[$index][] = [$point[0], $point[$index + 1]];
+            }
         }
 
         $this->config['data'] = $output;

@@ -33,7 +33,10 @@ class GraphViewController
     {
         [$_, $group, $graph] = explode('/', $request->path(), 3);
         $options = $request->only(['start', 'end']);
-        $options['fudge'] = 'yes';
+        $id = $request->get('id');
+        if ($id !== null) {
+            $options['id'] = $id;
+        }
 
         return view('graph', ['url' => route("graph_data.{$group}_{$graph}", $options)]);
     }

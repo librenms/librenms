@@ -25,10 +25,13 @@
 
 namespace App\Graphing\Interfaces;
 
+use InfluxDB\ResultSet;
+
 interface Renderer
 {
     public function setLabels($labels, $yLabel);
     public function formatRrdData($data): array;
+    public function formatInfluxData(ResultSet $data): array;
     public function enableRangeValues();
     public function setTimeRange($start, $end);
     public function setYRange($min = null, $max = null);

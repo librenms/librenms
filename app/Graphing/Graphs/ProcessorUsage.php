@@ -27,6 +27,8 @@ namespace App\Graphing\Graphs;
 
 use App\Data\Sets\Processor;
 use Illuminate\Http\Request;
+use LibreNMS\Data\Store\InfluxDB;
+use LibreNMS\Proc;
 use Rrd;
 
 class ProcessorUsage extends \App\Graphing\BaseGraph
@@ -37,15 +39,17 @@ class ProcessorUsage extends \App\Graphing\BaseGraph
         $this->renderer->setLabels(['Usage'], 'Percent');
         $this->renderer->enableRangeValues();
         $this->renderer->setYRange(0, 100);
-        return $this->renderer->formatRrdData($this->fetchData(1));
+
+        $processor = \App\Models\Processor::with('device')->find(1);
+
+        return $this->renderer->formatRrdData($this->fetchData($processor));
     }
 
-    private function fetchData($id)
+    private function fetchData(\App\Models\Processor $processor)
     {
-        $processor = \App\Models\Processor::with('device')->find($id);
-        /** @var \App\Models\Processor $processor */
-        $dg = Processor::make($processor);
-        $rrd_file = Rrd::fileName($dg, $dg->getDataSet('usage'));
+        $dataGroup = Processor::make($processor);
+        $id = $processor->processor_id;
+        $rrd_file = Rrd::fileName($dataGroup, $dataGroup->getDataSet('usage'));
 
         $defs = [
             "DEF:minusage$id=$rrd_file:value:MIN",
@@ -57,5 +61,13 @@ class ProcessorUsage extends \App\Graphing\BaseGraph
         ];
 
         return Rrd::xport($defs, $this->start->timestamp, $this->end->timestamp);
+    }
+
+    private function fetchFromInfluxDB(\App\Models\Processor $processor)
+    {
+        $dataGroup = Processor::make($processor);
+        $db = app(InfluxDB::class)->getConnection();
+        $db->getQueryBuilder();
+
     }
 }

@@ -26,6 +26,7 @@
 namespace App\Graphing\Renderer;
 
 use App\Graphing\Interfaces\Renderer;
+use InfluxDB\ResultSet;
 
 class Chartjs implements Renderer
 {
@@ -111,5 +112,10 @@ class Chartjs implements Renderer
 
         $this->config['options']['scales']['yAxes'][0]['ticks']['min'] = $min;
         $this->config['options']['scales']['yAxes'][0]['ticks']['max'] = $max;
+    }
+
+    public function formatInfluxData(ResultSet $data): array
+    {
+        return [];
     }
 }
