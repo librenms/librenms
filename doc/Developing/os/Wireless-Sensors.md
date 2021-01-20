@@ -12,6 +12,8 @@ with the values we expect to see the data in:
 | ap-count    | %           | WirelessApCountDiscovery     | The number of APs attached to this controller                                                   |
 | capacity    | %           | WirelessCapacityDiscovery    | The % of operating rate vs theoretical max                                                      |
 | ccq         | %           | WirelessCcqDiscovery         | The Client Connection Quality                                                                   |
+| cellband    | count       | WirelessCellbandDiscovery    | The operational cellular band                                                                   |
+| cellid      | count       | WirelessCellidDiscovery      | The operational cellular band                                                                   |
 | clients     | count       | WirelessClientsDiscovery     | The number of clients connected to/managed by this device                                       |
 | distance    | km          | WirelessDistanceDiscovery    | The distance of a radio link in Kilometers                                                      |
 | error-rate  | bps         | WirelessErrorRateDiscovery   | The rate of errored packets or bits, etc                                                        |

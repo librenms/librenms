@@ -14,6 +14,8 @@ $role_data = snmpwalk_cache_oid($device, 'cswSwitchRole', [], 'CISCO-STACKWISE-M
 $redundant_data = snmp_get($device, 'cswRingRedundant.0', '-OQv', 'CISCO-STACKWISE-MIB');
 
 $tables = [
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.6.',    'oid' => 'c3gModemStatus',                       'state_name' => 'Modem Status',                 'mib' => 'CISCO-WAN-3G-MIB',                'descr' => 'Cellular modem status'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.3.',  'oid' => 'c3gGsmCurrentBand',                    'state_name' => 'Current Band',                 'mib' => 'CISCO-WAN-3G-MIB',                'descr' => 'Cellular modem status'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.2.1.7.',       'oid' => 'ciscoEnvMonVoltageStatusTable',        'state_name' => 'ciscoEnvMonVoltageState',      'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonVoltageStatusDescr'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.3.1.6.',       'oid' => 'ciscoEnvMonTemperatureStatusTable',    'state_name' => 'ciscoEnvMonTemperatureState',  'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonTemperatureStatusDescr'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.4.1.3.',       'oid' => 'ciscoEnvMonFanStatusTable',            'state_name' => 'ciscoEnvMonFanState',          'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonFanStatusDescr'],
@@ -117,6 +119,28 @@ foreach ($tables as $tablevalue) {
                 ['value' => 11, 'generic' => 2, 'graph' => 0, 'descr' => 'off (connector rating)'],
                 ['value' => 12, 'generic' => 1, 'graph' => 0, 'descr' => 'on (no inline power)'],
             ];
+        } elseif ($state_name == 'Modem Status') {
+            $states = [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'offline'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'online'],
+                ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'low power mode'],
+            ];
+        } elseif ($state_name == 'Current Band') {
+            $states = [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'invalid'],
+                ['value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'none'],
+                ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'gsm850'],
+                ['value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'gsm900'],
+                ['value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'gsm1800'],
+                ['value' => 7, 'generic' => 0, 'graph' => 0, 'descr' => 'gsm1900'],
+                ['value' => 8, 'generic' => 0, 'graph' => 0, 'descr' => 'wcdma800'],
+                ['value' => 9, 'generic' => 0, 'graph' => 0, 'descr' => 'wcdma850'],
+                ['value' => 10, 'generic' => 0, 'graph' => 0, 'descr' => 'wcdma1900'],
+                ['value' => 11, 'generic' => 0, 'graph' => 0, 'descr' => 'wcdma2100'],
+                ['value' => 12, 'generic' => 0, 'graph' => 0, 'descr' => 'lte band'],
+            ];
         } else {
             $states = [
                 ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
@@ -148,6 +172,8 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'] . $stack_port_descr['ifDescr'];
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
+                } elseif ($state_name == 'Modem Status' || $state_name == 'Current Band') {
+                    $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . " - " . $state_name;
                 }
                 discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
 

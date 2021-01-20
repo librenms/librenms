@@ -200,6 +200,12 @@ class WirelessSensor extends Sensor
             'distance' => [
                 'icon' => 'space-shuttle',
             ],
+            'cellband' => [
+                'icon' => 'line-chart',
+            ],
+            'cellid' => [
+                'icon' => 'line-chart',
+            ],
         ];
 
         if ($valid) {
