@@ -26,6 +26,11 @@ jobs:
       matrix:
         include:
           -
+            php-version: 8.0
+            name: Unit
+            skip-style-check: 1
+            skip-web-check: 1
+          -
             php-version: 7.4
             name: Unit
             skip-style-check: 1
@@ -69,10 +74,10 @@ jobs:
          run: |
            FILES=$(git diff --diff-filter=d --name-only origin/master | tr '\n' ' '|sed 's/,*$//g')
            echo $FILES
-           
+
            echo 'FILES<<EOF' >> $GITHUB_ENV
            echo $FILES >> $GITHUB_ENV
-           echo 'EOF' >> $GITHUB_ENV  
+           echo 'EOF' >> $GITHUB_ENV
       -
          name: Set $PATH
          run: |
@@ -81,7 +86,7 @@ jobs:
         name: set MySQL collate
         env:
           PORT: ${{ job.services.mysql.ports[3306] }}
-        run: | 
+        run: |
           mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
       -
         name: Set up PHP
