@@ -106,5 +106,19 @@ return [
         'long' => 'Interférence polaire croisée',
         'unit' => 'dB',
     ],
-
+    'cellband' => [
+        'short' => 'CellBande',
+        'long' => 'Bande de fonctionnement cellulaire',
+        'unit' => '',
+    ],
+    'cellid' => [
+        'short' => 'CellId',
+        'long' => 'Identifiant de cellule cellulaire',
+        'unit' => '',
+    ],
+    'ccrx' => [
+        'short' => 'CellCanRe',
+        'long' => 'Canal de réception cellulaire',
+        'unit' => '',
+    ],
 ];
