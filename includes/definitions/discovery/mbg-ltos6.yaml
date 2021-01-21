@@ -2,6 +2,7 @@ mib: MBG-SNMP-LTNG-MIB
 modules:
     sensors:
         count:
+            data:
                 -
                     oid: mbgLtNgRefclockTable
                     value: mbgLtNgRefclockStatusA
