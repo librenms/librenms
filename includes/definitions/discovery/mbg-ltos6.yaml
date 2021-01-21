@@ -1,8 +1,8 @@
 mib: MBG-SNMP-LTNG-MIB
 modules:
     os:
-        serial: mbgLtNgSerialNumber
-        version: mbgLtNgFirmwareVersion
+        serial: MBG-SNMP-LTNG-MIB::mbgLtNgSerialNumber
+        version: MBG-SNMP-LTNG-MIB::mbgLtNgFirmwareVersion
     sensors:
         count:
             data:
