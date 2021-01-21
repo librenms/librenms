@@ -39,7 +39,7 @@ class Processor extends DataGroup
                 'device' => $processor->device_id,
                 'index' => $processor->processor_index,
             ])
-            ->setFields([
+            ->setAnnotations([
                 'hostname' => $processor->device->hostname,
                 'description' => $processor->processor_descr,
             ])

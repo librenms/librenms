@@ -150,7 +150,7 @@ abstract class DataGroup
      *
      * @param  array  $fields
      */
-    protected function addAnnotations(array $fields)
+    protected function setAnnotations(array $fields)
     {
         $this->annotations = $fields;
         return $this;

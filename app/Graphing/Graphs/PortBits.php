@@ -28,6 +28,7 @@ namespace App\Graphing\Graphs;
 use App\Data\Sets\PortPackets;
 use App\Facades\Rrd;
 use App\Graphing\BaseGraph;
+use App\Graphing\QueryBuilder;
 use App\Models\Port;
 use Illuminate\Http\Request;
 use LibreNMS\Data\Store\InfluxDB;
@@ -65,18 +66,14 @@ class PortBits extends BaseGraph
     private function fetchFromInfluxDB(Port $port)
     {
         $dataGroup = PortPackets::make($port);
-
+        /** @var \InfluxDB\Database $db */
         $db = app(InfluxDB::class)->getConnection();
-        $query = $db->getQueryBuilder()
-            ->select('non_negative_derivative(mean("ifInOctets"), 1s) *8 AS "In", non_negative_derivative(mean("ifOutOctets"), 1s) *-8 AS "Out"')
-            ->from($dataGroup->getName())
-            ->where([
-                "port = '$port->port_id'",
-                'time >= ' . $this->start->timestamp . 's',
-                'time <= ' . $this->end->timestamp . 's',
-            ])
-            ->groupBy('time(15s) fill(null)');
 
-        return $query->getResultSet();
+        $builder = QueryBuilder::fromDataGroup($dataGroup)
+            ->select('ifInOctets')->math('*', 8)
+            ->select('ifOutOctets')->math('*', -8)
+            ->range($this->start, $this->end);
+
+        return $db->query($builder->toInfluxDBQuery());
     }
 }

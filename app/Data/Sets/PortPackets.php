@@ -40,7 +40,7 @@ class PortPackets extends DataGroup
                 'device' => $port->device_id,
                 'port' => $port->port_id,
             ])
-            ->setFields([
+            ->setAnnotations([
                 'hostname' => $port->device->hostname,
                 'ifName' => $port->ifName,
                 'ifAlias' => $port->ifAlias,
