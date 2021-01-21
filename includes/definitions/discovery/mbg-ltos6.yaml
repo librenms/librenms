@@ -93,10 +93,10 @@ modules:
                     descr: 'Reference Clock Usage'
                     index: 'mbgLtNgRefclockUsage.{{ $index }}'
                     states:
-                        - { value: 0, descr: notAvailable, graph: 0, generic: 3 }
-                        - { value: 1, descr: secondary, graph: 1, generic: 0 }
-                        - { value: 2, descr: compare, graph: 2, generic: 3 }
-                        - { value: 3, descr: primary, graph: 3, generic: 0 }
+                        - { value: 0, descr: notAvailable, graph: 0 }
+                        - { value: 1, descr: secondary, graph: 1 }
+                        - { value: 2, descr: compare, graph: 2 }
+                        - { value: 3, descr: primary, graph: 3 }
                 -
                     oid: mbgLtNgRefclockTable
                     value: mbgLtNgRefclockState
@@ -104,9 +104,9 @@ modules:
                     descr: 'Reference Clock State'
                     index: 'mbgLtNgRefclockState.{{ $index }}'
                     states:
-                        - { value: 0, descr: notAvailable, graph: 0, generic: 3 }
-                        - { value: 1, descr: synchronized, graph: 1, generic: 0 }
-                        - { value: 2, descr: notSynchronized, graph: 2, generic: 2 }
+                        - { value: 0, descr: notAvailable, graph: 0 }
+                        - { value: 1, descr: synchronized, graph: 1 }
+                        - { value: 2, descr: notSynchronized, graph: 2 }
 
 
                 
