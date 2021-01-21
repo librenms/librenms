@@ -109,7 +109,7 @@ modules:
                     index: 'mbgLtNgRefclockState.{{ $index }}'
                     states:
                         - { value: 0, descr: notAvailable, graph: 0 }
-                        - { value: 1, descr: aaaasynchronized, graph: 1 }
+                        - { value: 1, descr: synchronized, graph: 1 }
                         - { value: 2, descr: notSynchronized, graph: 2 }
 
 
