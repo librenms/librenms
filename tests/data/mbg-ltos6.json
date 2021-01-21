@@ -12,7 +12,7 @@
                     "features": null,
                     "os": "mbg-ltos6",
                     "type": "timing",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "meinberg.svg",
                     "location": "<private>"
                 }
