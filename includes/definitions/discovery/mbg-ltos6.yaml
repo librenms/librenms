@@ -7,13 +7,13 @@ modules:
                     oid: mbgLtNgRefclockStatusA
                     value: mbgLtNgRefclockStatusA
                     num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.6.{{ $index }}'
-                    descr: 'Antenna A #{{ $index }} Satellites'
+                    descr: 'Antenna A{{ $index }} Satellites'
                     index: 'mbgLtNgRefclockStatusA'
                 -
                     oid: mbgLtNgRefclockStatusB
                     value: mbgLtNgRefclockStatusB
                     num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.8.{{ $index }}'
-                    descr: 'Antenna B #{{ $index }} Satellites'
+                    descr: 'Antenna B{{ $index }} Satellites'
                     index: 'mbgLtNgRefclockStatusB'
         state:
             data:
