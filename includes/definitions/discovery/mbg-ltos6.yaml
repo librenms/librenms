@@ -57,7 +57,7 @@ modules:
                         - { value: 27, descr: jjy511, graph: 27, generic: 0 }
                         - { value: 28, descr: pzf600, graph: 28, generic: 0 }
                         - { value: 29, descr: tcr600, graph: 29, generic: 0 }
-                        - { value: 30, descr: gps180, graph: 30, generic: 0 }
+                        - { value: 30, descr: gps180, graph: 30 }
                         - { value: 31, descr: gln170, graph: 31, generic: 0 }
                         - { value: 32, descr: gps180PEX, graph: 32, generic: 0 }
                         - { value: 33, descr: tcr180PEX, graph: 33, generic: 0 }
