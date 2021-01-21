@@ -7,7 +7,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.5597.3",
                     "sysDescr": "Meinberg LANTIME  V6.20.014",
                     "sysContact": null,
-                    "version": null,
+                    "version": "7.00.014",
                     "hardware": null,
                     "features": null,
                     "os": "mbg-ltos6",
@@ -25,12 +25,12 @@
                     "sysObjectID": ".1.3.6.1.4.1.5597.3",
                     "sysDescr": "Meinberg LANTIME  V6.20.014",
                     "sysContact": "<private>",
-                    "version": null,
+                    "version": "7.00.014",
                     "hardware": null,
                     "features": null,
                     "os": "mbg-ltos6",
                     "type": "timing",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "meinberg.svg",
                     "location": "<private>"
                 }
@@ -1159,11 +1159,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": 505611,
+                    "ifInUcastPkts": 1194556,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": 505611,
+                    "ifOutUcastPkts": 1194556,
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -1175,11 +1175,11 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": 667993898,
+                    "ifInOctets": 1574162501,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": 667993898,
+                    "ifOutOctets": 1574162501,
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -1266,11 +1266,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": 74018,
+                    "ifInUcastPkts": 172697,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": 106051,
+                    "ifOutUcastPkts": 247871,
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -1282,11 +1282,11 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": 6743219,
+                    "ifInOctets": 15727098,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": 17792077,
+                    "ifOutOctets": 41665715,
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -2196,7 +2196,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
                     "processor_index": "196608",
                     "processor_type": "hr",
-                    "processor_usage": 6,
+                    "processor_usage": 8,
                     "processor_descr": "Geode Integrated Processor by AMD PCS",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -2217,9 +2217,9 @@
                     "mempool_descr": "Physical memory",
                     "mempool_perc": 13,
                     "mempool_perc_oid": null,
-                    "mempool_used": 30908416,
+                    "mempool_used": 30785536,
                     "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
-                    "mempool_free": 203714560,
+                    "mempool_free": 203837440,
                     "mempool_free_oid": null,
                     "mempool_total": 234622976,
                     "mempool_total_oid": null,
@@ -2237,9 +2237,9 @@
                     "mempool_descr": "Virtual memory",
                     "mempool_perc": 57,
                     "mempool_perc_oid": null,
-                    "mempool_used": 132661248,
+                    "mempool_used": 133640192,
                     "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.3",
-                    "mempool_free": 101961728,
+                    "mempool_free": 100982784,
                     "mempool_free_oid": null,
                     "mempool_total": 234622976,
                     "mempool_total_oid": null,
@@ -2277,9 +2277,9 @@
                     "mempool_descr": "Cached memory",
                     "mempool_perc": 36,
                     "mempool_perc_oid": null,
-                    "mempool_used": 84500480,
+                    "mempool_used": 85602304,
                     "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.7",
-                    "mempool_free": 150122496,
+                    "mempool_free": 149020672,
                     "mempool_free_oid": null,
                     "mempool_total": 234622976,
                     "mempool_total_oid": null,
@@ -2297,9 +2297,9 @@
                     "mempool_descr": "Shared memory",
                     "mempool_perc": 17,
                     "mempool_perc_oid": null,
-                    "mempool_used": 39792640,
+                    "mempool_used": 40894464,
                     "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.8",
-                    "mempool_free": 194830336,
+                    "mempool_free": 193728512,
                     "mempool_free_oid": null,
                     "mempool_total": 234622976,
                     "mempool_total_oid": null,
@@ -2317,12 +2317,60 @@
             "sensors": [
                 {
                     "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.5597.30.0.1.2.1.6.1",
+                    "sensor_index": "mbgLtNgRefclockStatusA.1",
+                    "sensor_type": "mbg-ltos6",
+                    "sensor_descr": "Antenna A1 Satellites",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 5,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": 0,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.5597.30.0.1.2.1.8.1",
+                    "sensor_index": "mbgLtNgRefclockStatusB.1",
+                    "sensor_type": "mbg-ltos6",
+                    "sensor_descr": "Antenna B1 Satellites",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": 0,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.5597.30.0.1.2.1.5.1",
                     "sensor_index": "mbgLtNgRefclockState.1",
-                    "sensor_type": "mbgLtNgRefclockTable",
-                    "sensor_descr": "Reference clock state",
+                    "sensor_type": "mbgLtNgRefclockState",
+                    "sensor_descr": "Reference Clock State",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2337,7 +2385,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "mbgLtNgRefclockTable"
+                    "state_name": "mbgLtNgRefclockState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -2345,8 +2393,8 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.5597.30.0.1.2.1.2.1",
                     "sensor_index": "mbgLtNgRefclockType.1",
-                    "sensor_type": "mbgLtNgRefclockTable",
-                    "sensor_descr": "Reference clock type",
+                    "sensor_type": "mbgLtNgRefclockType",
+                    "sensor_descr": "Reference Clock Type",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2361,7 +2409,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "mbgLtNgRefclockTable"
+                    "state_name": "mbgLtNgRefclockType"
                 },
                 {
                     "sensor_deleted": 0,
@@ -2369,8 +2417,8 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.5597.30.0.1.2.1.3.1",
                     "sensor_index": "mbgLtNgRefclockUsage.1",
-                    "sensor_type": "mbgLtNgRefclockTable",
-                    "sensor_descr": "Reference clock usage",
+                    "sensor_type": "mbgLtNgRefclockUsage",
+                    "sensor_descr": "Reference Clock Usage",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2385,30 +2433,492 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "mbgLtNgRefclockTable"
+                    "state_name": "mbgLtNgRefclockUsage"
                 }
             ],
             "state_indexes": [
                 {
-                    "state_name": "mbgLtNgRefclockTable",
+                    "state_name": "mbgLtNgRefclockState",
                     "state_descr": "notAvailable",
                     "state_draw_graph": 0,
                     "state_value": 0,
-                    "state_generic_value": 3
+                    "state_generic_value": 2
                 },
                 {
-                    "state_name": "mbgLtNgRefclockTable",
+                    "state_name": "mbgLtNgRefclockState",
                     "state_descr": "synchronized",
                     "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "mbgLtNgRefclockTable",
+                    "state_name": "mbgLtNgRefclockState",
                     "state_descr": "notSynchronized",
                     "state_draw_graph": 2,
                     "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps166",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps167",
+                    "state_draw_graph": 2,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps167SV",
+                    "state_draw_graph": 3,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps167PC",
+                    "state_draw_graph": 4,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps167PCI",
+                    "state_draw_graph": 5,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps163",
+                    "state_draw_graph": 6,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps168PCI",
+                    "state_draw_graph": 7,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps161",
+                    "state_draw_graph": 8,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps169PCI",
+                    "state_draw_graph": 9,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "tcr167PCI",
+                    "state_draw_graph": 10,
+                    "state_value": 10,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps164",
+                    "state_draw_graph": 11,
+                    "state_value": 11,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps170PCI",
+                    "state_draw_graph": 12,
+                    "state_value": 12,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "pzf511",
+                    "state_draw_graph": 13,
+                    "state_value": 13,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps170",
+                    "state_draw_graph": 14,
+                    "state_value": 14,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "tcr511",
+                    "state_draw_graph": 15,
+                    "state_value": 15,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "am511",
+                    "state_draw_graph": 16,
+                    "state_value": 16,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "msf511",
+                    "state_draw_graph": 17,
+                    "state_value": 17,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "grc170",
+                    "state_draw_graph": 18,
+                    "state_value": 18,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps170PEX",
+                    "state_draw_graph": 19,
+                    "state_value": 19,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps162",
+                    "state_draw_graph": 20,
+                    "state_value": 20,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "ptp270PEX",
+                    "state_draw_graph": 21,
+                    "state_value": 21,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "frc511PEX",
+                    "state_draw_graph": 22,
+                    "state_value": 22,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gen170",
+                    "state_draw_graph": 23,
+                    "state_value": 23,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "tcr170PEX",
+                    "state_draw_graph": 24,
+                    "state_value": 24,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "wwvb511",
+                    "state_draw_graph": 25,
+                    "state_value": 25,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "mgr170",
+                    "state_draw_graph": 26,
+                    "state_value": 26,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "jjy511",
+                    "state_draw_graph": 27,
+                    "state_value": 27,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "pzf600",
+                    "state_draw_graph": 28,
+                    "state_value": 28,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "tcr600",
+                    "state_draw_graph": 29,
+                    "state_value": 29,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps180",
+                    "state_draw_graph": 30,
+                    "state_value": 30,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gln170",
+                    "state_draw_graph": 31,
+                    "state_value": 31,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps180PEX",
+                    "state_draw_graph": 32,
+                    "state_value": 32,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "tcr180PEX",
+                    "state_draw_graph": 33,
+                    "state_value": 33,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "pzf180PEX",
+                    "state_draw_graph": 34,
+                    "state_value": 34,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "mgr180",
+                    "state_draw_graph": 35,
+                    "state_value": 35,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "msf600",
+                    "state_draw_graph": 36,
+                    "state_value": 36,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "wwvb600",
+                    "state_draw_graph": 37,
+                    "state_value": 37,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "jjy600",
+                    "state_draw_graph": 38,
+                    "state_value": 38,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps180HS",
+                    "state_draw_graph": 39,
+                    "state_value": 39,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gps180AMC",
+                    "state_draw_graph": 40,
+                    "state_value": 40,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "esi180",
+                    "state_draw_graph": 41,
+                    "state_value": 41,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "cpe180",
+                    "state_draw_graph": 42,
+                    "state_value": 42,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "lno180",
+                    "state_draw_graph": 43,
+                    "state_value": 43,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "grc180",
+                    "state_draw_graph": 44,
+                    "state_value": 44,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "liu",
+                    "state_draw_graph": 45,
+                    "state_value": 45,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "dcf600HS",
+                    "state_draw_graph": 46,
+                    "state_value": 46,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "dcf600RS",
+                    "state_draw_graph": 47,
+                    "state_value": 47,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "mri",
+                    "state_draw_graph": 48,
+                    "state_value": 48,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "bpe",
+                    "state_draw_graph": 49,
+                    "state_value": 49,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "gln180Pex",
+                    "state_draw_graph": 50,
+                    "state_value": 50,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "n2x",
+                    "state_draw_graph": 51,
+                    "state_value": 51,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "rsc180",
+                    "state_draw_graph": 52,
+                    "state_value": 52,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "lneGb",
+                    "state_draw_graph": 53,
+                    "state_value": 53,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "lnePpg180",
+                    "state_draw_graph": 54,
+                    "state_value": 54,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "scg",
+                    "state_draw_graph": 55,
+                    "state_value": 55,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "mdu300",
+                    "state_draw_graph": 56,
+                    "state_value": 56,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "sdi",
+                    "state_draw_graph": 57,
+                    "state_value": 57,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "fdm180",
+                    "state_draw_graph": 58,
+                    "state_value": 58,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "spt",
+                    "state_draw_graph": 59,
+                    "state_value": 59,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "pzf180",
+                    "state_draw_graph": 60,
+                    "state_value": 60,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockType",
+                    "state_descr": "rel1000",
+                    "state_draw_graph": 61,
+                    "state_value": 61,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockUsage",
+                    "state_descr": "notAvailable",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "mbgLtNgRefclockUsage",
+                    "state_descr": "secondary",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "mbgLtNgRefclockUsage",
+                    "state_descr": "compare",
+                    "state_draw_graph": 2,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "mbgLtNgRefclockUsage",
+                    "state_descr": "primary",
+                    "state_draw_graph": 3,
+                    "state_value": 3,
+                    "state_generic_value": 0
                 }
             ]
         },
@@ -2424,7 +2934,7 @@
                     "storage_descr": "/var",
                     "storage_size": 33554432,
                     "storage_units": 4096,
-                    "storage_used": 2895872,
+                    "storage_used": 3997696,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -2493,9 +3003,9 @@
                     "storage_descr": "/var",
                     "storage_size": 33554432,
                     "storage_units": 4096,
-                    "storage_used": 2895872,
-                    "storage_free": 30658560,
-                    "storage_perc": 9,
+                    "storage_used": 3997696,
+                    "storage_free": 29556736,
+                    "storage_perc": 12,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
                 },
