@@ -805,6 +805,13 @@
             "section": "port-descr",
             "order": 3
         },
+        "datastores.annotations": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "datastores",
+            "order": 0
+        },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
             "type": "text"

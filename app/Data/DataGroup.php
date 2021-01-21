@@ -34,7 +34,7 @@ abstract class DataGroup
     private $name;
     private $dataSets = [];
     private $tags = [];
-    private $fields = [];
+    private $annotations = [];
     private $timestamp;
 
     protected function __construct($name)
@@ -54,9 +54,9 @@ abstract class DataGroup
         return $this->tags;
     }
 
-    public function getFields()
+    public function getAnnotations()
     {
-        return $this->fields;
+        return $this->annotations;
     }
 
     public function getTimestamp()
@@ -150,9 +150,9 @@ abstract class DataGroup
      *
      * @param  array  $fields
      */
-    protected function setFields(array $fields)
+    protected function addAnnotations(array $fields)
     {
-        $this->fields = $fields;
+        $this->annotations = $fields;
         return $this;
     }
 
@@ -176,7 +176,7 @@ abstract class DataGroup
             }
         }
 
-        foreach ($this->fields as $name => $value) {
+        foreach ($this->annotations as $name => $value) {
             if ($this->nameIsInvalid($name)) {
                 throw new InvalidDataDefinitionException("DS $this->name: Invalid field name '$name'");
             }

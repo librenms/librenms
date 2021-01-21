@@ -39,11 +39,13 @@ class InfluxDB extends BaseDatastore
 {
     /** @var \InfluxDB\Database */
     private $connection;
+    private $annotationsEnabled;
 
     public function __construct(Database $influx)
     {
         parent::__construct();
         $this->connection = $influx;
+        $this->annotationsEnabled = Config::get('datastore.annotations');
 
         // if the database doesn't exist, create it.
         try {
@@ -75,7 +77,9 @@ class InfluxDB extends BaseDatastore
             $fields[$ds->getName()] = $ds->getValue();
         }
 
-        $tags = array_merge($dg->getTags(), $dg->getFields());
+        $tags = $this->annotationsEnabled
+            ? array_merge($dg->getTags(), $dg->getAnnotations())
+            : $dg->getTags();
 
         try {
             $this->connection->writePoints([new Point(
