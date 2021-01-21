@@ -95,10 +95,10 @@ modules:
                         - { value: 2, descr: notSynchronized, graph: 2, generic: 2 }
                 -
                     oid: mbgLtNgRefclockTable
-                    value: mbgLtRefClockModeVal
+                    value: mbgLtNgRefClockModeVal
                     num_oid: '.1.3.6.1.4.1.5597.3.2.4.0.{{ $index }}'
                     descr: 'Reference Clock Mode'
-                    index: 'mbgLtRefClockModeVal.{{ $index }}'
+                    index: 'mbgLtNgRefClockModeVal.{{ $index }}'
                     states:
                         - { value: 0, descr: notAvailable, graph: 0, generic: 3 }
                         - { value: 1, descr: normalOperation, graph: 1, generic: 0 }
