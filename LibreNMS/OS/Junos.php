@@ -101,6 +101,9 @@ class Junos extends OS implements OSPolling, MplsDiscovery
                 $mplsLspToAddr = long2ip(hexdec(str_replace(' ', '', $value['mplsLspInfoTo'])));
             }
 
+            var_dump($mplsLspCache);
+
+
             # todo: fast reroute not in this table!
             $lsps->push(new MplsLsp([
                 'vrf_oid' => $vrf_oid,
