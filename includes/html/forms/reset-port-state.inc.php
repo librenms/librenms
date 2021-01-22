@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2021 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
@@ -42,7 +41,7 @@ if (isset($_POST['device_id'])) {
     } else {
         $device = Device::find($_POST['device_id']);
 
-        log_event("Port state history reset by " . Auth::user()->username, $device);
+        log_event('Port state history reset by ' . Auth::user()->username, $device);
 
         try {
             foreach ($device->ports()->get() as $port) {
