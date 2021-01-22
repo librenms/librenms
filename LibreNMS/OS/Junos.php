@@ -119,4 +119,39 @@ class Junos extends OS implements OSPolling, MplsDiscovery
 
         return $lsps;
     }
+    
+    public function discoverMplsPaths($lsps)
+    {
+        // TODO
+    }
+
+    public function discoverMplsSdps()
+    {
+        // TODO
+    }
+
+    public function discoverMplsServices()
+    {
+        // TODO
+    }
+
+    public function discoverMplsSaps($svcs)
+    {
+        // TODO
+    }
+
+    public function discoverMplsSdpBinds($sdps, $svcs)
+    {
+        // TODO
+    }
+
+    public function discoverMplsTunnelArHops($paths)
+    {
+        // TODO
+    }
+
+    public function discoverMplsTunnelCHops($paths)
+    {
+        // TODO
+    }
 }
