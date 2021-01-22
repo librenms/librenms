@@ -124,8 +124,8 @@ class Junos extends OS implements OSPolling, MplsDiscovery
             # todo: fast reroute not in this table!
             var_dump($lsps);
             $lsps->push(new MplsLsp([
-                'vrf_oid' => $vrf_oid,
-                'lsp_oid' => $lsp_oid,
+                'vrf_oid' => 1,
+                'lsp_oid' => $count,
                 'device_id' => $this->getDeviceId(),
                 'mplsLspRowStatus' => $value['mplsLspInfoState'],
                 'mplsLspLastChange' => round($value['mplsLspInfoLastPathChange'] / 100),
