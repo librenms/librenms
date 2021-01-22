@@ -42,7 +42,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 
-class Junos extends OS implements OSPolling, MplsDiscovery, MplsPolling
+class Junos extends OS implements OSPolling, MplsDiscovery
 {
     public function discoverOS(Device $device): void
     {
