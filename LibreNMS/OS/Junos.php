@@ -94,20 +94,6 @@ class Junos extends OS implements OSPolling, MplsDiscovery
         foreach ($mplsLspCache as $key => $value) {
             [$vrf_oid, $lsp_oid] = explode(':', $key);
             #$lsp_devices = explode('->', $key);
-            #if (strpos($key, '->') == false) {
-            #    continue;
-            #}
-            $count++;
-            #var_dump($key);
-            // example $keys
-            // Without filtering for "->"
-            // ["'1.1.1.1:1.1.1.2:6:vpls:VPLS-C123-123456'"]
-
-            // With filtering for "->"
-            // lp-building-a-er1->building-b-er1
-
-            #$lsp_oid = $count;
-            #$vrf_oid = 0;
 
             $mplsLspFromAddr = $value['mplsLspInfoFrom'];
             if (isset($value['mplsLspInfoFrom'])) {
@@ -120,12 +106,11 @@ class Junos extends OS implements OSPolling, MplsDiscovery
 
             #var_dump($mplsLspCache);
 
-
-            # todo: fast reroute not in this table!
+            // TODO: some values are not not checked
             var_dump($lsps);
             $lsps->push(new MplsLsp([
-                'vrf_oid' => 1,
-                'lsp_oid' => $count,
+                'vrf_oid' => $vrf_oid,
+                'lsp_oid' => $lsp_oid,
                 'device_id' => $this->getDeviceId(),
                 'mplsLspRowStatus' => $value['mplsLspInfoState'],
                 'mplsLspLastChange' => round($value['mplsLspInfoLastPathChange'] / 100),
