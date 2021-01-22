@@ -92,14 +92,13 @@ class Junos extends OS implements OSPolling, MplsDiscovery
         #var_dump($mplsLspCache);
         $count = 0;
         foreach ($mplsLspCache as $key => $value) {
-            
-            #[$vrf_oid, $lsp_oid] = explode(':', $key);
+            [$vrf_oid, $lsp_oid] = explode(':', $key);
             #$lsp_devices = explode('->', $key);
-            if (strpos($key, '->') == false) {
-                continue;
-            }
+            #if (strpos($key, '->') == false) {
+            #    continue;
+            #}
             $count++;
-            var_dump($key);
+            #var_dump($key);
             // example $keys
             // Without filtering for "->"
             // ["'1.1.1.1:1.1.1.2:6:vpls:VPLS-C123-123456'"]
@@ -107,8 +106,8 @@ class Junos extends OS implements OSPolling, MplsDiscovery
             // With filtering for "->"
             // lp-building-a-er1->building-b-er1
 
-            $lsp_oid = $count;
-            $vrf_oid = 0;
+            #$lsp_oid = $count;
+            #$vrf_oid = 0;
 
             $mplsLspFromAddr = $value['mplsLspInfoFrom'];
             if (isset($value['mplsLspInfoFrom'])) {
