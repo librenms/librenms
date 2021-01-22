@@ -89,7 +89,6 @@ class Junos extends OS implements OSPolling, MplsDiscovery
         }
 
         $lsps = collect();
-        #var_dump($mplsLspCache);
         $count = 0;
         foreach ($mplsLspCache as $key => $value) {
             [$vrf_oid, $lsp_oid] = explode(':', $key);
@@ -108,6 +107,8 @@ class Junos extends OS implements OSPolling, MplsDiscovery
 
             // TODO: some values are not not checked
             var_dump($lsps);
+            
+            // TODO: How to get correct vrf- and lsp-oids?
             $lsps->push(new MplsLsp([
                 'vrf_oid' => $vrf_oid,
                 'lsp_oid' => $lsp_oid,
