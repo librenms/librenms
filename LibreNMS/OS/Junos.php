@@ -130,6 +130,7 @@ class Junos extends OS implements OSPolling, MplsDiscovery
                 'mplsLspRowStatus' => $value['mplsLspInfoState'],
                 'mplsLspLastChange' => round($value['mplsLspInfoLastPathChange'] / 100),
                 'mplsLspName' => $value['mplsLspInfoName'],
+                'mplsLspAdminState' => $value['mplsLspInfoState'],
                 'mplsLspOperState' => $value['mplsLspInfoState'],
                 'mplsLspFromAddr' => $mplsLspFromAddr,
                 'mplsLspToAddr' => $mplsLspToAddr,
