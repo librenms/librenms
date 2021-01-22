@@ -91,13 +91,17 @@ class Junos extends OS implements OSPolling, MplsDiscovery
         $lsps = collect();
         var_dump($mplsLspCache);
         foreach ($mplsLspCache as $key => $value) {
-            [$vrf_oid, $lsp_oid] = explode(':', $key);
-            #$id_data = explode(':', $key);
+            #[$vrf_oid, $lsp_oid] = explode(':', $key);
+            $id_data = explode(':', $key);
             #var_dump($key);
             #echo($vrf_oid);
             #echo($lsp_oid);
 
-            
+            // example $key
+            // ["'1.1.1.1:1.1.1.2:6:vpls:VPLS-C123-123456'"]=>
+
+            $lsp_oid = $id_data[2];
+            $vrf_oid = $id_data[2];
 
             $mplsLspFromAddr = $value['mplsLspInfoFrom'];
             if (isset($value['mplsLspInfoFrom'])) {
