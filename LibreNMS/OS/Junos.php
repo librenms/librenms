@@ -29,7 +29,20 @@ use App\Models\Device;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
-class Junos extends \LibreNMS\OS implements OSPolling
+use App\Models\MplsLsp;
+use App\Models\MplsLspPath;
+use App\Models\MplsSap;
+use App\Models\MplsSdp;
+use App\Models\MplsSdpBind;
+use App\Models\MplsService;
+use App\Models\MplsTunnelArHop;
+use App\Models\MplsTunnelCHop;
+
+use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\MplsDiscovery;
+use LibreNMS\Interfaces\Polling\MplsPolling;
+
+class Junos extends OS implements OSPolling, MplsDiscovery, MplsPolling
 {
     public function discoverOS(Device $device): void
     {
@@ -63,5 +76,47 @@ class Junos extends \LibreNMS\OS implements OSPolling
 
             $this->enableGraph('junos_jsrx_spu_sessions');
         }
+    }
+
+    /**
+     * @return Collection MplsLsp objects
+     */
+    public function discoverMplsLsps()
+    {
+        $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'mplsLspInfoList', [], 'MPLS-MIB', 'junos');
+        if (! empty($mplsLspCache)) {
+            $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'mplsLspInfoLastPathChange', $mplsLspCache, 'MPLS-MIB', 'junos', '-OQUst');
+        }
+
+        $lsps = collect();
+        foreach ($mplsLspCache as $key => $value) {
+            [$vrf_oid, $lsp_oid] = explode('.', $key);
+
+            $mplsLspFromAddr = $value['mplsLspInfoFrom'];
+            if (isset($value['mplsLspInfoFrom'])) {
+                $mplsLspFromAddr = long2ip(hexdec(str_replace(' ', '', $value['mplsLspInfoFrom'])));
+            }
+            $mplsLspToAddr = $value['mplsLspInfoTo'];
+            if (isset($value['mplsLspInfoTo'])) {
+                $mplsLspToAddr = long2ip(hexdec(str_replace(' ', '', $value['mplsLspInfoTo'])));
+            }
+
+            # todo: fast reroute not in this table!
+            $lsps->push(new MplsLsp([
+                'vrf_oid' => $vrf_oid,
+                'lsp_oid' => $lsp_oid,
+                'device_id' => $this->getDeviceId(),
+                'mplsLspRowStatus' => $value['mplsLspInfoState'],
+                'mplsLspLastChange' => round($value['mplsLspInfoLastPathChange'] / 100),
+                'mplsLspName' => $value['mplsLspInfoName'],
+                'mplsLspOperState' => $value['mplsLspState'],
+                'mplsLspFromAddr' => $mplsLspFromAddr,
+                'mplsLspToAddr' => $mplsLspToAddr,
+                'mplsLspType' => $value['mplsPathType'],
+                'mplsLspFastReroute' => 0,
+            ]));
+        }
+
+        return $lsps;
     }
 }
