@@ -42,6 +42,8 @@ if (isset($_POST['device_id'])) {
     } else {
         $device = Device::find($_POST['device_id']);
 
+        log_event("Port state history reset by " . Auth::user()->username, $device);
+
         try {
             foreach ($device->ports()->get() as $port) {
                 $port->ifSpeed_prev = null;
