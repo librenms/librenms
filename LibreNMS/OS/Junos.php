@@ -91,6 +91,8 @@ class Junos extends OS implements OSPolling, MplsDiscovery
         $lsps = collect();
         $count = 0;
         foreach ($mplsLspCache as $key => $value) {
+
+            // TODO: Does not get VRF or LSP IDs correcly
             [$vrf_oid, $lsp_oid] = explode(':', $key);
             #$lsp_devices = explode('->', $key);
 
@@ -102,11 +104,6 @@ class Junos extends OS implements OSPolling, MplsDiscovery
             if (isset($value['mplsLspInfoTo'])) {
                 $mplsLspToAddr = long2ip(hexdec(str_replace(' ', '', $value['mplsLspInfoTo'])));
             }
-
-            #var_dump($mplsLspCache);
-
-            // TODO: some values are not not checked
-            var_dump($lsps);
             
             // TODO: How to get correct vrf- and lsp-oids?
             $lsps->push(new MplsLsp([
