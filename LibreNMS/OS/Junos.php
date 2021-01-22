@@ -90,11 +90,11 @@ class Junos extends OS implements OSPolling, MplsDiscovery
 
         $lsps = collect();
         foreach ($mplsLspCache as $key => $value) {
-            [$vrf_oid, $lsp_oid] = explode(':', $key);
-
+            #[$vrf_oid, $lsp_oid] = explode(':', $key);
+            #$id_data = 
             echo($key);
-            echo($vrf_oid);
-            echo($lsp_oid);
+            #echo($vrf_oid);
+            #echo($lsp_oid);
 
             $mplsLspFromAddr = $value['mplsLspInfoFrom'];
             if (isset($value['mplsLspInfoFrom'])) {
@@ -105,7 +105,7 @@ class Junos extends OS implements OSPolling, MplsDiscovery
                 $mplsLspToAddr = long2ip(hexdec(str_replace(' ', '', $value['mplsLspInfoTo'])));
             }
 
-            var_dump($mplsLspCache);
+            #var_dump($mplsLspCache);
 
 
             # todo: fast reroute not in this table!
