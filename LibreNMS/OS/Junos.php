@@ -96,6 +96,7 @@ class Junos extends OS implements OSPolling, MplsDiscovery
             [$vrf_oid, $lsp_oid] = explode(':', $key);
             #$lsp_devices = explode('->', $key);
 
+            // This is working correcly
             $mplsLspFromAddr = $value['mplsLspInfoFrom'];
             if (isset($value['mplsLspInfoFrom'])) {
                 $mplsLspFromAddr = long2ip(hexdec(str_replace(' ', '', $value['mplsLspInfoFrom'])));
