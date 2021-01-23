@@ -5,7 +5,7 @@
 
     @config('login_message')
     <x-slot name="footer">
-        <pre style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif;border: 0;padding: 0;font-weight: bold;">{{ \LibreNMS\Config::get('login_message') }}</pre>
+        <div style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif;border: 0;padding: 0;font-weight: bold;">{{ \LibreNMS\Config::get('login_message') }}</div>
     </x-slot>
     @endconfig
 
