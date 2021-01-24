@@ -1117,7 +1117,7 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
             $safi = array_shift($afisafi_tmp);
             $peertype = array_shift($afisafi_tmp);
             $bgp_ip = implode('.', $afisafi_tmp);
-        } elseif $device['os'] == 'aos7') {
+        } elseif ($device['os'] == 'aos7') {
             $afi = 'ipv4';
             $safi = 'unicast';
             $bgp_ip = $k;
