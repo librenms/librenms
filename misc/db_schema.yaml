@@ -1404,7 +1404,6 @@ ports:
     - { Field: ifDescr, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifName, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: portName, Type: varchar(128), 'Null': true, Extra: '' }
-    - { Field: port_group_id, Type: 'int unsigned', 'Null': true, Extra: ''}
     - { Field: ifIndex, Type: bigint, 'Null': true, Extra: '', Default: '0' }
     - { Field: ifSpeed, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifSpeed_prev, Type: bigint, 'Null': true, Extra: '' }
@@ -1481,6 +1480,17 @@ port_groups:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     port_groups_name_unique: { Name: port_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }
+port_group_port:
+  Columns:
+    - { Field: port_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [port_group_id, port_id], Unique: true, Type: BTREE }
+    port_group_port_port_group_id_index: { Name: port_group_port_port_group_id_index, Columns: [port_group_id], Unique: false, Type: BTREE }
+    port_group_port_port_id_index: { Name: port_group_port_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints:
+    port_group_port_port_group_id_foreign: { name: port_group_port_port_group_id_foreign, foreign_key: port_group_id, table: port_groups, key: id, extra: 'ON DELETE CASCADE' }
+    port_group_port_port_id_foreign: { name: port_group_port_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE CASCADE' }
 ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }

@@ -49,7 +49,6 @@
                     "ifDescr": "lo",
                     "ifName": "lo",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -146,8 +145,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -158,7 +156,6 @@
                     "ifDescr": "eth0",
                     "ifName": "eth0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -255,8 +252,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -267,7 +263,6 @@
                     "ifDescr": "tun0",
                     "ifName": "tun0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 3,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -364,8 +359,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -376,7 +370,6 @@
                     "ifDescr": "tun1",
                     "ifName": "tun1",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 4,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -473,8 +466,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         },
@@ -489,7 +481,6 @@
                     "ifDescr": "lo",
                     "ifName": "lo",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 1,
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
@@ -586,8 +577,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -598,7 +588,6 @@
                     "ifDescr": "eth0",
                     "ifName": "eth0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 2,
                     "ifSpeed": 10000000000,
                     "ifSpeed_prev": null,
@@ -695,8 +684,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -707,7 +695,6 @@
                     "ifDescr": "tun0",
                     "ifName": "tun0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 3,
                     "ifSpeed": null,
                     "ifSpeed_prev": 0,
@@ -804,8 +791,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -816,7 +802,6 @@
                     "ifDescr": "tun1",
                     "ifName": "tun1",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 4,
                     "ifSpeed": null,
                     "ifSpeed_prev": 0,
@@ -913,8 +898,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         }

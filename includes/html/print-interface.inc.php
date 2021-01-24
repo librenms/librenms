@@ -72,7 +72,7 @@ if ($port_details) {
 
 echo '</span>';
 
-$port_group_name = dbFetchCell('SELECT name FROM port_groups WHERE id=?', [$port['port_group_id']]) ?: 'Default';
+$port_group_name = dbFetchCell('SELECT port_groups.name FROM port_groups LEFT JOIN port_group_port ON port_groups.id=port_group_port.port_group_id WHERE port_group_port.port_id=?', [$port['port_id']]) ?: 'Default';
 
 echo '</td><td width=100>';
 echo $port_group_name;

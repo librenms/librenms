@@ -28,4 +28,18 @@ class PortGroup extends BaseModel
 {
     public $timestamps = false;
     protected $fillable = ['name', 'desc'];
+
+    public function scopeHasAccess($query, User $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+        # maybe filtered in future
+        return $query;
+    }
+
+    public function ports()
+    {
+        return $this->belongsToMany(\App\Models\Port::class, 'port_group_port', 'port_group_id', 'port_id');
+    }
 }

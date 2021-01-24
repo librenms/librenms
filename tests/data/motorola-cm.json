@@ -49,7 +49,6 @@
                     "ifDescr": "Broadcom BCM3349 Rev. a0, Ethernet NI",
                     "ifName": "eth0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -146,8 +145,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -158,7 +156,6 @@
                     "ifDescr": "Broadcom BCM3349 r.A0 CM CATV-MAC IF",
                     "ifName": "cbl0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -255,8 +252,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -267,7 +263,6 @@
                     "ifDescr": "Broadcom BCM3349 r.A0 CM CATV-DS IF",
                     "ifName": "cbl0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 3,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -364,8 +359,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -376,7 +370,6 @@
                     "ifDescr": "Broadcom BCM3349 r.A0 CM CATV-US IF",
                     "ifName": "cbl0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 4,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -473,8 +466,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -485,7 +477,6 @@
                     "ifDescr": "Broadcom BCM3349 Rev. a0, USB NI",
                     "ifName": "usb0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 5,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -582,8 +573,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -594,7 +584,6 @@
                     "ifDescr": "Software Loopback",
                     "ifName": "lo 0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 6,
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
@@ -691,8 +680,7 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         },
@@ -707,7 +695,6 @@
                     "ifDescr": "Broadcom BCM3349 Rev. a0, Ethernet NI",
                     "ifName": "eth0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 1,
                     "ifSpeed": 100000000,
                     "ifSpeed_prev": null,
@@ -804,8 +791,7 @@
                     "ifOutMulticastPkts": 1192,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -816,7 +802,6 @@
                     "ifDescr": "Broadcom BCM3349 r.A0 CM CATV-MAC IF",
                     "ifName": "cbl0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
                     "ifSpeed_prev": 0,
@@ -913,8 +898,7 @@
                     "ifOutMulticastPkts": 124027,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -925,7 +909,6 @@
                     "ifDescr": "Broadcom BCM3349 r.A0 CM CATV-DS IF",
                     "ifName": "cbl0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 3,
                     "ifSpeed": 56000000,
                     "ifSpeed_prev": null,
@@ -1022,8 +1005,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1034,7 +1016,6 @@
                     "ifDescr": "Broadcom BCM3349 r.A0 CM CATV-US IF",
                     "ifName": "cbl0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 4,
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
@@ -1131,8 +1112,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1143,7 +1123,6 @@
                     "ifDescr": "Broadcom BCM3349 Rev. a0, USB NI",
                     "ifName": "usb0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 5,
                     "ifSpeed": 12000000,
                     "ifSpeed_prev": null,
@@ -1240,8 +1219,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 },
                 {
                     "port_descr_type": null,
@@ -1252,7 +1230,6 @@
                     "ifDescr": "Software Loopback",
                     "ifName": "lo 0",
                     "portName": null,
-                    "port_group_id": null,
                     "ifIndex": 6,
                     "ifSpeed": null,
                     "ifSpeed_prev": 0,
@@ -1349,8 +1326,7 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null,
-                    "port_group_id": null
+                    "ifOutMulticastPkts_rate": null
                 }
             ]
         }

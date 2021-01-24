@@ -252,6 +252,15 @@ class Port extends DeviceRelatedModel
         return $this->hasPortAccess($query, $user);
     }
 
+    public function scopeInPortGroup($query, $portGroup)
+    {
+        return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup) {
+            $query->select('port_id')
+                ->from('port_group_port')
+                ->where('port_group_id', $portGroup);
+        });
+    }
+
     // ---- Define Relationships ----
 
     public function adsl()
@@ -267,6 +276,11 @@ class Port extends DeviceRelatedModel
     public function fdbEntries()
     {
         return $this->hasMany(\App\Models\PortsFdb::class, 'port_id', 'port_id');
+    }
+
+    public function groups()
+    {
+        return $this->belongsToMany(\App\Models\PortGroup::class, 'port_group_port', 'port_id', 'port_group_id');
     }
 
     public function ipv4()

@@ -55,6 +55,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
     // Mark interfaces which are OperDown (but not AdminDown) yet not ignored or disabled, or up yet ignored or disabled
     // - as to draw the attention to a possible problem.
 
+    $associated_port_groups = dbFetchColumn('SELECT `port_group_id` FROM `port_group_port` where `port_id`=?', $port['port_id']);
     $isportbad = ($port['ifOperStatus'] != 'up' && $port['ifAdminStatus'] != 'down') ? 1 : 0;
     $dowecare = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : ! $isportbad;
     $outofsync = $dowecare ? " class='red'" : '';
@@ -66,7 +67,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
 
     $port_group_field = '<select class="input-sm" name="port_group_' . $port['port_id'] . '"  data-device_id="' . $port['device_id'] . '">';
     foreach ($port_groups as $pg_k => $pg_v) {
-        $port_group_field .= '<option value="' . $pg_k . '"' . ($port['port_group_id'] != $pg_k ?: ' selected') . '>' . $pg_v . '</option>';
+        $port_group_field .= '<option value="' . $pg_k . '"' . (! in_array($pg_k, $associated_port_groups) ?: ' selected') . '>' . $pg_v . '</option>';
     }
     $port_group_field .= '</select>';
 

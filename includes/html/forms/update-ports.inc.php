@@ -21,7 +21,11 @@ $rows_updated = 0;
 foreach ($_POST as $key => $val) {
     $port_id = intval(substr($key, 7));
     $port_group_id = $_POST['port_group_' . $port_id];
-    dbUpdate(['port_group_id' => $port_group_id], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
+
+    dbDelete('port_group_port', '`port_id` = ?', [$port_id]);
+    if (! empty($port_group_id)) {
+        dbInsert(['port_group_id' => $port_group_id, 'port_id' => $port_id], 'port_group_port');
+    }
 
     if (strncmp($key, 'oldign_', 7) == 0) {
         // Interface identifier passed as part of the field name

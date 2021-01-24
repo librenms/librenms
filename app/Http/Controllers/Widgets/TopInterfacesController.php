@@ -52,17 +52,17 @@ class TopInterfacesController extends WidgetController
             $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
         }])
             ->isValid()
-            ->select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias', 'port_group_id')
-            ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias', 'port_group_id')
+            ->select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
+            ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval'])->timestamp)
             ->isUp()
-            ->when($data['port_group'], function ($query) use ($data) {
-                $query->where('port_group_id', '=', $data['port_group']);
-            })
             ->when($data['device_group'], function ($query) use ($data) {
                 $query->inDeviceGroup($data['device_group']);
             }, function ($query) {
                 $query->has('device');
+            })
+            ->when($data['port_group'], function ($query) use ($data) {
+                $query->inPortGroup($data['port_group']);
             })
             ->orderByRaw('SUM(LEAST(ifInOctets_rate, 9223372036854775807) + LEAST(ifOutOctets_rate, 9223372036854775807)) DESC')
             ->limit($data['interface_count']);
