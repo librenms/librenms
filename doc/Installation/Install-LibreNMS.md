@@ -487,7 +487,7 @@ This feature grants you the opportunity to use tab for completion on lnms comman
 for normal linux commands.
 
 ```
-ln -s /opt/librenms/lnms /usr/local/bin/lnms
+ln -s /opt/librenms/lnms /usr/bin/lnms
 cp /opt/librenms/misc/lnms-completion.bash /etc/bash_completion.d/
 ```
 
