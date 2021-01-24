@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Util\Dns;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
@@ -331,19 +330,7 @@ class Device extends BaseModel
 
         $this->location_id = null;
         if ($location_text) {
-            $location_data = ['location' => $location_text];
-
-            if (\LibreNMS\Config::get('parse_dns_location_record')) {
-                $r = new Dns();
-                $dns_record = $r->getRecord($this->hostname, 'LOC');
-
-                if (is_array($dns_record)) {
-                    $location_data['lat'] = $dns_record[0]->latitude;
-                    $location_data['lng'] = $dns_record[0]->longitude;
-                }
-            }
-
-            $location = Location::firstOrCreate($location_data);
+            $location = Location::firstOrCreate(['location' => $location_text]);
             $this->location()->associate($location);
         }
     }

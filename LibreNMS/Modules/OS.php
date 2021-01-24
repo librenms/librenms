@@ -28,6 +28,7 @@ use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Util\Dns;
 use LibreNMS\Util\Url;
 
 class OS implements Module
@@ -107,8 +108,18 @@ class OS implements Module
             $device->setLocation(snmp_get($os->getDeviceArray(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
         }
 
-        // make sure the location has coordinates
-        if (Config::get('geoloc.latlng', true) && $device->location && ! $device->location->hasCoordinates()) {
+        if (\LibreNMS\Config::get('parse_dns_location_record')) {
+            $r = new Dns();
+            $dns_record = $r->getRecord($this->hostname, 'LOC');
+
+            if (is_array($dns_record)) {
+                $device->location->lat = $dns_record[0]->latitude;
+                $device->location->lng = $dns_record[0]->longitude;
+                $device->location->location = $device->hostname;
+                $device->location->save();
+            }
+        } elseif (Config::get('geoloc.latlng', true) && $device->location && ! $device->location->hasCoordinates()) {
+            // make sure the location has coordinates
             $device->location->lookupCoordinates();
             $device->location->save();
         }
