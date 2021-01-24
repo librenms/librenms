@@ -250,7 +250,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'aristaBgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
                                 'aristaBgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
                                 'aristaBgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
-            ];
+                            ];
                         } elseif ($device['os'] === 'aos7') {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
                             $mib = 'BGP4-MIB';
