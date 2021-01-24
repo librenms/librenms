@@ -1046,6 +1046,7 @@ function build_bgp_peers($device, $data, $peer2)
     d_echo("Peers : $data\n");
     $remove = [
         'ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.',
+        'ALCATEL-IND1-BGP-MIB::alaBgpPeerAS.',
         'CISCO-BGP4-MIB::cbgpPeer2RemoteAs.',
         'BGP4-MIB::bgpPeerRemoteAs.',
         'HUAWEI-BGP-VPN-MIB::hwBgpPeerRemoteAs.',
@@ -1116,6 +1117,10 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
             $safi = array_shift($afisafi_tmp);
             $peertype = array_shift($afisafi_tmp);
             $bgp_ip = implode('.', $afisafi_tmp);
+        } elseif $device['os'] == 'aos7') {
+            $afi = 'ipv4';
+            $safi = 'unicast';
+            $bgp_ip = $k;
         } else {
             $safi = array_pop($afisafi_tmp);
             $afi = array_pop($afisafi_tmp);
