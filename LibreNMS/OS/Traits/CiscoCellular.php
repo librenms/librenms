@@ -37,6 +37,7 @@ trait CiscoCellular
         if ($apn == '') {
             return $device;
         }
+
         return $device . ' ' . $apn;
     }
 
