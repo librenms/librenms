@@ -31,8 +31,9 @@ foreach ($tables as $tablevalue) {
         if ($state_name == 'ffgfggf' || $state_name == '345tyh' || $state_name == 'dgdfgdd' || $state_name == 'gfgfgf') {
             $descr = $tablevalue['descr'];
         } elseif ($state_name == 'c3gImsi' || $state_name == 'c3gImei' || $state_name == 'c3gIccId' || $state_name == 'c3gMsisdn' || $state_name == 'c3gGsmNumberOfNearbyCell') {
-            $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . " - " . $tablevalue['descr'];
+            $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . ' - ' . $tablevalue['descr'];
         }
         discover_sensor($valid['sensor'], 'count', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
     }
 }
+

@@ -1,7 +1,7 @@
 <?php
 /**
  * WirelessCcrxDiscovery.php
- * 
+ *
  * Discover Cellular wireless RX channel in channel number
  *
  * This program is free software: you can redistribute it and/or modify

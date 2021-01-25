@@ -26,15 +26,14 @@ namespace LibreNMS\OS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcrxDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellBandDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellIdDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcrxDiscovery;
-
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
 
