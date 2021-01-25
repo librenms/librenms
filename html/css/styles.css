@@ -1962,6 +1962,7 @@ label {
 .widget_body {
     padding: 0.8em;
     overflow-y: auto;
+    overflow-x: hidden;
     width: 100%;
     height: calc(100% - 38px);
     cursor: auto;
