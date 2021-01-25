@@ -20,11 +20,13 @@ $rows_updated = 0;
 
 foreach ($_POST as $key => $val) {
     $port_id = intval(substr($key, 7));
-    $port_group_id = $_POST['port_group_' . $port_id];
+    $port_group_ids = $_POST['port_group_' . $port_id];
 
     dbDelete('port_group_port', '`port_id` = ?', [$port_id]);
-    if (! empty($port_group_id)) {
-        dbInsert(['port_group_id' => $port_group_id, 'port_id' => $port_id], 'port_group_port');
+    if (! empty($port_group_ids)) {
+        foreach ($port_group_ids as $port_group_id) {
+            dbInsert(['port_group_id' => $port_group_id, 'port_id' => $port_id], 'port_group_port');
+        }
     }
 
     if (strncmp($key, 'oldign_', 7) == 0) {
