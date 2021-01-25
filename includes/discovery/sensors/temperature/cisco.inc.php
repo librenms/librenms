@@ -8,7 +8,6 @@
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
-
  */
 
 $temp = snmpwalk_cache_multi_oid($device, 'ciscoEnvMonTemperatureStatusTable', [], 'CISCO-ENVMON-MIB');
