@@ -36,4 +36,3 @@ foreach ($tables as $tablevalue) {
         discover_sensor($valid['sensor'], 'count', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
     }
 }
-

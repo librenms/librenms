@@ -29,4 +29,3 @@ if (is_array($temp)) {
         discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $index, $index, 'cisco', $descr, '1', '1', null, null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'], $temp[$index]['c3gModemTemperature'], 'snmp', $index);
     }
 }
-

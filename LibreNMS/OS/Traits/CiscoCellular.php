@@ -32,7 +32,7 @@ trait CiscoCellular
     {
         $cwceLteProfileApn = snmpwalk_cache_oid($this->getDeviceArray(), 'cwceLteProfileApn', [], 'CISCO-WAN-CELL-EXT-MIB');
         $device = snmp_get($this->getDeviceArray(), 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
-        $device = ($device == "" ? strval($index) : preg_replace('/Modem(.*)Cellular/', 'Ce', $device));
+        $device = ($device == '' ? strval($index) : preg_replace('/Modem(.*)Cellular/', 'Ce', $device));
         $apn = $cwceLteProfileApn[$index . '.1']['cwceLteProfileApn'];
         if ($apn == '') {
             return $device;
