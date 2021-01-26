@@ -16,8 +16,8 @@ return [
                 'help' => 'Amount of poller workers to spawn on this node.',
             ],
             'poller_frequency' => [
-                'description' => 'Poller Frequency',
-                'help' => 'How often to to poll devices on this node.  Warning! Changing this is not recommended. See docs for more info.',
+                'description' => 'Poller Frequency (Warning!)',
+                'help' => 'How often to to poll devices on this node.  Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
             ],
             'poller_down_retry' => [
                 'description' => 'Device Down Retry',
