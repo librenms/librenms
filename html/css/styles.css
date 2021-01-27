@@ -2383,3 +2383,7 @@ label {
 #manage-device-groups-table > thead > tr > th:last-child {
     min-width: 7%;
 }
+
+.logon-message {
+    white-space: pre-wrap;
+}
