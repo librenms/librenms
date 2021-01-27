@@ -17,7 +17,7 @@ return [
             ],
             'poller_frequency' => [
                 'description' => 'Poller Frequency (Warning!)',
-                'help' => 'How often to to poll devices on this node.  Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
+                'help' => 'How often to poll devices on this node.  Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
             ],
             'poller_down_retry' => [
                 'description' => 'Device Down Retry',
