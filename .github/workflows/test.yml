@@ -53,11 +53,6 @@ jobs:
           MYSQL_PASSWORD: librenms
         ports:
           - 3306
-        options: >-
-          --health-cmd "mysqladmin ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
     steps:
       -
         name: Checkout
@@ -77,12 +72,6 @@ jobs:
          name: Set $PATH
          run: |
            echo "/home/runner/.local/bin/" >> $GITHUB_PATH
-      -
-        name: set MySQL collate
-        env:
-          PORT: ${{ job.services.mysql.ports[3306] }}
-        run: |
-          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -153,6 +142,18 @@ jobs:
         if: matrix.skip-web-check != '1'
         run: |
           php artisan dusk:update --detect
+      -
+        name: Ensure MySQL is up
+        env:
+          PORT: ${{ job.services.mysql.ports[3306] }}
+        run: |
+          mysqladmin -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms ping --wait=5
+      -
+        name: Set MySQL collate
+        env:
+          PORT: ${{ job.services.mysql.ports[3306] }}
+        run: |
+          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'  
       -
         name: Artisan serve
         if: matrix.skip-web-check != '1'
