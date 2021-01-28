@@ -110,7 +110,7 @@ class PollerCluster extends Model
             [
                 'name' => 'poller_frequency',
                 'default' => \LibreNMS\Config::get('service_poller_frequency'),
-                'value' => $this->poller_workers ?? \LibreNMS\Config::get('service_poller_frequency'),
+                'value' => $this->poller_frequency ?? \LibreNMS\Config::get('service_poller_frequency'),
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,
