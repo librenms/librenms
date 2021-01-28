@@ -1345,8 +1345,8 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     $devices = [];
-    $device_types = "'" . implode("','", Config::get('oxidized.ignore_types')) . "'";
-    $device_os = "'" . implode("','", Config::get('oxidized.ignore_os')) . "'";
+    $device_types = "'" . implode("','", Config::get('oxidized.ignore_types', [])) . "'";
+    $device_os = "'" . implode("','", Config::get('oxidized.ignore_os', [])) . "'";
 
     $sql = '';
     $params = [];
@@ -2271,18 +2271,22 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
         $query = ' FROM eventlog LEFT JOIN `devices` ON `eventlog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `eventlog`.`device_id` as `host`, `eventlog`.*'; // inject host for backward compat
         $timestamp = 'datetime';
+        $id_field = 'event_id';
     } elseif ($type === 'list_syslog') {
         $query = ' FROM syslog LEFT JOIN `devices` ON `syslog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `syslog`.*';
         $timestamp = 'timestamp';
+        $id_field = 'seq';
     } elseif ($type === 'list_alertlog') {
         $query = ' FROM alert_log LEFT JOIN `devices` ON `alert_log`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `alert_log`.*';
         $timestamp = 'time_logged';
+        $id_field = 'id';
     } elseif ($type === 'list_authlog') {
         $query = ' FROM authlog WHERE 1';
         $full_query = 'SELECT `authlog`.*';
         $timestamp = 'datetime';
+        $id_field = 'id';
     } else {
         $query = ' FROM eventlog LEFT JOIN `devices` ON `eventlog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `eventlog`.*';
@@ -2300,12 +2304,20 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
     }
 
     if ($from) {
-        $query .= " AND $timestamp >= ?";
+        if (is_numeric($from)) {
+            $query .= " AND $id_field >= ?";
+        } else {
+            $query .= " AND $timestamp >= ?";
+        }
         $param[] = $from;
     }
 
     if ($to) {
-        $query .= " AND $timestamp <= ?";
+        if (is_numeric($to)) {
+            $query .= " AND $id_field <= ?";
+        } else {
+            $query .= " AND $timestamp <= ?";
+        }
         $param[] = $to;
     }
 

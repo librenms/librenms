@@ -56,6 +56,20 @@ class YamlSchemaTest extends TestCase
     /**
      * @group os
      */
+    public function testOSMatchFilename()
+    {
+        foreach ($this->listFiles('/includes/definitions/*.yaml') as $filename => $file) {
+            $this->assertEquals(
+                Yaml::parseFile($file)['os'],
+                substr($filename, 0, -5),
+                "Parameter 'os' doesn't match the filename $filename"
+            );
+        }
+    }
+
+    /**
+     * @group os
+     */
     public function testDiscoveryDefinitionSchema()
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions/discovery', '/misc/discovery_schema.json');

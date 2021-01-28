@@ -1,4 +1,4 @@
-os: eatonups
+os: eatonupsm2
 text: 'Eaton UPS'
 group: ups
 type: power
