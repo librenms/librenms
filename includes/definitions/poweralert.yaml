@@ -3,6 +3,8 @@ text: 'Tripp Lite PowerAlert'
 type: power
 over:
     - { graph: device_current, text: Current }
+    - { graph: sensor_power, text: Power }
+    - { graph: sensor_load, text: Load}
 icon: tripplite
 rfc1628_compat: true
 mib_dir: poweralert
@@ -10,3 +12,6 @@ discovery:
     -
         sysDescr_regex:
             - '/POWERALERT/i'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.850

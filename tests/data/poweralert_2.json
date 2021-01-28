@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.850.1",
                     "sysDescr": "POWERALERT 12",
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "version": "12.06.0069",
+                    "hardware": "SMART1500RMXL2UA",
+                    "features": "Envirosense",
                     "os": "poweralert",
                     "type": "power",
-                    "serial": null,
+                    "serial": "upsserialnum",
                     "icon": "tripplite.svg",
-                    "location": null
+                    "location": "location1"
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": "POWERALERT 12",
                     "sysContact": null,
                     "version": "12.06.0069",
-                    "hardware": null,
-                    "features": null,
+                    "hardware": "SMART1500RMXL2UA",
+                    "features": "Envirosense",
                     "os": "poweralert",
                     "type": "power",
-                    "serial": null,
+                    "serial": "snmpcardserialnum",
                     "icon": "tripplite.svg",
-                    "location": null
+                    "location": "location1"
                 }
             ]
         }
