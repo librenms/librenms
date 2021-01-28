@@ -26,11 +26,6 @@ jobs:
       matrix:
         include:
           -
-            php-version: 8.0
-            name: Unit
-            skip-style-check: 1
-            skip-web-check: 1
-          -
             php-version: 7.4
             name: Unit
             skip-style-check: 1
