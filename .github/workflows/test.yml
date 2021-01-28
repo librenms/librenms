@@ -88,17 +88,17 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
+            ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
       -
         name: Cache pip
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
       -
         name: Install packages
         run: |
@@ -107,8 +107,8 @@ jobs:
       -
         name: Pip install
         run: |
-          pip3 install --upgrade pip
-          pip3 install --user snmpsim pylint python-memcached mysqlclient --upgrade
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade --user snmpsim pylint python-memcached mysqlclient
       -
         name: Composer validate
         run: |
@@ -153,7 +153,7 @@ jobs:
         env:
           PORT: ${{ job.services.mysql.ports[3306] }}
         run: |
-          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'  
+          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
       -
         name: Artisan serve
         if: matrix.skip-web-check != '1'
