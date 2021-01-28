@@ -1344,8 +1344,8 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     $devices = [];
-    $device_types = "'" . implode("','", Config::get('oxidized.ignore_types')) . "'";
-    $device_os = "'" . implode("','", Config::get('oxidized.ignore_os')) . "'";
+    $device_types = "'" . implode("','", Config::get('oxidized.ignore_types', [])) . "'";
+    $device_os = "'" . implode("','", Config::get('oxidized.ignore_os', [])) . "'";
 
     $sql = '';
     $params = [];
