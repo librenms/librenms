@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Facades\Permissions;
 use App\Models\ServiceTemplate;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -31,7 +30,7 @@ class ServiceTemplatePolicy
      */
     public function view(User $user, ServiceTemplate $template)
     {
-        return $this->viewAny($user) || Permissions::canAccessServiceTemplate($template, $user);
+        return $this->viewAny($user);
     }
 
     /**

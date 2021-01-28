@@ -27,7 +27,6 @@ namespace LibreNMS\Cache;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
-use App\Models\ServiceTemplate;
 use App\Models\User;
 use Auth;
 use DB;
@@ -39,7 +38,6 @@ class PermissionsCache
     private $portPermissions;
     private $billPermissions;
     private $deviceGroupMap;
-    private $serviceTemplatePermissions;
 
     /**
      * Check if a device can be accessed by user (non-global read/admin)
@@ -84,22 +82,6 @@ class PermissionsCache
         return $this->getBillPermissions()
             ->where('user_id', $this->getUserId($user))
             ->where('bill_id', $this->getBillId($bill))
-            ->isNotEmpty();
-    }
-
-    /**
-     * Check if a service template can be accessed by user (non-global read/admin)
-     * If no user is given, use the logged in user
-     *
-     * @param \App\Models\ServiceTemplate|int $serviceTemplate
-     * @param \App\Models\User|int $user
-     * @return bool
-     */
-    public function canAccessServiceTemplate($serviceTemplate, $user = null)
-    {
-        return $this->getServiceTemplatePermissions()
-            ->where('user_id', $this->getUserId($user))
-            ->where('id', $this->getServiceTemplateId($serviceTemplate))
             ->isNotEmpty();
     }
 
@@ -204,19 +186,6 @@ class PermissionsCache
     }
 
     /**
-     * Get a list of id of all service templates the user can access
-     *
-     * @param \App\Models\User|int $user
-     * @return \Illuminate\Support\Collection
-     */
-    public function serviceTemplatesForUser($user = null)
-    {
-        return $this->getServiceTemplatePermissions()
-            ->where('user_id', $this->getUserId($user))
-            ->pluck('id');
-    }
-
-    /**
      * Get the cached data for device permissions.  Use helpers instead.
      *
      * @param \App\Models\User|int $user
@@ -269,22 +238,6 @@ class PermissionsCache
     }
 
     /**
-     * Get the cached data for service template permissions.  Use helpers instead.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function getServiceTemplatePermissions()
-    {
-        if (is_null($this->serviceTemplatePermissions)) {
-            $this->serviceTemplatePermissions = DB::table('service_templates_perms')
-            ->select(['user_id', 'service_template_id'])
-            ->get();
-        }
-
-        return $this->serviceTemplatePermissions;
-    }
-
-    /**
      * @param $user
      * @return int|null
      */
@@ -318,15 +271,6 @@ class PermissionsCache
     private function getBillId($bill)
     {
         return $bill instanceof Bill ? $bill->bill_id : (is_numeric($bill) ? (int) $bill : 0);
-    }
-
-    /**
-     * @param $serviceTemplate
-     * @return int
-     */
-    private function getServiceTemplateId($serviceTemplate)
-    {
-        return $serviceTemplate instanceof ServiceTemplate ? $serviceTemplate->id : (is_numeric($serviceTemplate) ? (int) $serviceTemplate : 0);
     }
 
     /**

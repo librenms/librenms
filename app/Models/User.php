@@ -201,11 +201,6 @@ class User extends Authenticatable
         return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
-    public function servicesTemplates()
-    {
-        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_perms', 'user_id', 'service_template_id');
-    }
-
     public function ports()
     {
         if ($this->hasGlobalRead()) {

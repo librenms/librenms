@@ -2355,7 +2355,11 @@ function add_service_template_for_device_group(Illuminate\Http\Request $request)
 
 function get_service_templates(Illuminate\Http\Request $request)
 {
-    $templates = ServiceTemplate::query()->hasAccess(Auth::user())->orderBy('name')->get();
+    if ($request->user()->cannot('viewAny', ServiceTemplate::class)) {
+        return api_error(403, 'Insufficient permissions to access service templates');
+    }
+
+    $templates = ServiceTemplate::query()->orderBy('name')->get();
 
     if ($templates->isEmpty()) {
         return api_error(404, 'No service templates found');

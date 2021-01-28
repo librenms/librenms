@@ -28,7 +28,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Log;
-use Permissions;
 
 class ServiceTemplate extends BaseModel
 {
@@ -216,9 +215,7 @@ class ServiceTemplate extends BaseModel
      */
     public function getDeviceParser()
     {
-        return ! empty($this->drules) ?
-            QueryBuilderFluentParser::fromJson($this->drules) :
-            QueryBuilderFluentParser::fromOld($this->pattern);
+        return QueryBuilderFluentParser::fromJson($this->drules);
     }
 
     /**
@@ -228,21 +225,10 @@ class ServiceTemplate extends BaseModel
      */
     public function getDeviceGroupParser()
     {
-        return ! empty($this->dgrules) ?
-            QueryBuilderFluentParser::fromJson($this->dgrules) :
-            QueryBuilderFluentParser::fromOld($this->pattern);
+        return QueryBuilderFluentParser::fromJson($this->dgrules);
     }
 
     // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        if ($user->hasGlobalRead()) {
-            return $query;
-        }
-
-        return $query->whereIn('id', Permissions::serviceTemplatesForUser($user));
-    }
 
     /**
      * @param  Builder $query
@@ -263,11 +249,6 @@ class ServiceTemplate extends BaseModel
     public function services()
     {
         return $this->belongsToMany(\App\Models\Service::class, 'service_templates_device', 'service_template_id', 'device_id');
-    }
-
-    public function users()
-    {
-        return $this->belongsToMany(\App\Models\User::class, 'service_templates_perms', 'service_template_id', 'user_id');
     }
 
     public function groups()
