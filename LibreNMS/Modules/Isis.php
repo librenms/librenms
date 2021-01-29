@@ -139,11 +139,10 @@ class Isis implements Module
                             'isisISAdjState' => $state,
                         ]);
                     }
-
                     $adjacencies->push($adjacency);
                 }
-                echo "\Found " . $adjacencies->count() . " configured adjacencies";
             }
+            echo "\nFound " . $adjacencies->count() . " configured adjacencies";
         }
 
         // Cleanup -> needs testing
