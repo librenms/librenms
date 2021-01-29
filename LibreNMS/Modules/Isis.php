@@ -142,6 +142,7 @@ class Isis implements Module
 
                     $adjacencies->push($adjacency);
                 }
+                echo "\Found " . $adjacencies->count() . " configured adjacencies";
             }
         }
 

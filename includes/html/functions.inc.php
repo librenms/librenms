@@ -937,7 +937,7 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['isisISAdjIPAddrAddress']) {
-            $fault_detail .= "ISIS adjacent <a href='" .
+            $fault_detail .= "Adjacent <a href='" .
                 generate_url(['page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'routing',
