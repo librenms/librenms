@@ -40,7 +40,7 @@ function read_var($name, &$array, $default = null)
         if (is_array($array[$name])) {
             if (get_magic_quotes_gpc()) {
                 $ret = [];
-                while ([$k, $v] = each($array[$name])) {
+                foreach ($array[$name] as $k => $v) {
                     $ret[stripslashes($k)] = stripslashes($v);
                 }
 
@@ -499,7 +499,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     $has_min = false;
     reset($rrdinfo['RRA']);
     $l_max = 0;
-    while ([$k, $v] = each($rrdinfo['RRA'])) {
+    foreach ($rrdinfo['RRA'] as $k => $v) {
         if ($v['cf'] == 'MAX') {
             $has_max = true;
         } elseif ($v['cf'] == 'AVERAGE') {
@@ -527,7 +527,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     }
 
     reset($rrdinfo['DS']);
-    while ([$k, $v] = each($rrdinfo['DS'])) {
+    foreach ($rrdinfo['DS'] as $k => $v) {
         if (strlen($k) > $l_max) {
             $l_max = strlen($k);
         }
@@ -548,7 +548,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     if ($has_min && $has_max || $has_min && $has_avg || $has_avg && $has_max) {
         $n = 1;
         reset($rrdinfo['DS']);
-        while ([$k, $v] = each($rrdinfo['DS'])) {
+        foreach ($rrdinfo['DS'] as $k => $v) {
             $graph[] = sprintf('LINE:%s_%s', $k, $has_min ? 'min' : 'avg');
             $graph[] = sprintf('CDEF:%s_var=%s_%s,%s_%s,-', $k, $k, $has_max ? 'max' : 'avg', $k, $has_min ? 'min' : 'avg');
             $graph[] = sprintf('AREA:%s_var#%s::STACK', $k, rrd_get_color($n++, false));
@@ -557,7 +557,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
 
     reset($rrdinfo['DS']);
     $n = 1;
-    while ([$k, $v] = each($rrdinfo['DS'])) {
+    foreach ($rrdinfo['DS'] as $k => $v) {
         $graph[] = sprintf('LINE1:%s_avg#%s:%s ', $k, rrd_get_color($n++, true), $k . substr('                  ', 0, ($l_max - strlen($k))));
         if (isset($opts['tinylegend']) && $opts['tinylegend']) {
             continue;

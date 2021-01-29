@@ -1,8 +1,3 @@
-<div class="row">
-    <div class="col-sm-12">
-        <span id="message"></span>
-    </div>
-</div>
 <div class="table-responsive">
     <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts">
         <thead>

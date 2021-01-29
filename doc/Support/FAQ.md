@@ -43,6 +43,7 @@ path: blob/master/doc/
 - [How do I use trend prediction in graphs](#how-do-i-use-trend-prediction-in-graphs)
 - [How do I move only the DB to another server](#move-db-to-another-server)
 - [What are the "optional requirements message" when I add SNMPv3 devices](#optional-requirements-for-snmpv3-sha2-auth)
+- [How do I clean up alerts from my switches and routers about ports being down or changing speed](#network-config-permanent-change)
 
 # Developing
 
@@ -371,6 +372,24 @@ Tag device, component, service and port to ignore alerts. Alert checks will stil
 However, ignore tag can be read in alert rules. For example on device, if `devices.ignore = 0` 
 or `macros.device = 1` condition is is set and ignore alert tag is on,
 the alert rule won't match. The alert rule is ignored.
+
+## <a name="network-config-permanent-change"> How do I clean up alerts from my switches and routers about ports being down or changing speed</a>
+
+Some properties used for alerting (ending in `_prev`) are only updated when a
+change is detected, and not every time the poller runs. This means that if you
+make a permanant change to your network such as removing a device, performing a
+major firmware upgrade, or downgrading a WAN connection, you may be stuck with
+some unresolvable alerts.
+
+If a port will be permantly down, it's best practice to configure it to be
+administratively down on the device to prevent malicious access. You can then
+only run alerts on ports with `ifAdminStatus = up`. Otherwise, you'll need to
+reset the device port state history.
+
+On the device generating alerts, use the cog button to go to the edit device
+page. At the top of the _device settings_ pane is a button labelled `Reset Port
+State` - this will clear the historic state for all ports on that device,
+allowing any active alerts to clear.
 
 ## <a name="faq8"> How do I add support for a new OS?</a>
 
