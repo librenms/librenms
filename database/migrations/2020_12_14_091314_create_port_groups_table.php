@@ -13,7 +13,7 @@ class CreatePortGroupsTable extends Migration
     public function up()
     {
         Schema::create('port_groups', function (Blueprint $table) {
-            $table->unsignedInteger('id', true);
+            $table->increments('id');
             $table->string('name')->unique();
             $table->string('desc')->nullable();
         });
