@@ -25,8 +25,8 @@
     "extra": "{\"count\": 1}"
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"isis_adjacencies.isisISAdjState","field":"isis_adjacencies.isisISAdjState","type":"string","input":"text","operator":"equal","value":"up"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
-    "name": "ISIS adjacency down"
+    "builder": {"condition":"AND","rules":[{"id":"isis_adjacencies.isisISAdjState","field":"isis_adjacencies.isisISAdjState","type":"string","input":"text","operator":"not_equal","value":"up"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "ISIS Adjacency down"
   },
   {
     "rule": "bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && bgpPeers.bgpPeerState = \"established\" && macros.device_up = \"1\"",
