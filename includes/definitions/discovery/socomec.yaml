@@ -1,0 +1,72 @@
+mib: SOCOMECPDU-MIB
+modules:
+    os:
+        features: SOCOMECPDU-MIB::dpduIdentModel.0
+        hardware: SOCOMECPDU-MIB::dpduIdentPDUFirmwareVersion.0
+        serial: SOCOMECPDU-MIB::dpduIdentSerialNumber.0
+        version: SOCOMECPDU-MIB::dpduIdentAgentSoftwareVersion.0
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: dpduOutput
+                    value: dpduOutputVoltage1
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.2.0'
+                    descr: 'Line 1 Voltage'
+                    divisor: 10
+                    index: 'dpduOutputVoltage1'
+                    snmp_flags: ['-ObsaQ']
+                -
+                    oid: dpduOutput
+                    value: dpduOutputVoltage2
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.4.0'
+                    descr: 'Line 2 Voltage'
+                    divisor: 10
+                    index: 'dpduOutputVoltage2'
+                    snmp_flags: ['-ObsaQ']
+                -
+                    oid: dpduOutput
+                    value: dpduOutputVoltage3
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.6.0'
+                    descr: 'Line 3 Voltage'
+                    divisor: 10
+                    index: 'dpduOutputVoltage3'
+                    snmp_flags: ['-ObsaQ']
+
+        current:
+            data:
+                -
+                    oid: dpduOutput
+                    value: dpduOutputCurrent1
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.3.0'
+                    descr: 'Line 1 Current'
+                    divisor: 10
+                    index: 'dpduOutputCurrent1'
+                    snmp_flags: ['-ObsaQ']
+                -
+                    oid: dpduOutput
+                    value: dpduOutputCurrent2
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.5.0'
+                    descr: 'Line 2 Current'
+                    divisor: 10
+                    index: 'dpduOutputCurrent2'
+                    snmp_flags: ['-ObsaQ']
+                -
+                    oid: dpduOutput
+                    value: dpduOutputCurrent3
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.7.0'
+                    descr: 'Line 3 Current'
+                    divisor: 10
+                    index: 'dpduOutputCurrent3'
+                    snmp_flags: ['-ObsaQ']
+
+
+        frequency:
+              data:
+                  -
+                    oid: dpduOutput
+                    value: dpduOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.1.0'
+                    divisor: 10
+                    descr: 'Output frequency'
+                    snmp_flags: ['-ObsaQ']
