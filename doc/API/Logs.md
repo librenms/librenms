@@ -11,8 +11,8 @@ Input:
 
 - start: The page number to request.
 - limit: The limit of results to be returned.
-- from: The date and time to search from.
-- to: The data and time to search to.
+- from: The date and time or the event id to search from.
+- to: The data and time or the event id to search to.
 
 ### `list_eventlog`
 

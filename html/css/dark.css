@@ -7183,7 +7183,8 @@
   .device-overview>.panel-body>.row:nth-child(odd) { background-color: #4f565d; }
   .device-overview>.panel-body>.row:hover {background-color: #686d73;}
   .gridster .gs-w{
-  	background: #353a41;
+    color: var(--color-light2);
+    background: #353a41;
   }
   a.list-device{
     color: #acb6bf;
