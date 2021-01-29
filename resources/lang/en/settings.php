@@ -1029,6 +1029,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'isis' => [
+                'description' => 'ISIS',
+            ],
             'cisco-ipsec-flow-monitor' => [
                 'description' => 'Cisco IPSec flow Monitor',
             ],

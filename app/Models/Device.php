@@ -580,6 +580,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
     }
 
+    public function isisAdjacencies()
+    {
+        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
+    }
+
     public function netscalerVservers()
     {
         return $this->hasMany(NetscalerVserver::class, 'device_id');

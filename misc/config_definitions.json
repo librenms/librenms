@@ -4286,6 +4286,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.isis": {
+            "order": 331,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.cisco-ipsec-flow-monitor": {
             "order": 90,
             "group": "poller",

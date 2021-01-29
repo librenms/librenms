@@ -1,6 +1,6 @@
 <?php
 /**
- * isis.inc.php
+ * IsisAdjacency.php
  *
  * -Description-
  *
@@ -22,9 +22,35 @@
  * @author     Otto Reinikainen <otto@ottorei.fi>
  */
 
-use LibreNMS\OS;
+namespace App\Models;
 
-if (! $os instanceof OS) {
-    $os = OS::make($device);
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class IsisAdjacency extends PortRelatedModel
+{
+    use HasFactory;
+
+    //public $primaryKey = 'id';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'device_id',
+        'port_id',
+        'ifIndex',
+        'isisISAdjState',
+        'isisISAdjNeighSysType',
+        'isisISAdjNeighSysID',
+        'isisISAdjNeighPriority',
+        'isisISAdjLastUpTime',
+        'isisISAdjAreaAddress',
+        'isisISAdjIPAddrType',
+        'isisISAdjIPAddrAddress',
+    ];
+
+    // ---- Define Relationships ----
+
+    public function device()
+    {
+        return $this->belongsTo(\App\Models\Port::class, 'device_id');
+    }
 }
-(new \LibreNMS\Modules\Isis())->poll($os);
