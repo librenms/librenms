@@ -808,7 +808,7 @@ isis_adjacencies:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     isis_adjacencies_device_id_index: { Name: isis_adjacencies_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     isis_adjacencies_port_id_index: { Name: isis_adjacencies_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
-    isis_adjacencies_ifIndex_index: { Name: isis_adjacencies_ifIndex_index, Columns: [ifIndex], Unique: false, Type: BTREE }
+    isis_adjacencies_ifindex_index: { Name: isis_adjacencies_ifindex_index, Columns: [ifIndex], Unique: false, Type: BTREE }
 juniAtmVp:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
