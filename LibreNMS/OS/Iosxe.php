@@ -24,9 +24,9 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcrxDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellBandDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellIdDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessBandDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
@@ -34,13 +34,13 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS\Traits\CiscoCellular;
 
 class Iosxe extends Ciscowlc implements
+    WirelessBandDiscovery,
+    WirelessCellDiscovery,
+    WirelessChannelDiscovery,
     WirelessRssiDiscovery,
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
-    WirelessCellBandDiscovery,
-    WirelessCellIdDiscovery,
-    WirelessSnrDiscovery,
-    WirelessCcrxDiscovery
+    WirelessSnrDiscovery
 {
     use CiscoCellular;
 }

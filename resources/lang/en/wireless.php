@@ -122,19 +122,19 @@ return [
         'long' => 'Cross Polar Interference',
         'unit' => 'dB',
     ],
-    'cellband' => [
-        'short' => 'CellBand',
-        'long' => 'Cellular Operating Band',
+    'band' => [
+        'short' => 'Band',
+        'long' => 'Band',
         'unit' => '',
     ],
-    'cellid' => [
-        'short' => 'CellId',
-        'long' => 'Cellular Cell Id',
+    'cell' => [
+        'short' => 'Cell',
+        'long' => 'Cell',
         'unit' => '',
     ],
-    'ccrx' => [
-        'short' => 'CellChRx',
-        'long' => 'Cellular RX Channel',
+    'channel' => [
+        'short' => 'Channel',
+        'long' => 'Channel',
         'unit' => '',
     ],
 ];

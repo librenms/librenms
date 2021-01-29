@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessCcrxPolling.php
+ * WirelessChannelDiscovery.php
  *
- * Custom polling interface for Cellular RX channel in channel number
+ * Discover Wireless channel in channel number. Type is channel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,16 +22,15 @@
  * @author     Janno Schouwenburg <handel@janno.com>
  */
 
-namespace LibreNMS\Interfaces\Polling\Sensors;
+namespace LibreNMS\Interfaces\Discovery\Sensors;
 
-interface WirelessCcrxPolling
+interface WirelessChannelDiscovery
 {
     /**
-     * Poll Cellular wireless RX channel in channel number. Type is count
-     * The returned array should be sensor_id => value pairs
+     * Discover Wireless channel in channel number. Type is channel.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
+     * @return array Sensors
      */
-    public function pollWirelessCcrx(array $sensors);
+    public function discoverWirelessChannel();
 }

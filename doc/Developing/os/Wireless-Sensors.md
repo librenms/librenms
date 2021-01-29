@@ -12,9 +12,9 @@ with the values we expect to see the data in:
 | ap-count    | %           | WirelessApCountDiscovery     | The number of APs attached to this controller                                                   |
 | capacity    | %           | WirelessCapacityDiscovery    | The % of operating rate vs theoretical max                                                      |
 | ccq         | %           | WirelessCcqDiscovery         | The Client Connection Quality                                                                   |
-| ccrx        | count       | WirelessCcrxDiscovery        | The operational cellular channel rx                                                             |
-| cellband    | count       | WirelessCellbandDiscovery    | The operational cellular band                                                                   |
-| cellid      | count       | WirelessCellidDiscovery      | The operational cell id                                                                         |
+| channel     | count       | WirelessChannelDiscovery     | The channel, use of frequency is preferred                                                      |
+| band        | count       | WirelessBandDiscovery        | The band in a multiband technology                                                              |
+| cell        | count       | WirelessCellDiscovery        | The cell in a multicell technology                                                              |
 | clients     | count       | WirelessClientsDiscovery     | The number of clients connected to/managed by this device                                       |
 | distance    | km          | WirelessDistanceDiscovery    | The distance of a radio link in Kilometers                                                      |
 | error-rate  | bps         | WirelessErrorRateDiscovery   | The rate of errored packets or bits, etc                                                        |

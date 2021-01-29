@@ -200,13 +200,13 @@ class WirelessSensor extends Sensor
             'distance' => [
                 'icon' => 'space-shuttle',
             ],
-            'cellband' => [
+            'band' => [
                 'icon' => 'line-chart',
             ],
-            'cellid' => [
+            'cell' => [
                 'icon' => 'line-chart',
             ],
-            'ccrx' => [
+            'channel' => [
                 'icon' => 'line-chart',
             ],
         ];

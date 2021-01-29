@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessCellIdPolling.php
+ * WirelessBandDiscovery.php
  *
- * Custom polling interface for wireless Cellular Cell Id
+ * Discover Wireless Band in band number. Type is band.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,16 +22,15 @@
  * @author     Janno Schouwenburg <handel@janno.com>
  */
 
-namespace LibreNMS\Interfaces\Polling\Sensors;
+namespace LibreNMS\Interfaces\Discovery\Sensors;
 
-interface WirelessCellIdPolling
+interface WirelessBandDiscovery
 {
     /**
-     * Poll wireless Cellular Cell Id in cell number
-     * The returned array should be sensor_id => value pairs
+     * Discover Wireless Band in band number. Type is band.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
+     * @return array
      */
-    public function pollWirelessCellId(array $sensors);
+    public function discoverWirelessBand();
 }

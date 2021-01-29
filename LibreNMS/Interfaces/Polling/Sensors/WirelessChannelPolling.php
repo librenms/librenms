@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessCellBandPolling.php
+ * WirelessChannelPolling.php
  *
- * Custom polling interface for wireless Cellular Operating Band
+ * Custom polling interface for Wireless Channel. Type is channel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +24,14 @@
 
 namespace LibreNMS\Interfaces\Polling\Sensors;
 
-interface WirelessCellBandPolling
+interface WirelessChannelPolling
 {
     /**
-     * Poll wireless Cellular Operating Band in band number
+     * Poll Wireless Channel.  Type is channel.
      * The returned array should be sensor_id => value pairs
      *
      * @param array $sensors Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessCellBand(array $sensors);
+    public function pollWirelessChannel(array $sensors);
 }

@@ -2,8 +2,8 @@
 
 $scale_min = '0';
 
-$class = 'cellband';
+$class = 'cell';
 $unit = '';
-$unit_long = 'Cellular Operating Band';
+$unit_long = 'Cell';
 
 require 'includes/html/graphs/device/wireless-sensor.inc.php';

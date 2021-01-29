@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessCellIdDiscovery.php
+ * WirelessCellPolling.php
  *
- * Discover wireless Cellular Cell Id. This is in cell number
+ * Custom polling interface for Wireless Cell. Type is cell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,16 @@
  * @author     Janno Schouwenburg <handel@janno.com>
  */
 
-namespace LibreNMS\Interfaces\Discovery\Sensors;
+namespace LibreNMS\Interfaces\Polling\Sensors;
 
-interface WirelessCellIdDiscovery
+interface WirelessCellPolling
 {
     /**
-     * Discover wireless Cellular Cell Id. This is in cell number. Type is cellid.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * Poll wireless Cellular Cell. Type is cell.
+     * The returned array should be sensor_id => value pairs
      *
-     * @return array
+     * @param array $sensors Array of sensors needed to be polled
+     * @return array of polled data
      */
-    public function discoverWirelessCellId();
+    public function pollWirelessCell(array $sensors);
 }

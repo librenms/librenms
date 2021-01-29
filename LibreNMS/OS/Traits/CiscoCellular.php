@@ -155,19 +155,19 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessCcrx()
+    public function discoverWirelessChannel()
     {
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gGsmChannelNumber', [], 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'ccrx',
+                'channel',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.4.' . $index,
                 'ios',
                 $index,
-                'CCRX: ' . $this->profileApn($index),
+                'ChannelRx: ' . $this->profileApn($index),
                 $entry['c3gGsmChannelNumber.1']
             );
         }
@@ -181,19 +181,19 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessCellBand()
+    public function discoverWirelessBand()
     {
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'cwceLteCurrOperatingBand', [], 'CISCO-WAN-CELL-EXT-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'cellband',
+                'band',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.6.' . $index,
                 'ios',
                 $index,
-                'CellBand: ' . $this->profileApn($index),
+                'Band: ' . $this->profileApn($index),
                 $entry['cwceLteCurrOperatingBand.1']
             );
         }
@@ -207,19 +207,19 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessCellId()
+    public function discoverWirelessCell()
     {
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gGsmCurrentCellId', [], 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'cellid',
+                'cell',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.661.1.3.2.1.13.' . $index,
                 'ios',
                 $index,
-                'CellId: ' . $this->profileApn($index),
+                'Cell: ' . $this->profileApn($index),
                 $entry['c3gGsmCurrentCellId.1']
             );
         }

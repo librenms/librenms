@@ -106,19 +106,19 @@ return [
         'long' => 'Kreuzpolarisation Interferenz',
         'unit' => 'dB',
     ],
-    'cellband' => [
-        'short' => 'MobilBand',
-        'long' => 'Mobil Betriebsband',
+    'band' => [
+        'short' => 'Band',
+        'long' => 'Band',
         'unit' => '',
     ],
-    'cellid' => [
-        'short' => 'MobilId',
-        'long' => 'Mobil Zell-ID',
+    'cell' => [
+        'short' => 'Zell',
+        'long' => 'Zell',
         'unit' => '',
     ],
-    'ccrx' => [
-        'short' => 'MobileEmpKan',
-        'long' => 'Mobilfunkempfangskanall',
+    'channel' => [
+        'short' => 'Kanall',
+        'long' => 'Kanall',
         'unit' => '',
     ],
 ];

@@ -2,8 +2,8 @@
 
 $scale_min = '0';
 
-$class = 'cellid';
+$class = 'band';
 $unit = '';
-$unit_long = 'Cellular Cell Id';
+$unit_long = 'Band';
 
 require 'includes/html/graphs/device/wireless-sensor.inc.php';

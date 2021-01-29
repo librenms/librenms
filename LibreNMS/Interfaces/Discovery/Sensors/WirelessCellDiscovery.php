@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessCellBandDiscovery.php
+ * WirelessCellDiscovery.php
  *
- * Discover wireless Cellular Operating Band. This is in band number
+ * Discover Wireless Cell in cell number. Type is cell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,13 +24,13 @@
 
 namespace LibreNMS\Interfaces\Discovery\Sensors;
 
-interface WirelessCellBandDiscovery
+interface WirelessCellDiscovery
 {
     /**
-     * Discover wireless Cellular Operating Band. This is in band number. Type is cellband.
+     * Discover Wireless Cell in cell number. Type is cell.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array
      */
-    public function discoverWirelessCellBand();
+    public function discoverWirelessCell();
 }

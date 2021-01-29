@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessCcrxDiscovery.php
+ * WirelessBandPolling.php
  *
- * Discover Cellular wireless RX channel in channel number
+ * Custom polling interface for wireless Band. Type is band.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,16 @@
  * @author     Janno Schouwenburg <handel@janno.com>
  */
 
-namespace LibreNMS\Interfaces\Discovery\Sensors;
+namespace LibreNMS\Interfaces\Polling\Sensors;
 
-interface WirelessCcrxDiscovery
+interface WirelessBandPolling
 {
     /**
-     * Discover Cellular wireless RX channel in channel number. Type is count
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * Poll Wireless Band. Type is band.
+     * The returned array should be sensor_id => value pairs
      *
-     * @return array Sensors
+     * @param array $sensors Array of sensors needed to be polled
+     * @return array of polled data
      */
-    public function discoverWirelessCcrx();
+    public function pollWirelessBand(array $sensors);
 }

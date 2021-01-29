@@ -2,7 +2,7 @@
 
 $scale_min = '0';
 
-$unit_long = 'Cellular Operating Band';
+$unit_long = 'Cell';
 $unit = '';
 
 include 'wireless-sensor.inc.php';

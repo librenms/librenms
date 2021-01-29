@@ -1,6 +1,6 @@
 <?php
 
-$unit_long = 'Cellular RX Channel';
+$unit_long = 'Channel';
 $unit = '';
 
 include 'wireless-sensor.inc.php';
