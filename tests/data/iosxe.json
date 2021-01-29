@@ -390,11 +390,11 @@
                     "sysDescr": "Cisco IOS Software, ASR1000 Software (PPC_LINUX_IOSD-ADVENTERPRISEK9-M), Version 15.5(3)S1a, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2015 by Cisco Systems, Inc.\r\nCompiled Wed 04-Nov-15 17:40 by mcpre",
                     "sysContact": null,
                     "version": "15.5(3)S1a",
-                    "hardware": "IR1101-K9",
+                    "hardware": "ciscoASR1002F",
                     "features": "ADVENTERPRISEK9",
                     "os": "iosxe",
                     "type": "network",
-                    "serial": "FCW2428P6Q9",
+                    "serial": null,
                     "icon": "cisco.svg",
                     "location": "<private>"
                 }
@@ -408,11 +408,11 @@
                     "sysDescr": "Cisco IOS Software, ASR1000 Software (PPC_LINUX_IOSD-ADVENTERPRISEK9-M), Version 15.5(3)S1a, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2015 by Cisco Systems, Inc.\r\nCompiled Wed 04-Nov-15 17:40 by mcpre",
                     "sysContact": "<private>",
                     "version": "15.5(3)S1a",
-                    "hardware": "IR1101-K9",
+                    "hardware": "ciscoASR1002F",
                     "features": "ADVENTERPRISEK9",
                     "os": "iosxe",
                     "type": "network",
-                    "serial": "FCW2428P6Q9",
+                    "serial": null,
                     "icon": "cisco.svg",
                     "location": "<private>"
                 }
