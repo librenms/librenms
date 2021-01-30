@@ -93,6 +93,7 @@ class Dygraph implements Renderer
 
     public function formatData(SeriesData $data): array
     {
-        // TODO: Implement formatData() method.
+        $this->config['data'] = iterator_to_array($data);
+        return $this->config;
     }
 }

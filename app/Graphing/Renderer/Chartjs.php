@@ -122,6 +122,13 @@ class Chartjs implements Renderer
 
     public function formatData(SeriesData $data): array
     {
-        // TODO: Implement formatData() method.
+        foreach ($data as $point) {
+            foreach ($this->data as $index => $config) {
+                $this->data[$index]['data'][] = ['x' => $point[0] * 1000, 'y' => $point[$index + 1]];
+            }
+        }
+        $this->config['data']['datasets'] = $this->data;
+
+        return $this->config;
     }
 }

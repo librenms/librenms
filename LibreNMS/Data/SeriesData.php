@@ -53,6 +53,14 @@ class SeriesData implements Iterator
         return $this;
     }
 
+    public function getSeries($index)
+    {
+        return $this->data[$index]['values'];
+    }
+
+    /**
+     * @access protected
+     */
     public function current()
     {
         return array_map(function ($series) {
@@ -60,16 +68,25 @@ class SeriesData implements Iterator
         }, $this->data);
     }
 
+    /**
+     * @access protected
+     */
     public function next()
     {
         $this->iter_pos++;
     }
 
+    /**
+     * @access protected
+     */
     public function key()
     {
         return $this->iter_pos;
     }
 
+    /**
+     * @access protected
+     */
     public function valid()
     {
         foreach ($this->data as $series) {
@@ -81,6 +98,9 @@ class SeriesData implements Iterator
         return false;
     }
 
+    /**
+     * @access protected
+     */
     public function rewind()
     {
         $this->iter_pos = 0;

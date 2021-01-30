@@ -71,8 +71,55 @@ class Plotly implements Renderer
     {
         $timestamp = $data['meta']['start'];
         $step = $data['meta']['step'];
-        $output = [];
+        $output = $this->prepAxis();
 
+        $indexes = array_keys($output);
+        foreach ($data['data'] as $values) {
+            foreach ($indexes as $index) {
+                $output[$index]['x'][] = $timestamp;
+                $output[$index]['y'][] = $values[$index];
+            }
+            $timestamp += $step;
+        }
+
+        return ['data' => $output, 'layout' => $this->layout];
+    }
+
+    public function enableRangeValues()
+    {
+        $this->rangeValues = true;
+    }
+
+    public function setTimeRange($start, $end)
+    {
+        // TODO: Implement setTimeRange() method.
+    }
+
+    public function setYRange($min = null, $max = null)
+    {
+        $this->layout['yaxis']['range'] = [$min, $max];
+    }
+
+    public function formatInfluxData(ResultSet $data): array
+    {
+        return [];
+    }
+
+    public function formatData(SeriesData $data): array
+    {
+        $output = $this->prepAxis();
+
+        foreach (array_keys($output) as $index) {
+            $output[$index]['x'] = $data->getSeries(0);
+            $output[$index]['y'] = $data->getSeries($index + 1);
+        }
+
+        return ['data' => $output, 'layout' => $this->layout];
+    }
+
+    private function prepAxis(): array
+    {
+        $output = [];
         foreach ($this->labels as $index => $label) {
             if ($this->rangeValues) {
                 $dataIndex = $index + $index * 3;
@@ -120,41 +167,6 @@ class Plotly implements Renderer
                 ];
             }
         }
-
-        $indexes = array_keys($output);
-        foreach ($data['data'] as $values) {
-            foreach ($indexes as $index) {
-                $output[$index]['x'][] = $timestamp;
-                $output[$index]['y'][] = $values[$index];
-            }
-            $timestamp += $step;
-        }
-
-        return ['data' => $output, 'layout' => $this->layout];
-    }
-
-    public function enableRangeValues()
-    {
-        $this->rangeValues = true;
-    }
-
-    public function setTimeRange($start, $end)
-    {
-        // TODO: Implement setTimeRange() method.
-    }
-
-    public function setYRange($min = null, $max = null)
-    {
-        $this->layout['yaxis']['range'] = [$min, $max];
-    }
-
-    public function formatInfluxData(ResultSet $data): array
-    {
-        return [];
-    }
-
-    public function formatData(SeriesData $data): array
-    {
-        // TODO: Implement formatData() method.
+        return $output;
     }
 }
