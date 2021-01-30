@@ -47,6 +47,7 @@ echo '<div style="width:99%;margin:0 auto;">';
 
 switch ($vars['section']) {
     case 'alerts':
+        include 'includes/html/modal/alert_details.php';
         include 'includes/html/modal/alert_notes.inc.php';
         include 'includes/html/modal/alert_ack.inc.php';
         include 'includes/html/common/alerts.inc.php';
@@ -55,6 +56,7 @@ switch ($vars['section']) {
     case 'alert-log':
         $vars['fromdevice'] = true;
         $device_id = (int) $vars['device'];
+        include 'includes/html/modal/alert_details.php';
         include 'includes/html/common/alert-log.inc.php';
         echo implode('', $common_output);
         break;
