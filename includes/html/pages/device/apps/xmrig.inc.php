@@ -13,9 +13,10 @@ version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
 */
 
 $graphs = [
-    'xmrig_threads'   => 'XMRig Worker - Threads',
+    'xmrig_threads'     => 'XMRig Worker - Threads',
     'xmrig_hashrate'    => 'XMRig Worker - Hashrate',
-    'xmrig_jobtime'    => 'XMRig Worker - Jobtime',
+    'xmrig_jobtime'     => 'XMRig Worker - Jobtime',
+    'xmrig_shares'      => 'XMRig Worker - Shares',
 ];
 
 foreach ($graphs as $key => $text) {

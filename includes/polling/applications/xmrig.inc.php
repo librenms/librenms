@@ -48,8 +48,8 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('hashrate_15m', 'GAUGE', 0, 65536000)
     ->addDataset('hashrate_max', 'GAUGE', 0, 65536000)
     ->addDataset('jobtime_avg', 'GAUGE', 0, 600)
-    ->addDataset('shares_total', 'DERIVE', 0, 600)
-    ->addDataset('shares_good', 'DERIVE', 0, 600)
+    ->addDataset('shares_total', 'DERIVE', 0, 1000000000)
+    ->addDataset('shares_good', 'DERIVE', 0, 1000000000)
     ->addDataset('difficulty_last', 'GAUGE', 0, 1000000000);
 
 $fields = [

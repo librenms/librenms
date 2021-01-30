@@ -27,15 +27,10 @@ $ds_list[0]['ds'] = 'threads';
 $ds_list[0]['filename'] = $rrd_filename;
 $ds_list[0]['descr'] = 'XMRig Threads';
 $ds_list[0]['line_width'] = 2.5;
-
-// Monero colours
-//$ds_list[0]['colour'] = 'FF6600';
-//$ds_list[0]['areacolour'] = '4C4C4C';
-
-// Lighter grey
-$ds_list[0]['colour'] = 'FF6600';
-$ds_list[0]['areacolour'] = '939393';
-$ds_list[0]['areacolour'] = 'D1D1D1';
+$ds_list[0]['colour'] = 'FF6600'; // Monero orange
+//$ds_list[0]['areacolour'] = '4C4C4C'; // Monero Gray
+//$ds_list[0]['areacolour'] = '939393'; // Lighter gray 1
+$ds_list[0]['areacolour'] = 'D1D1D1'; // Lighter gray 2
 
 $ds_list[1]['vname'] = 'sys_nodes';
 $ds_list[1]['ds'] = 'sys_nodes';

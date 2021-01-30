@@ -19,26 +19,17 @@ $app_id = $app['app_id'];
 
 $rrd_filename = rrd_name($device['hostname'], ['app', $name, $app_id]);
 
-$ds_list[0]['vname'] = 'jobtime';
-$ds_list[0]['ds'] = 'jobtime_avg';
+$ds_list[0]['vname'] = 'shares_good';
+$ds_list[0]['ds'] = 'shares_good';
 $ds_list[0]['filename'] = $rrd_filename;
-$ds_list[0]['descr'] = 'Average jobtime';
-$ds_list[0]['line_width'] = 2.5;
-$ds_list[0]['units_text'] = 'seconds';
-// Greens
-//$ds_list[0]['colour'] = '009900';
-//$ds_list[0]['areacolour'] = 'D5F2D5';
-// Monero colours
-//$ds_list[0]['colour'] = '4C4C4C';
-//$ds_list[0]['areacolour'] = 'FF6600';
-// Monerish
-$ds_list[0]['colour'] = 'FF6600';
-$ds_list[0]['areacolour'] = 'FFEEE2';
+$ds_list[0]['descr'] = 'Accepted';
 
-$ds_list[1]['vname'] = 'difficulty';
-$ds_list[1]['ds'] = 'difficulty_last';
+$ds_list[1]['vname'] = 'shares_total';
+$ds_list[1]['ds'] = 'shares_total';
 $ds_list[1]['filename'] = $rrd_filename;
-$ds_list[1]['descr'] = 'Last difficulty';
+$ds_list[1]['descr'] = 'Submitted';
+$ds_list[1]['colour'] = '4C4C4C'; // Monero gray
+
 
 if ($_GET['debug']) {
     print_r($ds_list);
@@ -55,22 +46,23 @@ if ($_GET['debug']) {
 //$nodetails = false;
 //$noagg = true;
 //$title = '';
-$scale_min = 0;
+$scale_pm = 0;
 //$scale_max = 0;
 //$scale_rigid = anything;
 //$norigid = false;
-$float_precision = 1;
+$float_precision = 2;
 
 // LOCAL OPTIONS
 
-$line_width = 2.0;
-$pad_to = 21;   // padding for left-hand column in legend
+$line_width = 1;
+$pad_to = 16;   // padding for left-hand column in legend
 
 require 'includes/html/graphs/common.inc.php';
 
 //if ($nototal) {
 //    $pad_to += '2';
 //}
+
 
 $i = 0;
 foreach ($ds_list as $ds_item) {
@@ -123,23 +115,37 @@ foreach ($ds_list as $ds_item) {
     }
 
     // Graph command
-    if ($vname == 'jobtime') {
+    if ($vname == 'shares_good') {
+        // Legend Header
         $rrd_options .= " COMMENT:\s"; // spacer in legend
-        $rrd_options .= " COMMENT:'" . str_repeat(' ', $pad_to + 5) . "'";
-        $rrd_options .= " COMMENT:'Seconds\l'";
-        $rrd_options .= ' AREA:' . $vname . '#' . $areacolour;
-        $rrd_options .= ' LINE' . $ds_line_width . ':' . $vname . '#' . $colour . ":'$descr'";
-        //$rrd_options .= " LINE" . $ds_line_width . ':' . $vname . '#' . $colour . ":'$descr'";
-        $rrd_options .= ' GPRINT:' . $vname . ':AVERAGE:%9.' . $float_precision . "lf\l";
+        $rrd_options .= " COMMENT:'" . str_repeat(' ', $pad_to - 1) . "'";
+        $rrd_options .= " COMMENT:'Shares/min\l'";
 
-        $rrd_options .= " LINE1.5:60#FF0000:dashes:'Maximum jobtime'";
-        $rrd_options .= " COMMENT:'            60.0\l'";
-
-    } else if ($vname == 'difficulty') {
-        $rrd_options .= " COMMENT:\s"; // spacer in legend
-        $rrd_options .= " COMMENT:'" . $descr . "  '";
-        $float_precision = 0;
-        $rrd_options .= ' GPRINT:' . $vname . ":LAST:'%9." . $float_precision . 'lf ' . $units_text . "\l'";
-        $float_precision = 1;
+        // Accepted
+        $rrd_options .= " CDEF:shares_good_pm=shares_good,60,*"; // convert to per minute
+        $vname = "shares_good_pm";
+        $areacolour = 'D5F2D5'; // Green 1
+        $areacolour = 'BCF0BC'; // Green 2
+        $rrd_options .= " AREA:" . $vname . "#" . $areacolour . ":'$descr'";
+        $rrd_options .= " GPRINT:" . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
     }
+
+    if ($vname == 'shares_total') {
+        // Rejected
+        $rrd_options .= " CDEF:shares_bad=shares_total,shares_good,-";
+        $rrd_options .= " CDEF:shares_bad_pm=shares_bad,60,*"; // convert to per minute
+        $vname = "shares_bad_pm";
+        $bad_descr = rrdtool_escape("Rejected", $pad_to);
+        $areacolour = 'FF6666'; // Red
+        $rrd_options .= " AREA:" . $vname . "#" . $areacolour . ":'$bad_descr'" . ":STACK";
+        $rrd_options .= " GPRINT:" . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
+
+        // Submitted
+        $rrd_options .= " CDEF:shares_total_pm=shares_total,60,*"; // convert to per minute
+        $vname = "shares_total_pm";
+        $rrd_options .= " LINE" . $ds_line_width . ":" . $vname . "#" . $colour . ":'$descr'";
+        $rrd_options .= " GPRINT:" . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
+    }
+
 }
+
