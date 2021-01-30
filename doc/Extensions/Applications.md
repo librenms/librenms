@@ -2000,11 +2000,12 @@ extend voipmon /etc/snmp/voipmon-stats.sh
 ```
 
 
-
 # XMRig
 
-XMRig is a Monero (XMR) crypto-currency miner. This application collects stats such as 
-hashrate, job times and threading. See <https://xmrig.com/> for more about XMRig.
+XMRig is a Monero (XMR) crypto-currency miner. This application collects stats 
+such as hashrate, job times, shares and threading.
+
+See <https://xmrig.com/> for more about XMRig.
 
 ## SNMP Extend
 
@@ -2067,7 +2068,6 @@ systemctl reload snmpd
 ```
 
 9: You're now ready to enable the application in LibreNMS. 
-
 
 
 # ZFS
