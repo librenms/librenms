@@ -447,6 +447,19 @@ return [
                 'description' => 'Enable extra annotations',
                 'help' => 'Enable this to add extra data to datastores, this will increase storage usage. Helpful for usage in other tools such as Grafana.',
             ],
+            'graphs' => [
+                'source' => [
+                    'description' => 'Graph Datastore',
+                    'help' => 'Set the datastore used for graphing',
+                    'options' => [
+                        'graphite' => 'Graphite',
+                        'influxdb' => 'InfluxDB',
+                        'opentsdb' => 'OpenTSDB',
+                        'prometheus' => 'Prometheus',
+                        'rrd' => 'RRD',
+                    ],
+                ],
+            ],
         ],
         'discovery_modules' => [
             'arp-table' => [

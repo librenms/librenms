@@ -27,9 +27,11 @@ namespace LibreNMS\Data\Store;
 
 use App\Data\DataGroup;
 use App\Data\DataSet;
+use App\Graphing\QueryBuilder;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
+use LibreNMS\Data\SeriesData;
 use LibreNMS\Enum\DataRateType;
 use LibreNMS\Enum\DataType;
 use LibreNMS\Exceptions\FileExistsException;
@@ -151,8 +153,25 @@ class Rrd extends BaseDatastore
                 $this->command('create', $rrd, $this->genDef($ds));
             }
             $this->update($rrd, ['value' => $ds->getValue()]);
-//            dd($rrd, $ds->getValue());
         }
+    }
+
+    public function fetch(QueryBuilder $query): SeriesData
+    {
+        $data = $this->xport($query->toRrdQuery(), $query->getStart()->timestamp, $query->getEnd()->timestamp);
+
+        $timestamp = $data['meta']['start'];
+        $step = $data['meta']['step'];
+        $labels = $data['meta']['legend'];
+        $output = SeriesData::make($labels);
+
+        foreach ($data['data'] as $values) {
+            array_unshift($values, $timestamp);
+            $output->appendPoint(...$values);
+            $timestamp += $step;
+        }
+
+        return $output;
     }
 
     public function fileName(DataGroup $dg, DataSet $ds)

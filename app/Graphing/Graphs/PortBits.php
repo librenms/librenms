@@ -25,13 +25,12 @@
 
 namespace App\Graphing\Graphs;
 
+use App\Data\DataGroup;
 use App\Data\Sets\PortPackets;
-use App\Facades\Rrd;
 use App\Graphing\BaseGraph;
 use App\Graphing\QueryBuilder;
 use App\Models\Port;
 use Illuminate\Http\Request;
-use LibreNMS\Data\Store\InfluxDB;
 
 class PortBits extends BaseGraph
 {
@@ -40,40 +39,17 @@ class PortBits extends BaseGraph
         $this->init($request);
         $this->renderer->setLabels(['In', 'Out'], 'bps');
         $port = Port::with('device')->find($request->get('id'));
-//        $data = $this->fetchData($port);
-//        return $this->renderer->formatRrdData($data);
-        $data = $this->fetchFromInfluxDB($port);
-        return $this->renderer->formatInfluxData($data);
+        $query = $this->getQuery(PortPackets::make($port));
+
+        $data = app('Datastore')->fetch($query);
+        return $this->renderer->formatData($data);
     }
 
-    private function fetchData($port)
+    private function getQuery(DataGroup $dataGroup): QueryBuilder
     {
-        $id = $port->port_id;
-        $rrd_file = Rrd::name($port->device->hostname, Rrd::portName($id));
-        $defs = [
-            "DEF:outoctets$id=$rrd_file:OUTOCTETS:AVERAGE",
-            "DEF:inoctets$id=$rrd_file:INOCTETS:AVERAGE",
-            "CDEF:doutoctets$id=outoctets$id,-1,*",
-            "CDEF:doutbits$id=doutoctets$id,8,*",
-            "CDEF:inbits$id=inoctets$id,8,*",
-            "XPORT:inbits$id:'In'",
-            "XPORT:doutbits$id:'Out'",
-        ];
-
-        return Rrd::xport($defs, $this->start->timestamp, $this->end->timestamp);
-    }
-
-    private function fetchFromInfluxDB(Port $port)
-    {
-        $dataGroup = PortPackets::make($port);
-        /** @var \InfluxDB\Database $db */
-        $db = app(InfluxDB::class)->getConnection();
-
-        $builder = QueryBuilder::fromDataGroup($dataGroup)
+        return QueryBuilder::fromDataGroup($dataGroup)
             ->select('ifInOctets')->math('*', 8)
             ->select('ifOutOctets')->math('*', -8)
             ->range($this->start, $this->end);
-
-        return $db->query($builder->toInfluxDBQuery());
     }
 }

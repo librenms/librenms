@@ -27,12 +27,14 @@
 namespace LibreNMS\Data\Store;
 
 use App\Data\DataGroup;
+use App\Graphing\QueryBuilder;
 use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Driver\UDP;
 use InfluxDB\Point;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
+use LibreNMS\Data\SeriesData;
 use Log;
 
 class InfluxDB extends BaseDatastore
@@ -67,28 +69,30 @@ class InfluxDB extends BaseDatastore
         return Config::get('influxdb.enable', false);
     }
 
-    public function record(DataGroup $dg)
+    public function record(DataGroup $dataGroup)
     {
         $stat = Measurement::start('write');
         $fields = [];
 
         /** @var \App\Data\DataSet $ds */
-        foreach ($dg->getDataSets() as $ds) {
+        foreach ($dataGroup->getDataSets() as $ds) {
             $fields[$ds->getName()] = $ds->getValue();
         }
 
         $tags = $this->annotationsEnabled
-            ? array_merge($dg->getTags(), $dg->getAnnotations())
-            : $dg->getTags();
+            ? array_merge($dataGroup->getTags(), $dataGroup->getAnnotations())
+            : $dataGroup->getTags();
 
         try {
-            $this->connection->writePoints([new Point(
-                $dg->getName(),
+            $point = new Point(
+                $dataGroup->getName(),
                 null,
                 $tags,
                 $fields,
-                $dg->getTimestamp(),
-            )], Database::PRECISION_SECONDS);
+                $dataGroup->getTimestamp(),
+            );
+            $this->connection->writePoints([$point], Database::PRECISION_SECONDS);
+            d_echo("[InfluxDB] $point");
 
             $this->recordStatistic($stat->end());
         } catch (\Exception $e) {
@@ -220,5 +224,17 @@ class InfluxDB extends BaseDatastore
     public function getConnection(): Database
     {
         return $this->connection;
+    }
+
+    public function fetch(QueryBuilder $query): SeriesData
+    {
+        $resultSet = $this->getConnection()->query($query->toInfluxDBQuery(), ['epoch' => 's']);
+
+        $output = SeriesData::make($resultSet->getColumns());
+        foreach ($resultSet->getSeries()[0]['values'] as $points) {
+            $output->appendPoint(...$points);
+        }
+
+        return $output;
     }
 }

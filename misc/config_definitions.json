@@ -812,6 +812,20 @@
             "section": "datastores",
             "order": 0
         },
+        "datastores.graphs.source": {
+            "default": "rrd",
+            "type": "select",
+            "options": {
+                "graphite": "Graphite",
+                "influxdb": "InfluxDB",
+                "opentsdb": "OpenTSDB",
+                "prometheus": "Prometheus",
+                "rrd": "RRD"
+            },
+            "group": "poller",
+            "section": "datastores",
+            "order": 2
+        },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
             "type": "text"

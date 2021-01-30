@@ -25,6 +25,10 @@
 
 namespace LibreNMS\Interfaces\Data;
 
+use App\Data\DataGroup;
+use App\Graphing\QueryBuilder;
+use LibreNMS\Data\SeriesData;
+
 interface Datastore
 {
     /**
@@ -71,4 +75,19 @@ interface Datastore
      *                               single values are allowed and will be paired with $measurement
      */
     public function put($device, $measurement, $tags, $fields);
+
+    /**
+     * Send data to be recorded to all active datastores
+     * @param  \App\Data\DataGroup  $dataGroup
+     * @return void
+     */
+    public function record(DataGroup $dataGroup);
+
+    /**
+     * Execute the query on the graphing datastore and return the formatted array
+     *
+     * @param  \App\Graphing\QueryBuilder  $query
+     * @return SeriesData
+     */
+    public function fetch(QueryBuilder $query): SeriesData;
 }

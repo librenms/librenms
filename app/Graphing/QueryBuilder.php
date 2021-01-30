@@ -27,6 +27,7 @@ namespace App\Graphing;
 
 use App\Data\DataGroup;
 use Carbon\CarbonImmutable;
+use Rrd;
 
 class QueryBuilder
 {
@@ -102,5 +103,35 @@ class QueryBuilder
         $query .= ' GROUP BY time(15s) fill(null)';
 
         return $query;
+    }
+
+    public function toRrdQuery()
+    {
+        $defs = [];
+
+        foreach ($this->fields as $index => $field) {
+            $name = $field['name'];
+            $ds = $this->dataGroup->getDataSet($name);
+            $rrd_file = Rrd::fileName($this->dataGroup, $ds);
+            $defs[] = "DEF:{$name}_raw_$index=$rrd_file:value:AVERAGE";
+            if (isset($field['op'], $field['value'])) {
+                $defs[] = "CDEF:{$name}_calc_$index={$name}_raw_$index,{$field['value']},{$field['op']}";
+                $defs[] = "XPORT:{$name}_calc_$index:'$name'";
+            } else {
+                $defs[] = "XPORT:{$name}_raw_$index:'$name'";
+            }
+        }
+
+        return $defs;
+    }
+
+    public function getStart(): CarbonImmutable
+    {
+        return $this->start;
+    }
+
+    public function getEnd(): CarbonImmutable
+    {
+        return $this->end;
     }
 }

@@ -27,6 +27,7 @@ namespace App\Graphing\Renderer;
 
 use App\Graphing\Interfaces\Renderer;
 use InfluxDB\ResultSet;
+use LibreNMS\Data\SeriesData;
 
 class Chartjs implements Renderer
 {
@@ -117,5 +118,10 @@ class Chartjs implements Renderer
     public function formatInfluxData(ResultSet $data): array
     {
         return [];
+    }
+
+    public function formatData(SeriesData $data): array
+    {
+        // TODO: Implement formatData() method.
     }
 }

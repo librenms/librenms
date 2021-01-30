@@ -26,9 +26,12 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\DataGroup;
+use App\Graphing\QueryBuilder;
 use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
+use LibreNMS\Data\SeriesData;
 use Log;
 
 class Graphite extends BaseDatastore
@@ -143,5 +146,15 @@ class Graphite extends BaseDatastore
         } catch (\Socket\Raw\Exception $e) {
             Log::error('Graphite write error: ' . $e->getMessage());
         }
+    }
+
+    public function record(DataGroup $dataGroup)
+    {
+        // TODO: Implement record() method.
+    }
+
+    public function fetch(QueryBuilder $query): SeriesData
+    {
+        // TODO: Implement fetch() method.
     }
 }

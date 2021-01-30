@@ -27,6 +27,7 @@ namespace App\Graphing\Renderer;
 
 use App\Graphing\Interfaces\Renderer;
 use InfluxDB\ResultSet;
+use LibreNMS\Data\SeriesData;
 
 class MetricsGraphics implements Renderer
 {
@@ -64,6 +65,20 @@ class MetricsGraphics implements Renderer
         } else {
             $this->config['y_label'] = $yLabel;
         }
+    }
+
+    public function formatData(SeriesData $data): array
+    {
+        $output = [];
+        foreach ($data as $point) {
+            foreach ($this->config['legend'] as $index => $label) {
+                $output[$index][] = [$point[0], $point[$index + 1]];
+            }
+        }
+
+        $this->config['data'] = $output;
+
+        return $this->config;
     }
 
     public function formatRrdData($data): array

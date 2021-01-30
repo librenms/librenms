@@ -34,11 +34,11 @@ class DatastoreServiceProvider extends ServiceProvider
 {
     protected $namespace = 'LibreNMS\\Data\\Store\\';
     protected $stores = [
-        'LibreNMS\Data\Store\Graphite',
-        'LibreNMS\Data\Store\InfluxDB',
-        'LibreNMS\Data\Store\OpenTSDB',
-        'LibreNMS\Data\Store\Prometheus',
-        'LibreNMS\Data\Store\Rrd',
+        'graphite' => 'LibreNMS\Data\Store\Graphite',
+        'influxdb' => 'LibreNMS\Data\Store\InfluxDB',
+        'opentsdb' => 'LibreNMS\Data\Store\OpenTSDB',
+        'prometheus' => 'LibreNMS\Data\Store\Prometheus',
+        'rrd' => 'LibreNMS\Data\Store\Rrd',
     ];
 
     public function register()
