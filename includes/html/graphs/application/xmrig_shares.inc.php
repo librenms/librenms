@@ -30,7 +30,6 @@ $ds_list[1]['filename'] = $rrd_filename;
 $ds_list[1]['descr'] = 'Submitted';
 $ds_list[1]['colour'] = '4C4C4C'; // Monero gray
 
-
 if ($_GET['debug']) {
     print_r($ds_list);
 }
@@ -62,7 +61,6 @@ require 'includes/html/graphs/common.inc.php';
 //if ($nototal) {
 //    $pad_to += '2';
 //}
-
 
 $i = 0;
 foreach ($ds_list as $ds_item) {
@@ -122,30 +120,28 @@ foreach ($ds_list as $ds_item) {
         $rrd_options .= " COMMENT:'Shares/min\l'";
 
         // Accepted
-        $rrd_options .= " CDEF:shares_good_pm=shares_good,60,*"; // convert to per minute
-        $vname = "shares_good_pm";
+        $rrd_options .= ' CDEF:shares_good_pm=shares_good,60,*'; // convert to per minute
+        $vname = 'shares_good_pm';
         $areacolour = 'D5F2D5'; // Green 1
         $areacolour = 'BCF0BC'; // Green 2
-        $rrd_options .= " AREA:" . $vname . "#" . $areacolour . ":'$descr'";
-        $rrd_options .= " GPRINT:" . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
+        $rrd_options .= ' AREA:' . $vname . '#' . $areacolour . ":'$descr'";
+        $rrd_options .= ' GPRINT:' . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
     }
 
     if ($vname == 'shares_total') {
         // Rejected
-        $rrd_options .= " CDEF:shares_bad=shares_total,shares_good,-";
-        $rrd_options .= " CDEF:shares_bad_pm=shares_bad,60,*"; // convert to per minute
-        $vname = "shares_bad_pm";
-        $bad_descr = rrdtool_escape("Rejected", $pad_to);
+        $rrd_options .= ' CDEF:shares_bad=shares_total,shares_good,-';
+        $rrd_options .= ' CDEF:shares_bad_pm=shares_bad,60,*'; // convert to per minute
+        $vname = 'shares_bad_pm';
+        $bad_descr = rrdtool_escape('Rejected', $pad_to);
         $areacolour = 'FF6666'; // Red
-        $rrd_options .= " AREA:" . $vname . "#" . $areacolour . ":'$bad_descr'" . ":STACK";
-        $rrd_options .= " GPRINT:" . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
+        $rrd_options .= ' AREA:' . $vname . '#' . $areacolour . ":'$bad_descr'" . ':STACK';
+        $rrd_options .= ' GPRINT:' . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
 
         // Submitted
-        $rrd_options .= " CDEF:shares_total_pm=shares_total,60,*"; // convert to per minute
-        $vname = "shares_total_pm";
-        $rrd_options .= " LINE" . $ds_line_width . ":" . $vname . "#" . $colour . ":'$descr'";
-        $rrd_options .= " GPRINT:" . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
+        $rrd_options .= ' CDEF:shares_total_pm=shares_total,60,*'; // convert to per minute
+        $vname = 'shares_total_pm';
+        $rrd_options .= ' LINE' . $ds_line_width . ':' . $vname . '#' . $colour . ":'$descr'";
+        $rrd_options .= ' GPRINT:' . $vname . ":AVERAGE:'%6." . $float_precision . "lf\l'";
     }
-
 }
-

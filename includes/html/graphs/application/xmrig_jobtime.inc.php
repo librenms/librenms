@@ -134,8 +134,7 @@ foreach ($ds_list as $ds_item) {
 
         $rrd_options .= " LINE1.5:60#FF0000:dashes:'Maximum jobtime'";
         $rrd_options .= " COMMENT:'            60.0\l'";
-
-    } else if ($vname == 'difficulty') {
+    } elseif ($vname == 'difficulty') {
         $rrd_options .= " COMMENT:\s"; // spacer in legend
         $rrd_options .= " COMMENT:'" . $descr . "  '";
         $float_precision = 0;
