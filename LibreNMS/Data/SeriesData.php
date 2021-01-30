@@ -26,8 +26,9 @@
 namespace LibreNMS\Data;
 
 use Iterator;
+use JsonSerializable;
 
-class SeriesData implements Iterator
+class SeriesData implements Iterator, JsonSerializable
 {
     private $data = [];
     private $iter_pos = 0;
@@ -104,5 +105,10 @@ class SeriesData implements Iterator
     public function rewind()
     {
         $this->iter_pos = 0;
+    }
+
+    public function jsonSerialize()
+    {
+        return json_encode($this->data);
     }
 }

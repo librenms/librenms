@@ -56,10 +56,12 @@ class GraphService
         $this->route->prefix('graph/data')
             ->get("$group/$name", GraphDataController::class)
             ->name("graph_data.{$group}_$name")
+            ->middleware('graphs')
             ->defaults('graph', $instance);
         $this->route->prefix('graph')
             ->get("$group/$name", GraphViewController::class)
             ->name("graph_view.{$group}_$name")
+            ->middleware('graphs')
             ->defaults('graph', $instance);
     }
 }
