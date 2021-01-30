@@ -1,10 +1,21 @@
 <?php
 
-// Application for XMRig Miner
-// yrebrac@upaya.net.au
+/*
 
-use LibreNMS\RRD\RrdDefinition;
+LibreNMS Application for XMRig Miner
+
+Copyright(C) 2021 Ben Carbery yrebrac@upaya.net.au
+
+LICENSE - GPLv3
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
+
+*/
+
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\RRD\RrdDefinition;
 
 $name = 'xmrig';
 $app_id = $app['app_id'];
@@ -13,11 +24,11 @@ echo $name;
 
 try {
     $result = json_app_get($device, $name);
-
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
-    log_event("application xmrig caught JsonAppException");
+    log_event('application xmrig caught JsonAppException');
+
     return;
 }
 // should be doing something with error codes/messages returned in the snmp result or will they be caught above?
@@ -29,9 +40,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('sys_cores', 'GAUGE', 0, 16384)
     ->addDataset('sys_threads', 'GAUGE', 0, 65536)
     ->addDataset('sys_l2', 'GAUGE', 0, 34359738368)
-    ->addDataset('sys_l3', 'GAUGE', 0,34359738368)
+    ->addDataset('sys_l3', 'GAUGE', 0, 34359738368)
     ->addDataset('threads', 'GAUGE', 0, 65536)
-    ->addDataset('hashes', 'DERIVE', 0) 
+    ->addDataset('hashes', 'DERIVE', 0)
     ->addDataset('hashrate_10s', 'GAUGE', 0, 65536000)
     ->addDataset('hashrate_60s', 'GAUGE', 0, 65536000)
     ->addDataset('hashrate_15m', 'GAUGE', 0, 65536000)
@@ -68,7 +79,7 @@ $fields = [
     . ", sys_l2: " . $result['data']['cpu']['l2']
     . ", sys_l3: " . $result['data']['cpu']['l3']
     . ", threads: " . count($result['data']['hashrate']['threads'])
-    . ", hashes: " . $result['data']['results']['hashes_total'] 
+    . ", hashes: " . $result['data']['results']['hashes_total']
     . ", hashrate_10s: " . $result['data']['hashrate']['total']['0']
     . ", hashrate_60s: " . $result['data']['hashrate']['total']['1']
     . ", hashrate_15m: " . $result['data']['hashrate']['total']['2']

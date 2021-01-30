@@ -1,5 +1,17 @@
 <?php
 
+/*
+
+Copyright(C) 2021 Ben Carbery yrebrac@upaya.net.au
+
+LICENSE - GPLv3
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
+
+*/
+
 $graphs = [
     'xmrig_threads'   => 'XMRig Worker - Threads',
     'xmrig_hashrate'    => 'XMRig Worker - Hashrate',

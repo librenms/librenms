@@ -1,5 +1,19 @@
 <?php
 
+/*
+
+LibreNMS Application for XMRig Miner
+
+Copyright(C) 2021 Ben Carbery yrebrac@upaya.net.au
+
+LICENSE - GPLv3
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
+
+*/
+
 $name = 'xmrig';
 $app_id = $app['app_id'];
 
@@ -64,16 +78,15 @@ foreach ($ds_list as $ds_item) {
     $descr = rrdtool_escape($ds_item['descr'], $pad_to);
 
     // CF to use
-    $use_cf_last = array("nothing", "nothing");
+    $use_cf_last = ['nothing', 'nothing'];
 
     if (in_array($vname, $use_cf_last)) {
-        $cf = "LAST";
-
+        $cf = 'LAST';
     } else {
-        $cf = "AVERAGE";
+        $cf = 'AVERAGE';
     }
 
-    $rrd_options .= " DEF:" . $vname . "=$filename:$ds:" . $cf;
+    $rrd_options .= ' DEF:' . $vname . "=$filename:$ds:" . $cf;
 
     // Units
     if (isset($ds_item['units_text'])) {
@@ -85,7 +98,6 @@ foreach ($ds_list as $ds_item) {
     // Line Width
     if (isset($ds_item['line_width'])) {
         $ds_line_width = $ds_item['line_width'];
-
     } else {
         $ds_line_wdith = $line_width;
     }
@@ -93,7 +105,6 @@ foreach ($ds_list as $ds_item) {
     // Line Colour
     if (isset($ds_item['colour'])) {
         $colour = $ds_item['colour'];
-
     } else {
         if (! \LibreNMS\Config::get("graph_colours.$colours.$i")) {
             $i = 0;
@@ -105,20 +116,19 @@ foreach ($ds_list as $ds_item) {
     // Area Colour
     if (isset($ds_item['areacolour'])) {
         $areacolour = $ds_item['areacolour'];
-
     } else {
         $areacolour = $colour . '20';
     }
 
     // Graph command
-    if ($vname == "jobtime") {
+    if ($vname == 'jobtime') {
         $rrd_options .= " COMMENT:\s"; // spacer in legend
-        $rrd_options .= " COMMENT:'" . str_repeat(' ',$pad_to + 2) . "'";
+        $rrd_options .= " COMMENT:'" . str_repeat(' ', $pad_to + 2) . "'";
         $rrd_options .= " COMMENT:'Seconds\l'";
-        $rrd_options .= " AREA:" . $vname . "#" . $areacolour;
-        $rrd_options .= " LINE" . $ds_line_width . ':' . $vname . '#' . $colour . ":'$descr'";
+        $rrd_options .= ' AREA:' . $vname . '#' . $areacolour;
+        $rrd_options .= ' LINE' . $ds_line_width . ':' . $vname . '#' . $colour . ":'$descr'";
         //$rrd_options .= " LINE" . $ds_line_width . ':' . $vname . '#' . $colour . ":'$descr'";
-        $rrd_options .= " GPRINT:" . $vname . ":AVERAGE:%6." . $float_precision . "lf\l";
+        $rrd_options .= ' GPRINT:' . $vname . ':AVERAGE:%6.' . $float_precision . "lf\l";
 
         $rrd_options .= " LINE1.5:60#FF0000:dashes:'Maximum jobtime'";
         //$rrd_options .= " GPRINT:60:AVERAGE:%6." . $float_precision . "lf\l";

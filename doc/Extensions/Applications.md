@@ -137,6 +137,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
 1. [Voip-monitor](#voip-monitor) - SNMP extend
+1. [XMRig](#xmrig) - SNMP extend
 1. [ZFS](#zfs) - SNMP extend
 
 # Apache
@@ -1997,6 +1998,77 @@ Shell script that reports cpu-load/memory/open-files files stats of Voip Monitor
 ```
 extend voipmon /etc/snmp/voipmon-stats.sh
 ```
+
+
+
+# XMRig
+
+XMRig is a Monero (XMR) crypto-currency miner. This application collects stats such as 
+hashrate, job times and threading. See <https://xmrig.com/> for more about XMRig.
+
+## SNMP Extend
+
+1: Ensure the XMRig API is enabled as per that project's documentation. 
+
+2: Determine the URL to your worker. It should be something like below, 
+   which you can check by browsing to. For example:
+```
+https://<my_worker_ip>:<my_worker_port>/1/summary
+```
+
+3: Download the SNMP Extend python script onto the host with the XMRig worker:
+
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/xmrig-snmp.py -O /usr/local/bin/xmrig-snmp.py
+```
+
+3: Make the script executable:
+
+```
+chmod +x /usr/local/bin/xmrig-snmp.py
+```
+
+4: Install the python dependencies for the script:
+
+```
+pip install validators 
+```
+
+5: Create the cache directory & cache file. The cache is a safeguard against too
+   many requests to the API. If you don't want to use a cache you can add the 
+   '-n' option to the script
+
+```
+mkdir -p /var/cache/librenms/
+touch /var/cache/xmrig/summary.json
+```
+
+6: Test the script from the command-line, with the URL you determined earlier.
+
+You should see a JSON string with numbers, or perhaps an error if there's a 
+   problem.  The script has a '-v' '-w' options which may be useful for 
+   troubleshooting errors.
+
+```
+/usr/local/bin/xmrig-snmp.py -u <worker_url>
+```
+
+7: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add the 
+   following:
+
+```
+extend  xmrig   /usr/local/bin/xmrig-snmp.py -u https://<myworker_ip>:<myworker_port>/1/summary
+```
+
+8: Reload your snmpd service:
+
+```
+systemctl reload snmpd
+```
+
+9: You're now ready to enable the application in LibreNMS. 
+
+
 
 # ZFS
 
