@@ -173,4 +173,8 @@ class HiveosWireless extends OS implements
 
         return $data;
     }
+
+    /**
+     * Add Airtime code here
+     */
 }
