@@ -139,15 +139,14 @@ ls
 Make sure your config files are there :-)
 
 ```
-sudo usermod -a -G rancid www-data
-cd /opt/librenms/
+sudo usermod -a -G rancid librenms
 ```
 
 Add Rancid into LibreNMS config.php:
 
-```php
+```
 ### Rancid
-$config['rancid_configs'][]             = '/var/lib/rancid/librenms/configs/';
+$config['rancid_configs']             = '/var/lib/rancid/librenms/configs/';
 $config['rancid_repo_type']             = 'svn';  //'svn' or 'git'
 $config['rancid_ignorecomments']        = 0;
 ```
