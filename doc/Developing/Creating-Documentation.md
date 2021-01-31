@@ -101,13 +101,13 @@ INFO    -  Building documentation...
 <..>
 INFO    -  Documentation built in 12.54 seconds
 <..>
-INFO    -  Serving on http://127.0.0.1:8000
+INFO    -  Serving on http://0.0.0.0:8000
 <..>
 INFO    -  Start watching changes
 ``` 
 
 Now you will find the complete set of LibreNMS documentation by opening your
-browser to `localhost:8000` or `127.0.0.1:8000`.
+browser to `<your_ip>:8000`.
 
 Note it is not necessary to `build` before viewing as the `serve` command
 will do this for you. Also the server will update the documents it is serving
