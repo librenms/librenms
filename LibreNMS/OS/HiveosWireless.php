@@ -179,10 +179,14 @@ class HiveosWireless extends OS implements
      */
     public function discoverWirelessUtilization()
     {
-       
-        $util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'ahRadioTxAirtime', $util_oids, 'AH-INTERFACE-MIB');
-        $util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'ahRadioRxAirtime', $util_oids, 'AH-INTERFACE-MIB');
+        /**
+         *$util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'ahRadioTxAirtime', $util_oids, 'AH-INTERFACE-MIB');
+         *$util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'ahRadioRxAirtime', $util_oids, 'AH-INTERFACE-MIB');
+        */
         $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
+        $ahRadioTxAirtime = snmpwalk_group($this->getDeviceArray(), 'ahRadioTxAirtime', 'AH-INTERFACE-MIB');
+        $ahRadioRxAirtime = snmpwalk_group($this->getDeviceArray(), 'ahRadioRxAirtime', 'AH-INTERFACE-MIB');
+
 
         $sensors = [];
         foreach ($ahRadioName as $index => $name) {
