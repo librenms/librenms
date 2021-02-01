@@ -79,7 +79,6 @@ Copy the output. Replace all ":" with ";" example:
 ```
 alphcr1:cisco:up will change to:
 alphcr1;cisco;up
-
 ```
 
 copy and past results into the below file:
@@ -131,7 +130,8 @@ Upon success, run rancid:
 
 Ensure your configs pulled:
 
-```sudo su - rancid
+```
+sudo su - rancid
 cd librenms/configs/
 ls
 ```
@@ -144,9 +144,9 @@ sudo usermod -a -G rancid librenms
 
 Add Rancid into LibreNMS config.php:
 
-```
+```php
 ### Rancid
-$config['rancid_configs']             = '/var/lib/rancid/librenms/configs/';
+$config['rancid_configs'][]             = '/var/lib/rancid/librenms/configs/';
 $config['rancid_repo_type']             = 'svn';  //'svn' or 'git'
 $config['rancid_ignorecomments']        = 0;
 ```
