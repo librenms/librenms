@@ -1,4 +1,4 @@
-ource: Developing/Creating-Documentation.md path: blob/master/doc/
+source: Developing/Creating-Documentation.md path: blob/master/doc/
 
 # Creating Documentation
 
