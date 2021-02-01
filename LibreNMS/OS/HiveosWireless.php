@@ -175,6 +175,38 @@ class HiveosWireless extends OS implements
     }
 
     /**
-     * Add Airtime code here
+     * Rx and Tx Airtime sensors
      */
+    public function discoverWirelessUtilization()
+    {
+       
+        $util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'ahRadioTxAirtime', $util_oids, 'AH-INTERFACE-MIB');
+        $util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'ahRadioRxAirtime', $util_oids, 'AH-INTERFACE-MIB');
+        $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
+
+        $sensors = [];
+        foreach ($ahRadioName as $index => $name) {
+            $sensors[] = new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.' . $index,
+                'ah-tx',
+                $index,
+                "Tx Util ($name)",
+                $util_oids[$index]['ahRadioTxAirtime']
+            );
+            $sensors[] = new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.' . $index,
+                'ah-rx',
+                $index,
+                "Rx Util ($name)",
+                $util_oids[$index]['ahRadioRxAirtime']
+            );
+           
+        }
+
+        return $sensors;
+    }
 }
