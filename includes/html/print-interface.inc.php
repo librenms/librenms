@@ -5,6 +5,7 @@ $(function () {
 </script>
 <?php
 
+use App\Models\PortGroup;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
@@ -72,7 +73,7 @@ if ($port_details) {
 
 echo '</span>';
 
-$port_group_name_list = dbFetchColumn('SELECT port_groups.name FROM port_groups LEFT JOIN port_group_port ON port_groups.id=port_group_port.port_group_id WHERE port_group_port.port_id=?', [$port['port_id']]) ?: ['Default'];
+$port_group_name_list = PortGroup::leftJoin('port_group_port', 'port_groups.id', '=', 'port_group_port.port_group_id')->where('port_group_port.port_id', '=', $port['port_id'])->pluck('name')->toArray() ?: ['Default'];
 
 echo '</td><td width=100>';
 echo implode('<br>', $port_group_name_list);
