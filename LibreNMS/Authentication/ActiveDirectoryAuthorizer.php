@@ -119,10 +119,10 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($connection, $search);
 
         if ($entries['count']) {
-            return boolval(1);
+            return true;
         }
 
-        return boolval(0);
+        return false;
     }
 
     public function getUserlevel($username)
