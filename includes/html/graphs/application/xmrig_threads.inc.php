@@ -17,9 +17,9 @@ version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
 DESCRIPTION
 
 This graph is not super interesting visually, but it's useful informationally,
-or if you are experimenting with the optimal number of threads. You can also 
+or if you are experimenting with the optimal number of threads. You can also
 set up alerts using this data source. For example, if you lose connection to
-a pool and stop getting jobs, your threads will drop and you can trigger an 
+a pool and stop getting jobs, your threads will drop and you can trigger an
 alert
 
 */

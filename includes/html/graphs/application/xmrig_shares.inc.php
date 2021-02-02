@@ -18,7 +18,7 @@ DESCRIPTION
 
 This graph is primarily useful to spot if any of your shares are being rejected
 by the pool, such as by exceeding the maximum job time. You can set up an alert
-from when bad shares exceeds 0. It's also a alternative view of the proof of 
+from when bad shares exceeds 0. It's also a alternative view of the proof of
 work being done by miner, shares instead of hashes.
 
 */
