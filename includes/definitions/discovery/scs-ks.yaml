@@ -1,4 +1,4 @@
-mib: SCS-ks-series-MIB
+mib: SCS-ks-MIB
 modules:
     sensors:
         temperature:
