@@ -27,6 +27,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
         Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
     });
+    Route::prefix('services')->name('services.')->group(function () {
+        Route::resource('templates', 'ServiceTemplateController');
+        Route::post('templates/applyAll', 'ServiceTemplateController@applyAll')->name('templates.applyAll');
+        Route::post('templates/apply/{template}', 'ServiceTemplateController@apply')->name('templates.apply');
+        Route::post('templates/remove/{template}', 'ServiceTemplateController@remove')->name('templates.remove');
+    });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
@@ -109,6 +115,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
             Route::get('service', 'ServiceController');
+            Route::get('template', 'ServiceTemplateController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });

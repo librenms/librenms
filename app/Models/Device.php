@@ -456,11 +456,46 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereIn($query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-            $query->select('device_id')
-                ->from('device_group_device')
-                ->where('device_group_id', $deviceGroup);
-        });
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
+
+    public function scopeNotInDeviceGroup($query, $deviceGroup)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
+
+    public function scopeInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
+    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                    ->from('service_templates_device')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
     }
 
     // ---- Define Relationships ----
@@ -633,6 +668,11 @@ class Device extends BaseModel
     public function sensors()
     {
         return $this->hasMany(\App\Models\Sensor::class, 'device_id');
+    }
+
+    public function serviceTemplates()
+    {
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
     }
 
     public function services()
