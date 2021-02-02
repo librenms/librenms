@@ -4,13 +4,23 @@
 
 LibreNMS Application for XMRig Miner
 
-Copyright(C) 2021 Ben Carbery yrebrac@upaya.net.au
+@link       https://www.upaya.net.au/
+@copyright  2021 Ben Carbery
+@author     Ben Carbery <yrebrac@upaya.net.au>
 
 LICENSE - GPLv3
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
+
+DESCRIPTION
+
+This graph is not super interesting visually, but it's useful informationally,
+such as to verify your pool is allocating a sensible difficulty for each share.
+You can also set up alerts using this data source. For example, if you lose
+connection to a pool and stop getting jobs, your threads will drop and you can
+trigger an alert
 
 */
 

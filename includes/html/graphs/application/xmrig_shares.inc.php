@@ -4,13 +4,22 @@
 
 LibreNMS Application for XMRig Miner
 
-Copyright(C) 2021 Ben Carbery yrebrac@upaya.net.au
+@link       https://www.upaya.net.au/
+@copyright  2021 Ben Carbery
+@author     Ben Carbery <yrebrac@upaya.net.au>
 
 LICENSE - GPLv3
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
+
+DESCRIPTION
+
+This graph is primarily useful to spot if any of your shares are being rejected
+by the pool, such as by exceeding the maximum job time. You can set up an alert
+from when bad shares exceeds 0. It's also a alternative view of the proof of 
+work being done by miner, shares instead of hashes.
 
 */
 

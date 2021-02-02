@@ -4,7 +4,9 @@
 
 LibreNMS Application for XMRig Miner
 
-Copyright(C) 2021 Ben Carbery yrebrac@upaya.net.au
+@link       https://www.upaya.net.au/
+@copyright  2021 Ben Carbery 
+@author     Ben Carbery <yrebrac@upaya.net.au>
 
 LICENSE - GPLv3
 

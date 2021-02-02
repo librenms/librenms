@@ -4,13 +4,26 @@
 
 LibreNMS Application for XMRig Miner
 
-Copyright(C) 2021 Ben Carbery yrebrac@upaya.net.au
+@link       https://www.upaya.net.au/
+@copyright  2021 Ben Carbery
+@author     Ben Carbery <yrebrac@upaya.net.au>
 
 LICENSE - GPLv3
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
+
+DESCRIPTION
+
+Calculates the hasrate from the raw 'hashes' counter returned by XMRig. This is
+more accurate than the hashrates reported by XMRig itself. Because the hashes
+counter is only updated when a share (job) is finished, and you can have
+different numbers of shares completed in each polling cycle, the graph appears
+'lumpy'. To compensate for this a moving average is included, and this gives
+a more reliable picture of the actual hashrates from your hardware. Note the
+moving average needs certain number of steps to produce a number, so the first
+part of each graph will be blank.
 
 */
 
