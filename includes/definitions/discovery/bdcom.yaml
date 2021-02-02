@@ -7,17 +7,14 @@ modules:
                 descr: 'Memory Usage'
     os:
         hardware:
-            - NMS-CHASSIS::nmscardHwVersion.0
-            - NMS-CHASSIS::nmscardHwVersion.1
+            - NMS-CHASSIS::nmscardDescr.0
+            - NMS-CHASSIS::nmscardDescr.1
         version:
             - NMS-CHASSIS::nmscardSwVersion.0
             - NMS-CHASSIS::nmscardSwVersion.1
         serial:
             - NMS-CHASSIS::nmscardSerial.0
             - NMS-CHASSIS::nmscardSerial.1
-        features:
-            - NMS-CHASSIS::nmscardDescr.0
-            - NMS-CHASSIS::nmscardDescr.1
     pre-cache:
         data:
             -
