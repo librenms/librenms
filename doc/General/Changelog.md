@@ -1,4 +1,4 @@
-## 20.1.0
+## 21.1.0
 *(2021-02-02)*
 
 A big thank you to the following 37 contributors this last month:
