@@ -1343,10 +1343,6 @@ return [
                 'description' => 'Enable dynamic graphs',
                 'help' => 'Enable dynamic graphs, enables zooming and panning on graphs',
             ],
-            'graph_processor_last_values' => [
-                'description' => 'Use last recorded values on processor usage graphs',
-                'help' => 'Use last recorded values instead of averages while drawing processor usage graphs',
-            ],
             'global_search_result_limit' => [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
