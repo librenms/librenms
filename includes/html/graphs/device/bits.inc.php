@@ -4,7 +4,13 @@
 $ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
-foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0 AND `deleted` = 0', [$device['device_id']]) as $port) {
+$ports = dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0 AND `deleted` = 0', [$device['device_id']]);
+
+if (empty($ports)) {
+    graph_text_and_exit('No Ports');
+}
+
+foreach ($ports as $port) {
     $ignore = 0;
     if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
         foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
