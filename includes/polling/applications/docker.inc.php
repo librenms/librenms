@@ -3,6 +3,7 @@
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 $name = 'docker';
 $app_id = $app['app_id'];
@@ -55,8 +56,8 @@ foreach ($docker_data as $data) {
     $fields = [
         'cpu_usage' => ((float) $data['cpu']) * 100,
         'pids' => $data['pids'],
-        'mem_limit' => convertToBytes($data['memory']['limit']),
-        'mem_used' => convertToBytes($data['memory']['used']),
+        'mem_limit' =>  Number::formatBi($data['memory']['limit']),
+        'mem_used' =>  Number::formatBi($data['memory']['used']),
         'mem_perc' => ((float) $data['memory']['perc']) * 100,
     ];
 
