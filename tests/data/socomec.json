@@ -13,7 +13,7 @@
                     "os": "socomec",
                     "type": "power",
                     "serial": "YD17190028  A",
-                    "icon": "socomecpdu.svg",
+                    "icon": "socomecpdu.png",
                     "location": "<private>"
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "socomec",
                     "type": "power",
                     "serial": "YD17190028  A",
-                    "icon": "socomecpdu.svg",
+                    "icon": "socomecpdu.png",
                     "location": "<private>"
                 }
             ]
