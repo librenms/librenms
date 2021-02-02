@@ -175,7 +175,7 @@ class HiveosWireless extends OS implements
 
         return $data;
     }
-    -
+    
     /**
      * Rx and Tx Airtime sensors
      */
