@@ -1,0 +1,22 @@
+os: CiscoME
+text: 'Cisco ME1200'
+ifname: true
+type: network
+icon: cisco
+group: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.9.1
+
+mib_dir: cisco
+poller_modules:
+    cisco-cbqos: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+discovery_modules:
+    cisco-cef: true
+    cisco-mac-accounting: true
