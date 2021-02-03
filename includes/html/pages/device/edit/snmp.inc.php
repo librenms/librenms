@@ -302,6 +302,7 @@ foreach (get_port_assoc_modes() as $pam_id => $pam) {
 }
 
 $snmpv3_sha2_capable = snmpv3_sha2_capable();
+$snmpv3_aes_strong_capable = snmpv3_aes_strong_capable();
 echo "        </select>
       </div>
     </div>
@@ -367,7 +368,7 @@ echo "        </select>
     </select>
     ';
 if (! $snmpv3_sha2_capable) {
-    echo '<label class="text-left"><small>Optional requirements not resolved so some options are disabled</small></label>';
+    echo '<label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>';
 }
     echo "
     </div>
@@ -383,13 +384,13 @@ if (! $snmpv3_sha2_capable) {
     <div class='col-sm-4'>
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>
     <option value='AES' " . ($device['cryptoalgo'] === 'AES' ? 'selected' : '') . ">AES</option>
-    <option value='AES-192' " . ($device['cryptoalgo'] === 'AES-192' ? 'selected' : '') . ($snmpv3_sha2_capable ?: ' disabled') . ">AES-192</option>
-    <option value='AES-256' " . ($device['cryptoalgo'] === 'AES-256' ? 'selected' : '') . ($snmpv3_sha2_capable ?: ' disabled') . ">AES-256</option>
+    <option value='AES-192' " . ($device['cryptoalgo'] === 'AES-192' ? 'selected' : '') . ($snmpv3_aes_strong_capable ?: ' disabled') . ">AES-192</option>
+    <option value='AES-256' " . ($device['cryptoalgo'] === 'AES-256' ? 'selected' : '') . ($snmpv3_aes_strong_capable ?: ' disabled') . ">AES-256</option>
     <option value='DES'>DES</option>
     </select>
     ";
-if (! $snmpv3_sha2_capable) {
-    echo '<label class="text-left"><small>Optional requirements not resolved so some options are disabled</small></label>';
+if (! $snmpv3_aes_strong_capable) {
+    echo '<label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>';
 }
     echo '
     </div>

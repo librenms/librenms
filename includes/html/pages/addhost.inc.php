@@ -191,6 +191,7 @@ foreach (get_port_assoc_modes() as $mode) {
 }
 
 $snmpv3_sha2_capable = snmpv3_sha2_capable();
+$snmpv3_aes_strong_capable = snmpv3_aes_strong_capable();
 ?>
             </select>
           </div>
@@ -248,7 +249,7 @@ $snmpv3_sha2_capable = snmpv3_sha2_capable();
                 <option value="SHA-512"<?= $snmpv3_sha2_capable ?: ' disabled'?>>SHA-512</option>
               </select>
               <?php if (! $snmpv3_sha2_capable) {?>
-              <label class="text-left"><small>Optional requirements not resolved so some options are disabled</small></label>
+              <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
               <?php } ?>
             </div>
           </div>
@@ -263,12 +264,12 @@ $snmpv3_sha2_capable = snmpv3_sha2_capable();
             <div class="col-sm-9">
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
                 <option value="AES" selected>AES</option>
-                <option value="AES-192"<?= $snmpv3_sha2_capable ?: ' disabled'?>>AES-192</option>
-                <option value="AES-256"<?= $snmpv3_sha2_capable ?: ' disabled'?>>AES-256</option>
+                <option value="AES-192"<?= $snmpv3_aes_strong_capable ?: ' disabled'?>>AES-192</option>
+                <option value="AES-256"<?= $snmpv3_aes_strong_capable ?: ' disabled'?>>AES-256</option>
                 <option value="DES">DES</option>
               </select>
-              <?php if (! $snmpv3_sha2_capable) {?>
-              <label class="text-left"><small>Optional requirements not resolved so some options are disabled</small></label>
+              <?php if (! $snmpv3_aes_strong_capable) {?>
+              <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
               <?php } ?>
             </div>
           </div>

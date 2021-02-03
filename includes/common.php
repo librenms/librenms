@@ -811,6 +811,18 @@ function snmpv3_sha2_capable()
 }
 
 /**
+ * Checks if system is SNMPv3 AES-192/256 capable for Privacy Algorithms
+ * @return bool
+ */
+function snmpv3_aes_strong_capable()
+{
+    $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
+    $process->run();
+
+    return Str::contains($process->getErrorOutput(), 'AES-256');
+}
+
+/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
  * @return string Empty if not valid.
