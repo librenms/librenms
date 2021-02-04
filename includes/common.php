@@ -799,27 +799,20 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
- * checks if System is SNMPv3 SHA2 Capable for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * @return bool
+ * Checks SNMPv3 capabilities
+ *
+ * SHA2 for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
+ * AES-192, AES-256 for Privacy Algorithms
  */
-function snmpv3_sha2_capable()
+function snmpv3_capabilities(): array
 {
     $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
     $process->run();
 
-    return Str::contains($process->getErrorOutput(), 'SHA-512');
-}
+    $ret['sha2'] = Str::contains($process->getErrorOutput(), 'SHA-512');
+    $ret['aes256'] = Str::contains($process->getErrorOutput(), 'AES-256');
 
-/**
- * Checks if system is SNMPv3 AES-192/256 capable for Privacy Algorithms
- * @return bool
- */
-function snmpv3_aes_strong_capable()
-{
-    $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
-    $process->run();
-
-    return Str::contains($process->getErrorOutput(), 'AES-256');
+    return $ret;
 }
 
 /**
