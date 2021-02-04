@@ -123,6 +123,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [PowerDNS](#powerdns) - Agent
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, SNMP extend, Agent
 1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
+1. [PowerMon](#powermon) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Puppet Agent](#puppet_agent) - SNMP extend
 1. [PureFTPd](#pureftpd) - SNMP extend
@@ -1495,6 +1496,23 @@ extend powerdns-dnsdist /etc/snmp/powerdns-dnsdist
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+# PowerMon
+
+PowerMon tracks the power consumption on your host.
+
+The script uses one of several methods, but you must test and then declare to 
+the scripts which ones works on each of your hosts (this is because there is
+no standard way to get this information). No one method is guaranteed to work,
+but if you do discover a new method that works, the script could be updated to
+include this new method as long as it returns data in the same format. 
+
+## SNMP Extend
+
+1. Blah
+
+2. Blah
+
 
 # Proxmox
 
