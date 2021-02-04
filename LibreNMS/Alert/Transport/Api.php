@@ -79,7 +79,7 @@ class Api extends Transport
             foreach ($obj as $key => $value) {
                 // iterate variables if it is an array recursivly
                 if (is_array($value)) {
-                    iterateVariables($value,$subject);
+                    iterateVariables($value, $subject);
                 } else {
                     // replace expected templated markup of {{ $variable }}
                     $subject = preg_replace("/\{\{\s*\\\${$key}\s*\}\}/i", $value, $subject);
