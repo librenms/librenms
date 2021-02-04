@@ -1656,12 +1656,11 @@ extend redis /etc/snmp/redis.py
 
 Install/Setup:
 For Install/Setup Local Librenms RRDCached: Please see [RRDCached](RRDCached.md)
-Securing RRCached: Please see [RRDCached Security](RRDCached-Security.md)
 
-For Remote Polling the 'RRDCached' Application, you have two options:
-
-1: Monitor thru exposing rrdcached port, listen 42217 as described: [RRDCached Security](RRDCached-Security.md)
-2: Monitor thru snmp with Snmp Extend as described, here:
+Capable of collecting stats via:
+1: Local unix socket specified by rrdcached config setting
+1: Local or remote connection to port 42217 specified by rrdcached config setting
+2: Monitor thru snmp with Snmp Extend:
 
 SNMP extend script to monitor your (remote) RRDCached via snmp
 
