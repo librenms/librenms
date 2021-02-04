@@ -16,14 +16,17 @@ version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
 
 DESCRIPTION
 
-Calculates the hasrate from the raw 'hashes' counter returned by XMRig. This is
-more accurate than the hashrates reported by XMRig itself. Because the hashes
-counter is only updated when a share (job) is finished, and you can have
-different numbers of shares completed in each polling cycle, the graph appears
-'lumpy'. To compensate for this a moving average is included, and this gives
-a more reliable picture of the actual hashrates from your hardware. Note the
-moving average needs certain number of steps to produce a number, so the first
-part of each graph will be blank.
+Displays the crrent watts being consumed by a host and uses that data series
+to estimate total power consumption in kWh over the graph. Finally, displays
+the cost of the kWh consumed based on the cost defined below. 
+
+Watts (power) is an instantaneous value. Hence this graph will be more accurate
+when these is a fairly consistent load on the server between polling cycles.
+
+Watts is easily converted to kilowatt hours which most electricity providers
+will charge in terms of. The graph will display the total kWh hours consumed at
+the bottom. You can update the default cost_per_kWh below and currency symbol
+below under LOCAL OPTIONS
 
 */
 
@@ -32,27 +35,13 @@ $app_id = $app['app_id'];
 
 $rrd_filename = rrd_name($device['hostname'], ['app', $name, $app_id]);
 
-$ds_list[0]['vname'] = 'watts-gauge';
+$ds_list[0]['vname'] = 'watts';
 $ds_list[0]['ds'] = 'watts-gauge';
 $ds_list[0]['filename'] = $rrd_filename;
-$ds_list[0]['descr'] = 'Average hashrate';
-$ds_list[0]['units_text'] = 'W';
-
-// Reds
-//$ds_list[0]['colour'] = 'CC0000';
-//$ds_list[0]['colour'] = 'CC0000';
-
-// Magentas
-//$ds_list[0]['colour'] = 'CC00CC';
-//$ds_list[0]['areacolour'] = 'FFCCFF';
-
-// Monero colours
-//$ds_list[0]['colour'] = 'FF6600';
-//$ds_list[0]['areacolour'] = '4C4C4C';
-
-// Monerish
-$ds_list[0]['colour'] = 'FF6600';
-$ds_list[0]['areacolour'] = 'FFEEE2';
+$ds_list[0]['descr'] = 'Average Power';
+$ds_list[0]['units_text'] = ' W';
+$ds_list[0]['colour'] = 'FF6600'; // orange
+$ds_list[0]['colour'] = 'F9F900'; // yellow
 
 if ($_GET['debug']) {
     print_r($ds_list);
@@ -78,13 +67,17 @@ $float_precision = 0;
 // LOCAL OPTIONS
 
 $line_width = 2.5;
-$pad_to = 24;   // padding for left-hand column in legend
+$pad_to = 18;               // padding for left-hand column in legend
+$cost_per_kWh = 0.224931;   // enter the electricity cost in your local currency
+$currency_symbol = "$";     // change if reqd.
 
 require 'includes/html/graphs/common.inc.php';
 
 //if ($nototal) {
 //    $pad_to += '2';
 //}
+
+$rrd_options .= " COMMENT:\s"; // spacer in legend
 
 $i = 0;
 foreach ($ds_list as $ds_item) {
@@ -133,32 +126,46 @@ foreach ($ds_list as $ds_item) {
     if (isset($ds_item['areacolour'])) {
         $areacolour = $ds_item['areacolour'];
     } else {
-        $areacolour = $colour . '20';
+        $areacolour = $colour . "20";
     }
 
     // Graph command
-    if ($vname == 'watts-gauage') {
-        // Convert rrdata to moving averages
-        //$rrd_options .= ' CDEF:' . 'hashes_ma_15m' . '=hashes,900,TRENDNAN';
-        //$rrd_options .= ' CDEF:' . 'hashes_ma_1h' . '=hashes,3600,TRENDNAN';
-        //$rrd_options .= ' CDEF:' . 'hashes_ma_1d' . '=hashes,86400,TRENDNAN';
+ 
+    if ($vname == "watts") {
+        //$rrd_options .= ' AREA:' . $vname . '#' . $areacolour;
+        $rrd_options .= " LINE" . $ds_line_width . ":" . $vname . "#" . $colour . ":'$descr'";
+        $rrd_options .= " GPRINT:" . $vname . ":AVERAGE:%12." . $float_precision . "lf'" . $units_text . "'\l";
 
         $rrd_options .= " COMMENT:\s"; // spacer in legend
-        $rrd_options .= " COMMENT:'" . str_repeat(' ', $pad_to + 6) . "'";
-        $rrd_options .= " COMMENT:'H/s\l'";
 
-        $rrd_options .= ' AREA:' . $vname . '#' . $areacolour;
-        $rrd_options .= ' LINE' . $ds_line_width . ':' . $vname . '#' . $colour . ":'$descr'";
-        $rrd_options .= ' GPRINT:' . $vname . ':AVERAGE:%6.' . $float_precision . "lf\l";
+/*        // Watt Seconds
+        $descr = "  Total Consumed";
+        $units_text = " Ws";
+        $descr = rrdtool_escape($descr, $pad_to + 2);
+        $rrd_options .= " COMMENT:'" . $descr . "'";
+        $rrd_options .= " VDEF:" . "wattsecs" . "=watts,TOTAL";
+        $rrd_options .= " GPRINT:" . "wattsecs" . ":%12." . $float_precision . "lf'" . $units_text . "'\l";
+ */
+        // Kilowatt Hours
+        $units_text = " kWh";
+        $float_precision = 2;
+        $descr = "  Total Consumed";
+        $descr = rrdtool_escape($descr, $pad_to + 2);
+        $rrd_options .= " COMMENT:'" . $descr . "'";
+        $rrd_options .= " CDEF:" . "series_a" . "=watts,3600000,/";
+        $rrd_options .= " VDEF:" . "kilowatthours" . "=series_a,TOTAL";
+        $rrd_options .= " GPRINT:" . "kilowatthours" . ":%12." . $float_precision . "lf'" . $units_text . "'\l";
 
-        //$ds_line_width = 2.5;
-        //$rrd_options .= " LINE" . $ds_line_width . ":hashes_ma_15m#" . "9999FF" . ":'Moving average 15 minutes'";
-        //$rrd_options .= " GPRINT:" . "hashes_ma_15m" . ":AVERAGE:%6." . $float_precision . "lf\l";
+        // Consumption Charge
+        $float_precision = 2;
+        $descr = "  Total Cost";
+        $descr = rrdtool_escape($descr, $pad_to + 7);
+        $divisor = 3600000 / $cost_per_kWh;
+        $rrd_options .= " COMMENT:'" . $descr . $currency_symbol . "'";
+        $rrd_options .= " CDEF:" . "series_b" . "=watts," . $divisor . ",/";
+        $rrd_options .= " VDEF:" . "charge" . "=series_b,TOTAL";
+        $rrd_options .= " GPRINT:" . "charge" . ":%6." . $float_precision . "lf" . "'         @ " . $cost_per_kWh . " p/kWh\l'";
 
-        //$rrd_options .= ' LINE' . $ds_line_width . ':hashes_ma_1h#' . '6666FF' . ":'Moving average 1 hour    '";
-        //$rrd_options .= ' GPRINT:' . 'hashes_ma_1h' . ':AVERAGE:%6.' . $float_precision . "lf\l";
-
-        //$rrd_options .= ' LINE' . $ds_line_width . ':hashes_ma_1d#' . '000099' . ":'Moving average 1 day     '";
-        //$rrd_options .= ' GPRINT:' . 'hashes_ma_1d' . ':AVERAGE:%6.' . $float_precision . "lf\l";
     }
 }
+

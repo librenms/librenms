@@ -2,7 +2,7 @@
 
 /*
 
-LibreNMS Application for monitoring power consumption
+LibreNMS Application for monitoring power consumption and cost
 
 @link       https://www.upaya.net.au/
 @copyright  2021 Ben Carbery

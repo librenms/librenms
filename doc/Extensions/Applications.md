@@ -785,7 +785,7 @@ Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 Shell script that reports load average/memory/open-files stats of Icecast
 ## SNMP Extend
 
-1. Copy the shell script, icecast-stats.sh, to the desired host (the host must be added to LibreNMS devices) 
+1. Copy the shell script, icecast-stats.sh, to the desired host (the host must be added to LibreNMS devices)
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/icecast-stats.sh -O /etc/snmp/icecast-stats.sh
 ```
@@ -811,7 +811,7 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailc
 
 2: Run `chmod +x /etc/snmp/mailcow-dockerized-postfix`
 
-> Maybe you will be neeed to install `pflogsumm` on debian based OS. Please check if you have package installed. 
+> Maybe you will be neeed to install `pflogsumm` on debian based OS. Please check if you have package installed.
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
@@ -1501,11 +1501,11 @@ Extend` heading top of page.
 
 PowerMon tracks the power consumption on your host.
 
-The script uses one of several methods, but you must test and then declare to 
+The script uses one of several methods, but you must test and then declare to
 the scripts which ones works on each of your hosts (this is because there is
 no standard way to get this information). No one method is guaranteed to work,
 but if you do discover a new method that works, the script could be updated to
-include this new method as long as it returns data in the same format. 
+include this new method as long as it returns data in the same format.
 
 ## SNMP Extend
 

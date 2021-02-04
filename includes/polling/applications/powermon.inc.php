@@ -2,7 +2,7 @@
 
 /*
 
-LibreNMS Application for monitoring power consumption
+LibreNMS Application for monitoring power consumption and cost
 
 @link       https://www.upaya.net.au/
 @copyright  2021 Ben Carbery
@@ -40,20 +40,19 @@ try {
 $rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('watts-gauge', 'GAUGE', 0)
-    ->addDataset('watts-derive', 'DERIVE', 0)
     ->addDataset('watts-abs', 'ABSOLUTE', 0);
 
 $fields = [
     'watts-gauge'       => $result['data']['reading'],
-    'watts-derive'      => $result['data']['reading'],
     'watts-abs'         => $result['data']['reading'],
 ];
 
+/*
 log_event(
       "watts-gauage: " . $result['data']['reading']
-    . ", watts-derive: " . $result['data']['reading']
     . ", watts-abs: " . $result['data']['reading']
 );
+ */
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
