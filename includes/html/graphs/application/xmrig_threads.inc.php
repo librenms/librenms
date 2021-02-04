@@ -24,7 +24,6 @@ alert
 
 */
 
-
 $name = 'xmrig';
 $app_id = $app['app_id'];
 
