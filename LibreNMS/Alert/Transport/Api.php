@@ -43,7 +43,7 @@ class Api extends Transport
     {
         $request_opts = [];
         $request_heads = [];
-	    $query = [];
+        $query = [];
 
         $method = strtolower($method);
         $host = explode('?', $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
@@ -76,9 +76,9 @@ class Api extends Transport
         */
         function iterateVariables($obj, &$subject)
         {
-            foreach( $obj as $key => $value ) {
+            foreach ($obj as $key => $value) {
                 // iterate variables if it is an array recursivly
-                if ( is_array($value)) {
+                if (is_array($value)) {
                     iterateVariables($value,$subject);
                 } else {
                     // replace expected templated markup of {{ $variable }}
