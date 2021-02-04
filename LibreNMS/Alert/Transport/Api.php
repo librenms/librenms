@@ -68,12 +68,6 @@ class Api extends Transport
             $query[$u_key] = $u_val;
         }
 
-        /**
-        * Recursivly iterate $obj's variables into $subject
-        * @param mixed $obj - Input object
-        * @param string &$subject - Output variable
-        * @return void
-        */
         function iterateVariables($obj, &$subject)
         {
             foreach ($obj as $key => $value) {
