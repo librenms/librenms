@@ -67,28 +67,27 @@ class Api extends Transport
             //store the parameter in the array for HTTP query
             $query[$u_key] = $u_val;
         }
-        
+
         /**
         * Recursivly iterate $obj's variables into $subject
         * @param mixed $obj - Input object
         * @param string &$subject - Output variable
         * @return void
         */
-        function iterateVariables($obj,&$subject)
+        function iterateVariables($obj, &$subject)
         {
-            foreach( $obj as $key => $value )
-            {
+            foreach( $obj as $key => $value ) {
                 // iterate variables if it is an array recursivly
-                if ( is_array($value) ) {
+                if ( is_array($value)) {
                     iterateVariables($value,$subject);
                 } else {
                     // replace expected templated markup of {{ $variable }}
-                    $subject = preg_replace("/\{\{\s*\\\${$key}\s*\}\}/i",$value,$subject);
+                    $subject = preg_replace("/\{\{\s*\\\${$key}\s*\}\}/i", $value, $subject);
                 }
             }
         }
         // turn objects into arrays in a newObj
-        $newObj = json_decode(json_encode($obj),true);
+        $newObj = json_decode(json_encode($obj), true);
         iterateVariables($newObj, $body);
 
         $client = new \GuzzleHttp\Client();
