@@ -182,7 +182,7 @@ class HiveosWireless extends OS implements
      */
     public function pollOS()
     {
-        $txairtime = snmp_get($this->getDeviceArray(), 'AH-INTERFACE-MIB::ahRadioTxAirtime.7', '-Ovq');
+        $txairtime = snmp_get($this->getDeviceArray(), 'AH-INTERFACE-MIB::ahRadioTxAirtime.7', '-On');
         if (is_numeric($sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('txairtime', 'COUNTER64', 0);
 
@@ -196,7 +196,7 @@ class HiveosWireless extends OS implements
             $this->enableGraph('ahradiotxairtime');
         }
 
-        $rxairtime = snmp_get($this->getDeviceArray(), 'AH-INTERFACE-MIB::ahRadioRxAirtime.7', '-Ovq');
+        $rxairtime = snmp_get($this->getDeviceArray(), 'AH-INTERFACE-MIB::ahRadioRxAirtime.7', '-On');
         if (is_numeric($sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('rxairtime', 'COUNTER64', 0);
 
