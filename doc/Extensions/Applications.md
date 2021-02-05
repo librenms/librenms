@@ -2005,6 +2005,8 @@ extend voipmon /etc/snmp/voipmon-stats.sh
 XMRig is a Monero (XMR) crypto-currency miner. This application collects stats 
 such as hashrate, job times, shares and threading.
 
+[XMRig example graphs](./Application-XMRig.md)
+
 See <https://xmrig.com/> for more about XMRig.
 
 ## SNMP Extend
