@@ -184,7 +184,7 @@ class HiveosWireless extends OS implements
     {
         $txairtime = snmp_get($this->getDeviceArray(), 'AH-INTERFACE-MIB::ahRadioTxAirtime.7', '-Ovq');
         if (is_numeric($sessions)) {
-            $rrd_def = RrdDefinition::make()->addDataset('txairtime', 'COUNTER64', 0);
+            $rrd_def = RrdDefinition::make()->addDataset('txairtime', 'COUNTER', 0);
 
             echo "TX Airtime: $txairtime\n";
             $fields = [
@@ -198,7 +198,7 @@ class HiveosWireless extends OS implements
 
         $rxairtime = snmp_get($this->getDeviceArray(), 'AH-INTERFACE-MIB::ahRadioRxAirtime.7', '-Ovq');
         if (is_numeric($sessions)) {
-            $rrd_def = RrdDefinition::make()->addDataset('rxairtime', 'COUNTER64', 0);
+            $rrd_def = RrdDefinition::make()->addDataset('rxairtime', 'COUNTER', 0);
 
             echo "RX Airtime: $rxairtime\n";
             $fields = [
