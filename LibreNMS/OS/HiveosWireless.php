@@ -34,6 +34,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessNoiseFloorPolling;
+use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\OS;
 
 class HiveosWireless extends OS implements
@@ -44,7 +46,8 @@ class HiveosWireless extends OS implements
     WirelessNoiseFloorPolling,
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery,
-    ProcessorDiscovery
+    ProcessorDiscovery,
+    OSPolling
 {
     /**
      * Discover processors.
@@ -175,44 +178,38 @@ class HiveosWireless extends OS implements
 
         return $data;
     }
-    
-    /**
-     * Rx and Tx Airtime sensors
+
+    /**Poll ahRadioTxAirtime and ahRadioRxAirtime and graph deltas
+     * 
      */
-    public function discoverWirelessUtilization()
+    public function pollOS()
     {
-        /**
-         *$util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'ahRadioTxAirtime', $util_oids, 'AH-INTERFACE-MIB');
-         *$util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'ahRadioRxAirtime', $util_oids, 'AH-INTERFACE-MIB');
-        */
-        $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
-        $ahRadioTxAirtime = snmpwalk_group($this->getDeviceArray(), 'ahRadioTxAirtime', 'AH-INTERFACE-MIB');
-        $ahRadioRxAirtime = snmpwalk_group($this->getDeviceArray(), 'ahRadioRxAirtime', 'AH-INTERFACE-MIB');
+        $txairtime = snmp_get($this->getDeviceArray(), 'AH-INTERFACE-MIB::ahRadioTxAirtime.0', '-Ovq');
+        if (is_numeric($sessions)) {
+            $rrd_def = RrdDefinition::make()->addDataset('txairtime', 'COUNTER', 0);
 
+            echo "TX Airtime: $txairtime\n";
+            $fields = [
+                'txairtime' => $txairtime,
+            ];
 
-        $sensors = [];
-        foreach ($ahRadioName as $index => $name) {
-            $sensors[] = new WirelessSensor(
-                'utilization',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.' . $index,
-                'ah-tx',
-                $index,
-                "Tx Util ($name)",
-                $util_oids[$index]['ahRadioTxAirtime']
-            );
-            $sensors[] = new WirelessSensor(
-                'utilization',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.' . $index,
-                'ah-rx',
-                $index,
-                "Rx Util ($name)",
-                $util_oids[$index]['ahRadioRxAirtime']
-            );
-           
+            $tags = compact('rrd_def');
+            app()->make('Datastore')->put($this->getDeviceArray(), 'ahradiotxairtime', $tags, $fields);
+            $this->enableGraph('ahradiotxairtime');
         }
 
-        return $sensors;
+        $rxairtime = snmp_get($this->getDeviceArray(), 'AH-INTERFACE-MIB::ahRadioRxAirtime.0', '-Ovq');
+        if (is_numeric($sessions)) {
+            $rrd_def = RrdDefinition::make()->addDataset('rxairtime', 'COUNTER', 0);
+
+            echo "RX Airtime: $rxairtime\n";
+            $fields = [
+                'rxairtime' => $rxairtime,
+            ];
+
+            $tags = compact('rrd_def');
+            app()->make('Datastore')->put($this->getDeviceArray(), 'ahradiorxairtime', $tags, $fields);
+            $this->enableGraph('ahradiorxairtime');
+        }
     }
 }
