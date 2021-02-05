@@ -1855,11 +1855,6 @@ function update_device_attrib(Illuminate\Http\Request $request)
         return api_error(400, 'Device Attrib field to patch has not been supplied');
     }
     if (is_array($data['attrib_type']) && is_array($data['attrib_value'])) {
-        foreach ($data['attrib_type'] as $tmp_field) {
-            if (in_array($tmp_field, $bad_fields)) {
-                return api_error(500, 'Device Attrib field is not allowed to be updated');
-            }
-        }
         if (count($data['attrib_type']) == count($data['attrib_value'])) {
             $update = [];
             $result = [];
