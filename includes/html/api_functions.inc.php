@@ -14,6 +14,7 @@
 
 use App\Models\Availability;
 use App\Models\Device;
+use App\Models\DeviceAttrib;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
 use App\Models\PortsFdb;
@@ -1841,6 +1842,45 @@ function rename_device(Illuminate\Http\Request $request)
         } else {
             return api_error(500, 'Device failed to be renamed');
         }
+    }
+}
+
+function update_device_attrib(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $data = json_decode($request->getContent(), true);
+    $bad_fields = ['override_icmp_disable'];
+    if (empty($data['field'])) {
+        return api_error(400, 'Device Attrib field to patch has not been supplied');
+    } elseif (in_array($data['field'], $bad_fields)) {
+        return api_error(500, 'Device Attrib field is not allowed to be updated');
+    }
+    if (is_array($data['field']) && is_array($data['data'])) {
+        foreach ($data['field'] as $tmp_field) {
+            if (in_array($tmp_field, $bad_fields)) {
+                return api_error(500, 'Device Attrib field is not allowed to be updated');
+            }
+        }
+        if (count($data['field']) == count($data['data'])) {
+            $update = [];
+            $result = [];
+            for ($x = 0; $x < count($data['field']); $x++) {
+                if (dbUpdate(['attrib_value' => $data['data'][$x]], 'devices_attribs', '`device_id`=? and `attrib_type`=?', [$device_id, $data['field'][$x]]) >= 0) {
+                    $result[$data['field'][$x]] = 'Success';
+                } else {
+                    return api_error(500, 'Device Attrib fields failed to be updated');
+                }
+            }
+            return api_success_noresult(200, 'Device Attrib fields updated');
+        } else {
+            return api_error(500, 'Device Attrib fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
+        }
+    } elseif (dbUpdate(['attrib_value' => $data['data']], 'devices_attribs', '`device_id`=? AND `attrib_type`=?', [$device_id, $data['field']]) >= 0) {
+        return api_success_noresult(200, 'Device Attrib ' . $data['field'] . ' field has been updated');
+    } else {
+        return api_error(500, 'Device Attrib ' . $data['field'] . ' field failed to be updated');
     }
 }
 
