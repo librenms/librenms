@@ -357,6 +357,12 @@ $graphs['voip-monitor'] = [
     'memoryusage',
     'openfiles',
 ];
+$graphs['xmrig'] = [
+    'hashrate',
+    'threads',
+    'jobtime',
+    'shares',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
