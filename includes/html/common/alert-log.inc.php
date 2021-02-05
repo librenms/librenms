@@ -37,6 +37,10 @@ $alert_severities = [
     'Warning' => 5,
 ];
 
+if (Auth::user()->hasGlobalAdmin()) {
+    $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
+}
+
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
@@ -72,6 +76,8 @@ if (isset($_POST['min_severity'])) {
     $_POST['min_severity'] = '';
 }
 
+
+
 $common_output[] = '
 <div class="table-responsive">
     <table id="alertlog" class="table table-hover table-condensed table-striped">
@@ -83,7 +89,7 @@ $common_output[] = '
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert">Alert</th>
             <th data-column-id="severity">Severity</th>
-            <th data-column-id="verbose_details" data-sortable="false">Details</th>
+            ' . $admin_verbose_details . '
         </tr>
         </thead>
     </table>
@@ -102,6 +108,7 @@ $common_output[] = '
                 ' . csrf_field() . ' \
             <input type=hidden name="hostname" id="hostname"> \
 ';
+
 
 if (isset($vars['fromdevice']) && ! $vars['fromdevice']) {
     $common_output[] = '<div class="form-group"> \

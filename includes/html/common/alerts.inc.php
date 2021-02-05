@@ -33,6 +33,9 @@ $alert_severities = [
     'warning only' => 5,
     'critical only' => 6,
 ];
+if ( Auth::user()->hasGlobalAdmin()) {
+  $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
+} 
 
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
 if (defined('SHOW_SETTINGS')) {
@@ -233,7 +236,8 @@ if (defined('SHOW_SETTINGS')) {
                 <th data-column-id="location">Location</th>
                 <th data-column-id="ack_ico" data-sortable="false">ACK</th>
                 <th data-column-id="notes" data-sortable="false">Notes</th>
-                <th data-column-id="verbose_details" data-sortable="false">Details</th>';
+                ' . $admin_verbose_details . '';
+                
 
     if ($proc == '1') {
         $common_output[] = '<th data-column-id="proc" data-sortable="false">URL</th>';
