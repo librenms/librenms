@@ -22,7 +22,9 @@ ahInterface MODULE-IDENTITY
          LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
          ORGANIZATION  "Aerohive Networks, Inc"
          CONTACT-INFO  "info@aerohive.com
-                        1011 McCarthy Boulevard                                                Milpitas, CA 95035"
+                        1011 McCarthy Boulevard
+                        
+                        Milpitas, CA 95035"
          DESCRIPTION   "This module contains the MIB definition of 
 			interface related information."
 	 
@@ -709,7 +711,7 @@ ahRadioTXRTSFailures OBJECT-TYPE
 	::=  {  ahRadioStatsEntry  21 }
 
 ahRadioTxAirtime OBJECT-TYPE	
-    SYNTAX	    Counter64
+    SYNTAX	    Counter32
 	MAX-ACCESS  read-only
 	STATUS	    current
 	DESCRIPTION "The accumulative transmit time in microseconds (us)
@@ -717,7 +719,7 @@ ahRadioTxAirtime OBJECT-TYPE
 	::=  {  ahRadioStatsEntry  22 }
 
 ahRadioRxAirtime OBJECT-TYPE	
-    SYNTAX	    Counter64
+    SYNTAX	    Counter32
 	MAX-ACCESS  read-only
 	STATUS	    current
 	DESCRIPTION "The accumulative receive time in microseconds (us)
