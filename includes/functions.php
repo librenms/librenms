@@ -931,7 +931,7 @@ function include_dir($dir, $regex = '')
 
 /**
  * Check if port is valid to poll.
- * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
+ * Settings: empty_ifdescr, good_if, good_if_regexp, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
  *
  * @param array $port
  * @param array $device
@@ -964,6 +964,13 @@ function is_port_valid($port, $device)
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
+    }
+
+	//Loop through the good_if_regexp interfaces and allow as a whitelist. This should be coupled with bad_if_regexp wildcard match on all interfaces. 
+    foreach (Config::getCombined($device['os'], 'good_if_regexp') as $gir) {
+        if (preg_match($gir . 'i', $ifDescr)) {
+            return true;
+        }
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
