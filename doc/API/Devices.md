@@ -1264,6 +1264,51 @@ Output:
 ]
 ```
 
+### `update_device_attrib`
+
+Update devices attributes in the database.
+
+Route: `/api/v0/attribs/:hostname`
+
+- hostname can be either the device hostname or id
+
+Input (JSON):
+
+- attrib_type: The attribute type within the database (can be an array of fields)
+- attrib_value: The attribute value to update the column with (can be an array of data))
+
+Examples:
+
+```curl
+curl -X PATCH -d '{"attrib_type": "override_icmp_disable", "attrib_value": "false"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/attribs/localhost
+```
+
+Output:
+
+```json
+[
+    {
+        "status": "ok",
+        "message": "Device Attrib override_icmp_disable field has been updated"
+    }
+]
+```
+
+```curl
+curl -X PATCH -d ''{"attrib_type": ["override_sysContact_string", "override_sysContact_bool"], "attrib_value": ["LibreNMS", 1]}'' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+```
+
+Output:
+
+```json
+[
+    {
+        "status": "ok",
+        "message": "Device Attrib fields updated"
+    }
+]
+```
+
 ### `get_device_groups`
 
 List the device groups that a device is matched on.
