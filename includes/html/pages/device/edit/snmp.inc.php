@@ -301,7 +301,7 @@ foreach (get_port_assoc_modes() as $pam_id => $pam) {
     echo ">$pam</option>\n";
 }
 
-list('sha2' => $snmpv3_sha2, 'aes256' => $snmpv3_aes256) = snmpv3_capabilities();
+['sha2' => $snmpv3_sha2, 'aes256' => $snmpv3_aes256] = snmpv3_capabilities();
 echo "        </select>
       </div>
     </div>
