@@ -144,15 +144,15 @@ foreach ($ds_list as $ds_item) {
         $rrd_options .= " GPRINT:{$vname}:AVERAGE:%12.{$float_precision}lf'{$units_text}'\l";
 
         $rrd_options .= ' COMMENT:\s'; // spacer in legend
-/*
-        // Watt Seconds
-        $descr = '  Total Consumed';
-        $units_text = ' Ws';
-        $descr = rrdtool_escape($descr, $pad_to + 2);
-        $rrd_options .= " COMMENT:'{$descr}'";
-        $rrd_options .= ' VDEF:wattsecs=watts,TOTAL';
-        $rrd_options .= " GPRINT:wattsecs:%12.{$float_precision}lf'{$units_text}'\l";
-*/
+        /*
+                // Watt Seconds
+                $descr = '  Total Consumed';
+                $units_text = ' Ws';
+                $descr = rrdtool_escape($descr, $pad_to + 2);
+                $rrd_options .= " COMMENT:'{$descr}'";
+                $rrd_options .= ' VDEF:wattsecs=watts,TOTAL';
+                $rrd_options .= " GPRINT:wattsecs:%12.{$float_precision}lf'{$units_text}'\l";
+        */
         // Kilowatt Hours
         $units_text = ' kWh';
         $float_precision = 2;
@@ -162,8 +162,7 @@ foreach ($ds_list as $ds_item) {
         $rrd_options .= ' CDEF:series_a=watts,3600000,/';
         $rrd_options .= ' VDEF:kilowatthours=series_a,TOTAL';
         $rrd_options .= " GPRINT:kilowatthours:%12.{$float_precision}lf'{$units_text}'\l";
-
-    } else if ($vname == 'rate') {
+    } elseif ($vname == 'rate') {
         // Consumption Charge
         $float_precision = 2;
         $descr = rrdtool_escape($descr, $pad_to + 7);
