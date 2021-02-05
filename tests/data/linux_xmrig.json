@@ -1,0 +1,127 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "xmrig",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "xmrig",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "difficulty_last",
+                    "value": 103231,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "hashes",
+                    "value": 2133403738,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "hashrate_10s",
+                    "value": 3218.68,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "hashrate_15m",
+                    "value": 3310.41,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "hashrate_60s",
+                    "value": 3248.66,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "hashrate_max",
+                    "value": 3361.24,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "jobtime_avg",
+                    "value": 29,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "shares_good",
+                    "value": 21409,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "shares_total",
+                    "value": 21409,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "sys_cores",
+                    "value": 12,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "sys_l2",
+                    "value": 3145728,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "sys_l3",
+                    "value": 25165824,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "sys_nodes",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "sys_threads",
+                    "value": 24,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "threads",
+                    "value": 12,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                },
+                {
+                    "metric": "uptime",
+                    "value": 630450,
+                    "value_prev": null,
+                    "app_type": "xmrig"
+                }
+            ]
+        }
+    }
+}
