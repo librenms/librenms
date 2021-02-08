@@ -294,7 +294,7 @@ class Url
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
             if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
-                $url .= $var . '=' . urlencode($value) . '/';
+                $url .= urlencode($var) . '=' . urlencode($value) . '/';
             }
         }
 

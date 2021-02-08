@@ -23,6 +23,54 @@ Note: Plugins will only load if they are prefixed with `check_`.
 The `check_` prefix is stripped out when displaying in the "Add Service"
 GUI "Type" dropdown list.
 
+## Service Templates
+
+Service Templates within LibreNMS provides the same ability as Nagios
+does with Host Groups. Known as Device Groups in LibreNMS.
+They are applied devices that belong to the specified Device Group.
+
+Use the Apply buttons to manually create or update Services for the Service
+Template.
+Use the Remove buttons to manually remove Services for the Service Template.
+
+After you Edit a Service Template, and then use Apply, all relevant changes are
+pushed to existing Services previously created.
+
+You can also enable Service Templates Auto Discovery to have Services
+added / removed / updated on regular discover intervals.
+
+When a Device is a member of multiple Device Groups, templates from
+all of those Device Groups are applied.
+
+If a Device is added or removed from a Device Group, when the Apply button
+is used or Auto Discovery runs Services will be added / removed as
+appropriate.
+
+**Service Templates are tied into Device Groups, you need at least
+one Device Group to be able to add Service Templates - You can define a
+dummy one. The Device Group does not need members to add Service Templates.**
+
+## Service Auto Discovery
+
+To automatically create services for devices with available checks.
+
+You need to enable the discover services within config.php with the following:
+
+```php
+$config['discover_services']           = true;
+```
+
+## Service Templates Auto Discovery
+
+To automatically create services for devices with configured
+Service Templates.
+
+You need to enable the discover services within config.php with the following:
+
+```php
+$config['discover_services_templates']           = true;
+```
+
 ## Setup
 
 Service checks are now distributable if you run a distributed
@@ -155,6 +203,42 @@ then you can run the following command to help troubleshoot services.
 
 ```
 ./check-services.php -d
+```
+
+## Related Polling / Discovery Options
+
+These settings are related and should be investigated and set accordingly.
+The below values are not defaults or recommended.
+
+```php
+$config['service_poller_enabled']           = true;
+```
+```php
+$config['service_poller_workers']           = 16;
+```
+```php
+$config['service_poller_frequency']           = 300;
+```
+```php
+$config['service_poller_down_retry']           = 5;
+```
+```php
+$config['service_discovery_enabled']           = true;
+```
+```php
+$config['service_discovery_workers']           = 16;
+```
+```php
+$config['service_discovery_frequency']           = 3600;
+```
+```php
+$config['service_services_enabled']           = true;
+```
+```php
+$config['service_services_workers']           = 16;
+```
+```php
+$config['service_services_frequency']           = 60;
 ```
 
 ## Service checks polling logic

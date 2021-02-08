@@ -947,6 +947,10 @@
             "default": false,
             "type": "boolean"
         },
+        "discover_services_templates": {
+            "default": false,
+            "type": "boolean"
+        },
         "discovery_by_ip": {
             "default": false,
             "type": "boolean"
