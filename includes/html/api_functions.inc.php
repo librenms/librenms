@@ -14,7 +14,6 @@
 
 use App\Models\Availability;
 use App\Models\Device;
-use App\Models\DeviceAttrib;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
 use App\Models\PortsFdb;
@@ -1856,12 +1855,8 @@ function update_device_attrib(Illuminate\Http\Request $request)
     }
     if (is_array($data['attrib_type']) && is_array($data['attrib_value'])) {
         if (count($data['attrib_type']) == count($data['attrib_value'])) {
-            $update = [];
-            $result = [];
             for ($x = 0; $x < count($data['attrib_type']); $x++) {
-                if (dbUpdate(['attrib_value' => $data['attrib_value'][$x]], 'devices_attribs', '`device_id`=? and `attrib_type`=?', [$device_id, $data['attrib_type'][$x]]) >= 0) {
-                    $result[$data['attrib_type'][$x]] = 'Success';
-                } else {
+                if (dbUpdate(['attrib_value' => $data['attrib_value'][$x]], 'devices_attribs', '`device_id`=? and `attrib_type`=?', [$device_id, $data['attrib_type'][$x]]) < 0) {
                     return api_error(500, 'Device Attrib fields failed to be updated');
                 }
             }
