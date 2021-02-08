@@ -1860,7 +1860,7 @@ function update_device_attrib(Illuminate\Http\Request $request)
                     return api_error(500, 'Device Attrib fields failed to be updated');
                 }
             }
-            
+
             return api_success_noresult(200, 'Device Attrib fields updated');
         } else {
             return api_error(500, 'Device Attrib fields failed to be updated as the number of fields (' . count($data['attrib_type']) . ') does not match the supplied data (' . count($data['attrib_value']) . ')');
