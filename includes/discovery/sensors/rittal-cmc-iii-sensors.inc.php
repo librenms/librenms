@@ -69,27 +69,32 @@ foreach ($cmc_iii_var_table as $index => $entry) {
                 $cmc_iii_sensors[$sensor_id]['value'] = $entry['cmcIIIVarValueStr'];
             }
 
-            $unit = $entry['cmcIIIVarUnit'];
-            $type = 'state';
-            if (Str::endsWith($unit, 'A')) {
-                $type = 'current';
-            } elseif (Str::endsWith($unit, 'degree C') or Str::endsWith($unit, 'degree F')) {
-                $type = 'temperature';
-            } elseif (Str::endsWith($unit, 'l/min')) {
-                $type = 'waterflow';
-            } elseif (Str::endsWith($unit, 'V')) {
-                $type = 'voltage';
-            } elseif (Str::endsWith($unit, 'W')) {
-                $type = 'power';
-            }
-
-            $cmc_iii_sensors[$sensor_id]['type'] = $type;
-
             if ($entry['cmcIIIVarScale'][0] == '-') {
                 $cmc_iii_sensors[$sensor_id]['divisor'] = substr($entry['cmcIIIVarScale'], 1);
             } elseif ($entry['cmcIIIVarScale'][0] == '+') {
                 $cmc_iii_sensors[$sensor_id]['multiplier'] = substr($entry['cmcIIIVarScale'], 1);
             }
+
+            $unit = $entry['cmcIIIVarUnit'];
+            $type = 'state';
+            if ($unit == 'mA') {
+                //In some cases we get a mA value. However, the cmcIIIVarScale is simply 1.
+                //Therefore, we must hardcode the divisor here to calculate the value into A.
+                $type = 'current';
+                $cmc_iii_sensors[$sensor_id]['divisor'] = 1000;
+            } elseif ($unit == 'A') {
+                $type = 'current';
+            } elseif ($unit == 'degree C' or $unit == 'degree F') {
+                $type = 'temperature';
+            } elseif ($unit == 'l/min') {
+                $type = 'waterflow';
+            } elseif ($unit == 'V') {
+                $type = 'voltage';
+            } elseif ($unit == 'W') {
+                $type = 'power';
+            }
+
+            $cmc_iii_sensors[$sensor_id]['type'] = $type;
             break;
     }
 }
@@ -139,16 +144,34 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
     }
 
     if (isset($sensor_data['divisor'])) {
-        $sensor_data['low_limit'] = ($sensor_data['low_limit'] / $sensor_data['divisor']);
-        $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] / $sensor_data['divisor']);
-        $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] / $sensor_data['divisor']);
-        $sensor_data['high_limit'] = ($sensor_data['high_limit'] / $sensor_data['divisor']);
+        if (isset($sensor_data['low_limit'])) {
+            $sensor_data['low_limit'] = ($sensor_data['low_limit'] / $sensor_data['divisor']);
+        }
+        if (isset($sensor_data['low_warn_limit'])) {
+            $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] / $sensor_data['divisor']);
+        }
+        if (isset($sensor_data['warn_limit'])) {
+            $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] / $sensor_data['divisor']);
+        }
+        if (isset($sensor_data['high_limit'])) {
+            $sensor_data['high_limit'] = ($sensor_data['high_limit'] / $sensor_data['divisor']);
+        }
+
         $sensor_data['value'] = ($sensor_data['value'] / $sensor_data['divisor']);
     } elseif (isset($sensor_data['multiplier'])) {
-        $sensor_data['low_limit'] = ($sensor_data['low_limit'] * $sensor_data['multiplier']);
-        $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] * $sensor_data['multiplier']);
-        $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] * $sensor_data['multiplier']);
-        $sensor_data['high_limit'] = ($sensor_data['high_limit'] * $sensor_data['multiplier']);
+        if (isset($sensor_data['low_limit'])) {
+            $sensor_data['low_limit'] = ($sensor_data['low_limit'] * $sensor_data['multiplier']);
+        }
+        if (isset($sensor_data['low_warn_limit'])) {
+            $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] * $sensor_data['multiplier']);
+        }
+        if (isset($sensor_data['warn_limit'])) {
+            $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] * $sensor_data['multiplier']);
+        }
+        if (isset($sensor_data['high_limit'])) {
+            $sensor_data['high_limit'] = ($sensor_data['high_limit'] * $sensor_data['multiplier']);
+        }
+
         $sensor_data['value'] = ($sensor_data['value'] * $sensor_data['multiplier']);
     }
 
