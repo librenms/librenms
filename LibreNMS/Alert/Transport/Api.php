@@ -39,6 +39,24 @@ class Api extends Transport
         return $this->contactAPI($obj, $url, $options, $method, $auth, $headers, $body);
     }
 
+   /**
+    * Recursivly iterate $obj's attributes into $subject for text replacement
+    * as {{ $ value }} format 
+    * @param mixed $obj - Object array to iterate
+    * @param string &$subject - String with text to be replaced
+    * @return void
+    */
+    private function iterateObjectAttributes($obj, &$subject)
+    {
+        foreach ($obj as $key => $value) {
+            if (is_array($value)) {
+                $this->iterateObjectAttributes($value, $subject);
+            } else {
+                $subject = preg_replace("/\{\{\s*\\\${$key}\s*\}\}/i", $value, $subject);
+            }
+        }
+    }
+
     private function contactAPI($obj, $api, $options, $method, $auth, $headers, $body)
     {
         $request_opts = [];
@@ -68,27 +86,8 @@ class Api extends Transport
             $query[$u_key] = $u_val;
         }
 
-        /**
-         * Recursivly iterate $obj's variables into $subject
-         * @param mixed $obj - Input object
-         * @param string &$subject - Output variable
-         * @return void
-         */
-        function iterateVariables($obj, &$subject)
-        {
-            foreach ($obj as $key => $value) {
-                // iterate variables if it is an array recursivly
-                if (is_array($value)) {
-                    iterateVariables($value, $subject);
-                } else {
-                    // replace expected templated markup of {{ $variable }}
-                    $subject = preg_replace("/\{\{\s*\\\${$key}\s*\}\}/i", $value, $subject);
-                }
-            }
-        }
-        // turn objects into arrays in a newObj
-        $newObj = json_decode(json_encode($obj), true);
-        iterateVariables($newObj, $body);
+        //typecast native array and iterate $obj attributes to process variables for Body;
+        $this->iterateObjectAttributes(json_decode(json_encode($obj),true), $body);
 
         $client = new \GuzzleHttp\Client();
         $request_opts['proxy'] = get_guzzle_proxy();
