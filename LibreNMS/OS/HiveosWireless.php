@@ -44,7 +44,7 @@ class HiveosWireless extends OS implements
     WirelessNoiseFloorDiscovery,
     WirelessNoiseFloorPolling,
     WirelessPowerDiscovery,
-    ProcessorDiscovery,
+    ProcessorDiscovery
     
 {
     /**
