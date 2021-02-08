@@ -49,6 +49,9 @@ foreach ($cmc_iii_var_table as $index => $entry) {
         case 'setWarn':
             $cmc_iii_sensors[$sensor_id]['warn_limit'] = $entry['cmcIIIVarValueInt'];
             break;
+        case 'setWarnLow':
+            $cmc_iii_sensors[$sensor_id]['low_warn_limit'] = $entry['cmcIIIVarValueInt'];
+            break;
         case 'setLow':
             $cmc_iii_sensors[$sensor_id]['low_limit'] = $entry['cmcIIIVarValueInt'];
             break;
@@ -137,17 +140,19 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
 
     if (isset($sensor_data['divisor'])) {
         $sensor_data['low_limit'] = ($sensor_data['low_limit'] / $sensor_data['divisor']);
+        $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] / $sensor_data['divisor']);
         $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] / $sensor_data['divisor']);
         $sensor_data['high_limit'] = ($sensor_data['high_limit'] / $sensor_data['divisor']);
         $sensor_data['value'] = ($sensor_data['value'] / $sensor_data['divisor']);
     } elseif (isset($sensor_data['multiplier'])) {
         $sensor_data['low_limit'] = ($sensor_data['low_limit'] * $sensor_data['multiplier']);
+        $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] * $sensor_data['multiplier']);
         $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] * $sensor_data['multiplier']);
         $sensor_data['high_limit'] = ($sensor_data['high_limit'] * $sensor_data['multiplier']);
         $sensor_data['value'] = ($sensor_data['value'] * $sensor_data['multiplier']);
     }
 
-    discover_sensor($valid['sensor'], $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'], $sensor_data['multiplier'], $sensor_data['low_limit'], null, $sensor_data['warn_limit'], $sensor_data['high_limit'], $sensor_data['value']);
+    discover_sensor($valid['sensor'], $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'], $sensor_data['multiplier'], $sensor_data['low_limit'], $sensor_data['low_warn_limit'], $sensor_data['warn_limit'], $sensor_data['high_limit'], $sensor_data['value']);
 
     if (isset($sensor_data['logic'])) {
         create_sensor_to_state_index($device, $sensor_data['name'], $sensor_id);
