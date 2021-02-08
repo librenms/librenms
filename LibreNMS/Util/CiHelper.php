@@ -462,7 +462,7 @@ class CiHelper
         }
 
         echo "\nRunning installing deps with composer failed.\n You should try running './scripts/composer_wrapper.php install' by hand\n";
-        echo "You can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
+        echo "You can find more info at https://docs.librenms.org/Developing/Validating-Code/\n";
         exit(1);
     }
 
@@ -499,7 +499,7 @@ class CiHelper
         echo "\nRunning installing deps with pip3 failed.\n You should try running 'pip3 install --user ";
         echo $exec;
         echo "' by hand\n";
-        echo "You can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
+        echo "You can find more info at https://docs.librenms.org/Developing/Validating-Code/\n";
         exit(1);
     }
 }

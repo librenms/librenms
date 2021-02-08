@@ -28,7 +28,7 @@
             <table class='table table-condensed table-hover'>
                 <tr>
                     <td><b>@lang('Version')</b></td>
-                    <td><a target="_blank" href='http://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
+                    <td><a target="_blank" href='https://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
                 </tr>
                 <tr>
                     <td><b>@lang('Database Schema')</b></td>
@@ -64,13 +64,13 @@
           <p>
             @lang('Please feel free to join us and contribute code, documentation, and bug reports:')
             <br />
-            <a target="_blank" href="http://www.librenms.org/">@lang('Web site')</a> |
+            <a target="_blank" href="https://www.librenms.org/">@lang('Web site')</a> |
             <a target="_blank" href="https://docs.librenms.org/">@lang('Docs')</a> |
             <a target="_blank" href="https://github.com/librenms/">@lang('GitHub')</a> |
             <a target="_blank" href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
             <a target="_blank" href="https://community.librenms.org">@lang('Community Forum')</a> |
-            <a target="_blank" href="http://twitter.com/librenms">@lang('Twitter')</a> |
-            <a target="_blank" href="http://www.librenms.org/changelog.html">@lang('Changelog')</a> |
+            <a target="_blank" href="https://twitter.com/librenms">@lang('Twitter')</a> |
+            <a target="_blank" href="https://www.librenms.org/changelog.html">@lang('Changelog')</a> |
             <a href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
           </p>
 
