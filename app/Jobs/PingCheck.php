@@ -256,9 +256,11 @@ class PingCheck implements ShouldQueue
 
             $device->save(); // only saves if needed (which is every time because of last_ping)
 
-            echo "Device $device->hostname changed status to $type, running alerts\n";
-            $rules = new AlertRules;
-            $rules->runRules($device->device_id);
+            if (isset($type)) { // only run alert rules if status changed
+                echo "Device $device->hostname changed status to $type, running alerts\n";
+                $rules = new AlertRules;
+                $rules->runRules($device->device_id);
+            }
 
             // add data to rrd
             app('Datastore')->put($device->toArray(), 'ping-perf', $this->rrd_tags, ['ping' => $device->last_ping_timetaken]);
