@@ -180,7 +180,7 @@ class HiveosWireless extends OS implements
     /**Poll ahRadioTxAirtime and ahRadioRxAirtime and graph deltas
      * 
      */
-    public function poll()
+    public function poll(OS $os)
     {
         $txairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.7', '-Ovq');
         if (is_numeric($sessions)) {
