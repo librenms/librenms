@@ -39,13 +39,13 @@ class Api extends Transport
         return $this->contactAPI($obj, $url, $options, $method, $auth, $headers, $body);
     }
 
-   /**
-    * Recursivly iterate $obj's attributes into $subject for text replacement
-    * as {{ $ value }} format 
-    * @param mixed $obj - Object array to iterate
-    * @param string &$subject - String with text to be replaced
-    * @return void
-    */
+    /**
+     * Recursivly iterate $obj's attributes into $subject for text replacement
+     * as {{ $ value }} format
+     * @param mixed $obj - Object array to iterate
+     * @param string &$subject - String with text to be replaced
+     * @return void
+     */
     private function iterateObjectAttributes($obj, &$subject)
     {
         foreach ($obj as $key => $value) {
@@ -87,7 +87,7 @@ class Api extends Transport
         }
 
         //typecast native array and iterate $obj attributes to process variables for Body;
-        $this->iterateObjectAttributes(json_decode(json_encode($obj),true), $body);
+        $this->iterateObjectAttributes(json_decode(json_encode($obj), true), $body);
 
         $client = new \GuzzleHttp\Client();
         $request_opts['proxy'] = get_guzzle_proxy();
