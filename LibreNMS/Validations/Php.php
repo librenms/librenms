@@ -125,7 +125,7 @@ class Php extends BaseValidation
             // make sure timezone is set
             $validator->fail(
                 'You have no timezone set for php.',
-                'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
+                'https://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
             );
         } elseif ($sh_tz !== $php_tz) {
             // check if system timezone matches the timezone of the current running php

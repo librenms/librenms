@@ -50,7 +50,7 @@ class IPv6 extends IP
      * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
      * @return string Empty if not valid.
      */
-    // Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
+    // Fuction is from https://php.net/manual/en/function.inet-ntop.php
     public static function ntop($ip)
     {
         $len = strlen($ip);
