@@ -1755,7 +1755,7 @@ function getCIMCentPhysical($location, &$entphysical, &$index)
     } // end if - Level 1
 } // end function
 
-/* idea from http://php.net/manual/en/function.hex2bin.php comments */
+/* idea from https://php.net/manual/en/function.hex2bin.php comments */
 function hex2bin_compat($str)
 {
     if (strlen($str) % 2 !== 0) {

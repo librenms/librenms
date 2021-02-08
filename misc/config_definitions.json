@@ -3927,7 +3927,7 @@
             "type": "executable"
         },
         "notifications.LibreNMS": {
-            "default": "http://www.librenms.org/notifications.rss",
+            "default": "https://www.librenms.org/notifications.rss",
             "type": "text"
         },
         "notifications.local": {
@@ -4502,7 +4502,7 @@
             "type": "boolean"
         },
         "project_home": {
-            "default": "http://www.librenms.org/",
+            "default": "https://www.librenms.org/",
             "type": "text"
         },
         "project_id": {

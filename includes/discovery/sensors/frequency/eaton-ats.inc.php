@@ -9,7 +9,7 @@
  * the source code distribution for details.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Thomas GAGNIERE
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */

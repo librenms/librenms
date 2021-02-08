@@ -815,7 +815,7 @@ function snmpv3_sha2_capable()
  * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
  * @return string Empty if not valid.
  */
-// Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
+// Fuction is from https://php.net/manual/en/function.inet-ntop.php
 function inet6_ntop($ip)
 {
     $l = strlen($ip);

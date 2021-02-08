@@ -96,7 +96,7 @@ chmod +x /usr/bin/composer
 
 ## Set timezone
 
-See <http://php.net/manual/en/timezones.php> for a list of supported
+See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 Ensure date.timezone is set in php.ini to your preferred time zone.
 

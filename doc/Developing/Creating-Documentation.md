@@ -52,7 +52,7 @@ This means you can use:
 
 - `~~strikethrough~~` to perform ~~strikethrough~~
 - [X] `- [X] List items`
-- Url's can be made `[like this](http://www.librenms.org)` [like this](http://www.librenms.org)
+- Url's can be made `[like this](https://www.librenms.org)` [like this](https://www.librenms.org)
 - Code can be placed in \`\` for single line or \`\`\` for multiline.
 - `#` Can be used for main headings which translates to a `<h1>` tag,
   increasing the `#`'s will increase the hX tags.
