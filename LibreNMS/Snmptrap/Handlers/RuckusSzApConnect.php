@@ -20,7 +20,7 @@
  * Ruckus ruckusSZAPConnectedTrap is sent when an access point connects
  * to a Smartzone controller.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

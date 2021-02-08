@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @license GPL
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @copyright  2017 Tony Murray

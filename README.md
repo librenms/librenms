@@ -91,7 +91,7 @@ exception):
 [7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
-[11]: http://www.librenms.org/#downloads
+[11]: https://www.librenms.org/#downloads
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
 [15]: https://docs.librenms.org/General/Contributing/

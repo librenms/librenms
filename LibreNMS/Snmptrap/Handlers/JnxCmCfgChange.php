@@ -22,7 +22,7 @@
  * If a commit confirmed is rolled back the source is "other" and the
  * user is "root".
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

@@ -21,7 +21,7 @@
  * Used covert alarm ID in the JnxDomLaneAlarm traps from Hex to a
  * descriptive string.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

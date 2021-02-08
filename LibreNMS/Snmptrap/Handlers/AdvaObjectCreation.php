@@ -20,7 +20,7 @@
  * Traps when Adva objects are created. This includes Remote User Login object,
  * Flow Creation object, and LAG Creation object.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart#kanren.net> & Neil Kahle <nkahle@kanren.net>
  */

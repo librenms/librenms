@@ -19,7 +19,7 @@
  *
  * Adva Threshold Exceeded Alarms.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>
  */

@@ -20,7 +20,7 @@
  * Ruckus ruckusSZAPRebootTrap occurs when an access point connected
  * to the SmartZone reboots.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

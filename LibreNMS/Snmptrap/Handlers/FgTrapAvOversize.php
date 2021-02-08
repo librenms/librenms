@@ -20,7 +20,7 @@
  * The Fortigate received a file that is larger than the proxy buffer for
  * AV scanning. Nothing to do.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

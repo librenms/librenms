@@ -55,7 +55,7 @@ you add the package information to the header.
 
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Internet Widgitz Pty Ltd <info@widgitz.com>
  * @author     Me <me@infowidgitz.com>
 

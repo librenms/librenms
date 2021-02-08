@@ -23,7 +23,7 @@
  * Ruckus ruckusSZClusterInMaintenanceStateTrap is sent when the
  * Smartzone Cluster enters a maintenance state.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

@@ -20,7 +20,7 @@
  * Ruckus ruckusSZClusterInServiceStateTrap is sent whtn a
  * Virtual Smartzone cluster state changed to "in service"
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

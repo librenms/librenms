@@ -19,7 +19,7 @@
  *
  * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017-2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */

@@ -20,7 +20,7 @@
  * Ruckus ruckusSZAPMiscEventTrap occurs when the SmartZone receives
  * an event from a connected access point.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

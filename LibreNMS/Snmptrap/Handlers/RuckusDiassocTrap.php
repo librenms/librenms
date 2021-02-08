@@ -20,7 +20,7 @@
  * ruckusEventDiassocTrap is sent when a client disassociates from the AP.
  * Contains the clients MAC addr.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net
  */

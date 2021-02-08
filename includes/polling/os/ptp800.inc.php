@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */

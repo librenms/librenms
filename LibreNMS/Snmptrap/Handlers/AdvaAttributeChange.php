@@ -21,7 +21,7 @@
  * This handler only catches some of those changes and aims to provide the user with
  * information about what configuration module was modified.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

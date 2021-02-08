@@ -20,7 +20,7 @@
  * @author    Daniel Preussker
  * @author    Tony Murray <murraytony@gmail.com>
  * @license   GPL
- * @link      http://librenms.org
+ * @link      https://www.librenms.org
  */
 
 /**

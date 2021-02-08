@@ -18,7 +18,7 @@
  * Unit tests for CyberPower UPS SNMP trap handlers
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2020 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
