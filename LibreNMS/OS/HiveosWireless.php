@@ -33,7 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessNoiseFloorPolling;
-use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\OS;
 
@@ -45,7 +45,7 @@ class HiveosWireless extends OS implements
     WirelessNoiseFloorPolling,
     WirelessPowerDiscovery,
     ProcessorDiscovery,
-    OSPolling
+    
 {
     /**
      * Discover processors.
@@ -180,7 +180,7 @@ class HiveosWireless extends OS implements
     /**Poll ahRadioTxAirtime and ahRadioRxAirtime and graph deltas
      * 
      */
-    public function pollOS()
+    public function poll()
     {
         $txairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.7', '-Ovq');
         if (is_numeric($sessions)) {
