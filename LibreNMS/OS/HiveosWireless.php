@@ -33,7 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessNoiseFloorPolling;
-use LibreNMS\Interfaces\Polling\PollerModule;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\OS;
 
@@ -44,6 +44,7 @@ class HiveosWireless extends OS implements
     WirelessNoiseFloorDiscovery,
     WirelessNoiseFloorPolling,
     WirelessPowerDiscovery,
+    OSPolling,
     ProcessorDiscovery
     
 {
@@ -180,10 +181,10 @@ class HiveosWireless extends OS implements
     /**Poll ahRadioTxAirtime and ahRadioRxAirtime and graph deltas
      * 
      */
-    public function poll(OS $os)
+    public function pollOS()
     {
         $txairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.7', '-Ovq');
-        if (is_numeric($sessions)) {
+        if (is_numeric($txairtime)) {
             $rrd_def = RrdDefinition::make()->addDataset('txairtime', 'COUNTER', 0);
 
             echo "TX Airtime: $txairtime\n";
@@ -197,7 +198,7 @@ class HiveosWireless extends OS implements
         }
 
         $rxairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.7', '-Ovq');
-        if (is_numeric($sessions)) {
+        if (is_numeric($rxairtime)) {
             $rrd_def = RrdDefinition::make()->addDataset('rxairtime', 'COUNTER', 0);
 
             echo "RX Airtime: $rxairtime\n";
