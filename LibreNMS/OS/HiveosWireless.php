@@ -182,7 +182,7 @@ class HiveosWireless extends OS implements
      */
     public function pollOS()
     {
-        $txairtime = snmp_get($device, '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.7', '-Ovq');
+        $txairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.7', '-Ovq');
         if (is_numeric($sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('txairtime', 'COUNTER', 0);
 
@@ -192,11 +192,11 @@ class HiveosWireless extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($device, 'ahradiotxairtime', $tags, $fields);
+            data_update($this->getDeviceArray(), 'ahradiotxairtime', $tags, $fields);
             $os->enableGraph('ahradiotxairtime');
         }
 
-        $rxairtime = snmp_get($device, '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.7', '-Ovq');
+        $rxairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.7', '-Ovq');
         if (is_numeric($sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('rxairtime', 'COUNTER', 0);
 
@@ -206,7 +206,7 @@ class HiveosWireless extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($device, 'ahradiorxairtime', $tags, $fields);
+            data_update($this->getDeviceArray(), 'ahradiorxairtime', $tags, $fields);
             $os->enableGraph('ahradiorxairtime');
         }
     }
