@@ -88,7 +88,7 @@ project.
 
 - Don't submit code whose license conflicts with the GPLv3.  If you're not
   sure, consult the [Free Software Foundation's license
-  list](http://www.gnu.org/licenses/license-list.html) and see if
+  list](https://www.gnu.org/licenses/license-list.html) and see if
   your code's license is on the compatible or incompatible list.  If
   you   prefer a non-copyleft license, Apache 2.0 is the recommended choice as per
   the FSF guidelines.
