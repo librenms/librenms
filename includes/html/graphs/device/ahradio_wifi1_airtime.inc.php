@@ -4,7 +4,7 @@
 $rrd_filename = rrd_name($device['hostname'], 'ahradio_wifi1_airtime');
 require 'includes/html/graphs/common.inc.php';
 
-// Combine tx and rx values and divide by 10,000 to get %
+// Add tx and rx values and divide by 10,000 to get %.  Could still use Interference Airtime, but there is no OID for this.
 
 $graph_min = "0";
 $graph_max = "100";
