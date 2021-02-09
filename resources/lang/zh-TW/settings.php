@@ -492,7 +492,7 @@ return [
                 'help' => 'Try to lookup latitude and longitude via geocoding API during polling',
             ],
         ],
-       'graphite' => [
+        'graphite' => [
             'enable' => [
                 'description' => '啟用',
                 'help' => 'Exports metrics to Graphite',
@@ -745,7 +745,7 @@ return [
             'description' => '自動探索網路',
             'help' => 'Networks from which devices will be discovered automatically.',
         ],
-       'autodiscovery' => [
+        'autodiscovery' => [
             'nets-exclude' => [
                 'description' => '要忽略的網路或 IP',
                 'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
