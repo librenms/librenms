@@ -1,8 +1,9 @@
 <?php
 
-require 'includes/html/graphs/common.inc.php';
 
-$rrdfilename = rrd_name($device['hostname'], 'ahradio_wifi0_airtime');
+
+$rrd_filename = rrd_name($device['hostname'], 'ahradio_wifi0_airtime');
+require 'includes/html/graphs/common.inc.php';
 
 // Combine tx and rx values and divide by 10,000 to get %
 
