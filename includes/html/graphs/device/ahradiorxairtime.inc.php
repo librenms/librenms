@@ -14,3 +14,5 @@ $colour_area_max = '9999cc';
 $graph_min = 0;
 
 $unit_text = 'WiFi0 Rx Airtime';
+
+require 'includes/graphs/generic_simplex.inc.php';
