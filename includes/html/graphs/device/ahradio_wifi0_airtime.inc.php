@@ -18,3 +18,5 @@ $rrd_options .= " CDEF:wifi0rxpct=wifi0rx,10000,/ ";
 $rrd_options .= " AREA:percentAir#00FF00:'Total Airtime %'";
 $rrd_options .= " LINE:wifi0txpct#ff0000:'TX Airtime %'";
 $rrd_options .= " LINE:wifi0rxpct#0000ff:'RX Airtime %'";
+$rrd_options .= " GPRINT:percentAir:MIN:%0.2lf%s ";
+$rrd_options .= " GPRINT:percentAir:MAX:%0.2lf%s ";
