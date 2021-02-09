@@ -14,3 +14,5 @@ $rrd_options .= " DEF:wifi1rx=$rrd_filename:wifi1rxairtime:AVERAGE";
 $rrd_options .= " CDEF:totalAir=wifi1tx,wifi1rx,+";
 $rrd_options .= " CDEF:percentAir=totalAir,10000,/ ";
 $rrd_options .= " AREA:percentAir#00FF00:'Total Airtime %'"; 
+$rrd_options .= " LINE:wifi1tx#ff0000:'TX Airtime'";
+$rrd_options .= " LINE:wifi1rx#0000ff:'RX Airtime'";
