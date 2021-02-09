@@ -194,7 +194,7 @@ class HiveosWireless extends OS implements
 
             $tags = compact('rrd_def');
             app()->make('Datastore')->put($this->getDeviceArray(), 'ahradiotxairtime', $tags, $fields);
-            $os->enableGraph('ahradiotxairtime');
+            $this->enableGraph('ahradiotxairtime');
         }
 
         $rxairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.7', '-Ovq');
@@ -208,7 +208,7 @@ class HiveosWireless extends OS implements
 
             $tags = compact('rrd_def');
             app()->make('Datastore')->put($this->getDeviceArray(), 'ahradiorxairtime', $tags, $fields);
-            $os->enableGraph('ahradiorxairtime');
+            $this->enableGraph('ahradiorxairtime');
         }
     }
 }
