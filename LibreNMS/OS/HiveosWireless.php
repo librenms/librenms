@@ -193,7 +193,7 @@ class HiveosWireless extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'ahradiotxairtime', $tags, $fields);
+            app()->make('Datastore')->put($this->getDeviceArray(), 'ahradiotxairtime', $tags, $fields);
             $os->enableGraph('ahradiotxairtime');
         }
 
@@ -207,7 +207,7 @@ class HiveosWireless extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'ahradiorxairtime', $tags, $fields);
+            app()->make('Datastore')->put($this->getDeviceArray(), 'ahradiorxairtime', $tags, $fields);
             $os->enableGraph('ahradiorxairtime');
         }
     }
