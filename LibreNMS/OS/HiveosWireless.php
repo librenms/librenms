@@ -179,7 +179,9 @@ class HiveosWireless extends OS implements
     }
 
     /**Poll ahRadioTxAirtime and ahRadioRxAirtime and graph deltas
-     * 
+     * Note: ahRadioTxAirtime and ahRadioTxAirtime yield accumulative time in microseconds.  
+     * The MIB claims that the syntax for these is Counter64, but an snmpwalk returns Counter32.
+     * In my implementation I have modified the MIB to get this to work.
      */
     public function pollOS()
     {
