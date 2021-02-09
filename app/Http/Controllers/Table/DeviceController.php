@@ -88,7 +88,7 @@ class DeviceController extends TableController
     protected function baseQuery($request)
     {
         /** @var Builder $query */
-        $query = Device::hasAccess($request->user())->with('location')->select('devices.*');
+        $query = Device::hasAccess($request->user())->with('location')->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
         if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
@@ -140,7 +140,7 @@ class DeviceController extends TableController
         return [
             'extra' => $this->getLabel($device),
             'status' => $this->getStatus($device),
-            'maintenance' => AlertUtil::isMaintenance($device->device_id),
+            'maintenance' => $device->isUnderMaintenance(),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => $this->getHostname($device),
             'metrics' => $this->getMetrics($device),
@@ -229,9 +229,9 @@ class DeviceController extends TableController
      */
     private function getMetrics($device)
     {
-        $port_count = $device->ports()->count();
-        $sensor_count = $device->sensors()->count();
-        $wireless_count = $device->wirelessSensors()->count();
+        $port_count = $device->ports_count;
+        $sensor_count = $device->sensors_count;
+        $wireless_count = $device->wirelessSensors_count;
 
         $metrics = [];
         if ($port_count) {
