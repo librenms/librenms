@@ -752,10 +752,6 @@ return [
                 'help' => 'Les données sont mises à jour via daily.sh',
             ],
         ],
-        'perf_times_purge' => [
-            'description' => 'Journaux de performances des sondeurs (jours)',
-            'help' => 'Nettoyage effectué par daily.sh',
-        ],
         'permission' => [
             'device_group' => [
                 'allow_dynamic' => [

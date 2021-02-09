@@ -4128,13 +4128,6 @@
                 "value": "integer|between:0,100"
             }
         },
-        "perf_times_purge": {
-            "default": 30,
-            "group": "system",
-            "section": "cleanup",
-            "order": 6,
-            "type": "integer"
-        },
         "permission.device_group.allow_dynamic": {
             "default": false,
             "group": "authorization",
