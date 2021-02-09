@@ -160,17 +160,6 @@ $poller_end = microtime(true);
 $poller_run = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
-if ($polled_devices) {
-    dbInsert([
-        'type' => 'poll',
-        'doing' => $doing,
-        'start' => $poller_start,
-        'duration' => $poller_time,
-        'devices' => $polled_devices,
-        'poller' => Config::get('base_url'),
-    ], 'perf_times');
-}
-
 $string = $argv[0] . " $doing " . date(Config::get('dateformat.compact')) . " - $polled_devices devices polled in $poller_time secs";
 d_echo("$string\n");
 

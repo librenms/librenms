@@ -658,10 +658,6 @@ return [
                 'help' => '起用 PeeringDB lookup (資料將於由 daily.sh 進行下載)',
             ],
         ],
-        'perf_times_purge' => [
-            'description' => '輪詢器效能記錄項目大於 (天)',
-            'help' => 'Cleanup done by daily.sh',
-        ],
         'permission' => [
             'device_group' => [
                 'allow_dynamic' => [

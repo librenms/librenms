@@ -103,11 +103,6 @@ if ($options['f'] === 'authlog') {
     exit($ret);
 }
 
-if ($options['f'] === 'perf_times') {
-    $ret = lock_and_purge('perf_times', 'start < UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL ? DAY))');
-    exit($ret);
-}
-
 if ($options['f'] === 'callback') {
     include_once 'includes/callback.php';
 }
