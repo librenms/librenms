@@ -4,7 +4,7 @@ $rrd_filename = rrd_name($device['hostname'], 'ahradiotxairtime');
 
 require 'includes/html/graphs/common.inc.php';
 
-$ds = 'ahradiotxairtime';
+$ds = 'txairtime';
 
 $colour_area = '9999cc';
 $colour_line = '0000cc';
