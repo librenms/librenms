@@ -186,8 +186,9 @@ class HiveosWireless extends OS implements
         $wifi0txairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.7', '-Ovq');
         $wifi0rxairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.7', '-Ovq');
         if (is_numeric($wifi0txairtime)) {
-            $rrd_def = RrdDefinition::make()->addDataset('wifi0txairtime', 'COUNTER', 0);
-            $rrd_def = RrdDefinition::make()->addDataset('wifi0rxairtime', 'COUNTER', 0);
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('wifi0txairtime', 'COUNTER', 0)
+                ->addDataset('wifi0rxairtime', 'COUNTER', 0);
 
             echo "TX Airtime: $wifi0txairtime\n RX Airtime: $wifi0rxairtime\n";
             $fields = [
@@ -196,15 +197,16 @@ class HiveosWireless extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            app()->make('Datastore')->put($this->getDeviceArray(), 'ahradiowifi0airtime', $tags, $fields);
-            $this->enableGraph('ahradiowifi0txairtime');
+            app()->make('Datastore')->put($this->getDeviceArray(), 'ahradio_wifi0_airtime', $tags, $fields);
+            $this->enableGraph('ahradio_wifi0_airtime');
         }
 
         $wifi1txairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.8', '-Ovq');
         $wifi1rxairtime = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.8', '-Ovq');
         if (is_numeric($wifi1txairtime)) {
-            $rrd_def = RrdDefinition::make()->addDataset('wifi1txairtime', 'COUNTER', 0);
-            $rrd_def = RrdDefinition::make()->addDataset('wifi1rxairtime', 'COUNTER', 0);
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('wifi1txairtime', 'COUNTER', 0)
+                ->addDataset('wifi1rxairtime', 'COUNTER', 0);
 
             echo "TX Airtime: $wifi1txairtime\n RX Airtime: $wifi1rxairtime\n";
             $fields = [
@@ -213,8 +215,8 @@ class HiveosWireless extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            app()->make('Datastore')->put($this->getDeviceArray(), 'ahradiowifi1airtime', $tags, $fields);
-            $this->enableGraph('ahradiowifi1txairtime');
+            app()->make('Datastore')->put($this->getDeviceArray(), 'ahradio_wifi1_airtime', $tags, $fields);
+            $this->enableGraph('ahradio_wifi1_airtime');
         }
     }
 }
