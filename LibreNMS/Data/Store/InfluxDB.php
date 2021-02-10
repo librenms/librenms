@@ -230,11 +230,15 @@ class InfluxDB extends BaseDatastore
     {
         $resultSet = $this->getConnection()->query($query->toInfluxDBQuery(), ['epoch' => 's']);
 
-        $output = SeriesData::make($resultSet->getColumns());
-        foreach ($resultSet->getSeries()[0]['values'] as $points) {
-            $output->appendPoint(...$points);
-        }
+        try {
+            $output = SeriesData::make($resultSet->getColumns());
+            foreach ($resultSet->getSeries()[0]['values'] as $points) {
+                $output->appendPoint(...$points);
+            }
 
-        return $output;
+            return $output;
+        } catch (\Exception $e) {
+            return new SeriesData();
+        }
     }
 }

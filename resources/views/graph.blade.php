@@ -6,24 +6,35 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
+                <x-datepicker></x-datepicker>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+        <!-- TAB NAVIGATION -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="active"><a href="#tab1" role="tab" data-toggle="tab">Dygraph</a></li>
+            <li><a href="#tab2" role="tab" data-toggle="tab">Metrics Graphics</a></li>
+            <li><a href="#tab3" role="tab" data-toggle="tab">Plotly</a></li>
+            <li><a href="#tab4" role="tab" data-toggle="tab">ChartJS</a></li>
+        </ul>
+        <!-- TAB CONTENT -->
+        <div class="tab-content">
+            <div class="active tab-pane fade in" id="tab1">
                 <div id="dygraph" class="chart-container" style="position: relative; height:40vh; width:80vw"></div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12" style="min-height: 520px;">
+            <div class="tab-pane fade" id="tab2" style="min-height: 520px;">
                 <div id="metrics-graphics" class="chart-container" style="position: relative; height:40vh; width:80vw"></div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
+            <div class="tab-pane fade" id="tab3">
                 <div id="plotly" class="chart-container" style="position: relative; height:40vh; width:80vw"></div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
+            <div class="tab-pane fade" id="tab4">
                 <div class="chart-container" style="position: relative; height:40vh; width:80vw">
                     <canvas id="chartjs"></canvas>
                 </div>
+            </div>
+        </div>
             </div>
         </div>
     </div>
