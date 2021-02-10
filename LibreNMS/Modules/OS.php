@@ -24,9 +24,7 @@
 
 namespace LibreNMS\Modules;
 
-use App\Models\Device;
 use App\Models\Location;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
