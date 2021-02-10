@@ -82,7 +82,7 @@ function parse_rss($feed)
             'title'=>$item['title'],
             'body'=>$item['description'],
             'checksum'=>hash('sha512', $item['title'] . $item['description']),
-            'datetime'=>strftime('%F', strtotime($item['pubDate'])),
+            'datetime'=>strftime('%F', strtotime($item['pubDate']) ?: time()),
         ];
     }
 
@@ -105,7 +105,7 @@ function parse_atom($feed)
             'title'=>$item['title'],
             'body'=>$item['content'],
             'checksum'=>hash('sha512', $item['title'] . $item['content']),
-            'datetime'=>strftime('%F', strtotime($item['updated'])),
+            'datetime'=>strftime('%F', strtotime($item['updated']) ?: time()),
         ];
     }
 
