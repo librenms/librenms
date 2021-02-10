@@ -890,7 +890,7 @@ function alert_details($details)
             $fallback = false;
         }
 
-        if ($tmp_alerts['port_id'] && ! $tmp_alerts['isisISAdjIPAddrAddress']) {
+        if ($tmp_alerts['port_id']) {
             $tmp_alerts = cleanPort($tmp_alerts);
             $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
             $fallback = false;
@@ -933,17 +933,6 @@ function alert_details($details)
                 "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
             $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
             $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
-            $fallback = false;
-        }
-
-        if ($tmp_alerts['isisISAdjIPAddrAddress']) {
-            $fault_detail .= "Adjacent <a href='" .
-                generate_url(['page' => 'device',
-                    'device' => $tmp_alerts['device_id'],
-                    'tab' => 'routing',
-                    'proto' => 'isis', ]) .
-                "'>" . $tmp_alerts['isisISAdjIPAddrAddress'] . '</a>';
-            $fault_detail .= ', State ' . $tmp_alerts['isisISAdjState'];
             $fallback = false;
         }
 
