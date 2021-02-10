@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d1c28bcdcda41de34b846ccd5d0d7eaf",
+    "content-hash": "8c58a0455ef4b5d9b4c6c1339dcaf0cb",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -304,72 +304,6 @@
                 "source": "https://github.com/dapphp/radius/tree/composer-pear"
             },
             "time": "2018-04-26T01:55:40+00:00"
-        },
-        {
-            "name": "darkghosthunter/larapoke",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DarkGhostHunter/Larapoke.git",
-                "reference": "2a58fc8a0705c9695489623fd8f5814c45b7ad4f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DarkGhostHunter/Larapoke/zipball/2a58fc8a0705c9695489623fd8f5814c45b7ad4f",
-                "reference": "2a58fc8a0705c9695489623fd8f5814c45b7ad4f",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/http": "^6.0||^7.0||^8.0",
-                "illuminate/routing": "^6.0||^7.0||^8.0",
-                "illuminate/support": "^6.0||^7.0||^8.0",
-                "illuminate/view": "^6.0||^7.0||^8.0",
-                "php": "^7.2"
-            },
-            "require-dev": {
-                "laravel/ui": "^1.0||^2.0||^3.0",
-                "orchestra/testbench": "^4.1||^5.0||^6.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "DarkGhostHunter\\Larapoke\\LarapokeServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "DarkGhostHunter\\Larapoke\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Italo Baeza C.",
-                    "email": "darkghosthunter@gmail.com"
-                }
-            ],
-            "description": "Keep your forms alive, avoid TokenMismatchException by gently poking your Laravel app",
-            "support": {
-                "issues": "https://github.com/DarkGhostHunter/Larapoke/issues",
-                "source": "https://github.com/DarkGhostHunter/Larapoke/tree/master"
-            },
-            "funding": [
-                {
-                    "url": "https://paypal.me/darkghosthunter",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://ko-fi.com/DarkGhostHunter",
-                    "type": "ko_fi"
-                }
-            ],
-            "time": "2020-10-20T00:47:24+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -10802,7 +10736,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "darkghosthunter/larapoke": 20,
         "oriceon/toastr-5-laravel": 20
     },
     "prefer-stable": false,

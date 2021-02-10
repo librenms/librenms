@@ -33,7 +33,6 @@
         "amenadiel/jpgraph": "^3.6",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^2.0",
-        "darkghosthunter/larapoke": "dev-master",
         "doctrine/dbal": "^2.11",
         "easybook/geshi": "^1.0.8",
         "ezyang/htmlpurifier": "^4.8",
