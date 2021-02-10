@@ -28,8 +28,6 @@ if ($epmp_ap == 1) {
     }
 }
 
-$version = snmp_get($device, 'cambiumCurrentuImageVersion.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
-
 $cambiumGPSNumTrackedSat = snmp_get($device, 'cambiumGPSNumTrackedSat.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
 $cambiumGPSNumVisibleSat = snmp_get($device, 'cambiumGPSNumVisibleSat.0', '-Ovqn', 'CAMBIUM-PMP80211-MIB');
 if (is_numeric($cambiumGPSNumTrackedSat) && is_numeric($cambiumGPSNumVisibleSat)) {

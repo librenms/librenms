@@ -156,6 +156,6 @@ class Location extends Model
 
     public function __toString()
     {
-        return $this->location;
+        return $this->location . ($this->coordinatesValid() ? " [$this->lat, $this->lng]" : '');
     }
 }

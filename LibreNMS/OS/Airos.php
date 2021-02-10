@@ -25,6 +25,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Location;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
@@ -65,6 +66,16 @@ class Airos extends OS implements
             preg_match('/\.v(.*)$/', $data['dot11manufacturerProductVersion'], $matches);
             $device->version = $matches[1] ?? null;
         }
+    }
+
+    public function fetchLocation(): Location
+    {
+        $location = parent::fetchLocation();
+
+        // fix longitude having an extra - in the middle after the decimal point
+        $location->lng = preg_replace('/(-?\d+)\.-?(\d+)/', '$1.$2', $location->getAttributes()['lng']);
+
+        return $location;
     }
 
     /**

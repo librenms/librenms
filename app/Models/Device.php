@@ -324,14 +324,31 @@ class Device extends BaseModel
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
     }
 
-    public function setLocation($location_text)
+    /**
+     * Update the location to the correct location and update GPS if needed
+     *
+     * @param  \App\Models\Location  $location location data
+     */
+    public function setLocation(Location $location)
     {
-        $location_text = $location_text ? Rewrite::location($location_text) : null;
+        $location->location = $location->location ? Rewrite::location($location->location) : null;
 
-        $this->location_id = null;
-        if ($location_text) {
-            $location = Location::firstOrCreate(['location' => $location_text]);
+        if (!$location->location) {
+            $this->location_id = null;
+            return;
+        }
+
+        $coord = array_filter($location->only(['lat', 'lng']));
+        if (! $this->relationLoaded('location') || optional($this->location)->location !== $location->location) {
+            if (! $location->exists) {
+                $location = Location::firstOrCreate(['location' => $location->location], $coord);
+            }
             $this->location()->associate($location);
+        }
+
+        // save new coords if needed
+        if ($this->location) {
+            $this->location->fill($coord)->save();
         }
     }
 

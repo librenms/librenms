@@ -24,6 +24,8 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
+use App\Models\Location;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Module;
@@ -74,7 +76,7 @@ class OS implements Module
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
             if (! empty($location)) {
-                $deviceModel->setLocation($location);
+                $deviceModel->setLocation(new Location(['location' => $location]));
             }
         }
 
@@ -100,17 +102,17 @@ class OS implements Module
         $device->save();
     }
 
-    private function updateLocation(\LibreNMS\OS $os, $altLocation = null)
+    private function updateLocation(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
-        if ($device->override_sysLocation == 0) {
-            $device->setLocation(snmp_get($os->getDeviceArray(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
+        if ($device->override_sysLocation) {
+            $device->location->lookupCoordinates();
+        } else {
+            $new = $os->fetchLocation();  // fetch location data from device
+            $new->lookupCoordinates();
+            $device->setLocation($new);
         }
 
-        // make sure the location has coordinates
-        if (Config::get('geoloc.latlng', true) && $device->location && ! $device->location->hasCoordinates()) {
-            $device->location->lookupCoordinates();
-            $device->location->save();
-        }
+        optional($device->location)->save();
     }
 }

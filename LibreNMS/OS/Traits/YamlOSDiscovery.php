@@ -26,6 +26,7 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Device;
+use App\Models\Location;
 use Illuminate\Support\Arr;
 use Log;
 
@@ -43,7 +44,6 @@ trait YamlOSDiscovery
         'hardware',
         'features',
         'serial',
-        'location',
     ];
 
     public function discoverOS(Device $device): void
@@ -61,18 +61,12 @@ trait YamlOSDiscovery
         $oids = Arr::only($os_yaml, $this->osFields);
         $fetch_oids = array_unique(Arr::flatten($oids));
         $numeric = $this->isNumeric($fetch_oids);
-        $flags = $numeric ? '-OUQn' : '-OUQ';
-        $data = snmp_get_multi_oid($this->getDeviceArray(), $fetch_oids, $flags);
+        $data = $this->fetch($fetch_oids, $numeric);
 
         Log::debug('Yaml OS data:', $data);
 
         foreach ($oids as $field => $oid_list) {
             if ($value = $this->findFirst($data, $oid_list, $numeric)) {
-                if ($field == 'location') {
-                    $device->setLocation($value);
-                    continue;
-                }
-
                 // extract via regex if requested
                 if (isset($os_yaml["{$field}_regex"])) {
                     $this->parseRegex($os_yaml["{$field}_regex"], $value);
@@ -84,6 +78,26 @@ trait YamlOSDiscovery
                     : $value;
             }
         }
+    }
+
+    public function fetchLocation(): Location
+    {
+        $os_yaml = $this->getDiscovery('os');
+        $name = $os_yaml['location'] ?? 'SNMPv2-MIB::sysLocation.0';
+        $lat = $os_yaml['lat'] ?? null;
+        $lng = $os_yaml['long'] ?? null;
+
+        $oids = array_filter([$name, $lat, $lng]);
+        $numeric = $this->isNumeric($oids);
+        $data = $this->fetch($oids, $numeric);
+
+        Log::debug('Yaml location data:', $data);
+
+        return new Location([
+            'location' => $this->findFirst($data, $name, $numeric),
+            'lat' => $this->findFirst($data, $lat, $numeric),
+            'lng' => $this->findFirst($data, $lng, $numeric),
+        ]);
     }
 
     private function findFirst($data, $oids, $numeric = false)
@@ -129,6 +143,11 @@ trait YamlOSDiscovery
         if ($regex) {
             $this->parseRegex($regex, $device->hardware);
         }
+    }
+
+    private function fetch(array $oids, $numeric)
+    {
+        return snmp_get_multi_oid($this->getDeviceArray(), $oids, $numeric ? '-OUQn' : '-OUQ');
     }
 
     private function isNumeric($oids)
