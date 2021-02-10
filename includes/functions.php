@@ -2234,7 +2234,7 @@ function get_db_schema()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if (!empty($device['attribs']['snmp_max_oid'])) {
+    if (! empty($device['attribs']['snmp_max_oid'])) {
         return $device['attribs']['snmp_max_oid'];
     }
 

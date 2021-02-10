@@ -333,8 +333,9 @@ class Device extends BaseModel
     {
         $location->location = $location->location ? Rewrite::location($location->location) : null;
 
-        if (!$location->location) {
+        if (! $location->location) {
             $this->location_id = null;
+
             return;
         }
 
