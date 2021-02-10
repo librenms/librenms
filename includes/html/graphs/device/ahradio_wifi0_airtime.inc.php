@@ -8,6 +8,8 @@ require 'includes/html/graphs/common.inc.php';
 
 $graph_min = "0";
 $graph_max = "100";
+$scale_min = "0";
+$scale_max = '100';
 
 $rrd_options .= " DEF:wifi0tx=$rrd_filename:wifi0txairtime:AVERAGE";
 $rrd_options .= " DEF:wifi0rx=$rrd_filename:wifi0rxairtime:AVERAGE";
