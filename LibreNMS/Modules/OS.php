@@ -25,7 +25,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Location;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Util\Url;
@@ -35,18 +34,17 @@ class OS implements Module
     public function discover(\LibreNMS\OS $os)
     {
         $this->updateLocation($os);
-        if ($os instanceof OSDiscovery) {
-            // null out values in case they aren't filled.
-            $os->getDevice()->fill([
-                'hardware' => null,
-                'version' => null,
-                'features' => null,
-                'serial' => null,
-                'icon' => null,
-            ]);
 
-            $os->discoverOS($os->getDevice());
-        }
+        // null out values in case they aren't filled.
+        $os->getDevice()->fill([
+            'hardware' => null,
+            'version' => null,
+            'features' => null,
+            'serial' => null,
+            'icon' => null,
+        ]);
+
+        $os->discoverOS($os->getDevice());
         $this->handleChanges($os);
     }
 
@@ -92,7 +90,7 @@ class OS implements Module
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
-        echo trans('device.attributes.location') . ": $device->location\n";
+        echo trans('device.attributes.location') . ': ' . optional($device->location)->display() . PHP_EOL;
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             echo \App\Observers\DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
         }
@@ -104,7 +102,7 @@ class OS implements Module
     {
         $device = $os->getDevice();
         if ($device->override_sysLocation) {
-            $device->location->lookupCoordinates();
+            optional($device->location)->lookupCoordinates();
         } else {
             $new = $os->fetchLocation();  // fetch location data from device
             $new->lookupCoordinates();

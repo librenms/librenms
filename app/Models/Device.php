@@ -333,7 +333,7 @@ class Device extends BaseModel
     {
         $location->location = $location->location ? Rewrite::location($location->location) : null;
 
-        if (! $location->location) {
+        if (! $location->location) { // disassociate if the location name is empty
             $this->location_id = null;
 
             return;
@@ -341,7 +341,7 @@ class Device extends BaseModel
 
         $coord = array_filter($location->only(['lat', 'lng']));
         if (! $this->relationLoaded('location') || optional($this->location)->location !== $location->location) {
-            if (! $location->exists) {
+            if (! $location->exists) { // don't fetch if new location persisted to the DB, just use it
                 $location = Location::firstOrCreate(['location' => $location->location], $coord);
             }
             $this->location()->associate($location);
