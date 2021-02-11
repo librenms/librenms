@@ -39,6 +39,7 @@
         "fico7489/laravel-pivot": "^3.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
+        "genealabs/laravel-caffeine": "^8.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "influxdb/influxdb-php": "^1.14",
         "laravel/framework": "^8.12",
