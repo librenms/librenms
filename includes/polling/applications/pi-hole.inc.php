@@ -53,8 +53,8 @@ if ($pihole) {
         'query_aaaa' => $query_aaaa,
         'query_ptr' => $query_ptr,
         'query_srv' => $query_srv,
-	'dhcp_scopesize' => $dhcp_scopesize,
-	'dhcp_leases' => $dhcp_leases,
+        'dhcp_scopesize' => $dhcp_scopesize,
+        'dhcp_leases' => $dhcp_leases,
     ];
 
     $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
