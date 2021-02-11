@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2606.7",
                     "sysDescr": "Rittal CMC III PU Compact SN <private> HW V6.02 - SW V3.15.70_4",
-                    "sysContact": null,
-                    "version": "V3.15.70_4",
-                    "hardware": "CMCIII-PU Compact",
-                    "features": null,
-                    "os": "rittal-cmc-iii-pu",
-                    "type": "environment",
-                    "serial": "<private>",
-                    "icon": "rittal.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2606.7",
-                    "sysDescr": "Rittal CMC III PU Compact SN <private> HW V6.02 - SW V3.15.70_4",
                     "sysContact": "<private>",
                     "version": "V3.15.70_4",
                     "hardware": "CMCIII-PU Compact",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

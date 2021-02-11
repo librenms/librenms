@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.14988.2",
                     "sysDescr": "CSS106-1G-4P-1S SwOS v2.11",
-                    "sysContact": null,
-                    "version": "v2.11",
-                    "hardware": "CSS106-1G-4P-1S",
-                    "features": null,
-                    "os": "swos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "mikrotik.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.14988.2",
-                    "sysDescr": "CSS106-1G-4P-1S SwOS v2.11",
                     "sysContact": "<private>",
                     "version": "v2.11",
                     "hardware": "CSS106-1G-4P-1S",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
