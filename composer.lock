@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d1c28bcdcda41de34b846ccd5d0d7eaf",
+    "content-hash": "0911a4d37f7dda7d8d6c8d1cfe3c1bbc",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -304,72 +304,6 @@
                 "source": "https://github.com/dapphp/radius/tree/composer-pear"
             },
             "time": "2018-04-26T01:55:40+00:00"
-        },
-        {
-            "name": "darkghosthunter/larapoke",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DarkGhostHunter/Larapoke.git",
-                "reference": "2a58fc8a0705c9695489623fd8f5814c45b7ad4f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DarkGhostHunter/Larapoke/zipball/2a58fc8a0705c9695489623fd8f5814c45b7ad4f",
-                "reference": "2a58fc8a0705c9695489623fd8f5814c45b7ad4f",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/http": "^6.0||^7.0||^8.0",
-                "illuminate/routing": "^6.0||^7.0||^8.0",
-                "illuminate/support": "^6.0||^7.0||^8.0",
-                "illuminate/view": "^6.0||^7.0||^8.0",
-                "php": "^7.2"
-            },
-            "require-dev": {
-                "laravel/ui": "^1.0||^2.0||^3.0",
-                "orchestra/testbench": "^4.1||^5.0||^6.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "DarkGhostHunter\\Larapoke\\LarapokeServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "DarkGhostHunter\\Larapoke\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Italo Baeza C.",
-                    "email": "darkghosthunter@gmail.com"
-                }
-            ],
-            "description": "Keep your forms alive, avoid TokenMismatchException by gently poking your Laravel app",
-            "support": {
-                "issues": "https://github.com/DarkGhostHunter/Larapoke/issues",
-                "source": "https://github.com/DarkGhostHunter/Larapoke/tree/master"
-            },
-            "funding": [
-                {
-                    "url": "https://paypal.me/darkghosthunter",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://ko-fi.com/DarkGhostHunter",
-                    "type": "ko_fi"
-                }
-            ],
-            "time": "2020-10-20T00:47:24+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -1310,6 +1244,69 @@
             "time": "2020-10-22T13:57:20+00:00"
         },
         {
+            "name": "genealabs/laravel-caffeine",
+            "version": "8.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/GeneaLabs/laravel-caffeine.git",
+                "reference": "7f878138eefdc463db4f47af83b2fcdec2b78136"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/7f878138eefdc463db4f47af83b2fcdec2b78136",
+                "reference": "7f878138eefdc463db4f47af83b2fcdec2b78136",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/routing": "^8.0",
+                "illuminate/support": "^8.0",
+                "jenssegers/model": "^1.4"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.0",
+                "orchestra/testbench-browser-kit": "^6.0",
+                "orchestra/testbench-dusk": "^6.0",
+                "php-coveralls/php-coveralls": "^2.2",
+                "phpmd/phpmd": "^2.7",
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "GeneaLabs\\LaravelCaffeine\\Providers\\Service"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GeneaLabs\\LaravelCaffeine\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mike Bronner",
+                    "email": "hello@genealabs.com"
+                }
+            ],
+            "description": "Keeping Your Laravel Forms Awake",
+            "support": {
+                "issues": "https://github.com/GeneaLabs/laravel-caffeine/issues",
+                "source": "https://github.com/GeneaLabs/laravel-caffeine/tree/8.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/mikebronner",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-09-11T14:04:09+00:00"
+        },
+        {
             "name": "graham-campbell/result-type",
             "version": "v1.0.1",
             "source": {
@@ -1672,6 +1669,57 @@
                 "source": "https://github.com/influxdata/influxdb-php/tree/1.15.2"
             },
             "time": "2020-12-26T17:45:17+00:00"
+        },
+        {
+            "name": "jenssegers/model",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jenssegers/model.git",
+                "reference": "546aa41336495ca3e4afd3cd155d454d1c831384"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jenssegers/model/zipball/546aa41336495ca3e4afd3cd155d454d1c831384",
+                "reference": "546aa41336495ca3e4afd3cd155d454d1c831384",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^5.0|^6.0|^7.0|^8.0",
+                "illuminate/support": "^4.0|^5.0|^6.0|^7.0|^8.0"
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "*",
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jenssegers\\Model\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jens Segers",
+                    "homepage": "https://jenssegers.com"
+                }
+            ],
+            "description": "An Laravel eloquent-like model class, for Laravel and other frameworks",
+            "homepage": "https://github.com/jenssegers/model",
+            "keywords": [
+                "eloquent",
+                "laravel",
+                "model"
+            ],
+            "support": {
+                "issues": "https://github.com/jenssegers/model/issues",
+                "source": "https://github.com/jenssegers/model/tree/v1.4.0"
+            },
+            "time": "2020-09-11T11:05:47+00:00"
         },
         {
             "name": "laravel/framework",
@@ -10802,7 +10850,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "darkghosthunter/larapoke": 20,
         "oriceon/toastr-5-laravel": 20
     },
     "prefer-stable": false,
