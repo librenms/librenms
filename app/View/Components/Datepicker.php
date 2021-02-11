@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use DateTimeInterface;
 use Illuminate\View\Component;
 
 class Datepicker extends Component
@@ -17,8 +18,8 @@ class Datepicker extends Component
      */
     public function __construct($from = null, $to = null)
     {
-        $this->from = $from;
-        $this->to = $to;
+        $this->from = $from instanceof DateTimeInterface ? $from->getTimestamp() : $from;
+        $this->to = $to instanceof DateTimeInterface ? $to->getTimestamp() : $to;
     }
 
     /**

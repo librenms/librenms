@@ -1,25 +1,37 @@
-<div style='text-align: center;'>
-    <form class='form-inline' id='customrange'>
-        @csrf
+<div style="text-align: center;">
+    <form class="form-inline" id="customrange">
+        <input type="hidden" id="selfaction" value="http://librenms.local/graphs/to=1612928100/id=447/type=port_bits/from=1612841700/">
         <div class="form-group">
-            <label for="dtpickerfrom">From</label>
+            <label for="dtpickerfrom">@lang('From')</label>
             <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="{{ $from }}" data-date-format="YYYY-MM-DD HH:mm">
         </div>
         <div class="form-group">
-            <label for="dtpickerto">To</label>
+            <label for="dtpickerto">@lang('To')</label>
             <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="{{ $to }}" data-date-format="YYYY-MM-DD HH:mm">
         </div>
-        <input type="submit" class="btn btn-default" id="submit" value="Update" onclick="submitCustomRange(this.form);">
+        <input type="submit" class="btn btn-default" id="submit" value="@lang('Update')" onclick="submitCustomRange(this.form)">
     </form>
     <script type="text/javascript">
         function submitCustomRange(frmdata) {
-            var reto = /to=([0-9a-zA-Z\-])+/g;
-            var refrom = /from=([0-9a-zA-Z\-])+/g;
             var tsto = moment(frmdata.dtpickerto.value).unix();
             var tsfrom = moment(frmdata.dtpickerfrom.value).unix();
             var action = document.location.href;
-            frmdata.action = action.replace(reto, 'to=' + tsto).replace(refrom, 'from=' + tsfrom);
+            action = setOrReplace(action, 'to', tsto);
+            action = setOrReplace(action, 'from', tsfrom);
+
+            frmdata.action = action;
             return true;
+        }
+
+        function setOrReplace(url, key, value) {
+            var search = key + '=';
+            if (url.includes(search)) {
+                var regex = new RegExp(search + '[0-9a-zA-Z\-]+');
+                return url.replace(regex, search + value)
+            }
+            var sep = url.includes('?') ? '&' : '?';
+
+            return url + sep + search + value;
         }
 
         $(function () {

@@ -25,6 +25,7 @@
 
 namespace App\Graphing;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 
 class GraphViewController
@@ -32,12 +33,18 @@ class GraphViewController
     public function __invoke(Request $request)
     {
         [$_, $group, $graph] = explode('/', $request->path(), 3);
-        $options = $request->only(['start', 'end']);
-        $id = $request->get('id');
-        if ($id !== null) {
-            $options['id'] = $id;
-        }
 
-        return view('graph', ['url' => route("graph_data.{$group}_{$graph}", $options)]);
+        $options = [
+            'id' => $request->get('id'),
+            'from' => $this->parseDate($request->get('from', CarbonImmutable::now()->subHours(2))),
+            'to' => $this->parseDate($request->get('from', CarbonImmutable::now())),
+        ];
+
+        return view('graph', ['url' => route("graph_data.{$group}_{$graph}", $options)], $options);
+    }
+
+    private function parseDate($date): CarbonImmutable
+    {
+        return CarbonImmutable::parse(is_numeric($date) ? intval($date) : $date);
     }
 }

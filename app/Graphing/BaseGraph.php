@@ -55,9 +55,9 @@ abstract class BaseGraph extends Controller
     protected function init(Request $request)
     {
         $this->now = CarbonImmutable::now();
-        $start = $request->get('start', $this->now->subHours(2));
+        $start = $request->get('from', $this->now->subHours(2));
         $this->start = CarbonImmutable::parse(is_numeric($start) ? intval($start) : $start);
-        $end = $request->get('end', $this->now);
+        $end = $request->get('to', $this->now);
         $this->end = CarbonImmutable::parse(is_numeric($end) ? intval($end) : $end);
 
         $this->renderer = RendererFactory::make($request->get('renderer'));

@@ -56,7 +56,7 @@ class SeriesData implements Iterator, JsonSerializable
 
     public function getSeries($index)
     {
-        return $this->data[$index]['values'];
+        return $this->data[$index]['values'] ?? [];
     }
 
     /**

@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <x-datepicker></x-datepicker>
+                <x-datepicker :to="$to" :from="$from"></x-datepicker>
             </div>
         </div>
         <div class="row">
@@ -42,8 +42,10 @@
 
 @push('scripts')
     <script>
+        var graphUrl = '{!! $url !!}';
+
         // ------  ChartJS
-        axios.get('{!! $url !!}',{params: {renderer: 'chartjs'}})
+        axios.get(graphUrl,{params: {renderer: 'chartjs'}})
             .then(function (response) {
                 new Chart(document.getElementById('chartjs').getContext('2d'), response.data);
             }).catch(function (e) {
@@ -54,7 +56,7 @@
         var dygraph;
         var updateDygraph;
         updateDygraph = function (start, end) {
-            axios.get('{!! $url !!}', {params: {renderer: 'dygraph', start: start/1000, end: end/1000}})
+            axios.get(graphUrl, {params: {renderer: 'dygraph', from: start/1000, to: end/1000}})
                 .then(function (response) {
                     var config = response.data.config;
                     var data = response.data.data;
@@ -67,7 +69,7 @@
                 console.log(e)
             });
         };
-        axios.get('{!! $url !!}', {params: {renderer: 'dygraph'}})
+        axios.get(graphUrl, {params: {renderer: 'dygraph'}})
             .then(function (response) {
                 var json = response.data;
                 json.data.forEach(function (item) {
@@ -81,7 +83,7 @@
             });
 
         // ------ Metrics Graphics
-        d3.json('{!! $url !!}&renderer=metrics-graphics', function(config) {
+        d3.json(graphUrl + '&renderer=metrics-graphics', function(config) {
             for (var i = 0; i < config.data.length; i++) {
                 for (var j = 0; j < config.data[i].length; j++) {
                     config.data[i][j][0] = new Date(config.data[i][j][0] * 1000);
@@ -98,16 +100,14 @@
         });
 
         // ------ Plotly.js
-        axios.get('{!! $url !!}', {params: {renderer: 'plotly'}})
+        axios.get(graphUrl, {params: {renderer: 'plotly'}})
             .then(function (response) {
                 data = response.data.data;
                 for (var i = 0; i < data.length; i++) {
-                    console.log(data);
                     for (var j = 0; j < data[i]['x'].length; j++) {
                         data[i]['x'][j] = new Date(data[i]['x'][j] * 1000)
                     }
                 }
-                console.log(data);
 
                 Plotly.newPlot( document.getElementById('plotly'), data /*, response.data.layout */);
             }).catch(function (e) {
