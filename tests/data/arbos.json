@@ -2845,24 +2845,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9694.1.4",
                     "sysDescr": "Peakflow SP 8.3 (build HIU6)  System Board Model: S2600CO Serial Number: XX00000000XXX",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "arbos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "arbor.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9694.1.4",
-                    "sysDescr": "Peakflow SP 8.3 (build HIU6)  System Board Model: S2600CO Serial Number: XX00000000XXX",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -2874,7 +2856,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {

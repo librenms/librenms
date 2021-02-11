@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.20916.1.6",
                     "sysDescr": "Room Alert 4E v4.2.4",
-                    "sysContact": null,
-                    "version": "4.2.4",
-                    "hardware": "Room Alert 4E",
-                    "features": null,
-                    "os": "avtech",
-                    "type": "environment",
-                    "serial": null,
-                    "icon": "avtech.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.20916.1.6",
-                    "sysDescr": "Room Alert 4E v4.2.4",
                     "sysContact": "<private>",
                     "version": "4.2.4",
                     "hardware": "Room Alert 4E",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

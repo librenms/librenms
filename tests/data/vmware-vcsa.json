@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.6876.4.6",
                     "sysDescr": "VMware-vCenter-Server-Appliance 7.0.0.10100 generic build 16386292 VMware, Inc. x86_64",
-                    "sysContact": null,
-                    "version": "7.0.0.10100",
-                    "hardware": null,
-                    "features": "build 16386292",
-                    "os": "vmware-vcsa",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "vmware.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.6876.4.6",
-                    "sysDescr": "VMware-vCenter-Server-Appliance 7.0.0.10100 generic build 16386292 VMware, Inc. x86_64",
                     "sysContact": "<private>",
                     "version": "7.0.0.10100",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

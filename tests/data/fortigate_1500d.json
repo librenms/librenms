@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.101.1.15000",
                     "sysDescr": "FG1K5D3I14802135",
-                    "sysContact": null,
-                    "version": "v5.4.8,build1183,180115 (GA)",
-                    "hardware": "FGT_1500D",
-                    "features": null,
-                    "os": "fortigate",
-                    "type": "firewall",
-                    "serial": "FG1K5D3I14802132",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.12356.101.1.15000",
-                    "sysDescr": "FG1K5D3I14802135",
                     "sysContact": "<private>",
                     "version": "v5.4.8,build1183,180115 (GA)",
                     "hardware": "FGT_1500D",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

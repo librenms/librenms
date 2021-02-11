@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.5597.3",
                     "sysDescr": "Meinberg LANTIME  V6.20.014",
-                    "sysContact": null,
-                    "version": "7.00.014",
-                    "hardware": null,
-                    "features": null,
-                    "os": "mbg-ltos6",
-                    "type": "timing",
-                    "serial": "<private>",
-                    "icon": "meinberg.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.5597.3",
-                    "sysDescr": "Meinberg LANTIME  V6.20.014",
                     "sysContact": "<private>",
                     "version": "7.00.014",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

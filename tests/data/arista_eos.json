@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.30065.1.3011.7050.1958.128",
                     "sysDescr": "Arista Networks EOS version 4.15.3F running on an Arista Networks DCS-7050TX-128",
-                    "sysContact": null,
-                    "version": "4.15.3F",
-                    "hardware": "DCS-7050TX-128",
-                    "features": null,
-                    "os": "arista_eos",
-                    "type": "network",
-                    "serial": "JPE00000000",
-                    "icon": "arista.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.30065.1.3011.7050.1958.128",
-                    "sysDescr": "Arista Networks EOS version 4.15.3F running on an Arista Networks DCS-7050TX-128",
                     "sysContact": "<private>",
                     "version": "4.15.3F",
                     "hardware": "DCS-7050TX-128",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

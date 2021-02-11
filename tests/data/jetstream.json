@@ -24,24 +24,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.11863.5.34",
                     "sysDescr": "JetStream 48-Port Gigabit L2 Managed Switch with 4 SFP Slots",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "jetstream",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "tplink.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.11863.5.34",
-                    "sysDescr": "JetStream 48-Port Gigabit L2 Managed Switch with 4 SFP Slots",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -53,7 +35,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

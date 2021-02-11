@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux TomatoWifi 2.6.22.19 #13 Wed Sep 23 16:39:18 CEST 2020 mips",
-                    "sysContact": null,
-                    "version": "2020.6",
-                    "hardware": "Asus RT-N66U",
-                    "features": null,
-                    "os": "freshtomato",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "tomato.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux TomatoWifi 2.6.22.19 #13 Wed Sep 23 16:39:18 CEST 2020 mips",
                     "sysContact": "<private>",
                     "version": "2020.6",
                     "hardware": "Asus RT-N66U",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

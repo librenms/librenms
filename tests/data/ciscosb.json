@@ -24,9 +24,9 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.6.1.80",
                     "sysDescr": "Linux, Cisco Systems, Inc WAP371 (WAP371-A-K9), Version 1.3.0.4",
-                    "sysContact": null,
+                    "sysContact": "<private>",
                     "version": "Software 1.3.0.4",
-                    "hardware": null,
+                    "hardware": "",
                     "features": null,
                     "os": "ciscosb",
                     "type": "network",
@@ -36,24 +36,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.6.1.80",
-                    "sysDescr": "Linux, Cisco Systems, Inc WAP371 (WAP371-A-K9), Version 1.3.0.4",
-                    "sysContact": "<private>",
-                    "version": "Software 1.3.0.4",
-                    "hardware": null,
-                    "features": null,
-                    "os": "ciscosb",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
