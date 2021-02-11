@@ -15,10 +15,9 @@ use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Time;
 
-$snmpdata = snmp_get_multi_oid($device, ['sysUpTime.0', 'sysContact.0', 'sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OQnUt', 'SNMPv2-MIB');
+$snmpdata = snmp_get_multi_oid($device, ['sysUpTime.0', 'sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OQnUt', 'SNMPv2-MIB');
 
 $poll_device['sysUptime'] = $snmpdata['.1.3.6.1.2.1.1.3.0'];
-$poll_device['sysContact'] = str_replace("\n", '', $snmpdata['.1.3.6.1.2.1.1.4.0']);
 $poll_device['sysName'] = str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']));
 $poll_device['sysObjectID'] = $snmpdata['.1.3.6.1.2.1.1.2.0'];
 $poll_device['sysDescr'] = str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']);
@@ -56,14 +55,8 @@ if ($uptime != 0 && Config::get("os.{$device['os']}.bad_uptime") !== true) {
     $device['uptime'] = $uptime;
 }//end if
 
-$poll_device['sysContact'] = str_replace('"', '', $poll_device['sysContact']);
-
-if ($poll_device['sysContact'] == 'not set') {
-    $poll_device['sysContact'] = '';
-}
-
 // Save results of various polled values to the database
-foreach (['sysContact', 'sysObjectID', 'sysName', 'sysDescr'] as $elem) {
+foreach (['sysObjectID', 'sysName', 'sysDescr'] as $elem) {
     if ($poll_device[$elem] != $device[$elem]) {
         $update_array[$elem] = $poll_device[$elem];
         $device[$elem] = $poll_device[$elem];
