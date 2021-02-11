@@ -78,12 +78,12 @@ if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) &
 
 $multi_get_array = snmp_get_multi($device, ['ulWLanTotalAvailableFrameTimePerSecond.0', 'ulWLanTotalUsedFrameTimePerSecond.0', 'dlWLanTotalAvailableFrameTimePerSecond.0', 'dlWLanTotalUsedFrameTimePerSecond.0'], '-OQU', 'CAMBIUM-PMP80211-MIB');
 
-$ulWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::ulWLanTotalAvailableFrameTimePerSecond'];
-$ulWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::ulWLanTotalUsedFrameTimePerSecond'];
-$dlWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalAvailableFrameTimePerSecond'];
-$dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond'];
+$ulWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::ulWLanTotalAvailableFrameTimePerSecond'] ?? null;
+$ulWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::ulWLanTotalUsedFrameTimePerSecond'] ?? null;
+$dlWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalAvailableFrameTimePerSecond'] ?? null;
+$dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond'] ?? null;
 
-if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond)) {
+if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && $ulWLanTotalAvailableFrameTimePerSecond && $ulWLanTotalUsedFrameTimePerSecond) {
     $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond / $ulWLanTotalAvailableFrameTimePerSecond) * 100), 2);
     $dlWlanFrameUtilization = round((($dlWLanTotalUsedFrameTimePerSecond / $dlWLanTotalAvailableFrameTimePerSecond) * 100), 2);
     d_echo($dlWlanFrameUtilization);
