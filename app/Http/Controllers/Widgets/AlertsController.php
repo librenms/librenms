@@ -47,7 +47,7 @@ class AlertsController extends WidgetController
 
     public function getView(Request $request)
     {
-        $alert_count = Alert::where('state', '!=', AlertState::RECOVERED)->get()->count();
+        $alert_count = Alert::where('state', '!=', AlertState::RECOVERED)->count();
 
         if ($alert_count) {
             $this->title .= ' (' . $alert_count . ')';
