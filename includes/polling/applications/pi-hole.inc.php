@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage pi-hole
- * @link       http://www.librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     crcro <crc@nuamchefazi.ro>
 */
