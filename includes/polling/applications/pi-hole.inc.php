@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage pi-hole
- * @link       https://www.librenms.org
+ * @link       http://librenms.org
  * @copyright  2017 LibreNMS
  * @author     crcro <crc@nuamchefazi.ro>
 */
@@ -23,7 +23,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.45.104.111.108.101';
 $pihole = snmp_walk($device, $oid, $options);
 
 if ($pihole) {
-    [$domains_blocked, $dns_query, $ads_blocked, $ads_percentage, $unique_domains, $queries_forwarded, $queries_cached, $query_a, $query_aaaa, $query_ptr, $query_srv] = explode("\n", $pihole);
+    [$domains_blocked, $dns_query, $ads_blocked, $ads_percentage, $unique_domains, $queries_forwarded, $queries_cached, $query_a, $query_aaaa, $query_ptr, $query_srv,$dhcp_scopesize,$dhcp_leases] = explode("\n", $pihole);
 
     $rrd_name = ['app', $name, $app_id];
     $rrd_def = RrdDefinition::make()
@@ -37,7 +37,9 @@ if ($pihole) {
         ->addDataset('query_a', 'GAUGE', 0)
         ->addDataset('query_aaaa', 'GAUGE', 0)
         ->addDataset('query_ptr', 'GAUGE', 0)
-        ->addDataset('query_srv', 'GAUGE', 0);
+        ->addDataset('query_srv', 'GAUGE', 0)
+        ->addDataset('dhcp_scopesize', 'GAUGE', 0)
+        ->addDataset('dhcp_leases', 'GAUGE', 0);
 
     $fields = [
         'domains_blocked' => $domains_blocked,
@@ -51,6 +53,8 @@ if ($pihole) {
         'query_aaaa' => $query_aaaa,
         'query_ptr' => $query_ptr,
         'query_srv' => $query_srv,
+	'dhcp_scopesize' => $dhcp_scopesize,
+	'dhcp_leases' => $dhcp_leases,
     ];
 
     $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];

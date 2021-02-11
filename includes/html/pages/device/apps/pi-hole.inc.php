@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage pi-hole
- * @link       https://www.librenms.org
+ * @link       http://librenms.org
  * @copyright  2017 LibreNMS
  * @author     crcro <crc@nuamchefazi.ro>
 */
@@ -19,6 +19,7 @@ $graphs = [
     'pi-hole_query_results' => 'Query Results',
     'pi-hole_block_percent' => 'Block Percentage',
     'pi-hole_blocklist' => 'Blocklist Domains',
+    'pi-hole_dhcp' => 'DHCP Statistics',
 ];
 
 foreach ($graphs as $key => $text) {
