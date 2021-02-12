@@ -1,39 +1,34 @@
 {
     "applications": {
         "discovery": {
-            "applications": [
-                {
-                    "app_type": "chronyd",
-                    "app_state": "UNKNOWN",
-                    "discovered": 1,
-                    "app_state_prev": null,
-                    "app_status": "",
-                    "app_instance": ""
-                }
-            ],
+            "applications": [{
+                "app_type": "chronyd",
+                "app_state": "UNKNOWN",
+                "discovered": 1,
+                "app_state_prev": null,
+                "app_status": "",
+                "app_instance": ""
+            }],
             "application_metrics": []
         },
         "poller": {
-            "applications": [
-                {
-                    "app_type": "chronyd",
-                    "app_state": "OK",
-                    "discovered": 1,
-                    "app_state_prev": "UNKNOWN",
-                    "app_status": "",
-                    "app_instance": ""
-                }
-            ],
-            "application_metrics": [
-                {
+            "applications": [{
+                "app_type": "chronyd",
+                "app_state": "OK",
+                "discovered": 1,
+                "app_state_prev": "UNKNOWN",
+                "app_status": "",
+                "app_instance": ""
+            }],
+            "application_metrics": [{
                     "metric": "tracking_frequency",
-                    "value": -7.077,
+                    "value": -9.845,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
                 {
                     "metric": "tracking_last_offset",
-                    "value": -2.56e-7,
+                    "value": 1.5e-8,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
@@ -51,7 +46,7 @@
                 },
                 {
                     "metric": "tracking_reference_time",
-                    "value": 1612299988.0746846,
+                    "value": 1613135374.765365,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
@@ -63,13 +58,13 @@
                 },
                 {
                     "metric": "tracking_residual_frequency",
-                    "value": -0.001,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
                 {
                     "metric": "tracking_rms_offset",
-                    "value": 1.03e-7,
+                    "value": 9.5e-8,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
@@ -81,13 +76,13 @@
                 },
                 {
                     "metric": "tracking_root_dispersion",
-                    "value": 9.639e-6,
+                    "value": 8.054e-6,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
                 {
                     "metric": "tracking_skew",
-                    "value": 0.016,
+                    "value": 0.006,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
@@ -99,7 +94,7 @@
                 },
                 {
                     "metric": "tracking_system_time",
-                    "value": 1.6e-7,
+                    "value": -1.6e-8,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
