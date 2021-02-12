@@ -562,7 +562,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
 
     if ($descr && $size > '0') {
         $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', [$index, $device['device_id'], $mib]);
-        if (! empty($storage)) {
+        if (empty($storage)) {
             if (Config::getOsSetting($device['os'], 'storage_perc_warn')) {
                 $perc_warn = Config::getOsSetting($device['os'], 'storage_perc_warn');
             } else {
