@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux wap-study 5.4.35 #0 Sun Apr 26 12:19:33 2020 armv5tel",
-                    "sysContact": null,
-                    "version": "snapshot",
-                    "hardware": "Marvell Kirkwood (Flattened Device Tree)",
-                    "features": null,
-                    "os": "openwrt",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "openwrt.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux wap-study 5.4.35 #0 Sun Apr 26 12:19:33 2020 armv5tel",
                     "sysContact": "<private>",
                     "version": "snapshot",
                     "hardware": "Marvell Kirkwood (Flattened Device Tree)",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux unitrends 3.10.0-862.14.4.el7.x86_64 #1 SMP Wed Sep 26 15:12:11 UTC 2018 x86_64",
-                    "sysContact": null,
-                    "version": "3.10.0-862.14.4.el7.x86_64",
-                    "hardware": "VMware, Inc. [VMware Virtual Platform]",
-                    "features": "RecoveryOS 7",
-                    "os": "recoveryos",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "unitrends.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux unitrends 3.10.0-862.14.4.el7.x86_64 #1 SMP Wed Sep 26 15:12:11 UTC 2018 x86_64",
                     "sysContact": "<private>",
                     "version": "3.10.0-862.14.4.el7.x86_64",
                     "hardware": "VMware, Inc. [VMware Virtual Platform]",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

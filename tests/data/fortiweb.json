@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.107.1.50007",
                     "sysDescr": "FortiwebAz",
-                    "sysContact": null,
-                    "version": "5.91",
-                    "hardware": "FortiWeb-Azure",
-                    "features": null,
-                    "os": "fortiweb",
-                    "type": "firewall",
-                    "serial": "FVVM123456789012",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.12356.107.1.50007",
-                    "sysDescr": "FortiwebAz",
                     "sysContact": "<private>",
                     "version": "5.91",
                     "hardware": "FortiWeb-Azure",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

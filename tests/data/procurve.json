@@ -547,9 +547,9 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.8.5.2",
                     "sysDescr": "HP Stack, revision KA.15.03.3004, ROM KA.15.05 (/sw/code/build/tam(KA_15_03))",
-                    "sysContact": null,
+                    "sysContact": "<private>",
                     "version": "KA.15.03.3004",
-                    "hardware": null,
+                    "hardware": "",
                     "features": null,
                     "os": "procurve",
                     "type": "network",
@@ -559,24 +559,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.8.5.2",
-                    "sysDescr": "HP Stack, revision KA.15.03.3004, ROM KA.15.05 (/sw/code/build/tam(KA_15_03))",
-                    "sysContact": "<private>",
-                    "version": "KA.15.03.3004",
-                    "hardware": null,
-                    "features": null,
-                    "os": "procurve",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "hpe.svg",
-                    "location": "<private>"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {

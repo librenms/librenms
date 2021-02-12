@@ -35,6 +35,7 @@ class OS implements Module
     public function discover(\LibreNMS\OS $os)
     {
         $this->updateLocation($os);
+        $this->sysContact($os);
         if ($os instanceof OSDiscovery) {
             // null out values in case they aren't filled.
             $os->getDevice()->fill([
@@ -111,6 +112,16 @@ class OS implements Module
         if (Config::get('geoloc.latlng', true) && $device->location && ! $device->location->hasCoordinates()) {
             $device->location->lookupCoordinates();
             $device->location->save();
+        }
+    }
+
+    private function sysContact(\LibreNMS\OS $os)
+    {
+        $device = $os->getDevice();
+        $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
+        $device->sysContact = str_replace(['', '"', '\n', 'not set'], null, $device->sysContact);
+        if (empty($device->sysContact)) {
+            $device->sysContact = null;
         }
     }
 }
