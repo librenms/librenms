@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": null,
                     "sysDescr": "HP PDU Management Module, revision 1.00.A, firmware version 1.00.16",
-                    "sysContact": null,
-                    "version": "1.00.16",
-                    "hardware": null,
-                    "features": null,
-                    "os": "hpe-pdumm",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "hpe.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": null,
-                    "sysDescr": "HP PDU Management Module, revision 1.00.A, firmware version 1.00.16",
                     "sysContact": "<private>",
                     "version": "1.00.16",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

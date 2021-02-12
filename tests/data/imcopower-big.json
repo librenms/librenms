@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.818.32.4.43",
                     "sysDescr": "IMCO SNMP Agent 10.10",
-                    "sysContact": null,
-                    "version": "2.8",
-                    "hardware": "XXX2.8",
-                    "features": null,
-                    "os": "imcopower-big",
-                    "type": "power",
-                    "serial": "201254517",
-                    "icon": "imco.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.818.32.4.43",
-                    "sysDescr": "IMCO SNMP Agent 10.10",
                     "sysContact": "<private>",
                     "version": "2.8",
                     "hardware": "XXX2.8",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

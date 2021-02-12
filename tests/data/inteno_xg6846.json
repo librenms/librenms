@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.4413",
                     "sysDescr": "XG6846_4.12ITT01.99",
-                    "sysContact": null,
-                    "version": "4.12ITT01.99",
-                    "hardware": "XG6846",
-                    "features": null,
-                    "os": "inteno",
-                    "type": "network",
-                    "serial": "684624H197019306",
-                    "icon": "inteno.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.4413",
-                    "sysDescr": "XG6846_4.12ITT01.99",
                     "sysContact": "<private>",
                     "version": "4.12ITT01.99",
                     "hardware": "XG6846",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

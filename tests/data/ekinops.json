@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.20044",
                     "sysDescr": "Ekinops 360 Platform, C600HC, Release 6.3.900",
-                    "sysContact": null,
-                    "version": "Release 6.3.900",
-                    "hardware": "C600HC",
-                    "features": null,
-                    "os": "ekinops",
-                    "type": "network",
-                    "serial": "002870",
-                    "icon": "ekinops.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.20044",
-                    "sysDescr": "Ekinops 360 Platform, C600HC, Release 6.3.900",
                     "sysContact": "<private>",
                     "version": "Release 6.3.900",
                     "hardware": "C600HC",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

@@ -444,24 +444,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.23465",
                     "sysDescr": "Mega-Pixel Network Camera",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "vivotek",
-                    "type": "camera",
-                    "serial": null,
-                    "icon": "vivotek.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.23465",
-                    "sysDescr": "Mega-Pixel Network Camera",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
@@ -473,6 +455,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

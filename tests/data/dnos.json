@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.6027.1.3.20",
                     "sysDescr": "Dell Networking OS Operating System Version: 2.0 Application Software Version: 9.9(0.0P9) Series: S4048-ON Copyright (c) 1999-2015 by Dell Inc. All Rights Reserved. Build Time: Thu Feb  4 06:57:34 2016",
-                    "sysContact": null,
-                    "version": "9.9(0.0P9)",
-                    "hardware": "S4048-ON",
-                    "features": null,
-                    "os": "dnos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "dell.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.6027.1.3.20",
-                    "sysDescr": "Dell Networking OS Operating System Version: 2.0 Application Software Version: 9.9(0.0P9) Series: S4048-ON Copyright (c) 1999-2015 by Dell Inc. All Rights Reserved. Build Time: Thu Feb  4 06:57:34 2016",
                     "sysContact": "<private>",
                     "version": "9.9(0.0P9)",
                     "hardware": "S4048-ON",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.11.2.3.9.1",
                     "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:AAA0A00000,FN:1G11F33,SVCID:26267,PID:Purchasing Color Laser",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "Color LaserJet M452nw",
-                    "features": null,
-                    "os": "jetdirect",
-                    "type": "printer",
-                    "serial": null,
-                    "icon": "hp.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.9.1",
-                    "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:AAA0A00000,FN:1G11F33,SVCID:26267,PID:Purchasing Color Laser",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": "Color LaserJet M452nw",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "toner": {
         "discovery": {

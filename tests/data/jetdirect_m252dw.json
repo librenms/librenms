@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.11.2.3.9.1",
                     "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:VNB3J99999,FN:1F31B6C,SVCID:99999,PID:HP Color LaserJet Pro M252dw",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "Color LaserJet Pro M252dw",
-                    "features": null,
-                    "os": "jetdirect",
-                    "type": "printer",
-                    "serial": null,
-                    "icon": "hp.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.9.1",
-                    "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:VNB3J99999,FN:1F31B6C,SVCID:99999,PID:HP Color LaserJet Pro M252dw",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": "Color LaserJet Pro M252dw",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

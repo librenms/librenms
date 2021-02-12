@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.8",
                     "sysDescr": "FreeBSD sn654321.example.org 10.0-RELEASE-p11 FreeBSD 10.0-RELEASE-p11 #0: Mon Jan  8 09:55:45 CST 2018     root@es-vb100-1:/work/buildmaster/r07.02.31/R07.02.31.003/07_02_31_003/work/buildmaster/r07.02.31/R07.02.31.003/src/sys/COMPELLENT amd64",
-                    "sysContact": null,
-                    "version": "10.0-RELEASE-p11",
-                    "hardware": null,
-                    "features": null,
-                    "os": "dell-compellent",
-                    "type": "storage",
-                    "serial": null,
-                    "icon": "dell.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.8",
-                    "sysDescr": "FreeBSD sn654321.example.org 10.0-RELEASE-p11 FreeBSD 10.0-RELEASE-p11 #0: Mon Jan  8 09:55:45 CST 2018     root@es-vb100-1:/work/buildmaster/r07.02.31/R07.02.31.003/07_02_31_003/work/buildmaster/r07.02.31/R07.02.31.003/src/sys/COMPELLENT amd64",
                     "sysContact": "<private>",
                     "version": "10.0-RELEASE-p11",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

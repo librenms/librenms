@@ -379,7 +379,6 @@ main () {
                                "syslog"
                                "eventlog"
                                "authlog"
-                               "perf_times"
                                "callback"
                                "device_perf"
                                "purgeusers"

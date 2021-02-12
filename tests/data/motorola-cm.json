@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1166.1.450.12.2",
                     "sysDescr": "<<HW_REV: 1; VENDOR: Motorola Corporation; BOOTR: 2164; SW_REV: SB5101E-2.6.2.0-SCM00-NOSH; MODEL: SB5101E>>",
-                    "sysContact": null,
-                    "version": "SB5101E-2.6.2.0-SCM00-NOSH",
-                    "hardware": "SB5101E",
-                    "features": null,
-                    "os": "motorola-cm",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "motorola-cm.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1166.1.450.12.2",
-                    "sysDescr": "<<HW_REV: 1; VENDOR: Motorola Corporation; BOOTR: 2164; SW_REV: SB5101E-2.6.2.0-SCM00-NOSH; MODEL: SB5101E>>",
                     "sysContact": "<private>",
                     "version": "SB5101E-2.6.2.0-SCM00-NOSH",
                     "hardware": "SB5101E",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

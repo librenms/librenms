@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.10456",
                     "sysDescr": "IPM-8220 1.30.4",
-                    "sysContact": null,
-                    "version": "1.30.4",
-                    "hardware": "IPM-8220",
-                    "features": null,
-                    "os": "planet-pdu",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "planet.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.10456",
-                    "sysDescr": "IPM-8220 1.30.4",
                     "sysContact": "<private>",
                     "version": "1.30.4",
                     "hardware": "IPM-8220",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

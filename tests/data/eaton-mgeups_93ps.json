@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.705.1",
                     "sysDescr": "93PS 20kW",
-                    "sysContact": null,
-                    "version": "2.30.0004",
-                    "hardware": "93PS 20kW",
-                    "features": "Network Management Card V6.00 LD",
-                    "os": "eaton-mgeups",
-                    "type": "power",
-                    "serial": "H2652000009",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.705.1",
-                    "sysDescr": "93PS 20kW",
                     "sysContact": "<private>",
                     "version": "2.30.0004",
                     "hardware": "93PS 20kW",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

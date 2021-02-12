@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.6141.1.98",
                     "sysDescr": "3942 Service Delivery Switch",
-                    "sysContact": null,
-                    "version": "rel_saos8700_8.7.0_ga195",
-                    "hardware": "154-8700-930",
-                    "features": null,
-                    "os": "ciena-sds",
-                    "type": "network",
-                    "serial": "M9123456",
-                    "icon": "ciena.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.6141.1.98",
-                    "sysDescr": "3942 Service Delivery Switch",
                     "sysContact": "<private>",
                     "version": "rel_saos8700_8.7.0_ga195",
                     "hardware": "154-8700-930",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -25730,7 +25713,7 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
-                    "sensor_limit": 0.014999999999999999,
+                    "sensor_limit": 0.015,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
                     "sensor_limit_low_warn": null,

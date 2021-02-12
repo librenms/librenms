@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.37662.1.2.2.1",
                     "sysDescr": "SNMP Smart II Card v1.05 (SN 11230031806015)",
-                    "sysContact": null,
-                    "version": "1.05",
-                    "hardware": "ATS11747",
-                    "features": null,
-                    "os": "ats",
-                    "type": "power",
-                    "serial": "11230031806015",
-                    "icon": "ats.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.37662.1.2.2.1",
-                    "sysDescr": "SNMP Smart II Card v1.05 (SN 11230031806015)",
                     "sysContact": "<private>",
                     "version": "1.05",
                     "hardware": "ATS11747",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

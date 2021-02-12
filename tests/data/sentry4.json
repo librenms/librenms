@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1718.4",
                     "sysDescr": "Sentry Smart PDU",
-                    "sysContact": null,
-                    "version": "Version 8.0n",
-                    "hardware": "C2S42CE-YCMFAM00",
-                    "features": null,
-                    "os": "sentry4",
-                    "type": "power",
-                    "serial": "<private>",
-                    "icon": "servertech.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1718.4",
-                    "sysDescr": "Sentry Smart PDU",
                     "sysContact": "<private>",
                     "version": "Version 8.0n",
                     "hardware": "C2S42CE-YCMFAM00",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

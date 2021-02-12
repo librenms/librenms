@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1425.1040",
                     "sysDescr": "TS 324 (SN: 0302000017017 - 11 03)",
-                    "sysContact": null,
-                    "version": "Rev 2.44d",
-                    "hardware": "TS 324 (047202CD)",
-                    "features": null,
-                    "os": "cxr-ts",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cxr-networks.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1425.1040",
-                    "sysDescr": "TS 324 (SN: 0302000017017 - 11 03)",
                     "sysContact": "<private>",
                     "version": "Rev 2.44d",
                     "hardware": "TS 324 (047202CD)",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
