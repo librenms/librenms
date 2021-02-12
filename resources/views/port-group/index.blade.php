@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <x-panel id="manage-port-groups-panel">
             <x-slot name="title">
-                <i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i> @lang('Port Groups')
+                <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Port Groups')
             </x-slot>
 
             <div class="row">
