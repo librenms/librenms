@@ -138,3 +138,5 @@ try {
 } catch (InvalidModuleException $e) {
     echo $e->getMessage() . PHP_EOL;
 }
+
+$snmpsim->stop();
