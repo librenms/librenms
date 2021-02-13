@@ -167,14 +167,22 @@ LibreNMS are no longer required and must be removed.
 A systemd unit file is provided - the sysv and upstart init scripts
 could also be used with a little modification.
 
-This requires: python3-systemd
-
 ## systemd
 
 A systemd unit file can be found in `misc/librenms.service`. To
 install run `cp /opt/librenms/misc/librenms.service
 /etc/systemd/system/librenms.service && systemctl enable --now
 librenms.service`
+
+## systemd-watchdog
+
+A systemd unit file can be found in `misc/librenms-watchdog.service`. To
+install run `cp /opt/librenms/misc/librenms.service
+/etc/systemd/system/librenms.service && systemctl enable --now
+librenms.service`
+
+This requires: python3-systemd (or python-systemd on older systems)
+or https://pypi.org/project/systemd-python/
 
 ## OS-Specific Instructions
 

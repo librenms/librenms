@@ -8,8 +8,9 @@ ExecReload=/bin/kill -HUP $MAINPID
 WorkingDirectory=/opt/librenms
 User=librenms
 Group=librenms
-RestartSec=2
+RestartSec=10
 Restart=always
+WatchdogSec=30
 
 [Install]
 WantedBy=multi-user.target
