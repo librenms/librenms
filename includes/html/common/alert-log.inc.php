@@ -76,8 +76,6 @@ if (isset($_POST['min_severity'])) {
     $_POST['min_severity'] = '';
 }
 
-
-
 $common_output[] = '
 <div class="table-responsive">
     <table id="alertlog" class="table table-hover table-condensed table-striped">
@@ -108,7 +106,6 @@ $common_output[] = '
                 ' . csrf_field() . ' \
             <input type=hidden name="hostname" id="hostname"> \
 ';
-
 
 if (isset($vars['fromdevice']) && ! $vars['fromdevice']) {
     $common_output[] = '<div class="form-group"> \
