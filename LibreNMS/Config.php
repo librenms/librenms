@@ -407,7 +407,7 @@ class Config
         // If we're on SSL or behind loadbalancer with SSL, let's properly detect it
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
-        } elseif ( !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || isset($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 
