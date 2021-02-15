@@ -71,7 +71,7 @@ ospf:
         excluded_fields: [id, device_id]
 isis:
     isis_adjacencies:
-    excluded_fields: [id, device_id, port_id]
+        excluded_fields: [id, device_id, port_id]
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
