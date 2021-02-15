@@ -205,7 +205,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     $low_warn_limit = set_null($low_warn_limit);
     $warn_limit = set_null($warn_limit);
     $high_limit = set_null($high_limit);
-    $current = floatval($current);
+    $current = $current + 0;
 
     if (! is_numeric($divisor)) {
         $divisor = 1;
