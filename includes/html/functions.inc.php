@@ -924,13 +924,25 @@ function clean_bootgrid($string)
     return $output;
 }//end clean_bootgrid()
 
+function request_protocol() {
+    $request_protocol = 'http';
+    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+        $request_protocol = 'https';
+    }
+    elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
+        $request_protocol = 'https';
+    }
+    return $request_protocol;
+}//end request_protocol()
+
 function get_url()
 {
     // http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
     // http://stackoverflow.com/users/184600/ma%C4%8Dek
+    // https://stackoverflow.com/questions/1175096/how-to-find-out-if-youre-using-https-without-serverhttps#comment102520055_2886224
     return sprintf(
         '%s://%s%s',
-        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+        request_protocol(),
         $_SERVER['SERVER_NAME'],
         $_SERVER['REQUEST_URI']
     );
