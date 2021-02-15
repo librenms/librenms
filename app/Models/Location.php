@@ -81,10 +81,7 @@ class Location extends Model
         if (! $this->hasCoordinates() && $this->location) {
             $this->parseCoordinates();
 
-            if (! $this->hasCoordinates() &&
-                \LibreNMS\Config::get('geoloc.latlng', true) &&
-                (! $this->id || $this->timestamp && $this->timestamp->diffInDays() > 2)
-            ) {
+            if (! $this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
                 $this->fetchCoordinates();
                 $this->updateTimestamps();
             }
@@ -98,7 +95,8 @@ class Location extends Model
      */
     public function display()
     {
-        return trim(preg_replace($this->location_regex, '', $this->location)) ?: $this->location;
+        return (trim(preg_replace($this->location_regex, '', $this->location)) ?: $this->location)
+            . ($this->coordinatesValid() ? " [$this->lat, $this->lng]" : '');
     }
 
     protected function parseCoordinates()
@@ -122,8 +120,8 @@ class Location extends Model
     // ---- Query scopes ----
 
     /**
-     * @param Builder $query
-     * @param User $user
+     * @param  Builder  $query
+     * @param  User  $user
      * @return Builder
      */
     public function scopeHasAccess($query, $user)
