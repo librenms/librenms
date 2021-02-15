@@ -249,7 +249,13 @@ class ModuleTestHelper
             [$os, $variant] = self::extractVariant($file);
 
             // calculate valid modules
-            $data_modules = array_keys(json_decode(file_get_contents($file), true));
+            $decoded = json_decode(file_get_contents($file), true);
+
+            if (json_last_error()) {
+                throw new \Exception("Unable to decode file $file");
+            }
+
+            $data_modules = array_keys($decoded);
 
             if (json_last_error()) {
                 echo "Invalid json data: $base_name\n";
