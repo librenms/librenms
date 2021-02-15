@@ -133,9 +133,9 @@ class OSModulesTest extends DBTestCase
             if ($expected_data[$module]['poller'] == 'matches discovery') {
                 $expected = $expected_data[$module]['discovery'];
             } else {
-                $expected = $expected_data[$module]['poller'];
+                $expected = $expected_data[$module]['poller'] ?? [];
             }
-            $actual = $results[$module]['poller'];
+            $actual = $results[$module]['poller'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,

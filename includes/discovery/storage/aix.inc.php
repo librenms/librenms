@@ -24,4 +24,4 @@ if (is_array($aix_filesystem)) {
         }
     } // end foreach
 } // endif
-unset($aix_filesystem, $aix_fs);
+unset($aix_fs);
