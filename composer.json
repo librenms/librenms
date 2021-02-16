@@ -11,7 +11,7 @@
         "snmp",
         "distributed"
     ],
-    "homepage": "http://www.librenms.org/",
+    "homepage": "https://www.librenms.org/",
     "license": "GPL-3.0-or-later",
     "support": {
         "source": "https://github.com/librenms/librenms/",
@@ -33,13 +33,13 @@
         "amenadiel/jpgraph": "^3.6",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^2.0",
-        "darkghosthunter/larapoke": "dev-master",
         "doctrine/dbal": "^2.11",
         "easybook/geshi": "^1.0.8",
         "ezyang/htmlpurifier": "^4.8",
         "fico7489/laravel-pivot": "^3.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
+        "genealabs/laravel-caffeine": "^8.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "influxdb/influxdb-php": "^1.14",
         "laravel/framework": "^8.12",
@@ -94,6 +94,9 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         },
+        "classmap": [
+            "vendor/dapphp/radius"
+        ],
         "files": [
             "includes/helpers.php"
         ]
