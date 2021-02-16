@@ -8,7 +8,7 @@
 
  * @package    LibreNMS
  * @subpackage discovery
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 PipoCanaja <pipocanaja@gmail.com>
  * @author     PipoCanaja <pipocanaja@gmail.com>
  * @author     Tony Murray <murraytony@gmail.com> (bridge.inc.php used as base)

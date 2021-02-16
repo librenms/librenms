@@ -3,7 +3,7 @@
 <channel>
  <title>LibreNMS Notifications</title>
  <description>RSS feed for notifications to LibreNMS users</description>
- <link>http://www.librenms.org/</link>
+ <link>https://www.librenms.org/</link>
  <lastBuildDate>Mon, 02 May 2016 20:00:00 +0000</lastBuildDate>
  <pubDate>Mon, 02 Mar 2016 20:00:00 +0000</pubDate>
  <ttl>1800</ttl>

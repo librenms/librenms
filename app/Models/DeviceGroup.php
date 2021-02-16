@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -138,6 +138,28 @@ class DeviceGroup extends BaseModel
         return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
     }
 
+    public function scopeInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_group_id')
+                    ->from('service_templates_device_group')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
+    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_group_id')
+                    ->from('service_templates_device_group')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
     // ---- Define Relationships ----
 
     public function devices()
@@ -153,5 +175,10 @@ class DeviceGroup extends BaseModel
     public function users()
     {
         return $this->belongsToMany(\App\Models\User::class, 'devices_group_perms', 'device_group_id', 'user_id');
+    }
+
+    public function serviceTemplates()
+    {
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device_group', 'device_group_id', 'service_template_id');
     }
 }

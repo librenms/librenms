@@ -6,24 +6,6 @@
                     "sysName": "my_ict_ups",
                     "sysObjectID": ".1.3.6.1.4.1.39145.13",
                     "sysDescr": "ICT Modular Power System",
-                    "sysContact": null,
-                    "version": "1.04",
-                    "hardware": "2",
-                    "features": null,
-                    "os": "ict-mps",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "ict.png",
-                    "location": "my_ict_ups"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "my_ict_ups",
-                    "sysObjectID": ".1.3.6.1.4.1.39145.13",
-                    "sysDescr": "ICT Modular Power System",
                     "sysContact": "Example, Inc",
                     "version": "1.04",
                     "hardware": "2",
@@ -35,7 +17,8 @@
                     "location": "my_ict_ups"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

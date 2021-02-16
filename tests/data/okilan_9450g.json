@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2001.1.1.1.1",
                     "sysDescr": "OKI OkiLAN 9450g Rev.00.69 10/100/1000BASE Ethernet PrintServer: Attached to MC873 Rev.07.87 : Copyright (c) 2015 Oki Data Corporation. All rights reserved.",
-                    "sysContact": null,
-                    "version": "07.87",
-                    "hardware": "MC873",
-                    "features": "9450g Rev.00.69",
-                    "os": "okilan",
-                    "type": "printer",
-                    "serial": null,
-                    "icon": "oki.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2001.1.1.1.1",
-                    "sysDescr": "OKI OkiLAN 9450g Rev.00.69 10/100/1000BASE Ethernet PrintServer: Attached to MC873 Rev.07.87 : Copyright (c) 2015 Oki Data Corporation. All rights reserved.",
                     "sysContact": "<private>",
                     "version": "07.87",
                     "hardware": "MC873",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

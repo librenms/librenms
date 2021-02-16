@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -125,7 +125,7 @@ class Php extends BaseValidation
             // make sure timezone is set
             $validator->fail(
                 'You have no timezone set for php.',
-                'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
+                'https://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
             );
         } elseif ($sh_tz !== $php_tz) {
             // check if system timezone matches the timezone of the current running php

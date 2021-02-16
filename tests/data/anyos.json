@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.4413",
                     "sysDescr": "1.00(AAJZ.16)C0",
-                    "sysContact": null,
-                    "version": "1.00(AAJZ.16)C0",
-                    "hardware": null,
-                    "features": null,
-                    "os": "anyos",
-                    "type": "network",
-                    "serial": "E4186BAB9C4F",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.4413",
-                    "sysDescr": "1.00(AAJZ.16)C0",
                     "sysContact": "<private>",
                     "version": "1.00(AAJZ.16)C0",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

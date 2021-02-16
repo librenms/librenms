@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.14823.1.2.71",
                     "sysDescr": "ArubaOS (MODEL: 105), Version 6.4.4.8-4.2.4.12",
-                    "sysContact": null,
-                    "version": "6.4.4.8-4.2.4.12",
-                    "hardware": "105",
-                    "features": null,
-                    "os": "aruba-instant",
-                    "type": "wireless",
-                    "serial": "BT0489813",
-                    "icon": "aruba.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.14823.1.2.71",
-                    "sysDescr": "ArubaOS (MODEL: 105), Version 6.4.4.8-4.2.4.12",
                     "sysContact": "<private>",
                     "version": "6.4.4.8-4.2.4.12",
                     "hardware": "105",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

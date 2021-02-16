@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -43,7 +43,8 @@ class PingCheck implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $process;
+    private $command;
+    private $wait;
     private $rrd_tags;
 
     /** @var \Illuminate\Database\Eloquent\Collection List of devices keyed by hostname */
@@ -80,11 +81,8 @@ class PingCheck implements ShouldQueue
         $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
         $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
 
-        $cmd = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
-
-        $wait = Config::get('rrd.step', 300) * 2;
-
-        $this->process = new Process($cmd, null, null, null, $wait);
+        $this->command = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
+        $this->wait = Config::get('rrd.step', 300) * 2;
     }
 
     /**
@@ -98,7 +96,9 @@ class PingCheck implements ShouldQueue
 
         $this->fetchDevices();
 
-        d_echo($this->process->getCommandLine() . PHP_EOL);
+        $process = new Process($this->command, null, null, null, $this->wait);
+
+        d_echo($process->getCommandLine() . PHP_EOL);
 
         // send hostnames to stdin to avoid overflowing cli length limits
         $ordered_device_list = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
@@ -106,10 +106,10 @@ class PingCheck implements ShouldQueue
             ->unique()
             ->implode(PHP_EOL);
 
-        $this->process->setInput($ordered_device_list);
-        $this->process->start(); // start as early as possible
+        $process->setInput($ordered_device_list);
+        $process->start(); // start as early as possible
 
-        foreach ($this->process as $type => $line) {
+        foreach ($process as $type => $line) {
             d_echo($line);
 
             if (Process::ERR === $type) {
@@ -256,9 +256,11 @@ class PingCheck implements ShouldQueue
 
             $device->save(); // only saves if needed (which is every time because of last_ping)
 
-            echo "Device $device->hostname changed status to $type, running alerts\n";
-            $rules = new AlertRules;
-            $rules->runRules($device->device_id);
+            if (isset($type)) { // only run alert rules if status changed
+                echo "Device $device->hostname changed status to $type, running alerts\n";
+                $rules = new AlertRules;
+                $rules->runRules($device->device_id);
+            }
 
             // add data to rrd
             app('Datastore')->put($device->toArray(), 'ping-perf', $this->rrd_tags, ['ping' => $device->last_ping_timetaken]);

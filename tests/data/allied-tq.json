@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.207.1.13.27",
                     "sysDescr": "AT-TQ4600 version 4.0.1.07",
-                    "sysContact": null,
-                    "version": "4.0.1.07",
-                    "hardware": "AT-TQ4600",
-                    "features": null,
-                    "os": "allied-tq",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "alliedtelesis.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.207.1.13.27",
-                    "sysDescr": "AT-TQ4600 version 4.0.1.07",
                     "sysContact": "<private>",
                     "version": "4.0.1.07",
                     "hardware": "AT-TQ4600",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
