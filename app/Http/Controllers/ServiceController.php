@@ -8,6 +8,43 @@ use Toastr;
 
 class ServiceController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Service::class, 'service');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function index()
+    {
+        //$this->authorize('manage', Service::class);
+
+        return view(
+            'service.index', [
+                'service' => Service::orderBy('name')->get(),
+            ]
+        );
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function create()
+    {
+        return view(
+            'service.create', [
+                'service' => new Service(),
+                'services' => Service::orderBy('name')->get(),
+                'filters' => json_encode(new QueryBuilderFilter('group')),
+            ]
+        );
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -47,6 +84,36 @@ class ServiceController extends Controller
 
         Toastr::success(__('Service :name created', ['name' => $service->service_name]));
 
-        return redirect()->route('services.templates.index');
+        return redirect()->route('services.index');
     }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Service $service
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function show(Service $service)
+    {
+        return redirect(url('/services/' . $service->id));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Service $service
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function edit(Service $service)
+    {
+        return view(
+            'service.edit', [
+                'service' => $service,
+                'filters' => json_encode(new QueryBuilderFilter('group')),
+                'services' => Services::list(),
+            ]
+            //
+        );
+    }
+
 }
