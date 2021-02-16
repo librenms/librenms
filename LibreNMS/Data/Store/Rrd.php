@@ -60,7 +60,9 @@ class Rrd extends BaseDatastore
             ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
             ' RRA:LAST:0.5:1:2016 '
         );
-        $this->version = Config::get('rrdtool_version', '1.4');
+
+        $versions = version_info();
+        $this->version = Config::get('rrdtool_version', $versions['rrdtool_ver']);
     }
 
     public function getName()
