@@ -835,7 +835,7 @@
             "order": 3,
             "group": "webui",
             "section": "device",
-            "default": false,
+            "default": true,
             "type": "boolean"
         },
         "device_location_map_open": {

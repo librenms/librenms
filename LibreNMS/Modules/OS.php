@@ -104,9 +104,6 @@ class OS implements Module
     private function updateLocation(\LibreNMS\OS $os, $altLocation = null)
     {
         $device = $os->getDevice();
-        if ($device->override_sysLocation == 0) {
-            $device->setLocation(snmp_get($os->getDeviceArray(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
-        }
 
         if (\LibreNMS\Config::get('parse_dns_location_record')) {
             $r = new Dns();
@@ -118,6 +115,8 @@ class OS implements Module
                 $device->location->location = $device->hostname;
                 $device->location->save();
             }
+        } elseif ($device->override_sysLocation == 0) {
+            $device->setLocation(snmp_get($os->getDeviceArray(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
         } elseif (Config::get('geoloc.latlng', true) && $device->location && ! $device->location->hasCoordinates()) {
             // make sure the location has coordinates
             $device->location->lookupCoordinates();
