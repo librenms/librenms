@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8886.23.191",
                     "sysDescr": "ROS_.RAX711-C-R.2020614.(null)",
-                    "sysContact": null,
-                    "version": "ROS_6.2.0_20200614",
-                    "hardware": "RAX711-C-R P100R001C00",
-                    "features": null,
-                    "os": "raisecom-ros",
-                    "type": "network",
-                    "serial": "103002031910S20907S0003G",
-                    "icon": "raisecom.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8886.23.191",
-                    "sysDescr": "ROS_.RAX711-C-R.2020614.(null)",
                     "sysContact": "<private>",
                     "version": "ROS_6.2.0_20200614",
                     "hardware": "RAX711-C-R P100R001C00",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

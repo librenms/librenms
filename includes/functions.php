@@ -887,11 +887,6 @@ function send_mail($emails, $subject, $message, $html = false)
     return 'No contacts found';
 }
 
-function formatCiscoHardware(&$device, $short = false)
-{
-    return \LibreNMS\Util\Rewrite::ciscoHardware($device, $short);
-}
-
 function hex2str($hex)
 {
     $string = '';
@@ -1763,7 +1758,7 @@ function getCIMCentPhysical($location, &$entphysical, &$index)
     } // end if - Level 1
 } // end function
 
-/* idea from http://php.net/manual/en/function.hex2bin.php comments */
+/* idea from https://php.net/manual/en/function.hex2bin.php comments */
 function hex2bin_compat($str)
 {
     if (strlen($str) % 2 !== 0) {
@@ -2242,7 +2237,7 @@ function get_db_schema()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if ($device['attribs']['snmp_max_oid'] > 0) {
+    if (! empty($device['attribs']['snmp_max_oid'])) {
         return $device['attribs']['snmp_max_oid'];
     }
 

@@ -799,15 +799,20 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
- * checks if System is SNMPv3 SHA2 Capable for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * @return bool
+ * Checks SNMPv3 capabilities
+ *
+ * SHA2 for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
+ * AES-192, AES-256 for Privacy Algorithms
  */
-function snmpv3_sha2_capable()
+function snmpv3_capabilities(): array
 {
     $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
     $process->run();
 
-    return Str::contains($process->getErrorOutput(), 'SHA-512');
+    $ret['sha2'] = Str::contains($process->getErrorOutput(), 'SHA-512');
+    $ret['aes256'] = Str::contains($process->getErrorOutput(), 'AES-256');
+
+    return $ret;
 }
 
 /**
@@ -815,7 +820,7 @@ function snmpv3_sha2_capable()
  * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
  * @return string Empty if not valid.
  */
-// Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
+// Fuction is from https://php.net/manual/en/function.inet-ntop.php
 function inet6_ntop($ip)
 {
     $l = strlen($ip);

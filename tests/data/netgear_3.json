@@ -112,24 +112,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.4526.100.11.22",
                     "sysDescr": "M4100-D12G ProSafe 12-port Gigabit L2+ Intelligent Edge Desktop Managed Switch, 10.0.2.26, B1.0.1.1",
-                    "sysContact": null,
-                    "version": "10.0.2.26",
-                    "hardware": "M4100-D12G",
-                    "features": null,
-                    "os": "netgear",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "netgear.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.4526.100.11.22",
-                    "sysDescr": "M4100-D12G ProSafe 12-port Gigabit L2+ Intelligent Edge Desktop Managed Switch, 10.0.2.26, B1.0.1.1",
                     "sysContact": "<private>",
                     "version": "10.0.2.26",
                     "hardware": "M4100-D12G",
@@ -141,6 +123,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

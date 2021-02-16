@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2544.1.12.1.1.8",
                     "sysDescr": "FSP150CC-GE112",
-                    "sysContact": null,
-                    "version": "6.3.1-106",
-                    "hardware": "FSP150CC-GE112 1.01",
-                    "features": null,
-                    "os": "adva_fsp150",
-                    "type": "network",
-                    "serial": "LBADVA71171203608",
-                    "icon": "adva.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2544.1.12.1.1.8",
-                    "sysDescr": "FSP150CC-GE112",
                     "sysContact": "<private>",
                     "version": "6.3.1-106",
                     "hardware": "FSP150CC-GE112 1.01",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

@@ -4,14 +4,19 @@ modules:
         data:
             -
                 oid: JUNIPER-MIB::jnxOperatingTable
-                total: JUNIPER-MIB::jnxOperatingDRAMSize
+                total: JUNIPER-MIB::jnxOperatingMemory
                 percent_used: JUNIPER-MIB::jnxOperatingBuffer
                 descr: '{{ JUNIPER-MIB::jnxOperatingDescr }}'
+                precision: 1048576
                 skip_values:
                     -
-                        oid: JUNIPER-MIB::jnxOperatingDRAMSize
+                        oid: JUNIPER-MIB::jnxOperatingMemory
                         op: '='
                         value: 0
+                    -
+                        oid: JUNIPER-MIB::jnxOperatingDescr
+                        op: 'regex'
+                        value: '/(fan|sensor)/i'
     processors:
         data:
             -
@@ -24,6 +29,10 @@ modules:
                         oid: jnxOperatingBuffer
                         op: '='
                         value: 0
+                    -
+                        oid: jnxOperatingDescr
+                        op: 'regex'
+                        value: '/(fan|sensor)/i'
             -
                 oid: jnxJsSPUMonitoringObjectsEntry
                 value: jnxJsSPUMonitoringCPUUsage

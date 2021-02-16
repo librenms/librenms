@@ -94,6 +94,19 @@
                             </div>
                         </form>
                     </div>
+                    @if (count($user_list) and auth()->user()->isAdmin())
+                    <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
+                        <div class="btn-group">
+                        <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
+                            <option value="-1" selected> Copy Dashboard to </option>
+                        @foreach ($user_list as $user)
+                            <option value="{{ $user->user_id }}">{{ $user->username }}</option>
+                        @endforeach
+                        </select>
+                        </div>
+                        <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="Copy Dashboard"><i class="fa fa-copy fa-fw"></i></button>
+                    </div>
+                    @endif
                 </div>
             </div>
             <!-- End Dashboard-Settings -->
@@ -181,6 +194,7 @@
         avoid_overlapped_widgets: true,
         min_cols: 1,
         max_cols: 20,
+        max_rows: 200,
         draggable: {
             handle: 'header, span',
             stop: function(e, ui, $widget) {
@@ -472,6 +486,49 @@
         });
     }
 
+@if (auth()->user()->isAdmin())
+    function dashboard_copy_user_select() {
+        var button_disabled = true;
+        if (document.getElementById("dashboard_copy_target").value > 0) {
+            button_disabled = false;
+        }
+        $("#do_copy_dashboard").prop('disabled', button_disabled);
+    }
+
+    function dashboard_copy(data) {
+        var target_user_id = document.getElementById("dashboard_copy_target").value;
+        var dashboard_id = {{ $dashboard->dashboard_id }};
+        var username = $("#dashboard_copy_target option:selected").text().trim();
+
+        if (target_user_id == -1) {
+            toastr.warning('No target selected to copy Dashboard to');
+        } else {
+            if (! confirm("Do you really want to copy this Dashboard to User '" + username + "'?")) {
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ url('/ajax/form/copy-dashboard') }}',
+                data: {target_user_id: target_user_id, dashboard_id: dashboard_id},
+                dataType: "json",
+                success: function (data) {
+                    if( data.status == "ok" ) {
+                        toastr.success(data.message);
+                    } else {
+                        toastr.error(data.message);
+                    }
+                },
+                error: function(data) {
+                    toastr.error(data.message);
+                }
+            });
+            $("#dashboard_copy_target option:eq(-1)").prop('selected', true);
+            dashboard_copy_user_select();
+        }
+    }
+@endif
+
     function widget_dom(data) {
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
@@ -609,6 +666,5 @@
         $('#dashboard_name').val('Default');
         dashboard_add($('#add_form'));
     @endif
-
 </script>
 @endpush

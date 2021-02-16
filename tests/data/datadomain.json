@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.19746.3.1.38",
                     "sysDescr": "Data Domain OS 5.5.1.4-464376",
-                    "sysContact": null,
-                    "version": "5.5.1.4-464376",
-                    "hardware": null,
-                    "features": null,
-                    "os": "datadomain",
-                    "type": "storage",
-                    "serial": null,
-                    "icon": "emc.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.19746.3.1.38",
-                    "sysDescr": "Data Domain OS 5.5.1.4-464376",
                     "sysContact": "<private>",
                     "version": "5.5.1.4-464376",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {

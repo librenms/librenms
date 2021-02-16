@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.14988.1",
                     "sysDescr": "RouterOS RBLHGG-60ad",
-                    "sysContact": null,
-                    "version": "6.44",
-                    "hardware": "RBLHGG-60ad",
-                    "features": "Level 3",
-                    "os": "routeros",
-                    "type": "network",
-                    "serial": "90C709063CC4",
-                    "icon": "mikrotik.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.14988.1",
-                    "sysDescr": "RouterOS RBLHGG-60ad",
                     "sysContact": "<private>",
                     "version": "6.44",
                     "hardware": "RBLHGG-60ad",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

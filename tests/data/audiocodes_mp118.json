@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.5003.8.1.1.56",
                     "sysDescr": "Product: GW 8 FXS;SW Version: 6.60A.309.001",
-                    "sysContact": null,
-                    "version": "6.60A.309.001",
-                    "hardware": "MP-118 FXS",
-                    "features": null,
-                    "os": "audiocodes",
-                    "type": "network",
-                    "serial": "10512508",
-                    "icon": "audiocodes.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.5003.8.1.1.56",
-                    "sysDescr": "Product: GW 8 FXS;SW Version: 6.60A.309.001",
                     "sysContact": "<private>",
                     "version": "6.60A.309.001",
                     "hardware": "MP-118 FXS",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

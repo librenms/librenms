@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -98,6 +98,10 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
             $oid = '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.8.1.11.')) { //ES3510MA
             $oid = '.1.3.6.1.4.1.259.8.1.11.1.39.2.1.0';
+        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.46.')) { //ECS4100-52T
+            $oid = '.1.3.6.1.4.1.259.10.1.46.1.39.2.1.0';
+        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.5')) { //ECS4610-24F
+            $oid = '.1.3.6.1.4.1.259.10.1.5.1.39.2.1.0';
         }
 
         if (isset($oid)) {
@@ -130,6 +134,8 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
             '.1.3.6.1.4.1.259.10.1.45.' => 'ECS4120-MIB',
             '.1.3.6.1.4.1.259.8.1.11' => 'ES3510MA-MIB',
             '.1.3.6.1.4.1.259.10.1.43.' => 'ECS2100-MIB',
+            '.1.3.6.1.4.1.259.10.1.46.' => 'ECS4100-52T-MIB',
+            '.1.3.6.1.4.1.259.10.1.5' => 'ECS4610-24F-MIB',
         ];
 
         foreach ($table as $prefix => $mib) {

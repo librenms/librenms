@@ -18,24 +18,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.318.1.3.14.23",
-                    "sysDescr": "APC InRow DX 300mm (MB:v4.1.0 PF:v6.8.8 PN:apc_hw06_aos_688.bin AF1:v6.6.9.b AN1:apc_hw06_rd3xx_669b.bin MN:0N-9580AC HR:06 SN: JK1905001111 MD:01/30/2019)",
-                    "sysContact": null,
-                    "version": "AOS v6.8.8 / App v6.6.9.b",
-                    "hardware": "InRow DX 300mm",
-                    "features": null,
-                    "os": "apc",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "apc.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

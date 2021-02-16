@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux patriot-1 3.19.0-FNGi-ModularOS-2.0.0 #1 SMP Thu Aug 9 14:02:24 UTC 2018 x86_64",
-                    "sysContact": null,
-                    "version": "6.4.0",
-                    "hardware": "MODELNUMBER",
-                    "features": "Non-Expiry License",
-                    "os": "dhcpatriot",
-                    "type": "server",
-                    "serial": "SERIALNUMBER",
-                    "icon": "dhcpatriot.png",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux patriot-1 3.19.0-FNGi-ModularOS-2.0.0 #1 SMP Thu Aug 9 14:02:24 UTC 2018 x86_64",
                     "sysContact": "<private>",
                     "version": "6.4.0",
                     "hardware": "MODELNUMBER",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

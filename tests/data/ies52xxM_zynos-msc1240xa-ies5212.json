@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.890.1.5.13.16",
                     "sysDescr": "MSC1240XA",
-                    "sysContact": null,
-                    "version": "V1.10(AAWC.1)",
-                    "hardware": "IES5206 MSC",
-                    "features": null,
-                    "os": "ies52xxM",
-                    "type": "network",
-                    "serial": "<private>",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.890.1.5.13.16",
-                    "sysDescr": "MSC1240XA",
                     "sysContact": "<private>",
                     "version": "V1.10(AAWC.1)",
                     "hardware": "IES5206 MSC",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

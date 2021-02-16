@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.207.1.14.120",
                     "sysDescr": "Allied Telesis router/switch, Software (AlliedWare Plus) Version 5.4.8-2.1",
-                    "sysContact": null,
-                    "version": "5.4.8-2.1",
-                    "hardware": "AT-x930-28GSTX",
-                    "features": null,
-                    "os": "awplus",
-                    "type": "network",
-                    "serial": "A04881A151300018",
-                    "icon": "alliedtelesis.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.207.1.14.120",
-                    "sysDescr": "Allied Telesis router/switch, Software (AlliedWare Plus) Version 5.4.8-2.1",
                     "sysContact": "<private>",
                     "version": "5.4.8-2.1",
                     "hardware": "AT-x930-28GSTX",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

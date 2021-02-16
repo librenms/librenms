@@ -154,7 +154,7 @@ chkconfig --levels 235 httpd on
 ```
 
 In `/etc/php.ini`, ensure `date.timezone` is set to your preferred
-time zone.  See <http://php.net/manual/en/timezones.php> for a list of
+time zone.  See <https://php.net/manual/en/timezones.php> for a list of
 supported timezones.  Valid examples are: "America/New York",
 "Australia/Brisbane", "Etc/UTC". Please also ensure that
 `allow_url_fopen` is enabled. Other functions needed for LibreNMS
