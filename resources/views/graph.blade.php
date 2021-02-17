@@ -83,20 +83,24 @@
             });
 
         // ------ Metrics Graphics
-        d3.json(graphUrl + '&renderer=metrics-graphics', function(config) {
-            for (var i = 0; i < config.data.length; i++) {
-                for (var j = 0; j < config.data[i].length; j++) {
-                    config.data[i][j][0] = new Date(config.data[i][j][0] * 1000);
+        axios.get(graphUrl, {params: {renderer: 'metrics-graphics'}})
+            .then(function (response) {
+                var config = response.data;
+                for (var i = 0; i < config.data.length; i++) {
+                    for (var j = 0; j < config.data[i].length; j++) {
+                        config.data[i][j][0] = new Date(config.data[i][j][0] * 1000);
+                    }
                 }
-            }
-            if (config['yax_format']) {
-                config['yax_format'] = d3.format(config['yax_format']);
-            }
-            if (config['y_rollover_format']) {
-                config['y_rollover_format'] = d3.format(config['y_rollover_format']);
-            }
-            config['target'] = document.getElementById('metrics-graphics');
-            MG.data_graphic(config);
+                if (config['yax_format']) {
+                    config['yax_format'] = d3.format(config['yax_format']);
+                }
+                if (config['y_rollover_format']) {
+                    config['y_rollover_format'] = d3.format(config['y_rollover_format']);
+                }
+                config['target'] = document.getElementById('metrics-graphics');
+                MG.data_graphic(config);
+            }).catch(function (e) {
+            console.log(e)
         });
 
         // ------ Plotly.js
