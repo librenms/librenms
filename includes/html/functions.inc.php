@@ -804,7 +804,7 @@ function generate_ap_link($args, $text = null, $type = null)
 
 function generate_ap_url($ap, $vars = [])
 {
-    return generate_url(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']], $vars);
+    return generate_url(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
 }//end generate_ap_url()
 
 // Find all the files in the given directory that match the pattern
