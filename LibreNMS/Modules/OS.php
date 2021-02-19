@@ -27,7 +27,6 @@ namespace LibreNMS\Modules;
 use App\Models\Location;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\Util\Dns;
 use LibreNMS\Util\Url;
 
 class OS implements Module
@@ -103,18 +102,7 @@ class OS implements Module
     private function updateLocation(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
-
-        if (\LibreNMS\Config::get('parse_dns_location_record')) {
-            $r = new Dns();
-            $dns_record = $r->getRecord($this->hostname, 'LOC');
-
-            if (is_array($dns_record)) {
-                $device->location->lat = $dns_record[0]->latitude;
-                $device->location->lng = $dns_record[0]->longitude;
-                $device->location->location = $device->hostname;
-                $device->location->save();
-            }
-        } elseif ($device->override_sysLocation) {
+        if ($device->override_sysLocation) {
             optional($device->location)->lookupCoordinates();
         } else {
             $new = $os->fetchLocation();  // fetch location data from device

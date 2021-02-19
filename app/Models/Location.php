@@ -27,6 +27,8 @@ namespace App\Models;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use LibreNMS\Config;
+use LibreNMS\Util\Dns;
 
 class Location extends Model
 {
@@ -78,7 +80,17 @@ class Location extends Model
      */
     public function lookupCoordinates()
     {
-        if (! $this->hasCoordinates() && $this->location) {
+        if (\LibreNMS\Config::get('parse_dns_location_record')) {
+            $r = new Dns();
+            $dns_record = $r->getRecord($this->hostname, 'LOC');
+
+            if (is_array($dns_record)) {
+                $device->location->lat = $dns_record[0]->latitude;
+                $device->location->lng = $dns_record[0]->longitude;
+                $device->location->location = $device->hostname;
+                $device->location->save();
+            }
+        } elseif (! $this->hasCoordinates() && $this->location) {
             $this->parseCoordinates();
 
             if (! $this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
