@@ -65730,7 +65730,7 @@
     },
     "processors": {
         "discovery": {
-            "processors":
+            "processors": [
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
