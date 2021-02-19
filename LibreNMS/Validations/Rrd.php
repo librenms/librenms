@@ -41,6 +41,7 @@ class Rrd extends BaseValidation
 
         // Check that rrdtool config version is what we see
         if (Config::has('rrdtool_version')
+            && version_compare(Config::get('rrdtool_version'), '1.5.5', '<')
             && version_compare(Config::get('rrdtool_version'), $versions['rrdtool_ver'], '>')
         ) {
             $validator->fail(
