@@ -106,11 +106,6 @@ return [
         'long' => 'Kreuzpolarisation Interferenz',
         'unit' => 'dB',
     ],
-    'band' => [
-        'short' => 'Band',
-        'long' => 'Band',
-        'unit' => '',
-    ],
     'cell' => [
         'short' => 'Zell',
         'long' => 'Zell',

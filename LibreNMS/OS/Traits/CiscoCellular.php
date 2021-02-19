@@ -176,32 +176,6 @@ trait CiscoCellular
     }
 
     /**
-     * Discover wireless Cellular Operating Band. This is in band number. Type is cellband.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessBand()
-    {
-        $sensors = [];
-
-        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'cwceLteCurrOperatingBand', [], 'CISCO-WAN-CELL-EXT-MIB');
-        foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'band',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.6.' . $index,
-                'ios',
-                $index,
-                'Band: ' . $this->profileApn($index),
-                $entry['cwceLteCurrOperatingBand.1']
-            );
-        }
-
-        return $sensors;
-    }
-
-    /**
      * Discover wireless Cellular Cell Id. This is in cell number. Type is cellid.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *

@@ -122,11 +122,6 @@ return [
         'long' => 'Cross Polar Interference',
         'unit' => 'dB',
     ],
-    'band' => [
-        'short' => 'Band',
-        'long' => 'Band',
-        'unit' => '',
-    ],
     'cell' => [
         'short' => 'Cell',
         'long' => 'Cell',

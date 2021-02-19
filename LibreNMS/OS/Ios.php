@@ -26,7 +26,6 @@ namespace LibreNMS\OS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessBandDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -38,7 +37,6 @@ use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
 
 class Ios extends Cisco implements
-    WirelessBandDiscovery,
     WirelessCellDiscovery,
     WirelessChannelDiscovery,
     WirelessClientsDiscovery,

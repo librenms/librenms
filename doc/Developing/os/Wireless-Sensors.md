@@ -13,7 +13,6 @@ with the values we expect to see the data in:
 | capacity    | %           | WirelessCapacityDiscovery    | The % of operating rate vs theoretical max                                                      |
 | ccq         | %           | WirelessCcqDiscovery         | The Client Connection Quality                                                                   |
 | channel     | count       | WirelessChannelDiscovery     | The channel, use of frequency is preferred                                                      |
-| band        | count       | WirelessBandDiscovery        | The band in a multiband technology                                                              |
 | cell        | count       | WirelessCellDiscovery        | The cell in a multicell technology                                                              |
 | clients     | count       | WirelessClientsDiscovery     | The number of clients connected to/managed by this device                                       |
 | distance    | km          | WirelessDistanceDiscovery    | The distance of a radio link in Kilometers                                                      |
