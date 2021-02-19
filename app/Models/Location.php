@@ -27,7 +27,6 @@ namespace App\Models;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use LibreNMS\Config;
 use LibreNMS\Util\Dns;
 
 class Location extends Model
