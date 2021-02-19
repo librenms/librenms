@@ -91,7 +91,7 @@ class Service extends DeviceRelatedModel
 
     public function devices()
     {
-        return $this->belongsToMany(\App\Models\Device::class, 'service_templates_device', 'service_template_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Device::class, 'services', 'service_id', 'device_id');
     }
 
 }
