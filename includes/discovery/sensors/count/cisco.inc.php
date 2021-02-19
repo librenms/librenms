@@ -28,9 +28,7 @@ foreach ($tables as $tablevalue) {
     foreach ($temp as $index => $entry) {
         //Discover Sensors
         $descr = ucwords($temp[$index][$tablevalue['descr']]);
-        if ($state_name == 'ffgfggf' || $state_name == '345tyh' || $state_name == 'dgdfgdd' || $state_name == 'gfgfgf') {
-            $descr = $tablevalue['descr'];
-        } elseif ($state_name == 'c3gImsi' || $state_name == 'c3gImei' || $state_name == 'c3gIccId' || $state_name == 'c3gMsisdn' || $state_name == 'c3gGsmNumberOfNearbyCell') {
+        if ($state_name == 'c3gImsi' || $state_name == 'c3gImei' || $state_name == 'c3gIccId' || $state_name == 'c3gMsisdn' || $state_name == 'c3gGsmNumberOfNearbyCell') {
             $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . ' - ' . $tablevalue['descr'];
         }
         discover_sensor($valid['sensor'], 'count', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
