@@ -23,7 +23,7 @@ class ServiceController extends Controller
         //$this->authorize('manage', Service::class);
 
         return view(
-            'service.index', [
+            'services.index', [
                 'service' => Service::orderBy('name')->get(),
             ]
         );
@@ -37,7 +37,7 @@ class ServiceController extends Controller
     public function create()
     {
         return view(
-            'service.create', [
+            'services.create', [
                 'service' => new Service(),
                 'services' => Service::orderBy('name')->get(),
                 'filters' => json_encode(new QueryBuilderFilter('group')),

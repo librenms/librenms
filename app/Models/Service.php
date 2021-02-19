@@ -86,4 +86,12 @@ class Service extends DeviceRelatedModel
     {
         return $query->where('service_disabled', 1);
     }
+
+        // ---- Define Relationships ----
+
+    public function devices()
+    {
+        return $this->belongsToMany(\App\Models\Device::class, 'service_templates_device', 'service_template_id', 'device_id');
+    }
+
 }
