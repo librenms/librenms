@@ -24,7 +24,7 @@ class ServiceController extends Controller
 
         return view(
             'services.index', [
-                'service' => Service::orderBy('name')->get(),
+                'services' => Service::orderBy('name')->get(),
             ]
         );
     }
