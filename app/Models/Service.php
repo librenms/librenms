@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class Service extends DeviceRelatedModel
+class Service extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'service_id';
@@ -25,6 +25,20 @@ class Service extends DeviceRelatedModel
         'service_name',
     ];
 
+    protected $attributes = [ // default values
+        'ignore' => '0',
+        'disabled' => '0',
+    ];
+
+    protected $casts = [
+        'ignore' => 'integer',
+        'disabled' => 'integer',
+    ];
+
+    public static function boot()
+    {
+        parent::boot();
+    }
     // ---- Query Scopes ----
 
     /**
