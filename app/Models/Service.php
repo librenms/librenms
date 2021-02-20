@@ -108,5 +108,4 @@ class Service extends BaseModel
     {
         return $this->belongsToMany(\App\Models\Device::class, 'services', 'service_id', 'device_id');
     }
-
 }
