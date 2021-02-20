@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
-use LibreNMS\Services;
 use Illuminate\Http\Request;
+use LibreNMS\Services;
 use Toastr;
 
 class ServiceController extends Controller
