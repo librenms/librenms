@@ -41,7 +41,6 @@ class ServiceController extends Controller
             'services.create', [
                 'service' => new Service(),
                 'services' => Service::orderBy('name')->get(),
-                'filters' => json_encode(new QueryBuilderFilter('group')),
             ]
         );
     }
