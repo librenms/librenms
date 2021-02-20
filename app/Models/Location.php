@@ -84,10 +84,9 @@ class Location extends Model
             $dns_record = $r->getRecord($this->hostname, 'LOC');
 
             if (is_array($dns_record)) {
-                $device->location->lat = $dns_record[0]->latitude;
-                $device->location->lng = $dns_record[0]->longitude;
-                $device->location->location = $device->hostname;
-                $device->location->save();
+                $this->lat = $dns_record[0]->latitude;
+                $this->lng = $dns_record[0]->longitude;
+                $this->location = '';
             }
         } elseif (! $this->hasCoordinates() && $this->location) {
             $this->parseCoordinates();
