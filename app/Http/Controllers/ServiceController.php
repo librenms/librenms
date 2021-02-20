@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use LibreNMS\Services;
 use Illuminate\Http\Request;
 use Toastr;
 
@@ -109,7 +110,6 @@ class ServiceController extends Controller
         return view(
             'service.edit', [
                 'service' => $service,
-                'filters' => json_encode(new QueryBuilderFilter('group')),
                 'services' => Services::list(),
             ]
             //
